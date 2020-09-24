@@ -38,7 +38,7 @@ class MainMemoryBasedUserStoreTest {
     @Test
     void findUserByName() {
         // arrange
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(0);
 
         // act
@@ -52,7 +52,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByName_NotFound() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
@@ -62,7 +62,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
         store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
 
@@ -75,7 +75,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword_NotFound() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
@@ -85,7 +85,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void findUserByNameAndPassword_EmptyUser_NotFound() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
 
         Optional<User> userFound = store.findUser(null, "");
 
@@ -95,7 +95,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void overwriteUser() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
         store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
         store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
@@ -111,7 +111,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void updateUser() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
 
         store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() , userToUpdate.getEMail()+"@TESTING");
@@ -125,7 +125,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void changePassword() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
 
         store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() +"_NEWPASS", userToUpdate.getEMail());
@@ -139,7 +139,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void dropUser() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
         store.removeUser(userToRemove.getUsername());
@@ -151,7 +151,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void createEmptyUser(){
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
 
         assertThrows(IllegalArgumentException.class,
                 () -> store.createUser("","","")
@@ -160,7 +160,7 @@ class MainMemoryBasedUserStoreTest {
 
     @Test
     void getAllUsers() {
-        MainMemoryBasedUserStore store = getDefaultStore();
+        UserStore store = getDefaultStore();
         List<UserDTO> allUsers = getDefaultUsers();
 
         List<User> allUsersFromStore = store.getAllUsers();
