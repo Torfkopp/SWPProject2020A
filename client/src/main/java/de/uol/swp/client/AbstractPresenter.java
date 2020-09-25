@@ -13,6 +13,7 @@ import de.uol.swp.client.user.ClientUserService;
  * @author Marco Grawunder
  * @since 2019-08-29
  */
+@SuppressWarnings("UnstableApiUsage")
 public class AbstractPresenter {
 
     @Inject

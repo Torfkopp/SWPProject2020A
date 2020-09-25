@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
 
     static final User userToRegister = new UserDTO("Marco", "Marco", "Marco@Grawunder.com");

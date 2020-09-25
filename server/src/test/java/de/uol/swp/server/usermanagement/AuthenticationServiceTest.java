@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("UnstableApiUsage")
 class AuthenticationServiceTest {
 
     private final CountDownLatch lock = new CountDownLatch(1);

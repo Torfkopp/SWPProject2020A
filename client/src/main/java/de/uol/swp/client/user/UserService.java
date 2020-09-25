@@ -18,7 +18,7 @@ import java.util.List;
  * @since 2017-03-17
  *
  */
-
+@SuppressWarnings("UnstableApiUsage")
 public class UserService implements ClientUserService {
 
 	private static final Logger LOG = LogManager.getLogger(UserService.class);

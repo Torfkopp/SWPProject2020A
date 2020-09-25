@@ -15,6 +15,7 @@ import java.util.Collections;
  * @author Marco Grawunder
  * @since 2019-10-08
  */
+@SuppressWarnings("UnstableApiUsage")
 public class AbstractService {
 
 

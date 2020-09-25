@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
  * @author Marco Grawunder
  * @since 2019-08-05
  */
+@SuppressWarnings("UnstableApiUsage")
 @Singleton
 public class UserService extends AbstractService {
 

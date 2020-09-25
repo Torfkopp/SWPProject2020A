@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Marco Grawunder
  * @since 2017-03-17
  */
+@SuppressWarnings("UnstableApiUsage")
 public class ServerHandler implements ServerHandlerDelegate {
 
     private static final Logger LOG = LogManager.getLogger(ServerHandler.class);
@@ -49,7 +50,6 @@ public class ServerHandler implements ServerHandlerDelegate {
      *
      * @param eventBus the EventBus used throughout the entire server
      * @see EventBus
-     * @since
      */
     @Inject
     public ServerHandler(EventBus eventBus) {
