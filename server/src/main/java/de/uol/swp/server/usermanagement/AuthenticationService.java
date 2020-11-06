@@ -30,6 +30,7 @@ import java.util.*;
  * @author Marco Grawunder
  * @since 2019-08-30
  */
+@SuppressWarnings("UnstableApiUsage")
 @Singleton
 public class AuthenticationService extends AbstractService {
     private static final Logger LOG = LogManager.getLogger(AuthenticationService.class);

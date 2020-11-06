@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 2019-10-10
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
 
     final User defaultUser = new UserDTO("Marco", "test", "marco@test.de");

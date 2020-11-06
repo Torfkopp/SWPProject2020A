@@ -18,6 +18,7 @@ import javafx.fxml.FXMLLoader;
  * @since 2019-09-18
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class ClientModule extends AbstractModule {
     final EventBus eventBus = new EventBus();
 

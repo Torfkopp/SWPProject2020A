@@ -13,6 +13,7 @@ import de.uol.swp.common.user.UserDTO;
  * @since 2019-11-20
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class LobbyService {
 
     private final EventBus eventBus;

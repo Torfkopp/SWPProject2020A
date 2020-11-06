@@ -20,6 +20,7 @@ import java.util.Optional;
  * @author Marco Grawunder
  * @since 2019-10-08
  */
+@SuppressWarnings("UnstableApiUsage")
 @Singleton
 public class LobbyService extends AbstractService {
 

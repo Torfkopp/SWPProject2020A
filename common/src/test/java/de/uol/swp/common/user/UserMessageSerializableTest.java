@@ -22,7 +22,7 @@ class UserMessageSerializableTest {
     private static final User defaultUser = new UserDTO("marco", "marco", "marco@grawunder.de");
 
     private static final int SIZE = 10;
-    private static List<String> users = new ArrayList<>();
+    private static final List<String> users = new ArrayList<>();
 
     static {
         for (int i = 0; i < SIZE; i++) {

@@ -12,6 +12,7 @@ import de.uol.swp.server.usermanagement.store.UserStore;
  * @since 2019-09-18
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class ServerModule extends AbstractModule {
 
     private final EventBus bus = new EventBus();
