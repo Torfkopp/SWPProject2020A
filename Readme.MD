@@ -29,3 +29,5 @@ java -jar client-1.0-SNAPSHOT-jar-with-dependencies.jar
 Analoges gilt für den Server.
 
 Weitere Hinweise finden sich im Wiki https://confluence.swl.informatik.uni-oldenburg.de/display/SWP/Vorlesungsvideos
+
+
