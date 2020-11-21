@@ -7,6 +7,7 @@ import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
+import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
@@ -40,6 +41,7 @@ public class SceneManager {
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
+    private Scene lobbyScene;
     private Scene lastScene = null;
     private Scene currentScene = null;
 
@@ -63,6 +65,7 @@ public class SceneManager {
         initLoginView();
         initMainView();
         initRegistrationView();
+        initLobbyView();
     }
 
     /**
@@ -141,6 +144,24 @@ public class SceneManager {
             Parent rootPane = initPresenter(RegistrationPresenter.fxml);
             registrationScene = new Scene(rootPane, 400,200);
             registrationScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
+     * Initializes the lobby view
+     *
+     * If the lobbyScene is null it gets set to a new scene containing the
+     * a pane showing the lobby view as specified by the LobbyView
+     * FXML file.
+     *
+     * @see de.uol.swp.client.lobby.LobbyPresenter
+     * @since 2020-11-21
+     */
+    private void initLobbyView(){
+        if (lobbyScene == null){
+            Parent rootPane = initPresenter(LobbyPresenter.fxml);
+            lobbyScene = new Scene(rootPane, 400,200);
+            lobbyScene.getStylesheets().add(styleSheet);
         }
     }
 
@@ -309,5 +330,17 @@ public class SceneManager {
      */
     public void showRegistrationScreen() {
         showScene(registrationScene,"Registration");
+    }
+
+    /**
+     * Shows the lobby screen
+     *
+     * Switches the current Scene to the lobbyScene and sets the title of
+     * the window to "Lobby"
+     *
+     * @since 2020-11-21
+     */
+    public void showLobbyScreen() {
+        showScene(lobbyScene,"Lobby");
     }
 }
