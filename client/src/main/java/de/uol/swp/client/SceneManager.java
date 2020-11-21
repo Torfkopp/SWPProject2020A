@@ -197,6 +197,21 @@ public class SceneManager {
     }
 
     /**
+     * Handles ShowLobbyViewEvent detected on the EventBus
+     *
+     * If a ShowLobbyViewEvent is detected on the EventBus, this method gets
+     * called. It calls q method to switch the current screen to the login screen.
+     *
+     * @param event The ShowLobbyViewEvent detected on the EventBus
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @since 2020-11-21
+     */
+    @Subscribe
+    public void onShowLobbyViewEvent(ShowLoginViewEvent event) {
+        showLobbyScreen();
+    }
+
+    /**
      * Handles RegistrationCanceledEvent detected on the EventBus
      *
      * If a RegistrationCanceledEvent is detected on the EventBus, this method gets

@@ -1,16 +1,14 @@
 package de.uol.swp.client.lobby;
 
-import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 /**
  * Manages the lobby menu
@@ -24,39 +22,43 @@ public class LobbyPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
-    private static final Logger LOG = LogManager.getLogger(de.uol.swp.client.lobby.LobbyPresenter.class);
-
     private ObservableList<String> users;
 
-    private User joinedUser;
-
-    @Inject
-    private LobbyService lobbyService;
-
     @FXML
-    private ListView<String> usersJoinedView;
-
+    private ListView<String> usersView;
 
     /**
-     * Handles new joined users
+     * Default Constructor
      *
-     * If a new UserJoinedLobbyMessage object is posted to the EventBus the name of the newly
-     * joined user is appended to the user list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "New user {@literal
-     * <Username>} joined." is displayed in the log.
-     *
-     * @param message the UserJoinedLobbyMessage object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2020-11-21
      */
-    @Subscribe
-    public void newUser(UserJoinedLobbyMessage message) {
+    public LobbyPresenter() {
 
-        LOG.debug("New user " + message.getUser().getUsername() + " joined");
-        Platform.runLater(() -> {
-                    if (users != null && joinedUser != null && !joinedUser.getUsername().equals(message.getUser().getUsername()))
-                        users.add(message.getUser().getUsername());
-            });
     }
 
+    /**
+     * Updates the main menus user list according to the list given
+     *
+     * This method clears the entire user list and then adds the name of each user
+     * in the list given to the main menus user list. If there ist no user list
+     * this it creates one.
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
+     * @param userList A list of UserDTO objects including all currently logged in
+     *                 users
+     * @see de.uol.swp.common.user.UserDTO
+     * @since 2019-08-29
+     */
+    private void updateUsersList(List<UserDTO> userList) {
+        // Attention: This must be done on the FX Thread!
+        Platform.runLater(() -> {
+            if (users == null) {
+                users = FXCollections.observableArrayList();
+                usersView.setItems(users);
+            }
+            users.clear();
+            userList.forEach(u -> users.add(u.getUsername()));
+        });
+    }
 }

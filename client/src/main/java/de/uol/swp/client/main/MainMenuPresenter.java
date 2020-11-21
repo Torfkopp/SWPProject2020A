@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -34,6 +35,8 @@ public class MainMenuPresenter extends AbstractPresenter {
     public static final String fxml = "/fxml/MainMenuView.fxml";
 
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
+
+    private static final ShowLobbyViewEvent showLobbyViewMessage = new ShowLobbyViewEvent();
 
     private ObservableList<String> users;
 
@@ -161,6 +164,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     @FXML
     void onCreateLobby(ActionEvent event) {
         lobbyService.createNewLobby("test", new UserDTO("ich", "", ""));
+        eventBus.post(showLobbyViewMessage);
     }
 
     /**
