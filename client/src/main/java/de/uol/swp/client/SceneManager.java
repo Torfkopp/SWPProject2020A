@@ -30,6 +30,7 @@ import java.net.URL;
  * @author Marco Grawunder
  * @since 2019-09-03
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SceneManager {
 
     static final Logger LOG = LogManager.getLogger(SceneManager.class);

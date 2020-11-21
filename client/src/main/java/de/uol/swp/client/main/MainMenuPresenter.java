@@ -29,6 +29,7 @@ import java.util.List;
  * @since 2019-08-29
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class MainMenuPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/MainMenuView.fxml";
