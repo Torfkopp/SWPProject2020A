@@ -58,8 +58,7 @@ public class LobbyService extends AbstractService {
     @Subscribe
     public void onCreateLobbyRequest(CreateLobbyRequest createLobbyRequest) {
         lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
-        //sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
-        //^DeadEvent in LobbyCreatedMessage. Habs nur auskommentiert, da ich denke, dass es wichtig  für die Anzeige der Lobby im Mainfenster sein könnte. -Mario
+        sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
     }
 
     /**

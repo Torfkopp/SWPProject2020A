@@ -24,7 +24,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.net.URL;
 
 /**
@@ -43,7 +42,7 @@ public class SceneManager {
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
-    private Scene lobbyScene;
+    private Scene lobbyScene; //Hypothese: mehrere lobbyScenes nötig.
     private Scene lastScene = null;
     private Scene currentScene = null;
 
@@ -144,7 +143,7 @@ public class SceneManager {
     private void initRegistrationView(){
         if (registrationScene == null){
             Parent rootPane = initPresenter(RegistrationPresenter.fxml);
-            registrationScene = new Scene(rootPane, 400,200);
+            registrationScene = new Scene(rootPane, 400, 200);
             registrationScene.getStylesheets().add(styleSheet);
         }
     }
@@ -162,7 +161,7 @@ public class SceneManager {
     private void initLobbyView(){
         if (lobbyScene == null){
             Parent rootPane = initPresenter(LobbyPresenter.fxml);
-            lobbyScene = new Scene(rootPane, 400,200);
+            lobbyScene = new Scene(rootPane, 400, 200);
             lobbyScene.getStylesheets().add(styleSheet);
         }
     }
@@ -194,7 +193,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onShowLoginViewEvent(ShowLoginViewEvent event){
+    public void onShowLoginViewEvent(ShowLoginViewEvent event) {
         showLoginScreen();
     }
 
@@ -202,7 +201,7 @@ public class SceneManager {
      * Handles ShowLobbyViewEvent detected on the EventBus
      *
      * If a ShowLobbyViewEvent is detected on the EventBus, this method gets
-     * called. It calls q method to switch the current screen to the login screen.
+     * called. It opens the lobby in a new window.
      *
      * @param event The ShowLobbyViewEvent detected on the EventBus
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
@@ -215,13 +214,13 @@ public class SceneManager {
         lobbyStage.setTitle("Lobby");
         lobbyStage.setScene(lobbyScene);
         //Specifies the modality for new window
-        lobbyStage.initModality(Modality.WINDOW_MODAL);
+        lobbyStage.initModality(Modality.NONE);
         //Specifies the owner Window (parent) for new window
         lobbyStage.initOwner(primaryStage);
         //Set position of second window, related to primary window
         lobbyStage.setX(primaryStage.getX() + 200);
         lobbyStage.setY(primaryStage.getY() + 100);
-
+        //Shows the window
         lobbyStage.show();
     }
 
@@ -346,7 +345,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        showScene(loginScene,"Login");
+        showScene(loginScene, "Login");
     }
 
     /**
@@ -358,18 +357,6 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene,"Registration");
-    }
-
-    /**
-     * Shows the lobby screen
-     *
-     * Switches the current Scene to the lobbyScene and sets the title of
-     * the window to "Lobby"
-     *
-     * @since 2020-11-21
-     */
-    public void showLobbyScreen() {
-        showScene(lobbyScene,"Lobby");
+        showScene(registrationScene, "Registration");
     }
 }

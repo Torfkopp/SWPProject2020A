@@ -1,6 +1,8 @@
 package de.uol.swp.client.main;
 
+import com.google.common.base.Charsets;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.hash.Hashing;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.lobby.LobbyService;
@@ -154,8 +156,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Method called when the create lobby button is pressed
      *
      * If the create lobby button is pressed, this method requests the lobby service
-     * to create a new lobby. Therefore it currently uses the lobby name "test"
-     * and an user called "ich"
+     * to create a new lobby. This lobby will get a unique name and registers the user as its creator.
      *
      * @param event The ActionEvent created by pressing the create lobby button
      * @see de.uol.swp.client.lobby.LobbyService
@@ -163,7 +164,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onCreateLobby(ActionEvent event) {
-        lobbyService.createNewLobby("test", new UserDTO("ich", "", ""));
+        //Creates a unique name by hashing the current time in milliseconds. Sorry (Marvin & Mario)
+        String name = Hashing.sha256().hashString( "" + System.currentTimeMillis() , Charsets.UTF_8 ).toString();
+        lobbyService.createNewLobby(name, (UserDTO) loggedInUser);
         eventBus.post(showLobbyViewMessage);
     }
 
