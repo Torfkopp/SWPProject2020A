@@ -8,6 +8,7 @@ import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
+import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
@@ -148,7 +149,7 @@ public class SceneManager {
     }
 
     /**
-     * Initializes the lobby view
+     * Initialises the lobby view
      *
      * If the lobbyScene is null it gets set to a new scene containing the
      * a pane showing the lobby view as specified by the LobbyView
@@ -207,7 +208,7 @@ public class SceneManager {
      * @since 2020-11-21
      */
     @Subscribe
-    public void onShowLobbyViewEvent(ShowLoginViewEvent event) {
+    public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         showLobbyScreen();
     }
 
