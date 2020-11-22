@@ -20,6 +20,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -209,7 +210,19 @@ public class SceneManager {
      */
     @Subscribe
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
-        showLobbyScreen();
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Lobby");
+        lobbyStage.setScene(lobbyScene);
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.WINDOW_MODAL);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Set position of second window, related to primary window
+        lobbyStage.setX(primaryStage.getX() + 200);
+        lobbyStage.setY(primaryStage.getY() + 100);
+
+        lobbyStage.show();
     }
 
     /**
