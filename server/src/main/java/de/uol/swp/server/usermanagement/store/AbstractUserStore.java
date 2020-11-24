@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
  * @see de.uol.swp.server.usermanagement.store.UserStore
  * @since 2019-09-04
  */
+@SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractUserStore implements UserStore {
 
     /**

@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
  * @since 2019-08-08
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class LoginPresenter extends AbstractPresenter {
 
     private static final Logger LOG = LogManager.getLogger(LoginPresenter.class);

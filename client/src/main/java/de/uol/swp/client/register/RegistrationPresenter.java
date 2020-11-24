@@ -21,6 +21,7 @@ import javafx.scene.control.TextField;
  * @since 2019-08-29
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class RegistrationPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RegistrationView.fxml";
