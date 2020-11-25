@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.net.URL;
+import java.util.LinkedList;
 
 /**
  * Class that manages which window/scene is currently shown
@@ -42,7 +43,8 @@ public class SceneManager {
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
-    private Scene lobbyScene; //Hypothese: mehrere lobbyScenes nötig.
+    private LinkedList<Scene> lobbyScenes = new LinkedList<>();
+    private int lobbyCount = 0;
     private Scene lastScene = null;
     private Scene currentScene = null;
 
@@ -66,7 +68,6 @@ public class SceneManager {
         initLoginView();
         initMainView();
         initRegistrationView();
-        initLobbyView();
     }
 
     /**
@@ -149,24 +150,6 @@ public class SceneManager {
     }
 
     /**
-     * Initialises the lobby view
-     *
-     * If the lobbyScene is null it gets set to a new scene containing the
-     * a pane showing the lobby view as specified by the LobbyView
-     * FXML file.
-     *
-     * @see de.uol.swp.client.lobby.LobbyPresenter
-     * @since 2020-11-21
-     */
-    private void initLobbyView(){
-        if (lobbyScene == null){
-            Parent rootPane = initPresenter(LobbyPresenter.fxml);
-            lobbyScene = new Scene(rootPane, 400, 200);
-            lobbyScene.getStylesheets().add(styleSheet);
-        }
-    }
-
-    /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
      *
      * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
@@ -211,8 +194,14 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //New window (Stage)
         Stage lobbyStage = new Stage();
-        lobbyStage.setTitle("Lobby");
-        lobbyStage.setScene(lobbyScene);
+        lobbyStage.setTitle("Lobby " + lobbyCount);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(LobbyPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane, 400, 200);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyScenes.add(lobbyScene);
+        //Sets the stage to the newly created scene
+        lobbyStage.setScene(lobbyScenes.getLast());
         //Specifies the modality for new window
         lobbyStage.initModality(Modality.NONE);
         //Specifies the owner Window (parent) for new window

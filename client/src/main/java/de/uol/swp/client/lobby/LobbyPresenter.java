@@ -10,7 +10,6 @@ import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +32,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     private ObservableList<String> users;
 
-    private User joinedUser;
+    private User creator;
 
     @FXML
     private ListView<String> usersView;
@@ -59,7 +58,8 @@ public class LobbyPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void creationSuccessful(LobbyCreatedMessage message) {
-        this.joinedUser = message.getUser();
+        this.creator = message.getUser();
+        userService.retrieveAllUsers();
     }
 
     /**
@@ -76,9 +76,9 @@ public class LobbyPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void newUser(UserJoinedLobbyMessage message) {
-        LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby");
+        LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
-            if (users != null && joinedUser != null && !joinedUser.getUsername().equals(message.getUser().getUsername()))
+            if (users != null && creator != null && !creator.getUsername().equals(message.getUser().getUsername()))
                 users.add(message.getUser().getUsername());
         });
     }
@@ -92,14 +92,15 @@ public class LobbyPresenter extends AbstractPresenter {
      * list" with the names of all currently logged in users is displayed in the
      * log.
      *
-     * @param allUsersResponse the AllOnlineUsersResponse object seen on the EventBus
+     * @param allUsersResponse AllOnlineUsersResponse object seen on the EventBus
      * @see de.uol.swp.common.user.response.AllOnlineUsersResponse
-     * @since 2019-08-29
+     * @since 2020-11-22
      */
     @Subscribe
     public void userList(AllOnlineUsersResponse allUsersResponse) {
         LOG.debug("Update of user list " + allUsersResponse.getUsers());
         updateUsersList(allUsersResponse.getUsers());
+        //Eventuell ein AllOnlineUsersResponse-Pendant für Lobbys anlegen. Keine Ahnung -Mario
     }
 
     /**
