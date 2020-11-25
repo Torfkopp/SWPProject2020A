@@ -2,6 +2,7 @@ package de.uol.swp.common.lobby.dto;
 
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserDTO;
 
 import java.util.Collections;
 import java.util.Set;
@@ -35,6 +36,10 @@ public class LobbyDTO implements Lobby {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
+    }
+
+    public static LobbyDTO create(Lobby lobby) {
+        return new LobbyDTO(lobby.getName(), lobby.getOwner());
     }
 
     @Override

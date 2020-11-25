@@ -6,10 +6,12 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,6 +40,8 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     private ObservableList<String> users;
 
+    private ObservableList<String> lobbys;
+
     private User loggedInUser;
 
     @Inject
@@ -45,6 +49,9 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     @FXML
     private ListView<String> usersView;
+
+    @FXML
+    private ListView<String> lobbyView;
 
     /**
      * Handles successful login
@@ -145,6 +152,23 @@ public class MainMenuPresenter extends AbstractPresenter {
             }
             users.clear();
             userList.forEach(u -> users.add(u.getUsername()));
+        });
+    }
+
+    @Subscribe
+    public void lobbyList(AllOnlineLobbysResponse allLobbysResponse) {
+        updateLobbyList(allLobbysResponse.getName());
+    }
+
+    private void updateLobbyList(List<LobbyDTO> lobbyList) {
+
+        Platform.runLater(() -> {
+            if (lobbys == null) {
+                lobbys = FXCollections.observableArrayList();
+                lobbyView.setItems(lobbys);
+            }
+            lobbys.clear();
+            lobbyList.forEach(l -> lobbys.add(l.getName()));
         });
     }
 
