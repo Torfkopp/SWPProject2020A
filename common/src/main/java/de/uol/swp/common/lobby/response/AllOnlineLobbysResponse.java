@@ -13,19 +13,18 @@ public class AllOnlineLobbysResponse extends AbstractResponseMessage {
     final private ArrayList<LobbyDTO> lobbys = new ArrayList<>();
 
     public AllOnlineLobbysResponse(){
-        // needed for serialization
+
     }
 
     /**
      * Constructor
      *
-     * This constructor generates a new List of the logged in users from the given
+     * This constructor generates a new List of the existing lobbys from the given
      * Collection. The significant difference between the two being that the new
-     * List contains copies of the User objects. These copies have their password
-     * variable set to an empty String.
+     * List contains copies of the Lobby objects.
      *
-     * @param lobbys Collection of all users currently logged in
-     * @since 2019-08-13
+     * @param lobbys Collection of all existing lobbys
+     * @since 2020-11-29
      */
     public AllOnlineLobbysResponse(Collection<Lobby> lobbys) {
         for (Lobby lobby : lobbys) {
@@ -34,10 +33,10 @@ public class AllOnlineLobbysResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Getter for the list of users currently logged in
+     * Getter for the list of existing lobbys
      *
-     * @return list of users currently logged in
-     * @since 2019-08-13
+     * @return list of existing lobbys
+     * @since 2020-11-29
      */
     public List<LobbyDTO> getName() {
         return lobbys;

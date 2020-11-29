@@ -2,7 +2,6 @@ package de.uol.swp.common.lobby.dto;
 
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 
 import java.util.Collections;
 import java.util.Set;
@@ -37,6 +36,14 @@ public class LobbyDTO implements Lobby {
         this.owner = creator;
         this.users.add(creator);
     }
+
+    /**
+     * Copy constructor
+     *
+     * @param lobby Lobby object to copy the values of
+     * @return LobbyDTO copy of Lobby object
+     * @since 2020-11-29
+     */
 
     public static LobbyDTO create(Lobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getOwner());

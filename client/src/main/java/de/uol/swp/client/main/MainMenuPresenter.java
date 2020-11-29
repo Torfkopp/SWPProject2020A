@@ -155,10 +155,38 @@ public class MainMenuPresenter extends AbstractPresenter {
         });
     }
 
-    @Subscribe
+    /**
+     * Handles new list of lobbys
+     *
+     * If a new AllLobbysResponse object is posted to the EventBus the names
+     * of currently logged in users are put onto the lobby list in the main menu.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Update of lobby
+     * list" with the names of all currently existing lobbys is displayed in the
+     * log.
+     *
+     * @param allLobbysResponse the AllLobbysResponse object seen on the EventBus
+     * @see de.uol.swp.common.lobby.response.AllOnlineLobbysResponse
+     * @since 2020-11-29
+     */
+
     public void lobbyList(AllOnlineLobbysResponse allLobbysResponse) {
         updateLobbyList(allLobbysResponse.getName());
     }
+
+    /**
+     * Updates the main menus lobby list according to the list given
+     *
+     * This method clears the entire lobby list and then adds the name of each lobby
+     * in the list given to the main menus lobby list. If there is no lobby list
+     * this creates one.
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
+     * @param lobbyList  A list of LobbyDTO objects including all currently existing
+     * Lobbys
+     * @see de.uol.swp.common.lobby.dto.LobbyDTO
+     * @since 2020-11-29
+     */
 
     private void updateLobbyList(List<LobbyDTO> lobbyList) {
 
