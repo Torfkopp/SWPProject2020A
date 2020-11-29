@@ -4,20 +4,21 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,6 +53,7 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     @FXML
     private ListView<String> lobbyView;
+
 
     /**
      * Handles successful login
@@ -220,16 +222,27 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Method called when the join lobby button is pressed
      *
      * If the join lobby button is pressed, this method requests the lobby service
-     * to join a specified lobby. Therefore it currently uses the lobby name "test"
-     * and an user called "ich"
+     * to join a specified lobby. If there is no existing lobby or the user didnt choose one,
+     * nothing will happen.
      *
      * @param event The ActionEvent created by pressing the join lobby button
      * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2019-11-20
+     * @since 2020-11-29
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        lobbyService.joinLobby("test", new UserDTO("ich", "", ""));
+        String lobbyname = "";
+
+        lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        if(lobbyView.getSelectionModel().isEmpty()){
+            System.out.println("leere Liste oder du hast nichts ausgewählt");
+        }else{
+        lobbyname = lobbyView.getSelectionModel().getSelectedItem();
+        }
+
+
+        lobbyService.joinLobby(lobbyname, new UserDTO(loggedInUser.getUsername(), "", ""));
     }
 
 
