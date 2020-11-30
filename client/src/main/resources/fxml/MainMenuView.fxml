@@ -19,6 +19,6 @@
         <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2"/>
         <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout" GridPane.columnIndex="3"/>
         <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account" GridPane.columnIndex="4"/>
-
+        <Button mnemonicParsing="false" onAction="#onChangePasswordButtonPressed" text="Change Password" GridPane.columnIndex="5"/>
     </GridPane>
 </AnchorPane>

@@ -14,6 +14,7 @@ import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,6 +43,9 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
     private static final ShowLobbyViewEvent showLobbyViewMessage = new ShowLobbyViewEvent();
+
+    private static final ShowChangePasswordViewEvent showChangePasswordMessage = new ShowChangePasswordViewEvent();
+
 
     private ObservableList<String> users;
 
@@ -229,4 +233,10 @@ public class MainMenuPresenter extends AbstractPresenter {
         eventBus.post(showLoginViewMessage);
         userService.dropUser(loggedInUser);
     }
+
+    @FXML
+    void onChangePasswordButtonPressed(ActionEvent event) {
+        eventBus.post(showChangePasswordMessage);
+    }
+
 }
