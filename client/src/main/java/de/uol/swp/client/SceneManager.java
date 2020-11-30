@@ -7,6 +7,8 @@ import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
+import de.uol.swp.client.lobby.LobbyPresenter;
+import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
@@ -18,11 +20,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.net.URL;
+import java.util.LinkedList;
 
 /**
  * Class that manages which window/scene is currently shown
@@ -30,6 +33,7 @@ import java.net.URL;
  * @author Marco Grawunder
  * @since 2019-09-03
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SceneManager {
 
     static final Logger LOG = LogManager.getLogger(SceneManager.class);
@@ -40,6 +44,8 @@ public class SceneManager {
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
+    private LinkedList<Scene> lobbyScenes = new LinkedList<>();
+    private int lobbyCount = 0;
     private Scene lastScene = null;
     private Scene currentScene = null;
 
@@ -139,7 +145,7 @@ public class SceneManager {
     private void initRegistrationView(){
         if (registrationScene == null){
             Parent rootPane = initPresenter(RegistrationPresenter.fxml);
-            registrationScene = new Scene(rootPane, 400,200);
+            registrationScene = new Scene(rootPane, 400, 200);
             registrationScene.getStylesheets().add(styleSheet);
         }
     }
@@ -171,8 +177,41 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onShowLoginViewEvent(ShowLoginViewEvent event){
+    public void onShowLoginViewEvent(ShowLoginViewEvent event) {
         showLoginScreen();
+    }
+
+    /**
+     * Handles ShowLobbyViewEvent detected on the EventBus
+     *
+     * If a ShowLobbyViewEvent is detected on the EventBus, this method gets
+     * called. It opens the lobby in a new window.
+     *
+     * @param event The ShowLobbyViewEvent detected on the EventBus
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @since 2020-11-21
+     */
+    @Subscribe
+    public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Lobby " + lobbyCount);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(LobbyPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane, 400, 200);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyScenes.add(lobbyScene);
+        //Sets the stage to the newly created scene
+        lobbyStage.setScene(lobbyScenes.getLast());
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Set position of second window, related to primary window
+        lobbyStage.setX(primaryStage.getX() + 200);
+        lobbyStage.setY(primaryStage.getY() + 100);
+        //Shows the window
+        lobbyStage.show();
     }
 
     /**
@@ -296,7 +335,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        showScene(loginScene,"Login");
+        showScene(loginScene, "Login");
     }
 
     /**
@@ -308,6 +347,6 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene,"Registration");
+        showScene(registrationScene, "Registration");
     }
 }
