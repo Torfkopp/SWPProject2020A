@@ -6,6 +6,10 @@ package de.uol.swp.client.ChangePassword.event;
  * In order to show the ChangePasswordError alert using this event, post an instance of it
  * onto the eventBus the SceneManager is subscribed to.
  *
+ * @author Eric Vuong
+ * @see de.uol.swp.client.SceneManager
+ * @since 2020-11-25
+ *
  */
 
 public class ChangePasswordErrorEvent {
