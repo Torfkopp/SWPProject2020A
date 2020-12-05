@@ -138,7 +138,7 @@ public class UserService extends AbstractService {
             returnMessage = new ChangePasswordSuccessfulResponse();
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new ChangePasswordExceptionMessage("Cannot change Password" + msg.getUser() + " " + e.getMessage());
+            returnMessage = new ChangePasswordExceptionMessage("Cannot change Password of" + msg.getUser() + " " + e.getMessage());
         }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());

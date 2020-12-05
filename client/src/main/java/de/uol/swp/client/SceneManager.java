@@ -163,6 +163,7 @@ public class SceneManager {
      * a pane showing the Change Password view as specified by the ChangePasswordView
      * FXML file.
      *
+     * @author Eric Vuong
      */
     private void initChangePasswordView(){
         if (ChangePasswordScene == null){
@@ -197,6 +198,7 @@ public class SceneManager {
      * called. It calls a method to switch the current screen to the Change Password
      * screen.
      *
+     * @author Eric Vuong
      */
     @Subscribe
     public void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event){
@@ -274,6 +276,7 @@ public class SceneManager {
      * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the screen shown before Change Password screen.
      *
+     * @author Eric Vuong
      */
     @Subscribe
     public void onChangeCanceledPasswordEvent(ChangePasswordCanceledEvent event){
@@ -300,6 +303,7 @@ public class SceneManager {
      *
      * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
+     * @author Eric Vuong
      *
      */
     @Subscribe
@@ -418,6 +422,7 @@ public class SceneManager {
      *
      * Switches the current Scene to the ChangePasswordScene and sets the title of
      * the window to "Change Password"
+     * @author Eric Vuong
      *
      */
         public void showChangePasswordScreen() {
