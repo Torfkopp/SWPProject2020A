@@ -169,6 +169,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @since 2020-11-29
      */
 
+    @Subscribe
     public void lobbyList(AllOnlineLobbysResponse allLobbysResponse) {
         updateLobbyList(allLobbysResponse.getName());
     }

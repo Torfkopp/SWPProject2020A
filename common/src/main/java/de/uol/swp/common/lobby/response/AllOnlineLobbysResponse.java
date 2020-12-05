@@ -12,10 +12,6 @@ public class AllOnlineLobbysResponse extends AbstractResponseMessage {
 
     final private ArrayList<LobbyDTO> lobbys = new ArrayList<>();
 
-    public AllOnlineLobbysResponse(){
-
-    }
-
     /**
      * Constructor
      *
