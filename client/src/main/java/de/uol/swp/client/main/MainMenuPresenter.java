@@ -197,7 +197,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
 
     private void updateLobbyList(List<LobbyDTO> lobbyList) {
-
+    LOG.debug("Update Lobby List");
         Platform.runLater(() -> {
             if (lobbys == null) {
                 lobbys = FXCollections.observableArrayList();
@@ -205,6 +205,7 @@ public class MainMenuPresenter extends AbstractPresenter {
             }
             lobbys.clear();
             lobbyList.forEach(l -> lobbys.add(l.getName()));
+            LOG.debug(lobbys.toString()); //zeigt Lobbys in Konsole an.. kann später entfernt werden
         });
     }
 
