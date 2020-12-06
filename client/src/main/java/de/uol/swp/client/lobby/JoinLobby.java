@@ -22,16 +22,6 @@ package de.uol.swp.client.lobby;
 
 
 
-public class JoinLobby extends AbstractPresenter {
-
-    public static final String fxml = "/fxml/LobbyView.fxml";
-
-    private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
-
-    private ObservableList<String> Lobby;
-
-    private Lobby lobby;
-
 
 
     @FXML
