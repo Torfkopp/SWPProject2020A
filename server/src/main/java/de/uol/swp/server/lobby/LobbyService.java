@@ -6,17 +6,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.RetrieveAllOnlineLobbysRequest;
+import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.lobby.request.RetrieveAllOnlineLobbysRequest;
-import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+
 
 /**
  * Handles the lobby requests send by the users
@@ -32,6 +32,12 @@ public class LobbyService extends AbstractService {
     private final AuthenticationService authenticationService;
 
     final private List<Lobby> lobbyList = new ArrayList<>();
+
+    private final Set<User> users = new TreeSet<>();
+
+    public Set<User> getUsers() {
+        return Collections.unmodifiableSet(users);
+    }
 
     /**
      * Constructor
@@ -83,10 +89,17 @@ public class LobbyService extends AbstractService {
     public void onLobbyJoinUserRequest(LobbyJoinUserRequest lobbyJoinUserRequest) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyJoinUserRequest.getName());
 
-        if (lobby.isPresent()) {
+        if (lobby.isPresent() && getUsers().size() < 4 ) {
             lobby.get().joinUser(lobbyJoinUserRequest.getUser());
             sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
         }
+
+         else if (lobby.isPresent() && getUsers().size() > 4)
+        {
+            return false;
+            System.out.println("Die gewählte Lobby ist voll");
+        }
+
         // TODO: error handling not existing lobby
     }
 
@@ -110,6 +123,8 @@ public class LobbyService extends AbstractService {
             lobby.get().leaveUser(lobbyLeaveUserRequest.getUser());
             sendToAllInLobby(lobbyLeaveUserRequest.getName(), new UserLeftLobbyMessage(lobbyLeaveUserRequest.getName(), lobbyLeaveUserRequest.getUser()));
         }
+
+
         // TODO: error handling not existing lobby
     }
 
