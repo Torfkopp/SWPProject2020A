@@ -65,16 +65,19 @@ public class UserService implements ClientUserService {
 	}
 
 	/**
-	 * Method to delete an users account
+	 * Method to delete a user's account
 	 *
-	 * This method should send a request to delete an users account, but being not
-	 * implemented, it currently does nothing.
+	 * This method creates a new DeleteUserRequest object with the user as parameter,
+	 * and posts this instance to the EventBus.
 	 *
 	 * @param user The user to remove
+	 * @see de.uol.swp.common.user.request.DeleteUserRequest
+	 * @since 2020-11-02
 	 */
-    public void dropUser(User user) {
-        //TODO: Implement me
-    }
+	public void dropUser(User user) {
+		DeleteUserRequest request = new DeleteUserRequest(user);
+		bus.post(request);
+	}
 
 	@Override
 	public void updateUser(User user) {

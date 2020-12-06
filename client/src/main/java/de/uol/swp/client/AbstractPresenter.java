@@ -2,6 +2,7 @@ package de.uol.swp.client;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.ClientUserService;
 
 /**
@@ -18,6 +19,9 @@ public class AbstractPresenter {
 
     @Inject
     protected ClientUserService userService;
+
+    @Inject
+    protected LobbyService lobbyService;
 
     protected EventBus eventBus;
 
