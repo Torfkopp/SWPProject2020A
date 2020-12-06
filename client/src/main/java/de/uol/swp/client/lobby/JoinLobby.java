@@ -24,23 +24,23 @@ package de.uol.swp.client.lobby;
 
 
 
-    @FXML
+@FXML
     void onJoinLobby(ActionEvent event){
-        lobbyService.joinLobby("test",new UserDTO("ich","",""));
-    }
+            lobbyService.joinLobby("test",new UserDTO("ich","",""));
+            }
 
 
 
-    /**
-     * Message if a user successfully joins an existing Lobby
-     */
+/**
+ * Message if a user successfully joins an existing Lobby
+ */
 
-    @Subscribe
-    public void joinedSuccessful(LobbyCreatedMessage message) {
+@Subscribe
+public void joinedSuccessful(LobbyCreatedMessage message) {
         this.joinedSuccessful(); = message.getUser();
         userService.retrieveAllUsers();
-    }
+        }
 
 
-}
+        }
 
