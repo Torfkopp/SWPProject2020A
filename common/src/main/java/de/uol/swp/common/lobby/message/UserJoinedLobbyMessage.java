@@ -11,15 +11,13 @@ import de.uol.swp.common.user.UserDTO;
  * @since 2019-10-08
  */
 public class UserJoinedLobbyMessage extends AbstractLobbyMessage {
-
     /**
      * Default constructor
      *
      * @implNote this constructor is needed for serialization
      * @since 2019-10-08
      */
-    public UserJoinedLobbyMessage() {
-    }
+    public UserJoinedLobbyMessage() { }
 
     /**
      * Constructor

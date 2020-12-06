@@ -7,8 +7,11 @@ import com.google.inject.Singleton;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
+import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
+import de.uol.swp.common.user.request.DeleteUserRequest;
 import de.uol.swp.common.user.request.RegisterUserRequest;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
 import de.uol.swp.server.AbstractService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,5 +77,38 @@ public class UserService extends AbstractService {
             returnMessage.setMessageContext(msg.getMessageContext().get());
         }
         post(returnMessage);
+    }
+
+    /**
+     * Handles DeleteUserRequest found on the EventBus
+     *
+     * If a DeleteUserRequest is detected on the EventBus, this method is called.
+     * It requests the UserManagement to drop the user. If this succeeds, a
+     * UserDeletionSuccessfulResponse is posted on the EventBus, otherwise a UserDeletionExceptionMessage
+     * gets posted there.
+     *
+     * @param msg The DeleteUserRequest found on the EventBus
+     * @see de.uol.swp.server.usermanagement.UserManagement#dropUser(User)
+     * @see de.uol.swp.common.user.request.DeleteUserRequest
+     * @see de.uol.swp.common.user.response.UserDeletionSuccessfulResponse
+     * @see de.uol.swp.common.user.exception.UserDeletionExceptionMessage
+     * @since 2020-11-02
+     */
+    @Subscribe
+    private void onDeleteUserRequest(DeleteUserRequest msg) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Got new deletion message with " + msg.getUser());
+        }
+        ResponseMessage returnMessage;
+        try {
+            userManagement.dropUser(msg.getUser());
+            returnMessage = new UserDeletionSuccessfulResponse();
+        } catch (Exception e) {
+            LOG.error(e);
+            returnMessage = new UserDeletionExceptionMessage("Cannot delete user " + msg.getUser() + " " + e.getMessage());
+        }
+        if (msg.getMessageContext().isPresent()) {
+            returnMessage.setMessageContext(msg.getMessageContext().get());
+        }
     }
 }
