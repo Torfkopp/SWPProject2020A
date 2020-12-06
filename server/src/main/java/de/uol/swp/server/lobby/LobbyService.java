@@ -74,17 +74,11 @@ public class LobbyService extends AbstractService {
     }
 
     /**
-     * Handles LobbyJoinUserRequests found on the EventBus
-     *
-     * If a LobbyJoinUserRequest is detected on the EventBus, this method is called.
-     * It adds a user to a Lobby stored in the LobbyManagement and sends a UserJoinedLobbyMessage
-     * to every user in the lobby.
-     *
-     * @param lobbyJoinUserRequest The LobbyJoinUserRequest found on the EventBus
-     * @see de.uol.swp.common.lobby.Lobby
-     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
-     * @since 2019-10-08
+     * Handles Joining into existing Lobbies, if the amount of users is lower than 4
+     * @since 2020-12-05
+     * @author Aldin
      */
+
     @Subscribe
     public void onLobbyJoinUserRequest(LobbyJoinUserRequest lobbyJoinUserRequest) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyJoinUserRequest.getName());
