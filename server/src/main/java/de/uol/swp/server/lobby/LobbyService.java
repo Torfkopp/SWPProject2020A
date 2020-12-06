@@ -9,9 +9,13 @@ import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.lobby.request.RetrieveAllOnlineLobbysRequest;
+import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -26,6 +30,8 @@ public class LobbyService extends AbstractService {
 
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
+
+    final private List<Lobby> lobbyList = new ArrayList<>();
 
     /**
      * Constructor
@@ -125,6 +131,24 @@ public class LobbyService extends AbstractService {
         }
 
         // TODO: error handling not existing lobby
+    }
+
+    /**
+     * Handles RetrieveAllOnlineLobbysRequests found on the EventBus
+     *
+     * If a RetrieveAllOnlineLobbysRequest is detected on the EventBus, this method
+     * is called. It posts a AllOnlineLobbysResponse.
+     *
+     * @param msg RetrieveAllOnlineLobbysRequest found on the EventBus
+     * @see de.uol.swp.common.lobby.request.RetrieveAllOnlineLobbysRequest
+     * @see de.uol.swp.common.lobby.response.AllOnlineLobbysResponse
+     * @since 2020-12-05
+     */
+    @Subscribe
+    public void onRetrieveAllOnlineLobbysRequest(RetrieveAllOnlineLobbysRequest msg) {
+        AllOnlineLobbysResponse response = new AllOnlineLobbysResponse(lobbyList);
+        response.initWithMessage(msg);
+        post(response);
     }
 
 }

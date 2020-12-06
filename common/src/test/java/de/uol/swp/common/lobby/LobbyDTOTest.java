@@ -21,6 +21,7 @@ class LobbyDTOTest {
 
     private static final User defaultUser = new UserDTO("marco", "marco", "marco@grawunder.de");
     private static final User notInLobbyUser = new UserDTO("no", "marco", "no@grawunder.de");
+    private static final Lobby defaultLobby = new LobbyDTO("TestLobby", defaultUser);
 
     private static final int NO_USERS = 10;
     private static final List<UserDTO> users;
@@ -47,6 +48,24 @@ class LobbyDTOTest {
         assertEquals(lobby.getName(), "test");
         assertEquals(lobby.getUsers().size(), 1);
         assertEquals(lobby.getUsers().iterator().next(), defaultUser);
+
+    }
+
+    /**
+     * This test checks if the copy constructor works correctly
+     *
+     * This test fails if any of the fields mismatch or the objects are not considered equal
+     *
+     * @since 2020-12-05
+     */
+    @Test
+    void createWithExistingLobby() {
+
+        Lobby newLobby = LobbyDTO.create(defaultLobby);
+
+        // Test every attribute
+        assertEquals(newLobby.getName(), defaultLobby.getName());
+        assertEquals(newLobby.getOwner(), defaultLobby.getOwner());
 
     }
 
