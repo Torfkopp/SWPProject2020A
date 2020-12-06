@@ -37,6 +37,18 @@ public class LobbyDTO implements Lobby {
         this.users.add(creator);
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param lobby Lobby object to copy the values of
+     * @return LobbyDTO copy of Lobby object
+     * @since 2020-11-29
+     */
+
+    public static LobbyDTO create(Lobby lobby) {
+        return new LobbyDTO(lobby.getName(), lobby.getOwner());
+    }
+
     @Override
     public String getName() {
         return name;

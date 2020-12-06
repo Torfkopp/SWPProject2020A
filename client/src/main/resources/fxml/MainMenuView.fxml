@@ -17,6 +17,7 @@
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0"/>
         <Button mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1"/>
         <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2"/>
+        <ListView fx:id="lobbyView" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3"/>
 
     </GridPane>
 </AnchorPane>
