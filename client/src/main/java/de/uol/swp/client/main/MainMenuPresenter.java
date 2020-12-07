@@ -249,7 +249,6 @@ public class MainMenuPresenter extends AbstractPresenter {
             lobbyname = lobbyView.getSelectionModel().getSelectedItem();
         }
 
-
         lobbyService.joinLobby(lobbyname, new UserDTO(loggedInUser.getUsername(), "", ""));
     }
 
