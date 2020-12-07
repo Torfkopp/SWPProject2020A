@@ -17,7 +17,6 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import java.util.*;
 
 
-
 /**
  * Handles the lobby requests send by the users
  *
@@ -74,6 +73,17 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     *
+     *Handles LobbyJoinUserRequests found on the EventBus
+     *
+     * If a LobbyJoinUserRequest is detected on the EventBus, this method is called.
+     * It adds a user to a Lobby stored in the LobbyManagement and sends a UserJoinedLobbyMessage
+     *  to every user in the lobby.
+     *
+     * @param lobbyJoinUserRequest The LobbyJoinUserRequest found on the EventBus
+     * @see de.uol.swp.common.lobby.Lobby
+     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
+     * @since 2019-10-08
      * Handles Joining into existing Lobbies, if the amount of users is lower than 4
      * @since 2020-12-05
      * @author Aldin
@@ -88,10 +98,7 @@ public class LobbyService extends AbstractService {
             sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
         }
 
-         else
-        {
-          System.out.println("Die gewählte Lobby ist voll");
-        }
+
 
         // TODO: error handling not existing lobby
     }
@@ -111,7 +118,6 @@ public class LobbyService extends AbstractService {
     @Subscribe
     public void onLobbyLeaveUserRequest(LobbyLeaveUserRequest lobbyLeaveUserRequest) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyLeaveUserRequest.getName());
-
         if (lobby.isPresent()) {
             lobby.get().leaveUser(lobbyLeaveUserRequest.getUser());
             sendToAllInLobby(lobbyLeaveUserRequest.getName(), new UserLeftLobbyMessage(lobbyLeaveUserRequest.getName(), lobbyLeaveUserRequest.getUser()));
