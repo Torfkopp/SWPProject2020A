@@ -12,7 +12,6 @@ import de.uol.swp.common.user.UserDTO;
  * @since 2019-10-08
  */
 public class CreateLobbyRequest extends AbstractLobbyRequest {
-
     /**
      * Default constructor
      *
