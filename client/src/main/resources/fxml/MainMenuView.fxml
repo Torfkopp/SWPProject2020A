@@ -16,9 +16,11 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" />
-        <Button mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1" />
-        <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2" />
-        <VBox GridPane.columnIndex="3">
+        <Button mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1"/>
+        <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2"/>
+        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout" GridPane.columnIndex="3"/>
+        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account" GridPane.columnIndex="4"/>
+        <VBox GridPane.columnIndex="5">
             <ListView prefHeight="200.0" prefWidth="200.0">
                 <VBox.margin>
                     <Insets bottom="10.0" top="10.0"/>
@@ -31,11 +33,6 @@
                 </VBox.margin>
             </Button>
         </VBox>
-
-        <Button mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1"/>
-        <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2"/>
-        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout" GridPane.columnIndex="3"/>
-        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account" GridPane.columnIndex="4"/>
         
     </GridPane>
 </AnchorPane>
