@@ -32,6 +32,10 @@
             </Button>
         </VBox>
 
-
+        <Button mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1"/>
+        <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2"/>
+        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout" GridPane.columnIndex="3"/>
+        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account" GridPane.columnIndex="4"/>
+        
     </GridPane>
 </AnchorPane>

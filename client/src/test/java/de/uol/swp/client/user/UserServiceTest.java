@@ -210,17 +210,34 @@ class UserServiceTest {
     /**
      * Test for the dropUser routine
      *
-     * This test case has to be implemented after the respective dropUser method
-     * has been implemented
+     * This Test creates a new UserService object registered to the EventBus of
+     * this test class. It then calls the dropUser function of the object using
+     * the defaultUser as parameter and waits for it to post a DeleteUserRequest
+     * object on the EventBus.
+     * If this happens within one second, it checks if authorization is needed.
+     * Authorization should be needed.
+     * If any of these checks fail or the method takes too long, this test is unsuccessful.
      *
+     * @throws InterruptedException thrown by lock.await()
+     * @author Phillip-André Suhr
      * @since 2019-10-10
      */
     @Test
-    void dropUserTest() {
+    void dropUserTest() throws InterruptedException {
         UserService userService = new UserService(bus);
+
         userService.dropUser(defaultUser);
 
-        // TODO: Add when method is implemented
+        lock.await(1000, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof DeleteUserRequest);
+
+        DeleteUserRequest request = (DeleteUserRequest) event;
+
+        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
+        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
+        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
+        assertTrue(request.authorizationNeeded());
     }
 
     /**
