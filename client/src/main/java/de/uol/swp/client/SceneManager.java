@@ -7,7 +7,6 @@ import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
-import de.uol.swp.client.chat.ChatPresenter;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
@@ -44,9 +43,6 @@ public class SceneManager {
     private Scene mainScene;
     private Scene lastScene = null;
     private Scene currentScene = null;
-    private Scene chatScene;
-
-    private ChatPresenter globalChatPresenter;
 
     private final Injector injector;
 
@@ -111,13 +107,6 @@ public class SceneManager {
             Parent rootPane = initPresenter(MainMenuPresenter.fxml);
             mainScene = new Scene(rootPane, 800, 600);
             mainScene.getStylesheets().add(styleSheet);
-
-            rootPane = initPresenter(ChatPresenter.fxml);
-            chatScene = new Scene(rootPane, 800, 600);
-            chatScene.getStylesheets().add(styleSheet);
-
-
-
         }
     }
 
