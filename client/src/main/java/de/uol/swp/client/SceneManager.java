@@ -24,8 +24,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class that manages which window/scene is currently shown
@@ -44,8 +46,7 @@ public class SceneManager {
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
-    private LinkedList<Scene> lobbyScenes = new LinkedList<>();
-    private int lobbyCount = 0;
+    private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private Scene lastScene = null;
     private Scene currentScene = null;
 
@@ -61,8 +62,9 @@ public class SceneManager {
 
     /**
      * Subroutine to initialize all views
-     *
+     * <p>
      * This is a subroutine of the constructor to initialize all views
+     *
      * @since 2019-09-03
      */
     private void initViews() {
@@ -73,7 +75,7 @@ public class SceneManager {
 
     /**
      * Subroutine creating parent panes from FXML files
-     *
+     * <p>
      * This Method tries to create a parent pane from the FXML file specified by
      * the URL String given to it. If the LOG-Level is set to Debug or higher loading
      * is written to the LOG.
@@ -99,7 +101,7 @@ public class SceneManager {
 
     /**
      * Initializes the main menu view
-     *
+     * <p>
      * If the mainScene is null it gets set to a new scene containing the
      * a pane showing the main menu view as specified by the MainMenuView
      * FXML file.
@@ -117,7 +119,7 @@ public class SceneManager {
 
     /**
      * Initializes the login view
-     *
+     * <p>
      * If the loginScene is null it gets set to a new scene containing the
      * a pane showing the login view as specified by the LoginView FXML file.
      *
@@ -134,7 +136,7 @@ public class SceneManager {
 
     /**
      * Initializes the registration view
-     *
+     * <p>
      * If the registrationScene is null it gets set to a new scene containing the
      * a pane showing the registration view as specified by the RegistrationView
      * FXML file.
@@ -142,8 +144,8 @@ public class SceneManager {
      * @see de.uol.swp.client.register.RegistrationPresenter
      * @since 2019-09-03
      */
-    private void initRegistrationView(){
-        if (registrationScene == null){
+    private void initRegistrationView() {
+        if (registrationScene == null) {
             Parent rootPane = initPresenter(RegistrationPresenter.fxml);
             registrationScene = new Scene(rootPane, 400, 200);
             registrationScene.getStylesheets().add(styleSheet);
@@ -152,7 +154,7 @@ public class SceneManager {
 
     /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
-     *
+     * <p>
      * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the registration
      * screen.
@@ -162,13 +164,13 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onShowRegistrationViewEvent(ShowRegistrationViewEvent event){
+    public void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
         showRegistrationScreen();
     }
 
     /**
      * Handles ShowLoginViewEvent detected on the EventBus
-     *
+     * <p>
      * If a ShowLoginViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the login screen.
      *
@@ -183,7 +185,7 @@ public class SceneManager {
 
     /**
      * Handles ShowLobbyViewEvent detected on the EventBus
-     *
+     * <p>
      * If a ShowLobbyViewEvent is detected on the EventBus, this method gets
      * called. It opens the lobby in a new window.
      *
@@ -195,14 +197,16 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //New window (Stage)
         Stage lobbyStage = new Stage();
-        lobbyStage.setTitle("Lobby " + lobbyCount);
+        lobbyStage.setTitle(event.getName());
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane, 400, 200);
         lobbyScene.getStylesheets().add(styleSheet);
-        lobbyScenes.add(lobbyScene);
+        //gets the lobby's name
+        String lobbyName = event.getName();
+        lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene
-        lobbyStage.setScene(lobbyScenes.getLast());
+        lobbyStage.setScene(lobbyScenes.get(lobbyName));
         //Specifies the modality for new window
         lobbyStage.initModality(Modality.NONE);
         //Specifies the owner Window (parent) for new window
@@ -216,7 +220,7 @@ public class SceneManager {
 
     /**
      * Handles RegistrationCanceledEvent detected on the EventBus
-     *
+     * <p>
      * If a RegistrationCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the screen shown before registration.
      *
@@ -225,13 +229,13 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onRegistrationCanceledEvent(RegistrationCanceledEvent event){
+    public void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
         showScene(lastScene, lastTitle);
     }
 
     /**
      * Handles RegistrationErrorEvent detected on the EventBus
-     *
+     * <p>
      * If a RegistrationErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
      *
@@ -265,7 +269,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showServerError(String e) {
-        showError("Server returned an error:\n" , e);
+        showError("Server returned an error:\n", e);
     }
 
     /**
@@ -275,12 +279,12 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showError(String e) {
-        showError("Error:\n" , e);
+        showError("Error:\n", e);
     }
 
     /**
      * Switches the current scene and title to the given ones
-     *
+     * <p>
      * The current scene and title are saved in the lastScene and lastTitle variables,
      * before the new scene and title are set and shown.
      *
@@ -301,7 +305,7 @@ public class SceneManager {
 
     /**
      * Shows the login error alert
-     *
+     * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
      *
      * @since 2019-09-03
@@ -316,7 +320,7 @@ public class SceneManager {
 
     /**
      * Shows the main menu
-     *
+     * <p>
      * Switches the current Scene to the mainScene and sets the title of
      * the window to "Welcome " and the username of the current user
      *
@@ -328,7 +332,7 @@ public class SceneManager {
 
     /**
      * Shows the login screen
-     *
+     * <p>
      * Switches the current Scene to the loginScene and sets the title of
      * the window to "Login"
      *
@@ -340,7 +344,7 @@ public class SceneManager {
 
     /**
      * Shows the registration screen
-     *
+     * <p>
      * Switches the current Scene to the registrationScene and sets the title of
      * the window to "Registration"
      *
