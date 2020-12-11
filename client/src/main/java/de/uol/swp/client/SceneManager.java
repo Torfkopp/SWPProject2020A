@@ -195,27 +195,31 @@ public class SceneManager {
      */
     @Subscribe
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
-        //New window (Stage)
-        Stage lobbyStage = new Stage();
-        lobbyStage.setTitle(event.getName());
-        //Initialises a new lobbyScene
-        Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 400, 200);
-        lobbyScene.getStylesheets().add(styleSheet);
         //gets the lobby's name
         String lobbyName = event.getName();
-        lobbyScenes.put(lobbyName, lobbyScene);
-        //Sets the stage to the newly created scene
-        lobbyStage.setScene(lobbyScenes.get(lobbyName));
-        //Specifies the modality for new window
-        lobbyStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        lobbyStage.initOwner(primaryStage);
-        //Set position of second window, related to primary window
-        lobbyStage.setX(primaryStage.getX() + 200);
-        lobbyStage.setY(primaryStage.getY() + 100);
-        //Shows the window
-        lobbyStage.show();
+        if (!lobbyScenes.containsKey(lobbyName)) {
+            //New window (Stage)
+            Stage lobbyStage = new Stage();
+            lobbyStage.setTitle(event.getName());
+            //Initialises a new lobbyScene
+            Parent rootPane = initPresenter(LobbyPresenter.fxml);
+            Scene lobbyScene = new Scene(rootPane, 400, 200);
+            lobbyScene.getStylesheets().add(styleSheet);
+            lobbyScenes.put(lobbyName, lobbyScene);
+            //Sets the stage to the newly created scene
+            lobbyStage.setScene(lobbyScenes.get(lobbyName));
+            //Specifies the modality for new window
+            lobbyStage.initModality(Modality.NONE);
+            //Specifies the owner Window (parent) for new window
+            lobbyStage.initOwner(primaryStage);
+            //Set position of second window, related to primary window
+            lobbyStage.setX(primaryStage.getX() + 200);
+            lobbyStage.setY(primaryStage.getY() + 100);
+            //Shows the window
+            lobbyStage.show();
+        } else {
+            showError("Lobby name already exists");
+        }
     }
 
     /**
