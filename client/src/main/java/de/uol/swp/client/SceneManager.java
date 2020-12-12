@@ -14,6 +14,7 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.common.lobby.message.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -181,6 +182,24 @@ public class SceneManager {
     @Subscribe
     public void onShowLoginViewEvent(ShowLoginViewEvent event) {
         showLoginScreen();
+    }
+
+    /**
+     * Handles the incoming LobbyListMessage
+     * <p>
+     * If a LobbyListMessage is detected, the lobbyScenes map
+     * is updated to know the same lobbies as the server
+     *
+     * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
+     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @since 2020-12-12
+     */
+    @Subscribe
+    public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
+        LOG.debug("Retrieval of lobby map");
+        for (String name : allLobbiesResponse.getLobbies()) {
+            lobbyScenes.put(name, null);
+        }
     }
 
     /**

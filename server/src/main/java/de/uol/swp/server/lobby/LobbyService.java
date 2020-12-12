@@ -120,7 +120,7 @@ public class LobbyService extends AbstractService {
      * posts it on the EventBus
      *
      * @param lobbyName Name of the lobby the players are in
-     * @param message the message to be send to the users
+     * @param message   the message to be send to the users
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-10-08
      */
@@ -135,4 +135,20 @@ public class LobbyService extends AbstractService {
         // TODO: error handling not existing lobby
     }
 
+    /**
+     * Handles RetrieveAllLobbiesRequests found on the EventBus
+     * <p>
+     * If a RetrieveAllLobbiesRequest is detected on the EventBus, this method is called.
+     * It posts a AllLobbiesResponse containing a list of all lobby names
+     *
+     * @param retrieveAllLobbiesRequest The RetrieveAllLobbiesRequests found on the EventBus
+     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @since 2020-12-12
+     */
+    @Subscribe
+    public void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest retrieveAllLobbiesRequest) {
+        AllLobbiesResponse response = new AllLobbiesResponse(lobbyManagement.getLobbies());
+        response.initWithMessage(retrieveAllLobbiesRequest);
+        post(response);
+    }
 }

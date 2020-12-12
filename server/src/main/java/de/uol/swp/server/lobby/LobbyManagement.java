@@ -68,4 +68,14 @@ public class LobbyManagement {
         }
         return Optional.empty();
     }
+
+    /**
+     * Getter for the map
+     *
+     * @return HashMap with the lobby's name and its lobby object
+     * @since 2020-12-12
+     */
+    public Map<String, Lobby> getLobbies() {
+        return lobbies;
+    }
 }

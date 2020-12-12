@@ -56,7 +56,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * <p>
      * If a LoginSuccessfulResponse is posted to the EventBus the loggedInUser
      * of this client is set to the one in the message received and the full
-     * list of users currently logged in is requested.
+     * list of users currently logged in is requested, as well as the list
+     * of lobbies.
      *
      * @param message the LoginSuccessfulResponse object seen on the EventBus
      * @see de.uol.swp.common.user.response.LoginSuccessfulResponse
@@ -66,6 +67,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     public void loginSuccessful(LoginSuccessfulResponse message) {
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
@@ -160,7 +162,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * to create a new lobby. This lobby will get a unique name and registers the user as its creator.
      *
      * @param event The ActionEvent created by pressing the create lobby button
-     * @author Marvio
+     * @author Mario and Marvin
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2020-12-11
      */
@@ -180,7 +182,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         if (result.isPresent()) {
             lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
             eventBus.post(new ShowLobbyViewEvent(result.get()));
-        } //Intention: Lobbyfenster kommt nur, wenn ein LobbyCreatedMessage ankommt.
+        }
     }
 
     /**
