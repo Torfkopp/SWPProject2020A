@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -10,11 +11,11 @@ import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.util.List;
 
 /**
@@ -27,6 +28,9 @@ import java.util.List;
 public class LobbyPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
+
+    @Inject
+    private LobbyService lobbyService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
@@ -127,5 +131,16 @@ public class LobbyPresenter extends AbstractPresenter {
             users.clear();
             userList.forEach(u -> users.add(u.getUsername()));
         });
+    }
+
+    /**
+     * Method called when the leave lobby button is pressed
+     * If the leave lobby button is pressed, this method requests the lobby service
+     * to leave a specified lobby.
+     * @param event The ActionEvent created by pressing the leave lobby Button
+     */
+    @FXML
+    void onLeaveLobby(ActionEvent event) {
+        lobbyService.leaveLobby();
     }
 }

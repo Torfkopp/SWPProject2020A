@@ -4,9 +4,8 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 
 /**
  * Manages creation, deletion and storing of lobbies
@@ -19,6 +18,7 @@ import java.util.Optional;
 public class LobbyManagement {
 
     private final Map<String, Lobby> lobbies = new HashMap<>();
+    private final SortedMap<String, User> loggedInUsers = new TreeMap<>();
 
     /**
      * Creates a new lobby and adds it to the list
@@ -68,6 +68,5 @@ public class LobbyManagement {
         }
         return Optional.empty();
     }
-
 
 }

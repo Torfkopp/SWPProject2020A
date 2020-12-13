@@ -107,5 +107,4 @@ class LobbyServiceTest {
         assertEquals(request.getOwner().getEMail(), defaultUser.getEMail());
 
     }
-
 }

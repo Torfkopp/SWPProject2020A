@@ -2,6 +2,7 @@ package de.uol.swp.client.user;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import de.uol.swp.common.lobby.message.LobbyLeaveUserRequest;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.*;
 import org.apache.logging.log4j.LogManager;
@@ -88,4 +89,5 @@ public class UserService implements ClientUserService {
 		RetrieveAllOnlineUsersRequest cmd = new RetrieveAllOnlineUsersRequest();
 		bus.post(cmd);
 	}
+
 }

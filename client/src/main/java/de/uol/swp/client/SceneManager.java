@@ -24,6 +24,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.net.URL;
 import java.util.LinkedList;
 
@@ -38,17 +39,16 @@ public class SceneManager {
 
     static final Logger LOG = LogManager.getLogger(SceneManager.class);
     static final String styleSheet = "css/swp.css";
-
     final private Stage primaryStage;
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
+    private Scene lobbyScene;
     private LinkedList<Scene> lobbyScenes = new LinkedList<>();
     private int lobbyCount = 0;
     private Scene lastScene = null;
     private Scene currentScene = null;
-
     private final Injector injector;
 
     @Inject
@@ -150,6 +150,7 @@ public class SceneManager {
         }
     }
 
+
     /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
      *
@@ -198,7 +199,7 @@ public class SceneManager {
         lobbyStage.setTitle("Lobby " + lobbyCount);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 400, 200);
+        lobbyScene = new Scene(rootPane, 400, 400);
         lobbyScene.getStylesheets().add(styleSheet);
         lobbyScenes.add(lobbyScene);
         //Sets the stage to the newly created scene
@@ -213,6 +214,7 @@ public class SceneManager {
         //Shows the window
         lobbyStage.show();
     }
+
 
     /**
      * Handles RegistrationCanceledEvent detected on the EventBus
@@ -349,4 +351,5 @@ public class SceneManager {
     public void showRegistrationScreen() {
         showScene(registrationScene, "Registration");
     }
+
 }
