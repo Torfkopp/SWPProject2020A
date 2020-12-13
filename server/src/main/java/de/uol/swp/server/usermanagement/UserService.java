@@ -115,9 +115,9 @@ public class UserService extends AbstractService {
         }
     }
     /**
-     * Handles ChangePasswordRequest found on the EventBus
+     * Handles UpdateUserRequest found on the EventBus
      *
-     * If a ChangePasswordRequest is detected on the EventBus, this method is called.
+     * If a UpdateUserRequest is detected on the EventBus, this method is called.
      * It tries to change the Password of an User via the UserManagement.
      * If this succeeds, a ChangePasswordSuccessfulResponse is posted on the EventBus,
      * otherwise a ChangePasswordExceptionMessage gets posted there.
