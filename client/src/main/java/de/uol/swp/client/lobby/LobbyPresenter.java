@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.lobby.event.HideLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.user.User;
@@ -16,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 
 /**
@@ -23,7 +25,6 @@ import java.util.List;
  *
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2020-11-21
- *
  */
 public class LobbyPresenter extends AbstractPresenter {
 
@@ -37,6 +38,10 @@ public class LobbyPresenter extends AbstractPresenter {
     private ObservableList<String> users;
 
     private User creator;
+
+    private User loggedInUser;
+
+    private String lobbyName;
 
     @FXML
     private ListView<String> usersView;
@@ -52,7 +57,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Handles successful lobby creation
-     *
+     * <p>
      * If a LobbyCreatedMessage is posted to the EventBus the lobbyCreator
      * is set to the
      *
@@ -63,12 +68,14 @@ public class LobbyPresenter extends AbstractPresenter {
     @Subscribe
     public void creationSuccessful(LobbyCreatedMessage message) {
         this.creator = message.getUser();
+        this.loggedInUser = message.getUser();
+        this.lobbyName = message.getName();
         userService.retrieveAllUsers();
     }
 
     /**
      * Handles new joined users
-     *
+     * <p>
      * If a new UserJoinedLobbyMessage object is posted to the EventBus the name of the newly
      * joined user is appended to the user list in the lobby menu.
      * Furthermore if the LOG-Level is set to DEBUG the message "New user {@literal
@@ -89,7 +96,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Handles new list of users
-     *
+     * <p>
      * If a new AllOnlineUsersResponse object is posted to the EventBus the names
      * of currently logged in users are put onto the user list in the main menu.
      * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
@@ -109,15 +116,15 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Updates the main menus user list according to the list given
-     *
+     * <p>
      * This method clears the entire user list and then adds the name of each user
      * in the list given to the main menus user list. If there ist no user list
      * this it creates one.
      *
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
      * @param userList A list of UserDTO objects including all currently logged in
      *                 users
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.UserDTO
      * @since 2020-11-22
      */
@@ -134,13 +141,26 @@ public class LobbyPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the leave lobby button is pressed
-     * If the leave lobby button is pressed, this method requests the lobby service
-     * to leave a specified lobby.
+     * Handles a click on the LeaveLobby button
+     * <p>
+     * Method called when the leaveLobby button is pressed.
+     * If the leaveLobby button is pressed by the creator of the lobby,
+     * this method requests the lobby service to delete the lobby.
+     * If it is not the creator this method requests
+     * the lobby service to leave the lobby.
+     *
      * @param event The ActionEvent created by pressing the leave lobby Button
+     * @since 2020-12-14
      */
     @FXML
     void onLeaveLobby(ActionEvent event) {
-        lobbyService.leaveLobby();
+        //If the Creator leaves the lobby, the lobby gets deleted
+        if (loggedInUser == creator) {
+            lobbyService.deleteLobby(lobbyName);
+        } else {
+            lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
+        }
+        //Provisorium
+        eventBus.post(new HideLobbyViewEvent(lobbyName));
     }
 }

@@ -8,6 +8,7 @@ import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
+import de.uol.swp.client.lobby.event.HideLobbyViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
@@ -61,8 +62,9 @@ public class SceneManager {
 
     /**
      * Subroutine to initialize all views
-     *
+     * <p>
      * This is a subroutine of the constructor to initialize all views
+     *
      * @since 2019-09-03
      */
     private void initViews() {
@@ -73,7 +75,7 @@ public class SceneManager {
 
     /**
      * Subroutine creating parent panes from FXML files
-     *
+     * <p>
      * This Method tries to create a parent pane from the FXML file specified by
      * the URL String given to it. If the LOG-Level is set to Debug or higher loading
      * is written to the LOG.
@@ -99,7 +101,7 @@ public class SceneManager {
 
     /**
      * Initializes the main menu view
-     *
+     * <p>
      * If the mainScene is null it gets set to a new scene containing the
      * a pane showing the main menu view as specified by the MainMenuView
      * FXML file.
@@ -117,7 +119,7 @@ public class SceneManager {
 
     /**
      * Initializes the login view
-     *
+     * <p>
      * If the loginScene is null it gets set to a new scene containing the
      * a pane showing the login view as specified by the LoginView FXML file.
      *
@@ -134,7 +136,7 @@ public class SceneManager {
 
     /**
      * Initializes the registration view
-     *
+     * <p>
      * If the registrationScene is null it gets set to a new scene containing the
      * a pane showing the registration view as specified by the RegistrationView
      * FXML file.
@@ -142,8 +144,8 @@ public class SceneManager {
      * @see de.uol.swp.client.register.RegistrationPresenter
      * @since 2019-09-03
      */
-    private void initRegistrationView(){
-        if (registrationScene == null){
+    private void initRegistrationView() {
+        if (registrationScene == null) {
             Parent rootPane = initPresenter(RegistrationPresenter.fxml);
             registrationScene = new Scene(rootPane, 400, 200);
             registrationScene.getStylesheets().add(styleSheet);
@@ -153,7 +155,7 @@ public class SceneManager {
 
     /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
-     *
+     * <p>
      * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the registration
      * screen.
@@ -163,13 +165,13 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onShowRegistrationViewEvent(ShowRegistrationViewEvent event){
+    public void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
         showRegistrationScreen();
     }
 
     /**
      * Handles ShowLoginViewEvent detected on the EventBus
-     *
+     * <p>
      * If a ShowLoginViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the login screen.
      *
@@ -184,7 +186,7 @@ public class SceneManager {
 
     /**
      * Handles ShowLobbyViewEvent detected on the EventBus
-     *
+     * <p>
      * If a ShowLobbyViewEvent is detected on the EventBus, this method gets
      * called. It opens the lobby in a new window.
      *
@@ -215,10 +217,24 @@ public class SceneManager {
         lobbyStage.show();
     }
 
+    /**
+     * Handles HideLobbyViewEvent detected on the EventBus
+     * <p>
+     * If a HideLobbyViewEvent is detected on the EventBus,
+     * this method gets called. It hides the lobby.
+     *
+     * @param event The HideLobbyViewEvent detected on the EventBus
+     * @see de.uol.swp.client.lobby.event.HideLobbyViewEvent
+     * @since 2020-12-14
+     */
+    @Subscribe
+    public void hideLobbyScreen(HideLobbyViewEvent event) {
+        //Für Implementation erst auf Mergen der Story #32 warten
+    }
 
     /**
      * Handles RegistrationCanceledEvent detected on the EventBus
-     *
+     * <p>
      * If a RegistrationCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the screen shown before registration.
      *
@@ -227,13 +243,13 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onRegistrationCanceledEvent(RegistrationCanceledEvent event){
+    public void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
         showScene(lastScene, lastTitle);
     }
 
     /**
      * Handles RegistrationErrorEvent detected on the EventBus
-     *
+     * <p>
      * If a RegistrationErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
      *
@@ -267,7 +283,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showServerError(String e) {
-        showError("Server returned an error:\n" , e);
+        showError("Server returned an error:\n", e);
     }
 
     /**
@@ -277,12 +293,12 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showError(String e) {
-        showError("Error:\n" , e);
+        showError("Error:\n", e);
     }
 
     /**
      * Switches the current scene and title to the given ones
-     *
+     * <p>
      * The current scene and title are saved in the lastScene and lastTitle variables,
      * before the new scene and title are set and shown.
      *
@@ -303,7 +319,7 @@ public class SceneManager {
 
     /**
      * Shows the login error alert
-     *
+     * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
      *
      * @since 2019-09-03
@@ -318,7 +334,7 @@ public class SceneManager {
 
     /**
      * Shows the main menu
-     *
+     * <p>
      * Switches the current Scene to the mainScene and sets the title of
      * the window to "Welcome " and the username of the current user
      *
@@ -330,7 +346,7 @@ public class SceneManager {
 
     /**
      * Shows the login screen
-     *
+     * <p>
      * Switches the current Scene to the loginScene and sets the title of
      * the window to "Login"
      *
@@ -342,7 +358,7 @@ public class SceneManager {
 
     /**
      * Shows the registration screen
-     *
+     * <p>
      * Switches the current Scene to the registrationScene and sets the title of
      * the window to "Registration"
      *

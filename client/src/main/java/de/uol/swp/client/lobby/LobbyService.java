@@ -2,12 +2,10 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.message.CreateLobbyRequest;
+import de.uol.swp.common.lobby.message.DeleteLobbyRequest;
 import de.uol.swp.common.lobby.message.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.message.LobbyLeaveUserRequest;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -15,7 +13,6 @@ import de.uol.swp.common.user.UserDTO;
  *
  * @author Marco Grawunder
  * @since 2019-11-20
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 public class LobbyService {
@@ -62,13 +59,25 @@ public class LobbyService {
     }
 
     /**
-     * Posts a request to leave a specified lobby on the EvenBus
+     * Posts a request to leave a specified lobby on the EventBus
      *
      * @see de.uol.swp.common.lobby.message.LobbyLeaveUserRequest
-     * @since 05.12.2020
+     * @since 2020-12-05
      */
-    public void leaveLobby(){
-        LobbyLeaveUserRequest lobbyLeaveUserRequest = new LobbyLeaveUserRequest();
+    public void leaveLobby(String lobbyName, UserDTO user) {
+        LobbyLeaveUserRequest lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
+    }
+
+    /**
+     * Posts a request to delete a specified lobby on the EventBus
+     *
+     * @param lobbyName The name of the lobby
+     * @see de.uol.swp.common.lobby.message.DeleteLobbyRequest
+     * @since 2020-12-14
+     */
+    public void deleteLobby(String lobbyName) {
+        DeleteLobbyRequest delete = new DeleteLobbyRequest(lobbyName);
+        eventBus.post(delete);
     }
 }
