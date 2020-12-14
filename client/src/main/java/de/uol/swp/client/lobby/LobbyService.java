@@ -77,7 +77,7 @@ public class LobbyService {
      * @since 2020-12-14
      */
     public void deleteLobby(String lobbyName) {
-        DeleteLobbyRequest delete = new DeleteLobbyRequest(lobbyName);
-        eventBus.post(delete);
+        DeleteLobbyRequest deleteLobbyRequest = new DeleteLobbyRequest(lobbyName);
+        eventBus.post(deleteLobbyRequest);
     }
 }

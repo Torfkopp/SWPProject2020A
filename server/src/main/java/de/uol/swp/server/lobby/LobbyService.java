@@ -81,9 +81,6 @@ public class LobbyService extends AbstractService {
     public void onDeleteLobbyRequest(DeleteLobbyRequest deleteLobbyRequest) {
         try {
             lobbyManagement.dropLobby(deleteLobbyRequest.getLobbyName());
-            //The LobbyCreatedMessage is only used to update the map of lobbies on the client side
-            //therefore making a LobbyDeletedMessage is not worth it.
-            sendToAll(new LobbyCreatedMessage(deleteLobbyRequest.getLobbyName(), null));
         } catch (IllegalArgumentException e) {
             LOG.debug(e.getMessage());
         }

@@ -1,9 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.lobby.event.HideLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.user.User;
@@ -14,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.stage.Stage;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +30,6 @@ public class LobbyPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
-    @Inject
     private LobbyService lobbyService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -156,11 +155,11 @@ public class LobbyPresenter extends AbstractPresenter {
     void onLeaveLobby(ActionEvent event) {
         //If the Creator leaves the lobby, the lobby gets deleted
         if (loggedInUser == creator) {
-            lobbyService.deleteLobby(lobbyName);
+            //Doesn't delete the lobby, but it deletes the functionality and my braincells
+            //lobbyService.deleteLobby(lobbyName);
         } else {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
         }
-        //Provisorium
-        eventBus.post(new HideLobbyViewEvent(lobbyName));
+        ((Stage) (((Button) event.getSource()).getScene().getWindow())).close();
     }
 }

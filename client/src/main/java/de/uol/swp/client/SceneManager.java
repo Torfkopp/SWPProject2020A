@@ -8,7 +8,6 @@ import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
-import de.uol.swp.client.lobby.event.HideLobbyViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
@@ -215,21 +214,6 @@ public class SceneManager {
         lobbyStage.setY(primaryStage.getY() + 100);
         //Shows the window
         lobbyStage.show();
-    }
-
-    /**
-     * Handles HideLobbyViewEvent detected on the EventBus
-     * <p>
-     * If a HideLobbyViewEvent is detected on the EventBus,
-     * this method gets called. It hides the lobby.
-     *
-     * @param event The HideLobbyViewEvent detected on the EventBus
-     * @see de.uol.swp.client.lobby.event.HideLobbyViewEvent
-     * @since 2020-12-14
-     */
-    @Subscribe
-    public void hideLobbyScreen(HideLobbyViewEvent event) {
-        //Für Implementation erst auf Mergen der Story #32 warten
     }
 
     /**

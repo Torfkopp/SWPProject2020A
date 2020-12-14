@@ -35,6 +35,7 @@ public class DeleteLobbyRequest extends AbstractLobbyRequest {
      * Getter for the lobbyName
      *
      * @return Name of the lobby that is to be deleted
+     * @since 2020-12-14
      */
     public String getLobbyName() {
         return lobbyName;
