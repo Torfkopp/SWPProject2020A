@@ -69,5 +69,7 @@ public class LobbyManagement {
         return Optional.empty();
     }
 
-
+    public Map<String, Lobby> getLobbies() {
+        return lobbies;
+    }
 }

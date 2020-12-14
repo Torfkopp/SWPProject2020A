@@ -2,6 +2,7 @@ package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.user.User;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Set;
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
  * @since 2019-10-08
  */
-public interface Lobby {
+public interface Lobby extends Serializable {
 
     /**
      * Getter for the lobby's name

@@ -16,6 +16,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -146,7 +147,8 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     public void onRetrieveAllOnlineLobbysRequest(RetrieveAllOnlineLobbysRequest msg) {
-        AllOnlineLobbysResponse response = new AllOnlineLobbysResponse(lobbyList);
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        AllOnlineLobbysResponse response = new AllOnlineLobbysResponse(lobbies.values());
         response.initWithMessage(msg);
         post(response);
     }
