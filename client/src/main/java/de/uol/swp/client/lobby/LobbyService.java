@@ -4,15 +4,14 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.common.lobby.message.CreateLobbyRequest;
 import de.uol.swp.common.lobby.message.LobbyJoinUserRequest;
+import de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.lobby.request.RetrieveAllOnlineLobbysRequest;
 
 /**
  * Classes that manages lobbies
  *
  * @author Marco Grawunder
  * @since 2019-11-20
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 public class LobbyService {
@@ -59,8 +58,14 @@ public class LobbyService {
 
     }
 
-    public void retrieveAllOnlineLobbysRequest(){
-        RetrieveAllOnlineLobbysRequest retrieveLobbysRequest = new RetrieveAllOnlineLobbysRequest();
-        eventBus.post(retrieveLobbysRequest);
+    /**
+     * Posts a request to retrieve all lobby names
+     *
+     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @since 2020-12-12
+     */
+    public void retrieveAllLobbies() {
+        RetrieveAllLobbiesRequest retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
+        eventBus.post(retrieveAllLobbiesRequest);
     }
 }

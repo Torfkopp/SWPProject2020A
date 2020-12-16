@@ -9,7 +9,7 @@ import java.util.TreeSet;
 
 /**
  * Object to transfer the information of a game lobby
- *
+ * <p>
  * This object is used to communicate the current state of game lobbies between
  * the server and clients. It contains information about the Name of the lobby,
  * who owns the lobby and who joined the lobby.

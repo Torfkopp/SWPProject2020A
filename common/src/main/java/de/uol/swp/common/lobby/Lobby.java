@@ -2,11 +2,12 @@ package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.user.User;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
  * Interface to unify lobby objects
- *
+ * <p>
  * This is an Interface to allow for multiple types of lobby objects since it is
  * possible that not every client has to have every information of the lobby.
  *
@@ -14,7 +15,7 @@ import java.util.Set;
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
  * @since 2019-10-08
  */
-public interface Lobby {
+public interface Lobby extends Serializable {
 
     /**
      * Getter for the lobby's name
