@@ -1,78 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Diagram>
   <ID>JAVA</ID>
-  <OriginalElement>de.uol.swp.client</OriginalElement>
+  <OriginalElement />
   <nodes>
-    <node x="522.0" y="1768.0">de.uol.swp.client.Main</node>
-    <node x="1493.0" y="792.0">de.uol.swp.client.ClientConnection</node>
-    <node x="0.0" y="1368.0">de.uol.swp.client.user.UserServiceTest</node>
-    <node x="277.0" y="1768.0">de.uol.swp.client.SceneManagerFactory</node>
-    <node x="922.0" y="1036.5">de.uol.swp.client.auth.LoginPresenter</node>
-    <node x="1107.0" y="1368.0">de.uol.swp.client.register.event.RegistrationErrorEvent</node>
-    <node x="996.0" y="1768.0">de.uol.swp.client.register.event.ShowRegistrationViewEvent</node>
-    <node x="624.0" y="968.0">de.uol.swp.client.main.MainMenuPresenter</node>
-    <node x="490.0" y="0.0">de.uol.swp.client.ConnectionListener</node>
-    <node x="326.0" y="1013.5">de.uol.swp.client.lobby.LobbyPresenter</node>
-    <node x="0.0" y="0.0">de.uol.swp.client.SceneManager</node>
-    <node x="1264.0" y="792.0">de.uol.swp.client.user.ClientUserService</node>
-    <node x="0.0" y="1025.0">de.uol.swp.client.register.RegistrationPresenter</node>
-    <node x="220.0" y="1368.0">de.uol.swp.client.lobby.LobbyServiceTest</node>
-    <node x="1289.0" y="1768.0">de.uol.swp.client.auth.events.ShowLoginViewEvent</node>
-    <node x="822.0" y="1368.0">de.uol.swp.client.lobby.LobbyService</node>
-    <node x="404.0" y="128.0">de.uol.swp.client.ClientApp</node>
-    <node x="0.0" y="1768.0">de.uol.swp.client.ClientConnectionFactory</node>
-    <node x="1526.0" y="1768.0">de.uol.swp.client.lobby.event.ShowLobbyViewEvent</node>
-    <node x="1376.0" y="1368.0">de.uol.swp.client.register.event.RegistrationErrorEventTest</node>
-    <node x="703.0" y="1768.0">de.uol.swp.client.register.event.RegistrationCanceledEvent</node>
-    <node x="446.0" y="1368.0">de.uol.swp.client.ClientHandler</node>
-    <node x="0.0" y="1868.0">de.uol.swp.client.di</node>
-    <node x="1274.5" y="1012.0">de.uol.swp.client.user.UserService</node>
-    <node x="517.5" y="792.0">de.uol.swp.client.AbstractPresenter</node>
+    <node x="189.0" y="610.0">de.uol.swp.client.Main</node>
+    <node x="237.0" y="155.0">de.uol.swp.client.user.ClientUserService</node>
+    <node x="0.0" y="535.0">de.uol.swp.client.ClientConnection</node>
+    <node x="384.0" y="80.0">de.uol.swp.client.register.RegistrationPresenter</node>
+    <node x="418.0" y="535.0">de.uol.swp.client.lobby.LobbyService</node>
+    <node x="36.0" y="235.0">de.uol.swp.client.ClientApp</node>
+    <node x="245.0" y="460.0">de.uol.swp.client.auth.events.ShowLoginViewEvent</node>
+    <node x="0.0" y="460.0">de.uol.swp.client.SceneManagerFactory</node>
+    <node x="204.0" y="80.0">de.uol.swp.client.auth.LoginPresenter</node>
+    <node x="0.0" y="385.0">de.uol.swp.client.ClientConnectionFactory</node>
+    <node x="277.0" y="385.0">de.uol.swp.client.register.event.RegistrationErrorEvent</node>
+    <node x="0.0" y="310.0">de.uol.swp.client.register.event.RegistrationCanceledEvent</node>
+    <node x="293.0" y="310.0">de.uol.swp.client.register.event.ShowRegistrationViewEvent</node>
+    <node x="0.0" y="80.0">de.uol.swp.client.main.MainMenuPresenter</node>
+    <node x="221.0" y="535.0">de.uol.swp.client.ClientHandler</node>
+    <node x="0.0" y="155.0">de.uol.swp.client.ConnectionListener</node>
+    <node x="261.0" y="235.0">de.uol.swp.client.user.UserService</node>
+    <node x="192.0" y="0.0">de.uol.swp.client.AbstractPresenter</node>
+    <node x="0.0" y="610.0">de.uol.swp.client.SceneManager</node>
   </nodes>
   <notes />
   <edges>
-    <edge source="de.uol.swp.client.main.MainMenuPresenter" target="de.uol.swp.client.AbstractPresenter">
-      <point x="0.0" y="-177.5" />
-      <point x="763.0" y="948.0" />
-      <point x="638.125" y="948.0" />
-      <point x="24.125" y="63.0" />
+    <edge source="de.uol.swp.client.auth.LoginPresenter" target="de.uol.swp.client.AbstractPresenter">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.client.user.UserService" target="de.uol.swp.client.user.ClientUserService">
-      <point x="0.0" y="-120.5" />
-      <point x="0.0" y="85.0" />
+    <edge source="de.uol.swp.client.main.MainMenuPresenter" target="de.uol.swp.client.AbstractPresenter">
+      <point x="0.0" y="-15.0" />
+      <point x="92.0" y="55.0" />
+      <point x="222.66666666666666" y="55.0" />
+      <point x="-61.33333333333334" y="15.0" />
     </edge>
     <edge source="de.uol.swp.client.ClientApp" target="de.uol.swp.client.ConnectionListener">
-      <point x="0.0" y="-223.5" />
-      <point x="0.0" y="39.0" />
-    </edge>
-    <edge source="de.uol.swp.client.auth.LoginPresenter" target="de.uol.swp.client.AbstractPresenter">
-      <point x="0.0" y="-109.0" />
-      <point x="1070.5" y="938.0" />
-      <point x="686.375" y="938.0" />
-      <point x="72.375" y="63.0" />
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.client.register.RegistrationPresenter" target="de.uol.swp.client.AbstractPresenter">
-      <point x="0.0" y="-120.5" />
-      <point x="153.0" y="938.0" />
-      <point x="541.625" y="938.0" />
-      <point x="-72.375" y="63.0" />
+      <point x="0.0" y="-15.0" />
+      <point x="492.0" y="55.0" />
+      <point x="345.33333333333337" y="55.0" />
+      <point x="61.33333333333337" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.client.lobby.LobbyPresenter" target="de.uol.swp.client.AbstractPresenter">
-      <point x="0.0" y="-132.0" />
-      <point x="465.0" y="948.0" />
-      <point x="589.875" y="948.0" />
-      <point x="-24.125" y="63.0" />
+    <edge source="de.uol.swp.client.user.UserService" target="de.uol.swp.client.user.ClientUserService">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="1.0" x="629.0" y="406.0" />
-  <SelectedNodes />
-  <Categories>
-    <Category>Fields</Category>
-    <Category>Constructors</Category>
-    <Category>Methods</Category>
-    <Category>Properties</Category>
-    <Category>Inner Classes</Category>
-  </Categories>
+  <settings layout="Hierarchic Group" zoom="0.9" x="704.2222222222222" y="241.0" />
+  <SelectedNodes>
+    <node>de.uol.swp.client.register.RegistrationPresenter</node>
+  </SelectedNodes>
+  <Categories />
   <SCOPE>All</SCOPE>
   <VISIBILITY>private</VISIBILITY>
 </Diagram>

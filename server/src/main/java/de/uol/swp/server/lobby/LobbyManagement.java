@@ -11,9 +11,9 @@ import java.util.Optional;
 /**
  * Manages creation, deletion and storing of lobbies
  *
+ * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.Lobby
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
- * @author Marco Grawunder
  * @since 2019-10-08
  */
 public class LobbyManagement {
@@ -23,15 +23,15 @@ public class LobbyManagement {
     /**
      * Creates a new lobby and adds it to the list
      *
-     * @implNote the primary key of the lobbies is the name therefore the name has
-     *           to be unique
-     * @param name the name of the lobby to create
+     * @param name  the name of the lobby to create
      * @param owner the user who wants to create a lobby
-     * @see de.uol.swp.common.user.User
      * @throws IllegalArgumentException name already taken
+     * @implNote the primary key of the lobbies is the name therefore the name has
+     * to be unique
+     * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    public void createLobby(String name, User owner) {
+    public void createLobby(String name, User owner) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name " + name + " already exists!");
         }
@@ -69,6 +69,12 @@ public class LobbyManagement {
         return Optional.empty();
     }
 
+    /**
+     * Getter for the map
+     *
+     * @return HashMap with the lobby's name and its lobby object
+     * @since 2020-12-12
+     */
     public Map<String, Lobby> getLobbies() {
         return lobbies;
     }
