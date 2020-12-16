@@ -22,8 +22,8 @@ import java.util.List;
  *
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2020-11-21
- *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class LobbyPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
@@ -33,6 +33,8 @@ public class LobbyPresenter extends AbstractPresenter {
     private ObservableList<String> users;
 
     private User creator;
+
+    private String lobbyName;
 
     @FXML
     private ListView<String> usersView;
@@ -48,7 +50,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Handles successful lobby creation
-     *
+     * <p>
      * If a LobbyCreatedMessage is posted to the EventBus the lobbyCreator
      * is set to the
      *
@@ -59,13 +61,14 @@ public class LobbyPresenter extends AbstractPresenter {
     @Subscribe
     public void creationSuccessful(LobbyCreatedMessage message) {
         this.creator = message.getUser();
+        this.lobbyName = message.getName();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
     }
 
     /**
      * Handles new joined users
-     *
+     * <p>
      * If a new UserJoinedLobbyMessage object is posted to the EventBus the name of the newly
      * joined user is appended to the user list in the lobby menu.
      * Furthermore if the LOG-Level is set to DEBUG the message "New user {@literal
@@ -86,7 +89,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Handles new list of users
-     *
+     * <p>
      * If a new AllOnlineUsersResponse object is posted to the EventBus the names
      * of currently logged in users are put onto the user list in the main menu.
      * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
@@ -106,15 +109,15 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Updates the main menus user list according to the list given
-     *
+     * <p>
      * This method clears the entire user list and then adds the name of each user
      * in the list given to the main menus user list. If there ist no user list
      * this it creates one.
      *
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
      * @param userList A list of UserDTO objects including all currently logged in
      *                 users
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.UserDTO
      * @since 2020-11-22
      */

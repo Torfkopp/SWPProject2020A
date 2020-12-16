@@ -6,6 +6,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -74,6 +75,21 @@ public class MainMenuPresenter extends AbstractPresenter {
     public void loginSuccessful(LoginSuccessfulResponse message) {
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
+        lobbyService.retrieveAllLobbies();
+    }
+
+    /**
+     * Handles lobbyCreatedMessage
+     * <p>
+     * If a Lobby gets created, this method is called.
+     * It updates the LobbyList.
+     *
+     * @param message the LobbyCreatedMessage object seen on the EventBus
+     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
+     * @since 2020-12-14
+     */
+    @Subscribe
+    public void newLobby(LobbyCreatedMessage lobbyCreatedMessage) {
         lobbyService.retrieveAllLobbies();
     }
 
@@ -234,7 +250,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
-            eventBus.post(new ShowLobbyViewEvent(result.get()));
+            eventBus.post(new ShowLobbyViewEvent(result.get(), true));
         }
     }
 
@@ -251,17 +267,19 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        String lobbyname = "";
+
+        String lobbyName = null;
 
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
-            System.out.println("leere Liste oder du hast nichts ausgewählt");
+            System.out.println("Please choose a valid Lobby"); // change to showError for production - Marvin
         } else {
-            lobbyname = lobbyView.getSelectionModel().getSelectedItem();
+            lobbyName = lobbyView.getSelectionModel().getSelectedItem();
+            lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(lobbyName, false));
         }
 
-        lobbyService.joinLobby(lobbyname, new UserDTO(loggedInUser.getUsername(), "", ""));
     }
 
     /**

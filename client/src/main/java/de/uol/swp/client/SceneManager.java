@@ -216,29 +216,50 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
         String lobbyName = event.getName();
-        if (!lobbyScenes.containsKey(lobbyName)) {
-            //New window (Stage)
-            Stage lobbyStage = new Stage();
-            lobbyStage.setTitle(event.getName());
-            //Initialises a new lobbyScene
-            Parent rootPane = initPresenter(LobbyPresenter.fxml);
-            Scene lobbyScene = new Scene(rootPane, 400, 200);
-            lobbyScene.getStylesheets().add(styleSheet);
-            lobbyScenes.put(lobbyName, lobbyScene);
-            //Sets the stage to the newly created scene
-            lobbyStage.setScene(lobbyScenes.get(lobbyName));
-            //Specifies the modality for new window
-            lobbyStage.initModality(Modality.NONE);
-            //Specifies the owner Window (parent) for new window
-            lobbyStage.initOwner(primaryStage);
-            //Set position of second window, related to primary window
-            lobbyStage.setX(primaryStage.getX() + 200);
-            lobbyStage.setY(primaryStage.getY() + 100);
-            //Shows the window
-            lobbyStage.show();
+        //User creating lobby
+        if (event.getIsCreating()) {
+            if (!lobbyScenes.containsKey(lobbyName)) {
+                spawnLobbyWindow(lobbyName);
+            } else {
+                showError("Lobby name already exists");
+            }
+        //User joining lobby
         } else {
-            showError("Lobby name already exists");
+            if (lobbyScenes.containsKey(lobbyName)) {
+                spawnLobbyWindow(lobbyName);
+            } else {
+                showError("Lobby name doesn't exist");
+            }
         }
+    }
+
+    /**
+     *  Method to create a lobby window
+     *
+     * @param name The name of the lobby
+     * @see de.uol.swp.client.SceneManager#onShowLobbyViewEvent(ShowLobbyViewEvent)
+     * @since 2020-12-14
+     */
+    public void spawnLobbyWindow(String name){
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle(name);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(LobbyPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane, 400, 200);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyScenes.put(name, lobbyScene);
+        //Sets the stage to the newly created scene
+        lobbyStage.setScene(lobbyScenes.get(name));
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Set position of second window, related to primary window
+        lobbyStage.setX(primaryStage.getX() + 200);
+        lobbyStage.setY(primaryStage.getY() + 100);
+        //Shows the window
+        lobbyStage.show();
     }
 
     /**
