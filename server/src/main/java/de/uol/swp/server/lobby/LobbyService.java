@@ -90,10 +90,16 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyJoinUserRequest.getName());
 
         if (lobby.isPresent()) {
-            lobby.get().joinUser(lobbyJoinUserRequest.getUser());
-            sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
+            if (lobby.get().getUsers().size() < 4) {
+                lobby.get().joinUser(lobbyJoinUserRequest.getUser());
+                sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
+            } else {
+                // TODO: Full lobby
+            }
+        } else {
+            // TODO: Not existing Lobby
         }
-        // TODO: error handling not existing lobby
+        // TODO: Even more error checking missing here!
     }
 
     /**
