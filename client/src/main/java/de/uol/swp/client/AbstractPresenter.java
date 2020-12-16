@@ -7,7 +7,7 @@ import de.uol.swp.client.user.ClientUserService;
 
 /**
  * This class is the base for creating a new Presenter.
- *
+ * <p>
  * This class prepares the child classes to have the UserService and EventBus set
  * in order to reduce unnecessary code repetition.
  *
@@ -27,13 +27,13 @@ public class AbstractPresenter {
 
     /**
      * Sets the field eventBus
-     *
+     * <p>
      * This method sets the field eventBus to the EventBus given via parameter.
      * Afterwards it registers this class to the new EventBus.
      *
-     * @implNote This method does not unregister this class from any EventBus it
-     *           may already be registered to.
      * @param eventBus The EventBus this class should use.
+     * @implNote This method does not unregister this class from any EventBus it
+     * may already be registered to.
      * @since 2019-08-29
      */
     @Inject
@@ -44,15 +44,15 @@ public class AbstractPresenter {
 
     /**
      * Clears the field eventBus
-     *
+     * <p>
      * This method clears the field eventBus. Before clearing it unregisters this
      * class from EventBus previously used.
      *
      * @implNote This method does not check whether the field eventBus is null.
-     *           The field is cleared by setting it to null.
+     * The field is cleared by setting it to null.
      * @since 2019-08-29
      */
-    public void clearEventBus(){
+    public void clearEventBus() {
         this.eventBus.unregister(this);
         this.eventBus = null;
     }

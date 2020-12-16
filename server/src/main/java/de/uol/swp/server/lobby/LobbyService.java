@@ -9,8 +9,6 @@ import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.common.lobby.request.RetrieveAllOnlineLobbysRequest;
-import de.uol.swp.common.lobby.response.AllOnlineLobbysResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
