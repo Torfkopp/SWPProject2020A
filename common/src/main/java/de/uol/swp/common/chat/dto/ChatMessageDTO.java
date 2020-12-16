@@ -17,7 +17,7 @@ public class ChatMessageDTO implements ChatMessage {
     private final Integer id;
     private final User author;
     private final Instant timestamp;
-    private final String content;
+    private String content;
 
     /**
      * Constructor
@@ -79,6 +79,11 @@ public class ChatMessageDTO implements ChatMessage {
     @Override
     public String getContent() {
         return this.content;
+    }
+
+    @Override
+    public void setContent(String newContent) {
+        if (newContent != null) this.content = newContent;
     }
 
     @Override

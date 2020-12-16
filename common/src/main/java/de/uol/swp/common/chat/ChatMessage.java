@@ -42,6 +42,14 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
     String getContent();
 
     /**
+     * Setter for the ChatMessage's content
+     *
+     * @param newContent The new ChatMessage content
+     * @since 2020-12-16
+     */
+    void setContent(String newContent);
+
+    /**
      * Getter for the ChatMessage's timestamp
      *
      * @return An Instant object in UTC to represent the creation time of the ChatMessage
