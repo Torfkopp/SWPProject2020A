@@ -181,10 +181,12 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg){
-        LOG.debug("Added Lobby to LobbyList " + msg.getName());
+
         if (msg.getName() == null || msg.getName().isEmpty()){
+            LOG.debug("Tried to add Lobby without name to LobbyList ");
         } else {
             lobbies.add(msg.getName());
+            LOG.debug("Added Lobby to LobbyList " + msg.getName());
         }
     }
 
@@ -204,10 +206,12 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg){
-        LOG.debug("Removed Lobby from LobbyList " + msg.getName());
+
         if (msg.getName() == null || msg.getName().isEmpty()){
+            LOG.debug("Tried to delete Lobby without name from LobbyList ");
         } else {
             lobbies.remove(msg.getName());
+            LOG.debug("Removed Lobby from LobbyList " + msg.getName());
         }
     }
 
