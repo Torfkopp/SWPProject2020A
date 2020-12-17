@@ -9,8 +9,10 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
 import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
+import de.uol.swp.common.user.exception.UserNotFoundExceptionMessage;
 import de.uol.swp.common.user.request.DeleteUserRequest;
 import de.uol.swp.common.user.request.RegisterUserRequest;
+import de.uol.swp.common.user.request.UpdateUserPasswordRequest;
 import de.uol.swp.common.user.request.UpdateUserRequest;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
@@ -18,6 +20,8 @@ import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
 import de.uol.swp.server.AbstractService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
 
 /**
  * Mapping vom event bus calls to user management calls
@@ -128,17 +132,27 @@ public class UserService extends AbstractService {
      *
      */
     @Subscribe
-    private void onChangePasswordRequest(UpdateUserRequest msg) {
+    private void onChangePasswordRequest(UpdateUserPasswordRequest msg) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Got new ChangePassword message with " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {
-            userManagement.updateUser(msg.getUser());
-            returnMessage = new ChangePasswordSuccessfulResponse();
+            Optional<User> optionalUser = userManagement.getUser(msg.getUser().getUsername());
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                if (user.getPassword().equals(msg.getOldPassword())) {
+                    userManagement.updateUser(msg.getUser());
+                    returnMessage = new ChangePasswordSuccessfulResponse();
+                }else{
+                 returnMessage = new ChangePasswordExceptionMessage("Your Old Passwords are not equal");
+                }
+            }else{
+                returnMessage = new UserNotFoundExceptionMessage();
+            }
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new ChangePasswordExceptionMessage("Cannot change Password of" + msg.getUser() + " " + e.getMessage());
+            returnMessage = new ChangePasswordExceptionMessage("Cannot change Password of " + msg.getUser() + " " + e.getMessage());
         }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());

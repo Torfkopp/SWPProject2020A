@@ -91,4 +91,10 @@ public class UserService implements ClientUserService {
 		RetrieveAllOnlineUsersRequest cmd = new RetrieveAllOnlineUsersRequest();
 		bus.post(cmd);
 	}
+
+	@Override
+	public void updateUserPassword(User user, String oldPassword) {
+		UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(user, oldPassword);
+		bus.post(request);
+	}
 }

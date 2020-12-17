@@ -102,7 +102,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
         } else if (!NewPasswordField1.getText().equals(NewPasswordField2.getText())) {
             eventBus.post(new ChangePasswordErrorEvent("Your New Passwords are not equal"));
         } else {
-            userService.updateUser(new UserDTO(user.getUsername(), NewPasswordField1.getText(), "empty"));
+            userService.updateUserPassword(new UserDTO(user.getUsername(), NewPasswordField1.getText(), "empty"),OldPasswordField1.getText());
         }
     }
 

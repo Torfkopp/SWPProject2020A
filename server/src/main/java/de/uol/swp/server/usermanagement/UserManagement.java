@@ -106,4 +106,9 @@ public class UserManagement extends AbstractUserManagement {
     public List<User> retrieveAllUsers() {
         return userStore.getAllUsers();
     }
+
+    @Override
+    public Optional<User> getUser(String userName) {
+        return userStore.findUser(userName);
+    }
 }

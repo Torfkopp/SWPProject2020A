@@ -77,4 +77,5 @@ public interface ClientUserService {
      */
     void retrieveAllUsers();
 
+    void updateUserPassword(User user, String oldPassword);
 }
