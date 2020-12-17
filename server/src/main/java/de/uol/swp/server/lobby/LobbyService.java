@@ -11,6 +11,8 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
@@ -27,13 +29,15 @@ public class LobbyService extends AbstractService {
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
 
+    private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+
     /**
      * Constructor
      *
-     * @param lobbyManagement The management class for creating, storing and deleting
-     *                        lobbies
+     * @param lobbyManagement       The management class for creating, storing and deleting
+     *                              lobbies
      * @param authenticationService the user management
-     * @param eventBus the server-wide EventBus
+     * @param eventBus              the server-wide EventBus
      * @since 2019-10-08
      */
     @Inject
@@ -45,7 +49,7 @@ public class LobbyService extends AbstractService {
 
     /**
      * Handles CreateLobbyRequests found on the EventBus
-     *
+     * <p>
      * If a CreateLobbyRequest is detected on the EventBus, this method is called.
      * It creates a new Lobby via the LobbyManagement using the parameters from the
      * request and sends a LobbyCreatedMessage to every connected user
@@ -57,13 +61,17 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     public void onCreateLobbyRequest(CreateLobbyRequest createLobbyRequest) {
-        lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
-        sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
+        try {
+            lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
+            sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
+        } catch (IllegalArgumentException e) {
+            LOG.debug(e.getMessage());
+        }
     }
 
     /**
      * Handles LobbyJoinUserRequests found on the EventBus
-     *
+     * <p>
      * If a LobbyJoinUserRequest is detected on the EventBus, this method is called.
      * It adds a user to a Lobby stored in the LobbyManagement and sends a UserJoinedLobbyMessage
      * to every user in the lobby.
@@ -86,7 +94,7 @@ public class LobbyService extends AbstractService {
 
     /**
      * Handles LobbyLeaveUserRequests found on the EventBus
-     *
+     * <p>
      * If a LobbyLeaveUserRequest is detected on the EventBus, this method is called.
      * It removes a user from a Lobby stored in the LobbyManagement and sends a
      * UserLeftLobbyMessage to every user in the lobby.
@@ -112,7 +120,7 @@ public class LobbyService extends AbstractService {
      * posts it on the EventBus
      *
      * @param lobbyName Name of the lobby the players are in
-     * @param message the message to be send to the users
+     * @param message   the message to be send to the users
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-10-08
      */
@@ -127,4 +135,20 @@ public class LobbyService extends AbstractService {
         // TODO: error handling not existing lobby
     }
 
+    /**
+     * Handles RetrieveAllLobbiesRequests found on the EventBus
+     * <p>
+     * If a RetrieveAllLobbiesRequest is detected on the EventBus, this method is called.
+     * It posts a AllLobbiesResponse containing a list of all lobby names
+     *
+     * @param retrieveAllLobbiesRequest The RetrieveAllLobbiesRequests found on the EventBus
+     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @since 2020-12-12
+     */
+    @Subscribe
+    public void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest retrieveAllLobbiesRequest) {
+        AllLobbiesResponse response = new AllLobbiesResponse(lobbyManagement.getLobbies());
+        response.initWithMessage(retrieveAllLobbiesRequest);
+        post(response);
+    }
 }
