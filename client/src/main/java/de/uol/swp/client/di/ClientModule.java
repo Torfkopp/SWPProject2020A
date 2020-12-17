@@ -7,6 +7,8 @@ import de.uol.swp.client.ClientConnection;
 import de.uol.swp.client.ClientConnectionFactory;
 import de.uol.swp.client.SceneManager;
 import de.uol.swp.client.SceneManagerFactory;
+import de.uol.swp.client.chat.ChatService;
+import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import javafx.fxml.FXMLLoader;
@@ -31,5 +33,6 @@ public class ClientModule extends AbstractModule {
         bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class);
         bind(EventBus.class).toInstance(eventBus);
         bind(ClientUserService.class).to(UserService.class);
+        bind(IChatService.class).to(ChatService.class);
     }
 }

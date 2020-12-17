@@ -44,8 +44,10 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore im
     @Override
     public List<ChatMessage> getLatestMessages(int amount) {
         List<Map.Entry<Integer, ChatMessage>> list = new LinkedList<>(chatHistory.entrySet());
-        Collections.reverse(list);
-        return list.stream().limit(amount).map(Map.Entry::getValue).collect(Collectors.toList());
+        Collections.reverse(list); // get the recentmost messages to top for proper [amount] limit
+        List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(Collectors.toList());
+        Collections.reverse(returnList); // re-order the messages oldest to newest (newest at the bottom in Chat)
+        return returnList;
     }
 
     @Override

@@ -13,6 +13,7 @@ import de.uol.swp.common.message.AbstractServerMessage;
 public class EditedChatMessageMessage extends AbstractServerMessage {
     private final int id;
     private final String newContent;
+    // TODO: send whole ChatMessage object
 
     /**
      * Constructor

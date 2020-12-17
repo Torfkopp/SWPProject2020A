@@ -23,7 +23,7 @@ public class NewChatMessageRequest extends AbstractRequestMessage {
      * @param content The content of the ChatMessage that should be saved
      * @since 2020-12-17
      */
-    NewChatMessageRequest(User author, String content) {
+    public NewChatMessageRequest(User author, String content) {
         this.author = author;
         this.content = content;
     }
