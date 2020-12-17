@@ -4,8 +4,15 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
+import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.chat.dto.ChatMessageDTO;
+import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
+import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
+import de.uol.swp.common.chat.message.EditedChatMessageMessage;
+import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -14,15 +21,21 @@ import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -42,14 +55,25 @@ public class MainMenuPresenter extends AbstractPresenter {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     private ObservableList<String> users;
+    private ObservableMap<Integer, String> chatMessageMap;
+    private ObservableList<String> chatMessages;
 
     private User loggedInUser;
 
     @Inject
     private LobbyService lobbyService;
 
+    @Inject
+    private ChatService chatService;
+
     @FXML
     private ListView<String> usersView;
+
+    @FXML
+    private TextField messageField; // TODO: MERGE CONFLICT INCOMING
+
+    @FXML
+    private ListView<String> chatView; // TODO: MERGE CONFLICT INCOMING
 
     /**
      * Handles successful login
@@ -65,9 +89,35 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void loginSuccessful(LoginSuccessfulResponse message) {
+        if (chatMessageMap == null) chatMessageMap = FXCollections.observableHashMap();
+        if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
+        chatMessageMap.addListener((MapChangeListener<? super Integer, ? super String>) change -> {
+            if (change.wasAdded() && !change.wasRemoved()) {
+                chatMessages.add(change.getValueAdded());
+            } else if (!change.wasAdded() && change.wasRemoved()) {
+                for (int i = 0; i < chatMessages.size(); i++) {
+                    String text = chatMessages.get(i);
+                    if (text.equals(change.getValueRemoved())) {
+                        chatMessages.remove(i);
+                        break;
+                    }
+                }
+                chatMessages.remove(change.getValueRemoved());
+            } else if (change.wasAdded() && change.wasRemoved()) {
+                for (int i = 0; i < chatMessages.size(); i++) {
+                    String text = chatMessages.get(i);
+                    if (text.equals(change.getValueRemoved())) {
+                        chatMessages.remove(i);
+                        chatMessages.add(i, change.getValueAdded());
+                        break;
+                    }
+                }
+            }
+        });
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
+        chatService.askLatestMessages(10);
     }
 
     /**
@@ -127,6 +177,114 @@ public class MainMenuPresenter extends AbstractPresenter {
     public void userList(AllOnlineUsersResponse allUsersResponse) {
         LOG.debug("Update of user list " + allUsersResponse.getUsers());
         updateUsersList(allUsersResponse.getUsers());
+    }
+
+    /**
+     * Handles new incoming ChatMessage
+     * <p>
+     * If a CreatedChatMessageMessage is posted to the EventBus, this method
+     * puts the incoming ChatMessage's content into the chatMessageMap with the
+     * ChatMessage's ID as the key.
+     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
+     * the incoming ChatMessage's content is displayed in the log.
+     *
+     * @param msg The CreatedChatMessageMessage object found on the EventBus
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see CreatedChatMessageMessage
+     * @see MainMenuPresenter#chatMessageMap
+     * @since 2020-12-17
+     */
+    @Subscribe
+    public void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+        LOG.debug("Received Chat Message: " + msg.getMsg().getContent());
+        String textMsg = msgToString(msg.getMsg());
+        Platform.runLater(() -> {
+            if (chatMessages == null) {
+                chatMessages = FXCollections.observableArrayList();
+                chatView.setItems(chatMessages);
+            }
+            chatMessageMap.put(msg.getMsg().getID(), textMsg);
+        });
+    }
+
+    /**
+     * Handles incoming notification that a ChatMessage was deleted
+     * <p>
+     * If a DeletedChatMessageMessage is posted to the EventBus, this method
+     * removes the ChatMessage with the corresponding ID from the chatMessageMap.
+     *
+     * @param msg The DeletedChatMessageMessage found on the EventBus
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see DeletedChatMessageMessage
+     * @see MainMenuPresenter#chatMessageMap
+     * @since 2020-12-17
+     */
+    @Subscribe
+    public void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
+        Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
+    }
+
+    /**
+     * Handles incoming notification that a ChatMessage was edited
+     * <p>
+     * If an EditedChatMessageMessage is posted to the EventBus, this method
+     * replaces the content in the chatMessageMap that is stored under the
+     * edited ChatMessage's ID.
+     *
+     * @param msg The EditedChatMessageMessage found on the EventBus
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see EditedChatMessageMessage
+     * @see MainMenuPresenter#chatMessageMap
+     * @since 2020-12-17
+     */
+    @Subscribe
+    public void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
+        // TODO: richtiger Inhalt wie bei einer normalen Nachricht?
+        String textMsg = "Edited  " + msg.getNewContent();
+        Platform.runLater(() -> chatMessageMap.replace(msg.getId(), textMsg));
+    }
+
+    /**
+     * Handles AskLatestChatMessageResponse
+     * <p>
+     * If a AskLatestChatMessageResponse is found on the EventBus,
+     * this method calls updateChatMessageList to fill or update the ChatMessageList.
+     *
+     * @param msg The AskLatestChatMessageResponse found on the EventBus
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see AskLatestChatMessageResponse
+     * @see MainMenuPresenter#updateChatMessageList(List)
+     * @since 2020-12-17
+     */
+    @Subscribe
+    public void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
+        LOG.debug(msg.getChatHistory());
+        updateChatMessageList(msg.getChatHistory());
+    }
+
+    /**
+     * Method to update the ChatMessageList with a given List of ChatMessages
+     *
+     * @param chatMessageList The List of ChatMessages to insert into the
+     *                        chatMessageMap
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see MainMenuPresenter#chatMessageMap
+     * @since 2020-12-17
+     */
+    private void updateChatMessageList(List<ChatMessageDTO> chatMessageList) {
+        Platform.runLater(() -> {
+            if (chatMessages == null) {
+                chatMessages = FXCollections.observableArrayList();
+                chatView.setItems(chatMessages);
+            }
+            chatMessages.clear();
+            chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), msgToString(m)));
+        });
     }
 
     /**
@@ -240,5 +398,123 @@ public class MainMenuPresenter extends AbstractPresenter {
         userService.logout(loggedInUser);
         eventBus.post(showLoginViewMessage);
         userService.dropUser(loggedInUser);
+    }
+
+    /**
+     * Method called when the SendMessageButton is pressed
+     * <p>
+     * This Method is called when the SendMessageButton is pressed. It calls the chatService
+     * to create a new message with the contents of the messageField as its content and
+     * the currently logged in user as author. It also clears the messageField.
+     *
+     * @param event the event
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see ChatService
+     * @since 2020-12-17
+     */
+    @FXML
+    public void onSendMessageButtonPressed(ActionEvent event) {
+        // TODO: entfernen vor commit (Konflikt) & Warten auf Merge von SWP2020A-52
+        String msg = messageField.getText();
+        messageField.clear();
+        chatService.newMessage(loggedInUser, msg);
+    }
+
+
+    /**
+     * Method called when the DeleteMessageButton is pressed
+     * <p>
+     * This method is called when the DeleteMessageButton is pressed. It calls the chatService
+     * to delete the message currently selected in the chatView.
+     *
+     * @param event the event
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see ChatService
+     * @since 2020-12-17
+     */
+    @FXML
+    public void onDeleteMessageButtonPressed(ActionEvent event) {
+        Integer msgId = findId();
+        if (msgId != null) {
+            chatService.deleteMessage(msgId);
+        }
+    }
+
+    /**
+     * Method called when the EditMessageButton is pressed.
+     * <p>
+     * This method is called when the EditMessageButton is pressed. It calls the ChatService
+     * to edit the message currently selected in the chatView by replacing the current content
+     * with the content found in the messageField.
+     *
+     * @param event the event
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see ChatService
+     * @since 2020-12-17
+     */
+    @FXML
+    public void onEditMessageButtonPressed(ActionEvent event) {
+        Integer msgId = findId();
+        if (msgId != null) {
+            chatService.editMessage(msgId, messageField.getText());
+        }
+    }
+
+    /**
+     * Converts a Instant (Timestamp) to a string
+     *
+     * @param timestamp The Instant to convert
+     * @return String the string that was created
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see ChatMessage
+     * @since 2020-12-17
+     */
+    private String timestampToString(Instant timestamp) {
+        return timestamp.atZone(ZoneOffset.UTC).getHour() +
+                ":" +
+                String.format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
+    }
+
+    /**
+     * Converts a ChatMessage to a string
+     *
+     * @param msg the ChatMessage to convert
+     * @return String the string that was created
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see ChatMessage
+     * @since 2020-12-17
+     */
+    private String msgToString(ChatMessage msg) {
+        return msg.getContent() +
+                " - " +
+                msg.getAuthor().getUsername() +
+                " - " +
+                timestampToString(msg.getTimestamp());
+    }
+
+    /**
+     * Method to find the ID of a message in the chatView
+     *
+     * @return The ID of the message that was searched
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see MainMenuPresenter#chatMessageMap
+     * @since 2020-12-17
+     */
+    private Integer findId() {
+        String msgText = chatView.getSelectionModel().getSelectedItem();
+        Integer msgId = null;
+        for (Map.Entry<Integer, String> entry : chatMessageMap.entrySet()) {
+            if (entry.getValue().equals(msgText)) {
+                msgId = entry.getKey();
+                break;
+            }
+        }
+        return msgId;
     }
 }
