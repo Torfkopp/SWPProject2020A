@@ -138,17 +138,13 @@ public class UserService extends AbstractService {
         }
         ResponseMessage returnMessage;
         try {
-            Optional<User> optionalUser = userManagement.getUser(msg.getUser().getUsername());
+            Optional<User> optionalUser = userManagement.getUserWithPassword(msg.getUser().getUsername(),msg.getOldPassword());
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                if (user.getPassword().equals(msg.getOldPassword())) {
                     userManagement.updateUser(msg.getUser());
                     returnMessage = new ChangePasswordSuccessfulResponse();
-                }else{
-                 returnMessage = new ChangePasswordExceptionMessage("Your Old Passwords are not equal");
-                }
-            }else{
-                returnMessage = new UserNotFoundExceptionMessage();
+            } else {
+                returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
             }
         } catch (Exception e) {
             LOG.error(e);
@@ -156,6 +152,7 @@ public class UserService extends AbstractService {
         }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
+            post(returnMessage);
         }
     }
 }

@@ -111,4 +111,10 @@ public class UserManagement extends AbstractUserManagement {
     public Optional<User> getUser(String userName) {
         return userStore.findUser(userName);
     }
+
+
+    public Optional<User> getUserWithPassword(String userName, String password) {
+        return userStore.findUser(userName, password);
+    }
+
 }
