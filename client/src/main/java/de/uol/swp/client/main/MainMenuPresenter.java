@@ -6,6 +6,8 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -162,6 +164,54 @@ public class MainMenuPresenter extends AbstractPresenter {
         });
     }
 
+
+    /**
+     * Adds newly created Lobby to LobbyList
+     * <p>
+     * If a new LobbyCreatedMessage object is posted to the EventBus the name
+     * of the newly created lobby is put onto the lobby list in the main menu.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Added new lobby to lobby
+     * list" with the name of the newly added lobby is displayed in the
+     * log.
+     *
+     * @author Temmo Junkhoff
+     * @param msg the LobbyCreatedMessage object seen on the EventBus
+     * @see LobbyCreatedMessage
+     * @since 2020-12-17
+     */
+    @Subscribe
+    private void onLobbyCreatedMessage(LobbyCreatedMessage msg){
+        LOG.debug("Added Lobby to LobbyList " + msg.getName());
+        if (msg.getName() == null || msg.getName().isEmpty()){
+        } else {
+            lobbies.add(msg.getName());
+        }
+    }
+
+    /**
+     * Removes deleted Lobby from LobbyList
+     * <p>
+     * If a new LobbyDeletedMessage object is posted to the EventBus the name
+     * of the deleted lobby is removed from the lobby list in the main menu.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Removed lobby from lobby
+     * list" with the name of the removed lobby is displayed in the
+     * log.
+     *
+     * @author Temmo Junkhoff
+     * @param msg the LobbyDeletedMessage object seen on the EventBus
+     * @see LobbyDeletedMessage
+     * @since 2020-12-17
+     */
+    @Subscribe
+    private void onLobbyDeletedMessage(LobbyDeletedMessage msg){
+        LOG.debug("Removed Lobby from LobbyList " + msg.getName());
+        if (msg.getName() == null || msg.getName().isEmpty()){
+        } else {
+            lobbies.remove(msg.getName());
+        }
+    }
+
+
     /**
      * Handles new list of lobbies
      * <p>
@@ -175,7 +225,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
      * @since 2020-11-29
      */
-
     @Subscribe
     public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
         updateLobbyList(allLobbiesResponse.getLobbies());
