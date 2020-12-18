@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.user.User;
@@ -273,7 +274,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
-            System.out.println("Please choose a valid Lobby"); // change to showError for production - Marvin
+            eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
             lobbyName = lobbyView.getSelectionModel().getSelectedItem();
             lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);

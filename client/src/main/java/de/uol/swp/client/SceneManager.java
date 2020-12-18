@@ -9,6 +9,7 @@ import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
@@ -260,6 +261,21 @@ public class SceneManager {
         lobbyStage.setY(primaryStage.getY() + 100);
         //Shows the window
         lobbyStage.show();
+    }
+
+    /**
+     * Handles LobbyErrorEvent detected on the EventBus
+     * <p>
+     * If a LobbyErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in a error alert.
+     *
+     * @param event The LobbyErrorEvent detected on the EventBus
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @since 2019-09-03
+     */
+    @Subscribe
+    public void onLobbyErrorEvent(LobbyErrorEvent event) {
+        showError(event.getMessage());
     }
 
     /**
