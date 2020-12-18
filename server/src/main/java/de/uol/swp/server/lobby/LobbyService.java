@@ -6,6 +6,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.CreateLobbyRequest;
+import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
+import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -152,7 +157,7 @@ public class LobbyService extends AbstractService {
      * It posts a AllLobbiesResponse containing a list of all lobby names
      *
      * @param retrieveAllLobbiesRequest The RetrieveAllLobbiesRequests found on the EventBus
-     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @see RetrieveAllLobbiesRequest
      * @since 2020-12-12
      */
     @Subscribe

@@ -13,7 +13,7 @@ import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -84,7 +84,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * If a Lobby gets created, this method is called.
      * It updates the LobbyList.
      *
-     * @param message the LobbyCreatedMessage object seen on the EventBus
+     * @param lobbyCreatedMessage the LobbyCreatedMessage object seen on the EventBus
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2020-12-14
      */
@@ -188,7 +188,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * log.
      *
      * @param allLobbiesResponse the AllLobbiesResponse object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @see AllLobbiesResponse
      * @since 2020-11-29
      */
 

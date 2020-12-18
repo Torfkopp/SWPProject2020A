@@ -14,7 +14,7 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -191,7 +191,7 @@ public class SceneManager {
      * is updated to know the same lobbies as the server
      *
      * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
-     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @see AllLobbiesResponse
      * @since 2020-12-12
      */
     @Subscribe
