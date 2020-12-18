@@ -11,6 +11,7 @@ import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
+import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -96,15 +97,22 @@ public class LobbyService extends AbstractService {
 
         if (lobby.isPresent()) {
             if (lobby.get().getUsers().size() < 4) {
-                lobby.get().joinUser(lobbyJoinUserRequest.getUser());
-                sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
+                if (!lobby.get().getUsers().contains(lobbyJoinUserRequest.getUser())) {
+                    lobby.get().joinUser(lobbyJoinUserRequest.getUser());
+                    sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
+                } else {
+                    ExceptionMessage message = new ExceptionMessage("You're already in this lobby!");
+                    post(message);
+                }
             } else {
-                // TODO: Full lobby
+                ExceptionMessage message = new ExceptionMessage("This lobby is full!");
+                post(message);
             }
         } else {
-            // TODO: Not existing Lobby
+            ExceptionMessage message = new ExceptionMessage("This lobby does not exist!");
+            post(message);
         }
-        // TODO: Even more error checking missing here!
+
     }
 
     /**

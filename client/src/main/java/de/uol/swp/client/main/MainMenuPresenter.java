@@ -8,6 +8,7 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -277,8 +278,12 @@ public class MainMenuPresenter extends AbstractPresenter {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
             lobbyName = lobbyView.getSelectionModel().getSelectedItem();
-            lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
-            eventBus.post(new ShowLobbyViewEvent(lobbyName, false));
+            // try {
+                lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
+                eventBus.post(new ShowLobbyViewEvent(lobbyName, false));
+            // } catch (ExceptionMessage) {
+            //    eventBus.post(new LobbyErrorEvent(ExceptionMessage));
+            //} TODO: Fix me
         }
 
     }
