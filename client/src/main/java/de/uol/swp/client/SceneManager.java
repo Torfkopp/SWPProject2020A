@@ -14,10 +14,7 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
-import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
-import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
-import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
+import de.uol.swp.common.lobby.message.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -28,8 +25,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class that manages which window/scene is currently shown
@@ -48,11 +47,9 @@ public class SceneManager {
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
-    private LinkedList<Scene> lobbyScenes = new LinkedList<>();
-    private int lobbyCount = 0;
+    private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private Scene lastScene = null;
     private Scene currentScene = null;
-    private Scene ChangePasswordScene;
 
     private final Injector injector;
 
@@ -75,7 +72,6 @@ public class SceneManager {
         initLoginView();
         initMainView();
         initRegistrationView();
-        initChangePasswordView();
     }
 
     /**
@@ -158,24 +154,6 @@ public class SceneManager {
     }
 
     /**
-     * Initializes the Change Password view
-     * <p>
-     * If the ChangePasswordScene is null it gets set to a new scene containing the
-     * a pane showing the Change Password view as specified by the ChangePasswordView
-     * FXML file.
-     *
-     * @author Eric Vuong
-     */
-    private void initChangePasswordView() {
-        if (ChangePasswordScene == null) {
-            Parent rootPane = initPresenter(ChangePasswordPresenter.fxml);
-            ChangePasswordScene = new Scene(rootPane, 400, 200);
-            ChangePasswordScene.getStylesheets().add(styleSheet);
-        }
-    }
-
-
-    /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
      * <p>
      * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
@@ -191,21 +169,6 @@ public class SceneManager {
         showRegistrationScreen();
     }
 
-
-    /**
-     * Handles ShowChangePasswordViewEvent detected on the EventBus
-     * <p>
-     * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
-     * called. It calls a method to switch the current screen to the Change Password
-     * screen.
-     *
-     * @author Eric Vuong
-     */
-    @Subscribe
-    public void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
-        showChangePasswordScreen(event.getUser());
-    }
-
     /**
      * Handles ShowLoginViewEvent detected on the EventBus
      * <p>
@@ -216,10 +179,27 @@ public class SceneManager {
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @since 2019-09-03
      */
-
     @Subscribe
     public void onShowLoginViewEvent(ShowLoginViewEvent event) {
         showLoginScreen();
+    }
+
+    /**
+     * Handles the incoming LobbyListMessage
+     * <p>
+     * If a LobbyListMessage is detected, the lobbyScenes map
+     * is updated to know the same lobbies as the server
+     *
+     * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
+     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @since 2020-12-12
+     */
+    @Subscribe
+    public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
+        LOG.debug("Retrieval of lobby map");
+        for (String name : allLobbiesResponse.getLobbies()) {
+            lobbyScenes.put(name, null);
+        }
     }
 
     /**
@@ -234,25 +214,31 @@ public class SceneManager {
      */
     @Subscribe
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
-        //New window (Stage)
-        Stage lobbyStage = new Stage();
-        lobbyStage.setTitle("Lobby " + lobbyCount);
-        //Initialises a new lobbyScene
-        Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 400, 200);
-        lobbyScene.getStylesheets().add(styleSheet);
-        lobbyScenes.add(lobbyScene);
-        //Sets the stage to the newly created scene
-        lobbyStage.setScene(lobbyScenes.getLast());
-        //Specifies the modality for new window
-        lobbyStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        lobbyStage.initOwner(primaryStage);
-        //Set position of second window, related to primary window
-        lobbyStage.setX(primaryStage.getX() + 200);
-        lobbyStage.setY(primaryStage.getY() + 100);
-        //Shows the window
-        lobbyStage.show();
+        //gets the lobby's name
+        String lobbyName = event.getName();
+        if (!lobbyScenes.containsKey(lobbyName)) {
+            //New window (Stage)
+            Stage lobbyStage = new Stage();
+            lobbyStage.setTitle(event.getName());
+            //Initialises a new lobbyScene
+            Parent rootPane = initPresenter(LobbyPresenter.fxml);
+            Scene lobbyScene = new Scene(rootPane, 400, 200);
+            lobbyScene.getStylesheets().add(styleSheet);
+            lobbyScenes.put(lobbyName, lobbyScene);
+            //Sets the stage to the newly created scene
+            lobbyStage.setScene(lobbyScenes.get(lobbyName));
+            //Specifies the modality for new window
+            lobbyStage.initModality(Modality.NONE);
+            //Specifies the owner Window (parent) for new window
+            lobbyStage.initOwner(primaryStage);
+            //Set position of second window, related to primary window
+            lobbyStage.setX(primaryStage.getX() + 200);
+            lobbyStage.setY(primaryStage.getY() + 100);
+            //Shows the window
+            lobbyStage.show();
+        } else {
+            showError("Lobby name already exists");
+        }
     }
 
     /**
@@ -270,20 +256,6 @@ public class SceneManager {
         showScene(lastScene, lastTitle);
     }
 
-
-    /**
-     * Handles ChangePasswordCanceledEvent detected on the EventBus
-     * <p>
-     * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
-     * called. It calls a method to show the screen shown before Change Password screen.
-     *
-     * @author Eric Vuong
-     */
-    @Subscribe
-    public void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
-        showScene(lastScene, lastTitle);
-    }
-
     /**
      * Handles RegistrationErrorEvent detected on the EventBus
      * <p>
@@ -296,19 +268,6 @@ public class SceneManager {
      */
     @Subscribe
     public void onRegistrationErrorEvent(RegistrationErrorEvent event) {
-        showError(event.getMessage());
-    }
-
-    /**
-     * Handles ChangePasswordErrorEvent detected on the EventBus
-     * <p>
-     * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
-     * called. It shows the error message of the event in a error alert.
-     *
-     * @author Eric Vuong
-     */
-    @Subscribe
-    public void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
         showError(event.getMessage());
     }
 
@@ -417,19 +376,4 @@ public class SceneManager {
     public void showRegistrationScreen() {
         showScene(registrationScene, "Registration");
     }
-
-    /**
-     * Shows the Change Password screen
-     * <p>
-     * Sets the scene's UserData to the current user.
-     * Switches the current Scene to the ChangePasswordScene and sets the title of
-     * the window to "Change Password"
-     *
-     * @author Eric Vuong
-     */
-    public void showChangePasswordScreen(User user) {
-        ChangePasswordScene.setUserData(user);
-        showScene(ChangePasswordScene, "Change Password");
-    }
-
 }
