@@ -8,6 +8,7 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -278,14 +279,28 @@ public class MainMenuPresenter extends AbstractPresenter {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
             lobbyName = lobbyView.getSelectionModel().getSelectedItem();
-            // try {
-                lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
-                eventBus.post(new ShowLobbyViewEvent(lobbyName, false));
-            // } catch (ExceptionMessage) {
-            //    eventBus.post(new LobbyErrorEvent(ExceptionMessage));
-            //} TODO: Fix me
+            lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
         }
 
+    }
+
+    /**
+     * Handles posting the ShowLobbyViewEvent
+     * <p>
+     * If a new UserJoinedLobbyMessage object is posted to the EventBus this
+     * method will post a ShowLobbyViewEvent on the EventBus
+     *
+     * @param message the UserJoinedLobbyMessage object seen on the EventBus
+     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
+     * @since 2020-12-19
+     */
+    @Subscribe
+    public void postLobbyViewEvent(UserJoinedLobbyMessage message) {
+        if (message.getUser().equals(loggedInUser)) {
+            Platform.runLater(() -> {
+                eventBus.post(new ShowLobbyViewEvent(message.getName(), false));
+            });
+        }
     }
 
     /**
