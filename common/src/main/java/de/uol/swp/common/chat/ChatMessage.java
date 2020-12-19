@@ -45,6 +45,7 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
      * Setter for the ChatMessage's content
      *
      * @param newContent The new ChatMessage content
+     * @implNote This method also automatically sets the edited attribute to true!
      * @since 2020-12-16
      */
     void setContent(String newContent);
@@ -56,4 +57,12 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
      * @since 2020-12-16
      */
     Instant getTimestamp();
+
+    /**
+     * Getter for the ChatMessage's edited status
+     *
+     * @return False, if the ChatMessage wasn't edited. True, if it was edited.
+     * @since 2020-12-19
+     */
+    boolean isEdited();
 }

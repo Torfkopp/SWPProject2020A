@@ -32,8 +32,6 @@ import javafx.scene.control.TextInputDialog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +53,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     private ObservableList<String> users;
-    private ObservableMap<Integer, String> chatMessageMap;
+    private ObservableMap<Integer, ChatMessage> chatMessageMap;
     private ObservableList<String> chatMessages;
 
     private User loggedInUser;
@@ -91,24 +89,25 @@ public class MainMenuPresenter extends AbstractPresenter {
     public void loginSuccessful(LoginSuccessfulResponse message) {
         if (chatMessageMap == null) chatMessageMap = FXCollections.observableHashMap();
         if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
-        chatMessageMap.addListener((MapChangeListener<? super Integer, ? super String>) change -> {
+        chatView.setItems(chatMessages);
+        chatMessageMap.addListener((MapChangeListener<Integer, ChatMessage>) change -> {
             if (change.wasAdded() && !change.wasRemoved()) {
-                chatMessages.add(change.getValueAdded());
+                chatMessages.add(change.getValueAdded().toString());
             } else if (!change.wasAdded() && change.wasRemoved()) {
                 for (int i = 0; i < chatMessages.size(); i++) {
                     String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved())) {
+                    if (text.equals(change.getValueRemoved().toString())) {
                         chatMessages.remove(i);
                         break;
                     }
                 }
-                chatMessages.remove(change.getValueRemoved());
+                chatMessages.remove(change.getValueRemoved().toString());
             } else if (change.wasAdded() && change.wasRemoved()) {
                 for (int i = 0; i < chatMessages.size(); i++) {
                     String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved())) {
+                    if (text.equals(change.getValueRemoved().toString())) {
                         chatMessages.remove(i);
-                        chatMessages.add(i, change.getValueAdded());
+                        chatMessages.add(i, change.getValueAdded().toString());
                         break;
                     }
                 }
@@ -198,14 +197,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     @Subscribe
     public void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         LOG.debug("Received Chat Message: " + msg.getMsg().getContent());
-        String textMsg = msgToString(msg.getMsg());
-        Platform.runLater(() -> {
-            if (chatMessages == null) {
-                chatMessages = FXCollections.observableArrayList();
-                chatView.setItems(chatMessages);
-            }
-            chatMessageMap.put(msg.getMsg().getID(), textMsg);
-        });
+        Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
     }
 
     /**
@@ -276,12 +268,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     private void updateChatMessageList(List<ChatMessageDTO> chatMessageList) {
         Platform.runLater(() -> {
-            if (chatMessages == null) {
-                chatMessages = FXCollections.observableArrayList();
-                chatView.setItems(chatMessages);
-            }
             chatMessages.clear();
-            chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), msgToString(m)));
+            chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), m));
         });
     }
 
@@ -458,41 +446,8 @@ public class MainMenuPresenter extends AbstractPresenter {
         Integer msgId = findId();
         if (msgId != null) {
             chatService.editMessage(msgId, messageField.getText());
+            messageField.clear();
         }
-    }
-
-    /**
-     * Converts a Instant (Timestamp) to a string
-     *
-     * @param timestamp The Instant to convert
-     * @return String the string that was created
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see ChatMessage
-     * @since 2020-12-17
-     */
-    private String timestampToString(Instant timestamp) {
-        return timestamp.atZone(ZoneOffset.UTC).getHour() +
-                ":" +
-                String.format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
-    }
-
-    /**
-     * Converts a ChatMessage to a string
-     *
-     * @param msg the ChatMessage to convert
-     * @return String the string that was created
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see ChatMessage
-     * @since 2020-12-17
-     */
-    private String msgToString(ChatMessage msg) {
-        return msg.getContent() +
-                " - " +
-                msg.getAuthor().getUsername() +
-                " - " +
-                timestampToString(msg.getTimestamp());
     }
 
     /**
@@ -507,8 +462,9 @@ public class MainMenuPresenter extends AbstractPresenter {
     private Integer findId() {
         String msgText = chatView.getSelectionModel().getSelectedItem();
         Integer msgId = null;
-        for (Map.Entry<Integer, String> entry : chatMessageMap.entrySet()) {
-            if (entry.getValue().equals(msgText)) {
+        for (Map.Entry<Integer, ChatMessage> entry : chatMessageMap.entrySet()) {
+            final ChatMessage selectedMessage = entry.getValue();
+            if (selectedMessage.toString().equals(msgText) && selectedMessage.getAuthor().equals(loggedInUser)) {
                 msgId = entry.getKey();
                 break;
             }
