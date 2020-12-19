@@ -1,5 +1,6 @@
 package de.uol.swp.server.chat.store;
 
+import com.google.common.base.Strings;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.user.User;
@@ -64,13 +65,14 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore im
     @Override
     public ChatMessage updateChatMessage(int id, String updatedContent) {
         ChatMessage messageToEdit = chatHistory.get(id);
-        messageToEdit.setContent(updatedContent);
+        if (!Strings.isNullOrEmpty(updatedContent)) {
+            messageToEdit.setContent(updatedContent);
+        }
         return messageToEdit;
     }
 
     @Override
     public void removeChatMessage(int id) {
         chatHistory.remove(id);
-        // TODO: send Message to client
     }
 }
