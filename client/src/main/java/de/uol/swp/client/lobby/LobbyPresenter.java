@@ -60,6 +60,7 @@ public class LobbyPresenter extends AbstractPresenter {
     public void creationSuccessful(LobbyCreatedMessage message) {
         this.creator = message.getUser();
         userService.retrieveAllUsers();
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
