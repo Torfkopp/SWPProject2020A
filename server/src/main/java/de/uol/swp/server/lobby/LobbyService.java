@@ -11,7 +11,6 @@ import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -89,7 +88,7 @@ public class LobbyService extends AbstractService {
      * @param lobbyJoinUserRequest The LobbyJoinUserRequest found on the EventBus
      * @see de.uol.swp.common.lobby.Lobby
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
-     * @since 2019-10-08
+     * @since 2020-12-19
      */
     @Subscribe
     public void onLobbyJoinUserRequest(LobbyJoinUserRequest lobbyJoinUserRequest) {
@@ -101,15 +100,15 @@ public class LobbyService extends AbstractService {
                     lobby.get().joinUser(lobbyJoinUserRequest.getUser());
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
                 } else {
-                    ExceptionMessage message = new ExceptionMessage("You're already in this lobby!");
+                    LobbyExceptionMessage message = new LobbyExceptionMessage("You're already in this lobby!");
                     post(message);
                 }
             } else {
-                ExceptionMessage message = new ExceptionMessage("This lobby is full!");
+                LobbyExceptionMessage message = new LobbyExceptionMessage("This lobby is full!");
                 post(message);
             }
         } else {
-            ExceptionMessage message = new ExceptionMessage("This lobby does not exist!");
+            LobbyExceptionMessage message = new LobbyExceptionMessage("This lobby does not exist!");
             post(message);
         }
 

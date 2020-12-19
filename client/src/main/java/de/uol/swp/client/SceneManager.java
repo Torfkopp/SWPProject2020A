@@ -15,6 +15,7 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -217,6 +218,7 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
         String lobbyName = event.getName();
+
         //User creating lobby
         if (event.getIsCreating()) {
             if (!lobbyScenes.containsKey(lobbyName)) {
@@ -271,11 +273,26 @@ public class SceneManager {
      *
      * @param event The LobbyErrorEvent detected on the EventBus
      * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
-     * @since 2019-09-03
+     * @since 2020-12-18
      */
     @Subscribe
     public void onLobbyErrorEvent(LobbyErrorEvent event) {
         showError(event.getMessage());
+    }
+
+    /**
+     * Handles LobbyExceptionMessage detected on the EventBus
+     * <p>
+     * If a LobbyExceptionMessage is detected on the EventBus, this method gets
+     * called. It shows the exception message of the message in a error alert.
+     *
+     * @param message The LobbyExceptionMessage detected on the EventBus
+     * @see de.uol.swp.common.lobby.message.LobbyExceptionMessage
+     * @since 2020-12-19
+     */
+    @Subscribe
+    public void onLobbyExceptionMessae(LobbyExceptionMessage message) {
+        showError(message.getException());
     }
 
     /**
