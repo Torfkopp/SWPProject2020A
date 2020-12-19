@@ -125,7 +125,7 @@ public class ChatService extends AbstractService {
         }
         try {
             ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());
-            ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage.getID(), chatMessage.getContent());
+            ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
             sendToAll(returnMessage);
         } catch (Exception e) {
             LOG.error(e);

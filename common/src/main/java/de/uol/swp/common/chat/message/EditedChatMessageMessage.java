@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat.message;
 
+import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.message.AbstractServerMessage;
 
 /**
@@ -11,39 +12,25 @@ import de.uol.swp.common.message.AbstractServerMessage;
  * @since 2020-12-17
  */
 public class EditedChatMessageMessage extends AbstractServerMessage {
-    private final int id;
-    private final String newContent;
-    // TODO: send whole ChatMessage object
+    private final ChatMessage chatMsg;
 
     /**
      * Constructor
      *
-     * @param id         The ID of the edited ChatMessage
-     * @param newContent The new content of the edited ChatMessage
-     * @since 2020-12-17
+     * @param chatMsg The edited ChatMessage
+     * @since 2020-12-19
      */
-    public EditedChatMessageMessage(int id, String newContent) {
-        this.id = id;
-        this.newContent = newContent;
+    public EditedChatMessageMessage(ChatMessage chatMsg) {
+        this.chatMsg = chatMsg;
     }
 
     /**
-     * Getter for the ID attribute
+     * Getter for the chatMsg attribute
      *
-     * @return the ID of the edited ChatMessage
-     * @since 2020-12-17
+     * @return The edited ChatMessage
+     * @since 2020-12-19
      */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Getter for the newContent attribute
-     *
-     * @return the new Content of the edited ChatMessage
-     * @since 2020-12-17
-     */
-    public String getNewContent() {
-        return newContent;
+    public ChatMessage getMsg() {
+        return chatMsg;
     }
 }

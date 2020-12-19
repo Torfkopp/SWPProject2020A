@@ -242,9 +242,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        // TODO: richtiger Inhalt wie bei einer normalen Nachricht?
-        String textMsg = "Edited  " + msg.getNewContent();
-        Platform.runLater(() -> chatMessageMap.replace(msg.getId(), textMsg));
+        Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
     }
 
     /**
