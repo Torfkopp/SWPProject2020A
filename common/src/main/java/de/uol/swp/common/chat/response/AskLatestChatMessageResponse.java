@@ -23,7 +23,7 @@ import java.util.List;
  * @since 2020-12-17
  */
 public class AskLatestChatMessageResponse extends AbstractResponseMessage {
-    private List<ChatMessageDTO> chatHistory = new LinkedList<>();
+    private final List<ChatMessageDTO> chatHistory = new LinkedList<>();
 
     /**
      * Constructor
