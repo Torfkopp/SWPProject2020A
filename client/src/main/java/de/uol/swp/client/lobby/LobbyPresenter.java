@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -30,6 +31,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
+    @Inject
     private LobbyService lobbyService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -51,7 +53,6 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-21
      */
     public LobbyPresenter() {
-
     }
 
     /**
@@ -153,10 +154,7 @@ public class LobbyPresenter extends AbstractPresenter {
      */
     @FXML
     void onLeaveLobby(ActionEvent event) {
-        //If the Creator leaves the lobby, the lobby gets deleted
-        if (loggedInUser == creator) {
-            //Doesn't delete the lobby, but it deletes the functionality and my braincells
-            //lobbyService.deleteLobby(lobbyName);
+        if (lobbyName == null && loggedInUser == null) {
         } else {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
         }
