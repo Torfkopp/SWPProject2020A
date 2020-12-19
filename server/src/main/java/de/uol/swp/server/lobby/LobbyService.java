@@ -101,14 +101,17 @@ public class LobbyService extends AbstractService {
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
                 } else {
                     LobbyExceptionMessage message = new LobbyExceptionMessage("You're already in this lobby!");
+                    message.setSession(lobbyJoinUserRequest.getSession().get()); // TODO: This spawns 2 errors but without it spawns 0
                     post(message);
                 }
             } else {
                 LobbyExceptionMessage message = new LobbyExceptionMessage("This lobby is full!");
+                message.setSession(lobbyJoinUserRequest.getSession().get());
                 post(message);
             }
         } else {
             LobbyExceptionMessage message = new LobbyExceptionMessage("This lobby does not exist!");
+            message.setSession(lobbyJoinUserRequest.getSession().get());
             post(message);
         }
 
