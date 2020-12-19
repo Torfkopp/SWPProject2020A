@@ -116,7 +116,7 @@ class ChatServiceTest {
         assertFalse(latestMessages.isEmpty());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), 1);
+        assertEquals(latestMessage.getID(), msg.getID());
         assertEquals(latestMessage.getContent(), secondContent);
     }
 
