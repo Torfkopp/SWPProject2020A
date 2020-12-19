@@ -9,11 +9,9 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
 import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
-import de.uol.swp.common.user.exception.UserNotFoundExceptionMessage;
 import de.uol.swp.common.user.request.DeleteUserRequest;
 import de.uol.swp.common.user.request.RegisterUserRequest;
 import de.uol.swp.common.user.request.UpdateUserPasswordRequest;
-import de.uol.swp.common.user.request.UpdateUserRequest;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
 import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
@@ -119,9 +117,9 @@ public class UserService extends AbstractService {
         }
     }
     /**
-     * Handles UpdateUserRequest found on the EventBus
+     * Handles UpdateUserPasswordRequest found on the EventBus
      *
-     * If a UpdateUserRequest is detected on the EventBus, this method is called.
+     * If a UpdateUserPasswordRequest is detected on the EventBus, this method is called.
      * It tries to change the Password of an User via the UserManagement.
      * If this succeeds, a ChangePasswordSuccessfulResponse is posted on the EventBus,
      * otherwise a ChangePasswordExceptionMessage gets posted there.
@@ -141,8 +139,8 @@ public class UserService extends AbstractService {
             Optional<User> optionalUser = userManagement.getUserWithPassword(msg.getUser().getUsername(),msg.getOldPassword());
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                    userManagement.updateUser(msg.getUser());
-                    returnMessage = new ChangePasswordSuccessfulResponse();
+                userManagement.updateUser(msg.getUser());
+                returnMessage = new ChangePasswordSuccessfulResponse();
             } else {
                 returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
             }

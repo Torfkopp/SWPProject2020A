@@ -87,6 +87,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2020-12-05
+     * @author Eric Vuong, Steven Luong
      */
     @FXML
     void onChangePasswordButtonPressed(ActionEvent event) {

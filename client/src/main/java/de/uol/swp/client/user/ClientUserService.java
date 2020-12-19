@@ -77,5 +77,14 @@ public interface ClientUserService {
      */
     void retrieveAllUsers();
 
+    /**
+     * Update a user password
+     *
+     * @param user
+     * @param oldPassword
+     * @author Eric Vuong, Steven Luong
+     * @since 2020-12-17
+     *
+     */
     void updateUserPassword(User user, String oldPassword);
 }

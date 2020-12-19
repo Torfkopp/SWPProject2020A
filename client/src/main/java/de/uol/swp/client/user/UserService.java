@@ -92,6 +92,16 @@ public class UserService implements ClientUserService {
 		bus.post(cmd);
 	}
 
+	/** Method to change a user´s Password
+	 *
+	 * This method creates a new updateUserPasswordRequest object with the user and oldPassword as parameter,
+	 * and post this instance to the EventBus
+	 *
+	 * @param user The user to update
+	 * @param oldPassword the password to change and verified
+	 * @author Eric Vuong, Steven Luong
+	 * @since 2020-12-17
+	 */
 	@Override
 	public void updateUserPassword(User user, String oldPassword) {
 		UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(user, oldPassword);

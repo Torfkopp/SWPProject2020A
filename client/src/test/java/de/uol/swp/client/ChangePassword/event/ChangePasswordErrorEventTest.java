@@ -18,7 +18,7 @@ public class ChangePasswordErrorEventTest {
     /**
      * Test for the creation of ChangePasswordErrorEvents
      *
-     * This test checks if the error message of the  ChangePasswordErrorEvent gets
+     * This test checks if the error message of the ChangePasswordErrorEvent gets
      * set correctly during the creation of a new event
      *
      * @since 2020-12-03

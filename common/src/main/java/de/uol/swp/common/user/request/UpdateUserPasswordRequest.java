@@ -2,14 +2,23 @@ package de.uol.swp.common.user.request;
 
 import de.uol.swp.common.user.User;
 
+/**
+ * Request to update an user´s password
+ *
+ * @see de.uol.swp.common.user.User
+ * @author Eric Vuong, Steven Luong
+ * @since 2020-12-17
+ */
 public class UpdateUserPasswordRequest extends UpdateUserRequest{
+
     private String oldPassword;
+
+
     /**
      * Constructor
      *
-     * @param user the user object the sender shall be updated to unchanged fields
-     *             being empty
-     * @since 2019-09-02
+     * @author Eric Vuong, Steven Luong
+     * @since 2020-12-17
      */
     public UpdateUserPasswordRequest(User user, String oldPassword) {
         super(user);
