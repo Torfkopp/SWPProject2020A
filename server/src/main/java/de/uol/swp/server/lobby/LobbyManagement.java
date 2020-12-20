@@ -82,6 +82,6 @@ public class LobbyManagement implements ServerLobbyService {
 
     @Override
     public List<User> retrieveAllLobbyUsers() {
-        return null; //todo: Funktion
+        return null; //todo: Funktion integrieeren
     }
 }
