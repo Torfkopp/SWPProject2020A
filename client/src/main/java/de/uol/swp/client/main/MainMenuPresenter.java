@@ -183,7 +183,6 @@ public class MainMenuPresenter extends AbstractPresenter {
         });
     }
 
-
     /**
      * Adds newly created Lobby to LobbyList
      * <p>
@@ -306,7 +305,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
-            eventBus.post(new ShowLobbyViewEvent(result.get(), true));
+            eventBus.post(new ShowLobbyViewEvent(result.get()));
         }
     }
 
@@ -323,7 +322,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-
         String lobbyName = null;
 
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -351,7 +349,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     public void postLobbyViewEvent(UserJoinedLobbyMessage message) {
         if (message.getUser().equals(loggedInUser)) {
             Platform.runLater(() -> {
-                eventBus.post(new ShowLobbyViewEvent(message.getName(), false));
+                eventBus.post(new ShowLobbyViewEvent(message.getName()));
             });
         }
     }

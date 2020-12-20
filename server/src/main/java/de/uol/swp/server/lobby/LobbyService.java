@@ -74,6 +74,8 @@ public class LobbyService extends AbstractService {
             lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
             sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
         } catch (IllegalArgumentException e) {
+            LobbyExceptionMessage message = new LobbyExceptionMessage(e.getMessage());
+            message.setSession(createLobbyRequest.getSession().get());
             LOG.debug(e.getMessage());
         }
     }
@@ -101,7 +103,7 @@ public class LobbyService extends AbstractService {
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
                 } else {
                     LobbyExceptionMessage message = new LobbyExceptionMessage("You're already in this lobby!");
-                    message.setSession(lobbyJoinUserRequest.getSession().get()); // TODO: This spawns 2 errors but without it spawns 0
+                    message.setSession(lobbyJoinUserRequest.getSession().get()); // TODO: This shouldn't be necessary
                     post(message);
                 }
             } else {

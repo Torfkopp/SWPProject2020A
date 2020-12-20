@@ -12,16 +12,14 @@ package de.uol.swp.client.lobby.event;
  */
 public class ShowLobbyViewEvent {
     private final String name;
-    private final boolean isCreating;
 
     /**
      * Constructor
      *
      * @param name Name containing the Lobby's name
      */
-    public ShowLobbyViewEvent(String name, boolean isCreating) {
+    public ShowLobbyViewEvent(String name) {
         this.name = name;
-        this.isCreating = isCreating;
     }
 
     /**
@@ -32,6 +30,4 @@ public class ShowLobbyViewEvent {
     public String getName() {
         return name;
     }
-
-    public boolean getIsCreating(){ return isCreating; }
 }

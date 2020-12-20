@@ -219,31 +219,21 @@ public class SceneManager {
         //gets the lobby's name
         String lobbyName = event.getName();
 
-        //User creating lobby
-        if (event.getIsCreating()) {
-            if (!lobbyScenes.containsKey(lobbyName)) {
-                spawnLobbyWindow(lobbyName);
-            } else {
-                showError("Lobby name already exists");
-            }
-        //User joining lobby
+        if (!lobbyScenes.containsKey(lobbyName)) {
+            spawnLobbyWindow(lobbyName);
         } else {
-            if (lobbyScenes.containsKey(lobbyName)) {
-                spawnLobbyWindow(lobbyName);
-            } else {
-                showError("Lobby name doesn't exist");
-            }
+            showError("Lobby name already exists");
         }
     }
 
     /**
-     *  Method to create a lobby window
+     * Method to create a lobby window
      *
      * @param name The name of the lobby
      * @see de.uol.swp.client.SceneManager#onShowLobbyViewEvent(ShowLobbyViewEvent)
      * @since 2020-12-14
      */
-    public void spawnLobbyWindow(String name){
+    public void spawnLobbyWindow(String name) {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(name);
@@ -278,21 +268,6 @@ public class SceneManager {
     @Subscribe
     public void onLobbyErrorEvent(LobbyErrorEvent event) {
         showError(event.getMessage());
-    }
-
-    /**
-     * Handles LobbyExceptionMessage detected on the EventBus
-     * <p>
-     * If a LobbyExceptionMessage is detected on the EventBus, this method gets
-     * called. It shows the exception message of the message in a error alert.
-     *
-     * @param message The LobbyExceptionMessage detected on the EventBus
-     * @see de.uol.swp.common.lobby.message.LobbyExceptionMessage
-     * @since 2020-12-19
-     */
-    @Subscribe
-    public void onLobbyExceptionMessae(LobbyExceptionMessage message) {
-        showError(message.getException());
     }
 
     /**
