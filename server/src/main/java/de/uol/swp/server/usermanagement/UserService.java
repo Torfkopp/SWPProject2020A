@@ -110,5 +110,6 @@ public class UserService extends AbstractService {
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
         }
+        post(returnMessage);
     }
 }
