@@ -30,12 +30,12 @@ public class LobbyPresenter extends AbstractPresenter {
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    private ObservableList<String> users;
+    private ObservableList<String> lobbyMembers;
 
     private User creator;
 
     @FXML
-    private ListView<String> usersView;
+    private ListView<String> membersView;
 
     /**
      * Default Constructor
@@ -59,7 +59,8 @@ public class LobbyPresenter extends AbstractPresenter {
     @Subscribe
     public void creationSuccessful(LobbyCreatedMessage message) {
         this.creator = message.getUser();
-        userService.retrieveAllUsers();
+//        userService.retrieveAllUsers();
+        lobbyService.retrieveAllLobbyMembers(message.getName());
     }
 
     /**
@@ -78,8 +79,8 @@ public class LobbyPresenter extends AbstractPresenter {
     public void newUser(UserJoinedLobbyMessage message) {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
-            if (users != null && creator != null && !creator.getUsername().equals(message.getUser().getUsername()))
-                users.add(message.getUser().getUsername());
+            if (lobbyMembers != null && creator != null && !creator.getUsername().equals(message.getUser().getUsername()))
+                lobbyMembers.add(message.getUser().getUsername());
         });
     }
 
@@ -119,12 +120,13 @@ public class LobbyPresenter extends AbstractPresenter {
     private void updateUsersList(List<UserDTO> userLobbyList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
-            if (users == null) {
-                users = FXCollections.observableArrayList();
-                usersView.setItems(users);
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
             }
-            users.clear();
-            userLobbyList.forEach(u -> users.add(u.getUsername()));
+            lobbyMembers.clear();
+            lobbyMembers.add(creator.getUsername());
+            userLobbyList.forEach(u -> lobbyMembers.add(u.getUsername()));
         });
     }
 }

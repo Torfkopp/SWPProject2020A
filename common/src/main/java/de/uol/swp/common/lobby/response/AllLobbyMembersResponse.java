@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AllLobbyMembersResponse extends AbstractResponseMessage {
 
-    final private ArrayList<UserDTO> users = new ArrayList<>();
+    final private List<UserDTO> users = new ArrayList<>();
 
     /**
      * Default Constructor

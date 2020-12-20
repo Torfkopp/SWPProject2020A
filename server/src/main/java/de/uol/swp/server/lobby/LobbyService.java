@@ -9,6 +9,7 @@ import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
@@ -17,7 +18,10 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Handles the lobby requests send by the users
@@ -33,6 +37,7 @@ public class LobbyService extends AbstractService{
     private final AuthenticationService authenticationService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+    final private Map<Session, User> userSessions = new HashMap<>();
 
     /**
      * Constructor
@@ -157,8 +162,17 @@ public class LobbyService extends AbstractService{
 
     @Subscribe
     public void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest) {
-        AllLobbyMembersResponse response = new AllLobbyMembersResponse();
-        response.initWithMessage(retrieveAllLobbyMembersRequest);
-        post(response);
+        String lobbyName = retrieveAllLobbyMembersRequest.getLobbyName();
+        Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
+        if (lobby.isPresent()) {
+            System.out.println("lobby found");
+            Set<User> lobbyMembers = lobby.get().getUsers();
+            AllLobbyMembersResponse response = new AllLobbyMembersResponse(lobbyMembers);
+            response.initWithMessage(retrieveAllLobbyMembersRequest);
+            post(response);
+        } else {
+            System.out.println("lobby not found :(");
+        }
+        //fixme: LOG.error(???)
     }
 }

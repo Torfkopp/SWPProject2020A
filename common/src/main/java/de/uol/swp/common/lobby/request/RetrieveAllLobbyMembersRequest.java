@@ -13,4 +13,17 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * @since 2019-08-07
  */
 public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
+
+    private String lobbyName;
+
+    public RetrieveAllLobbyMembersRequest() {
+    }
+
+    public RetrieveAllLobbyMembersRequest(String lobbyName) {
+        this.lobbyName = lobbyName;
+    }
+
+    public String getLobbyName() {
+        return lobbyName;
+    }
 }

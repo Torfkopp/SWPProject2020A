@@ -5,7 +5,6 @@ import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,7 +16,7 @@ import java.util.Optional;
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
  * @since 2019-10-08
  */
-public class LobbyManagement implements ServerLobbyService {
+public class LobbyManagement{
 
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -80,8 +79,6 @@ public class LobbyManagement implements ServerLobbyService {
         return lobbies;
     }
 
-    @Override
-    public List<User> retrieveAllLobbyUsers() {
-        return null; //todo: Funktion integrieeren
-    }
+
+
 }
