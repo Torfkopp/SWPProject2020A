@@ -12,6 +12,7 @@ import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.lobby.AllLobbiesResponse;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -259,4 +260,13 @@ public class MainMenuPresenter extends AbstractPresenter {
     void onChangePasswordButtonPressed(ActionEvent event) {
         eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
     }
+
+    @FXML
+    private void onSendMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onDeleteMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onEditMessageButton(ActionEvent event){}
 }
