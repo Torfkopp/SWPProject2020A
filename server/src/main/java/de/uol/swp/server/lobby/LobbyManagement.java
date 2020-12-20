@@ -14,7 +14,7 @@ import java.util.*;
  * @author Marco Grawunder
  * @since 2019-10-08
  */
-public class LobbyManagement {
+public class LobbyManagement{
 
     private final Map<String, Lobby> lobbies = new HashMap<>();
     private final SortedMap<String, User> loggedInUsers = new TreeMap<>();
@@ -77,4 +77,7 @@ public class LobbyManagement {
     public Map<String, Lobby> getLobbies() {
         return lobbies;
     }
+
+
+
 }

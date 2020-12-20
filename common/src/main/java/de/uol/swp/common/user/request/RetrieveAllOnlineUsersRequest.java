@@ -14,5 +14,4 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  */
 public class RetrieveAllOnlineUsersRequest extends AbstractRequestMessage {
 
-
 }

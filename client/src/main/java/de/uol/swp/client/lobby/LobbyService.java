@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -87,5 +88,12 @@ public class LobbyService {
     public void retrieveAllLobbies() {
         RetrieveAllLobbiesRequest retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
         eventBus.post(retrieveAllLobbiesRequest);
+    }
+
+    public void retrieveAllLobbyMembers(String lobbyName) {
+        //fixme: add lobby as param
+        System.out.println("retrieving all lobby members....");
+        RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
+        eventBus.post(retrieveAllLobbyMembersRequest);
     }
 }

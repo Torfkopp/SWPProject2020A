@@ -17,7 +17,7 @@ public class UsersListMessage extends AbstractServerMessage {
 	private static final long serialVersionUID = -7968574381977330152L;
 	private final ArrayList<String> users;
 
-	/**
+    /**
 	 * Constructor
 	 *
 	 * @param users List containing all users currently logged in

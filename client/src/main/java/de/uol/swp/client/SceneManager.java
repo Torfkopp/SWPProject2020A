@@ -215,6 +215,7 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
         String lobbyName = event.getName();
+        //TODO: RequestAllLobbyMembersRequest für alle users in der lobby
         if (!lobbyScenes.containsKey(lobbyName)) {
             //New window (Stage)
             Stage lobbyStage = new Stage();
