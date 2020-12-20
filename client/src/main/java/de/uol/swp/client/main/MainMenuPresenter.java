@@ -303,10 +303,7 @@ public class MainMenuPresenter extends AbstractPresenter {
 
         //if 'OK' is pressed the lobby will be created, otherwise it won't
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
-            eventBus.post(new ShowLobbyViewEvent(result.get()));
-        }
+        result.ifPresent(s -> lobbyService.createNewLobby(s, (UserDTO) loggedInUser));
     }
 
     /**
@@ -336,7 +333,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles posting the ShowLobbyViewEvent
+     * Handles posting the ShowLobbyViewEvent on User join
      * <p>
      * If a new UserJoinedLobbyMessage object is posted to the EventBus this
      * method will post a ShowLobbyViewEvent on the EventBus
@@ -346,7 +343,26 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @since 2020-12-19
      */
     @Subscribe
-    public void postLobbyViewEvent(UserJoinedLobbyMessage message) {
+    public void postLobbyViewOnJoin(UserJoinedLobbyMessage message) {
+        if (message.getUser().equals(loggedInUser)) {
+            Platform.runLater(() -> {
+                eventBus.post(new ShowLobbyViewEvent(message.getName()));
+            });
+        }
+    }
+
+    /**
+     * Handles posting the ShowLobbyViewEvent on Lobby create
+     * <p>
+     * If a new LobbyCreatedMessage object is posted to the EventBus this
+     * method will post a ShowLobbyViewEvent on the EventBus
+     *
+     * @param message the LobbyCreatedMessage object seen on the EventBus
+     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
+     * @since 2020-12-19
+     */
+    @Subscribe
+    public void postLobbyViewOnCreate(LobbyCreatedMessage message) {
         if (message.getUser().equals(loggedInUser)) {
             Platform.runLater(() -> {
                 eventBus.post(new ShowLobbyViewEvent(message.getName()));

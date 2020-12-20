@@ -218,32 +218,16 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
         String lobbyName = event.getName();
-
-        if (!lobbyScenes.containsKey(lobbyName)) {
-            spawnLobbyWindow(lobbyName);
-        } else {
-            showError("Lobby name already exists");
-        }
-    }
-
-    /**
-     * Method to create a lobby window
-     *
-     * @param name The name of the lobby
-     * @see de.uol.swp.client.SceneManager#onShowLobbyViewEvent(ShowLobbyViewEvent)
-     * @since 2020-12-14
-     */
-    public void spawnLobbyWindow(String name) {
         //New window (Stage)
         Stage lobbyStage = new Stage();
-        lobbyStage.setTitle(name);
+        lobbyStage.setTitle(lobbyName);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane, 400, 200);
         lobbyScene.getStylesheets().add(styleSheet);
-        lobbyScenes.put(name, lobbyScene);
+        lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene
-        lobbyStage.setScene(lobbyScenes.get(name));
+        lobbyStage.setScene(lobbyScenes.get(lobbyName));
         //Specifies the modality for new window
         lobbyStage.initModality(Modality.NONE);
         //Specifies the owner Window (parent) for new window
