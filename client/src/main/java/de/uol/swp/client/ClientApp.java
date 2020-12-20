@@ -13,6 +13,10 @@ import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
+import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
+import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
 import io.netty.channel.Channel;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -188,6 +192,7 @@ public class ClientApp extends Application implements ConnectionListener {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Handles unsuccessful change Password process
 	 *
 	 * If an ChangePasswordExceptionMessage object is detected on the EventBus this
@@ -222,6 +227,39 @@ public class ClientApp extends Application implements ConnectionListener {
 		sceneManager.showMainScreen(user);
 	}
 
+
+	 /** Handles unsuccessful User deletions
+	 * <p>
+	 * If a UserDeletionExceptionMessage object is detected on the EventBus, this method is called.
+	 * It tells the SceneManager to show the ServerError alert. If the loglevel is set to Error or
+	 * higher, "User Deletion error " and the error message are written to the log.
+	 *
+	 * @param message The UserDeletionExceptionMessage object detected on the EventBus
+	 * @see de.uol.swp.client.SceneManager
+	 * @since 2020-12-17
+	 */
+	@Subscribe
+	public void onUserDeletionExceptionMessage(UserDeletionExceptionMessage message) {
+		sceneManager.showServerError("Error when deleting the user " + message);
+		LOG.error("User Deletion error " + message);
+	}
+
+	/**
+	 * Handles successful User deletions
+	 * <p>
+	 * If a UserDeletionSuccessfulResponse object is detected on the EventBus, this method is called.
+	 * It tells the SceneManager to show the login window. If the loglevel is set to INFO or higher,
+	 * "Deletion of user successful." is written to the log.
+	 *
+	 * @param message The UserDeletionSuccessfulResponse object detected on the EventBus
+	 * @see de.uol.swp.client.SceneManager
+	 * @since 2020-12-17
+	 */
+	@Subscribe
+	public void onUserDeletionSuccessfulMessage(UserDeletionSuccessfulResponse message) {
+		LOG.info("Deletion of user successful.");
+		sceneManager.showLoginScreen();
+	}
 
 	/**
 	 * Handles errors produced by the EventBus
