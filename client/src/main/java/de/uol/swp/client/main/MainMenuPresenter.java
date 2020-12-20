@@ -188,8 +188,10 @@ public class MainMenuPresenter extends AbstractPresenter {
         if (msg.getName() == null || msg.getName().isEmpty()){
             LOG.debug("Tried to add Lobby without name to LobbyList ");
         } else {
-            lobbies.add(msg.getName());
-            LOG.debug("Added Lobby to LobbyList " + msg.getName());
+            Platform.runLater(()-> {
+                lobbies.add(msg.getName());
+                LOG.debug("Added Lobby to LobbyList " + msg.getName());
+            });
         }
     }
 
@@ -290,7 +292,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
-            eventBus.post(new ShowLobbyViewEvent(result.get()));
+            Platform.runLater(()->eventBus.post(new ShowLobbyViewEvent(result.get())));
         }
     }
 

@@ -2,10 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.common.lobby.message.CreateLobbyRequest;
-import de.uol.swp.common.lobby.message.DeleteLobbyRequest;
-import de.uol.swp.common.lobby.message.LobbyJoinUserRequest;
-import de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.user.UserDTO;
 
 /**
