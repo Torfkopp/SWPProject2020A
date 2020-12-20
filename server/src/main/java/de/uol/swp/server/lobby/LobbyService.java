@@ -6,7 +6,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
+import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
@@ -14,9 +17,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Handles the lobby requests send by the users
@@ -26,12 +27,13 @@ import java.util.Optional;
  */
 @SuppressWarnings("UnstableApiUsage")
 @Singleton
-public class LobbyService extends AbstractService {
+public class LobbyService extends AbstractService{
 
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+    final private Map<Session, User> userSessions = new HashMap<>();
 
     final private List<Lobby> lobbyList = new ArrayList<>();
 
@@ -154,5 +156,21 @@ public class LobbyService extends AbstractService {
         AllLobbiesResponse response = new AllLobbiesResponse(lobbyManagement.getLobbies());
         response.initWithMessage(retrieveAllLobbiesRequest);
         post(response);
+    }
+
+    @Subscribe
+    public void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest) {
+        String lobbyName = retrieveAllLobbyMembersRequest.getLobbyName();
+        Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
+        if (lobby.isPresent()) {
+            System.out.println("lobby found");
+            Set<User> lobbyMembers = lobby.get().getUsers();
+            AllLobbyMembersResponse response = new AllLobbyMembersResponse(lobbyMembers);
+            response.initWithMessage(retrieveAllLobbyMembersRequest);
+            post(response);
+        } else {
+            System.out.println("lobby not found :(");
+        }
+        //fixme: LOG.error(???)
     }
 }
