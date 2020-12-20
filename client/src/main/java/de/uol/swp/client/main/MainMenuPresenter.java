@@ -55,6 +55,9 @@ public class MainMenuPresenter extends AbstractPresenter {
     private LobbyService lobbyService;
 
     @FXML
+    private ListView<String> chatView;
+
+    @FXML
     private ListView<String> usersView;
 
     @FXML
@@ -357,4 +360,13 @@ public class MainMenuPresenter extends AbstractPresenter {
         eventBus.post(showLoginViewMessage);
         userService.dropUser(loggedInUser);
     }
+
+    @FXML
+    private void onSendMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onDeleteMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onEditMessageButton(ActionEvent event){}
 }
