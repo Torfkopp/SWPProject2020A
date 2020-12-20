@@ -8,7 +8,6 @@ import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.chat.ChatMessage;
-import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
@@ -283,7 +282,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
-    private void updateChatMessageList(List<ChatMessageDTO> chatMessageList) {
+    private void updateChatMessageList(List<ChatMessage> chatMessageList) {
         Platform.runLater(() -> {
             chatMessages.clear();
             chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), m));
