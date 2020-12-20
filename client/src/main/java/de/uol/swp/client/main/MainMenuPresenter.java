@@ -87,6 +87,26 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void loginSuccessful(LoginSuccessfulResponse message) {
+        prepareChatVars();
+        this.loggedInUser = message.getUser();
+        userService.retrieveAllUsers();
+        lobbyService.retrieveAllLobbies();
+        chatService.askLatestMessages(10);
+    }
+
+    /**
+     * Prepares the variables used for the chat storage and management
+     * <p>
+     * This method is called on a successful login and ensures that
+     * the used variables chatMessageMap and chatMessages aren't null,
+     * sets the items of the chatView to the chatMessages observableList,
+     * and adds a MapChangeListener that manages the displayed ChatMessages.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2020-12-20
+     */
+    private void prepareChatVars() {
         if (chatMessageMap == null) chatMessageMap = FXCollections.observableHashMap();
         if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
         chatView.setItems(chatMessages);
@@ -113,10 +133,6 @@ public class MainMenuPresenter extends AbstractPresenter {
                 }
             }
         });
-        this.loggedInUser = message.getUser();
-        userService.retrieveAllUsers();
-        lobbyService.retrieveAllLobbies();
-        chatService.askLatestMessages(10);
     }
 
     /**
