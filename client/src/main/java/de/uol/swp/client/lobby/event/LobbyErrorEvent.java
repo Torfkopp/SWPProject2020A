@@ -8,7 +8,7 @@ package de.uol.swp.client.lobby.event;
  *
  * @author Marvin und Aldin
  * @see de.uol.swp.client.SceneManager
- * @since 2019-12-18
+ * @since 2020-12-18
  *
  */
 public class LobbyErrorEvent {
@@ -18,7 +18,7 @@ public class LobbyErrorEvent {
      * Constructor
      *
      * @param message Message containing the cause of the Error
-     * @since 2019-12-18
+     * @since 2020-12-18
      */
     public LobbyErrorEvent(String message) {
         this.message = message;
@@ -28,7 +28,7 @@ public class LobbyErrorEvent {
      * Gets the error message
      *
      * @return A String containing the error message
-     * @since 2019-12-18
+     * @since 2020-12-18
      */
     public String getMessage() {
         return message;
