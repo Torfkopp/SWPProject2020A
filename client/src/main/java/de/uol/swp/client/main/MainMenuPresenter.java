@@ -51,13 +51,13 @@ public class MainMenuPresenter extends AbstractPresenter {
     private LobbyService lobbyService;
 
     @FXML
+    private ListView<String> chatView;
+
+    @FXML
     private ListView<String> usersView;
 
     @FXML
     private ListView<String> lobbyView;
-
-    @FXML
-    private ListView<String> chatView;
 
     /**
      * Handles successful login
