@@ -21,6 +21,7 @@ class LobbyDTOTest {
 
     private static final User defaultUser = new UserDTO("marco", "marco", "marco@grawunder.de");
     private static final User notInLobbyUser = new UserDTO("no", "marco", "no@grawunder.de");
+    private static final Lobby defaultLobby = new LobbyDTO("TestLobby", defaultUser);
 
     private static final int NO_USERS = 10;
     private static final List<UserDTO> users;
@@ -35,7 +36,7 @@ class LobbyDTOTest {
 
     /**
      * This test check whether a lobby is created correctly
-     *
+     * <p>
      * If the variables are not set correctly the test fails
      *
      * @since 2019-10-08
@@ -51,8 +52,26 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test check whether a user can join a lobby
+     * This test checks if the copy constructor works correctly
+     * <p>
+     * This test fails if any of the fields mismatch or the objects are not considered equal
      *
+     * @since 2020-12-05
+     */
+    @Test
+    void createWithExistingLobby() {
+
+        Lobby newLobby = LobbyDTO.create(defaultLobby);
+
+        // Test every attribute
+        assertEquals(newLobby.getName(), defaultLobby.getName());
+        assertEquals(newLobby.getOwner(), defaultLobby.getOwner());
+
+    }
+
+    /**
+     * This test check whether a user can join a lobby
+     * <p>
      * The test fails if the size of the user list of the lobby does not get bigger
      * or a user who joined is not in the list.
      *
@@ -76,7 +95,7 @@ class LobbyDTOTest {
 
     /**
      * This test check whether a user can leave a lobby
-     *
+     * <p>
      * The test fails if the size of the user list of the lobby does not get smaller
      * or the user who left is still in the list.
      *
@@ -96,7 +115,7 @@ class LobbyDTOTest {
 
     /**
      * Test to check if the owner can leave the Lobby correctly
-     *
+     * <p>
      * This test fails if the owner field is not updated if the owner leaves the
      * lobby or if he still is in the user list of the lobby.
      *
@@ -117,7 +136,7 @@ class LobbyDTOTest {
     /**
      * This checks if the owner of a lobby can be updated and if he has have joined
      * the lobby
-     *
+     * <p>
      * This test fails if the owner cannot be updated or does not have to be joined
      *
      * @since 2019-10-08
@@ -135,7 +154,7 @@ class LobbyDTOTest {
 
     /**
      * This test check whether a lobby can be empty
-     *
+     * <p>
      * If the leaveUser function does not throw an Exception the test fails
      *
      * @since 2019-10-08

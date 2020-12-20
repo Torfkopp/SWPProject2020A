@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.common.lobby.message.CreateLobbyRequest;
 import de.uol.swp.common.lobby.message.DeleteLobbyRequest;
 import de.uol.swp.common.lobby.message.LobbyJoinUserRequest;
-import de.uol.swp.common.lobby.message.LobbyLeaveUserRequest;
+import de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -79,5 +79,16 @@ public class LobbyService {
     public void deleteLobby(String lobbyName) {
         DeleteLobbyRequest deleteLobbyRequest = new DeleteLobbyRequest(lobbyName);
         eventBus.post(deleteLobbyRequest);
+    }
+
+    /**
+     * Posts a request to retrieve all lobby names
+     *
+     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @since 2020-12-12
+     */
+    public void retrieveAllLobbies() {
+        RetrieveAllLobbiesRequest retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
+        eventBus.post(retrieveAllLobbiesRequest);
     }
 }

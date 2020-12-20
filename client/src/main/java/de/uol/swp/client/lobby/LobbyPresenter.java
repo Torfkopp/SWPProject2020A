@@ -47,6 +47,9 @@ public class LobbyPresenter extends AbstractPresenter {
     @FXML
     private ListView<String> usersView;
 
+    @FXML
+    private ListView<String> chatView;
+
     /**
      * Default Constructor
      *
@@ -71,6 +74,7 @@ public class LobbyPresenter extends AbstractPresenter {
         this.loggedInUser = message.getUser();
         this.lobbyName = message.getName();
         userService.retrieveAllUsers();
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
@@ -160,4 +164,14 @@ public class LobbyPresenter extends AbstractPresenter {
         }
         ((Stage) (((Button) event.getSource()).getScene().getWindow())).close();
     }
+
+    @FXML
+    private void onSendMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onDeleteMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onEditMessageButton(ActionEvent event){}
+
 }

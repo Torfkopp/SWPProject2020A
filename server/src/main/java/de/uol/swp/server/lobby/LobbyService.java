@@ -14,6 +14,8 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,6 +32,8 @@ public class LobbyService extends AbstractService {
     private final AuthenticationService authenticationService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+
+    final private List<Lobby> lobbyList = new ArrayList<>();
 
     /**
      * Constructor
@@ -61,8 +65,12 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     public void onCreateLobbyRequest(CreateLobbyRequest createLobbyRequest) {
-        lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
-        sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
+        try {
+            lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
+            sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
+        } catch (IllegalArgumentException e) {
+            LOG.debug(e.getMessage());
+        }
     }
 
     /**
@@ -152,4 +160,20 @@ public class LobbyService extends AbstractService {
         // TODO: error handling not existing lobby
     }
 
+    /**
+     * Handles RetrieveAllLobbiesRequests found on the EventBus
+     * <p>
+     * If a RetrieveAllLobbiesRequest is detected on the EventBus, this method is called.
+     * It posts a AllLobbiesResponse containing a list of all lobby names
+     *
+     * @param retrieveAllLobbiesRequest The RetrieveAllLobbiesRequests found on the EventBus
+     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @since 2020-12-12
+     */
+    @Subscribe
+    public void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest retrieveAllLobbiesRequest) {
+        AllLobbiesResponse response = new AllLobbiesResponse(lobbyManagement.getLobbies());
+        response.initWithMessage(retrieveAllLobbiesRequest);
+        post(response);
+    }
 }
