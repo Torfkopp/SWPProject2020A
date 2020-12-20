@@ -20,7 +20,7 @@ import java.util.Optional;
  * @see User
  * @since 2020-12-16
  */
-public class ChatManagement extends AbstractChatManagement implements IChatManagement {
+public class ChatManagement extends AbstractChatManagement {
 
     private final ChatMessageStore chatMessageStore;
 
