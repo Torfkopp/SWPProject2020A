@@ -12,6 +12,9 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.message.AllLobbiesResponse;
+import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -26,6 +29,7 @@ import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +59,8 @@ public class MainMenuPresenter extends AbstractPresenter {
     private ObservableMap<Integer, ChatMessage> chatMessageMap;
     private ObservableList<String> chatMessages;
 
+    private ObservableList<String> lobbies;
+
     private User loggedInUser;
 
     @Inject
@@ -64,13 +70,16 @@ public class MainMenuPresenter extends AbstractPresenter {
     private ChatService chatService;
 
     @FXML
+    private ListView<String> chatView;
+
+    @FXML
     private ListView<String> usersView;
 
     @FXML
-    private TextField messageField; // TODO: MERGE CONFLICT INCOMING
+    private TextField messageField;
 
     @FXML
-    private ListView<String> chatView; // TODO: MERGE CONFLICT INCOMING
+    private ListView<String> lobbyView;
 
     /**
      * Handles successful login
@@ -315,6 +324,103 @@ public class MainMenuPresenter extends AbstractPresenter {
         });
     }
 
+
+    /**
+     * Adds newly created Lobby to LobbyList
+     * <p>
+     * If a new LobbyCreatedMessage object is posted to the EventBus the name
+     * of the newly created lobby is put onto the lobby list in the main menu.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Added new lobby to lobby
+     * list" with the name of the newly added lobby is displayed in the
+     * log.
+     *
+     * @param msg the LobbyCreatedMessage object seen on the EventBus
+     * @author Temmo Junkhoff
+     * @see LobbyCreatedMessage
+     * @since 2020-12-17
+     */
+    @Subscribe
+    private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
+
+        if (msg.getName() == null || msg.getName().isEmpty()) {
+            LOG.debug("Tried to add Lobby without name to LobbyList ");
+        } else {
+            lobbies.add(msg.getName());
+            LOG.debug("Added Lobby to LobbyList " + msg.getName());
+        }
+    }
+
+    /**
+     * Removes deleted Lobby from LobbyList
+     * <p>
+     * If a new LobbyDeletedMessage object is posted to the EventBus the name
+     * of the deleted lobby is removed from the lobby list in the main menu.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Removed lobby from lobby
+     * list" with the name of the removed lobby is displayed in the
+     * log.
+     *
+     * @param msg the LobbyDeletedMessage object seen on the EventBus
+     * @author Temmo Junkhoff
+     * @see LobbyDeletedMessage
+     * @since 2020-12-17
+     */
+    @Subscribe
+    private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
+
+        if (msg.getName() == null || msg.getName().isEmpty()) {
+            LOG.debug("Tried to delete Lobby without name from LobbyList ");
+        } else {
+            lobbies.remove(msg.getName());
+            LOG.debug("Removed Lobby from LobbyList " + msg.getName());
+        }
+    }
+
+
+    /**
+     * Handles new list of lobbies
+     * <p>
+     * If a new AllLobbiesResponse object is posted to the EventBus the names
+     * of currently existing lobbies are put onto the lobby list in the main menu.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Update of lobby
+     * list" with the names of all currently existing lobbies is displayed in the
+     * log.
+     *
+     * @param allLobbiesResponse the AllLobbiesResponse object seen on the EventBus
+     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @since 2020-11-29
+     */
+    @Subscribe
+    public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
+        updateLobbyList(allLobbiesResponse.getLobbies());
+    }
+
+    /**
+     * Updates the main menus lobby list according to the list given
+     * <p>
+     * This method clears the entire lobby list and then adds the name of each lobby
+     * in the list given to the main menus lobby list. If there is no lobby list
+     * this creates one.
+     *
+     * @param lobbyList A list of LobbyDTO objects including all currently existing
+     *                  lobbies
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.lobby.dto.LobbyDTO
+     * @since 2020-11-29
+     */
+
+    private void updateLobbyList(List<String> lobbyList) {
+        LOG.debug("Update Lobby List");
+        Platform.runLater(() -> {
+            if (lobbies == null) {
+                lobbies = FXCollections.observableArrayList();
+                lobbyView.setItems(lobbies);
+            }
+            lobbies.clear();
+            lobbies.addAll(lobbyList);
+        });
+    }
+
     /**
      * Method called when the create lobby button is pressed
      * <p>
@@ -349,16 +455,26 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Method called when the join lobby button is pressed
      * <p>
      * If the join lobby button is pressed, this method requests the lobby service
-     * to join a specified lobby. Therefore it currently uses the lobby name "test"
-     * and an user called "ich"
+     * to join a specified lobby. If there is no existing lobby or the user didnt choose one,
+     * nothing will happen.
      *
      * @param event The ActionEvent created by pressing the join lobby button
      * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2019-11-20
+     * @since 2020-11-29
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        lobbyService.joinLobby("test", new UserDTO("ich", "", ""));
+        String lobbyname = "";
+
+        lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        if (lobbyView.getSelectionModel().isEmpty()) {
+            System.out.println("leere Liste oder du hast nichts ausgewählt");
+        } else {
+            lobbyname = lobbyView.getSelectionModel().getSelectedItem();
+        }
+
+        lobbyService.joinLobby(lobbyname, new UserDTO(loggedInUser.getUsername(), "", ""));
     }
 
     /**
@@ -417,7 +533,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     public void onSendMessageButtonPressed(ActionEvent event) {
-        // TODO: entfernen vor commit (Konflikt) & Warten auf Merge von SWP2020A-52
         String msg = messageField.getText();
         messageField.clear();
         chatService.newMessage(loggedInUser, msg);
