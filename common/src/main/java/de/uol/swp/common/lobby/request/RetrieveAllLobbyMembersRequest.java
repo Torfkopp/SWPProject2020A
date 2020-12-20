@@ -9,8 +9,9 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * respond with a AllLobbyMembersResponse.
  *
  * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
- * @author Marco Grawunder
- * @since 2019-08-07
+ * @author Alwin Bossert
+ * @author Steven Luong
+ * @since 2020-12-20
  */
 public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
 

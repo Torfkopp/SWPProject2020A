@@ -2,7 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.user.User;
@@ -25,6 +24,7 @@ import java.util.List;
  * @since 2020-11-21
  *
  */
+@SuppressWarnings("UnstableApiUsage")
 public class LobbyPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
@@ -51,20 +51,22 @@ public class LobbyPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles successful lobby creation
+     * Handles new list of users
      *
-     * If a LobbyCreatedMessage is posted to the EventBus the lobbyCreator
-     * is set to the
+     * If a new AllOnlineUsersResponse object is posted to the EventBus the names
+     * of currently logged in members are put onto the list of lobby members.
+     * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
+     * list" with the names of all currently logged in users is displayed in the
+     * log.
      *
-     * @param message the LoginSuccessfulResponse object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
+     * @param allLobbyMembersResponse AllLobbyMembersResponse object seen on the EventBus
+     * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2020-11-22
      */
     @Subscribe
-    public void creationSuccessful(LobbyCreatedMessage message) {
-        this.creator = message.getUser();
-//        userService.retrieveAllUsers();
-        lobbyService.retrieveAllLobbyMembers(message.getName());
+    public void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
+        LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
+        updateUsersList(allLobbyMembersResponse.getUsers());
     }
 
     /**
@@ -80,7 +82,7 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-22
      */
     @Subscribe
-    public void newUser(UserJoinedLobbyMessage message) {
+    public void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
             if (lobbyMembers != null && creator != null && !creator.getUsername().equals(message.getUser().getUsername()))
@@ -89,29 +91,10 @@ public class LobbyPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles new list of users
+     * Updates the lobby's member list according to the list given
      *
-     * If a new AllOnlineUsersResponse object is posted to the EventBus the names
-     * of currently logged in users are put onto the user list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
-     * list" with the names of all currently logged in users is displayed in the
-     * log.
-     *
-     * @param allLobbyMembersResponse AllOnlineUsersResponse object seen on the EventBus
-     * @see de.uol.swp.common.user.response.AllOnlineUsersResponse
-     * @since 2020-11-22
-     */
-    @Subscribe
-    public void userLobbyList(AllLobbyMembersResponse allLobbyMembersResponse) { //fixme: RequestAllLobbyMembersRequest
-        LOG.debug("Update of user list " + allLobbyMembersResponse.getUsers());
-        updateUsersList(allLobbyMembersResponse.getUsers());
-    }
-
-    /**
-     * Updates the main menus user list according to the list given
-     *
-     * This method clears the entire user list and then adds the name of each user
-     * in the list given to the main menus user list. If there ist no user list
+     * This method clears the entire member list and then adds the name of each user
+     * in the list given to the lobby's member list. If there is no member list
      * this it creates one.
      *
      * @implNote The code inside this Method has to run in the JavaFX-application

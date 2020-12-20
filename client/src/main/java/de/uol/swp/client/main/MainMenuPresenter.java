@@ -8,6 +8,7 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -188,9 +189,32 @@ public class MainMenuPresenter extends AbstractPresenter {
         if (msg.getName() == null || msg.getName().isEmpty()){
             LOG.debug("Tried to add Lobby without name to LobbyList ");
         } else {
-            lobbies.add(msg.getName());
+            Platform.runLater(() -> lobbies.add(msg.getName()));
             LOG.debug("Added Lobby to LobbyList " + msg.getName());
         }
+    }
+
+    /**
+     * Handles CreateLobbyResponses found on the EventBus
+     *
+     * If a new CreateLobbyResponse object is found on the EventBus, this method
+     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
+     * subscribed to, and then calls the LobbyService to retrieve
+     * all members of that new lobby in order for the lobby window to be
+     * able to display all members from the beginning.
+     *
+     * @param createLobbyResponse The CreateLobbyResponse object found on the EventBus
+     * @see CreateLobbyResponse
+     * @see ShowLobbyViewEvent
+     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @since 2020-12-20
+     */
+    @Subscribe
+    public void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getName()));
+            lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getName());
+        });
     }
 
     /**
@@ -290,7 +314,6 @@ public class MainMenuPresenter extends AbstractPresenter {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
-            eventBus.post(new ShowLobbyViewEvent(result.get()));
         }
     }
 
