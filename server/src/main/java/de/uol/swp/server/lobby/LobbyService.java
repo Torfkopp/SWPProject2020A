@@ -76,6 +76,7 @@ public class LobbyService extends AbstractService {
         } catch (IllegalArgumentException e) {
             LobbyExceptionMessage message = new LobbyExceptionMessage(e.getMessage());
             message.setSession(createLobbyRequest.getSession().get());
+            post(message);
             LOG.debug(e.getMessage());
         }
     }
