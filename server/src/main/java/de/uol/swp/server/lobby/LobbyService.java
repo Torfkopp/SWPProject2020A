@@ -6,9 +6,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
+import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +27,7 @@ import java.util.Optional;
  */
 @SuppressWarnings("UnstableApiUsage")
 @Singleton
-public class LobbyService extends AbstractService {
+public class LobbyService extends AbstractService{
 
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
@@ -149,6 +152,13 @@ public class LobbyService extends AbstractService {
     public void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest retrieveAllLobbiesRequest) {
         AllLobbiesResponse response = new AllLobbiesResponse(lobbyManagement.getLobbies());
         response.initWithMessage(retrieveAllLobbiesRequest);
+        post(response);
+    }
+
+    @Subscribe
+    public void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest) {
+        AllLobbyMembersResponse response = new AllLobbyMembersResponse();
+        response.initWithMessage(retrieveAllLobbyMembersRequest);
         post(response);
     }
 }
