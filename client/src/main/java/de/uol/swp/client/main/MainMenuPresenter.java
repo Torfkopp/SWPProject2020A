@@ -54,6 +54,9 @@ public class MainMenuPresenter extends AbstractPresenter {
     private ListView<String> usersView;
 
     @FXML
+    private ListView<String> lobbyView;
+
+    @FXML
     private ListView<String> chatView;
 
     /**
