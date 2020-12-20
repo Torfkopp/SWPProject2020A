@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore implements ChatMessageStore {
 
     private static final int MAX_HISTORY = 10000;
-    private static int id_count = 0;
+    private int id_count;
     // LinkedHashMaps keep insertion order and remove the eldest element when the override below returns true
     private final Map<Integer, ChatMessage> chatHistory = new LinkedHashMap<>() {
         @Override

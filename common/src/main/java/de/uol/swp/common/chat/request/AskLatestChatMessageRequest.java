@@ -24,9 +24,9 @@ public class AskLatestChatMessageRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the ID attribute
+     * Getter for the amount attribute
      *
-     * @return the ID of the ChatMessage that got deleted
+     * @return The amount of ChatMessages the client requested
      * @since 2020-12-17
      */
     public int getAmount() {

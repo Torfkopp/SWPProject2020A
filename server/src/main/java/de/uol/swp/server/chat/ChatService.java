@@ -67,12 +67,13 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new ChatMessage message with " + msg.getAuthor() + " and content '" + msg.getContent() + '\'');
+            LOG.debug("Got new ChatMessage message from " + msg.getAuthor().getUsername()
+                    + " with content '" + msg.getContent() + '\'');
         }
         try {
             ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent());
             ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
-            post(returnMessage);
+            sendToAll(returnMessage);
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -94,7 +95,7 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onDeleteChatMessageRequest(DeleteChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new DeleteChatMessage message with " + msg.getId());
+            LOG.debug("Got new DeleteChatMessage message for the ChatMessage ID " + msg.getId());
         }
         try {
             chatManagement.dropChatMessage(msg.getId());
@@ -121,7 +122,8 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new EditChatMessage message with " + msg.getId() + " and new content '" + msg.getContent());
+            LOG.debug("Got new EditChatMessage message for the ChatMessage ID " + msg.getId()
+                    + " and new content '" + msg.getContent() + '\'');
         }
         try {
             ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());
@@ -148,7 +150,7 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onAskLatestChatMessageRequest(AskLatestChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new AskLatestMessage with " + msg.getAmount());
+            LOG.debug("Got new AskLatestMessage with " + msg.getAmount() + " messages");
         }
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount());
         ResponseMessage returnMessage = new AskLatestChatMessageResponse(latestMessages);

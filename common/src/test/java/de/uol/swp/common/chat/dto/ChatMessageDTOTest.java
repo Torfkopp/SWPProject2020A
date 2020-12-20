@@ -127,7 +127,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createWithCopyConstructor() {
-        ChatMessageDTO copiedMessage = ChatMessageDTO.create(defaultMessage);
+        ChatMessage copiedMessage = ChatMessageDTO.create(defaultMessage);
         assertEquals(defaultMessage, copiedMessage);
     }
 
@@ -143,7 +143,7 @@ class ChatMessageDTOTest {
     @Test
     void createWithCopyConstructorAndEditContent() {
         final String newContent = "I am new, even more intelligent content";
-        ChatMessageDTO copiedMessage = ChatMessageDTO.create(defaultMessage);
+        ChatMessage copiedMessage = ChatMessageDTO.create(defaultMessage);
         copiedMessage.setContent(newContent);
         assertEquals(copiedMessage.getContent(), newContent);
         assertNotEquals(defaultMessage, copiedMessage);
@@ -159,7 +159,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createWithCopyConstructorAndSetContentToNull() {
-        ChatMessageDTO copiedMessage = ChatMessageDTO.create(defaultMessage);
+        ChatMessage copiedMessage = ChatMessageDTO.create(defaultMessage);
         copiedMessage.setContent(null);
         assertEquals(copiedMessage.getContent(), defaultContent);
     }

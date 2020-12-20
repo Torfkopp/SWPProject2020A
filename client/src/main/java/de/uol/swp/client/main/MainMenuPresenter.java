@@ -212,7 +212,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        LOG.debug("Received Chat Message: " + msg.getMsg().getContent());
+        LOG.debug("Received Chat Message from " + msg.getMsg().getAuthor().getUsername()
+                + ": '" + msg.getMsg().getContent() + '\'');
         Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
     }
 

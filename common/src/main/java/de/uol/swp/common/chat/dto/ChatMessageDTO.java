@@ -85,11 +85,27 @@ public class ChatMessageDTO implements ChatMessage {
      * Copy constructor
      *
      * @param chatMessage ChatMessage object to copy the values of
-     * @return ChatMessageDTO copy of ChatMessage object
+     * @return Copy of ChatMessage object
      * @since 2020-12-16
      */
-    public static ChatMessageDTO create(ChatMessage chatMessage) {
+    public static ChatMessage create(ChatMessage chatMessage) {
         return new ChatMessageDTO(chatMessage.getID(), chatMessage.getAuthor(), chatMessage.getTimestamp(), chatMessage.getContent(), chatMessage.isEdited());
+    }
+
+    /**
+     * Converts a Instant (Timestamp) to a string
+     *
+     * @param timestamp The Instant to convert
+     * @return String the string that was created
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see ChatMessage
+     * @since 2020-12-17
+     */
+    private static String timestampToString(Instant timestamp) {
+        return timestamp.atZone(ZoneOffset.UTC).getHour() +
+                ":" +
+                String.format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
     }
 
     @Override
@@ -122,7 +138,7 @@ public class ChatMessageDTO implements ChatMessage {
 
     @Override
     public boolean isEdited() {
-        return edited;
+        return this.edited;
     }
 
     @Override
@@ -131,6 +147,11 @@ public class ChatMessageDTO implements ChatMessage {
         if (o == null || getClass() != o.getClass()) return false;
         ChatMessageDTO that = (ChatMessageDTO) o;
         return id.equals(that.id) && author.equals(that.author) && timestamp.equals(that.timestamp) && content.equals(that.content);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override
@@ -149,30 +170,12 @@ public class ChatMessageDTO implements ChatMessage {
      */
     @Override
     public String toString() {
-        String text = this.getContent() +
-                " - " +
-                this.getAuthor().getUsername() +
-                " - " +
+        String text = this.getContent() + " - " +
+                this.getAuthor().getUsername() + " - " +
                 timestampToString(this.getTimestamp());
         if (isEdited()) {
             text += " (ed)";
         }
         return text;
-    }
-
-    /**
-     * Converts a Instant (Timestamp) to a string
-     *
-     * @param timestamp The Instant to convert
-     * @return String the string that was created
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see ChatMessage
-     * @since 2020-12-17
-     */
-    private String timestampToString(Instant timestamp) {
-        return timestamp.atZone(ZoneOffset.UTC).getHour() +
-                ":" +
-                String.format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
     }
 }
