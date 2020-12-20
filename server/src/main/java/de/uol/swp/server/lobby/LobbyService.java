@@ -14,6 +14,8 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,6 +32,8 @@ public class LobbyService extends AbstractService {
     private final AuthenticationService authenticationService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+
+    final private List<Lobby> lobbyList = new ArrayList<>();
 
     /**
      * Constructor
