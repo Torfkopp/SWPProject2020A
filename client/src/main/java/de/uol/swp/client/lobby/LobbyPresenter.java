@@ -10,6 +10,7 @@ import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
@@ -36,6 +37,9 @@ public class LobbyPresenter extends AbstractPresenter {
 
     @FXML
     private ListView<String> usersView;
+
+    @FXML
+    private ListView<String> chatView;
 
     /**
      * Default Constructor
@@ -128,4 +132,14 @@ public class LobbyPresenter extends AbstractPresenter {
             userList.forEach(u -> users.add(u.getUsername()));
         });
     }
+
+    @FXML
+    private void onSendMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onDeleteMessageButton(ActionEvent event){}
+
+    @FXML
+    private void onEditMessageButton(ActionEvent event){}
+
 }
