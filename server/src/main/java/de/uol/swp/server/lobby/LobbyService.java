@@ -74,18 +74,19 @@ public class LobbyService extends AbstractService {
     @Subscribe
     public void onCreateLobbyRequest(CreateLobbyRequest createLobbyRequest) {
         try {
-            ResponseMessage responseMessage;
             lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
-            responseMessage = new CreateLobbyResponse(createLobbyRequest.getName());
+            ResponseMessage responseMessage = new CreateLobbyResponse(createLobbyRequest.getName());
             if (createLobbyRequest.getMessageContext().isPresent()) {
                 responseMessage.setMessageContext(createLobbyRequest.getMessageContext().get());
             }
             post(responseMessage);
             sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
         } catch (IllegalArgumentException e) {
-            LobbyExceptionMessage message = new LobbyExceptionMessage(e.getMessage());
-            message.setSession(createLobbyRequest.getSession().get());
-            post(message);
+            LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage(e.getMessage());
+            if (createLobbyRequest.getMessageContext().isPresent()) {
+                exceptionMessage.setMessageContext(createLobbyRequest.getMessageContext().get());
+            }
+            post(exceptionMessage);
             LOG.debug(e.getMessage());
         }
     }
@@ -110,21 +111,31 @@ public class LobbyService extends AbstractService {
             if (lobby.get().getUsers().size() < 4) {
                 if (!lobby.get().getUsers().contains(lobbyJoinUserRequest.getUser())) {
                     lobby.get().joinUser(lobbyJoinUserRequest.getUser());
+                    // TODO: Make a proper response and don't reuse the next line to spawn a window - Marvin
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
                 } else {
-                    LobbyExceptionMessage message = new LobbyExceptionMessage("You're already in this lobby!");
-                    message.setSession(lobbyJoinUserRequest.getSession().get()); // TODO: This shouldn't be necessary
-                    post(message);
+                    LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
+                    if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
+                        exceptionMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
+                    }
+                    post(exceptionMessage);
+                    LOG.debug(exceptionMessage.getException());
                 }
             } else {
-                LobbyExceptionMessage message = new LobbyExceptionMessage("This lobby is full!");
-                message.setSession(lobbyJoinUserRequest.getSession().get());
-                post(message);
+                LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby is full!");
+                if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
+                    exceptionMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
+                }
+                post(exceptionMessage);
+                LOG.debug(exceptionMessage.getException());
             }
         } else {
-            LobbyExceptionMessage message = new LobbyExceptionMessage("This lobby does not exist!");
-            message.setSession(lobbyJoinUserRequest.getSession().get());
-            post(message);
+            LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby does not exist!");
+            if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
+                exceptionMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
+            }
+            post(exceptionMessage);
+            LOG.debug(exceptionMessage.getException());
         }
 
     }
@@ -179,7 +190,7 @@ public class LobbyService extends AbstractService {
      * It posts a AllLobbiesResponse containing a list of all lobby names
      *
      * @param retrieveAllLobbiesRequest The RetrieveAllLobbiesRequest found on the EventBus
-     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
      * @since 2020-12-12
      */
     @Subscribe
