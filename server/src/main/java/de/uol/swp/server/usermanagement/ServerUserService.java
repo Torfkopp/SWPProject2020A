@@ -3,6 +3,7 @@ package de.uol.swp.server.usermanagement;
 import de.uol.swp.common.user.User;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An interface for all methods of the server user service
@@ -88,4 +89,5 @@ public interface ServerUserService {
      */
     List<User> retrieveAllUsers();
 
+    Optional<User> getUser(String userName);
 }

@@ -9,6 +9,10 @@ import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
+import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
+import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
+import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
 import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
@@ -188,7 +192,43 @@ public class ClientApp extends Application implements ConnectionListener {
 	}
 
 	/**
-	 * Handles unsuccessful User deletions
+<<<<<<< HEAD
+	 * Handles unsuccessful change Password process
+	 *
+	 * If an ChangePasswordExceptionMessage object is detected on the EventBus this
+	 * method is called. It tells the SceneManager to show the sever error alert.
+	 *
+	 * @param message The ChangePasswordExceptionMessage object detected on the EventBus
+	 * @see de.uol.swp.client.SceneManager
+	 * @since 2020-12-03
+	 * @author Eric Vuong, Steven Luong
+	 */
+
+	 @Subscribe
+	public void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message){
+		sceneManager.showServerError("Change Password error " + message);
+		LOG.error("Change Password error " + message);
+	}
+
+	/**
+	 * Handles successful change Password process
+	 *
+	 * If an ChangePasswordSuccessfulResponse object is detected on the EventBus this
+	 * method is called. It tells the SceneManager to show the MainScreen window.
+	 *
+	 * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
+	 * @see de.uol.swp.client.SceneManager
+	 * @since 2020-12-03
+	 * @author Eric Vuong, Steven Luong
+	 */
+	@Subscribe
+	public void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
+		LOG.info("Change Password successful.");
+		sceneManager.showMainScreen(user);
+	}
+
+
+	 /** Handles unsuccessful User deletions
 	 * <p>
 	 * If a UserDeletionExceptionMessage object is detected on the EventBus, this method is called.
 	 * It tells the SceneManager to show the ServerError alert. If the loglevel is set to Error or
