@@ -18,6 +18,7 @@ import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
+import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -516,21 +517,26 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * TODO: This crappy code I wrote needs rework - Marvin
-     * Handles posting the ShowLobbyViewEvent on User join
+     * Handles JoinLobbyResponses found on the EventBus
      * <p>
-     * If a new UserJoinedLobbyMessage object is posted to the EventBus this
-     * method will post a ShowLobbyViewEvent on the EventBus
+     * If a new JoinLobbyResponse object is found on the EventBus, this method
+     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
+     * subscribed to, and then calls the LobbyService to retrieve
+     * all members of that new lobby in order for the lobby window to be
+     * able to display all members from the beginning.
      *
-     * @param message the UserJoinedLobbyMessage object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
-     * @since 2020-12-19
+     * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
+     * @see JoinLobbyResponse
+     * @see ShowLobbyViewEvent
+     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @since 2020-12-20
      */
     @Subscribe
-    public void postLobbyViewOnJoin(UserJoinedLobbyMessage message) {
-        if (message.getUser().equals(loggedInUser)) {
-            Platform.runLater(() -> eventBus.post(new ShowLobbyViewEvent(message.getName())));
-        }
+    public void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
+            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
+        });
     }
 
     /**

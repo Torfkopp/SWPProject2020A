@@ -14,9 +14,9 @@ import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
+import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
-import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
@@ -111,7 +111,11 @@ public class LobbyService extends AbstractService {
             if (lobby.get().getUsers().size() < 4) {
                 if (!lobby.get().getUsers().contains(lobbyJoinUserRequest.getUser())) {
                     lobby.get().joinUser(lobbyJoinUserRequest.getUser());
-                    // TODO: Make a proper response and don't reuse the next line to spawn a window - Marvin
+                    ResponseMessage responseMessage = new JoinLobbyResponse(lobbyJoinUserRequest.getName());
+                    if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
+                        responseMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
+                    }
+                    post(responseMessage);
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
                 } else {
                     LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
