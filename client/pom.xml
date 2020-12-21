@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <properties>
-        <javafx.version>11</javafx.version>
+        <javafx.version>11.0.2</javafx.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
