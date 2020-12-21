@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 public class DeleteUserRequest extends AbstractRequestMessage {
 
-    public static final long serialVersionUID = 7375314481654981321L;
+    private static final long serialVersionUID = 7375314481654981321L;
     final private User toDelete;
 
     /**
