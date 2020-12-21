@@ -15,7 +15,7 @@
         <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
-        <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" />
+        <ListView fx:id="membersView" prefHeight="200.0" prefWidth="200.0"/>
 
         <VBox GridPane.columnIndex="5">
             <ListView fx:id="chatView" prefHeight="200.0" prefWidth="200.0">

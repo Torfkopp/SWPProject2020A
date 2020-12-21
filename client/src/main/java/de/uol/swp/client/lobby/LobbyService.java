@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.common.lobby.message.CreateLobbyRequest;
 import de.uol.swp.common.lobby.message.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -66,5 +67,10 @@ public class LobbyService {
     public void retrieveAllLobbies() {
         RetrieveAllLobbiesRequest retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
         eventBus.post(retrieveAllLobbiesRequest);
+    }
+
+    public void retrieveAllLobbyMembers(String lobbyName) {
+        RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
+        eventBus.post(retrieveAllLobbyMembersRequest);
     }
 }
