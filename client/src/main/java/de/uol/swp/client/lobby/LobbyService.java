@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -36,7 +37,7 @@ public class LobbyService {
      *
      * @param name Name chosen for the new lobby
      * @param user User who wants to create the new lobby
-     * @see CreateLobbyRequest
+     * @see de.uol.swp.common.lobby.message.CreateLobbyRequest
      * @since 2019-11-20
      */
     public void createNewLobby(String name, UserDTO user) {
@@ -49,7 +50,7 @@ public class LobbyService {
      *
      * @param name Name of the lobby the user wants to join
      * @param user User who wants to join the lobby
-     * @see LobbyJoinUserRequest
+     * @see de.uol.swp.common.lobby.message.LobbyJoinUserRequest
      * @since 2019-11-20
      */
     public void joinLobby(String name, UserDTO user) {
@@ -60,11 +61,16 @@ public class LobbyService {
     /**
      * Posts a request to retrieve all lobby names
      *
-     * @see RetrieveAllLobbiesRequest
+     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
      * @since 2020-12-12
      */
     public void retrieveAllLobbies() {
         RetrieveAllLobbiesRequest retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
         eventBus.post(retrieveAllLobbiesRequest);
+    }
+
+    public void retrieveAllLobbyMembers(String lobbyName) {
+        RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
+        eventBus.post(retrieveAllLobbyMembersRequest);
     }
 }

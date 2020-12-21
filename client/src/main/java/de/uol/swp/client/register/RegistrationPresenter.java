@@ -104,5 +104,4 @@ public class RegistrationPresenter extends AbstractPresenter {
         }
     }
 
-
 }

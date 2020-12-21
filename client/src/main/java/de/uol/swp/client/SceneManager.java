@@ -15,6 +15,11 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
+import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
+import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
+import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
+import de.uol.swp.common.lobby.message.AllLobbiesResponse;
 import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
@@ -52,6 +57,7 @@ public class SceneManager {
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private Scene lastScene = null;
     private Scene currentScene = null;
+    private Scene ChangePasswordScene;
 
     private final Injector injector;
 
@@ -74,6 +80,7 @@ public class SceneManager {
         initLoginView();
         initMainView();
         initRegistrationView();
+        initChangePasswordView();
     }
 
     /**
@@ -156,6 +163,24 @@ public class SceneManager {
     }
 
     /**
+     * Initializes the Change Password view
+     * <p>
+     * If the ChangePasswordScene is null it gets set to a new scene containing the
+     * a pane showing the Change Password view as specified by the ChangePasswordView
+     * FXML file.
+     *
+     * @author Eric Vuong
+     */
+    private void initChangePasswordView() {
+        if (ChangePasswordScene == null) {
+            Parent rootPane = initPresenter(ChangePasswordPresenter.fxml);
+            ChangePasswordScene = new Scene(rootPane, 400, 200);
+            ChangePasswordScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+
+    /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
      * <p>
      * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
@@ -169,6 +194,21 @@ public class SceneManager {
     @Subscribe
     public void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
         showRegistrationScreen();
+    }
+
+    /**
+     *
+     * Handles ShowChangePasswordViewEvent detected on the EventBus
+     * <p>
+     * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the Change Password
+     * screen.
+     *
+     * @author Eric Vuong
+     */
+    @Subscribe
+    public void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
+        showChangePasswordScreen(event.getUser());
     }
 
     /**
@@ -193,7 +233,7 @@ public class SceneManager {
      * is updated to know the same lobbies as the server
      *
      * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
-     * @see AllLobbiesResponse
+     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
      * @since 2020-12-12
      */
     @Subscribe
@@ -270,6 +310,20 @@ public class SceneManager {
     }
 
     /**
+     *
+     * Handles ChangePasswordCanceledEvent detected on the EventBus
+     * <p>
+     * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the screen shown before Change Password screen.
+     *
+     * @author Eric Vuong
+     */
+    @Subscribe
+    public void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
+        showScene(lastScene, lastTitle);
+    }
+
+    /**
      * Handles RegistrationErrorEvent detected on the EventBus
      * <p>
      * If a RegistrationErrorEvent is detected on the EventBus, this method gets
@@ -281,6 +335,19 @@ public class SceneManager {
      */
     @Subscribe
     public void onRegistrationErrorEvent(RegistrationErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
+     * Handles ChangePasswordErrorEvent detected on the EventBus
+     * <p>
+     * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in a error alert.
+     *
+     * @author Eric Vuong
+     */
+    @Subscribe
+    public void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
         showError(event.getMessage());
     }
 
@@ -389,4 +456,20 @@ public class SceneManager {
     public void showRegistrationScreen() {
         showScene(registrationScene, "Registration");
     }
+
+    /**
+     * Shows the Change Password screen
+     * <p>
+     * Sets the scene's UserData to the current user.
+     * Switches the current Scene to the ChangePasswordScene and sets the title of
+     * the window to "Change Password"
+     *
+     * @author Eric Vuong
+     */
+    public void showChangePasswordScreen(User user) {
+        ChangePasswordScene.setUserData(user);
+        showScene(ChangePasswordScene, "Change Password");
+    }
+
+
 }

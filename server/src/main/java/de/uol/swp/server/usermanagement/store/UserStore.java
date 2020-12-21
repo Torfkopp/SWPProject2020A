@@ -71,5 +71,4 @@ public interface UserStore {
      */
     List<User> getAllUsers();
 
-
 }
