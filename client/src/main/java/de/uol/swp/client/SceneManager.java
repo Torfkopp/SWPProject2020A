@@ -19,8 +19,6 @@ import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
 import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
-import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -197,7 +195,6 @@ public class SceneManager {
     }
 
     /**
-     *
      * Handles ShowChangePasswordViewEvent detected on the EventBus
      * <p>
      * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
@@ -233,7 +230,7 @@ public class SceneManager {
      * is updated to know the same lobbies as the server
      *
      * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
-     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-12-12
      */
     @Subscribe
@@ -310,7 +307,6 @@ public class SceneManager {
     }
 
     /**
-     *
      * Handles ChangePasswordCanceledEvent detected on the EventBus
      * <p>
      * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets

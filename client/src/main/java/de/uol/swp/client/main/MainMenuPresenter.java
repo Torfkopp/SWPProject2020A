@@ -13,11 +13,9 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.message.ExceptionMessage;
-import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.user.User;
@@ -27,7 +25,6 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -355,8 +352,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * list" with the name of the newly added lobby is displayed in the
      * log.
      *
-     * @author Temmo Junkhoff
      * @param msg the LobbyCreatedMessage object seen on the EventBus
+     * @author Temmo Junkhoff
      * @see LobbyCreatedMessage
      * @since 2020-12-17
      */
@@ -373,7 +370,7 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     /**
      * Handles CreateLobbyResponses found on the EventBus
-     *
+     * <p>
      * If a new CreateLobbyResponse object is found on the EventBus, this method
      * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
      * subscribed to, and then calls the LobbyService to retrieve
@@ -403,8 +400,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * list" with the name of the removed lobby is displayed in the
      * log.
      *
-     * @author Temmo Junkhoff
      * @param msg the LobbyDeletedMessage object seen on the EventBus
+     * @author Temmo Junkhoff
      * @see LobbyDeletedMessage
      * @since 2020-12-17
      */
@@ -430,7 +427,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * log.
      *
      * @param allLobbiesResponse the AllLobbiesResponse object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-11-29
      */
     @Subscribe
@@ -505,7 +502,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        String lobbyName = null;
+        String lobbyName;
 
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
@@ -531,9 +528,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     @Subscribe
     public void postLobbyViewOnJoin(UserJoinedLobbyMessage message) {
         if (message.getUser().equals(loggedInUser)) {
-            Platform.runLater(() -> {
-                eventBus.post(new ShowLobbyViewEvent(message.getName()));
-            });
+            Platform.runLater(() -> eventBus.post(new ShowLobbyViewEvent(message.getName())));
         }
     }
 
@@ -550,9 +545,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     @Subscribe
     public void postLobbyViewOnCreate(LobbyCreatedMessage message) {
         if (message.getUser().equals(loggedInUser)) {
-            Platform.runLater(() -> {
-                eventBus.post(new ShowLobbyViewEvent(message.getName()));
-            });
+            Platform.runLater(() -> eventBus.post(new ShowLobbyViewEvent(message.getName())));
         }
     }
 
