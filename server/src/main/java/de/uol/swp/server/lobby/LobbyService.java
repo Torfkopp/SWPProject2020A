@@ -9,6 +9,7 @@ import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
+import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Session;
@@ -123,6 +124,9 @@ public class LobbyService extends AbstractService {
         if (lobby.isPresent()) {
             lobby.get().joinUser(lobbyJoinUserRequest.getUser());
             sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
+            UserJoinLobbyResponse response = new UserJoinLobbyResponse(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser());
+            response.initWithMessage(lobbyJoinUserRequest);
+            post(response);
         }
         // TODO: error handling not existing lobby
     }

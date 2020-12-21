@@ -23,7 +23,7 @@
                 GridPane.columnIndex="4"/>
         <ListView fx:id="lobbyView" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5"/>
 
-        <VBox GridPane.columnIndex="5">
+        <VBox GridPane.columnIndex="6">
             <ListView fx:id="chatView" prefHeight="200.0" prefWidth="200.0">
                 <VBox.margin>
                     <Insets bottom="10.0" top="10.0"/>

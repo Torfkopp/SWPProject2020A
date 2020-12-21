@@ -5,10 +5,12 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.lobby.event.LobbyReadyEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
+import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -242,6 +244,14 @@ public class MainMenuPresenter extends AbstractPresenter {
         }
     }
 
+    @Subscribe
+    private void onLobbyReadyEvent(LobbyReadyEvent msg){
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(msg.getName()));
+            lobbyService.retrieveAllLobbyMembers(msg.getName());
+        });
+
+    }
 
     /**
      * Handles new list of lobbies

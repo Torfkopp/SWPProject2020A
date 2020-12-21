@@ -3,8 +3,11 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.lobby.event.LobbyReadyEvent;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
@@ -18,7 +21,10 @@ import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages the lobby menu
@@ -38,14 +44,13 @@ public class LobbyPresenter extends AbstractPresenter {
 
     private ObservableList<String> lobbyMembers;
 
-    private User creator;
-
     private User loggedInUser;
 
     private String lobbyName;
+    private String test;
 
     @FXML
-    private ListView<String> membersView;
+    private ListView<String> membersView = new ListView<String>();
 
     @FXML
     private ListView<String> chatView;
@@ -56,6 +61,7 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-21
      */
     public LobbyPresenter() {
+        lobbyName = "Baum";
     }
 
     /**
@@ -93,11 +99,27 @@ public class LobbyPresenter extends AbstractPresenter {
     public void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
-            if (lobbyMembers != null && creator != null && !creator.getUsername().equals(message.getUser().getUsername()))
+            if (lobbyMembers != null)
                 lobbyMembers.add(message.getUser().getUsername());
         });
     }
 
+    @Subscribe
+    private void onUserJoinLobbyResponse(UserJoinLobbyResponse rsp){
+        if (lobbyName == null && loggedInUser == null) {
+                lobbyName = rsp.getName();
+                loggedInUser = rsp.getUser();
+                test = "ggfdgreg";
+
+                System.out.println("Gesetzt");
+                System.out.println(lobbyName);
+                System.out.println(loggedInUser.getUsername());
+        } else {
+            System.out.println("NOTNULL");
+        }
+        eventBus.post(new LobbyReadyEvent(rsp.getName()));
+
+    }
     /**
      * Updates the lobby's member list according to the list given
      *
@@ -105,8 +127,6 @@ public class LobbyPresenter extends AbstractPresenter {
      * in the list given to the lobby's member list. If there is no member list
      * this it creates one.
      *
-     * @param userList A list of UserDTO objects including all currently logged in
-     *                 users
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
      * @param userLobbyList A list of UserDTO objects including all currently logged in
@@ -140,20 +160,32 @@ public class LobbyPresenter extends AbstractPresenter {
      */
     @FXML
     void onLeaveLobby(ActionEvent event) {
-        if (lobbyName == null && loggedInUser == null) {
-        } else {
+        System.out.println(lobbyName);
+        System.out.println(loggedInUser);
+
+        if (lobbyName != null || loggedInUser != null) {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
         }
         ((Stage) (((Button) event.getSource()).getScene().getWindow())).close();
     }
 
     @FXML
-    private void onSendMessageButton(ActionEvent event){}
+    private void onSendMessageButton(ActionEvent event){
+        System.out.println("fsd");
+        System.out.println(lobbyName); // prints null?????????????
+        lobbyName = "Weird";
+        System.out.println(lobbyName); //now it's set again
+    }
 
     @FXML
-    private void onDeleteMessageButton(ActionEvent event){}
+    private void onDeleteMessageButton(ActionEvent event){
+        System.out.println(lobbyName);
+    }
 
     @FXML
-    private void onEditMessageButton(ActionEvent event){}
-
+    private void onEditMessageButton(ActionEvent event){
+        Platform.runLater(()-> {
+            System.out.println(test);
+        });
+    }
 }
