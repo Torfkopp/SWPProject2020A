@@ -37,7 +37,7 @@ public class LobbyService {
      *
      * @param name Name chosen for the new lobby
      * @param user User who wants to create the new lobby
-     * @see de.uol.swp.common.lobby.message.CreateLobbyRequest
+     * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
     public void createNewLobby(String name, UserDTO user) {
@@ -50,7 +50,7 @@ public class LobbyService {
      *
      * @param name Name of the lobby the user wants to join
      * @param user User who wants to join the lobby
-     * @see de.uol.swp.common.lobby.message.LobbyJoinUserRequest
+     * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
      */
     public void joinLobby(String name, UserDTO user) {
@@ -61,7 +61,7 @@ public class LobbyService {
     /**
      * Posts a request to retrieve all lobby names
      *
-     * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+     * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
      * @since 2020-12-12
      */
     public void retrieveAllLobbies() {

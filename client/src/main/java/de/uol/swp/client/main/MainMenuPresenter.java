@@ -516,6 +516,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
+     * TODO: This crappy code I wrote needs rework - Marvin
      * Handles posting the ShowLobbyViewEvent on User join
      * <p>
      * If a new UserJoinedLobbyMessage object is posted to the EventBus this
@@ -527,23 +528,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void postLobbyViewOnJoin(UserJoinedLobbyMessage message) {
-        if (message.getUser().equals(loggedInUser)) {
-            Platform.runLater(() -> eventBus.post(new ShowLobbyViewEvent(message.getName())));
-        }
-    }
-
-    /**
-     * Handles posting the ShowLobbyViewEvent on Lobby create
-     * <p>
-     * If a new LobbyCreatedMessage object is posted to the EventBus this
-     * method will post a ShowLobbyViewEvent on the EventBus
-     *
-     * @param message the LobbyCreatedMessage object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
-     * @since 2020-12-19
-     */
-    @Subscribe
-    public void postLobbyViewOnCreate(LobbyCreatedMessage message) {
         if (message.getUser().equals(loggedInUser)) {
             Platform.runLater(() -> eventBus.post(new ShowLobbyViewEvent(message.getName())));
         }

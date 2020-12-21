@@ -15,6 +15,13 @@ import de.uol.swp.common.message.ResponseMessage;
 
 public class LobbyExceptionMessage extends ExceptionMessage implements ResponseMessage {
 
+
+    /**
+     * Constructor
+     *
+     * @param message Exception message returned by server
+     * @since 2020-12-19
+     */
     public LobbyExceptionMessage(String message) {
         super(message);
     }
