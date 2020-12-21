@@ -1,7 +1,8 @@
-package de.uol.swp.common.lobby.message;
+package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Map;
  *
  * @author Mario
  * @see de.uol.swp.common.message.AbstractResponseMessage
- * @see de.uol.swp.common.lobby.message.RetrieveAllLobbiesRequest
+ * @see RetrieveAllLobbiesRequest
  * @see de.uol.swp.common.lobby.Lobby
  * @since 2020-12-12
  */

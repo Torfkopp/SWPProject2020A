@@ -6,16 +6,19 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
+import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -23,7 +26,6 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -144,6 +146,21 @@ public class MainMenuPresenter extends AbstractPresenter {
                 }
             }
         });
+    }
+
+    /**
+     * Handles lobbyCreatedMessage
+     * <p>
+     * If a Lobby gets created, this method is called.
+     * It updates the LobbyList.
+     *
+     * @param lobbyCreatedMessage the LobbyCreatedMessage object seen on the EventBus
+     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
+     * @since 2020-12-14
+     */
+    @Subscribe
+    public void newLobby(LobbyCreatedMessage lobbyCreatedMessage) {
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
@@ -327,7 +344,6 @@ public class MainMenuPresenter extends AbstractPresenter {
         });
     }
 
-
     /**
      * Adds newly created Lobby to LobbyList
      * <p>
@@ -355,7 +371,7 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     /**
      * Handles CreateLobbyResponses found on the EventBus
-     *
+     * <p>
      * If a new CreateLobbyResponse object is found on the EventBus, this method
      * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
      * subscribed to, and then calls the LobbyService to retrieve
@@ -412,7 +428,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * log.
      *
      * @param allLobbiesResponse the AllLobbiesResponse object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-11-29
      */
     @Subscribe
@@ -471,9 +487,7 @@ public class MainMenuPresenter extends AbstractPresenter {
 
         //if 'OK' is pressed the lobby will be created, otherwise it won't
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            lobbyService.createNewLobby(result.get(), (UserDTO) loggedInUser);
-        }
+        result.ifPresent(s -> lobbyService.createNewLobby(s, (UserDTO) loggedInUser));
     }
 
     /**
@@ -489,17 +503,40 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        String lobbyname = "";
+        String lobbyName;
 
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
-            System.out.println("leere Liste oder du hast nichts ausgewählt");
+            eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
-            lobbyname = lobbyView.getSelectionModel().getSelectedItem();
+            lobbyName = lobbyView.getSelectionModel().getSelectedItem();
+            lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
         }
 
-        lobbyService.joinLobby(lobbyname, new UserDTO(loggedInUser.getUsername(), "", ""));
+    }
+
+    /**
+     * Handles JoinLobbyResponses found on the EventBus
+     * <p>
+     * If a new JoinLobbyResponse object is found on the EventBus, this method
+     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
+     * subscribed to, and then calls the LobbyService to retrieve
+     * all members of that new lobby in order for the lobby window to be
+     * able to display all members from the beginning.
+     *
+     * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
+     * @see JoinLobbyResponse
+     * @see ShowLobbyViewEvent
+     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @since 2020-12-20
+     */
+    @Subscribe
+    public void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
+            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
+        });
     }
 
     /**

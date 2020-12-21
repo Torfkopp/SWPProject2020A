@@ -9,6 +9,7 @@ import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
@@ -18,7 +19,7 @@ import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
 import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
-import de.uol.swp.common.lobby.message.AllLobbiesResponse;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -194,7 +195,6 @@ public class SceneManager {
     }
 
     /**
-     *
      * Handles ShowChangePasswordViewEvent detected on the EventBus
      * <p>
      * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
@@ -230,7 +230,7 @@ public class SceneManager {
      * is updated to know the same lobbies as the server
      *
      * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
-     * @see de.uol.swp.common.lobby.message.AllLobbiesResponse
+     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-12-12
      */
     @Subscribe
@@ -255,30 +255,40 @@ public class SceneManager {
     public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
         String lobbyName = event.getName();
-        //TODO: RequestAllLobbyMembersRequest für alle users in der lobby
-        if (!lobbyScenes.containsKey(lobbyName)) {
-            //New window (Stage)
-            Stage lobbyStage = new Stage();
-            lobbyStage.setTitle(event.getName());
-            //Initialises a new lobbyScene
-            Parent rootPane = initPresenter(LobbyPresenter.fxml);
-            Scene lobbyScene = new Scene(rootPane, 400, 200);
-            lobbyScene.getStylesheets().add(styleSheet);
-            lobbyScenes.put(lobbyName, lobbyScene);
-            //Sets the stage to the newly created scene
-            lobbyStage.setScene(lobbyScenes.get(lobbyName));
-            //Specifies the modality for new window
-            lobbyStage.initModality(Modality.NONE);
-            //Specifies the owner Window (parent) for new window
-            lobbyStage.initOwner(primaryStage);
-            //Set position of second window, related to primary window
-            lobbyStage.setX(primaryStage.getX() + 200);
-            lobbyStage.setY(primaryStage.getY() + 100);
-            //Shows the window
-            lobbyStage.show();
-        } else {
-            showError("Lobby name already exists");
-        }
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle(lobbyName);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(LobbyPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane, 400, 200);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyScenes.put(lobbyName, lobbyScene);
+        //Sets the stage to the newly created scene
+        lobbyStage.setScene(lobbyScenes.get(lobbyName));
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Set position of second window, related to primary window
+        lobbyStage.setX(primaryStage.getX() + 200);
+        lobbyStage.setY(primaryStage.getY() + 100);
+        //Shows the window
+        lobbyStage.show();
+    }
+
+    /**
+     * Handles LobbyErrorEvent detected on the EventBus
+     * <p>
+     * If a LobbyErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in a error alert.
+     *
+     * @param event The LobbyErrorEvent detected on the EventBus
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @since 2020-12-18
+     */
+    @Subscribe
+    public void onLobbyErrorEvent(LobbyErrorEvent event) {
+        showError(event.getMessage());
     }
 
     /**
@@ -297,7 +307,6 @@ public class SceneManager {
     }
 
     /**
-     *
      * Handles ChangePasswordCanceledEvent detected on the EventBus
      * <p>
      * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
