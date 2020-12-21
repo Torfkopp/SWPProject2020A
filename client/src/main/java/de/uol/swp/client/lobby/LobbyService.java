@@ -70,8 +70,6 @@ public class LobbyService {
     }
 
     public void retrieveAllLobbyMembers(String lobbyName) {
-        //fixme: add lobby as param
-        System.out.println("retrieving all lobby members....");
         RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }

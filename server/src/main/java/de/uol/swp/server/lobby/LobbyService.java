@@ -35,7 +35,6 @@ public class LobbyService extends AbstractService {
     private final AuthenticationService authenticationService;
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
-    final private Map<Session, User> userSessions = new HashMap<>();
 
     final private List<Lobby> lobbyList = new ArrayList<>();
 

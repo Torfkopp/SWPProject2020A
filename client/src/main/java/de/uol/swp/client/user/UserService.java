@@ -2,8 +2,6 @@ package de.uol.swp.client.user;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.common.lobby.message.RetrieveAllLobbyMembersMessage;
-import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.*;
 import org.apache.logging.log4j.LogManager;

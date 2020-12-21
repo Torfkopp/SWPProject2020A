@@ -15,7 +15,7 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * Default Constructor
      *
      * @implNote this constructor is needed for serialization
-     * @since 2019-08-13
+     * @since 2020.12.21
      */
     public AllLobbyMembersResponse(){
         // needed for serialization
@@ -24,13 +24,13 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
     /**
      * Constructor
      *
-     * This constructor generates a new List of the logged in users from the given
+     * This constructor generates a new List of the lobby members from the given
      * Collection. The significant difference between the two being that the new
      * List contains copies of the User objects. These copies have their password
      * variable set to an empty String.
      *
-     * @param users Collection of all users currently logged in
-     * @since 2019-08-13
+     * @param users Collection of all lobby members
+     * @since 2020.12.21
      */
     public AllLobbyMembersResponse(Collection<User> users) {
         for (User user : users) {
@@ -39,10 +39,10 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Getter for the list of users currently logged in
+     * Getter for the list of lobby members
      *
-     * @return list of users currently logged in
-     * @since 2019-08-13
+     * @return list of lobby members
+     * @since 2020.12.21
      */
     public List<UserDTO> getUsers() {
         return users;

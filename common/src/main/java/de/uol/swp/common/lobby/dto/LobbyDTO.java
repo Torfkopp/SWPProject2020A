@@ -23,7 +23,6 @@ public class LobbyDTO implements Lobby {
     private User owner;
     private final Set<User> users = new TreeSet<>();
 
-
     /**
      * Constructor
      *

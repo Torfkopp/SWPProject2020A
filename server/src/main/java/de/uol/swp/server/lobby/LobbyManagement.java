@@ -16,7 +16,7 @@ import java.util.Optional;
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
  * @since 2019-10-08
  */
-public class LobbyManagement{
+public class LobbyManagement {
 
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -78,7 +78,4 @@ public class LobbyManagement{
     public Map<String, Lobby> getLobbies() {
         return lobbies;
     }
-
-
-
 }
