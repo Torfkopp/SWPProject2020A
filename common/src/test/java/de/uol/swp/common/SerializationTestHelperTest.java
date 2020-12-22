@@ -23,6 +23,4 @@ class SerializationTestHelperTest {
     private static class NotSerializable implements Serializable {
         private final Thread thread = new Thread();
     }
-
-
 }

@@ -23,7 +23,7 @@ public class UserDTO implements User {
      *
      * @param username username of the user
      * @param password password the user uses
-     * @param eMail email address the user is registered to
+     * @param eMail    email address the user is registered to
      * @since 2019-08-13
      */
     public UserDTO(String username, String password, String eMail) {
@@ -47,7 +47,7 @@ public class UserDTO implements User {
 
     /**
      * Copy constructor leaving password variable empty
-     *
+     * <p>
      * This constructor is used for the user list, because it would be a major security
      * flaw to send all user data including passwords to everyone connected.
      *
@@ -58,7 +58,6 @@ public class UserDTO implements User {
     public static UserDTO createWithoutPassword(User user) {
         return new UserDTO(user.getUsername(), "", user.getEMail());
     }
-
 
     @Override
     public String getUsername() {
@@ -86,15 +85,15 @@ public class UserDTO implements User {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (! (obj instanceof UserDTO)){
-            return false;
-        }
-        return Objects.equals(this.username, ((UserDTO)obj).username);
+    public int hashCode() {
+        return Objects.hashCode(username);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(username);
+    public boolean equals(Object obj) {
+        if (!(obj instanceof UserDTO)) {
+            return false;
+        }
+        return Objects.equals(this.username, ((UserDTO) obj).username);
     }
 }

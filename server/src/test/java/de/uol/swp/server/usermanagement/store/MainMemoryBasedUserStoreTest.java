@@ -92,7 +92,6 @@ class MainMemoryBasedUserStoreTest {
         assertFalse(userFound.isPresent());
     }
 
-
     @Test
     void overwriteUser() {
         UserStore store = getDefaultStore();
@@ -105,22 +104,19 @@ class MainMemoryBasedUserStoreTest {
         assertEquals(store.getAllUsers().size(), NO_USERS);
         assertTrue(userFound.isPresent());
         assertEquals(userToCreate, userFound.get());
-
     }
-
 
     @Test
     void updateUser() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
 
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() , userToUpdate.getEMail()+"@TESTING");
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), userToUpdate.getEMail() + "@TESTING");
 
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
         assertTrue(userFound.isPresent());
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
-
     }
 
     @Test
@@ -128,13 +124,12 @@ class MainMemoryBasedUserStoreTest {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
 
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() +"_NEWPASS", userToUpdate.getEMail());
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS", userToUpdate.getEMail());
 
-        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() +"_NEWPASS");
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS");
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() );
-
+        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail());
     }
 
     @Test
@@ -150,12 +145,12 @@ class MainMemoryBasedUserStoreTest {
     }
 
     @Test
-    void createEmptyUser(){
+    void createEmptyUser() {
         UserStore store = getDefaultStore();
 
         assertThrows(IllegalArgumentException.class,
-                () -> store.createUser("","","")
-                );
+                () -> store.createUser("", "", "")
+        );
     }
 
     @Test

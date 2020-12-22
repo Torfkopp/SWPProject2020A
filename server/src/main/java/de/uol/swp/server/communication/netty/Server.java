@@ -25,14 +25,13 @@ import java.net.InetSocketAddress;
 public class Server {
 
     private static final Logger LOG = LogManager.getLogger(Server.class);
-
-
     private final ChannelHandler serverHandler;
 
     /**
      * Constructor
-     *
+     * <p>
      * Creates a new Server Object
+     *
      * @see io.netty.channel.ChannelHandler
      * @see de.uol.swp.server.communication.ServerHandler
      * @since 2019-11-20
@@ -45,8 +44,8 @@ public class Server {
      * Start a new server on given port
      *
      * @param port port number the server shall be reachable on
-     * @throws Exception server failed to start e.g. because the port is already in use
-     * @see InetSocketAddress
+     * @throws java.lang.Exception server failed to start e.g. because the port is already in use
+     * @see java.net.InetSocketAddress
      * @since 2019-11-20
      */
     public void start(int port) throws Exception {
@@ -67,7 +66,6 @@ public class Server {
                     // get encoded/decoded objects but ByteBuf
                     ch.pipeline().addLast(serverHandler);
                 }
-
             });
             // Just wait for server shutdown
             ChannelFuture f = b.bind().sync();
@@ -77,6 +75,4 @@ public class Server {
             workerGroup.shutdownGracefully().sync();
         }
     }
-
-
 }

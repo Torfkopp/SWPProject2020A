@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Marco Grawunder
  * @see de.uol.swp.client.user.UserService
  * @since 2019-10-10
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
@@ -34,7 +33,7 @@ class UserServiceTest {
 
     /**
      * Handles DeadEvents detected on the EventBus
-     *
+     * <p>
      * If a DeadEvent is detected the event variable of this class gets updated
      * to its event and its event is printed to the console output.
      *
@@ -50,7 +49,7 @@ class UserServiceTest {
 
     /**
      * Helper method run before each test case
-     *
+     * <p>
      * This method resets the variable event to null and registers the object of
      * this class to the EventBus.
      *
@@ -64,7 +63,7 @@ class UserServiceTest {
 
     /**
      * Helper method run after each test case
-     *
+     * <p>
      * This method only unregisters the object of this class from the EventBus.
      *
      * @since 2019-10-10
@@ -76,11 +75,11 @@ class UserServiceTest {
 
     /**
      * Subroutine used for tests that need a logged in user
-     *
+     * <p>
      * This subroutine creates a new UserService object registered to the EventBus
      * of this test class and class the objects login method for the default user.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2019-10-10
      */
     private void loginUser() throws InterruptedException {
@@ -91,13 +90,13 @@ class UserServiceTest {
 
     /**
      * Test for the login method
-     *
+     * <p>
      * This test first calls the loginUser subroutine. Afterwards it checks if a
      * LoginRequest object got posted to the EventBus and if its content is the
      * default users information.
      * The test fails if any of the checks fail.
      *
-     * @throws InterruptedException thrown by loginUser()
+     * @throws java.lang.InterruptedException thrown by loginUser()
      * @since 2019-10-10
      */
     @Test
@@ -113,7 +112,7 @@ class UserServiceTest {
 
     /**
      * Test for the logout method
-     *
+     * <p>
      * This test first calls the loginUser subroutine. Afterwards it creates a new
      * UserService object registered to the EventBus of this test class. It then
      * calls the logout function of the object using the defaultUser as parameter
@@ -122,7 +121,7 @@ class UserServiceTest {
      * The test fails if no LogoutRequest is posted within one second or the request
      * says that no authorization is needed
      *
-     * @throws InterruptedException thrown by loginUser() and lock.await()
+     * @throws java.lang.InterruptedException thrown by loginUser() and lock.await()
      * @since 2019-10-10
      */
     @Test
@@ -144,7 +143,7 @@ class UserServiceTest {
 
     /**
      * Test for the createUser routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the createUser function of the object using
      * the defaultUser as parameter and waits for it to post an updateUserRequest
@@ -154,7 +153,7 @@ class UserServiceTest {
      * Authorization should not be needed.
      * If any of these checks fail or the method takes to long, this test is unsuccessful.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2019-10-10
      */
     @Test
@@ -172,12 +171,11 @@ class UserServiceTest {
         assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
         assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
         assertFalse(request.authorizationNeeded());
-
     }
 
     /**
      * Test for the updateUser routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the updateUser function of the object using
      * the defaultUser as parameter and waits for it to post an updateUserRequest
@@ -187,7 +185,7 @@ class UserServiceTest {
      * Authorization should be needed.
      * If any of these checks fail or the method takes to long, this test is unsuccessful.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2019-10-10
      */
     @Test
@@ -209,7 +207,7 @@ class UserServiceTest {
 
     /**
      * Test for the dropUser routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the dropUser function of the object using
      * the defaultUser as parameter and waits for it to post a DeleteUserRequest
@@ -218,7 +216,7 @@ class UserServiceTest {
      * Authorization should be needed.
      * If any of these checks fail or the method takes too long, this test is unsuccessful.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @author Phillip-André Suhr
      * @since 2019-10-10
      */
@@ -242,13 +240,13 @@ class UserServiceTest {
 
     /**
      * Test for the retrieveAllUsers routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the retrieveAllUsers function of the object
      * and waits for it to post a retrieveAllUsersRequest object on the EventBus.
      * If this happens within one second, the test is successful.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2019-10-10
      */
     @Test
@@ -260,5 +258,4 @@ class UserServiceTest {
 
         assertTrue(event instanceof RetrieveAllOnlineUsersRequest);
     }
-
 }

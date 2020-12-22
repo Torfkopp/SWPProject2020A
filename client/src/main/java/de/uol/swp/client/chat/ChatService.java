@@ -7,15 +7,13 @@ import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.user.User;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * This class is used to hide the communication implementation details
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see IChatService
+ * @see de.uol.swp.client.chat.IChatService
  * @since 2020-12-17
  */
 @SuppressWarnings("UnstableApiUsage")

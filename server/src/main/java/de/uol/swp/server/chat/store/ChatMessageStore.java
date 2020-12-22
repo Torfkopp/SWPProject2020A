@@ -11,8 +11,10 @@ import java.util.Optional;
  * them easily.
  *
  * @author Temmo Junkhoff
- * @see AbstractChatMessageStore
- * @see MainMemoryBasedChatMessageStore
+ * @see de.uol.swp.server.chat.store.AbstractChatMessageStore
+ * @see de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.chat.ChatMessage
  * @since 2020-12-16
  */
 public interface ChatMessageStore {

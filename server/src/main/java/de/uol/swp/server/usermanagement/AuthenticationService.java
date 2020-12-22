@@ -26,8 +26,8 @@ import java.util.*;
 /**
  * Mapping authentication event bus calls to user management calls
  *
- * @see de.uol.swp.server.AbstractService
  * @author Marco Grawunder
+ * @see de.uol.swp.server.AbstractService
  * @since 2019-08-30
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -38,14 +38,14 @@ public class AuthenticationService extends AbstractService {
     /**
      * The list of current logged in users
      */
-    final private Map<Session, User> userSessions = new HashMap<>();
+    private final Map<Session, User> userSessions = new HashMap<>();
 
     private final UserManagement userManagement;
 
     /**
      * Constructor
      *
-     * @param bus The EventBus used throughout the entire server
+     * @param bus            The EventBus used throughout the entire server
      * @param userManagement object of the UserManagement to use
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-30
@@ -90,7 +90,7 @@ public class AuthenticationService extends AbstractService {
 
     /**
      * Handles LoginRequests found on the EventBus
-     *
+     * <p>
      * If a LoginRequest is detected on the EventBus, this method is called. It
      * tries to login a user via the UserManagement. If this succeeds the user and
      * his Session are stored in the userSessions Map and a ClientAuthorizedMessage
@@ -127,7 +127,7 @@ public class AuthenticationService extends AbstractService {
 
     /**
      * Handles LogoutRequests found on the EventBus
-     *
+     * <p>
      * If a LogoutRequest is detected on the EventBus, this method is called. It
      * tries to logout a user via the UserManagement. If this succeeds the user and
      * his Session are removed from the userSessions Map and a UserLoggedOutMessage
@@ -156,14 +156,13 @@ public class AuthenticationService extends AbstractService {
 
                 ServerMessage returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
                 post(returnMessage);
-
             }
         }
     }
 
     /**
      * Handles RetrieveAllOnlineUsersRequests found on the EventBus
-     *
+     * <p>
      * If a RetrieveAllOnlineUsersRequest is detected on the EventBus, this method
      * is called. It posts a AllOnlineUsersResponse containing user objects for
      * every logged in user on the EvenBus.
@@ -179,6 +178,4 @@ public class AuthenticationService extends AbstractService {
         response.initWithMessage(msg);
         post(response);
     }
-
-
 }

@@ -7,9 +7,9 @@ import de.uol.swp.common.message.ResponseMessage;
  * This class returns exceptions to the client caused by various
  * serverside lobby related errors
  *
+ * @author Marvin
  * @see de.uol.swp.common.message.ResponseMessage
  * @see de.uol.swp.common.message.ExceptionMessage
- * @author Marvin
  * @since 2020-12-19
  */
 
@@ -25,5 +25,4 @@ public class LobbyExceptionMessage extends ExceptionMessage implements ResponseM
     public LobbyExceptionMessage(String message) {
         super(message);
     }
-
 }

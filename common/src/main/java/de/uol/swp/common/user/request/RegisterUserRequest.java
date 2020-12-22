@@ -8,13 +8,14 @@ import java.util.Objects;
 /**
  * Request to register a new user
  *
- * @see de.uol.swp.common.user.User
  * @author Marco Grawunder
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2019-09-02
  */
 public class RegisterUserRequest extends AbstractRequestMessage {
 
-    final private User toCreate;
+    private final User toCreate;
 
     /**
      * Constructor
@@ -22,7 +23,7 @@ public class RegisterUserRequest extends AbstractRequestMessage {
      * @param user the new User to create
      * @since 2019-09-02
      */
-    public RegisterUserRequest(User user){
+    public RegisterUserRequest(User user) {
         this.toCreate = user;
     }
 
@@ -42,15 +43,15 @@ public class RegisterUserRequest extends AbstractRequestMessage {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(toCreate);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegisterUserRequest that = (RegisterUserRequest) o;
         return Objects.equals(toCreate, that.toCreate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(toCreate);
     }
 }
