@@ -61,7 +61,7 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-21
      */
     public LobbyPresenter() {
-        lobbyName = "Baum";
+        test = "Starting Value";
     }
 
     /**
@@ -109,11 +109,9 @@ public class LobbyPresenter extends AbstractPresenter {
         if (lobbyName == null && loggedInUser == null) {
                 lobbyName = rsp.getName();
                 loggedInUser = rsp.getUser();
-                test = "ggfdgreg";
+                test = "JoinResponse Value";
 
-                System.out.println("Gesetzt");
-                System.out.println(lobbyName);
-                System.out.println(loggedInUser.getUsername());
+                System.out.println("In JoinResponse: " + test);
         } else {
             System.out.println("NOTNULL");
         }
@@ -171,21 +169,14 @@ public class LobbyPresenter extends AbstractPresenter {
 
     @FXML
     private void onSendMessageButton(ActionEvent event){
-        System.out.println("fsd");
-        System.out.println(lobbyName); // prints null?????????????
-        lobbyName = "Weird";
-        System.out.println(lobbyName); //now it's set again
+        System.out.println("In Button: " + test); // prints
     }
 
     @FXML
     private void onDeleteMessageButton(ActionEvent event){
-        System.out.println(lobbyName);
     }
 
     @FXML
     private void onEditMessageButton(ActionEvent event){
-        Platform.runLater(()-> {
-            System.out.println(test);
-        });
     }
 }

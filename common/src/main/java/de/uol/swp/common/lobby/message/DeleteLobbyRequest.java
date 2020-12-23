@@ -1,10 +1,12 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
+
 /**
  * Request sent to the server when a lobby has to be deleted
  *
  * @author Mario
- * @see de.uol.swp.common.lobby.message.AbstractLobbyRequest
+ * @see de.uol.swp.common.lobby.request.AbstractLobbyRequest
  * @since 2020-12-14
  */
 public class DeleteLobbyRequest extends AbstractLobbyRequest {

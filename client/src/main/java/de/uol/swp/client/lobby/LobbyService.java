@@ -3,7 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
+import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -59,7 +59,7 @@ public class LobbyService {
     /**
      * Posts a request to leave a specified lobby on the EventBus
      *
-     * @see de.uol.swp.common.lobby.message.LobbyLeaveUserRequest
+     * @see de.uol.swp.common.lobby.request.LobbyLeaveUserRequest
      * @since 2020-12-05
      */
     public void leaveLobby(String lobbyName, UserDTO user) {
@@ -71,7 +71,7 @@ public class LobbyService {
      * Posts a request to delete a specified lobby on the EventBus
      *
      * @param lobbyName The name of the lobby
-     * @see de.uol.swp.common.lobby.message.DeleteLobbyRequest
+     * @see de.uol.swp.common.lobby.request.DeleteLobbyRequest
      * @since 2020-12-14
      */
     public void deleteLobby(String lobbyName) {
