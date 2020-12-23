@@ -9,8 +9,9 @@ import java.util.Objects;
 /**
  * A message containing all current logged in usernames
  *
- * @author Marco Grawunder
- * @since 2017-03-17
+ * @author Alwin Bossert
+ * @author Steven Luong
+ * @since 2020.12.21
  */
 public class RetrieveAllLobbyMembersMessage extends AbstractServerMessage {
 

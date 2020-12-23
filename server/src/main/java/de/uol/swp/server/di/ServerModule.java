@@ -2,6 +2,8 @@ package de.uol.swp.server.di;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
+import de.uol.swp.server.chat.store.ChatMessageStore;
+import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
 
@@ -17,10 +19,12 @@ public class ServerModule extends AbstractModule {
 
     private final EventBus bus = new EventBus();
     private final UserStore store = new MainMemoryBasedUserStore();
+    private final ChatMessageStore chatMessageStore = new MainMemoryBasedChatMessageStore();
 
     @Override
     protected void configure() {
         bind(UserStore.class).toInstance(store);
         bind(EventBus.class).toInstance(bus);
+        bind(ChatMessageStore.class).toInstance(chatMessageStore);
     }
 }

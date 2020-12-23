@@ -1,12 +1,13 @@
-package de.uol.swp.common.lobby.message;
+package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
 /**
  * Request sent to the server when a user wants to create a new lobby
  *
- * @see de.uol.swp.common.lobby.message.AbstractLobbyRequest
+ * @see AbstractLobbyRequest
  * @see de.uol.swp.common.user.User
  * @author Marco Grawunder
  * @since 2019-10-08
