@@ -47,7 +47,6 @@ public class LobbyPresenter extends AbstractPresenter {
     private User loggedInUser;
 
     private String lobbyName;
-    private String test;
 
     @FXML
     private ListView<String> membersView = new ListView<String>();
@@ -61,7 +60,6 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-21
      */
     public LobbyPresenter() {
-        test = "Starting Value";
     }
 
     /**
@@ -106,17 +104,10 @@ public class LobbyPresenter extends AbstractPresenter {
 
     @Subscribe
     private void onUserJoinLobbyResponse(UserJoinLobbyResponse rsp){
-        if (lobbyName == null && loggedInUser == null) {
-                lobbyName = rsp.getName();
-                loggedInUser = rsp.getUser();
-                test = "JoinResponse Value";
+        this.lobbyName = rsp.getName();
+        this.loggedInUser = rsp.getUser();
 
-                System.out.println("In JoinResponse: " + test);
-        } else {
-            System.out.println("NOTNULL");
-        }
         eventBus.post(new LobbyReadyEvent(rsp.getName()));
-
     }
     /**
      * Updates the lobby's member list according to the list given
@@ -158,9 +149,6 @@ public class LobbyPresenter extends AbstractPresenter {
      */
     @FXML
     void onLeaveLobby(ActionEvent event) {
-        System.out.println(lobbyName);
-        System.out.println(loggedInUser);
-
         if (lobbyName != null || loggedInUser != null) {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
         }
@@ -169,7 +157,6 @@ public class LobbyPresenter extends AbstractPresenter {
 
     @FXML
     private void onSendMessageButton(ActionEvent event){
-        System.out.println("In Button: " + test); // prints
     }
 
     @FXML
