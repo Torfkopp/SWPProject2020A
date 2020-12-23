@@ -86,7 +86,6 @@ public class MainMenuPresenter extends AbstractPresenter {
     @FXML
     private TextField messageField;
 
-
     /**
      * Handles successful login
      * <p>
@@ -499,14 +498,12 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        String lobbyName;
-
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
-            lobbyName = lobbyView.getSelectionModel().getSelectedItem();
+            String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
             lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
         }
     }

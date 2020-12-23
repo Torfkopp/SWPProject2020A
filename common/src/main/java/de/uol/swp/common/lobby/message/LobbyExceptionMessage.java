@@ -15,7 +15,6 @@ import de.uol.swp.common.message.ResponseMessage;
 
 public class LobbyExceptionMessage extends ExceptionMessage implements ResponseMessage {
 
-
     /**
      * Constructor
      *
