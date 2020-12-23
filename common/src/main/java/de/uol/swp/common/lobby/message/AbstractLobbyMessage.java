@@ -2,7 +2,6 @@ package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.message.AbstractServerMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 
 import java.util.Objects;
 
@@ -17,7 +16,7 @@ import java.util.Objects;
 public class AbstractLobbyMessage extends AbstractServerMessage {
 
     String name;
-    UserDTO user;
+    User user;
 
     /**
      * Default constructor
@@ -35,7 +34,7 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
      * @param user user responsible for the creation of this message
      * @since 2019-10-08
      */
-    public AbstractLobbyMessage(String name, UserDTO user) {
+    public AbstractLobbyMessage(String name, User user) {
         this.name = name;
         this.user = user;
     }
@@ -75,7 +74,7 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
      * @param user  User responsible for the creation of this message
      * @since 2019-10-08
      */
-    public void setUser(UserDTO user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MainMemoryBasedUserStoreTest {
 
     private static final int NO_USERS = 10;
-    private static final List<UserDTO> users;
+    private static final List<User> users;
 
     static {
         users = new ArrayList<>();
@@ -24,13 +24,13 @@ class MainMemoryBasedUserStoreTest {
         Collections.sort(users);
     }
 
-    List<UserDTO> getDefaultUsers() {
+    List<User> getDefaultUsers() {
         return Collections.unmodifiableList(users);
     }
 
     MainMemoryBasedUserStore getDefaultStore() {
         MainMemoryBasedUserStore store = new MainMemoryBasedUserStore();
-        List<UserDTO> users = getDefaultUsers();
+        List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return store;
     }
@@ -161,7 +161,7 @@ class MainMemoryBasedUserStoreTest {
     @Test
     void getAllUsers() {
         UserStore store = getDefaultStore();
-        List<UserDTO> allUsers = getDefaultUsers();
+        List<User> allUsers = getDefaultUsers();
 
         List<User> allUsersFromStore = store.getAllUsers();
 

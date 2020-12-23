@@ -5,7 +5,6 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -99,12 +98,12 @@ public class LobbyPresenter extends AbstractPresenter {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
-     * @param userLobbyList A list of UserDTO objects including all currently logged in
+     * @param userLobbyList A list of User objects including all currently logged in
      *                 users
-     * @see de.uol.swp.common.user.UserDTO
+     * @see de.uol.swp.common.user.User
      * @since 2020-11-22
      */
-    private void updateUsersList(List<UserDTO> userLobbyList) {
+    private void updateUsersList(List<User> userLobbyList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (lobbyMembers == null) {

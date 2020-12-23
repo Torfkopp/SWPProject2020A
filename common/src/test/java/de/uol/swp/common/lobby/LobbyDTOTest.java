@@ -24,7 +24,7 @@ class LobbyDTOTest {
     private static final Lobby defaultLobby = new LobbyDTO("TestLobby", defaultUser);
 
     private static final int NO_USERS = 10;
-    private static final List<UserDTO> users;
+    private static final List<User> users;
 
     static {
         users = new ArrayList<>();

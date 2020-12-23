@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class AllOnlineUsersResponse extends AbstractResponseMessage {
 
-    final private ArrayList<UserDTO> users = new ArrayList<>();
+    final private List<User> users = new ArrayList<>();
 
     /**
      * Default Constructor
@@ -58,7 +58,7 @@ public class AllOnlineUsersResponse extends AbstractResponseMessage {
      * @return list of users currently logged in
      * @since 2019-08-13
      */
-    public List<UserDTO> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 

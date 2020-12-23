@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.request;
 
-import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
-import de.uol.swp.common.user.UserDTO;
+
+import de.uol.swp.common.user.User;
 
 /**
  * Request sent to the server when a user wants to leave a lobby
@@ -29,7 +29,7 @@ public class LobbyLeaveUserRequest extends AbstractLobbyRequest {
      * @param user user who wants to leave the lobby
      * @since 2019-10-08
      */
-    public LobbyLeaveUserRequest(String lobbyName, UserDTO user) {
+    public LobbyLeaveUserRequest(String lobbyName, User user) {
         super(lobbyName, user);
     }
 

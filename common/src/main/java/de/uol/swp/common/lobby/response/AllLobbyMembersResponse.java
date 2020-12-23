@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AllLobbyMembersResponse extends AbstractResponseMessage {
 
-    final private List<UserDTO> users = new ArrayList<>();
+    final private List<User> users = new ArrayList<>();
 
     /**
      * Default Constructor
@@ -44,7 +44,7 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * @return list of lobby members
      * @since 2020.12.21
      */
-    public List<UserDTO> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 }

@@ -18,7 +18,6 @@ import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
@@ -80,7 +79,7 @@ public class LobbyService extends AbstractService {
                 responseMessage.setMessageContext(createLobbyRequest.getMessageContext().get());
             }
             post(responseMessage);
-            sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), (UserDTO) createLobbyRequest.getOwner()));
+            sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), createLobbyRequest.getOwner()));
         } catch (IllegalArgumentException e) {
             LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage(e.getMessage());
             if (createLobbyRequest.getMessageContext().isPresent()) {

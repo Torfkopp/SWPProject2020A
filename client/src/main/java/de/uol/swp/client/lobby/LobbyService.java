@@ -6,7 +6,7 @@ import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
-import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.User;
 
 /**
  * Classes that manages lobbies
@@ -40,7 +40,7 @@ public class LobbyService {
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    public void createNewLobby(String name, UserDTO user) {
+    public void createNewLobby(String name, User user) {
         CreateLobbyRequest createLobbyRequest = new CreateLobbyRequest(name, user);
         eventBus.post(createLobbyRequest);
     }
@@ -53,7 +53,7 @@ public class LobbyService {
      * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
      */
-    public void joinLobby(String name, UserDTO user) {
+    public void joinLobby(String name, User user) {
         LobbyJoinUserRequest joinUserRequest = new LobbyJoinUserRequest(name, user);
         eventBus.post(joinUserRequest);
     }

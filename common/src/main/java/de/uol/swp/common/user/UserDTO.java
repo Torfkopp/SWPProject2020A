@@ -38,10 +38,10 @@ public class UserDTO implements User {
      * Copy constructor
      *
      * @param user User object to copy the values of
-     * @return UserDTO copy of User object
+     * @return User copy of User object
      * @since 2019-08-13
      */
-    public static UserDTO create(User user) {
+    public static User create(User user) {
         return new UserDTO(user.getUsername(), user.getPassword(), user.getEMail());
     }
 
@@ -52,10 +52,10 @@ public class UserDTO implements User {
      * flaw to send all user data including passwords to everyone connected.
      *
      * @param user User object to copy the values of
-     * @return UserDTO copy of User object having the password variable left empty
+     * @return User copy of User object having the password variable left empty
      * @since 2019-08-13
      */
-    public static UserDTO createWithoutPassword(User user) {
+    public static User createWithoutPassword(User user) {
         return new UserDTO(user.getUsername(), "", user.getEMail());
     }
 

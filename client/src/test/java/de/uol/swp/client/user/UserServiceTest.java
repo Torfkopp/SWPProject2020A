@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Marco Grawunder
  * @see de.uol.swp.client.user.UserService
  * @since 2019-10-10
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
@@ -34,7 +33,7 @@ class UserServiceTest {
 
     /**
      * Handles DeadEvents detected on the EventBus
-     *
+     * <p>
      * If a DeadEvent is detected the event variable of this class gets updated
      * to its event and its event is printed to the console output.
      *
@@ -50,7 +49,7 @@ class UserServiceTest {
 
     /**
      * Helper method run before each test case
-     *
+     * <p>
      * This method resets the variable event to null and registers the object of
      * this class to the EventBus.
      *
@@ -64,7 +63,7 @@ class UserServiceTest {
 
     /**
      * Helper method run after each test case
-     *
+     * <p>
      * This method only unregisters the object of this class from the EventBus.
      *
      * @since 2019-10-10
@@ -76,7 +75,7 @@ class UserServiceTest {
 
     /**
      * Subroutine used for tests that need a logged in user
-     *
+     * <p>
      * This subroutine creates a new UserService object registered to the EventBus
      * of this test class and class the objects login method for the default user.
      *
@@ -91,7 +90,7 @@ class UserServiceTest {
 
     /**
      * Test for the login method
-     *
+     * <p>
      * This test first calls the loginUser subroutine. Afterwards it checks if a
      * LoginRequest object got posted to the EventBus and if its content is the
      * default users information.
@@ -113,7 +112,7 @@ class UserServiceTest {
 
     /**
      * Test for the logout method
-     *
+     * <p>
      * This test first calls the loginUser subroutine. Afterwards it creates a new
      * UserService object registered to the EventBus of this test class. It then
      * calls the logout function of the object using the defaultUser as parameter
@@ -144,7 +143,7 @@ class UserServiceTest {
 
     /**
      * Test for the createUser routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the createUser function of the object using
      * the defaultUser as parameter and waits for it to post an updateUserRequest
@@ -177,7 +176,7 @@ class UserServiceTest {
 
     /**
      * Test for the updateUser routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the updateUser function of the object using
      * the defaultUser as parameter and waits for it to post an updateUserRequest
@@ -209,7 +208,7 @@ class UserServiceTest {
 
     /**
      * Test for the dropUser routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the dropUser function of the object using
      * the defaultUser as parameter and waits for it to post a DeleteUserRequest
@@ -242,7 +241,7 @@ class UserServiceTest {
 
     /**
      * Test for the retrieveAllUsers routine
-     *
+     * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the retrieveAllUsers function of the object
      * and waits for it to post a retrieveAllUsersRequest object on the EventBus.

@@ -1,7 +1,6 @@
 package de.uol.swp.server.usermanagement.store;
 
 import com.google.common.base.Strings;
-import com.google.inject.Injector;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
