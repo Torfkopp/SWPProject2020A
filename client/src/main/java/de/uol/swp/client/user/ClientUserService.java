@@ -5,10 +5,10 @@ import de.uol.swp.common.user.User;
 import java.util.List;
 
 /**
- * An interface for all methods of the client user service
- *
- * As the communication with the server is based on events, the
- * returns of the call must be handled by events
+ * An interface for all methods of the client's UserService
+ * <p>
+ * Since the communication with the server is based on events,
+ * the return of the calls must be handled by events
  *
  * @author Marco Grawunder
  * @since 2017-03-17
@@ -17,74 +17,79 @@ import java.util.List;
 public interface ClientUserService {
 
     /**
-     * Login with username and password
+     * Login with a username and a password
+     * <p>
+     * This method logs the user in.
      *
-     * @param username the name of the user
-     * @param password the password of the user
+     * @param username the user's name
+     * @param password the user's password
      * @since 2017-03-17
      */
     void login(String username, String password);
 
     /**
      * Log out from server
+     * <p>
+     * This method logs the user specified by the User object out.
      *
-     * @implNote the User Object has to contain a unique identifier in order to
-     * 			 remove the correct user
+     * @implNote The User object has to contain a unique identifier in order to
+     * remove the correct user
      * @since 2017-03-17
      */
     void logout(User user);
 
     /**
-     * Create a new persistent user
+     * Create a new permanent user
+     * <p>
+     * This method creates the user specified by the User object permanently.
      *
-     * @implNote the User Object has to contain a unique identifier in order to
-     * 			 remove the correct user
      * @param user The user to create
+     * @implNote The User object has to contain a unique identifier in order to
+     * remove the correct user
      * @since 2019-09-02
      */
     void createUser(User user);
 
     /**
-     * Removes a user from the sore
+     * Remove a user from the server
+     * <p>
+     * This method removes the user specified by the User object.
      *
-     * Remove the User specified by the User object.
-     *
-     * @implNote the User Object has to contain a unique identifier in order to
-     * 			 remove the correct user
      * @param user The user to remove
+     * @implNote The User object has to contain a unique identifier in order to
+     * remove the correct user
      * @since 2019-10-10
      */
     void dropUser(User user);
 
     /**
      * Update a user
+     * <p>
+     * This method updates the user specified by the User object.
      *
-     * Updates the User specified by the User object.
-     *
-     * @implNote the User Object has to contain a unique identifier in order to
-     * 			 update the correct user
-     * @param user the user object containing all infos to
-     *             update, if some values are not set, (e.g. password is "")
+     * @param user The User object containing all infos to update.
+     *             If some values are not set (e.g. password is ""),
      *             these fields are not updated
+     * @implNote The User object has to contain a unique identifier in order to
+     * update the correct user
      * @since 2019-09-02
      */
     void updateUser(User user);
 
     /**
-     * Retrieve the list of all current logged in users
+     * Retrieve the list of all currently logged in users
      *
      * @since 2017-03-17
      */
     void retrieveAllUsers();
 
     /**
-     * Update a user password
+     * Update a user's password
      *
-     * @param user
-     * @param oldPassword
+     * @param user The user changing the password
+     * @param oldPassword The password that is to be changed
      * @author Eric Vuong, Steven Luong
      * @since 2020-12-17
-     *
      */
     void updateUserPassword(User user, String oldPassword);
 }

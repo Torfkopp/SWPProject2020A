@@ -1,7 +1,7 @@
 package de.uol.swp.client.register.event;
 
 /**
- * Event used to show the window show before showing the registration window
+ * Event used to show the window shown before the registration window
  *
  * In order to show the previous window using this event, post an instance of it
  * onto the eventBus the SceneManager is subscribed to.

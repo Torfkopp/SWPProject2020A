@@ -17,7 +17,7 @@ public class RegistrationErrorEvent {
     /**
      * Constructor
      *
-     * @param message Message containing the cause of the Error
+     * @param message Message containing the cause of the error
      * @since 2019-09-03
      */
     public RegistrationErrorEvent(String message) {

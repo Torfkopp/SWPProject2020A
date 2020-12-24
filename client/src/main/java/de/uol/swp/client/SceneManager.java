@@ -461,6 +461,7 @@ public class SceneManager {
      * the window to "Change Password"
      *
      * @author Eric Vuong
+     * @author Mario
      */
     public void showChangePasswordScreen(User user) {
         ChangePasswordScene.setUserData(user);

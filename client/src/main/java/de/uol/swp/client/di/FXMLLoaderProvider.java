@@ -6,7 +6,7 @@ import com.google.inject.Provider;
 import javafx.fxml.FXMLLoader;
 
 /**
- * Class that provides Instances of the FXMLLoader
+ * Class that provides instances of the FXMLLoader
  *
  * @author Marco Grawunder
  * @since 2019-09-18
