@@ -467,6 +467,7 @@ public class SceneManager {
      * the window to "Change Password"
      *
      * @author Eric Vuong
+     * @author Mario
      * @since 2020-12-19
      */
     public void showChangePasswordScreen(User user) {

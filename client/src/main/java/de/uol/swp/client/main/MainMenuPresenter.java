@@ -87,12 +87,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     private TextField messageField;
 
     /**
-     * Handles successful login
+     * Handles a successful login
      * <p>
-     * If a LoginSuccessfulResponse is posted to the EventBus the loggedInUser
-     * of this client is set to the one in the message received and the full
-     * list of users currently logged in is requested, as well as the list
-     * of lobbies.
+     * If a LoginSuccessfulResponse is posted to the EventBus, the loggedInUser
+     * of this client is set to the one in the message received.
+     * Furthermore, the full list of users currently logged in is requested
+     * as well as the list of lobbies.
      *
      * @param message the LoginSuccessfulResponse object seen on the EventBus
      * @see de.uol.swp.common.user.response.LoginSuccessfulResponse
@@ -110,8 +110,8 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Prepares the variables used for the chat storage and management
      * <p>
-     * This method is called on a successful login and ensures that
-     * the used variables chatMessageMap and chatMessages aren't null,
+     * This method is called on a successful login.
+     * It ensures that the used variables chatMessageMap and chatMessages are not null,
      * sets the items of the chatView to the chatMessages observableList,
      * and adds a MapChangeListener that manages the displayed ChatMessages.
      *
@@ -149,10 +149,10 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles lobbyCreatedMessage
+     * Handles a lobbyCreatedMessage
      * <p>
-     * If a Lobby gets created, this method is called.
-     * It updates the LobbyList.
+     * If a lobby gets created, this method is called
+     * to update the LobbyList.
      *
      * @param lobbyCreatedMessage the LobbyCreatedMessage object seen on the EventBus
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
@@ -164,11 +164,11 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles new logged in users
+     * Handles newly logged in users
      * <p>
-     * If a new UserLoggedInMessage object is posted to the EventBus the name of the newly
+     * If a new UserLoggedInMessage object is posted to the EventBus, the name of the newly
      * logged in user is appended to the user list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "New user {@literal
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} logged in." is displayed in the log.
      *
      * @param message the UserLoggedInMessage object seen on the EventBus
@@ -185,11 +185,11 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles new logged out users
+     * Handles newly logged out users
      * <p>
-     * If a new UserLoggedOutMessage object is posted to the EventBus the name of the newly
+     * If a new UserLoggedOutMessage object is posted to the EventBus, the name of the newly
      * logged out user is removed from the user list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "User {@literal
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "User {@literal
      * <Username>} logged out." is displayed in the log.
      *
      * @param message the UserLoggedOutMessage object seen on the EventBus
@@ -203,11 +203,11 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles new list of users
+     * Handles a new list of users
      * <p>
-     * If a new AllOnlineUsersResponse object is posted to the EventBus the names
-     * of currently logged in users are put onto the user list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
+     * If a new AllOnlineUsersResponse object is posted to the EventBus, the names
+     * of the currently logged in users are put into the main menu's user list.
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of user
      * list" with the names of all currently logged in users is displayed in the
      * log.
      *
@@ -222,13 +222,13 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles new incoming ChatMessage
+     * Handles an incoming ChatMessage
      * <p>
-     * If a CreatedChatMessageMessage is posted to the EventBus, this method
+     * If a CreatedChatMessageMessage is posted onto the EventBus, this method
      * puts the incoming ChatMessage's content into the chatMessageMap with the
      * ChatMessage's ID as the key.
-     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
-     * the incoming ChatMessage's content is displayed in the log.
+     * If the loglevel is set to DEBUG, the message "Received Chat Message: "
+     * with the incoming ChatMessage's content is displayed in the log.
      *
      * @param msg The CreatedChatMessageMessage object found on the EventBus
      * @author Temmo Junkhoff
@@ -245,9 +245,9 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles incoming notification that a ChatMessage was deleted
+     * Handles an incoming notification about the deletion of a ChatMessage
      * <p>
-     * If a DeletedChatMessageMessage is posted to the EventBus, this method
+     * If a DeletedChatMessageMessage is posted onto the EventBus, this method
      * removes the ChatMessage with the corresponding ID from the chatMessageMap.
      *
      * @param msg The DeletedChatMessageMessage found on the EventBus
@@ -263,7 +263,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles incoming notification that a ChatMessage was edited
+     * Handles an incoming notification about an edition of a ChatMessage
      * <p>
      * If an EditedChatMessageMessage is posted to the EventBus, this method
      * replaces the content in the chatMessageMap that is stored under the
@@ -282,7 +282,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles AskLatestChatMessageResponse
+     * Handles a AskLatestChatMessageResponse
      * <p>
      * If a AskLatestChatMessageResponse is found on the EventBus,
      * this method calls updateChatMessageList to fill or update the ChatMessageList.
@@ -301,7 +301,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method to update the ChatMessageList with a given List of ChatMessages
+     * Method to update the ChatMessageList with a given list of ChatMessages
      *
      * @param chatMessageList The List of ChatMessages to insert into the
      *                        chatMessageMap
@@ -321,13 +321,13 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Updates the main menus user list according to the list given
      * <p>
      * This method clears the entire user list and then adds the name of each user
-     * in the list given to the main menus user list. If there ist no user list
-     * this it creates one.
+     * in the list given to the main menu's user list.
+     * If there is no user list, it creates one.
      *
      * @param userList A list of UserDTO objects including all currently logged in
      *                 users
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
+     * @implNote The code inside this method has to run in the JavaFX-application thread.
+     * Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.UserDTO
      * @since 2019-08-29
      */
@@ -344,13 +344,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Adds newly created Lobby to LobbyList
+     * Adds a newly created lobby to LobbyList
      * <p>
-     * If a new LobbyCreatedMessage object is posted to the EventBus the name
-     * of the newly created lobby is put onto the lobby list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "Added new lobby to lobby
-     * list" with the name of the newly added lobby is displayed in the
-     * log.
+     * If a new LobbyCreatedMessage object is posted onto the EventBus, the name
+     * of the newly created lobby is put into the main menu's lobby list.
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "Added new lobby to lobby
+     * list" with the name of the newly added lobby is displayed in the log.
      *
      * @param msg the LobbyCreatedMessage object seen on the EventBus
      * @author Temmo Junkhoff
@@ -368,13 +367,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles CreateLobbyResponses found on the EventBus
+     * Handles a CreateLobbyResponse found on the EventBus
      * <p>
      * If a new CreateLobbyResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
-     * subscribed to, and then calls the LobbyService to retrieve
-     * all members of that new lobby in order for the lobby window to be
-     * able to display all members from the beginning.
+     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is subscribed to.
+     * Then it calls the LobbyService to retrieve all members of that new lobby
+     * in order for the lobby window to be able to display all members from the beginning.
      *
      * @param createLobbyResponse The CreateLobbyResponse object found on the EventBus
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
@@ -391,13 +389,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Removes deleted Lobby from LobbyList
+     * Removes a deleted lobby from the LobbyList
      * <p>
-     * If a new LobbyDeletedMessage object is posted to the EventBus the name
-     * of the deleted lobby is removed from the lobby list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "Removed lobby from lobby
-     * list" with the name of the removed lobby is displayed in the
-     * log.
+     * If a new LobbyDeletedMessage object is posted to the EventBus, the name
+     * of the deleted lobby is removed from the main menu's lobby list.
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "Removed lobby from lobby
+     * list" with the name of the removed lobby is displayed in the log.
      *
      * @param msg the LobbyDeletedMessage object seen on the EventBus
      * @author Temmo Junkhoff
@@ -415,11 +412,34 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles new list of lobbies
+     * Handles a JoinLobbyResponse found on the EventBus
      * <p>
-     * If a new AllLobbiesResponse object is posted to the EventBus the names
-     * of currently existing lobbies are put onto the lobby list in the main menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "Update of lobby
+     * If a new JoinLobbyResponse object is found on the EventBus, this method
+     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
+     * subscribed to. Then it calls the LobbyService to retrieve
+     * all members of that new lobby in order for the lobby window to be
+     * able to display all members from the beginning.
+     *
+     * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
+     * @see JoinLobbyResponse
+     * @see ShowLobbyViewEvent
+     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @since 2020-12-20
+     */
+    @Subscribe
+    public void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
+            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
+        });
+    }
+
+    /**
+     * Handles a new list of lobbies
+     * <p>
+     * If a new AllLobbiesResponse object is posted to the EventBus, the names
+     * of currently existing lobbies are put into the main menu's lobby list.
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of lobby
      * list" with the names of all currently existing lobbies is displayed in the
      * log.
      *
@@ -433,16 +453,17 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Updates the main menus lobby list according to the list given
+     * Updates the main menu's lobby list according to the list given
      * <p>
-     * This method clears the entire lobby list and then adds the name of each lobby
-     * in the list given to the main menus lobby list. If there is no lobby list
-     * this creates one.
+     * This method clears the entire lobby list,
+     * and then adds the name of each lobby
+     * in the list given to the main menu's lobby list.
+     * If there is no lobby list, this creates one.
      *
      * @param lobbyList A list of LobbyDTO objects including all currently existing
      *                  lobbies
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
+     * @implNote The code inside this method has to run in the JavaFX-application thread.
+     * Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.lobby.dto.LobbyDTO
      * @since 2020-11-29
      */
@@ -459,45 +480,46 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the create lobby button is pressed
+     * Method called when the button to create a lobby is pressed
      * <p>
-     * If the create lobby button is pressed, this method requests the lobby service
+     * If the CreateLobbyButton is pressed, this method requests the lobby service
      * to create a new lobby. This lobby will get a unique name and registers the user as its creator.
      *
-     * @param event The ActionEvent created by pressing the create lobby button
-     * @author Mario and Marvin
+     * @param event The ActionEvent created by pressing the CreateLobbyButton
+     * @author Mario
+     * @author Marvin
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2020-12-11
      */
     @FXML
-    void onCreateLobby(ActionEvent event) {
-        //give the lobby a default name
+    void onCreateLobbyButtonPressed(ActionEvent event) {
+        //gives the lobby a default name
         String name = loggedInUser.getUsername() + "'s lobby";
 
-        //create Dialogue
+        //creates Dialogue
         TextInputDialog dialog = new TextInputDialog(name);
         dialog.setTitle("Lobby Name");
         dialog.setHeaderText("Choose how to name your lobby");
         dialog.setContentText("Please enter the lobby's name: ");
 
-        //if 'OK' is pressed the lobby will be created, otherwise it won't
+        //if 'OK' is pressed, the lobby will be created, otherwise it won't
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(s -> lobbyService.createNewLobby(s, (UserDTO) loggedInUser));
     }
 
     /**
-     * Method called when the join lobby button is pressed
+     * Method called when the button to join a lobby is pressed
      * <p>
-     * If the join lobby button is pressed, this method requests the lobby service
-     * to join a specified lobby. If there is no existing lobby or the user didnt choose one,
+     * If the JoinLobbyButton is pressed, this method requests the lobby service
+     * to join a specified lobby. If there is no existing lobby or the user didn't choose one,
      * nothing will happen.
      *
-     * @param event The ActionEvent created by pressing the join lobby button
+     * @param event The ActionEvent created by pressing the JoinLobbyButton
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2020-11-29
      */
     @FXML
-    void onJoinLobby(ActionEvent event) {
+    void onJoinLobbyButtonPressed(ActionEvent event) {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
@@ -509,37 +531,14 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles JoinLobbyResponses found on the EventBus
+     * Method called when the button to log out is pressed
      * <p>
-     * If a new JoinLobbyResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
-     * subscribed to, and then calls the LobbyService to retrieve
-     * all members of that new lobby in order for the lobby window to be
-     * able to display all members from the beginning.
-     *
-     * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
-     * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
-     * @since 2020-12-20
-     */
-    @Subscribe
-    public void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
-            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
-        });
-    }
-
-    /**
-     * Method called when the logout button is pressed
-     * <p>
-     * This method is called when the logout button is pressed. It calls the
-     * logout(user) method of the UserService to log out the user and posts an
+     * This method is called when the LogoutButton is pressed. It calls the
+     * logout method of the UserService to log out the user, and posts an
      * instance of the ShowLoginViewEvent to the EventBus the SceneManager
      * is subscribed to.
      *
-     * @param event The ActionEvent generated by pressing the logout button
+     * @param event The ActionEvent generated by pressing the LogoutButton
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
@@ -552,14 +551,14 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the delete user button is pressed
+     * Method called when the button to delete a user is pressed
      * <p>
-     * This method is called when the delete user button is pressed. It first calls the
+     * This method is called when the DeleteUserButton is pressed. It first calls the
      * UserService to log the user out, then posts an instance of the
      * ShowLoginViewEvent to the EventBus the SceneManager is subscribed to, and finally
      * calls the UserService to drop the user.
      *
-     * @param event The ActionEvent generated by pressing the delete user button
+     * @param event The ActionEvent generated by pressing the DeleteUserButton
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
@@ -573,12 +572,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the ChangePassword button is pressed
+     * Method called when the button to change a user's password is pressed
      * <p>
-     * This method is called when the ChangePassword button is pressed.
+     * This method is called when the ChangePasswordButton is pressed.
      * It posts an instance of the ShowChangePasswordViewEvent to the EventBus the SceneManager is subscribed to.
      *
-     * @param event The ActionEvent generated by pressing the ChangePassword button.
+     * @param event The ActionEvent generated by pressing the ChangePasswordButton.
      * @author Eric Vuong
      * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
      * @see de.uol.swp.client.SceneManager
@@ -590,13 +589,13 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the SendMessageButton is pressed
+     * Method called when the button to send a message is pressed
      * <p>
      * This Method is called when the SendMessageButton is pressed. It calls the chatService
      * to create a new message with the contents of the messageField as its content and
      * the currently logged in user as author. It also clears the messageField.
      *
-     * @param event the event
+     * @param event the ActionEvent generated by pressing the SendMessageButton
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.chat.ChatService
@@ -611,12 +610,12 @@ public class MainMenuPresenter extends AbstractPresenter {
 
 
     /**
-     * Method called when the DeleteMessageButton is pressed
+     * Method called when the button to delete a message is pressed
      * <p>
      * This method is called when the DeleteMessageButton is pressed. It calls the chatService
      * to delete the message currently selected in the chatView.
      *
-     * @param event the event
+     * @param event the ActionEvent generated by pressing the DeleteMessageButton
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.chat.ChatService
@@ -631,13 +630,13 @@ public class MainMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the EditMessageButton is pressed.
+     * Method called when the button to edit a message is pressed.
      * <p>
      * This method is called when the EditMessageButton is pressed. It calls the ChatService
      * to edit the message currently selected in the chatView by replacing the current content
      * with the content found in the messageField.
      *
-     * @param event the event
+     * @param event the ActionEvent generated by pressing the EditMessageButton
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.chat.ChatService

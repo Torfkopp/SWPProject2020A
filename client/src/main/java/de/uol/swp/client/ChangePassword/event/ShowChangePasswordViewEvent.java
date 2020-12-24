@@ -3,9 +3,9 @@ package de.uol.swp.client.ChangePassword.event;
 import de.uol.swp.common.user.User;
 
 /**
- * Event used to show the Change Password window
+ * Event used to show the ChangePassword window
  * <p>
- * In order to show the Change Password window using this event, post an instance of it
+ * In order to show the ChangePassword window using this event, post an instance of it
  * onto the eventBus the SceneManager is subscribed to.
  * It contains the user object of the user changing the password.
  *
@@ -37,9 +37,10 @@ public class ShowChangePasswordViewEvent {
     }
 
     /**
-     * Getter of the user
+     * Gets the user
      *
      * @return user object
+     * @author Mario
      * @since 2020-12-16
      */
     public User getUser() {
