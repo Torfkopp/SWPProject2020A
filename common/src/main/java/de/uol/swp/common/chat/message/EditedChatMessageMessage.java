@@ -8,7 +8,7 @@ import de.uol.swp.common.message.AbstractServerMessage;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see AbstractServerMessage
+ * @see de.uol.swp.common.message.AbstractServerMessage
  * @since 2020-12-17
  */
 public class EditedChatMessageMessage extends AbstractServerMessage {

@@ -18,7 +18,6 @@ import javafx.fxml.FXMLLoader;
  *
  * @author Marco Grawunder
  * @since 2019-09-18
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 public class ClientModule extends AbstractModule {

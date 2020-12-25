@@ -9,7 +9,7 @@ package de.uol.swp.server.chat;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see ChatManagement
+ * @see de.uol.swp.server.chat.ChatManagement
  * @since 2020-12-16
  */
 public class ChatManagementException extends RuntimeException {

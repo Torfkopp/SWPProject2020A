@@ -7,7 +7,6 @@ import java.io.*;
  * <p>
  * https://stackoverflow.com/questions/3840356/how-to-test-in-java-that-a-class-implements-serializable-correctly-not-just-is
  */
-
 public class SerializationTestHelper {
 
     public static <T extends Serializable> byte[] pickle(T obj)

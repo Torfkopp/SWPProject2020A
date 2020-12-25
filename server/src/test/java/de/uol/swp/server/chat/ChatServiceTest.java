@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.chat.ChatMessage
+ * @see de.uol.swp.server.chat.IChatManagement
  * @since 2020-12-19
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -74,7 +77,7 @@ class ChatServiceTest {
      * This test fails if the List of ChatMessages returned by the chatManagement is
      * empty or the requested ChatMessage wasn't created with the requested attributes.
      *
-     * @throws InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException the interrupted exception
      * @since 2020-12-19
      */
     @Test
@@ -101,7 +104,7 @@ class ChatServiceTest {
      * This test fails if the List of ChatMessages returned by the chatManagement is
      * empty or the requested ChatMessage wasn't edited.
      *
-     * @throws InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException interrupted exception
      * @since 2020-12-19
      */
     @Test
@@ -129,7 +132,7 @@ class ChatServiceTest {
      * This test fails if the List of ChatMessages returned by the chatManagement is
      * empty or the requested ChatMessage still exists.
      *
-     * @throws InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException the interrupted exception
      * @since 2020-12-19
      */
     @Test

@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @author Alwin Bossert
  * @author Steven Luong
- * @since 2020.12.21
+ * @since 2020-12-21
  */
 public class RetrieveAllLobbyMembersMessage extends AbstractServerMessage {
 
@@ -24,7 +24,9 @@ public class RetrieveAllLobbyMembersMessage extends AbstractServerMessage {
      * @param users List containing all users currently logged in
      * @since 2017-03-17
      */
-    public void RetrieveAllLobbyUserListMessage(List<String> users){this.users = new ArrayList<>(users);}
+    public void RetrieveAllLobbyUserListMessage(List<String> users) {
+        this.users = new ArrayList<>(users);
+    }
 
     /**
      * Getter for the List containing all users currently logged in
@@ -37,15 +39,15 @@ public class RetrieveAllLobbyMembersMessage extends AbstractServerMessage {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(users);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RetrieveAllLobbyMembersMessage that = (RetrieveAllLobbyMembersMessage) o;
         return Objects.equals(users, that.users);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(users);
     }
 }

@@ -8,8 +8,8 @@ import de.uol.swp.common.user.User;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see AbstractRequestMessage
- * @see User
+ * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.user.User
  * @since 2020-12-17
  */
 public class NewChatMessageRequest extends AbstractRequestMessage {

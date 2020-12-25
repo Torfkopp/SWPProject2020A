@@ -9,6 +9,7 @@ import java.util.Objects;
  * e.g.: The username doesn't exist
  *
  * @author Phillip-André Suhr
+ * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2020-11-02
  */
 public class UserDeletionExceptionMessage extends AbstractResponseMessage {
@@ -31,15 +32,15 @@ public class UserDeletionExceptionMessage extends AbstractResponseMessage {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(message);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserDeletionExceptionMessage that = (UserDeletionExceptionMessage) o;
         return Objects.equals(message, that.message);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(message);
     }
 }
