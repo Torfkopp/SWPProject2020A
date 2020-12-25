@@ -3,12 +3,14 @@ package de.uol.swp.common.user.response;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 /**
- * A response that the change Password was successful
+ * A response that the password was successfully changed
  *
- * This response is only sent to clients that previously sent a ChangePasswordRequest
- * that was executed successfully, otherwise an ExceptionMessage would be sent.
+ * This response is only sent to clients that previously sent a
+ * successfully executed ChangePasswordRequest.
+ * Otherwise, an ExceptionMessage would have been sent.
  *
- * @author Steven Luong, Eric Vuong
+ * @author Steven Luong
+ * @author Eric Vuong
  * @since 2020-12-03
  *
  */

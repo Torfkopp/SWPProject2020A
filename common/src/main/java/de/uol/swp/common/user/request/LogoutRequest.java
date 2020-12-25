@@ -3,9 +3,9 @@ package de.uol.swp.common.user.request;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
- * A request send from client to server to log out
+ * A request sent from client to server when a user wants to log out
  *
- * This Message should be used when implementing the Logout feature
+ * This message should be used when implementing the logout feature
  *
  * @author Marco Grawunder
  * @since 2019-08-07

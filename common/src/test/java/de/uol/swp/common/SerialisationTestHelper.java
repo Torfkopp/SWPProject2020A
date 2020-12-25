@@ -3,12 +3,12 @@ package de.uol.swp.common;
 import java.io.*;
 
 /**
- * Helper class to test if an object is serializable
+ * Helper class to test if an object is serialisable
  * <p>
  * https://stackoverflow.com/questions/3840356/how-to-test-in-java-that-a-class-implements-serializable-correctly-not-just-is
  */
 
-public class SerializationTestHelper {
+public class SerialisationTestHelper {
 
     public static <T extends Serializable> byte[] pickle(T obj)
             throws IOException {
@@ -27,7 +27,7 @@ public class SerializationTestHelper {
         return cl.cast(o);
     }
 
-    public static <T extends Serializable> boolean checkSerializableAndDeserializable(T obj, Class<T> cl) {
+    public static <T extends Serializable> boolean checkSerialisableAndDeserialisable(T obj, Class<T> cl) {
         try {
             byte[] bytes = pickle(obj);
             T obj2 = unpickle(bytes, cl);

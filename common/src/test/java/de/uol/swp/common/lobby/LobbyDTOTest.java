@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test Class for the UserDTO
+ * Test for the UserDTO class
  *
  * @author Marco Grawunder
  * @since 2019-10-08
@@ -35,9 +35,9 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test check whether a lobby is created correctly
+     * This test checks if a lobby is created correctly.
      * <p>
-     * If the variables are not set correctly the test fails
+     * If the variables are not set correctly, this test fails.
      *
      * @since 2019-10-08
      */
@@ -52,9 +52,9 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test checks if the copy constructor works correctly
+     * This test checks if the copy constructor works correctly.
      * <p>
-     * This test fails if any of the fields mismatch or the objects are not considered equal
+     * This test fails if any of the fields mismatch or the objects are not considered equal.
      *
      * @since 2020-12-05
      */
@@ -70,10 +70,10 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test check whether a user can join a lobby
+     * This test checks if an user can join a lobby.
      * <p>
-     * The test fails if the size of the user list of the lobby does not get bigger
-     * or a user who joined is not in the list.
+     * The test fails when the size of the lobby's user list does not get bigger,
+     * or when a newly joined user is not in the list.
      *
      * @since 2019-10-08
      */
@@ -94,10 +94,10 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test check whether a user can leave a lobby
+     * This test checks if a user can leave a lobby.
      * <p>
-     * The test fails if the size of the user list of the lobby does not get smaller
-     * or the user who left is still in the list.
+     * The test fails when the size of the lobby's user list does not get smaller,
+     * or when the user who left remains in the list.
      *
      * @since 2019-10-08
      */
@@ -114,10 +114,10 @@ class LobbyDTOTest {
     }
 
     /**
-     * Test to check if the owner can leave the Lobby correctly
+     * Test to check if the owner can leave the lobby correctly
      * <p>
-     * This test fails if the owner field is not updated if the owner leaves the
-     * lobby or if he still is in the user list of the lobby.
+     * This test fails if the owner field is not updated, if the owner leaves the
+     * lobby, or if he remains in the lobby's user list.
      *
      * @since 2019-10-08
      */
@@ -129,15 +129,17 @@ class LobbyDTOTest {
         lobby.leaveUser(defaultUser);
 
         assertNotEquals(lobby.getOwner(), defaultUser);
+        //Code Analysis: "Suspicious call to 'List.contains'" -Mario
         assertTrue(users.contains(lobby.getOwner()));
 
     }
 
     /**
-     * This checks if the owner of a lobby can be updated and if he has have joined
-     * the lobby
+     * This test checks if the owner of a lobby is in it
+     * and if he is updatable.
      * <p>
-     * This test fails if the owner cannot be updated or does not have to be joined
+     * This test fails when the owner is not in the lobby,
+     * or when he's not updatable.
      *
      * @since 2019-10-08
      */
@@ -153,9 +155,9 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test check whether a lobby can be empty
+     * This test checks if a lobby can be empty.
      * <p>
-     * If the leaveUser function does not throw an Exception the test fails
+     * If the leaveUser method does not throw an exception, this test fails.
      *
      * @since 2019-10-08
      */

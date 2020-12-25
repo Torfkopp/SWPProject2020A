@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 
 /**
- * Class used to encode Objects into ByteBuffers to send.
+ * Class used to encode an object into a sendable ByteBuffer.
  *
- * An Object of this class is used in the start method of de.uol.swp.server.communication.Server
+ * An object of this class is used in the start method of de.uol.swp.server.communication.Server
  *
  * @author Marco Grawunder
  * @since 2019-08-13
@@ -23,7 +23,7 @@ public class MyObjectEncoder extends ObjectEncoder {
     @Override
     protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception {
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Trying to encode " + msg);
+            LOG.trace("Trying to encode: " + msg);
         }
         try {
             super.encode(ctx, msg, out);

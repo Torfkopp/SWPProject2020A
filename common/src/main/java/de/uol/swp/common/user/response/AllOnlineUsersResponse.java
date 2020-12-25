@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * Response message for the RetrieveAllOnlineUsersRequest
  *
- * This message gets sent to the client that sent an RetrieveAllOnlineUsersRequest.
- * It contains a List with User objects of every user currently logged in to the
+ * This message gets sent to the origin of an RetrieveAllOnlineUsersRequest.
+ * It contains a list with User objects of every user currently logged in to the
  * server.
  *
  * @author Marco Grawunder
@@ -23,27 +23,27 @@ import java.util.List;
  */
 public class AllOnlineUsersResponse extends AbstractResponseMessage {
 
-    final private ArrayList<UserDTO> users = new ArrayList<>();
+    final private List<UserDTO> users = new ArrayList<>();
 
     /**
-     * Default Constructor
+     * Default constructor
      *
-     * @implNote this constructor is needed for serialization
+     * @implNote This constructor is needed for serialisation
      * @since 2019-08-13
      */
     public AllOnlineUsersResponse(){
-        // needed for serialization
+        // needed for serialisation
     }
 
     /**
      * Constructor
      *
-     * This constructor generates a new List of the logged in users from the given
-     * Collection. The significant difference between the two being that the new
-     * List contains copies of the User objects. These copies have their password
-     * variable set to an empty String.
+     * This constructor generates a new list of logged in users from the given
+     * collection. The significant difference between these two is
+     * that the new list contains copies of the User objects.
+     * These copies have their password variable set to an empty string.
      *
-     * @param users Collection of all users currently logged in
+     * @param users Collection of all currently logged in users
      * @since 2019-08-13
      */
     public AllOnlineUsersResponse(Collection<User> users) {
@@ -53,9 +53,9 @@ public class AllOnlineUsersResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Getter for the list of users currently logged in
+     * Gets the list of all currently logged in users
      *
-     * @return list of users currently logged in
+     * @return list of currently logged in users
      * @since 2019-08-13
      */
     public List<UserDTO> getUsers() {

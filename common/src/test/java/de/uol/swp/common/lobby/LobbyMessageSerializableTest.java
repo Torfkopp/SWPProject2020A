@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby;
 
-import de.uol.swp.common.SerializationTestHelper;
+import de.uol.swp.common.SerialisationTestHelper;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
@@ -17,17 +17,17 @@ public class LobbyMessageSerializableTest {
 
     @Test
     void testLobbyMessagesSerializable() {
-        assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new CreateLobbyRequest("test", defaultUser),
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new CreateLobbyRequest("test", defaultUser),
                 CreateLobbyRequest.class));
-        assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new LobbyJoinUserRequest("test", defaultUser),
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new LobbyJoinUserRequest("test", defaultUser),
                 LobbyJoinUserRequest.class));
-        assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new LobbyLeaveUserRequest("test", defaultUser),
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new LobbyLeaveUserRequest("test", defaultUser),
                 LobbyLeaveUserRequest.class));
-        assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new UserJoinedLobbyMessage("test", defaultUser),
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new UserJoinedLobbyMessage("test", defaultUser),
                 UserJoinedLobbyMessage.class));
-        assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new UserLeftLobbyMessage("test", defaultUser),
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new UserLeftLobbyMessage("test", defaultUser),
                 UserLeftLobbyMessage.class));
-        assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new RetrieveAllLobbiesRequest(),
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new RetrieveAllLobbiesRequest(),
                 RetrieveAllLobbiesRequest.class));
     }
 

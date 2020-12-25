@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A message containing all current logged in usernames
+ * A message containing all usernames of the currently logged in users
  * 
  * @author Marco Grawunder
  * @since 2017-03-17
@@ -28,9 +28,9 @@ public class UsersListMessage extends AbstractServerMessage {
 	}
 
 	/**
-	 * Getter for the List containing all users currently logged in
+	 * Gets the List containing all currently logged in users
 	 *
-	 * @return List containing all users currently logged in
+	 * @return List containing all currently logged in users
 	 * @since 2017-03-17
 	 */
 	public ArrayList<String> getUsers() {

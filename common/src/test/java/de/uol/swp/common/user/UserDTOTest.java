@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test Class for the UserDTO
+ * Test for the UserDTO class
  *
  * @author Marco Grawunder
  * @since 2019-09-04
@@ -16,9 +16,9 @@ class UserDTOTest {
     private static final User secondsUser = new UserDTO("marco2", "marco", "marco@grawunder.de");
 
     /**
-     * This test check whether the username can be null
+     * This test checks if the username can be null.
      *
-     * If the constructor does not throw an Exception the test fails
+     * If the constructor does not throw an exception, this test fails.
      *
      * @since 2019-09-04
      */
@@ -28,9 +28,9 @@ class UserDTOTest {
     }
 
     /**
-     * This test check whether the password can be null
+     * This test checks if the password can be null.
      *
-     * If the constructor does not throw an Exception the test fails
+     * If the constructor does not throw an exception, this test fails.
      *
      * @since 2019-09-04
      */
@@ -40,9 +40,9 @@ class UserDTOTest {
     }
 
     /**
-     * This test checks if the copy constructor works correctly
+     * This test checks if the copy constructor works correctly.
      *
-     * This test fails if any of the fields mismatch or the objects are not considered equal
+     * This test fails if any of the fields mismatch or the objects are not considered equal.
      *
      * @since 2019-09-04
      */
@@ -61,9 +61,9 @@ class UserDTOTest {
     }
 
     /**
-     * This test checks if the createWithoutPassword function generates the Object correctly
+     * This test checks if the createWithoutPassword function generates the Object correctly.
      *
-     * This test fails if the usernames or emails do not match or the password is not empty.
+     * This test fails when the usernames or e-mails do not match, or when the password is not empty.
      *
      * @since 2019-09-04
      */
@@ -81,9 +81,9 @@ class UserDTOTest {
     }
 
     /**
-     * This test checks if the getWithoutPassword function generates the Object correctly
+     * This test checks if the getWithoutPassword function generates the Object correctly.
      *
-     * This test fails if the usernames do not match or the password is not empty.
+     * This test fails when the usernames do not match, or when the password is not empty.
      *
      * @since 2019-09-04
      */
@@ -97,9 +97,9 @@ class UserDTOTest {
     }
 
     /**
-     * Test if two different users are equal
+     * Tests if two different users are equal.
      *
-     * This test fails if they are considered equal
+     * This test fails when they are considered equal.
      *
      * @since 2019-09-04
      */
@@ -109,9 +109,9 @@ class UserDTOTest {
     }
 
     /**
-     * Test if a UserDTO object is different from a String.
+     * Tests if a UserDTO object is different from a String.
      *
-     * This test fails if the UserDTO object ist considered equal to the String "Test"
+     * This test fails when the UserDTO object is considered equal to the String "Test".
      *
      * @since 2019-09-04
      */
@@ -134,9 +134,9 @@ class UserDTOTest {
     }
 
     /**
-     * Test if the HashCode of a copied object matches the one of the original
+     * Tests if the HashCode of a copied object matches the one of the original.
      *
-     * This test fails if the codes do not match
+     * This test fails when the codes do not match.
      *
      * @since 2019-09-04
      */

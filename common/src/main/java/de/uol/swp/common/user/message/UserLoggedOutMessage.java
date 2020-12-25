@@ -5,10 +5,10 @@ import de.uol.swp.common.message.AbstractServerMessage;
 import java.util.Objects;
 
 /**
- * A message to indicate a user is  logged out
+ * A message to indicate a user is logged out
  *
  * This message is used to automatically update the user lists of every connected
- * client as soon as a user successfully logs out
+ * client as soon as a user logs out successfully.
  *
  * @author Marco Grawunder
  * @since 2017-03-17
@@ -21,8 +21,8 @@ public class UserLoggedOutMessage extends AbstractServerMessage {
 	/**
 	 * Default constructor
 	 *
-	 * @implNote Do not use for valid logout since no username gets set
-	 * @implNote this constructor is needed for serialization
+	 * @implNote Do not use for valid logout, since no username gets set
+	 * @implNote This constructor is needed for serialisation
 	 * @since 2017-03-17
 	 */
 	public UserLoggedOutMessage(){
@@ -31,7 +31,7 @@ public class UserLoggedOutMessage extends AbstractServerMessage {
 	/**
 	 * Constructor
 	 *
-	 * @param username the username of the newly logged out user
+	 * @param username The username of the newly logged out user
 	 * @since 2017-03-17
 	 */
 	public UserLoggedOutMessage(String username){
@@ -39,7 +39,7 @@ public class UserLoggedOutMessage extends AbstractServerMessage {
 	}
 
 	/**
-	 * Getter for the username
+	 * Gets the username
 	 *
 	 * @return String containing the username
 	 * @since 2017-03-17

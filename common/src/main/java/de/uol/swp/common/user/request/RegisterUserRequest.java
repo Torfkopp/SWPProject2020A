@@ -19,7 +19,7 @@ public class RegisterUserRequest extends AbstractRequestMessage {
     /**
      * Constructor
      *
-     * @param user the new User to create
+     * @param user The new user to create
      * @since 2019-09-02
      */
     public RegisterUserRequest(User user){
@@ -32,9 +32,9 @@ public class RegisterUserRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the user variable
+     * Gets the user variable
      *
-     * @return the new user to create
+     * @return The new user to create
      * @since 2019-09-02
      */
     public User getUser() {

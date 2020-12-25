@@ -5,8 +5,8 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 import java.util.Objects;
 
 /**
- * This exception is thrown if something went wrong during the deletion process.
- * e.g.: The username doesn't exist
+ * This exception is thrown if something went wrong during the deletion process,
+ * e.g. the username doesn't exist.
  *
  * @author Phillip-André Suhr
  * @since 2020-11-02
