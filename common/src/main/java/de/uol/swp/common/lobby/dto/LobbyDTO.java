@@ -45,7 +45,7 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
 
-    public static LobbyDTO create(Lobby lobby) {
+    public static Lobby create(Lobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getOwner());
     }
 
