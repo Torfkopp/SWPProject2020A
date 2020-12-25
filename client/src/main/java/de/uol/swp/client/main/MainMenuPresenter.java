@@ -431,7 +431,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
-        updateLobbyList(allLobbiesResponse.getLobbies());
+        updateLobbyList(allLobbiesResponse.getLobbyNames());
     }
 
     /**

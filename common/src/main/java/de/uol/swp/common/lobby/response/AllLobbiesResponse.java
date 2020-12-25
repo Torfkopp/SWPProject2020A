@@ -23,8 +23,8 @@ import java.util.Map;
  */
 public class AllLobbiesResponse extends AbstractResponseMessage {
 
-    final private ArrayList<String> lobbies = new ArrayList<>();
-    final private ArrayList<LobbyDTO> lobbyDTOs = new ArrayList<>();
+    final private List<String> lobbyNames = new ArrayList<>();
+    final private List<Lobby> lobbies = new ArrayList<>();
 
     /**
      * Default Constructor
@@ -43,7 +43,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * @since 2020-12-12
      */
     public AllLobbiesResponse(Map<String, Lobby> lobbies) {
-        this.lobbies.addAll(lobbies.keySet());
+        this.lobbyNames.addAll(lobbies.keySet());
     }
 
     /**
@@ -52,18 +52,18 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * @return List of lobby names
      * @since 2020-12-12
      */
-    public ArrayList<String> getLobbies() {
-        return lobbies;
+    public List<String> getLobbyNames() {
+        return lobbyNames;
     }
 
     /**
-     * Getter for the list of existing lobbyDTOs
+     * Getter for the list of existing Lobby objects
      *
      * @author Marvin
-     * @return list of existing lobbyDTOs
+     * @return List of existing Lobby objects
      * @since 2020-12-16
      */
-    public List<LobbyDTO> getDTO() {
-        return lobbyDTOs;
+    public List<Lobby> getLobbies() {
+        return lobbies;
     }
 }

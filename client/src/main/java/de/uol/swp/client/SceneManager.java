@@ -236,7 +236,7 @@ public class SceneManager {
     @Subscribe
     public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
         LOG.debug("Retrieval of lobby map");
-        for (String name : allLobbiesResponse.getLobbies()) {
+        for (String name : allLobbiesResponse.getLobbyNames()) {
             lobbyScenes.put(name, null);
         }
     }
