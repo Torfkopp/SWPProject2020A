@@ -19,7 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ChatMessageSerializableTest {
+class ChatMessageSerialisableTest {
 
     private static final UserDTO defaultUser = new UserDTO("test", "test", "test@test.de");
     private static final Instant defaultTimestamp = Instant.ofEpochMilli(1608370913852L); // 2020-12-19-09:41:53.852
