@@ -8,7 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test for the event used to show the ChangePasswordError alert
  *
- * @author Eric Vuong, Steven Luong
+ * @author Eric Vuong
+ * @author Steven Luong
  * @see de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent
  * @since 2020-12-03
  *

@@ -27,9 +27,9 @@ public class EditChatMessageRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the ID attribute
+     * Gets the ID attribute
      *
-     * @return the ID of the ChatMessage that should be updated
+     * @return The ID of the ChatMessage that should be updated
      * @since 2020-12-17
      */
     public int getId() {
@@ -37,9 +37,9 @@ public class EditChatMessageRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the content attribute
+     * Gets the content attribute
      *
-     * @return the content of the ChatMessage that should be updated
+     * @return The content of the ChatMessage that should be updated
      * @since 2020-12-17
      */
     public String getContent() {

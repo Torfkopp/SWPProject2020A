@@ -17,12 +17,12 @@ import java.util.Objects;
 public class AbstractLobbyMessage extends AbstractServerMessage {
 
     String name;
-    UserDTO user;
+    User user;
 
     /**
      * Default constructor
      *
-     * @implNote this constructor is needed for serialization
+     * @implNote this constructor is needed for serialisation
      * @since 2019-10-08
      */
     public AbstractLobbyMessage() {
@@ -41,7 +41,7 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
     }
 
     /**
-     * Getter for the name variable
+     * Gets the name variable
      *
      * @return String containing the lobby's name
      * @since 2019-10-08
@@ -51,9 +51,9 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
     }
 
     /**
-     * Setter for the name variable
+     * Sets the name variable
      *
-     * @param name  String containing the lobby's name
+     * @param name String containing the lobby's name
      * @since 2019-10-08
      */
     public void setName(String name) {
@@ -61,7 +61,7 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
     }
 
     /**
-     * Getter for the user variable
+     * Gets the user variable
      *
      * @return User responsible for the creation of this message
      * @since 2019-10-08
@@ -70,12 +70,12 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
         return user;
     }
     /**
-     * Setter for the user variable
+     * Sets the user variable
      *
      * @param user  User responsible for the creation of this message
      * @since 2019-10-08
      */
-    public void setUser(UserDTO user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

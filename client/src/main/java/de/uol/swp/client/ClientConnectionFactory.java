@@ -10,10 +10,10 @@ package de.uol.swp.client;
 public interface ClientConnectionFactory {
 
     /**
-     * Creates an instance of the class ClientConnection
+     * Creates an instance of the ClientConnection class
      *
      * @param host Hostname of the server the sever application is running on
-     * @param port The port the server application is listening on
+     * @param port The port the server application is listening to
      * @return The ClientConnection object the application is using
      * @see de.uol.swp.client.ClientConnection
      * @since 2019-09-19

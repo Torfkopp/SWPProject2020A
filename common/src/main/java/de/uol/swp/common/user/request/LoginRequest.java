@@ -30,7 +30,7 @@ public class LoginRequest extends AbstractRequestMessage {
 	}
 
 	@Override
-	public boolean authorizationNeeded() {
+	public boolean authorisationNeeded() {
 		return false;
 	}
 

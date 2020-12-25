@@ -3,7 +3,7 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.message.AbstractServerMessage;
 
 /**
- * Message sent by the server when a ChatMessage was successfully deleted.
+ * Message sent by the server when a ChatMessage was deleted successfully.
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -16,7 +16,7 @@ public class DeletedChatMessageMessage extends AbstractServerMessage {
     /**
      * Constructor
      *
-     * @param id The ID of the ChatMessage that was deleted
+     * @param id The ID of the deleted ChatMessage
      * @since 2020-12-17
      */
     public DeletedChatMessageMessage(int id) {
@@ -24,9 +24,9 @@ public class DeletedChatMessageMessage extends AbstractServerMessage {
     }
 
     /**
-     * Getter for the ID attribute
+     * Gets the ID attribute
      *
-     * @return the ID of the ChatMessage that got deleted
+     * @return the ID of the deleted ChatMessage
      * @since 2020-12-17
      */
     public int getId() {

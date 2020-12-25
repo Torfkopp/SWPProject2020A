@@ -17,7 +17,7 @@ class RegistrationErrorEventTest {
     /**
      * Test for the creation of RegistrationErrorEvents
      *
-     * This test checks if the error message of the  RegistrationErrorEvent gets
+     * This test checks if the error message of the RegistrationErrorEvent gets
      * set correctly during the creation of a new event
      *
      * @since 2019-10-10

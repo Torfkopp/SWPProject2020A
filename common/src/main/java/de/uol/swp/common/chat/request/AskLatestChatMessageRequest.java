@@ -24,7 +24,7 @@ public class AskLatestChatMessageRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the amount attribute
+     * Gets the amount attribute
      *
      * @return The amount of ChatMessages the client requested
      * @since 2020-12-17

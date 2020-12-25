@@ -16,7 +16,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     /**
      * Default constructor
      *
-     * @implNote this constructor is needed for serialization
+     * @implNote This constructor is needed for serialisation
      * @since 2019-10-08
      */
     public CreateLobbyRequest() {
@@ -25,7 +25,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     /**
      * Constructor
      *
-     * @param name name of the lobby
+     * @param name Name of the lobby
      * @param owner User trying to create the lobby
      * @since 2019-10-08
      */
@@ -34,7 +34,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     }
 
     /**
-     * Setter for the user variable
+     * Sets the user variable
      *
      * @param owner  User trying to create the lobby
      * @since 2019-10-08
@@ -44,7 +44,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     }
 
     /**
-     * Getter for the user variable
+     * Gets the user variable
      *
      * @return User trying to create the lobby
      * @since 2019-10-08

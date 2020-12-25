@@ -68,9 +68,9 @@ public class SceneManager {
     }
 
     /**
-     * Subroutine to initialize all views
+     * Subroutine to initialise all views
      * <p>
-     * This is a subroutine of the constructor to initialize all views
+     * This is a subroutine of the constructor to initialise all views
      *
      * @since 2019-09-03
      */
@@ -85,12 +85,12 @@ public class SceneManager {
      * Subroutine creating parent panes from FXML files
      * <p>
      * This Method tries to create a parent pane from the FXML file specified by
-     * the URL String given to it. If the LOG-Level is set to Debug or higher loading
-     * is written to the LOG.
-     * If it fails to load the view a RuntimeException is thrown.
+     * the URL String given to it. If the LOG-Level is set to Debug or higher,
+     * "Loading " is written to the LOG.
+     * If it fails to load the view, a RuntimeException is thrown.
      *
      * @param fxmlFile FXML file to load the view from
-     * @return view loaded from FXML or null
+     * @return View loaded from FXML or null
      * @since 2019-09-03
      */
     private Parent initPresenter(String fxmlFile) {
@@ -108,10 +108,10 @@ public class SceneManager {
     }
 
     /**
-     * Initializes the main menu view
+     * Initialises the main menu view
      * <p>
-     * If the mainScene is null it gets set to a new scene containing the
-     * a pane showing the main menu view as specified by the MainMenuView
+     * If the mainScene is null, it gets set to a new scene containing the
+     * pane showing the main menu view as specified by the MainMenuView
      * FXML file.
      *
      * @see de.uol.swp.client.main.MainMenuPresenter
@@ -126,10 +126,10 @@ public class SceneManager {
     }
 
     /**
-     * Initializes the login view
+     * Initialises the login view
      * <p>
-     * If the loginScene is null it gets set to a new scene containing the
-     * a pane showing the login view as specified by the LoginView FXML file.
+     * If the loginScene is null, it gets set to a new scene containing the
+     * pane showing the login view as specified by the LoginView FXML file.
      *
      * @see de.uol.swp.client.auth.LoginPresenter
      * @since 2019-09-03
@@ -143,10 +143,10 @@ public class SceneManager {
     }
 
     /**
-     * Initializes the registration view
+     * Initialises the registration view
      * <p>
-     * If the registrationScene is null it gets set to a new scene containing the
-     * a pane showing the registration view as specified by the RegistrationView
+     * If the registrationScene is null, it gets set to a new scene containing the
+     * pane showing the registration view as specified by the RegistrationView
      * FXML file.
      *
      * @see de.uol.swp.client.register.RegistrationPresenter
@@ -161,10 +161,10 @@ public class SceneManager {
     }
 
     /**
-     * Initializes the Change Password view
+     * Initialises the Change Password view
      * <p>
-     * If the ChangePasswordScene is null it gets set to a new scene containing the
-     * a pane showing the Change Password view as specified by the ChangePasswordView
+     * If the ChangePasswordScene is null, it gets set to a new scene containing the
+     * pane showing the Change Password view as specified by the ChangePasswordView
      * FXML file.
      *
      * @author Eric Vuong
@@ -179,7 +179,7 @@ public class SceneManager {
 
 
     /**
-     * Handles ShowRegistrationViewEvent detected on the EventBus
+     * Handles the ShowRegistrationViewEvent detected on the EventBus
      * <p>
      * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the registration
@@ -195,7 +195,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles ShowChangePasswordViewEvent detected on the EventBus
+     * Handles the ShowChangePasswordViewEvent detected on the EventBus
      * <p>
      * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the Change Password
@@ -209,7 +209,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles ShowLoginViewEvent detected on the EventBus
+     * Handles the ShowLoginViewEvent detected on the EventBus
      * <p>
      * If a ShowLoginViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the login screen.
@@ -224,7 +224,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles the incoming LobbyListMessage
+     * Handles an incoming LobbyListMessage
      * <p>
      * If a LobbyListMessage is detected, the lobbyScenes map
      * is updated to know the same lobbies as the server
@@ -242,7 +242,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles ShowLobbyViewEvent detected on the EventBus
+     * Handles the ShowLobbyViewEvent detected on the EventBus
      * <p>
      * If a ShowLobbyViewEvent is detected on the EventBus, this method gets
      * called. It opens the lobby in a new window.
@@ -277,7 +277,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles LobbyErrorEvent detected on the EventBus
+     * Handles the LobbyErrorEvent detected on the EventBus
      * <p>
      * If a LobbyErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
@@ -292,7 +292,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles RegistrationCanceledEvent detected on the EventBus
+     * Handles the RegistrationCanceledEvent detected on the EventBus
      * <p>
      * If a RegistrationCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the screen shown before registration.
@@ -307,7 +307,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles ChangePasswordCanceledEvent detected on the EventBus
+     * Handles the ChangePasswordCanceledEvent detected on the EventBus
      * <p>
      * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the screen shown before Change Password screen.
@@ -320,7 +320,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles RegistrationErrorEvent detected on the EventBus
+     * Handles the RegistrationErrorEvent detected on the EventBus
      * <p>
      * If a RegistrationErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
@@ -335,7 +335,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles ChangePasswordErrorEvent detected on the EventBus
+     * Handles the ChangePasswordErrorEvent detected on the EventBus
      * <p>
      * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
@@ -384,7 +384,7 @@ public class SceneManager {
     /**
      * Switches the current scene and title to the given ones
      * <p>
-     * The current scene and title are saved in the lastScene and lastTitle variables,
+     * The current scene and title are saved in the lastScene and lastTitle variables
      * before the new scene and title are set and shown.
      *
      * @param scene New scene to show
@@ -420,8 +420,8 @@ public class SceneManager {
     /**
      * Shows the main menu
      * <p>
-     * Switches the current Scene to the mainScene and sets the title of
-     * the window to "Welcome " and the username of the current user
+     * Switches the current scene to the mainScene and sets the window's title
+     * to "Welcome " and the current user's username
      *
      * @since 2019-09-03
      */
@@ -432,8 +432,8 @@ public class SceneManager {
     /**
      * Shows the login screen
      * <p>
-     * Switches the current Scene to the loginScene and sets the title of
-     * the window to "Login"
+     * Switches the current Scene to the loginScene
+     * and sets the window's title of to "Login"
      *
      * @since 2019-09-03
      */
@@ -444,8 +444,8 @@ public class SceneManager {
     /**
      * Shows the registration screen
      * <p>
-     * Switches the current Scene to the registrationScene and sets the title of
-     * the window to "Registration"
+     * Switches the current Scene to the registrationScene
+     * and sets the window's title to "Registration"
      *
      * @since 2019-09-03
      */
@@ -454,11 +454,11 @@ public class SceneManager {
     }
 
     /**
-     * Shows the Change Password screen
+     * Shows the change password screen
      * <p>
      * Sets the scene's UserData to the current user.
-     * Switches the current Scene to the ChangePasswordScene and sets the title of
-     * the window to "Change Password"
+     * Switches the current Scene to the ChangePasswordScene
+     * and sets the window's title to "Change Password"
      *
      * @author Eric Vuong
      * @author Mario

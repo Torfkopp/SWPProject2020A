@@ -45,10 +45,10 @@ public class AbstractPresenter {
     /**
      * Clears the field eventBus
      * <p>
-     * This method clears the field eventBus. Before clearing it unregisters this
+     * This method clears the field eventBus. Before clearing, it unregisters this
      * class from EventBus previously used.
      *
-     * @implNote This method does not check whether the field eventBus is null.
+     * @implNote This method does not check if the field eventBus is null.
      * The field is cleared by setting it to null.
      * @since 2019-08-29
      */

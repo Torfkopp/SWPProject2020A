@@ -25,7 +25,7 @@ public class EditedChatMessageMessage extends AbstractServerMessage {
     }
 
     /**
-     * Getter for the chatMsg attribute
+     * Gets the chatMsg attribute
      *
      * @return The edited ChatMessage
      * @since 2020-12-19

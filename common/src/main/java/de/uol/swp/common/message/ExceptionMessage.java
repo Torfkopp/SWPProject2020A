@@ -1,7 +1,7 @@
 package de.uol.swp.common.message;
 
 /**
- * Encapsulates an Exception in a message object
+ * Encapsulates an exception in a message object
  * 
  * @author Marco Grawunder
  * @since 2017-03-17
@@ -22,7 +22,7 @@ public class ExceptionMessage extends AbstractResponseMessage{
 	}
 
 	/**
-	 * Getter for the exception message
+	 * Gets the exception message
 	 *
 	 * @return String containing the cause of the exception
 	 * @since 2017-03-17

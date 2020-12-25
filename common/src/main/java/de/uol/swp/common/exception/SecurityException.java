@@ -1,7 +1,7 @@
 package de.uol.swp.common.exception;
 
 /**
- * Exception to state e.g. that a authorization is required
+ * Exception to state e.g. that a authorisation is required
  *
  * @author Marco Grawunder
  * @since 2017-03-17
@@ -13,7 +13,7 @@ public class SecurityException extends RuntimeException {
 	/**
 	 * Constructor
 	 *
-	 * @param message Text the Exception should contain
+	 * @param message The exception's text
 	 * @since 2017-03-17
 	 */
 	public SecurityException(String message){

@@ -29,9 +29,9 @@ public class NewChatMessageRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the author attribute
+     * Gets the author attribute
      *
-     * @return the author of the ChatMessage that should be saved
+     * @return The author of the ChatMessage that should be saved
      * @since 2020-12-17
      */
     public User getAuthor() {
@@ -39,9 +39,9 @@ public class NewChatMessageRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the content attribute
+     * Gets the content attribute
      *
-     * @return the content of the ChatMessage that should be saved
+     * @return The content of the ChatMessage that should be saved
      * @since 2020-12-17
      */
     public String getContent() {

@@ -16,19 +16,19 @@ import java.util.Optional;
 public interface Message extends Serializable{
 
 	/**
-	 * Allows to set a MessageContext, e.g. for network purposes
+	 * Allows to set a MessageContext e.g. for network purposes
 	 *
-	 * @param messageContext the MessageContext to be set
+	 * @param messageContext The MessageContext to be set
 	 * @see de.uol.swp.common.message.MessageContext
 	 * @since 2019-08-13
 	 */
 	void setMessageContext(MessageContext messageContext);
 
 	/**
-	 * Retrieve the current message context
+	 * Retrieves the current message context
 	 *
-	 * @implNote .isPresent() to check if the MessageContext got set
-	 * @implNote .get() to get the MessageContext object
+	 * @implNote .isPresent() Checks if the MessageContext got set
+	 * @implNote .get() Gets the MessageContext object
 	 * @return Empty optional object or MessageContext
 	 * @see de.uol.swp.common.message.MessageContext
 	 * @since 2019-09-09
@@ -36,9 +36,9 @@ public interface Message extends Serializable{
 	Optional<MessageContext> getMessageContext();
 
 	/**
-	 * Set the current session
+	 * Sets the current session
 	 *
-	 * @param session the current session
+	 * @param session The current session
 	 * @see de.uol.swp.common.user.Session
 	 * @since 2019-08-13
 	 */
@@ -47,18 +47,18 @@ public interface Message extends Serializable{
 	/**
 	 * Retrieve current session
 	 *
-	 * @implNote .isPresent() to check if the Session got set
-	 * @implNote .get() to get the Session object
+	 * @implNote .isPresent() Checks if the Session got set
+	 * @implNote .get() Gets the Session object
 	 * @return Empty optional object or MessageContext
 	 * @since 2019-09-09
 	 */
 	Optional<Session> getSession();
 
 	/**
-	 * Allow to create a new message, based on
-	 * the given one (copy)
+	 * Allows to create a new message
+	 * based on the given one (copy)
 	 *
-	 * @param otherMessage original Message
+	 * @param otherMessage Original Message
 	 * @since 2019-08-13
 	 */
 	void initWithMessage(Message otherMessage);
