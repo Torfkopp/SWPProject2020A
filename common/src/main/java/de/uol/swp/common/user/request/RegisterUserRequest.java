@@ -28,7 +28,7 @@ public class RegisterUserRequest extends AbstractRequestMessage {
     }
 
     @Override
-    public boolean authorizationNeeded() {
+    public boolean authorisationNeeded() {
         return false;
     }
 

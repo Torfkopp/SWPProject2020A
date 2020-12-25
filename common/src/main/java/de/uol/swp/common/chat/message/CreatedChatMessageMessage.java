@@ -18,7 +18,7 @@ public class CreatedChatMessageMessage extends AbstractServerMessage {
     /**
      * Constructor
      *
-     * @param msg The ChatMessage that was created
+     * @param msg The newly created ChatMessage
      * @since 2020-12-17
      */
     public CreatedChatMessageMessage(ChatMessage msg) {
@@ -26,7 +26,7 @@ public class CreatedChatMessageMessage extends AbstractServerMessage {
     }
 
     /**
-     * Getter for the created ChatMessage attribute
+     * Gets the created ChatMessage attribute
      *
      * @return The created ChatMessage
      * @since 2020-12-17

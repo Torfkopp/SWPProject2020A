@@ -42,8 +42,8 @@ class ChatServiceTest {
     /**
      * Handles DeadEvents detected on the EventBus
      * <p>
-     * If a DeadEvent is detected the event variable of this class gets updated
-     * to its event and its event is printed to the console output.
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
      *
      * @param e The DeadEvent detected on the EventBus
      * @since 2020-12-19
@@ -84,8 +84,8 @@ class ChatServiceTest {
     /**
      * Test for the newMessage routine
      * <p>
-     * Test if the ChatService creates a NewChatMessageRequest
-     * with the given User and Content and posts it to the EventBus when newMessage is called.
+     * Test if the ChatService creates a NewChatMessageRequest with
+     * the given User and Content, and posts it to the EventBus when newMessage is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
@@ -108,8 +108,8 @@ class ChatServiceTest {
     /**
      * Test for the deleteMessage routine
      * <p>
-     * Tests if the ChatService creates a DeleteChatMessageRequest
-     * with the given ID and posts it to the EventBus when deleteMessage is called.
+     * Tests if the ChatService creates a DeleteChatMessageRequest with
+     * the given ID, and posts it to the EventBus when deleteMessage is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
@@ -131,8 +131,8 @@ class ChatServiceTest {
     /**
      * Test for editMessage routine
      * <p>
-     * Tests if the ChatService creates a EditChatMessageRequest
-     * with the given ID and content and posts it to the EventBus when editMessage is called.
+     * Tests if the ChatService creates a EditChatMessageRequest with
+     * the given ID and content, and posts it to the EventBus when editMessage is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
@@ -155,8 +155,8 @@ class ChatServiceTest {
     /**
      * Test for the askLatestMessages routine
      * <p>
-     * Tests if the ChatService creates an AskLatestChatMessageRequest
-     * with the given amount and posts it to the EventBus when askLatestMessages is called.
+     * Tests if the ChatService creates an AskLatestChatMessageRequest with
+     * the given amount, and posts it to the EventBus when askLatestMessages is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19

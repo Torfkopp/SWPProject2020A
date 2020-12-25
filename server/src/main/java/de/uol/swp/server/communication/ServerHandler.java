@@ -61,26 +61,28 @@ public class ServerHandler implements ServerHandlerDelegate {
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
         try {
-            checkIfMessageNeedsAuthorization(msg.getMessageContext().get(), msg);
+            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Mario
+            checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
             eventBus.post(msg);
         } catch (Exception e) {
             LOG.error("ServerException " + e.getClass().getName() + " " + e.getMessage());
+            //same as above
             sendToClient(msg.getMessageContext().get(), new ExceptionMessage(e.getMessage()));
         }
     }
 
     /**
-     * Helper method that check if a Message has the required authorization
+     * Helper method that check if a Message has the required authorisation
      *
-     * @param ctx the MessageContext connected to the message to check
-     * @param msg the message to check
+     * @param ctx The MessageContext connected to the message to check
+     * @param msg The message to check
      * @throws SecurityException authorization requirement not met
      * @since 2019-11-20
      */
-    private void checkIfMessageNeedsAuthorization(MessageContext ctx, RequestMessage msg) {
-        if (msg.authorizationNeeded()) {
+    private void checkIfMessageNeedsAuthorisation(MessageContext ctx, RequestMessage msg) {
+        if (msg.authorisationNeeded()) {
             if (getSession(ctx).isEmpty()) {
-                throw new SecurityException("Authorization required. Client not logged in!");
+                throw new SecurityException("Authorisation required. Client not logged in!");
             }
             msg.setSession(getSession(ctx).get());
         }
@@ -372,7 +374,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * Sends a ServerMessage to multiple users specified by a list of MessageContexts
      *
      * @param sendTo List of MessageContexts to send the message to
-     * @param msg    message to send
+     * @param msg    Message to send
      * @see de.uol.swp.common.message.MessageContext
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-11-20

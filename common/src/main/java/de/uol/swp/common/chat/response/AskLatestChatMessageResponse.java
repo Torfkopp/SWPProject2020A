@@ -11,7 +11,7 @@ import java.util.List;
  * Response message for the AskLatestChatMessageRequest
  * <p>
  * This message gets sent to the client that sent an AskLatestChatMessageRequest.
- * It contains a List with ChatMessage objects of the specified length as specified in the
+ * It contains a list with ChatMessage objects of the specified length as specified in the
  * AskLatestChatMessageRequest.
  *
  * @author Temmo Junkhoff
@@ -27,7 +27,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
     /**
      * Constructor
      *
-     * @param latestMessages a List of ChatMessage object of size as requested or less
+     * @param latestMessages A list of ChatMessage objects smaller or as big as requested
      * @since 2020-12-17
      */
     public AskLatestChatMessageResponse(List<ChatMessage> latestMessages) {
@@ -37,9 +37,9 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Getter for the chatHistory attribute
+     * Gets the chatHistory attribute
      *
-     * @return The List of ChatMessage object of size as requested or less
+     * @return A list of ChatMessage objects smaller or as big as requested
      * @since 2020-12-17
      */
     public List<ChatMessage> getChatHistory() {

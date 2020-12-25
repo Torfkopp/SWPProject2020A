@@ -5,8 +5,9 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 import java.util.Objects;
 
 /**
- * A request send from client to server, trying to log in with
- * username and password
+ * A request sent from client to server when
+ * the user tries to log in with
+ * an username and a password
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.message.AbstractRequestMessage
@@ -21,8 +22,8 @@ public class LoginRequest extends AbstractRequestMessage {
     /**
      * Constructor
      *
-     * @param username username the user tries to log in with
-     * @param password password the user tries to log in with
+     * @param username Username the user tries to log in with
+     * @param password Password the user tries to log in with
      * @since 2017-03-17
      */
     public LoginRequest(String username, String password) {
@@ -31,14 +32,14 @@ public class LoginRequest extends AbstractRequestMessage {
     }
 
     @Override
-    public boolean authorizationNeeded() {
+    public boolean authorisationNeeded() {
         return false;
     }
 
     /**
-     * Getter for the username variable
+     * Gets the username variable
      *
-     * @return String containing the username the user tries to log in with
+     * @return String The username the user tries to log in with
      * @since 2017-03-17
      */
     public String getUsername() {
@@ -46,7 +47,7 @@ public class LoginRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Setter for the username variable
+     * Sets the username variable
      *
      * @param username String containing the new username
      * @since 2017-03-17
@@ -56,9 +57,9 @@ public class LoginRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the password variable
+     * Gets the password variable
      *
-     * @return String containing the password the user tries to log in with
+     * @return String The password the user tries to log in with
      * @since 2017-03-17
      */
     public String getPassword() {
@@ -66,7 +67,7 @@ public class LoginRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Setter for the password variable
+     * Sets the password variable
      *
      * @param password String containing the new password
      * @since 2017-03-17

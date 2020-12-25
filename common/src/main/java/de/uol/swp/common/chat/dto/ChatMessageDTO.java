@@ -96,7 +96,7 @@ public class ChatMessageDTO implements ChatMessage {
      * Converts a Instant (Timestamp) to a string
      *
      * @param timestamp The Instant to convert
-     * @return String the string that was created
+     * @return String The created string
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.chat.ChatMessage
@@ -157,7 +157,7 @@ public class ChatMessageDTO implements ChatMessage {
     /**
      * Converts a ChatMessage to a string
      *
-     * @return String the string that was created
+     * @return String The created string
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.chat.ChatMessage

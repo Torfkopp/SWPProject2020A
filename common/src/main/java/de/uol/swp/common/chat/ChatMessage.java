@@ -26,7 +26,7 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
     int getID();
 
     /**
-     * Getter for the ChatMessage's author
+     * Gets the ChatMessage's author
      *
      * @return A User object that represents the ChatMessage author#
      * @since 2020-12-16
@@ -34,7 +34,7 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
     User getAuthor();
 
     /**
-     * Getter for the ChatMessage's content
+     * Gets the ChatMessage's content
      *
      * @return A String containing the ChatMessage content
      * @since 2020-12-16
@@ -42,7 +42,7 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
     String getContent();
 
     /**
-     * Setter for the ChatMessage's content
+     * Sets the ChatMessage's content
      *
      * @param newContent The new ChatMessage content
      * @implNote This method also automatically sets the edited attribute to true!
@@ -51,7 +51,7 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
     void setContent(String newContent);
 
     /**
-     * Getter for the ChatMessage's timestamp
+     * Gets the ChatMessage's timestamp
      *
      * @return An Instant object in UTC to represent the creation time of the ChatMessage
      * @since 2020-12-16
@@ -59,9 +59,9 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
     Instant getTimestamp();
 
     /**
-     * Getter for the ChatMessage's edited status
+     * Gets the ChatMessage's edited status
      *
-     * @return False, if the ChatMessage wasn't edited. True, if it was edited.
+     * @return False if the ChatMessage wasn't edited. True if it was edited.
      * @since 2020-12-19
      */
     boolean isEdited();

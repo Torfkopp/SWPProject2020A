@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The ClientConnection Connection class
+ * The ClientConnection class
  * <p>
- * This Class manages connecting to a server, disconnecting  from the server and
+ * This Class manages connecting to a server, disconnecting from the server and
  * handling of incoming and outgoing messages.
  *
  * @author Marco Grawunder
@@ -65,7 +65,7 @@ public class ClientConnection {
      * Sets the EventBus for the object and registers the object to it.
      *
      * @param eventBus The new EventBus to set
-     * @implNote If the object already has an EventBus it is replaced but not unregistered
+     * @implNote If the object already has an EventBus, it is replaced but not unregistered
      * @since 2019-09-18
      */
     public void setEventBus(EventBus eventBus) {
@@ -76,9 +76,9 @@ public class ClientConnection {
     /**
      * The netty init method
      * <p>
-     * The example method on how to initialize a connection to a server via netty.
-     * Inside the ChannelInitializer multiple settings are made with the {@code
-     * pipeline.addLast()} method. Things usually added are encoders, decoders and
+     * The example method on how to initialise a connection to a server via netty.
+     * Multiple settings are made inside the ChannelInitializer with the {@code
+     * pipeline.addLast()} method. Things usually added are encoders, decoders, and
      * the ChannelHandler.
      *
      * @throws Exception Connection failed
@@ -94,10 +94,10 @@ public class ClientConnection {
 
                         @Override
                         protected void initChannel(SocketChannel ch) {
-                            // Add both Encoder and Decoder to send and receive serializable objects
+                            // Add both Encoder and Decoder to send and receive serialisable objects
                             ch.pipeline().addLast(new ObjectEncoder());
                             ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                            // Add a client handler
+                            // Add a ClientHandler
                             ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
                         }
                     });
@@ -111,8 +111,8 @@ public class ClientConnection {
     /**
      * Disconnects the client from the server
      * <p>
-     * Disconnects the client from the server and prints the stack trace if an
-     * InterruptedException is thrown.
+	 * Disconnects the client from the server and prints the stack trace
+	 * if an InterruptedException is thrown.
      *
      * @since 2017-03-17
      */
@@ -126,9 +126,9 @@ public class ClientConnection {
 
     /**
      * Calls the ConnectionEstablished method of every ConnectionListener added
-     * to this.
+     * to this class.
      *
-     * @param channel The netty channel the new Connection is established on
+     * @param channel The netty channel the new connection is established on
      * @see de.uol.swp.client.ConnectionListener
      * @since 2017-03-17
      */
@@ -140,9 +140,9 @@ public class ClientConnection {
     }
 
     /**
-     * Add a new ConnectionListener to the ConnectionListener Array of this Object
+     * Add a new ConnectionListener to the ConnectionListener array of this object
      *
-     * @param listener The ConnectionListener to add to the Array
+     * @param listener The ConnectionListener to add to the array
      * @see de.uol.swp.client.ConnectionListener
      * @since 2017-03-17
      */
@@ -151,52 +151,54 @@ public class ClientConnection {
     }
 
     /**
-     * Processes the incoming messages
-     * <p>
-     * This method posts the message it gets on the EventBus if it is a ServerMessage
-     * or a ResponseMessage and writes "Received message. Post on event bus " and
+     * Processes incoming messages
+	 *<p>
+	 * This method posts the message it gets on the EventBus
+	 * if it is a ServerMessage or a ResponseMessage.
+	 * It writes "Received message. Post on event bus " plus
      * the Message to the LOG if the LOG-Level is set to DEBUG or higher.
-     * If it is a different kind of Message, it gets discarded and with LOG-Level
-     * set to WARN or higher "Can only process ServerMessage and ResponseMessage.
-     * Received " and the message are written to the LOG.
-     *
-     * @param in The incoming messages read by the ClientHandler
-     * @see de.uol.swp.client.ClientHandler
-     * @since 2017-03-17
-     */
-    public void receivedMessage(Message in) {
-        if (in instanceof ServerMessage || in instanceof ResponseMessage) {
-            LOG.debug("Received message. Post on event bus " + in);
-            eventBus.post(in);
-        } else {
-            LOG.warn("Can only process ServerMessage and ResponseMessage. Received " + in);
+     * If it is a different kind of message, it gets discarded.
+	 * With LOG-Level set to WARN or higher
+	 * "Can only process ServerMessage and ResponseMessage. Received: "
+     * and the message are written to the LOG.
+	 *
+	 * @param in The incoming messages read by the ClientHandler
+	 * @see de.uol.swp.client.ClientHandler
+	 * @since 2017-03-17
+	 */
+	public void receivedMessage(Message in) {
+		if (in instanceof ServerMessage || in instanceof ResponseMessage) {
+			LOG.debug("Received message. Post on event bus " + in);
+			eventBus.post(in);
+		}else{
+			LOG.warn("Can only process ServerMessage and ResponseMessage. Received: " + in);
         }
     }
 
-    /**
-     * Handles RequestMessages detected on the EventBus
-     * <p>
-     * If the client is connected to the server and the channel of this object
-     * is set the RequestMessage given to this method is send to the server.
-     * Otherwise "Some tries to send a message, but server is not connected" is
-     * written to the LOG if the LOG-Level is set to WARN or higher.
-     *
-     * @param message The RequestMessage object to  send to the server
-     * @see de.uol.swp.common.message.RequestMessage
-     * @since 2019-08-29
-     */
-    @Subscribe
-    public void onRequestMessage(RequestMessage message) {
-        if (channel != null) {
-            channel.writeAndFlush(message);
-        } else {
-            LOG.warn("Some tries to send a message, but server is not connected");
-            // TODO: may create stack trace?
-        }
-    }
+	/**
+	 * Handles a RequestMessage detected on the EventBus
+	 * <p>
+	 * If the client is connected to the server and the channel of this object
+	 * is set, the RequestMessage given to this method is sent to the server.
+	 * Otherwise, "Several tries to send a message, but server is not connected" is
+	 * written to the LOG if the LOG-Level is set to WARN or higher.
+	 *
+	 * @param message The RequestMessage object found on the EventBus
+	 * @see de.uol.swp.common.message.RequestMessage
+	 * @since 2019-08-29
+	 */
+	@Subscribe
+	public void onRequestMessage(RequestMessage message) {
+		if (channel != null) {
+			channel.writeAndFlush(message);
+		}else {
+			LOG.warn("Several tries to send a message, but server is not connected.");
+			// TODO: may create stack trace?
+		}
+	}
 
     /**
-     * Handles ExceptionMessages found on the EventBus
+     * Handles a ExceptionMessage found on the EventBus
      * <p>
      * If an ExceptionMessage object is detected on the EventBus, this method is called.
      * It calls the exceptionOccurred method of every ConnectionListener in the
@@ -218,22 +220,22 @@ public class ClientConnection {
      * <p>
      * If an DeadEvent object is detected on the EventBus, this method is called.
      * It writes "DeadEvent detected " and the error message of the detected DeadEvent
-     * object to the log, if the loglevel is set to WARN or higher.
+     * object to the log if the loglevel is set to WARN or higher.
      *
      * @param deadEvent The DeadEvent object found on the EventBus
      * @since 2017-03-17
      */
     @Subscribe
     public void onDeadEvent(DeadEvent deadEvent) {
-        LOG.warn("DeadEvent detected " + deadEvent);
+        LOG.warn("DeadEvent detected: " + deadEvent);
     }
 
     /**
      * Handles the distribution of throwable messages
      * <p>
      * This method distributes throwable messages to the ConnectionListeners.
-     * It calls the exceptionOccurred method of every ConnectionListener in the
-     * ConnectionListener array passing them the message.
+     * It calls the ExceptionOccurred method of every ConnectionListener in the
+     * ConnectionListener array and passes the message to them.
      *
      * @param message The ExceptionMessage object found on the EventBus
      * @see de.uol.swp.client.ClientHandler
