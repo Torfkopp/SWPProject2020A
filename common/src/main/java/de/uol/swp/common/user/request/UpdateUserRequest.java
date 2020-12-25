@@ -20,8 +20,9 @@ public class UpdateUserRequest extends AbstractRequestMessage {
     /**
      * Constructor
      *
-     * @param user the user object the sender shall be updated to unchanged fields
+     * @param user The user object the sender shall be updated to unchanged fields
      *             being empty
+     * //Unfortunately, I don't know what he wants to say -Mario
      * @since 2019-09-02
      */
     public UpdateUserRequest(User user) {
@@ -29,9 +30,9 @@ public class UpdateUserRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the updated user object
+     * Gets the updated User object
      *
-     * @return the updated user object
+     * @return The updated User object
      * @since 2019-09-02
      */
     public User getUser() {

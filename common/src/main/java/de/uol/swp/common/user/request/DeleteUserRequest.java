@@ -21,7 +21,7 @@ public class DeleteUserRequest extends AbstractRequestMessage {
     /**
      * Constructor
      *
-     * @param toDelete The User to delete
+     * @param toDelete The user to delete
      * @since 2020-11-02
      */
     public DeleteUserRequest(User toDelete) {
@@ -34,9 +34,9 @@ public class DeleteUserRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the user variable
+     * Gets the user variable
      *
-     * @return The User to delete
+     * @return The user to delete
      * @since 2020-11-02
      */
     public User getUser() {

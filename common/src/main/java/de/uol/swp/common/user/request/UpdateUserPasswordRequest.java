@@ -3,7 +3,7 @@ package de.uol.swp.common.user.request;
 import de.uol.swp.common.user.User;
 
 /**
- * Request to update an user´s password
+ * Request to update an user's password
  *
  * @author Eric Vuong
  * @author Steven Luong

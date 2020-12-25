@@ -5,8 +5,8 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 import java.util.Objects;
 
 /**
- * This exception is thrown if something went wrong during the registration process.
- * e.g.: The username is already taken
+ * This exception is thrown if something went wrong during the registration process,
+ * e.g. the username is already taken.
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.message.AbstractResponseMessage
@@ -28,7 +28,7 @@ public class RegistrationExceptionMessage extends AbstractResponseMessage {
 
     @Override
     public String toString() {
-        return "RegistrationExceptionMessage " + message;
+        return "RegistrationExceptionMessage: " + message;
     }
 
     @Override

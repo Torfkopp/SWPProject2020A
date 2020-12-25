@@ -8,9 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class used to decode incoming Byte buffer into objects.
+ * Class used to decode an incoming ByteBuffer into an object.
  * <p>
- * An Object of this class is used in the start methods of de.uol.swp.client.ClientConnection
+ * An object of this class is used in the start methods of de.uol.swp.client.ClientConnection
  * and de.uol.swp.server.communication.Server
  *
  * @author Marco Grawunder
@@ -24,7 +24,7 @@ public class MyObjectDecoder extends ObjectDecoder {
     /**
      * Constructor
      *
-     * @param classResolver the ClassResolver the decoder should use
+     * @param classResolver The ClassResolver the decoder should use
      * @since 2019-08-13
      */
     public MyObjectDecoder(ClassResolver classResolver) {
@@ -36,7 +36,7 @@ public class MyObjectDecoder extends ObjectDecoder {
         Object decoded;
         try {
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Trying to decode " + in);
+                LOG.trace("Trying to decode: " + in);
             }
             decoded = super.decode(ctx, in);
             if (LOG.isTraceEnabled()) {
