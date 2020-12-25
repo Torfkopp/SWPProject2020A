@@ -1,6 +1,7 @@
 package de.uol.swp.common.chat.dto;
 
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ class ChatMessageDTOTest {
 
     public static final int defaultID = 1;
     private static final String defaultContent = "I am intelligent content";
-    private static final UserDTO defaultUser = new UserDTO("test", "test", "test@test.de");
+    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
     private static final Instant defaultTimestamp = Instant.ofEpochMilli(1608370913852L); // 2020-12-19-09:41:53.852
     private static final ChatMessageDTO defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
 

@@ -10,6 +10,7 @@ import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChatMessageSerializableTest {
 
-    private static final UserDTO defaultUser = new UserDTO("test", "test", "test@test.de");
+    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
     private static final Instant defaultTimestamp = Instant.ofEpochMilli(1608370913852L); // 2020-12-19-09:41:53.852
     private static final ChatMessageDTO defaultChatMessage = new ChatMessageDTO(1, defaultUser, defaultTimestamp, "test message content");
     private static final List<ChatMessage> defaultLatestChatMessageList = new LinkedList<>();
