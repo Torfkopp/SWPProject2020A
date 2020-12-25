@@ -287,23 +287,4 @@ public class ClientApp extends Application implements ConnectionListener {
 	private void handleEventBusError(DeadEvent deadEvent){
 		LOG.error("DeadEvent detected: "+deadEvent);
 	}
-
-	@Override
-	public void exceptionOccurred(String e) {
-		sceneManager.showServerError(e);
-	}
-
-	// -----------------------------------------------------
-	// JavaFX Help method
-	// -----------------------------------------------------
-
-	/**
-	 * Default startup method for JavaFX applications
-	 * <p>
-	 * @param args Any arguments given when starting the application
-	 * @since 2017-03-17
-	 */
-	public static void main(String[] args) {
-		launch(args);
-	}
 }

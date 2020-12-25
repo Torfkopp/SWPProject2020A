@@ -437,29 +437,6 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles a new list of lobbies
      * <p>
-     * If a new JoinLobbyResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
-     * subscribed to. Then it calls the LobbyService to retrieve
-     * all members of that new lobby in order for the lobby window to be
-     * able to display all members from the beginning.
-     *
-     * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
-     * @see JoinLobbyResponse
-     * @see ShowLobbyViewEvent
-     * @see LobbyService#retrieveAllLobbyMembers(String)
-     * @since 2020-12-20
-     */
-    @Subscribe
-    public void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
-            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
-        });
-    }
-
-    /**
-     * Handles a new list of lobbies
-     * <p>
      * If a new AllLobbiesResponse object is posted to the EventBus, the names
      * of currently existing lobbies are put into the main menu's lobby list.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of lobby
