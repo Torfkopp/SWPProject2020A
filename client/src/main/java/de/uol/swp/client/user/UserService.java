@@ -24,7 +24,7 @@ public class UserService implements ClientUserService {
     /**
      * Constructor
      *
-     * @param bus The  EventBus set in ClientModule
+     * @param bus The EventBus set in ClientModule
      * @see de.uol.swp.client.di.ClientModule
      * @since 2017-03-17
      */

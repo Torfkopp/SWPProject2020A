@@ -1,13 +1,12 @@
 package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.SerialisationTestHelper;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
-import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,4 +30,6 @@ public class LobbyMessageSerialisableTest {
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new RetrieveAllLobbiesRequest(),
                 RetrieveAllLobbiesRequest.class));
     }
+
+
 }

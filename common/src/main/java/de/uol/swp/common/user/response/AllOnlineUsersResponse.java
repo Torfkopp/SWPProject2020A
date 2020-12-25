@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class AllOnlineUsersResponse extends AbstractResponseMessage {
 
-    private final List<UserDTO> users = new ArrayList<>();
+    final private List<UserDTO> users = new ArrayList<>();
 
     /**
      * Default constructor
