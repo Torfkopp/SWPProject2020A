@@ -32,17 +32,17 @@
                 </VBox.margin>
             </ListView>
             <TextField fx:id="messageField" prefHeight="25.0" prefWidth="150.0"/>
-            <Button mnemonicParsing="false" text="Nachricht Senden" onAction="#onSendMessageButtonPressed">
+            <Button mnemonicParsing="false" text="Send message" onAction="#onSendMessageButtonPressed">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Nachricht löschen" onAction="#onDeleteMessageButtonPressed">
+            <Button mnemonicParsing="false" text="Delete message" onAction="#onDeleteMessageButtonPressed">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Nachricht bearbeiten" onAction="#onEditMessageButtonPressed">
+            <Button mnemonicParsing="false" text="Edit message" onAction="#onEditMessageButtonPressed">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
