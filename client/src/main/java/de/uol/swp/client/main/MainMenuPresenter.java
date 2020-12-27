@@ -6,7 +6,6 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.chat.ChatService;
-import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.chat.ChatMessage;
@@ -70,9 +69,6 @@ public class MainMenuPresenter extends AbstractPresenter {
 
     @Inject
     private ChatService chatService;
-
-    @Inject
-    private LobbyService lobbyService;
 
     @FXML
     private ListView<String> chatView;
