@@ -22,7 +22,7 @@
                     <Insets bottom="10.0" top="10.0" />
                 </VBox.margin>
             </ListView>
-            <TextField maxWidth="-Infinity" prefColumnCount="1" prefHeight="25.0" prefWidth="150.0" />
+            <TextField prefColumnCount="1" prefHeight="25.0" prefWidth="150.0" />
             <Button mnemonicParsing="false" onAction="#onSendMessageButton" prefWidth="150.0" text="Nachricht Senden">
                 <VBox.margin>
                     <Insets top="10.0" />
