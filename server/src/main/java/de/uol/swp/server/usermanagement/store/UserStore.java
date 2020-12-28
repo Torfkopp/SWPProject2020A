@@ -10,6 +10,7 @@ import java.util.Optional;
  * them easily.
  *
  * @author Marco Grawunder
+ * @see de.uol.swp.common.user.User
  * @since 2019-08-13
  */
 public interface UserStore {
@@ -38,7 +39,7 @@ public interface UserStore {
      *
      * @param username username of the new user
      * @param password password the user wants to use
-     * @param eMail email address of the new user
+     * @param eMail    email address of the new user
      * @return The User without password information
      * @since 2019-08-13
      */
@@ -49,7 +50,7 @@ public interface UserStore {
      *
      * @param username username of the user to be modified
      * @param password new password
-     * @param eMail new email address
+     * @param eMail    new email address
      * @return The User without password information
      * @since 2019-08-13
      */
@@ -66,9 +67,9 @@ public interface UserStore {
 
     /**
      * Retrieves the list of all users.
+     *
      * @return A list of all users without password information
      * @since 2019-08-13
      */
     List<User> getAllUsers();
-
 }

@@ -13,7 +13,6 @@ import de.uol.swp.common.user.User;
  * @see de.uol.swp.client.SceneManager
  * @since 2020-11-25
  */
-
 public class ShowChangePasswordViewEvent {
     private User user;
 
@@ -24,7 +23,6 @@ public class ShowChangePasswordViewEvent {
      * @since 2020-12-16
      */
     public ShowChangePasswordViewEvent() {
-
     }
 
     /**

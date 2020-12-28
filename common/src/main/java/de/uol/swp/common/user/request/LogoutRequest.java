@@ -4,24 +4,24 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
  * A request send from client to server to log out
- *
+ * <p>
  * This Message should be used when implementing the Logout feature
  *
  * @author Marco Grawunder
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2019-08-07
  */
 
-public class LogoutRequest extends AbstractRequestMessage{
-	
-	private static final long serialVersionUID = -5912075449879112061L;
+public class LogoutRequest extends AbstractRequestMessage {
 
-	/**
-	 * Constructor
-	 *
-	 * @since 2019-08-07
-	 */
-	public LogoutRequest() {
-		super();
-	}
+    private static final long serialVersionUID = -5912075449879112061L;
 
+    /**
+     * Constructor
+     *
+     * @since 2019-08-07
+     */
+    public LogoutRequest() {
+        super();
+    }
 }

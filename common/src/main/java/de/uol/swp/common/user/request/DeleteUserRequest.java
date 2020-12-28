@@ -10,12 +10,13 @@ import java.util.Objects;
  *
  * @author Phillip-André Suhr
  * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2020-11-02
  */
 public class DeleteUserRequest extends AbstractRequestMessage {
 
     private static final long serialVersionUID = 7375314481654981321L;
-    final private User toDelete;
+    private final User toDelete;
 
     /**
      * Constructor
@@ -43,15 +44,15 @@ public class DeleteUserRequest extends AbstractRequestMessage {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(toDelete);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeleteUserRequest that = (DeleteUserRequest) o;
         return Objects.equals(toDelete, that.toDelete);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(toDelete);
     }
 }

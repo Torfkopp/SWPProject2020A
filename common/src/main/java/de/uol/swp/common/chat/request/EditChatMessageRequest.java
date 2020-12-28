@@ -7,7 +7,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see AbstractRequestMessage
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2020-12-17
  */
 public class EditChatMessageRequest extends AbstractRequestMessage {

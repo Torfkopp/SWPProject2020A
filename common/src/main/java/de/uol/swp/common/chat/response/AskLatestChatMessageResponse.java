@@ -2,7 +2,6 @@ package de.uol.swp.common.chat.response;
 
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
-import de.uol.swp.common.chat.request.AskLatestChatMessageRequest;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.LinkedList;
@@ -17,9 +16,9 @@ import java.util.List;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see AbstractResponseMessage
- * @see ChatMessage
- * @see AskLatestChatMessageRequest#getAmount()
+ * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @see de.uol.swp.common.chat.ChatMessage
+ * @see de.uol.swp.common.chat.request.AskLatestChatMessageRequest#getAmount()
  * @since 2020-12-17
  */
 public class AskLatestChatMessageResponse extends AbstractResponseMessage {

@@ -8,7 +8,7 @@ import java.util.Collections;
 
 /**
  * This class is the base for creating a new Service.
- *
+ * <p>
  * This class prepares the child classes to have the EventBus set and methods post
  * and sendToAll implemented in order to reduce unnecessary code repetition.
  *
@@ -17,7 +17,6 @@ import java.util.Collections;
  */
 @SuppressWarnings("UnstableApiUsage")
 public class AbstractService {
-
 
     private final EventBus bus;
 
@@ -55,5 +54,4 @@ public class AbstractService {
         message.setReceiver(Collections.emptyList());
         post(message);
     }
-
 }

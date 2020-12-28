@@ -4,13 +4,13 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
  * Request for initialising the user list in the client
- *
+ * <p>
  * This message is sent during the initialization of the user list. The server will
  * respond with a AllLobbyMembersResponse.
  *
- * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
  * @author Alwin Bossert
  * @author Steven Luong
+ * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
  * @since 2020-12-20
  */
 public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
