@@ -23,17 +23,17 @@
                 </VBox.margin>
             </ListView>
             <TextField prefColumnCount="1" prefHeight="25.0" prefWidth="150.0" />
-            <Button mnemonicParsing="false" onAction="#onSendMessageButton" prefWidth="150.0" text="Nachricht Senden">
+            <Button mnemonicParsing="false" onAction="#onSendMessageButton" prefWidth="150.0" text="Send Message">
                 <VBox.margin>
                     <Insets top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButton" prefWidth="150.0" text="Nachricht löschen">
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButton" prefWidth="150.0" text="Delete Message">
                 <VBox.margin>
                     <Insets top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButton" prefWidth="150.0" text="Nachricht bearbeiten">
+            <Button mnemonicParsing="false" onAction="#onEditMessageButton" prefWidth="150.0" text="Edit Message">
                 <VBox.margin>
                     <Insets top="10.0" />
                 </VBox.margin>
