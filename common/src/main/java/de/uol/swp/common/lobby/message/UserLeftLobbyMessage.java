@@ -5,9 +5,9 @@ import de.uol.swp.common.user.UserDTO;
 /**
  * Message sent by the server when a user successfully leaves a lobby
  *
+ * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.message.AbstractLobbyMessage
  * @see de.uol.swp.common.user.User
- * @author Marco Grawunder
  * @since 2019-10-08
  */
 public class UserLeftLobbyMessage extends AbstractLobbyMessage {
@@ -25,7 +25,7 @@ public class UserLeftLobbyMessage extends AbstractLobbyMessage {
      * Constructor
      *
      * @param lobbyName name of the lobby
-     * @param user user who left the lobby
+     * @param user      user who left the lobby
      * @since 2019-10-08
      */
     public UserLeftLobbyMessage(String lobbyName, UserDTO user) {

@@ -12,7 +12,6 @@ import de.uol.swp.server.usermanagement.store.UserStore;
  *
  * @author Marco Grawunder
  * @since 2019-09-18
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 public class ServerModule extends AbstractModule {

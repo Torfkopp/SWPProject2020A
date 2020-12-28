@@ -1,4 +1,4 @@
-SWP Basissystem	
+SWP Basissystem
 ===============
 
 Der folgende Code sollte als Basis für das Software Projekt verwendet werden.
@@ -6,7 +6,7 @@ Der folgende Code sollte als Basis für das Software Projekt verwendet werden.
 
 Maven
 -----
-Das Projekt kann mit Maven gebaut werden. 
+Das Projekt kann mit Maven gebaut werden.
 
 Dazu auf der Hauptebene zunächst
 
@@ -20,7 +20,7 @@ Um den Client zu bauen:
 mvn clean package
 </code></pre>
 
-der Client ist dann unter traget zu finden und kann dann z.B. wie folgt aufgerufen werden:
+der Client ist dann unter target zu finden und kann dann z. B. wie folgt aufgerufen werden:
 
 <pre><code>cd target
 java -jar client-1.0-SNAPSHOT-jar-with-dependencies.jar

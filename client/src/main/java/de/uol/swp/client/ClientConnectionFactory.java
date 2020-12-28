@@ -1,7 +1,7 @@
 package de.uol.swp.client;
 
 /**
- * Factory for use of injecting the ClientConnection via giuce
+ * Factory for use of injecting the ClientConnection via guice
  *
  * @author Marco Grawunder
  * @see de.uol.swp.client.di.ClientModule

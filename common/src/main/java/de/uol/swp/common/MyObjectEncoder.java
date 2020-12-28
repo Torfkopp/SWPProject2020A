@@ -10,10 +10,11 @@ import java.io.Serializable;
 
 /**
  * Class used to encode Objects into ByteBuffers to send.
- *
+ * <p>
  * An Object of this class is used in the start method of de.uol.swp.server.communication.Server
  *
  * @author Marco Grawunder
+ * @see io.netty.handler.codec.serialization.ObjectEncoder
  * @since 2019-08-13
  */
 public class MyObjectEncoder extends ObjectEncoder {
@@ -27,7 +28,7 @@ public class MyObjectEncoder extends ObjectEncoder {
         }
         try {
             super.encode(ctx, msg, out);
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e);
             e.printStackTrace();
             throw e;

@@ -64,5 +64,4 @@ public interface Lobby extends Serializable {
      * @since 2019-10-08
      */
     Set<User> getUsers();
-
 }

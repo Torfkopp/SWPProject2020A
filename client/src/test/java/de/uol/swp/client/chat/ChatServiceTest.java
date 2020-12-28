@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see ChatService
+ * @see de.uol.swp.client.chat.ChatService
  * @since 2020-12-19
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -87,7 +87,7 @@ class ChatServiceTest {
      * Test if the ChatService creates a NewChatMessageRequest
      * with the given User and Content and posts it to the EventBus when newMessage is called.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
      */
     @Test
@@ -111,7 +111,7 @@ class ChatServiceTest {
      * Tests if the ChatService creates a DeleteChatMessageRequest
      * with the given ID and posts it to the EventBus when deleteMessage is called.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
      */
     @Test
@@ -134,7 +134,7 @@ class ChatServiceTest {
      * Tests if the ChatService creates a EditChatMessageRequest
      * with the given ID and content and posts it to the EventBus when editMessage is called.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
      */
     @Test
@@ -158,7 +158,7 @@ class ChatServiceTest {
      * Tests if the ChatService creates an AskLatestChatMessageRequest
      * with the given amount and posts it to the EventBus when askLatestMessages is called.
      *
-     * @throws InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
      */
     @Test

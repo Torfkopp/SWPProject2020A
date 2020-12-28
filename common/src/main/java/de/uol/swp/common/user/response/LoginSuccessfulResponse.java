@@ -7,12 +7,13 @@ import java.util.Objects;
 
 /**
  * A message containing the session (typically for a new logged in user)
- *
+ * <p>
  * This response is sent to the Client whose LoginRequest was successful
  *
+ * @author Marco Grawunder
  * @see de.uol.swp.common.user.request.LoginRequest
  * @see de.uol.swp.common.user.User
- * @author Marco Grawunder
+ * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2019-08-07
  */
 public class LoginSuccessfulResponse extends AbstractResponseMessage {
@@ -42,15 +43,15 @@ public class LoginSuccessfulResponse extends AbstractResponseMessage {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(user);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LoginSuccessfulResponse that = (LoginSuccessfulResponse) o;
         return Objects.equals(user, that.user);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user);
     }
 }

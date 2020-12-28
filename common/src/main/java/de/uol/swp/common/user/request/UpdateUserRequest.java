@@ -8,13 +8,14 @@ import java.util.Objects;
 /**
  * Request to update an user
  *
- * @see de.uol.swp.common.user.User
  * @author Marco Grawunder
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2019-09-02
  */
 public class UpdateUserRequest extends AbstractRequestMessage {
 
-    final private User toUpdate;
+    private final User toUpdate;
 
     /**
      * Constructor
@@ -23,7 +24,7 @@ public class UpdateUserRequest extends AbstractRequestMessage {
      *             being empty
      * @since 2019-09-02
      */
-    public UpdateUserRequest(User user){
+    public UpdateUserRequest(User user) {
         this.toUpdate = user;
     }
 
@@ -38,15 +39,15 @@ public class UpdateUserRequest extends AbstractRequestMessage {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(toUpdate);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UpdateUserRequest that = (UpdateUserRequest) o;
         return Objects.equals(toUpdate, that.toUpdate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(toUpdate);
     }
 }
