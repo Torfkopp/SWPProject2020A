@@ -49,13 +49,10 @@ public class LobbyPresenter extends AbstractPresenter {
     private String lobbyName;
 
     @FXML
-    private ListView<String> membersView = new ListView<String>();
+    private ListView<String> membersView = new ListView<>();
 
     @FXML
     private ListView<String> chatView;
-
-    @FXML
-    private ListView<String> membersView;
 
     /**
      * Default Constructor

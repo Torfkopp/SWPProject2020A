@@ -5,10 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
-import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
@@ -25,10 +22,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Handles the lobby requests send by the users
@@ -44,7 +38,6 @@ public class LobbyService extends AbstractService {
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
 
-    private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     final private Map<Session, User> userSessions = new HashMap<>();
 
     final private List<Lobby> lobbyList = new ArrayList<>();
