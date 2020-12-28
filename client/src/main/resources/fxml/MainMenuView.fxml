@@ -8,10 +8,10 @@
     <GridPane layoutX="-5.0" layoutY="-4.0" prefHeight="410.0" prefWidth="800.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="79.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="402.0" minWidth="10.0" prefWidth="119.0" />
-         <ColumnConstraints maxWidth="369.0" minWidth="0.0" prefWidth="145.0" />
-         <ColumnConstraints maxWidth="369.0" minWidth="10.0" prefWidth="43.0" />
-         <ColumnConstraints maxWidth="312.0" minWidth="77.0" prefWidth="250.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="90.0" />
+         <ColumnConstraints maxWidth="369.0" minWidth="0.0" prefWidth="167.0" />
+         <ColumnConstraints maxWidth="369.0" minWidth="10.0" prefWidth="35.0" />
+         <ColumnConstraints maxWidth="312.0" minWidth="77.0" prefWidth="197.0" />
          <ColumnConstraints maxWidth="308.0" minWidth="138.0" prefWidth="261.0" />
         </columnConstraints>
         <rowConstraints>
@@ -21,8 +21,8 @@
          <RowConstraints maxHeight="90.0" minHeight="28.0" prefHeight="38.0" />
         </rowConstraints>
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647" />
-        <Button mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1" />
-        <Button mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="1" />
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         <ListView fx:id="lobbyView" prefHeight="372.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowSpan="2147483647" />
 
         <VBox prefHeight="385.0" prefWidth="199.0" GridPane.columnIndex="4" GridPane.columnSpan="2147483647" GridPane.rowSpan="2147483647">
@@ -48,7 +48,7 @@
                 </VBox.margin>
             </Button>
         </VBox>
-      <MenuBar maxWidth="-Infinity" prefHeight="25.0" prefWidth="80.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+      <MenuBar maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
 
           <Menu mnemonicParsing="false" text="Settings">
 
