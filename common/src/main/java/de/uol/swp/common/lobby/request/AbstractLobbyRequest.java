@@ -8,9 +8,9 @@ import java.util.Objects;
 /**
  * Base class of all lobby request messages. Basic handling of lobby data.
  *
+ * @author Marco Grawunder
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.message.AbstractRequestMessage
- * @author Marco Grawunder
  * @since 2019-10-08
  */
 public class AbstractLobbyRequest extends AbstractRequestMessage {
@@ -52,7 +52,7 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     /**
      * Setter for the name variable
      *
-     * @param name  String containing the lobby's name
+     * @param name String containing the lobby's name
      * @since 2019-10-08
      */
     public void setName(String name) {
@@ -72,11 +72,16 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     /**
      * Setter for the user variable
      *
-     * @param user  User responsible for the creation of this message
+     * @param user User responsible for the creation of this message
      * @since 2019-10-08
      */
     public void setUser(UserDTO user) {
         this.user = user;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, user);
     }
 
     @Override
@@ -86,10 +91,5 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
         AbstractLobbyRequest that = (AbstractLobbyRequest) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(user, that.user);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, user);
     }
 }

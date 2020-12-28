@@ -61,7 +61,6 @@ class LobbyServiceTest {
 
         // old lobby should not be overwritten!
         assertNotEquals(createdLobby.getOwner(), lobbyWithSameName.getOwner());
-
     }
 
     @Test
@@ -95,5 +94,4 @@ class LobbyServiceTest {
         assertTrue(createdLobby.getUsers().contains(user4));
         assertFalse(createdLobby.getUsers().contains(user5));
     }
-
 }

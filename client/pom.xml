@@ -1,14 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>de.uol.swp</groupId>
         <!-- rename to group -->
-		<artifactId>SWPBaseProject</artifactId>
+        <artifactId>SWPBaseProject</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <properties>
-        <javafx.version>11</javafx.version>
+        <javafx.version>11.0.2</javafx.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,14 +16,14 @@
     <name>client</name>
     <build>
         <plugins>
-                 <plugin>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-maven-plugin</artifactId>
-                    <version>0.0.4</version>
-                    <configuration>
-                        <mainClass>de.uol.swp.client.Main</mainClass>
-                    </configuration>
-                </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.4</version>
+                <configuration>
+                    <mainClass>de.uol.swp.client.Main</mainClass>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -81,21 +80,21 @@
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
+            <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
+            <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
             <classifier>linux</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
+            <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
             <classifier>mac</classifier>
         </dependency>
@@ -105,7 +104,6 @@
             <artifactId>ignite-guice</artifactId>
             <version>1.0.2</version>
         </dependency>
-
 
     </dependencies>
 </project>

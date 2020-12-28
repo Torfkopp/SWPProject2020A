@@ -13,14 +13,12 @@ import org.apache.logging.log4j.Logger;
  * This handler is called from netty when communications happens e.g. a new connection
  * is established or data is received
  *
- * @see io.netty.channel.ChannelInboundHandler
  * @author Marco Grawunder
+ * @see io.netty.channel.ChannelInboundHandler
  * @since 2019-11-20
  */
-
 @Sharable
-public
-class NettyServerHandler implements ChannelInboundHandler {
+public class NettyServerHandler implements ChannelInboundHandler {
 
     private static final Logger LOG = LogManager.getLogger(NettyServerHandler.class);
     private final ServerHandler delegate;
@@ -39,12 +37,10 @@ class NettyServerHandler implements ChannelInboundHandler {
 
     @Override
     public void channelRegistered(ChannelHandlerContext channelHandlerContext) {
-
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext channelHandlerContext) {
-
     }
 
     @Override
@@ -54,7 +50,6 @@ class NettyServerHandler implements ChannelInboundHandler {
 
     @Override
     public void channelInactive(ChannelHandlerContext channelHandlerContext) {
-
     }
 
     @Override
@@ -71,27 +66,14 @@ class NettyServerHandler implements ChannelInboundHandler {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext channelHandlerContext) {
-
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext channelHandlerContext, Object o) {
-
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext channelHandlerContext) {
-
-    }
-
-    @Override
-    public void handlerAdded(ChannelHandlerContext channelHandlerContext) {
-
-    }
-
-    @Override
-    public void handlerRemoved(ChannelHandlerContext channelHandlerContext) {
-
     }
 
     @Override
@@ -103,4 +85,11 @@ class NettyServerHandler implements ChannelInboundHandler {
         }
     }
 
+    @Override
+    public void handlerAdded(ChannelHandlerContext channelHandlerContext) {
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext channelHandlerContext) {
+    }
 }

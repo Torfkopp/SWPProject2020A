@@ -12,9 +12,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test Class for the UserDTO
+ * Test Class for the LobbyDTO
  *
  * @author Marco Grawunder
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.user.UserDTO
+ * @see de.uol.swp.common.lobby.Lobby
+ * @see de.uol.swp.common.lobby.dto.LobbyDTO
  * @since 2019-10-08
  */
 class LobbyDTOTest {
@@ -48,7 +52,6 @@ class LobbyDTOTest {
         assertEquals(lobby.getName(), "test");
         assertEquals(lobby.getUsers().size(), 1);
         assertEquals(lobby.getUsers().iterator().next(), defaultUser);
-
     }
 
     /**
@@ -60,13 +63,11 @@ class LobbyDTOTest {
      */
     @Test
     void createWithExistingLobby() {
-
         Lobby newLobby = LobbyDTO.create(defaultLobby);
 
         // Test every attribute
         assertEquals(newLobby.getName(), defaultLobby.getName());
         assertEquals(newLobby.getOwner(), defaultLobby.getOwner());
-
     }
 
     /**
@@ -130,7 +131,6 @@ class LobbyDTOTest {
 
         assertNotEquals(lobby.getOwner(), defaultUser);
         assertTrue(users.contains(lobby.getOwner()));
-
     }
 
     /**
@@ -165,6 +165,4 @@ class LobbyDTOTest {
 
         assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
     }
-
-
 }

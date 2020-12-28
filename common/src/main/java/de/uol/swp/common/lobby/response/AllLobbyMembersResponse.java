@@ -1,4 +1,5 @@
 package de.uol.swp.common.lobby.response;
+
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class AllLobbyMembersResponse extends AbstractResponseMessage {
 
-    final private List<UserDTO> users = new ArrayList<>();
+    private final List<UserDTO> users = new ArrayList<>();
 
     /**
      * Default Constructor
@@ -17,13 +18,13 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * @implNote this constructor is needed for serialization
      * @since 2020.12.21
      */
-    public AllLobbyMembersResponse(){
+    public AllLobbyMembersResponse() {
         // needed for serialization
     }
 
     /**
      * Constructor
-     *
+     * <p>
      * This constructor generates a new List of the lobby members from the given
      * Collection. The significant difference between the two being that the new
      * List contains copies of the User objects. These copies have their password

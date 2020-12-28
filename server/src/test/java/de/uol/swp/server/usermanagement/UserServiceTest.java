@@ -49,7 +49,5 @@ class UserServiceTest {
 
         // old user should not be overwritten!
         assertNotEquals(loggedInUser.getEMail(), userWithSameName.getEMail());
-
     }
-
 }

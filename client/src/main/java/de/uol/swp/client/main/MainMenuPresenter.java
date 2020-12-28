@@ -3,6 +3,7 @@ package de.uol.swp.client.main;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.lobby.LobbyService;
@@ -14,10 +15,9 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
@@ -27,7 +27,6 @@ import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -63,30 +62,31 @@ public class MainMenuPresenter extends AbstractPresenter {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     private ObservableList<String> users;
-    private ObservableMap<Integer, ChatMessage> chatMessageMap;
+
     private ObservableList<String> chatMessages;
+    private ObservableMap<Integer, ChatMessage> chatMessageMap;
 
     private ObservableList<String> lobbies;
 
     private User loggedInUser;
 
     @Inject
-    private LobbyService lobbyService;
+    private ChatService chatService;
 
     @Inject
-    private ChatService chatService;
+    private LobbyService lobbyService;
 
     @FXML
     private ListView<String> chatView;
+
+    @FXML
+    private ListView<String> lobbyView;
 
     @FXML
     private ListView<String> usersView;
 
     @FXML
     private TextField messageField;
-
-    @FXML
-    private ListView<String> lobbyView;
 
     /**
      * Handles successful login
@@ -179,7 +179,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void newUser(UserLoggedInMessage message) {
-
         LOG.debug("New user " + message.getUsername() + " logged in");
         Platform.runLater(() -> {
             if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUsername()))
@@ -236,8 +235,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The CreatedChatMessageMessage object found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see CreatedChatMessageMessage
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     @Subscribe
@@ -256,8 +255,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The DeletedChatMessageMessage found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see DeletedChatMessageMessage
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     @Subscribe
@@ -275,8 +274,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The EditedChatMessageMessage found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see EditedChatMessageMessage
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     @Subscribe
@@ -293,8 +292,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The AskLatestChatMessageResponse found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see AskLatestChatMessageResponse
-     * @see MainMenuPresenter#updateChatMessageList(List)
+     * @see de.uol.swp.common.chat.response.AskLatestChatMessageResponse
+     * @see de.uol.swp.client.main.MainMenuPresenter#updateChatMessageList(List)
      * @since 2020-12-17
      */
     @Subscribe
@@ -310,7 +309,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      *                        chatMessageMap
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
@@ -357,12 +356,11 @@ public class MainMenuPresenter extends AbstractPresenter {
      *
      * @param msg the LobbyCreatedMessage object seen on the EventBus
      * @author Temmo Junkhoff
-     * @see LobbyCreatedMessage
+     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2020-12-17
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
-
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to add Lobby without name to LobbyList ");
         } else {
@@ -381,9 +379,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      * able to display all members from the beginning.
      *
      * @param createLobbyResponse The CreateLobbyResponse object found on the EventBus
-     * @see CreateLobbyResponse
-     * @see ShowLobbyViewEvent
-     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
      * @since 2020-12-20
      */
     @Subscribe
@@ -405,12 +403,11 @@ public class MainMenuPresenter extends AbstractPresenter {
      *
      * @param msg the LobbyDeletedMessage object seen on the EventBus
      * @author Temmo Junkhoff
-     * @see LobbyDeletedMessage
+     * @see de.uol.swp.common.lobby.message.LobbyDeletedMessage
      * @since 2020-12-17
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
-
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to delete Lobby without name from LobbyList ");
         } else {
@@ -460,7 +457,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.lobby.dto.LobbyDTO
      * @since 2020-11-29
      */
-
     private void updateLobbyList(List<String> lobbyList) {
         LOG.debug("Update Lobby List");
         Platform.runLater(() -> {
@@ -513,17 +509,14 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        String lobbyName;
-
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
-            lobbyName = lobbyView.getSelectionModel().getSelectedItem();
+            String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
             lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
         }
-
     }
 
     /**
@@ -536,9 +529,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      * able to display all members from the beginning.
      *
      * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
-     * @see JoinLobbyResponse
-     * @see ShowLobbyViewEvent
-     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
      * @since 2020-12-20
      */
     @Subscribe
@@ -617,7 +610,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param event the event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatService
+     * @see de.uol.swp.client.chat.ChatService
      * @since 2020-12-17
      */
     @FXML
@@ -637,7 +630,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param event the event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatService
+     * @see de.uol.swp.client.chat.ChatService
      * @since 2020-12-17
      */
     @FXML
@@ -658,7 +651,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param event the event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatService
+     * @see de.uol.swp.client.chat.ChatService
      * @since 2020-12-17
      */
     @FXML
@@ -676,7 +669,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @return The ID of the message that was searched
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     private Integer findId() {

@@ -10,7 +10,7 @@ import de.uol.swp.common.user.User;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see ChatService
+ * @see de.uol.swp.client.chat.ChatService
  * @since 2020-12-17
  */
 public interface IChatService {
@@ -40,7 +40,7 @@ public interface IChatService {
     void editMessage(int id, String newContent);
 
     /**
-     * Ask for a List of [amount] or less ChatMessages that represents the newest [amount]
+     * Ask for a List of {@literal <amount>} or less ChatMessages that represents the newest {@literal <amount>}
      * of ChatMessages
      *
      * @param amount The maximum amount of ChatMessages the Client wants to request

@@ -99,7 +99,7 @@ public class ChatMessageDTO implements ChatMessage {
      * @return String the string that was created
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatMessage
+     * @see de.uol.swp.common.chat.ChatMessage
      * @since 2020-12-17
      */
     private static String timestampToString(Instant timestamp) {
@@ -119,11 +119,6 @@ public class ChatMessageDTO implements ChatMessage {
     }
 
     @Override
-    public Instant getTimestamp() {
-        return this.timestamp;
-    }
-
-    @Override
     public String getContent() {
         return this.content;
     }
@@ -137,8 +132,18 @@ public class ChatMessageDTO implements ChatMessage {
     }
 
     @Override
+    public Instant getTimestamp() {
+        return this.timestamp;
+    }
+
+    @Override
     public boolean isEdited() {
         return this.edited;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override
@@ -149,23 +154,13 @@ public class ChatMessageDTO implements ChatMessage {
         return id.equals(that.id) && author.equals(that.author) && timestamp.equals(that.timestamp) && content.equals(that.content);
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public int compareTo(ChatMessage o) {
-        return id.compareTo(o.getID());
-    }
-
     /**
      * Converts a ChatMessage to a string
      *
      * @return String the string that was created
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatMessage
+     * @see de.uol.swp.common.chat.ChatMessage
      * @since 2020-12-17
      */
     @Override
@@ -177,5 +172,10 @@ public class ChatMessageDTO implements ChatMessage {
             text += " (ed)";
         }
         return text;
+    }
+
+    @Override
+    public int compareTo(ChatMessage o) {
+        return id.compareTo(o.getID());
     }
 }

@@ -13,8 +13,8 @@ import java.util.TreeMap;
 /**
  * Handles most user related issues e.g. login/logout
  *
- * @see de.uol.swp.server.usermanagement.AbstractUserManagement
  * @author Marco Grawunder
+ * @see de.uol.swp.server.usermanagement.AbstractUserManagement
  * @since 2019-08-05
  */
 public class UserManagement extends AbstractUserManagement {
@@ -30,17 +30,17 @@ public class UserManagement extends AbstractUserManagement {
      * @since 2019-08-05
      */
     @Inject
-    public UserManagement(UserStore userStore){
+    public UserManagement(UserStore userStore) {
         this.userStore = userStore;
     }
 
     @Override
     public User login(String username, String password) {
         Optional<User> user = userStore.findUser(username, password);
-        if (user.isPresent()){
+        if (user.isPresent()) {
             this.loggedInUsers.put(username, user.get());
             return user.get();
-        }else{
+        } else {
             throw new SecurityException("Cannot auth user " + username);
         }
     }
@@ -51,55 +51,38 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
-    public User createUser(User userToCreate){
+    public void logout(User user) {
+        loggedInUsers.remove(user.getUsername());
+    }
+
+    @Override
+    public User createUser(User userToCreate) {
         Optional<User> user = userStore.findUser(userToCreate.getUsername());
-        if (user.isPresent()){
+        if (user.isPresent()) {
             throw new UserManagementException("Username already used!");
         }
         return userStore.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
     }
 
     @Override
-    public User updateUser(User userToUpdate){
+    public void dropUser(User userToDrop) {
+        Optional<User> user = userStore.findUser(userToDrop.getUsername());
+        if (user.isEmpty()) {
+            throw new UserManagementException("Username unknown!");
+        }
+        userStore.removeUser(userToDrop.getUsername());
+    }
+
+    @Override
+    public User updateUser(User userToUpdate) {
         Optional<User> user = userStore.findUser(userToUpdate.getUsername());
-        if (!user.isPresent()){
+        if (user.isEmpty()) {
             throw new UserManagementException("Username unknown!");
         }
         // Only update if there are new values
         String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
         String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
         return userStore.updateUser(userToUpdate.getUsername(), newPassword, newEMail);
-
-    }
-
-    @Override
-    public void dropUser(User userToDrop) {
-        Optional<User> user = userStore.findUser(userToDrop.getUsername());
-        if (!user.isPresent()) {
-            throw new UserManagementException("Username unknown!");
-        }
-        userStore.removeUser(userToDrop.getUsername());
-
-    }
-
-    /**
-     * Sub-function of update user
-     *
-     * This method is used to set the new user values to the old ones if the values
-     * in the update request were empty.
-     *
-     * @param firstValue value to update to, empty String or null
-     * @param secondValue the old value
-     * @return String containing the value to be used in the update command
-     * @since 2019-08-05
-     */
-    private String firstNotNull(String firstValue, String secondValue) {
-        return Strings.isNullOrEmpty(firstValue)?secondValue:firstValue;
-    }
-
-    @Override
-    public void logout(User user) {
-        loggedInUsers.remove(user.getUsername());
     }
 
     @Override
@@ -112,9 +95,22 @@ public class UserManagement extends AbstractUserManagement {
         return userStore.findUser(userName);
     }
 
+    /**
+     * Sub-function of update user
+     * <p>
+     * This method is used to set the new user values to the old ones if the values
+     * in the update request were empty.
+     *
+     * @param firstValue  value to update to, empty String or null
+     * @param secondValue the old value
+     * @return String containing the value to be used in the update command
+     * @since 2019-08-05
+     */
+    private String firstNotNull(String firstValue, String secondValue) {
+        return Strings.isNullOrEmpty(firstValue) ? secondValue : firstValue;
+    }
 
     public Optional<User> getUserWithPassword(String userName, String password) {
         return userStore.findUser(userName, password);
     }
-
 }

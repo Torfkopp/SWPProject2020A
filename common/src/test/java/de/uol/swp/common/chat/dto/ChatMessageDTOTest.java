@@ -13,6 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.user.UserDTO
+ * @see de.uol.swp.common.chat.ChatMessage
+ * @see de.uol.swp.common.chat.dto.ChatMessageDTO
+ * @see java.time.Instant
  * @since 2020-12-19
  */
 class ChatMessageDTOTest {

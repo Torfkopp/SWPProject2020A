@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see ChatMessageStore
- * @see AbstractChatMessageStore
+ * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see de.uol.swp.server.chat.store.AbstractChatMessageStore
  * @since 2020-12-16
  */
 public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {

@@ -19,6 +19,10 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
+ * @see de.uol.swp.server.chat.IChatManagement
+ * @see de.uol.swp.common.user.User
+ * @see de.uol.swp.common.chat.ChatMessage
+ * @see de.uol.swp.server.chat.store.ChatMessageStore
  * @since 2020-12-19
  */
 class ChatManagementTest {
