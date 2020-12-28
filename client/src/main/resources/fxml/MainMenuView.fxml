@@ -32,7 +32,7 @@
                     <Insets bottom="10.0" top="10.0" />
                 </VBox.margin>
             </ListView>
-            <TextField fx:id="messageField" maxWidth="-Infinity" prefHeight="25.0" />
+            <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" prefHeight="25.0" />
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="Send Message">
                 <VBox.margin>
                     <Insets top="10.0" />
