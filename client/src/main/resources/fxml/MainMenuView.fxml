@@ -15,9 +15,9 @@
          <ColumnConstraints maxWidth="308.0" minWidth="138.0" prefWidth="261.0" />
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints maxHeight="382.0" minHeight="10.0" prefHeight="69.0" vgrow="SOMETIMES" />
-         <RowConstraints maxHeight="315.0" minHeight="0.0" prefHeight="239.0" />
-         <RowConstraints maxHeight="309.0" minHeight="0.0" prefHeight="70.0" />
+            <RowConstraints maxHeight="382.0" minHeight="10.0" prefHeight="62.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="315.0" minHeight="0.0" prefHeight="65.0" />
+         <RowConstraints maxHeight="309.0" minHeight="0.0" prefHeight="245.0" />
          <RowConstraints maxHeight="90.0" minHeight="28.0" prefHeight="38.0" />
         </rowConstraints>
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647" />
@@ -48,7 +48,7 @@
                 </VBox.margin>
             </Button>
         </VBox>
-      <MenuBar maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
+      <MenuBar maxWidth="1.7976931348623157E308" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
 
           <Menu mnemonicParsing="false" text="Settings">
 
@@ -69,9 +69,6 @@
                   </MenuItem>
 
           </Menu>
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
       </MenuBar>
 
     </GridPane>
