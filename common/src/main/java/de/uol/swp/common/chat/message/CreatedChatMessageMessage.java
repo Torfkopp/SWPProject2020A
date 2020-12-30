@@ -1,18 +1,17 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.chat.ChatMessage;
-import de.uol.swp.common.message.AbstractServerMessage;
 
 /**
  * Message sent to clients when a new ChatMessage was saved on the server
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractServerMessage
+ * @see de.uol.swp.common.chat.message.AbstractChatMessageMessage
  * @see de.uol.swp.common.chat.ChatMessage
  * @since 2020-12-17
  */
-public class CreatedChatMessageMessage extends AbstractServerMessage {
+public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
     private final ChatMessage msg;
 
     /**
@@ -22,6 +21,12 @@ public class CreatedChatMessageMessage extends AbstractServerMessage {
      * @since 2020-12-17
      */
     public CreatedChatMessageMessage(ChatMessage msg) {
+        super(false);
+        this.msg = msg;
+    }
+
+    public CreatedChatMessageMessage(ChatMessage msg, boolean isLobbyChatMessage, String lobbyName) {
+        super(isLobbyChatMessage, lobbyName);
         this.msg = msg;
     }
 

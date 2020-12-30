@@ -1,17 +1,16 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.chat.ChatMessage;
-import de.uol.swp.common.message.AbstractServerMessage;
 
 /**
  * Message sent by the server when a ChatMessage got edited successfully
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractServerMessage
+ * @see de.uol.swp.common.chat.message.AbstractChatMessageMessage
  * @since 2020-12-17
  */
-public class EditedChatMessageMessage extends AbstractServerMessage {
+public class EditedChatMessageMessage extends AbstractChatMessageMessage {
     private final ChatMessage chatMsg;
 
     /**
@@ -21,6 +20,12 @@ public class EditedChatMessageMessage extends AbstractServerMessage {
      * @since 2020-12-19
      */
     public EditedChatMessageMessage(ChatMessage chatMsg) {
+        super(false);
+        this.chatMsg = chatMsg;
+    }
+
+    public EditedChatMessageMessage(ChatMessage chatMsg, boolean isLobbyChatMessage, String lobbyName) {
+        super(isLobbyChatMessage, lobbyName);
         this.chatMsg = chatMsg;
     }
 

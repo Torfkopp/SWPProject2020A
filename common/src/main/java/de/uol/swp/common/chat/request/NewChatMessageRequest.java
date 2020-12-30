@@ -1,6 +1,5 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 
 /**
@@ -8,11 +7,11 @@ import de.uol.swp.common.user.User;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.chat.request.AbstractChatMessageRequest
  * @see de.uol.swp.common.user.User
  * @since 2020-12-17
  */
-public class NewChatMessageRequest extends AbstractRequestMessage {
+public class NewChatMessageRequest extends AbstractChatMessageRequest {
     private final User author;
     private final String content;
 
@@ -24,6 +23,13 @@ public class NewChatMessageRequest extends AbstractRequestMessage {
      * @since 2020-12-17
      */
     public NewChatMessageRequest(User author, String content) {
+        super(null);
+        this.author = author;
+        this.content = content;
+    }
+
+    public NewChatMessageRequest(User author, String content, String originLobby) {
+        super(originLobby);
         this.author = author;
         this.content = content;
     }

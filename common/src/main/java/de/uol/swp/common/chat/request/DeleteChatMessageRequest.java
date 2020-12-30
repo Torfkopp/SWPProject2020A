@@ -1,16 +1,14 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.message.AbstractRequestMessage;
-
 /**
  * Request sent by the client when a ChatMessage should be deleted.
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.chat.request.AbstractChatMessageRequest
  * @since 2020-12-17
  */
-public class DeleteChatMessageRequest extends AbstractRequestMessage {
+public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
     private final int id;
 
     /**
@@ -20,6 +18,12 @@ public class DeleteChatMessageRequest extends AbstractRequestMessage {
      * @since 2020-12-17
      */
     public DeleteChatMessageRequest(int id) {
+        super(null);
+        this.id = id;
+    }
+
+    public DeleteChatMessageRequest(int id, String originLobby) {
+        super(originLobby);
         this.id = id;
     }
 

@@ -1,16 +1,14 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.message.AbstractRequestMessage;
-
 /**
  * Request sent by the client when a ChatMessage should be updated.
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.chat.request.AbstractChatMessageRequest
  * @since 2020-12-17
  */
-public class EditChatMessageRequest extends AbstractRequestMessage {
+public class EditChatMessageRequest extends AbstractChatMessageRequest {
     private final int id;
     private final String content;
 
@@ -22,6 +20,13 @@ public class EditChatMessageRequest extends AbstractRequestMessage {
      * @since 2020-12-17
      */
     public EditChatMessageRequest(int id, String content) {
+        super(null);
+        this.id = id;
+        this.content = content;
+    }
+
+    public EditChatMessageRequest(int id, String content, String originLobby) {
+        super(originLobby);
         this.id = id;
         this.content = content;
     }

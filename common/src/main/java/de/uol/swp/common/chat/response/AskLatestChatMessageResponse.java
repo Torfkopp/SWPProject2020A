@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class AskLatestChatMessageResponse extends AbstractResponseMessage {
     private final List<ChatMessage> chatHistory = new LinkedList<>();
+    private final String lobbyName;
 
     /**
      * Constructor
@@ -34,6 +35,14 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
         for (ChatMessage msg : latestMessages) {
             chatHistory.add(ChatMessageDTO.create(msg));
         }
+        this.lobbyName = null;
+    }
+
+    public AskLatestChatMessageResponse(List<ChatMessage> latestMessages, String lobbyName) {
+        for (ChatMessage msg : latestMessages) {
+            chatHistory.add(ChatMessageDTO.create(msg));
+        }
+        this.lobbyName = lobbyName;
     }
 
     /**
@@ -44,5 +53,9 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      */
     public List<ChatMessage> getChatHistory() {
         return chatHistory;
+    }
+
+    public String getLobbyName() {
+        return lobbyName;
     }
 }

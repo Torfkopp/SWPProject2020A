@@ -1,16 +1,14 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.message.AbstractRequestMessage;
-
 /**
  * Request sent by the client to ask for the latest messages
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.chat.request.AbstractChatMessageRequest
  * @since 2020-12-17
  */
-public class AskLatestChatMessageRequest extends AbstractRequestMessage {
+public class AskLatestChatMessageRequest extends AbstractChatMessageRequest {
     private final int amount;
 
     /**
@@ -20,6 +18,12 @@ public class AskLatestChatMessageRequest extends AbstractRequestMessage {
      * @since 2020-12-17
      */
     public AskLatestChatMessageRequest(int amount) {
+        super(null);
+        this.amount = amount;
+    }
+
+    public AskLatestChatMessageRequest(int amount, String originLobby) {
+        super(originLobby);
         this.amount = amount;
     }
 
