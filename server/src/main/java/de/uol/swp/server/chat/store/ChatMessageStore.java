@@ -27,6 +27,8 @@ public interface ChatMessageStore {
      */
     Optional<ChatMessage> findMessage(int id);
 
+    Optional<ChatMessage> findMessage(int id, String originLobby);
+
     /**
      * Method to get the last [amount] Messages
      *
@@ -34,6 +36,8 @@ public interface ChatMessageStore {
      * @return List of latest ChatMessages, sorted newest to oldest
      */
     List<ChatMessage> getLatestMessages(int amount);
+
+    List<ChatMessage> getLatestMessages(int amount, String originLobby);
 
     /**
      * Method to create a chat message
@@ -45,6 +49,8 @@ public interface ChatMessageStore {
      */
     ChatMessage createChatMessage(User author, String content);
 
+    ChatMessage createChatMessage(User author, String content, String originLobby);
+
     /**
      * Method to update contents of chat message
      *
@@ -54,10 +60,14 @@ public interface ChatMessageStore {
      */
     ChatMessage updateChatMessage(int id, String updatedContent);
 
+    ChatMessage updateChatMessage(int id, String updatedContent, String originLobby);
+
     /**
      * Method to remove a ChatMessage from the Store
      *
      * @param id The ID of the ChatMessage to remove
      */
     void removeChatMessage(int id);
+
+    void removeChatMessage(int id, String originLobby);
 }

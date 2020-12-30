@@ -22,6 +22,8 @@ public interface IChatService {
      */
     void newMessage(User author, String msg);
 
+    void newMessage(User author, String msg, String originLobby);
+
     /**
      * Method to delete a ChatMessage
      *
@@ -29,6 +31,8 @@ public interface IChatService {
      * @since 2020-12-17
      */
     void deleteMessage(int id);
+
+    void deleteMessage(int id, String originLobby);
 
     /**
      * Method to change the content of a ChatMessage
@@ -39,6 +43,8 @@ public interface IChatService {
      */
     void editMessage(int id, String newContent);
 
+    void editMessage(int id, String newContent, String originLobby);
+
     /**
      * Ask for a List of {@literal <amount>} or less ChatMessages that represents the newest {@literal <amount>}
      * of ChatMessages
@@ -47,4 +53,6 @@ public interface IChatService {
      * @since 2020-12-17
      */
     void askLatestMessages(int amount);
+
+    void askLatestMessages(int amount, String originLobby);
 }

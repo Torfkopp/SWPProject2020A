@@ -27,6 +27,8 @@ public interface IChatManagement {
      */
     List<ChatMessage> getLatestMessages(int amount);
 
+    List<ChatMessage> getLatestMessages(int amount, String originLobby);
+
     /**
      * Create a new ChatMessage in the ChatMessageStore
      *
@@ -36,6 +38,8 @@ public interface IChatManagement {
      * @since 2020-12-16
      */
     ChatMessage createChatMessage(User author, String content);
+
+    ChatMessage createChatMessage(User author, String content, String originLobby);
 
     /**
      * Update content of ChatMessage.
@@ -47,6 +51,8 @@ public interface IChatManagement {
      */
     ChatMessage updateChatMessage(int id, String updatedContent);
 
+    ChatMessage updateChatMessage(int id, String updatedContent, String originLobby);
+
     /**
      * Delete a ChatMessage.
      *
@@ -54,4 +60,6 @@ public interface IChatManagement {
      * @since 2020-12-16
      */
     void dropChatMessage(int id);
+
+    void dropChatMessage(int id, String originLobby);
 }
