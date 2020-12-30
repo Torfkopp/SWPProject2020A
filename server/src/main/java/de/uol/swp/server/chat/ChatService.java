@@ -17,6 +17,7 @@ import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,6 +39,8 @@ public class ChatService extends AbstractService {
 
     private final ChatManagement chatManagement;
 
+    private final LobbyService lobbyService;
+
     /**
      * Constructor
      *
@@ -45,10 +48,17 @@ public class ChatService extends AbstractService {
      * @param chatManagement the ChatManagement to use (injected)
      * @since 2020-12-16
      */
-    @Inject
     public ChatService(EventBus eventBus, ChatManagement chatManagement) {
         super(eventBus);
         this.chatManagement = chatManagement;
+        lobbyService = null;
+    }
+
+    @Inject
+    public ChatService(EventBus bus, ChatManagement chatManagement, LobbyService lobbyService) {
+        super(bus);
+        this.chatManagement = chatManagement;
+        this.lobbyService = lobbyService;
     }
 
     /**
@@ -71,9 +81,15 @@ public class ChatService extends AbstractService {
                     + " with content '" + msg.getContent() + '\'');
         }
         try {
-            ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent());
-            ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
-            sendToAll(returnMessage);
+            if (msg.isFromLobby()) {
+                ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent(), msg.getOriginLobby());
+                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, true, msg.getOriginLobby());
+                lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            } else {
+                ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent());
+                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
+                sendToAll(returnMessage);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -98,9 +114,15 @@ public class ChatService extends AbstractService {
             LOG.debug("Got new DeleteChatMessage message for the ChatMessage ID " + msg.getId());
         }
         try {
-            chatManagement.dropChatMessage(msg.getId());
-            ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId());
-            sendToAll(returnMessage);
+            if (msg.isFromLobby()) {
+                chatManagement.dropChatMessage(msg.getId(), msg.getOriginLobby());
+                ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId(), true, msg.getOriginLobby());
+                lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            } else {
+                chatManagement.dropChatMessage(msg.getId());
+                ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId());
+                sendToAll(returnMessage);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -126,9 +148,15 @@ public class ChatService extends AbstractService {
                     + " and new content '" + msg.getContent() + '\'');
         }
         try {
-            ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());
-            ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
-            sendToAll(returnMessage);
+            if (msg.isFromLobby()) {
+                ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent(), msg.getOriginLobby());
+                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, true, msg.getOriginLobby());
+                lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            } else {
+                ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());
+                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
+                sendToAll(returnMessage);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -152,8 +180,14 @@ public class ChatService extends AbstractService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Got new AskLatestMessage with " + msg.getAmount() + " messages");
         }
-        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount());
-        ResponseMessage returnMessage = new AskLatestChatMessageResponse(latestMessages);
+        ResponseMessage returnMessage;
+        if (msg.isFromLobby()) {
+            List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount(), msg.getOriginLobby());
+            returnMessage = new AskLatestChatMessageResponse(latestMessages, msg.getOriginLobby());
+        } else {
+            List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount());
+            returnMessage = new AskLatestChatMessageResponse(latestMessages);
+        }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
         }

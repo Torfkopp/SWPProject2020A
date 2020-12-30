@@ -86,6 +86,11 @@ public class MainMenuPresenter extends AbstractPresenter {
     @FXML
     private TextField messageField;
 
+    @FXML
+    private void initialize() {
+        prepareChatVars();
+    }
+
     /**
      * Handles successful login
      * <p>
@@ -100,7 +105,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void loginSuccessful(LoginSuccessfulResponse message) {
-        prepareChatVars();
+//        prepareChatVars();
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
@@ -239,9 +244,11 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        LOG.debug("Received Chat Message from " + msg.getMsg().getAuthor().getUsername()
-                + ": '" + msg.getMsg().getContent() + '\'');
-        Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
+        if (!msg.isLobbyChatMessage()) {
+            LOG.debug("Received Chat Message from " + msg.getMsg().getAuthor().getUsername()
+                    + ": '" + msg.getMsg().getContent() + " for Global chat");
+            Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
+        }
     }
 
     /**
@@ -259,7 +266,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
+        if (!msg.isLobbyChatMessage()) {
+            Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
+        }
     }
 
     /**
@@ -278,7 +287,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
+        if (!msg.isLobbyChatMessage()) {
+            Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
+        }
     }
 
     /**
@@ -296,8 +307,10 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
-        LOG.debug(msg.getChatHistory());
-        updateChatMessageList(msg.getChatHistory());
+        if (msg.getLobbyName() == null) {
+            LOG.debug(msg.getChatHistory());
+            updateChatMessageList(msg.getChatHistory());
+        }
     }
 
     /**
@@ -387,6 +400,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getName()));
             lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getName());
+            lobbyService.refreshLobbyPresenterFields(createLobbyResponse.getName(), loggedInUser);
         });
     }
 
@@ -528,6 +542,7 @@ public class MainMenuPresenter extends AbstractPresenter {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
             lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
+            lobbyService.refreshLobbyPresenterFields(joinLobbyResponse.getName(), loggedInUser);
         });
     }
 
@@ -608,7 +623,6 @@ public class MainMenuPresenter extends AbstractPresenter {
         messageField.clear();
         chatService.newMessage(loggedInUser, msg);
     }
-
 
     /**
      * Method called when the DeleteMessageButton is pressed

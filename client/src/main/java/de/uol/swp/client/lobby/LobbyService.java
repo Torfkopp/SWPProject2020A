@@ -2,10 +2,12 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -43,6 +45,10 @@ public class LobbyService {
     public void createNewLobby(String name, UserDTO user) {
         CreateLobbyRequest createLobbyRequest = new CreateLobbyRequest(name, user);
         eventBus.post(createLobbyRequest);
+    }
+
+    public void refreshLobbyPresenterFields(String lobbyName, User user) {
+        eventBus.post(new LobbyUpdateEvent(lobbyName, user));
     }
 
     /**
