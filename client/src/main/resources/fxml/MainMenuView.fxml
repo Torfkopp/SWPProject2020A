@@ -4,73 +4,82 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane layoutX="-5.0" layoutY="-4.0" prefHeight="410.0" prefWidth="800.0">
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="60.0" />
-         <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="5.0" prefWidth="30.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="109.0" />
-         <ColumnConstraints maxWidth="369.0" minWidth="0.0" prefWidth="167.0" />
-         <ColumnConstraints maxWidth="369.0" minWidth="10.0" prefWidth="35.0" />
-         <ColumnConstraints maxWidth="312.0" minWidth="77.0" prefWidth="197.0" />
-         <ColumnConstraints maxWidth="308.0" minWidth="138.0" prefWidth="261.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="60.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="5.0" prefWidth="30.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="109.0"/>
+            <ColumnConstraints maxWidth="369.0" minWidth="0.0" prefWidth="167.0"/>
+            <ColumnConstraints maxWidth="369.0" minWidth="10.0" prefWidth="35.0"/>
+            <ColumnConstraints maxWidth="312.0" minWidth="77.0" prefWidth="197.0"/>
+            <ColumnConstraints maxWidth="308.0" minWidth="138.0" prefWidth="261.0"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints maxHeight="382.0" minHeight="10.0" prefHeight="68.0" vgrow="SOMETIMES" />
-         <RowConstraints maxHeight="315.0" minHeight="0.0" prefHeight="24.0" />
-         <RowConstraints maxHeight="309.0" minHeight="0.0" prefHeight="280.0" />
-         <RowConstraints maxHeight="90.0" minHeight="28.0" prefHeight="38.0" />
+            <RowConstraints maxHeight="382.0" minHeight="10.0" prefHeight="68.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="315.0" minHeight="0.0" prefHeight="24.0"/>
+            <RowConstraints maxHeight="309.0" minHeight="0.0" prefHeight="280.0"/>
+            <RowConstraints maxHeight="90.0" minHeight="28.0" prefHeight="38.0"/>
         </rowConstraints>
-        <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647" />
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby" GridPane.columnIndex="2" />
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <ListView fx:id="lobbyView" prefHeight="372.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowSpan="2147483647" />
+        <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647"/>
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby"
+                GridPane.columnIndex="2"/>
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby"
+                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+        <ListView fx:id="lobbyView" prefHeight="372.0" prefWidth="200.0" GridPane.columnIndex="3"
+                  GridPane.rowSpan="2147483647"/>
 
-        <VBox prefHeight="385.0" prefWidth="199.0" GridPane.columnIndex="5" GridPane.columnSpan="2147483647" GridPane.rowSpan="2147483647">
+        <VBox prefHeight="385.0" prefWidth="199.0" GridPane.columnIndex="5" GridPane.columnSpan="2147483647"
+              GridPane.rowSpan="2147483647">
             <ListView fx:id="chatView" prefHeight="251.0" prefWidth="426.0" GridPane.columnSpan="2">
                 <VBox.margin>
-                    <Insets bottom="10.0" top="10.0" />
+                    <Insets bottom="10.0" top="10.0"/>
                 </VBox.margin>
             </ListView>
-            <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" prefHeight="25.0" />
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="Send Message">
+            <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" prefHeight="25.0"/>
+            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
+                    text="Send Message">
                 <VBox.margin>
-                    <Insets top="10.0" />
+                    <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="Delete Message">
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
+                    text="Delete Message">
                 <VBox.margin>
-                    <Insets top="10.0" />
+                    <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="Edit Message">
+            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
+                    text="Edit Message">
                 <VBox.margin>
-                    <Insets top="10.0" />
+                    <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
         </VBox>
-      <MenuBar maxWidth="1.7976931348623157E308" prefHeight="25.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
+        <MenuBar maxWidth="1.7976931348623157E308" prefHeight="25.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
 
-          <Menu mnemonicParsing="false" text="Settings">
+            <Menu mnemonicParsing="false" text="Settings">
 
-                  <MenuItem mnemonicParsing="false">
-                     <graphic>
-                          <Button mnemonicParsing="false" onAction="#onChangePasswordButtonPressed" text="Change Password" />
-                     </graphic>
-                  </MenuItem>
-                  <MenuItem mnemonicParsing="false">
-                     <graphic>
-                          <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account" />
-                     </graphic>
-                  </MenuItem>
-              <MenuItem mnemonicParsing="false">
-                     <graphic>
-                          <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout" />
-                     </graphic>
-                  </MenuItem>
+                <MenuItem mnemonicParsing="false">
+                    <graphic>
+                        <Button mnemonicParsing="false" onAction="#onChangePasswordButtonPressed"
+                                text="Change Password"/>
+                    </graphic>
+                </MenuItem>
+                <MenuItem mnemonicParsing="false">
+                    <graphic>
+                        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account"/>
+                    </graphic>
+                </MenuItem>
+                <MenuItem mnemonicParsing="false">
+                    <graphic>
+                        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout"/>
+                    </graphic>
+                </MenuItem>
 
-          </Menu>
-      </MenuBar>
+            </Menu>
+        </MenuBar>
 
     </GridPane>
 </AnchorPane>
