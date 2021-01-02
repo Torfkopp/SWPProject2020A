@@ -1,7 +1,6 @@
 <code_scheme name="SWP2020A" version="173">
     <JavaCodeStyleSettings>
         <option name="CLASS_NAMES_IN_JAVADOC" value="2"/>
-        <option name="USE_FQ_CLASS_NAMES" value="true"/>
     </JavaCodeStyleSettings>
     <JetCodeStyleSettings>
         <option name="PACKAGES_TO_USE_STAR_IMPORTS">
@@ -22,6 +21,9 @@
         </option>
     </JetCodeStyleSettings>
     <codeStyleSettings language="JAVA">
+        <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1"/>
+        <option name="KEEP_BLANK_LINES_IN_CODE" value="1"/>
+        <option name="KEEP_BLANK_LINES_BETWEEN_PACKAGE_DECLARATION_AND_HEADER" value="1"/>
         <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0"/>
         <arrangement>
             <groups>
