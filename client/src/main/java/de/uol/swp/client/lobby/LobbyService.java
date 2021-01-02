@@ -47,6 +47,16 @@ public class LobbyService {
         eventBus.post(createLobbyRequest);
     }
 
+    /**
+     * Posts a new instance of the LobbyUpdateEvent on the Eventbus
+     * <p>
+     * This ensures that a new LobbyPresenter will know what Lobby it is
+     * presenting and who the currently logged in User is.
+     *
+     * @param lobbyName The name of the Lobby
+     * @param user      The currently logged in User
+     * @since 2020-12-30
+     */
     public void refreshLobbyPresenterFields(String lobbyName, User user) {
         eventBus.post(new LobbyUpdateEvent(lobbyName, user));
     }

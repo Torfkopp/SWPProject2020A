@@ -13,15 +13,28 @@ public class AskLatestChatMessageRequest extends AbstractChatMessageRequest {
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for AskLatestChatMessageRequests originating from
+     * the global chat. It sets the inherited originLobby attribute to null.
      *
      * @param amount The amount of messages that should be sent back
-     * @since 2020-12-17
      */
     public AskLatestChatMessageRequest(int amount) {
         super(null);
         this.amount = amount;
     }
 
+    /**
+     * Constructor
+     * <p>
+     * This constructor is used for AskLatestChatMessageRequests originating from
+     * a lobby chat. It sets the inherited originLobby attribute to the parameter
+     * provided upon calling the constructor.
+     *
+     * @param amount      The amount of messages that should be sent back
+     * @param originLobby The Lobby the AskLatestChatMessageRequest originated from
+     * @since 2020-12-30
+     */
     public AskLatestChatMessageRequest(int amount, String originLobby) {
         super(originLobby);
         this.amount = amount;
@@ -31,7 +44,6 @@ public class AskLatestChatMessageRequest extends AbstractChatMessageRequest {
      * Getter for the amount attribute
      *
      * @return The amount of ChatMessages the client requested
-     * @since 2020-12-17
      */
     public int getAmount() {
         return amount;

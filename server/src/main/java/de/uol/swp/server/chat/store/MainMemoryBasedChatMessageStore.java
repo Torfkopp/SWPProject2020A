@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.user.User;
-import de.uol.swp.server.chat.ChatManagement;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -145,6 +144,13 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         }
     }
 
+    /**
+     * Helper method to ensure a Map for the originLobby exists before trying
+     * to access it in order to avoid a NullPointerException.
+     *
+     * @param originLobby The Lobby for which to ensure a Map of ChatMessages exists
+     * @since 2021-01-02
+     */
     private void ensureLobbyChatHistory(String originLobby) {
         if (lobbyChatHistories.get(originLobby) == null) {
             lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {

@@ -18,7 +18,7 @@ import de.uol.swp.common.user.User;
  * an existing Lobby, so it cannot be used to determine the Lobby owner.
  * @see de.uol.swp.client.main.MainMenuPresenter
  * @see de.uol.swp.client.lobby.LobbyPresenter
- * @since 2020-01-02
+ * @since 2020-12-30
  */
 public class LobbyUpdateEvent {
     private final String lobbyName;

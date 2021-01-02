@@ -33,7 +33,7 @@ import java.util.Map;
  * @see de.uol.swp.client.AbstractPresenter
  * @see de.uol.swp.client.main.MainMenuPresenter
  * @see de.uol.swp.client.lobby.LobbyPresenter
- * @since 2020-01-02
+ * @since 2021-01-02
  */
 public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
@@ -56,7 +56,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     /**
      * Called by the constructor of inheriting classes to set the Logger
      *
-     * @param log the log of the inheriting class
+     * @param log The Logger of the inheriting class
      */
     public void init(Logger log) {
         LOG = log;
@@ -64,6 +64,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     /**
      * Initialises the Presenter by calling {@code prepareChatVars()}.
+     *
+     * @implNote Called automatically by JavaFX
      */
     @FXML
     protected void initialize() {

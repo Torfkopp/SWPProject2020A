@@ -42,7 +42,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.AbstractPresenterWithChat
-     * @since 2020-01-02
+     * @since 2021-01-02
      */
     public LobbyPresenter() {
         super.init(LogManager.getLogger(LobbyPresenter.class));
@@ -60,7 +60,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
-     * @since 2020-01-02
+     * @since 2020-12-30
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent lobbyUpdateEvent) {

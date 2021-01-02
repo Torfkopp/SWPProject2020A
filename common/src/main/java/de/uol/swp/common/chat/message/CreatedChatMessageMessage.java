@@ -16,15 +16,29 @@ public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for CreatedChatMessageMessages sent to the global chat.
+     * It sets the inherited isLobbyChatMessage to false and sets lobbyName to null.
      *
      * @param msg The ChatMessage that was created
-     * @since 2020-12-17
      */
     public CreatedChatMessageMessage(ChatMessage msg) {
         super(false);
         this.msg = msg;
     }
 
+    /**
+     * Constructor
+     * <p>
+     * This constructor is used for CreatedChatMessageMessages sent to a lobby chat.
+     * It sets the inherited isLobbyChatMessage and lobbyName attributes to the
+     * parameters provided upon calling the constructor.
+     *
+     * @param msg                The ChatMessage that was created
+     * @param isLobbyChatMessage Whether this CreatedChatMessageMessage is being sent to a lobby chat
+     * @param lobbyName          The Lobby this CreatedChatMessageMessage is being sent to
+     * @since 2020-12-30
+     */
     public CreatedChatMessageMessage(ChatMessage msg, boolean isLobbyChatMessage, String lobbyName) {
         super(isLobbyChatMessage, lobbyName);
         this.msg = msg;
@@ -34,7 +48,6 @@ public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
      * Getter for the created ChatMessage attribute
      *
      * @return The created ChatMessage
-     * @since 2020-12-17
      */
     public ChatMessage getMsg() {
         return msg;

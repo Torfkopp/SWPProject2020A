@@ -17,10 +17,12 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for NewChatMessageRequests originating from
+     * the global chat. It sets the inherited originLobby attribute to null.
      *
      * @param author  The author of the ChatMessage that should be saved
      * @param content The content of the ChatMessage that should be saved
-     * @since 2020-12-17
      */
     public NewChatMessageRequest(User author, String content) {
         super(null);
@@ -28,6 +30,18 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
         this.content = content;
     }
 
+    /**
+     * Constructor
+     * <p>
+     * This constructor is used for NewChatMessageRequests originating from
+     * a lobby chat. It sets the inherited originLobby attribute to the parameter
+     * provided upon calling the constructor.
+     *
+     * @param author      The author of the ChatMessage that should be saved
+     * @param content     The content of the ChatMessage that should be saved
+     * @param originLobby The Lobby the NewChatMessageRequest originated from
+     * @since 2020-12-30
+     */
     public NewChatMessageRequest(User author, String content, String originLobby) {
         super(originLobby);
         this.author = author;
@@ -38,7 +52,6 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
      * Getter for the author attribute
      *
      * @return the author of the ChatMessage that should be saved
-     * @since 2020-12-17
      */
     public User getAuthor() {
         return author;
@@ -48,7 +61,6 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
      * Getter for the content attribute
      *
      * @return the content of the ChatMessage that should be saved
-     * @since 2020-12-17
      */
     public String getContent() {
         return content;

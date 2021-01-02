@@ -58,6 +58,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private ListView<String> usersView;
 
+    /**
+     * Constructor
+     * <p>
+     * This constructor calls the init method of the AbstractPresenterWithChat
+     * to set the appropriate Logger.
+     *
+     * @since 2021-01-02
+     */
     public MainMenuPresenter() {
         super.init(LogManager.getLogger(MainMenuPresenter.class));
     }

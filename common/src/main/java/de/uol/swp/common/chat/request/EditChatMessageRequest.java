@@ -14,10 +14,12 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for EditChatMessageRequests originating from
+     * the global chat. It sets the inherited originLobby attribute to null.
      *
-     * @param id      The id of the ChatMessage that should be updated
+     * @param id      The ID of the ChatMessage that should be updated
      * @param content The content of the ChatMessage that should be updated
-     * @since 2020-12-17
      */
     public EditChatMessageRequest(int id, String content) {
         super(null);
@@ -25,6 +27,18 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
         this.content = content;
     }
 
+    /**
+     * Constructor
+     * <p>
+     * This constructor is used for EditChatMessageRequests originating from
+     * a lobby chat. It sets the inherited originLobby attribute to the parameter
+     * provided upon calling the constructor.
+     *
+     * @param id          The ID of the ChatMessage that should be edited
+     * @param content     The content of the ChatMessage that should be updated
+     * @param originLobby The Lobby the EditChatMessageRequest originated from
+     * @since 2020-12-30
+     */
     public EditChatMessageRequest(int id, String content, String originLobby) {
         super(originLobby);
         this.id = id;
@@ -35,7 +49,6 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      * Getter for the ID attribute
      *
      * @return the ID of the ChatMessage that should be updated
-     * @since 2020-12-17
      */
     public int getId() {
         return id;
@@ -45,7 +58,6 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      * Getter for the content attribute
      *
      * @return the content of the ChatMessage that should be updated
-     * @since 2020-12-17
      */
     public String getContent() {
         return content;
