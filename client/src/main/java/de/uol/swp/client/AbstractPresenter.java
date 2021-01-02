@@ -8,7 +8,7 @@ import de.uol.swp.client.user.ClientUserService;
 /**
  * This class is the base for creating a new Presenter.
  * <p>
- * This class prepares the child classes to have the UserService and EventBus set
+ * This class prepares the child classes to have the UserService, the LobbyService, and EventBus set
  * in order to reduce unnecessary code repetition.
  *
  * @author Marco Grawunder

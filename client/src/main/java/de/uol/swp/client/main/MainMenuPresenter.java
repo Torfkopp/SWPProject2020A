@@ -1,14 +1,11 @@
 package de.uol.swp.client.main;
 
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
-import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
-import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
@@ -40,6 +37,7 @@ import java.util.Optional;
  * Manages the main menu
  *
  * @author Marco Grawunder
+ * @see de.uol.swp.client.AbstractPresenter
  * @see de.uol.swp.client.AbstractPresenterWithChat
  * @since 2019-08-29
  */
@@ -157,22 +155,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         updateUsersList(allUsersResponse.getUsers());
     }
 
-    /**
-     * Handles new incoming ChatMessage
-     * <p>
-     * If a CreatedChatMessageMessage is posted to the EventBus, this method
-     * puts the incoming ChatMessage's content into the chatMessageMap with the
-     * ChatMessage's ID as the key.
-     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
-     * the incoming ChatMessage's content is displayed in the log.
-     *
-     * @param msg The CreatedChatMessageMessage object found on the EventBus
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
-     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
-     * @since 2020-12-17
-     */
+    @Override
     @Subscribe
     public void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) {
@@ -180,19 +163,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         }
     }
 
-    /**
-     * Handles incoming notification that a ChatMessage was deleted
-     * <p>
-     * If a DeletedChatMessageMessage is posted to the EventBus, this method
-     * removes the ChatMessage with the corresponding ID from the chatMessageMap.
-     *
-     * @param msg The DeletedChatMessageMessage found on the EventBus
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
-     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
-     * @since 2020-12-17
-     */
+    @Override
     @Subscribe
     public void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) {
@@ -200,20 +171,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         }
     }
 
-    /**
-     * Handles incoming notification that a ChatMessage was edited
-     * <p>
-     * If an EditedChatMessageMessage is posted to the EventBus, this method
-     * replaces the content in the chatMessageMap that is stored under the
-     * edited ChatMessage's ID.
-     *
-     * @param msg The EditedChatMessageMessage found on the EventBus
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
-     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
-     * @since 2020-12-17
-     */
+    @Override
     @Subscribe
     public void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) {
@@ -221,40 +179,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         }
     }
 
-    /**
-     * Handles AskLatestChatMessageResponse
-     * <p>
-     * If a AskLatestChatMessageResponse is found on the EventBus,
-     * this method calls updateChatMessageList to fill or update the ChatMessageList.
-     *
-     * @param msg The AskLatestChatMessageResponse found on the EventBus
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.common.chat.response.AskLatestChatMessageResponse
-     * @since 2020-12-17
-     */
+    @Override
     @Subscribe
     public void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
         if (msg.getLobbyName() == null) {
             super.onAskLatestChatMessageResponse(msg);
         }
-    }
-
-    /**
-     * Method to update the ChatMessageList with a given List of ChatMessages
-     *
-     * @param chatMessageList The List of ChatMessages to insert into the
-     *                        chatMessageMap
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
-     * @since 2020-12-17
-     */
-    private void updateChatMessageList(List<ChatMessage> chatMessageList) {
-        Platform.runLater(() -> {
-            chatMessages.clear();
-            chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), m));
-        });
     }
 
     /**
@@ -484,6 +414,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @param event The ActionEvent generated by pressing the logout button
      * @author Phillip-André Suhr
+     * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
@@ -506,7 +437,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @param event The ActionEvent generated by pressing the delete user button
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.main.MainMenuPresenter#resetCharVars()
+     * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService

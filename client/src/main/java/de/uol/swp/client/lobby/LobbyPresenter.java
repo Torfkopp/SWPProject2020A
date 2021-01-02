@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * Manages the lobby menu
  *
+ * @see de.uol.swp.client.AbstractPresenter
  * @see de.uol.swp.client.AbstractPresenterWithChat
  * @since 2020-11-21
  */
@@ -36,21 +37,38 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private ListView<String> membersView;
 
     /**
-     * Default Constructor
+     * Constructor
      *
-     * @since 2020-11-21
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.AbstractPresenterWithChat
+     * @since 2020-01-02
      */
     public LobbyPresenter() {
         super.init(LogManager.getLogger(LobbyPresenter.class));
     }
 
+    /**
+     * Handles LobbyUpdateEvents on the EventBus
+     * <p>
+     * If a new LobbyUpdateEvent is posted to the EventBus, this method checks
+     * whether the lobbyName and/or loggedInUser attributes of the current
+     * LobbyPresenter are null. If they are, it sets these attributes to the
+     * values found in the LobbyUpdateEvent.
+     *
+     * @param lobbyUpdateEvent the lobby update event
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
+     * @since 2020-01-02
+     */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent lobbyUpdateEvent) {
-        if (super.lobbyName == null) {
+        if (super.lobbyName == null || loggedInUser == null) {
             super.lobbyName = lobbyUpdateEvent.getLobbyName();
             super.loggedInUser = lobbyUpdateEvent.getUser();
             super.chatService.askLatestMessages(10, super.lobbyName);
-        } else System.out.println("not for me?");
+        }
     }
 
     /**
@@ -67,7 +85,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-22
      */
     @Subscribe
-    public void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
+    private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
         LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
         updateUsersList(allLobbyMembersResponse.getUsers());
     }
@@ -85,7 +103,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-22
      */
     @Subscribe
-    public void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
+    private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
@@ -119,13 +137,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         });
     }
 
-    @Subscribe
-    private void onAskLatestChatMessagesResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName().equals(super.lobbyName)) {
-            super.onAskLatestChatMessageResponse(rsp);
-        }
-    }
-
+    @Override
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
@@ -133,6 +145,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
+    @Override
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
@@ -140,10 +153,19 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
+    @Override
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onEditedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
+        if (rsp.getLobbyName().equals(super.lobbyName)) {
+            super.onAskLatestChatMessageResponse(rsp);
         }
     }
 }
