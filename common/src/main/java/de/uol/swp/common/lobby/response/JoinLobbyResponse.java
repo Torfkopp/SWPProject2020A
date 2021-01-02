@@ -5,12 +5,12 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 public class JoinLobbyResponse extends AbstractResponseMessage {
 
     private final String name;
+
     /**
      * Constructor
      *
      * @param name the name for the new lobby
      * @since 2020-12-21
-     *
      **/
     public JoinLobbyResponse(String name) {
         this.name = name;

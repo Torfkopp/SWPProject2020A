@@ -79,7 +79,6 @@ class UserManagementTest {
         management.logout(userToLogin);
 
         assertFalse(management.isLoggedIn(userToLogin));
-
     }
 
     @Test
@@ -121,7 +120,6 @@ class UserManagementTest {
         User userToCreate = users.get(0);
 
         assertThrows(UserManagementException.class, () -> management.createUser(userToCreate));
-
     }
 
     @Test
@@ -167,7 +165,6 @@ class UserManagementTest {
 
         management.login(updatedUser.getUsername(), updatedUser.getPassword());
         assertTrue(management.isLoggedIn(updatedUser));
-
     }
 
     @Test
@@ -189,6 +186,4 @@ class UserManagementTest {
         // TODO: typically, there should be no logic in tests
         allUsers.forEach(u -> assertEquals(u.getPassword(), ""));
     }
-
-
 }

@@ -3,6 +3,7 @@ package de.uol.swp.client.main;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.lobby.LobbyService;
@@ -13,9 +14,9 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
@@ -23,7 +24,6 @@ import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -59,30 +59,31 @@ public class MainMenuPresenter extends AbstractPresenter {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     private ObservableList<String> users;
-    private ObservableMap<Integer, ChatMessage> chatMessageMap;
+
     private ObservableList<String> chatMessages;
+    private ObservableMap<Integer, ChatMessage> chatMessageMap;
 
     private ObservableList<String> lobbies;
 
     private User loggedInUser;
 
     @Inject
-    private LobbyService lobbyService;
+    private ChatService chatService;
 
     @Inject
-    private ChatService chatService;
+    private LobbyService lobbyService;
 
     @FXML
     private ListView<String> chatView;
+
+    @FXML
+    private ListView<String> lobbyView;
 
     @FXML
     private ListView<String> usersView;
 
     @FXML
     private TextField messageField;
-
-    @FXML
-    private ListView<String> lobbyView;
 
     /**
      * Handles successful login
@@ -103,47 +104,6 @@ public class MainMenuPresenter extends AbstractPresenter {
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
-    }
-
-    /**
-     * Prepares the variables used for the chat storage and management
-     * <p>
-     * This method is called on a successful login and ensures that
-     * the used variables chatMessageMap and chatMessages aren't null,
-     * sets the items of the chatView to the chatMessages observableList,
-     * and adds a MapChangeListener that manages the displayed ChatMessages.
-     *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @since 2020-12-20
-     */
-    private void prepareChatVars() {
-        if (chatMessageMap == null) chatMessageMap = FXCollections.observableHashMap();
-        if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
-        chatView.setItems(chatMessages);
-        chatMessageMap.addListener((MapChangeListener<Integer, ChatMessage>) change -> {
-            if (change.wasAdded() && !change.wasRemoved()) {
-                chatMessages.add(change.getValueAdded().toString());
-            } else if (!change.wasAdded() && change.wasRemoved()) {
-                for (int i = 0; i < chatMessages.size(); i++) {
-                    String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved().toString())) {
-                        chatMessages.remove(i);
-                        break;
-                    }
-                }
-                chatMessages.remove(change.getValueRemoved().toString());
-            } else if (change.wasAdded() && change.wasRemoved()) {
-                for (int i = 0; i < chatMessages.size(); i++) {
-                    String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved().toString())) {
-                        chatMessages.remove(i);
-                        chatMessages.add(i, change.getValueAdded().toString());
-                        break;
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -175,7 +135,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     public void newUser(UserLoggedInMessage message) {
-
         LOG.debug("New user " + message.getUsername() + " logged in");
         Platform.runLater(() -> {
             if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUsername()))
@@ -232,8 +191,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The CreatedChatMessageMessage object found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see CreatedChatMessageMessage
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     @Subscribe
@@ -252,8 +211,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The DeletedChatMessageMessage found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see DeletedChatMessageMessage
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     @Subscribe
@@ -271,8 +230,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The EditedChatMessageMessage found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see EditedChatMessageMessage
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     @Subscribe
@@ -289,8 +248,8 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param msg The AskLatestChatMessageResponse found on the EventBus
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see AskLatestChatMessageResponse
-     * @see MainMenuPresenter#updateChatMessageList(List)
+     * @see de.uol.swp.common.chat.response.AskLatestChatMessageResponse
+     * @see de.uol.swp.client.main.MainMenuPresenter#updateChatMessageList(List)
      * @since 2020-12-17
      */
     @Subscribe
@@ -306,7 +265,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      *                        chatMessageMap
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
@@ -353,12 +312,11 @@ public class MainMenuPresenter extends AbstractPresenter {
      *
      * @param msg the LobbyCreatedMessage object seen on the EventBus
      * @author Temmo Junkhoff
-     * @see LobbyCreatedMessage
+     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2020-12-17
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
-
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to add Lobby without name to LobbyList ");
         } else {
@@ -377,9 +335,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      * able to display all members from the beginning.
      *
      * @param createLobbyResponse The CreateLobbyResponse object found on the EventBus
-     * @see CreateLobbyResponse
-     * @see ShowLobbyViewEvent
-     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
      * @since 2020-12-20
      */
     @Subscribe
@@ -401,12 +359,11 @@ public class MainMenuPresenter extends AbstractPresenter {
      *
      * @param msg the LobbyDeletedMessage object seen on the EventBus
      * @author Temmo Junkhoff
-     * @see LobbyDeletedMessage
+     * @see de.uol.swp.common.lobby.message.LobbyDeletedMessage
      * @since 2020-12-17
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
-
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to delete Lobby without name from LobbyList ");
         } else {
@@ -414,7 +371,6 @@ public class MainMenuPresenter extends AbstractPresenter {
             LOG.debug("Removed Lobby from LobbyList " + msg.getName());
         }
     }
-
 
     /**
      * Handles new list of lobbies
@@ -448,7 +404,6 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.lobby.dto.LobbyDTO
      * @since 2020-11-29
      */
-
     private void updateLobbyList(List<String> lobbyList) {
         LOG.debug("Update Lobby List");
         Platform.runLater(() -> {
@@ -501,17 +456,14 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     @FXML
     void onJoinLobby(ActionEvent event) {
-        String lobbyName;
-
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
-            lobbyName = lobbyView.getSelectionModel().getSelectedItem();
+            String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
             lobbyService.joinLobby(lobbyName, loggedInUser);
         }
-
     }
 
     /**
@@ -524,9 +476,9 @@ public class MainMenuPresenter extends AbstractPresenter {
      * able to display all members from the beginning.
      *
      * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
-     * @see JoinLobbyResponse
-     * @see ShowLobbyViewEvent
-     * @see LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
      * @since 2020-12-20
      */
     @Subscribe
@@ -541,12 +493,14 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Method called when the logout button is pressed
      * <p>
      * This method is called when the logout button is pressed. It calls the
-     * logout(user) method of the UserService to log out the user and posts an
+     * logout(user) method of the UserService to log out the user, resets the
+     * variables used for storing the chat history, and then posts an
      * instance of the ShowLoginViewEvent to the EventBus the SceneManager
      * is subscribed to.
      *
      * @param event The ActionEvent generated by pressing the logout button
      * @author Phillip-André Suhr
+     * @see de.uol.swp.client.main.MainMenuPresenter#resetCharVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
@@ -554,19 +508,22 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     public void onLogoutButtonPressed(ActionEvent event) {
         userService.logout(loggedInUser);
+        resetCharVars();
         eventBus.post(showLoginViewMessage);
     }
 
     /**
      * Method called when the delete user button is pressed
      * <p>
-     * This method is called when the delete user button is pressed. It first calls the
-     * UserService to log the user out, then posts an instance of the
-     * ShowLoginViewEvent to the EventBus the SceneManager is subscribed to, and finally
-     * calls the UserService to drop the user.
+     * This method is called when the delete user button is pressed. It first
+     * calls the UserService to log the user out, resets the variables used
+     * for storing the chat history, and then posts an instance of the
+     * ShowLoginViewEvent to the EventBus the SceneManager is subscribed to,
+     * and finally calls the UserService to drop the user.
      *
      * @param event The ActionEvent generated by pressing the delete user button
      * @author Phillip-André Suhr
+     * @see de.uol.swp.client.main.MainMenuPresenter#resetCharVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
@@ -574,6 +531,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      */
     public void onDeleteButtonPressed(ActionEvent event) {
         userService.logout(loggedInUser);
+        resetCharVars();
         eventBus.post(showLoginViewMessage);
         userService.dropUser(loggedInUser);
     }
@@ -605,7 +563,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param event the event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatService
+     * @see de.uol.swp.client.chat.ChatService
      * @since 2020-12-17
      */
     @FXML
@@ -625,7 +583,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param event the event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatService
+     * @see de.uol.swp.client.chat.ChatService
      * @since 2020-12-17
      */
     @FXML
@@ -646,7 +604,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @param event the event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see ChatService
+     * @see de.uol.swp.client.chat.ChatService
      * @since 2020-12-17
      */
     @FXML
@@ -664,7 +622,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @return The ID of the message that was searched
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
-     * @see MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
     private Integer findId() {
@@ -678,5 +636,65 @@ public class MainMenuPresenter extends AbstractPresenter {
             }
         }
         return msgId;
+    }
+
+    /**
+     * Prepares the variables used for the chat storage and management
+     * <p>
+     * This method is called on a successful login and ensures that
+     * the used variables chatMessageMap and chatMessages aren't null,
+     * sets the items of the chatView to the chatMessages observableList,
+     * and adds a MapChangeListener that manages the displayed ChatMessages.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2020-12-20
+     */
+    private void prepareChatVars() {
+        if (chatMessageMap == null) chatMessageMap = FXCollections.observableHashMap();
+        if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
+        chatView.setItems(chatMessages);
+        chatMessageMap.addListener((MapChangeListener<Integer, ChatMessage>) change -> {
+            if (change.wasAdded() && !change.wasRemoved()) {
+                chatMessages.add(change.getValueAdded().toString());
+            } else if (!change.wasAdded() && change.wasRemoved()) {
+                for (int i = 0; i < chatMessages.size(); i++) {
+                    String text = chatMessages.get(i);
+                    if (text.equals(change.getValueRemoved().toString())) {
+                        chatMessages.remove(i);
+                        break;
+                    }
+                }
+                chatMessages.remove(change.getValueRemoved().toString());
+            } else if (change.wasAdded() && change.wasRemoved()) {
+                for (int i = 0; i < chatMessages.size(); i++) {
+                    String text = chatMessages.get(i);
+                    if (text.equals(change.getValueRemoved().toString())) {
+                        chatMessages.remove(i);
+                        chatMessages.add(i, change.getValueAdded().toString());
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Nulls the chatMessageMap and chatMessages variables
+     * <p>
+     * This method is called on pressing the logout or the delete account button, and
+     * ensures that the chatMessageMap and chatMessages are reset to null, to avoid
+     * multiple instances of the chat being displayed in the chatView.
+     *
+     * @author Finn Haase
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
+     * @see de.uol.swp.client.main.MainMenuPresenter#chatMessages
+     * @see de.uol.swp.client.main.MainMenuPresenter#prepareChatVars()
+     * @since 2020-12-26
+     */
+    private void resetCharVars() {
+        chatMessageMap = null;
+        chatMessages = null;
     }
 }

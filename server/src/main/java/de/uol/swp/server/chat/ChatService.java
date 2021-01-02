@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see AbstractService
+ * @see de.uol.swp.server.AbstractService
  * @since 2020-12-16
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -59,9 +59,9 @@ public class ChatService extends AbstractService {
      * CreatedChatMessageMessage is posted on the EventBus, otherwise nothing happens.
      *
      * @param msg The NewChatMessageRequest found on the EventBus
-     * @see ChatManagement#createChatMessage(User, String)
-     * @see NewChatMessageRequest
-     * @see CreatedChatMessageMessage
+     * @see de.uol.swp.server.chat.ChatManagement#createChatMessage(User, String)
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
      * @since 2020-12-17
      */
     @Subscribe
@@ -87,9 +87,9 @@ public class ChatService extends AbstractService {
      * DeleteChatMessageMessage is posted on the EventBus, otherwise nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
-     * @see ChatManagement#dropChatMessage(int)
-     * @see DeleteChatMessageRequest
-     * @see DeletedChatMessageMessage
+     * @see de.uol.swp.server.chat.ChatManagement#dropChatMessage(int)
+     * @see de.uol.swp.common.chat.request.DeleteChatMessageRequest
+     * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
      * @since 2020-12-17
      */
     @Subscribe
@@ -114,9 +114,9 @@ public class ChatService extends AbstractService {
      * EditedChatMessageMessage is posted on the EventBus, otherwise nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
-     * @see ChatManagement#updateChatMessage(int, String)
-     * @see EditChatMessageRequest
-     * @see EditedChatMessageMessage
+     * @see de.uol.swp.server.chat.ChatManagement#updateChatMessage(int, String)
+     * @see de.uol.swp.common.chat.request.EditChatMessageRequest
+     * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
      * @since 2020-12-17
      */
     @Subscribe
@@ -142,9 +142,9 @@ public class ChatService extends AbstractService {
      * It then posts a AskLatestChatMessageResponse on the EventBus.
      *
      * @param msg The AskLatestChatMessageRequest found on the EventBus
-     * @see ChatManagement#getLatestMessages(int)
-     * @see AskLatestChatMessageRequest
-     * @see AskLatestChatMessageResponse
+     * @see de.uol.swp.server.chat.ChatManagement#getLatestMessages(int)
+     * @see de.uol.swp.common.chat.request.AskLatestChatMessageRequest
+     * @see de.uol.swp.common.chat.response.AskLatestChatMessageResponse
      * @since 2020-12-17
      */
     @Subscribe

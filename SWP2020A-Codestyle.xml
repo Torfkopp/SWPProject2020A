@@ -1,0 +1,41 @@
+<code_scheme name="SWP2020A" version="173">
+    <JavaCodeStyleSettings>
+        <option name="CLASS_NAMES_IN_JAVADOC" value="2"/>
+    </JavaCodeStyleSettings>
+    <JetCodeStyleSettings>
+        <option name="PACKAGES_TO_USE_STAR_IMPORTS">
+            <value>
+                <package name="java.util" alias="false" withSubpackages="false"/>
+                <package name="kotlinx.android.synthetic" alias="false" withSubpackages="true"/>
+                <package name="io.ktor" alias="false" withSubpackages="true"/>
+            </value>
+        </option>
+        <option name="PACKAGES_IMPORT_LAYOUT">
+            <value>
+                <package name="" alias="false" withSubpackages="true"/>
+                <package name="java" alias="false" withSubpackages="true"/>
+                <package name="javax" alias="false" withSubpackages="true"/>
+                <package name="kotlin" alias="false" withSubpackages="true"/>
+                <package name="" alias="true" withSubpackages="true"/>
+            </value>
+        </option>
+    </JetCodeStyleSettings>
+    <codeStyleSettings language="JAVA">
+        <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1"/>
+        <option name="KEEP_BLANK_LINES_IN_CODE" value="1"/>
+        <option name="KEEP_BLANK_LINES_BETWEEN_PACKAGE_DECLARATION_AND_HEADER" value="1"/>
+        <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0"/>
+        <arrangement>
+            <groups>
+                <group>
+                    <type>GETTERS_AND_SETTERS</type>
+                    <order>KEEP</order>
+                </group>
+                <group>
+                    <type>OVERRIDDEN_METHODS</type>
+                    <order>KEEP</order>
+                </group>
+            </groups>
+        </arrangement>
+    </codeStyleSettings>
+</code_scheme>

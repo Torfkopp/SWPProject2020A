@@ -9,6 +9,7 @@ import java.util.Objects;
  * e.g.: The username is already taken
  *
  * @author Marco Grawunder
+ * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2019-09-02
  */
 public class RegistrationExceptionMessage extends AbstractResponseMessage {
@@ -21,13 +22,18 @@ public class RegistrationExceptionMessage extends AbstractResponseMessage {
      * @param message String containing the reason why the registration failed
      * @since 2019-09-02
      */
-    public RegistrationExceptionMessage(String message){
+    public RegistrationExceptionMessage(String message) {
         this.message = message;
     }
 
     @Override
     public String toString() {
-        return "RegistrationExceptionMessage "+message;
+        return "RegistrationExceptionMessage " + message;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(message);
     }
 
     @Override
@@ -36,10 +42,5 @@ public class RegistrationExceptionMessage extends AbstractResponseMessage {
         if (o == null || getClass() != o.getClass()) return false;
         RegistrationExceptionMessage that = (RegistrationExceptionMessage) o;
         return Objects.equals(message, that.message);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(message);
     }
 }

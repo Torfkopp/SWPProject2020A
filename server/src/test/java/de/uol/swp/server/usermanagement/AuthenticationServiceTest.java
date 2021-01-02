@@ -28,17 +28,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnstableApiUsage")
 class AuthenticationServiceTest {
 
-    private final CountDownLatch lock = new CountDownLatch(1);
-
     final User user = new UserDTO("name", "password", "email@test.de");
     final User user2 = new UserDTO("name2", "password2", "email@test.de2");
     final User user3 = new UserDTO("name3", "password3", "email@test.de3");
-
-
     final UserStore userStore = new MainMemoryBasedUserStore();
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(userStore);
     final AuthenticationService authService = new AuthenticationService(bus, userManagement);
+    private final CountDownLatch lock = new CountDownLatch(1);
     private Object event;
 
     @Subscribe
@@ -122,7 +119,6 @@ class AuthenticationServiceTest {
 
         assertEquals(((AllOnlineUsersResponse) event).getUsers().size(), 1);
         assertEquals(((AllOnlineUsersResponse) event).getUsers().get(0), user);
-
     }
 
     // TODO: replace with parametrized test
@@ -147,7 +143,6 @@ class AuthenticationServiceTest {
 
         Collections.sort(returnedUsers);
         assertEquals(returnedUsers, users);
-
     }
 
 
@@ -160,7 +155,6 @@ class AuthenticationServiceTest {
         assertTrue(event instanceof AllOnlineUsersResponse);
 
         assertTrue(((AllOnlineUsersResponse) event).getUsers().isEmpty());
-
     }
 
     @Test
@@ -172,7 +166,6 @@ class AuthenticationServiceTest {
         users.add(user);
         users.add(user2);
         users.add(user3);
-
 
         Optional<Session> session1 = authService.getSession(user);
         Optional<Session> session2 = authService.getSession(user2);
@@ -188,7 +181,5 @@ class AuthenticationServiceTest {
         assertTrue(sessions.contains(session1.get()));
         assertTrue(sessions.contains(session2.get()));
         assertTrue(sessions.contains(session3.get()));
-
     }
-
 }

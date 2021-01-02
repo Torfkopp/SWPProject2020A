@@ -49,6 +49,5 @@ class UserMessageSerializableTest {
                 RegisterUserRequest.class));
         assertTrue(SerializationTestHelper.checkSerializableAndDeserializable(new RetrieveAllOnlineUsersRequest(),
                 RetrieveAllOnlineUsersRequest.class));
-
     }
 }

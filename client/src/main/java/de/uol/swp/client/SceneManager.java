@@ -5,20 +5,20 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
+import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
+import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
+import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
+import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
-import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
+import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
-import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
-import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
-import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -47,17 +47,16 @@ public class SceneManager {
     static final Logger LOG = LogManager.getLogger(SceneManager.class);
     static final String styleSheet = "css/swp.css";
 
-    final private Stage primaryStage;
+    private final Stage primaryStage;
+    private final Map<String, Scene> lobbyScenes = new HashMap<>();
+    private final Injector injector;
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
     private Scene mainScene;
-    private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
-
-    private final Injector injector;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
@@ -168,6 +167,8 @@ public class SceneManager {
      * FXML file.
      *
      * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.ChangePasswordPresenter
+     * @since 2020-12-19
      */
     private void initChangePasswordView() {
         if (ChangePasswordScene == null) {
@@ -176,7 +177,6 @@ public class SceneManager {
             ChangePasswordScene.getStylesheets().add(styleSheet);
         }
     }
-
 
     /**
      * Handles ShowRegistrationViewEvent detected on the EventBus
@@ -202,6 +202,8 @@ public class SceneManager {
      * screen.
      *
      * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @since 2020-12-19
      */
     @Subscribe
     public void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
@@ -260,7 +262,7 @@ public class SceneManager {
         lobbyStage.setTitle(lobbyName);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 400, 200);
+        Scene lobbyScene = new Scene(rootPane, 600, 400);
         lobbyScene.getStylesheets().add(styleSheet);
         lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene
@@ -313,6 +315,8 @@ public class SceneManager {
      * called. It calls a method to show the screen shown before Change Password screen.
      *
      * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent
+     * @since 2020-12-19
      */
     @Subscribe
     public void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
@@ -341,6 +345,8 @@ public class SceneManager {
      * called. It shows the error message of the event in a error alert.
      *
      * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent
+     * @since 2020-12-19
      */
     @Subscribe
     public void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
@@ -461,11 +467,10 @@ public class SceneManager {
      * the window to "Change Password"
      *
      * @author Eric Vuong
+     * @since 2020-12-19
      */
     public void showChangePasswordScreen(User user) {
         ChangePasswordScene.setUserData(user);
         showScene(ChangePasswordScene, "Change Password");
     }
-
-
 }

@@ -21,7 +21,6 @@ import java.util.List;
  *
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2020-11-21
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 public class LobbyPresenter extends AbstractPresenter {
@@ -35,10 +34,10 @@ public class LobbyPresenter extends AbstractPresenter {
     private User creator;
 
     @FXML
-    private ListView<String> membersView;
+    private ListView<String> chatView;
 
     @FXML
-    private ListView<String> chatView;
+    private ListView<String> membersView;
 
     /**
      * Default Constructor
@@ -46,12 +45,11 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-21
      */
     public LobbyPresenter() {
-
     }
 
     /**
      * Handles new list of users
-     *
+     * <p>
      * If a new AllOnlineUsersResponse object is posted to the EventBus the names
      * of currently logged in members are put onto the list of lobby members.
      * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
@@ -70,7 +68,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Handles new joined users
-     *
+     * <p>
      * If a new UserJoinedLobbyMessage object is posted to the EventBus the name of the newly
      * joined user is appended to the user list in the lobby menu.
      * Furthermore if the LOG-Level is set to DEBUG the message "New user {@literal
@@ -91,7 +89,7 @@ public class LobbyPresenter extends AbstractPresenter {
 
     /**
      * Updates the lobby's member list according to the list given
-     *
+     * <p>
      * This method clears the entire member list and then adds the name of each user
      * in the list given to the lobby's member list. If there is no member list
      * this it creates one.
@@ -116,12 +114,14 @@ public class LobbyPresenter extends AbstractPresenter {
     }
 
     @FXML
-    private void onSendMessageButton(ActionEvent event){}
+    private void onSendMessageButton(ActionEvent event) {
+    }
 
     @FXML
-    private void onDeleteMessageButton(ActionEvent event){}
+    private void onDeleteMessageButton(ActionEvent event) {
+    }
 
     @FXML
-    private void onEditMessageButton(ActionEvent event){}
-
+    private void onEditMessageButton(ActionEvent event) {
+    }
 }

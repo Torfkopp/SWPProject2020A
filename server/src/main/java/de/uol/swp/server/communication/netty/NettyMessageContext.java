@@ -10,8 +10,8 @@ import java.util.Objects;
 /**
  * This class is used to encapsulate a netty channel handler context
  *
- * @see de.uol.swp.common.message.MessageContext
  * @author Marco Grawunder
+ * @see de.uol.swp.common.message.MessageContext
  * @since 2019-11-20
  */
 class NettyMessageContext implements MessageContext {
@@ -50,15 +50,15 @@ class NettyMessageContext implements MessageContext {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(ctx);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NettyMessageContext that = (NettyMessageContext) o;
         return Objects.equals(ctx, that.ctx);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(ctx);
     }
 }

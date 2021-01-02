@@ -2,7 +2,6 @@ package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
-import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import java.util.Map;
  *
  * @author Mario
  * @see de.uol.swp.common.message.AbstractResponseMessage
- * @see RetrieveAllLobbiesRequest
+ * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
  * @see de.uol.swp.common.lobby.Lobby
  * @since 2020-12-12
  */
@@ -59,8 +58,8 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     /**
      * Getter for the list of existing Lobby objects
      *
+     * @return list of existing lobbyDTOs
      * @author Marvin
-     * @return List of existing Lobby objects
      * @since 2020-12-16
      */
     public List<Lobby> getLobbies() {

@@ -6,9 +6,9 @@ import de.uol.swp.common.user.User;
 /**
  * Request sent to the server when a user wants to join a lobby
  *
- * @see AbstractLobbyRequest
- * @see de.uol.swp.common.user.User
  * @author Marco Grawunder
+ * @see de.uol.swp.common.lobby.request.AbstractLobbyRequest
+ * @see de.uol.swp.common.user.User
  * @since 2019-10-08
  */
 public class LobbyJoinUserRequest extends AbstractLobbyRequest {
@@ -21,15 +21,15 @@ public class LobbyJoinUserRequest extends AbstractLobbyRequest {
      */
     public LobbyJoinUserRequest() {
     }
+
     /**
      * Constructor
      *
      * @param lobbyName name of the lobby
-     * @param user user who wants to join the lobby
+     * @param user      user who wants to join the lobby
      * @since 2019-10-08
      */
     public LobbyJoinUserRequest(String lobbyName, User user) {
         super(lobbyName, user);
     }
-
 }

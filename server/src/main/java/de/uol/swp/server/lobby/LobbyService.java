@@ -5,13 +5,12 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.request.CreateLobbyRequest;
-import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
-import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
-import de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest;
+import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
+import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
@@ -23,7 +22,10 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Handles the lobby requests send by the users
@@ -35,12 +37,10 @@ import java.util.*;
 @Singleton
 public class LobbyService extends AbstractService {
 
+    private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
-
-    private static final Logger LOG = LogManager.getLogger(LobbyService.class);
-
-    final private List<Lobby> lobbyList = new ArrayList<>();
+    private final List<Lobby> lobbyList = new ArrayList<>();
 
     /**
      * Constructor
@@ -140,7 +140,6 @@ public class LobbyService extends AbstractService {
             post(exceptionMessage);
             LOG.debug(exceptionMessage.getException());
         }
-
     }
 
     /**
@@ -182,7 +181,6 @@ public class LobbyService extends AbstractService {
             message.setReceiver(authenticationService.getSessions(lobby.get().getUsers()));
             post(message);
         }
-
         // TODO: error handling not existing lobby
     }
 

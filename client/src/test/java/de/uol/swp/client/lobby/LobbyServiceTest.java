@@ -13,7 +13,8 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This a test of the class is used to hide the communication details
@@ -21,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Marvin
  * @see LobbyService
  * @since 2020-11-26
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 class LobbyServiceTest {
@@ -34,7 +34,7 @@ class LobbyServiceTest {
 
     /**
      * Handles DeadEvents detected on the EventBus
-     *
+     * <p>
      * If a DeadEvent is detected the event variable of this class gets updated
      * to its event and its event is printed to the console output.
      *
@@ -50,7 +50,7 @@ class LobbyServiceTest {
 
     /**
      * Helper method run before each test case
-     *
+     * <p>
      * This method resets the variable event to null and registers the object of
      * this class to the EventBus.
      *
@@ -64,7 +64,7 @@ class LobbyServiceTest {
 
     /**
      * Helper method run after each test case
-     *
+     * <p>
      * This method only unregisters the object of this class from the EventBus.
      *
      * @since 2020-11-26
@@ -76,7 +76,7 @@ class LobbyServiceTest {
 
     /**
      * Test for the createNewLobby routine
-     *
+     * <p>
      * This Test creates a new LobbyService object registered to the EventBus of
      * this test class. It then calls the createNewLobby function of the object using
      * the name "Test" and defaultUser as parameter and waits for it to post a
@@ -104,7 +104,5 @@ class LobbyServiceTest {
         assertEquals(request.getOwner().getUsername(), defaultUser.getUsername());
         assertEquals(request.getOwner().getPassword(), defaultUser.getPassword());
         assertEquals(request.getOwner().getEMail(), defaultUser.getEMail());
-
     }
-
 }

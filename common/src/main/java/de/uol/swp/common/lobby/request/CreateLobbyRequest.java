@@ -5,9 +5,9 @@ import de.uol.swp.common.user.User;
 /**
  * Request sent to the server when a user wants to create a new lobby
  *
- * @see AbstractLobbyRequest
- * @see de.uol.swp.common.user.User
  * @author Marco Grawunder
+ * @see de.uol.swp.common.lobby.request.AbstractLobbyRequest
+ * @see de.uol.swp.common.user.User
  * @since 2019-10-08
  */
 public class CreateLobbyRequest extends AbstractLobbyRequest {
@@ -23,7 +23,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     /**
      * Constructor
      *
-     * @param name name of the lobby
+     * @param name  name of the lobby
      * @param owner User trying to create the lobby
      * @since 2019-10-08
      */
@@ -51,4 +51,13 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
         return getUser();
     }
 
+    /**
+     * Setter for the user variable
+     *
+     * @param owner User trying to create the lobby
+     * @since 2019-10-08
+     */
+    public void setOwner(User owner) {
+        setUser(owner);
+    }
 }

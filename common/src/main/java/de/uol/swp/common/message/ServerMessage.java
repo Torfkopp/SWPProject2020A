@@ -8,8 +8,8 @@ import java.util.List;
  * A message from server to a number of clients that
  * is not necessary a response to a request (aka server push)
  *
- * @see de.uol.swp.common.message.Message
  * @author Marco Grawunder
+ * @see de.uol.swp.common.message.Message
  * @since 2019-08-07
  */
 public interface ServerMessage extends Message {

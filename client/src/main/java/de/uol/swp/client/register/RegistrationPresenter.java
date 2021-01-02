@@ -19,7 +19,6 @@ import javafx.scene.control.TextField;
  * @author Marco Grawunder
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2019-08-29
- *
  */
 @SuppressWarnings("UnstableApiUsage")
 public class RegistrationPresenter extends AbstractPresenter {
@@ -48,7 +47,7 @@ public class RegistrationPresenter extends AbstractPresenter {
     /**
      * Constructor
      *
-     * @param eventBus The EventBus set in ClientModule
+     * @param eventBus    The EventBus set in ClientModule
      * @param userService The injected ClientUserService
      * @see de.uol.swp.client.di.ClientModule
      * @since 2019-09-18
@@ -60,7 +59,7 @@ public class RegistrationPresenter extends AbstractPresenter {
 
     /**
      * Method called when the cancel button is pressed
-     *
+     * <p>
      * This Method is called when the cancel button is pressed. It posts an instance
      * of the RegistrationCanceledEvent to the EventBus the SceneManager is subscribed
      * to.
@@ -77,7 +76,7 @@ public class RegistrationPresenter extends AbstractPresenter {
 
     /**
      * Method called when the register button is pressed
-     *
+     * <p>
      * This Method is called when the register button is pressed. It posts an instance
      * of the RegistrationErrorEvent to the EventBus the SceneManager is subscribed
      * to, if one of the fields is empty or the password fields are not equal.
@@ -89,11 +88,10 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2019-09-02
-     *
      */
     @FXML
     void onRegisterButtonPressed(ActionEvent event) {
-        if (Strings.isNullOrEmpty(loginField.getText())){
+        if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent("Username cannot be empty"));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
             eventBus.post(new RegistrationErrorEvent("Passwords are not equal"));
@@ -103,5 +101,4 @@ public class RegistrationPresenter extends AbstractPresenter {
             userService.createUser(new UserDTO(loginField.getText(), passwordField1.getText(), "empty"));
         }
     }
-
 }

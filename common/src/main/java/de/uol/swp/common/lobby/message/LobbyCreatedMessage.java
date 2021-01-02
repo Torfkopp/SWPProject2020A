@@ -7,5 +7,4 @@ public class LobbyCreatedMessage extends AbstractLobbyMessage {
     public LobbyCreatedMessage(String name, User user) {
         super(name, user);
     }
-
 }

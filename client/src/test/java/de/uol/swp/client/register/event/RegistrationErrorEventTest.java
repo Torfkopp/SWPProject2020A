@@ -10,13 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Marco Grawunder
  * @see de.uol.swp.client.register.event.RegistrationErrorEvent
  * @since 2019-10-10
- *
  */
 class RegistrationErrorEventTest {
 
     /**
      * Test for the creation of RegistrationErrorEvents
-     *
+     * <p>
      * This test checks if the error message of the  RegistrationErrorEvent gets
      * set correctly during the creation of a new event
      *
@@ -28,5 +27,4 @@ class RegistrationErrorEventTest {
 
         assertEquals(event.getMessage(), "Test");
     }
-
 }
