@@ -35,7 +35,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private ListView<String> membersView;
 
-
     /**
      * Default Constructor
      *
@@ -122,29 +121,28 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     @Subscribe
     private void onAskLatestChatMessagesResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName)) {
+        if (rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
     }
 
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onCreatedChatMessageMessage(msg);
         }
     }
 
-
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onDeletedChatMessageMessage(msg);
         }
     }
 
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onEditedChatMessageMessage(msg);
         }
     }

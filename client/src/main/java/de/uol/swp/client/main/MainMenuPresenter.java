@@ -54,18 +54,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     private ObservableList<String> lobbies;
 
-    @Inject
-    private LobbyService lobbyService;
-
     @FXML
     private ListView<String> lobbyView;
 
     @FXML
     private ListView<String> usersView;
 
-    public MainMenuPresenter(){
+    public MainMenuPresenter() {
         super.init(LogManager.getLogger(MainMenuPresenter.class));
     }
+
     /**
      * Handles successful login
      * <p>
@@ -80,7 +78,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     public void loginSuccessful(LoginSuccessfulResponse message) {
-//        prepareChatVars();
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
@@ -538,5 +535,4 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     void onChangePasswordButtonPressed(ActionEvent event) {
         eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
     }
-
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.user.User;
+import de.uol.swp.server.chat.ChatManagement;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +47,15 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
 
     @Override
     public Optional<ChatMessage> findMessage(int id, String originLobby) {
-        return Optional.empty();
+        if (originLobby == null) {
+            return findMessage(id);
+        } else {
+            ChatMessage chatMessage = lobbyChatHistories.get(originLobby).get(id);
+            if (chatMessage != null) {
+                return Optional.of(chatMessage);
+            }
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -63,14 +72,7 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         if (originLobby == null) {
             return getLatestMessages(amount);
         } else {
-            if (lobbyChatHistories.get(originLobby) == null) {
-                lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {
-                    @Override
-                    protected boolean removeEldestEntry(Map.Entry<Integer, ChatMessage> eldest) {
-                        return size() > MAX_LOBBY_HISTORY;
-                    }
-                });
-            }
+            ensureLobbyChatHistory(originLobby);
             List<Map.Entry<Integer, ChatMessage>> list = new LinkedList<>(lobbyChatHistories.get(originLobby).entrySet());
             Collections.reverse(list);
             List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(Collectors.toList());
@@ -97,14 +99,7 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         } else if (originLobby == null) {
             return createChatMessage(author, content);
         } else {
-            if (lobbyChatHistories.get(originLobby) == null) {
-                lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {
-                    @Override
-                    protected boolean removeEldestEntry(Map.Entry<Integer, ChatMessage> eldest) {
-                        return size() > MAX_LOBBY_HISTORY;
-                    }
-                });
-            }
+            ensureLobbyChatHistory(originLobby);
             id_count += 1;
             ChatMessage chatMessage = new ChatMessageDTO(id_count, author, content);
             lobbyChatHistories.get(originLobby).put(id_count, chatMessage);
@@ -126,14 +121,7 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         if (originLobby == null) {
             return updateChatMessage(id, updatedContent);
         } else {
-            if (lobbyChatHistories.get(originLobby) == null) {
-                lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {
-                    @Override
-                    protected boolean removeEldestEntry(Map.Entry<Integer, ChatMessage> eldest) {
-                        return size() > MAX_LOBBY_HISTORY;
-                    }
-                });
-            }
+            ensureLobbyChatHistory(originLobby);
             ChatMessage messageToEdit = lobbyChatHistories.get(originLobby).get(id);
             if (!Strings.isNullOrEmpty(updatedContent)) {
                 messageToEdit.setContent(updatedContent);
@@ -152,15 +140,19 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         if (originLobby == null) {
             removeChatMessage(id);
         } else {
-            if (lobbyChatHistories.get(originLobby) == null) {
-                lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {
-                    @Override
-                    protected boolean removeEldestEntry(Map.Entry<Integer, ChatMessage> eldest) {
-                        return size() > MAX_LOBBY_HISTORY;
-                    }
-                });
-            }
+            ensureLobbyChatHistory(originLobby);
             lobbyChatHistories.get(originLobby).remove(id);
+        }
+    }
+
+    private void ensureLobbyChatHistory(String originLobby) {
+        if (lobbyChatHistories.get(originLobby) == null) {
+            lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<Integer, ChatMessage> eldest) {
+                    return size() > MAX_LOBBY_HISTORY;
+                }
+            });
         }
     }
 }

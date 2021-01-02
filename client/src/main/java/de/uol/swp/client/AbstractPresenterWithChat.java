@@ -2,7 +2,6 @@ package de.uol.swp.client;
 
 import com.google.inject.Inject;
 import de.uol.swp.client.chat.ChatService;
-import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -18,21 +17,20 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractPresenterWithChat extends AbstractPresenter{
+public abstract class AbstractPresenterWithChat extends AbstractPresenter {
+
+    protected static Logger LOG;
 
     @Inject
     protected ChatService chatService;
 
     protected String lobbyName;
     protected User loggedInUser;
-
-    protected static Logger LOG;
     protected ObservableList<String> chatMessages;
     protected ObservableMap<Integer, ChatMessage> chatMessageMap;
 
@@ -42,15 +40,16 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter{
     @FXML
     protected TextField messageField;
 
-    public void init(Logger log){
+    public void init(Logger log) {
         LOG = log;
     }
+
     @FXML
     protected void initialize() {
         prepareChatVars();
     }
 
-    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg){
+    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         LOG.debug("Received Chat Message from " + msg.getMsg().getAuthor().getUsername()
                 + ": '" + msg.getMsg().getContent() + " for Global chat");
         Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
@@ -61,13 +60,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter{
         Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
     }
 
-    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg){
+    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         LOG.debug("Received instruction to edit ChatMessage with id " + msg.getMsg().getID() + " to: '"
                 + msg.getMsg().getContent() + '\'');
         Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
     }
 
-    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg){
+    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
         LOG.debug(msg.getChatHistory());
         updateChatMessageList(msg.getChatHistory());
     }
@@ -76,10 +75,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter{
     protected void onDeleteMessageButtonPressed(ActionEvent event) {
         Integer msgId = findId();
         if (msgId != null) {
-            if(lobbyName != null) {
+            if (lobbyName != null) {
                 System.out.println("Calling chatService.deleteMessage(" + msgId + ", " + lobbyName + ");");
                 chatService.deleteMessage(msgId, lobbyName);
-            } else{
+            } else {
                 System.out.println("Calling chatService.deleteMessage(" + msgId + ");");
                 chatService.deleteMessage(msgId);
             }
@@ -90,10 +89,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter{
     protected void onSendMessageButtonPressed(ActionEvent event) {
         String msg = messageField.getText();
         messageField.clear();
-        if(lobbyName != null) {
+        if (lobbyName != null) {
             LOG.debug("Sending ChatMessage for lobby " + lobbyName + " ('" + msg + "') from " + loggedInUser.getUsername());
             chatService.newMessage(loggedInUser, msg, lobbyName);
-        }else{
+        } else {
             LOG.debug("Sending ChatMessage for MainMenu ('" + msg + "') from " + loggedInUser.getUsername());
             chatService.newMessage(loggedInUser, msg, lobbyName);
         }
@@ -103,10 +102,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter{
     protected void onEditMessageButtonPressed(ActionEvent event) {
         Integer msgId = findId();
         if (msgId != null) {
-            if(lobbyName != null) {
+            if (lobbyName != null) {
                 System.out.println("Calling chatService.editMessage(" + msgId + ", " + messageField.getText() + ", " + lobbyName + ");");
                 chatService.editMessage(msgId, messageField.getText(), lobbyName);
-            }else{
+            } else {
                 System.out.println("Calling chatService.editMessage(" + msgId + ", " + messageField.getText() + ");");
                 chatService.editMessage(msgId, messageField.getText());
             }
