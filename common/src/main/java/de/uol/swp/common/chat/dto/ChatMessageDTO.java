@@ -150,8 +150,8 @@ public class ChatMessageDTO implements ChatMessage {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChatMessageDTO that = (ChatMessageDTO) o;
-        return id.equals(that.id) && author.equals(that.author) && timestamp.equals(that.timestamp) && content.equals(that.content);
+        ChatMessage that = (ChatMessageDTO) o;
+        return id.equals(that.getID()) && author.equals(that.getAuthor()) && timestamp.equals(that.getTimestamp()) && content.equals(that.getContent());
     }
 
     /**

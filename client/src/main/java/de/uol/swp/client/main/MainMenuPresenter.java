@@ -6,6 +6,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.chat.ChatService;
+import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
@@ -38,6 +39,7 @@ import javafx.scene.control.TextInputDialog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,7 +70,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     private User loggedInUser;
 
     @Inject
-    private ChatService chatService;
+    private IChatService chatService;
 
     @Inject
     private LobbyService lobbyService;
@@ -268,7 +270,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.main.MainMenuPresenter#chatMessageMap
      * @since 2020-12-17
      */
-    private void updateChatMessageList(List<ChatMessage> chatMessageList) {
+    private void updateChatMessageList(Iterable<ChatMessage> chatMessageList) {
         Platform.runLater(() -> {
             chatMessages.clear();
             chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), m));
@@ -289,7 +291,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.user.User
      * @since 2019-08-29
      */
-    private void updateUsersList(List<User> userList) {
+    private void updateUsersList(Iterable<User> userList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (users == null) {
@@ -404,7 +406,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.lobby.dto.LobbyDTO
      * @since 2020-11-29
      */
-    private void updateLobbyList(List<String> lobbyList) {
+    private void updateLobbyList(Collection<String> lobbyList) {
         LOG.debug("Update Lobby List");
         Platform.runLater(() -> {
             if (lobbies == null) {

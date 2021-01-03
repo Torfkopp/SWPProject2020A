@@ -46,7 +46,7 @@ public class AllOnlineUsersResponse extends AbstractResponseMessage {
      * @param users Collection of all users currently logged in
      * @since 2019-08-13
      */
-    public AllOnlineUsersResponse(Collection<User> users) {
+    public AllOnlineUsersResponse(Iterable<User> users) {
         for (User user : users) {
             this.users.add(UserDTO.createWithoutPassword(user));
         }

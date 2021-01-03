@@ -6,6 +6,7 @@ import de.uol.swp.common.chat.request.AskLatestChatMessageRequest;
 import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 
 /**
@@ -34,25 +35,25 @@ public class ChatService implements IChatService {
 
     @Override
     public void newMessage(User currentUser, String msg) {
-        NewChatMessageRequest request = new NewChatMessageRequest(currentUser, msg);
+        Message request = new NewChatMessageRequest(currentUser, msg);
         bus.post(request);
     }
 
     @Override
     public void deleteMessage(int id) {
-        DeleteChatMessageRequest request = new DeleteChatMessageRequest(id);
+        Message request = new DeleteChatMessageRequest(id);
         bus.post(request);
     }
 
     @Override
     public void editMessage(int id, String newContent) {
-        EditChatMessageRequest request = new EditChatMessageRequest(id, newContent);
+        Message request = new EditChatMessageRequest(id, newContent);
         bus.post(request);
     }
 
     @Override
     public void askLatestMessages(int amount) {
-        AskLatestChatMessageRequest request = new AskLatestChatMessageRequest(amount);
+        Message request = new AskLatestChatMessageRequest(amount);
         bus.post(request);
     }
 }

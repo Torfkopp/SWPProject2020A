@@ -13,6 +13,7 @@ import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -36,7 +37,7 @@ public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
 
-    private final ChatManagement chatManagement;
+    private final IChatManagement chatManagement;
 
     /**
      * Constructor
@@ -153,7 +154,7 @@ public class ChatService extends AbstractService {
             LOG.debug("Got new AskLatestMessage with " + msg.getAmount() + " messages");
         }
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount());
-        ResponseMessage returnMessage = new AskLatestChatMessageResponse(latestMessages);
+        Message returnMessage = new AskLatestChatMessageResponse(latestMessages);
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
         }

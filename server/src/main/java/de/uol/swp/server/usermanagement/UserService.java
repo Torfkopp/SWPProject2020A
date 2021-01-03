@@ -16,6 +16,7 @@ import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.communication.netty.Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +35,7 @@ public class UserService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(UserService.class);
 
-    private final UserManagement userManagement;
+    private final ServerUserService userManagement;
 
     /**
      * Constructor

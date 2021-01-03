@@ -33,7 +33,7 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * @param users Collection of all lobby members
      * @since 2020.12.21
      */
-    public AllLobbyMembersResponse(Collection<User> users) {
+    public AllLobbyMembersResponse(Iterable<User> users) {
         for (User user : users) {
             this.users.add(UserDTO.createWithoutPassword(user));
         }

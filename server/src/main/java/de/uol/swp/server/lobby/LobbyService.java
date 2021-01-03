@@ -14,6 +14,8 @@ import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.message.ExceptionMessage;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -74,14 +76,14 @@ public class LobbyService extends AbstractService {
     public void onCreateLobbyRequest(CreateLobbyRequest createLobbyRequest) {
         try {
             lobbyManagement.createLobby(createLobbyRequest.getName(), createLobbyRequest.getOwner());
-            ResponseMessage responseMessage = new CreateLobbyResponse(createLobbyRequest.getName());
+            Message responseMessage = new CreateLobbyResponse(createLobbyRequest.getName());
             if (createLobbyRequest.getMessageContext().isPresent()) {
                 responseMessage.setMessageContext(createLobbyRequest.getMessageContext().get());
             }
             post(responseMessage);
             sendToAll(new LobbyCreatedMessage(createLobbyRequest.getName(), createLobbyRequest.getOwner()));
         } catch (IllegalArgumentException e) {
-            LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage(e.getMessage());
+            Message exceptionMessage = new LobbyExceptionMessage(e.getMessage());
             if (createLobbyRequest.getMessageContext().isPresent()) {
                 exceptionMessage.setMessageContext(createLobbyRequest.getMessageContext().get());
             }
@@ -110,14 +112,14 @@ public class LobbyService extends AbstractService {
             if (lobby.get().getUsers().size() < 4) {
                 if (!lobby.get().getUsers().contains(lobbyJoinUserRequest.getUser())) {
                     lobby.get().joinUser(lobbyJoinUserRequest.getUser());
-                    ResponseMessage responseMessage = new JoinLobbyResponse(lobbyJoinUserRequest.getName());
+                    Message responseMessage = new JoinLobbyResponse(lobbyJoinUserRequest.getName());
                     if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
                         responseMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
                     }
                     post(responseMessage);
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
                 } else {
-                    LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
+                    ExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
                     if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
                         exceptionMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
                     }
@@ -125,7 +127,7 @@ public class LobbyService extends AbstractService {
                     LOG.debug(exceptionMessage.getException());
                 }
             } else {
-                LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby is full!");
+                ExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby is full!");
                 if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
                     exceptionMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
                 }
@@ -133,7 +135,7 @@ public class LobbyService extends AbstractService {
                 LOG.debug(exceptionMessage.getException());
             }
         } else {
-            LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby does not exist!");
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby does not exist!");
             if (lobbyJoinUserRequest.getMessageContext().isPresent()) {
                 exceptionMessage.setMessageContext(lobbyJoinUserRequest.getMessageContext().get());
             }
@@ -196,7 +198,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     public void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest retrieveAllLobbiesRequest) {
-        AllLobbiesResponse response = new AllLobbiesResponse(lobbyManagement.getLobbies());
+        Message response = new AllLobbiesResponse(lobbyManagement.getLobbies());
         response.initWithMessage(retrieveAllLobbiesRequest);
         post(response);
     }
@@ -218,7 +220,7 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             Set<User> lobbyMembers = lobby.get().getUsers();
-            AllLobbyMembersResponse response = new AllLobbyMembersResponse(lobbyMembers);
+            Message response = new AllLobbyMembersResponse(lobbyMembers);
             response.initWithMessage(retrieveAllLobbyMembersRequest);
             post(response);
         } else {

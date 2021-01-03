@@ -101,7 +101,7 @@ public class LobbyPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.user.User
      * @since 2020-11-22
      */
-    private void updateUsersList(List<User> userLobbyList) {
+    private void updateUsersList(Iterable<User> userLobbyList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
