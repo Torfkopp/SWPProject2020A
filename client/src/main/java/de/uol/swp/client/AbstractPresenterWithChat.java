@@ -86,9 +86,15 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
      */
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        LOG.debug("Received Chat Message from " + msg.getMsg().getAuthor().getUsername()
-                + ": '" + msg.getMsg().getContent() + " for Global chat");
-        Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
+                    + ": '" + msg.getMsg().getContent() + " for Global chat");
+            Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
+        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
+                    + ": '" + msg.getMsg().getContent() + " for " + msg.getLobbyName() + " chat");
+            Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
+        }
     }
 
     /**
@@ -102,8 +108,14 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
      */
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        LOG.debug("Received instruction to delete ChatMessage with id " + msg.getId());
-        Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in lobby "
+                    + msg.getLobbyName());
+            Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
+        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in Global chat");
+            Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
+        }
     }
 
     /**
@@ -118,9 +130,15 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
      */
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        LOG.debug("Received instruction to edit ChatMessage with id " + msg.getMsg().getID() + " to: '"
-                + msg.getMsg().getContent() + '\'');
-        Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '"
+                    + msg.getMsg().getContent() + "' in lobby " + msg.getLobbyName());
+            Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
+        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug("Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '"
+                    + msg.getMsg().getContent() + "' in Global Chat");
+            Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
+        }
     }
 
     /**
@@ -133,8 +151,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.common.chat.response.AskLatestChatMessageResponse
      */
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        LOG.debug(rsp.getChatHistory());
-        updateChatMessageList(rsp.getChatHistory());
+        if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Latest ChatMessages for " + rsp.getLobbyName() + ": " + rsp.getChatHistory());
+            updateChatMessageList(rsp.getChatHistory());
+        } else if (rsp.getLobbyName() == null && this.lobbyName == null) {
+            LOG.debug("Latest ChatMessages for Global chat: " + rsp.getChatHistory());
+            updateChatMessageList(rsp.getChatHistory());
+        }
     }
 
     /**
@@ -151,10 +174,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         Integer msgId = findId();
         if (msgId != null) {
             if (lobbyName != null) {
-                System.out.println("Calling chatService.deleteMessage(" + msgId + ", " + lobbyName + ");");
+                LOG.debug("Requesting to delete ChatMessage with ID " + msgId + " from lobby " + lobbyName);
                 chatService.deleteMessage(msgId, lobbyName);
             } else {
-                System.out.println("Calling chatService.deleteMessage(" + msgId + ");");
+                LOG.debug("Requesting to delete ChatMessage with ID " + msgId + "from Global chat");
                 chatService.deleteMessage(msgId);
             }
         }
@@ -178,7 +201,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Sending ChatMessage for lobby " + lobbyName + " ('" + msg + "') from " + loggedInUser.getUsername());
             chatService.newMessage(loggedInUser, msg, lobbyName);
         } else {
-            LOG.debug("Sending ChatMessage for MainMenu ('" + msg + "') from " + loggedInUser.getUsername());
+            LOG.debug("Sending ChatMessage for Global chat ('" + msg + "') from " + loggedInUser.getUsername());
             chatService.newMessage(loggedInUser, msg);
         }
     }
@@ -201,12 +224,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         Integer msgId = findId();
         if (msgId != null) {
             if (lobbyName != null) {
-                LOG.debug("Sending request to edit ChatMessage with ID: " + msgId + " in lobby " + lobbyName
+                LOG.debug("Sending request to edit ChatMessage with ID " + msgId + " in lobby " + lobbyName
                         + " to new content '" + messageField.getText() + '\'');
                 chatService.editMessage(msgId, messageField.getText(), lobbyName);
             } else {
-                LOG.debug("Sending request to edit ChatMessage with ID: " + msgId + " in Global chat to new content: '"
-                        + messageField.getText() + "'");
+                LOG.debug("Sending request to edit ChatMessage with ID " + msgId + " in Global chat to new content: '"
+                        + messageField.getText() + '\'');
                 chatService.editMessage(msgId, messageField.getText());
             }
             messageField.clear();

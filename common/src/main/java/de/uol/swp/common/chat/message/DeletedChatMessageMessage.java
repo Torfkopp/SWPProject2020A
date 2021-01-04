@@ -20,7 +20,7 @@ public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
      * @param id The ID of the ChatMessage that was deleted
      */
     public DeletedChatMessageMessage(int id) {
-        super(false);
+        super(null);
         this.id = id;
     }
 
@@ -31,13 +31,12 @@ public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
      * It sets the inherited isLobbyChatMessage and lobbyName attributes to the
      * parameters provided upon calling the constructor.
      *
-     * @param id                 The ID of the ChatMessage that was deleted
-     * @param isLobbyChatMessage Whether this DeletedChatMessageMessage is being sent to a lobby chat
-     * @param lobbyName          The Lobby this DeletedChatMessageMessage is being sent to
+     * @param id        The ID of the ChatMessage that was deleted
+     * @param lobbyName The Lobby this DeletedChatMessageMessage is being sent to
      * @since 2020-12-30
      */
-    public DeletedChatMessageMessage(int id, boolean isLobbyChatMessage, String lobbyName) {
-        super(isLobbyChatMessage, lobbyName);
+    public DeletedChatMessageMessage(int id, String lobbyName) {
+        super(lobbyName);
         this.id = id;
     }
 

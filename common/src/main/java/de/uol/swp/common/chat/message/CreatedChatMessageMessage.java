@@ -23,7 +23,7 @@ public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
      * @param msg The ChatMessage that was created
      */
     public CreatedChatMessageMessage(ChatMessage msg) {
-        super(false);
+        super(null);
         this.msg = msg;
     }
 
@@ -34,13 +34,12 @@ public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
      * It sets the inherited isLobbyChatMessage and lobbyName attributes to the
      * parameters provided upon calling the constructor.
      *
-     * @param msg                The ChatMessage that was created
-     * @param isLobbyChatMessage Whether this CreatedChatMessageMessage is being sent to a lobby chat
-     * @param lobbyName          The Lobby this CreatedChatMessageMessage is being sent to
+     * @param msg       The ChatMessage that was created
+     * @param lobbyName The Lobby this CreatedChatMessageMessage is being sent to
      * @since 2020-12-30
      */
-    public CreatedChatMessageMessage(ChatMessage msg, boolean isLobbyChatMessage, String lobbyName) {
-        super(isLobbyChatMessage, lobbyName);
+    public CreatedChatMessageMessage(ChatMessage msg, String lobbyName) {
+        super(lobbyName);
         this.msg = msg;
     }
 

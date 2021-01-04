@@ -23,7 +23,7 @@ public class EditedChatMessageMessage extends AbstractChatMessageMessage {
      * @param chatMsg The edited ChatMessage
      */
     public EditedChatMessageMessage(ChatMessage chatMsg) {
-        super(false);
+        super(null);
         this.chatMsg = chatMsg;
     }
 
@@ -34,13 +34,12 @@ public class EditedChatMessageMessage extends AbstractChatMessageMessage {
      * It sets the inherited isLobbyChatMessage and lobbyName attributes to the
      * parameters provided upon calling the constructor.
      *
-     * @param chatMsg            The edited ChatMessage
-     * @param isLobbyChatMessage Whether this EditedChatMessageMessage is being sent to a lobby chat
-     * @param lobbyName          The Lobby this EditedChatMessageMessage is being sent to
+     * @param chatMsg   The edited ChatMessage
+     * @param lobbyName The Lobby this EditedChatMessageMessage is being sent to
      * @since 2020-12-30
      */
-    public EditedChatMessageMessage(ChatMessage chatMsg, boolean isLobbyChatMessage, String lobbyName) {
-        super(isLobbyChatMessage, lobbyName);
+    public EditedChatMessageMessage(ChatMessage chatMsg, String lobbyName) {
+        super(lobbyName);
         this.chatMsg = chatMsg;
     }
 

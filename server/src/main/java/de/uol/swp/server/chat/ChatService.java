@@ -44,16 +44,11 @@ public class ChatService extends AbstractService {
     /**
      * Constructor
      *
-     * @param eventBus       the EventBus used throughout the entire server (injected)
+     * @param bus            the EventBus used throughout the entire server (injected)
      * @param chatManagement the ChatManagement to use (injected)
-     * @since 2020-12-16
+     * @param lobbyService   the LobbyService to use (injected)
+     * @since 2020-12-30
      */
-    public ChatService(EventBus eventBus, ChatManagement chatManagement) {
-        super(eventBus);
-        this.chatManagement = chatManagement;
-        lobbyService = null;
-    }
-
     @Inject
     public ChatService(EventBus bus, ChatManagement chatManagement, LobbyService lobbyService) {
         super(bus);
@@ -83,7 +78,7 @@ public class ChatService extends AbstractService {
         try {
             if (msg.isFromLobby()) {
                 ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent(), msg.getOriginLobby());
-                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, true, msg.getOriginLobby());
+                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, msg.getOriginLobby());
                 lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
             } else {
                 ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent());
@@ -116,7 +111,7 @@ public class ChatService extends AbstractService {
         try {
             if (msg.isFromLobby()) {
                 chatManagement.dropChatMessage(msg.getId(), msg.getOriginLobby());
-                ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId(), true, msg.getOriginLobby());
+                ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId(), msg.getOriginLobby());
                 lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
             } else {
                 chatManagement.dropChatMessage(msg.getId());
@@ -150,7 +145,7 @@ public class ChatService extends AbstractService {
         try {
             if (msg.isFromLobby()) {
                 ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent(), msg.getOriginLobby());
-                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, true, msg.getOriginLobby());
+                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, msg.getOriginLobby());
                 lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
             } else {
                 ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());

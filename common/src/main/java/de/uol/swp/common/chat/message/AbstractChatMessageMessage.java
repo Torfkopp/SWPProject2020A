@@ -19,30 +19,14 @@ public abstract class AbstractChatMessageMessage extends AbstractServerMessage {
     /**
      * Constructor
      * <p>
-     * This constructor automatically sets the lobbyName attribute to null because none
-     * was provided. This is independent of whether or not isLobbyChatMessage is actually
-     * false.
-     *
-     * @param isLobbyChatMessage True, if the ChatMessage message is meant for a lobby chat &
-     *                           False, if the ChatMessage message is meant for the global chat.
-     */
-    public AbstractChatMessageMessage(boolean isLobbyChatMessage) {
-        this.isLobbyChatMessage = isLobbyChatMessage;
-        this.lobbyName = null;
-    }
-
-    /**
-     * Constructor
-     * <p>
      * This constructor sets the ChatMessage message's isLobbyChatMessage and lobbyName
      * attributes to the parameters provided upon calling the constructor.
      *
-     * @param isLobbyChatMessage the is lobby chat message
-     * @param lobbyName          the lobby name
+     * @param lobbyName the lobby name
      */
-    public AbstractChatMessageMessage(boolean isLobbyChatMessage, String lobbyName) {
-        this.isLobbyChatMessage = isLobbyChatMessage;
+    public AbstractChatMessageMessage(String lobbyName) {
         this.lobbyName = lobbyName;
+        this.isLobbyChatMessage = (lobbyName != null);
     }
 
     /**
