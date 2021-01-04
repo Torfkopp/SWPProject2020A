@@ -49,6 +49,7 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         if (originLobby == null) {
             return findMessage(id);
         } else {
+            ensureLobbyChatHistory(originLobby);
             ChatMessage chatMessage = lobbyChatHistories.get(originLobby).get(id);
             if (chatMessage != null) {
                 return Optional.of(chatMessage);
@@ -109,10 +110,14 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
     @Override
     public ChatMessage updateChatMessage(int id, String updatedContent) {
         ChatMessage messageToEdit = chatHistory.get(id);
-        if (!Strings.isNullOrEmpty(updatedContent)) {
-            messageToEdit.setContent(updatedContent);
+        if (messageToEdit != null) {
+            if (!Strings.isNullOrEmpty(updatedContent)) {
+                messageToEdit.setContent(updatedContent);
+            }
+            return messageToEdit;
+        } else {
+            throw new IllegalArgumentException("ChatMessage ID unknown");
         }
-        return messageToEdit;
     }
 
     @Override
@@ -122,10 +127,14 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         } else {
             ensureLobbyChatHistory(originLobby);
             ChatMessage messageToEdit = lobbyChatHistories.get(originLobby).get(id);
-            if (!Strings.isNullOrEmpty(updatedContent)) {
-                messageToEdit.setContent(updatedContent);
+            if (messageToEdit != null) {
+                if (!Strings.isNullOrEmpty(updatedContent)) {
+                    messageToEdit.setContent(updatedContent);
+                }
+                return messageToEdit;
+            } else {
+                throw new IllegalArgumentException("ChatMessage ID unknown");
             }
-            return messageToEdit;
         }
     }
 

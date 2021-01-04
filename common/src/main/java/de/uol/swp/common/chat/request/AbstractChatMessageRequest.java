@@ -44,7 +44,7 @@ public abstract class AbstractChatMessageRequest extends AbstractRequestMessage 
     /**
      * Getter for the lobbyName attribute
      *
-     * @return The name of the Lobby the ChatMessage request originated from (null fi from global chat)
+     * @return The name of the Lobby the ChatMessage request originated from (null if from global chat)
      */
     public String getOriginLobby() {
         return originLobby;
