@@ -472,6 +472,17 @@ class MainMemoryBasedChatMessageStoreTest {
 
     /**
      * Test of the getLatestMessages routine
+     * <p>
+     * Tests if ChatMessage objects created without the originLobby parameter
+     * are not returned when calling getLatestMessages with the originLobby
+     * parameter set to a lobby name (as the messages are in the global chat store
+     * instead).
+     * <p>
+     * This test fails if the List of ChatMessage objects returned by
+     * getLatestMessages is not empty, or if it is equal to the local list of
+     * the created ChatMessages.
+     *
+     * @since 2021-01-04
      */
     @Test
     void getLatestMessages_CreateWithoutOriginLobbyButProvideLobbyNameGetLatestMessagesTest() {
@@ -491,6 +502,16 @@ class MainMemoryBasedChatMessageStoreTest {
 
     /**
      * Test of the getLatestMessages routine
+     * <p>
+     * Tests if ChatMessage objects created with the originLobby parameter are
+     * not returned when calling getLatestMessages with a different lobby's name
+     * as the originLobby parameter.
+     * <p>
+     * This test fails  if the List of ChatMessage objects returned by
+     * getLatestMessages is not empty, or if it is equal to the local list of
+     * the created ChatMessages.
+     *
+     * @since 2021-01-04
      */
     @Test
     void getLatestMessages_CreateWithOriginLobbyButProvideWrongLobbyNameToGetLatestMessagesTest() {
@@ -511,12 +532,14 @@ class MainMemoryBasedChatMessageStoreTest {
     /**
      * Test for the createChatMessage routine
      * <p>
-     * Tests if a ChatMessage with a given author and content was created.
+     * Tests if a ChatMessage with a given Author and Content was created in
+     * the global chat store when calling createChatMessage without the
+     * originLobby parameter.
      * <p>
      * This test fails if the List of ChatMessage objects returned by
      * getLatestMessages is empty, or doesn't contain the created ChatMessage,
-     * or the author or content of the created ChatMessage are equal to the given
-     * author and content.
+     * or the Author or Content of the created ChatMessage are equal to the given
+     * Author and Content.
      */
     @Test
     void createChatMessageTest() {
@@ -530,7 +553,18 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Create chat message with origin lobby test.
+     * Test for the createChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with a given Author and Content was created in a
+     * lobby's chat store when calling createChatMessage with the originLobby
+     * parameter.
+     * <p>
+     * This test fails if the List of ChatMessage objects returned by
+     * getLatestMessages is empty, or doesn't contain the created ChatMessage,
+     * or the Author or Content of the created ChatMessage are equal to the given
+     * Author and Content.
+     *
+     * @since 2021-01-04
      */
     @Test
     void createChatMessageWithOriginLobbyTest() {
@@ -544,7 +578,18 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Create chat message with origin lobby is null test.
+     * Test for the createChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with a given Author and Content was created in
+     * the global chat store when calling createChatMessage with the
+     * originLobby parameter set to null.
+     * <p>
+     * This test fails if he List of ChatMessage objects returned by
+     * getLatestMessages is empty, or doesn't contain the created ChatMessage,
+     * or the Author or Content of the created ChatMessage are equal to the
+     * given Author and Content.
+     *
+     * @since 2021-01-04
      */
     @Test
     void createChatMessageWithOriginLobbyIsNullTest() {
@@ -560,10 +605,13 @@ class MainMemoryBasedChatMessageStoreTest {
     /**
      * Test for the updateChatMessage routine
      * <p>
-     * Tests if the contents of the ChatMessage with the specified ID are updated
+     * Tests if the contents of the ChatMessage with the specified ID in the
+     * global chat store are updated when calling updateChatMessage without the
+     * originLobby parameter.
      * <p>
-     * This test fails if the contents of the specified ChatMessage are not changed to the given content
-     * or any contents from other ChatMessages get changed.
+     * This test fails if the contents of the specified ChatMessage are not
+     * changed to the given content, or if any contents from other ChatMessages get
+     * changed.
      */
     @Test
     void updateChatMessageTest() {
@@ -580,7 +628,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message with origin lobby test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if the contents of the ChatMessage with the specified ID in a
+     * lobby's chat store are updated when calling updateChatMessage with the
+     * originLobby parameter.
+     * <p>
+     * This test fails if the contents of the specified ChatMessage are not
+     * changed to the given content, or if any contents from other ChatMessages
+     * get changed.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessageWithOriginLobbyTest() {
@@ -597,7 +655,16 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message with origin lobby is null test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if the contents of the ChatMessage with the specified ID in the
+     * global chat store are updated when calling updateChatMessage with the
+     * originLobby parameter set to null.
+     * <p>
+     * This test fails if the contents of the specified ChatMessage are not
+     * changed, or if any contents from other ChatMessages get changed.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessageWithOriginLobbyIsNullTest() {
@@ -614,7 +681,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message on null origin lobby use other update chat message test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if the contents of the ChatMessage with the specified ID in the
+     * global chat store, created without the originLobby parameter, are
+     * updated when calling updateChatMessage with the originLobby parameter
+     * set to null.
+     * <p>
+     * This test fails if the contents of the specified ChatMessage are not
+     * changed, or if any contents from other ChatMessages get changed.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessage_onNullOriginLobbyUseOtherUpdateChatMessageTest() {
@@ -631,7 +708,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message create with origin lobby null found with single param update chat message test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if the contents of the ChatMessage with the specified ID in the
+     * global chat store, created with the originLobby parameter set to null,
+     * are updated when calling updateChatMessage without the originLobby
+     * parameter.
+     * <p>
+     * This test fails if the contents of the specified ChatMessage are not
+     * changed, or if any contents from other ChatMessages get changed.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessage_CreateWithOriginLobbyNullFoundWithSingleParamUpdateChatMessageTest() {
@@ -648,7 +735,15 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message create with origin lobby but use wrong update chat message test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if updating a ChatMessage with a specified ID in a lobby's chat
+     * store by calling updateChatMessage without the originLobby parameter
+     * causes an IllegalArgumentException to be thrown.
+     * <p>
+     * This test fails if the IllegalArgumentException is not thrown.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessage_CreateWithOriginLobbyButUseWrongUpdateChatMessageTest() {
@@ -658,7 +753,15 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message create without origin lobby but provide lobby name update chat message test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if updating a ChatMessage with a specified ID in the global chat
+     * store by calling updateChatMessage with the originLobby parameter set to
+     * a lobby name throws an IllegalArgumentException.
+     * <p>
+     * This test fails if the IllegalArgumentException is not thrown.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessage_CreateWithoutOriginLobbyButProvideLobbyNameUpdateChatMessageTest() {
@@ -668,11 +771,19 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message create with origin lobby but provide wrong lobby name to update chat message test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if updating a ChatMessage with a specified ID in a lobby's chat
+     * store by calling updateChatMessage with the originLobby parameter set to
+     * a different lobby name throws an IllegalArgumentException.
+     * <p>
+     * This test fails if the IllegalArgumentException is not thrown.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessage_CreateWithOriginLobbyButProvideWrongLobbyNameToUpdateChatMessageTest() {
-        ChatMessage msg = store.createChatMessage(defaultUser, defaultContent);
+        ChatMessage msg = store.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
 
         assertThrows(IllegalArgumentException.class, () -> store.updateChatMessage(msg.getID(), secondContent, "other lobby name"));
     }
@@ -680,10 +791,11 @@ class MainMemoryBasedChatMessageStoreTest {
     /**
      * Test for the removeChatMessage routine
      * <p>
-     * Tests if the ChatMessage with the specified ID gets deleted from the chatMessageStore
-     * when removeChatMessage is called.
+     * Tests if a ChatMessage with the specified ID in the global chat store
+     * gets deleted from the global chat store when removeChatMessage is called
+     * without the originLobby parameter.
      * <p>
-     * This test fails when the created ChatMessage is still found.
+     * This test fails if the created ChatMessage is still found.
      */
     @Test
     void removeChatMessageTest() {
@@ -698,7 +810,16 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Remove chat message with origin lobby test.
+     * Test for the removeChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with the specified ID in a lobby's chat store
+     * gets deleted from the lobby's chat store when removeChatMessage is
+     * called with the originLobby parameter.
+     * <p>
+     * This test fails if the created ChatMessage is still found in the lobby's
+     * chat store.
+     *
+     * @since 2021-01-04
      */
     @Test
     void removeChatMessageWithOriginLobbyTest() {
@@ -713,7 +834,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Remove chat message with origin lobby is null test.
+     * Test for the removeChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with the specified ID in the global chat store,
+     * created with the originLobby parameter set to null, is removed from the
+     * global chat store when removeChatMessage is called with the originLobby
+     * parameter set to null.
+     * <p>
+     * This test fails if the created ChatMessage is still found in the lobby's
+     * chat store.
+     *
+     * @since 2021-01-04
      */
     @Test
     void removeChatMessageWithOriginLobbyIsNullTest() {
@@ -728,7 +859,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Remove chat message create with origin lobby null found with single param remove chat message.
+     * Test for the removeChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with the specified ID in the global chat store,
+     * created with the originLobby parameter set to null, is removed from the
+     * global chat store when removeChatMessage is called without the
+     * originLobby parameter.
+     * <p>
+     * This test fails if the created ChatMessage is still found in the global
+     * chat store.
+     *
+     * @since 2021-01-04
      */
     @Test
     void removeChatMessage_CreateWithOriginLobbyNullFoundWithSingleParamRemoveChatMessage() {
@@ -743,7 +884,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Remove chat message create without origin lobby but provide lobby name remove chat message test.
+     * Test for the removeChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with the specified ID in the global chat store is
+     * not removed from the global chat store when removeChatMessage is called
+     * with the originLobby parameter.
+     * <p>
+     * This test fails if the created ChatMessage is not found by findMessage,
+     * or if the ChatMessage found by findMessage is not equal to the created
+     * one.
+     *
+     * @since 2021-01-04
      */
     @Test
     void removeChatMessage_CreateWithoutOriginLobbyButProvideLobbyNameRemoveChatMessageTest() {
@@ -759,7 +910,17 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Remove chat message create with origin lobby but provide wrong lobby name to remove chat message test.
+     * Test for the removeChatMessage routine
+     * <p>
+     * Tests if a ChatMessage with the specified ID in a lobby's chat store is
+     * not removed from the lobby's chat store when removeChatMessage is called
+     * with the originLobby parameter set to a different lobby's name.
+     * <p>
+     * This test fails if the created ChatMessage is not found by findMessage,
+     * or if the ChatMessage found by findMessage is not equal to the created
+     * one.
+     *
+     * @since 2021-01-04
      */
     @Test
     void removeChatMessage_CreateWithOriginLobbyButProvideWrongLobbyNameToRemoveChatMessageTest() {
@@ -777,7 +938,9 @@ class MainMemoryBasedChatMessageStoreTest {
     /**
      * Test for the createChatMessage routine
      * <p>
-     * Tests if the createChatMessage routine correctly throws an IllegalArgumentException.
+     * Tests if the createChatMessage routine correctly throws an
+     * IllegalArgumentException when called with the author parameter set to
+     * null.
      * <p>
      * This test fails if the IllegalArgumentException isn't thrown.
      */
@@ -787,7 +950,15 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Create chat message with origin lobby empty author test.
+     * Test for the createChatMessage routine
+     * <p>
+     * Tests if the createChatMessage routine correctly throws an
+     * IllegalArgumentException when called with a lobby name and the author
+     * parameter set to null.
+     * <p>
+     * This test fails if the IllegalArgumentException isn't thrown.
+     *
+     * @since 2021-01-04
      */
     @Test
     void createChatMessageWithOriginLobbyEmptyAuthorTest() {
@@ -797,8 +968,8 @@ class MainMemoryBasedChatMessageStoreTest {
     /**
      * Test for the updateChatMessage routine
      * <p>
-     * Tests if the content of a created ChatMessage remains unchanged when
-     * the updatedContent parameter is set to null.
+     * Tests if the content of a created ChatMessage in the global chat store
+     * remains unchanged when the updatedContent parameter is set to null.
      * <p>
      * This test fails if the ChatMessage wasn't found, or if the content of
      * the created ChatMessage isn't the same anymore.
@@ -815,7 +986,15 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message with origin lobby empty content test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if the content of a created ChatMessage in a lobby's chat store
+     * remains when the updatedContent parameter is set to null.
+     * <p>
+     * This test fails if the ChatMessage wasn't found, or if the content of
+     * the created ChatMessage isn't the same anymore.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessageWithOriginLobbyEmptyContentTest() {
@@ -831,8 +1010,9 @@ class MainMemoryBasedChatMessageStoreTest {
     /**
      * Test for the updateChatMessage routine
      * <p>
-     * Tests if the content of a created ChatMessage remains unchanged when
-     * the updatedContent parameter is set to the empty String.
+     * Tests if the content of a created ChatMessage in the global chat store
+     * remains unchanged when the updatedContent parameter is set to the empty
+     * String.
      * <p>
      * This test fails if the ChatMessage wasn't found, or if the content of
      * the created ChatMessage isn't the same anymore.
@@ -849,7 +1029,16 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
-     * Update chat message with origin lobby empty string content test.
+     * Test for the updateChatMessage routine
+     * <p>
+     * Tests if the content of a created ChatMessage in a lobby's chat store
+     * remains unchanged when the updatedContent parameter is set to the empty
+     * String.
+     * <p>
+     * This test fails if the ChatMessage wasn't found, or if the content of
+     * the created ChatMessage isn't the same anymore.
+     *
+     * @since 2021-01-04
      */
     @Test
     void updateChatMessageWithOriginLobbyEmptyStringContentTest() {
