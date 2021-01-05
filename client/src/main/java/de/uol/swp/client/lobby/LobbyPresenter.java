@@ -8,6 +8,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -117,6 +118,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
                 lobbyMembers.add(message.getUser().getUsername());
         });
+    }
+
+    @Subscribe
+    private void onUserLeftLobbyMessage(UserLeftLobbyMessage message){
+        if(message.getUser().getUsername().equals(owner.getUsername())){
+            LOG.debug("Owner " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
+        } else {
+            LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            Platform.runLater(() -> {
+                        lobbyMembers.remove(message.getUser().getUsername());
+                    }
+            );
+        }
     }
 
     /**
