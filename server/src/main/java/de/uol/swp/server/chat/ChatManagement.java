@@ -29,7 +29,7 @@ public class ChatManagement extends AbstractChatManagement {
      * Constructor
      *
      * @param chatMessageStore Object of the ChatMessageStore to be used
-     * @see ChatMessageStore
+     * @see de.uol.swp.server.chat.store.ChatMessageStore
      * @since 2020-12-16
      */
     @Inject
@@ -43,6 +43,11 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
+    public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
+        return chatMessageStore.getLatestMessages(amount, originLobby);
+    }
+
+    @Override
     public ChatMessage createChatMessage(User author, String content) {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
@@ -50,6 +55,16 @@ public class ChatManagement extends AbstractChatManagement {
             throw new ChatManagementException("Author must not be null");
         }
         return chatMessageStore.createChatMessage(author, content);
+    }
+
+    @Override
+    public ChatMessage createChatMessage(User author, String content, String originLobby) {
+        if (Strings.isNullOrEmpty(content)) {
+            throw new ChatManagementException("Content must not be empty");
+        } else if (author == null) {
+            throw new ChatManagementException("Author must not be null");
+        }
+        return chatMessageStore.createChatMessage(author, content, originLobby);
     }
 
     @Override
@@ -62,11 +77,29 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
+    public ChatMessage updateChatMessage(int id, String updatedContent, String originLobby) {
+        Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
+        if (chatMessage.isEmpty()) {
+            throw new ChatManagementException("ChatMessage ID unknown");
+        }
+        return chatMessageStore.updateChatMessage(id, updatedContent, originLobby);
+    }
+
+    @Override
     public void dropChatMessage(int id) {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");
         }
         chatMessageStore.removeChatMessage(id);
+    }
+
+    @Override
+    public void dropChatMessage(int id, String originLobby) {
+        Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
+        if (chatMessage.isEmpty()) {
+            throw new ChatManagementException("ChatMessage ID unknown");
+        }
+        chatMessageStore.removeChatMessage(id, originLobby);
     }
 }
