@@ -1,65 +1,77 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
-import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.lobby.event.LobbyReadyEvent;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
+import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
+import de.uol.swp.common.chat.message.EditedChatMessageMessage;
+import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
-import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the lobby menu
  *
  * @see de.uol.swp.client.AbstractPresenter
+ * @see de.uol.swp.client.AbstractPresenterWithChat
  * @since 2020-11-21
  */
 @SuppressWarnings("UnstableApiUsage")
-public class LobbyPresenter extends AbstractPresenter {
+public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
-    @Inject
-    private LobbyService lobbyService;
-
-    private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
-
     private ObservableList<String> lobbyMembers;
 
-    private User loggedInUser;
-
-    private String lobbyName;
-
     @FXML
-    private ListView<String> membersView = new ListView<>();
-
-    @FXML
-    private ListView<String> chatView;
+    private ListView<String> membersView;
 
     /**
-     * Default Constructor
+     * Constructor
      *
-     * @since 2020-11-21
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.AbstractPresenterWithChat
+     * @since 2021-01-02
      */
     public LobbyPresenter() {
+        super.init(LogManager.getLogger(LobbyPresenter.class));
+    }
+
+    /**
+     * Handles LobbyUpdateEvents on the EventBus
+     * <p>
+     * If a new LobbyUpdateEvent is posted to the EventBus, this method checks
+     * whether the lobbyName and/or loggedInUser attributes of the current
+     * LobbyPresenter are null. If they are, it sets these attributes to the
+     * values found in the LobbyUpdateEvent.
+     *
+     * @param lobbyUpdateEvent the lobby update event
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
+     * @since 2020-12-30
+     */
+    @Subscribe
+    private void onLobbyUpdateEvent(LobbyUpdateEvent lobbyUpdateEvent) {
+        if (super.lobbyName == null || loggedInUser == null) {
+            super.lobbyName = lobbyUpdateEvent.getLobbyName();
+            super.loggedInUser = lobbyUpdateEvent.getUser();
+            super.chatService.askLatestMessages(10, super.lobbyName);
+        }
     }
 
     /**
@@ -76,7 +88,7 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-22
      */
     @Subscribe
-    public void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
+    private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
         LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
         updateUsersList(allLobbyMembersResponse.getUsers());
     }
@@ -94,21 +106,14 @@ public class LobbyPresenter extends AbstractPresenter {
      * @since 2020-11-22
      */
     @Subscribe
-    public void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
+    private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
-            if (lobbyMembers != null)
+            if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
                 lobbyMembers.add(message.getUser().getUsername());
         });
     }
 
-    @Subscribe
-    private void onUserJoinLobbyResponse(UserJoinLobbyResponse rsp){
-        this.lobbyName = rsp.getName();
-        this.loggedInUser = rsp.getUser();
-
-        eventBus.post(new LobbyReadyEvent(rsp.getName()));
-    }
     /**
      * Updates the lobby's member list according to the list given
      * <p>
@@ -135,13 +140,43 @@ public class LobbyPresenter extends AbstractPresenter {
         });
     }
 
+    @Override
+    @Subscribe
+    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onCreatedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onDeletedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onEditedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
+        if (rsp.getLobbyName().equals(super.lobbyName)) {
+            super.onAskLatestChatMessageResponse(rsp);
+        }
+    }
+
     /**
      * Handles a click on the LeaveLobby button
      * <p>
      * Method called when the leaveLobby button is pressed.
-     * If the leaveLobby button is pressed by the creator of the lobby,
-     * this method requests the lobby service to delete the lobby.
-     * If it is not the creator this method requests
+     * If the leaveLobby button is pressed this method requests
      * the lobby service to leave the lobby.
      *
      * @param event The ActionEvent created by pressing the leave lobby Button
@@ -153,17 +188,5 @@ public class LobbyPresenter extends AbstractPresenter {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
         }
         ((Stage) (((Button) event.getSource()).getScene().getWindow())).close();
-    }
-
-    @FXML
-    private void onSendMessageButtonPressed(ActionEvent event){
-    }
-
-    @FXML
-    private void onDeleteMessageButtonPressed(ActionEvent event){
-    }
-
-    @FXML
-    private void onEditMessageButtonPressed(ActionEvent event){
     }
 }

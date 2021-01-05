@@ -2,8 +2,9 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.request.*;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
 /**
@@ -44,6 +45,20 @@ public class LobbyService {
     }
 
     /**
+     * Posts a new instance of the LobbyUpdateEvent on the Eventbus
+     * <p>
+     * This ensures that a new LobbyPresenter will know what Lobby it is
+     * presenting and who the currently logged in User is.
+     *
+     * @param lobbyName The name of the Lobby
+     * @param user      The currently logged in User
+     * @since 2020-12-30
+     */
+    public void refreshLobbyPresenterFields(String lobbyName, User user) {
+        eventBus.post(new LobbyUpdateEvent(lobbyName, user));
+    }
+
+    /**
      * Posts a request to join a specified lobby on the EventBus
      *
      * @param name Name of the lobby the user wants to join
@@ -56,27 +71,9 @@ public class LobbyService {
         eventBus.post(joinUserRequest);
     }
 
-    /**
-     * Posts a request to leave a specified lobby on the EventBus
-     *
-     * @see de.uol.swp.common.lobby.request.LobbyLeaveUserRequest
-     * @since 2020-12-05
-     */
     public void leaveLobby(String lobbyName, UserDTO user) {
         LobbyLeaveUserRequest lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
-    }
-
-    /**
-     * Posts a request to delete a specified lobby on the EventBus
-     *
-     * @param lobbyName The name of the lobby
-     * @see de.uol.swp.common.lobby.request.DeleteLobbyRequest
-     * @since 2020-12-14
-     */
-    public void deleteLobby(String lobbyName) {
-        DeleteLobbyRequest deleteLobbyRequest = new DeleteLobbyRequest(lobbyName);
-        eventBus.post(deleteLobbyRequest);
     }
 
     /**
