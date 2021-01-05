@@ -4,9 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
-import de.uol.swp.client.chat.ChatService;
-import de.uol.swp.client.lobby.LobbyService;
-import de.uol.swp.client.lobby.event.LobbyReadyEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -17,7 +14,6 @@ import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
-import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -295,15 +291,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             lobbies.remove(msg.getName());
             LOG.debug("Removed Lobby from LobbyList " + msg.getName());
         }
-    }
-
-    @Subscribe
-    private void onLobbyReadyEvent(LobbyReadyEvent msg){
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(msg.getName()));
-            lobbyService.retrieveAllLobbyMembers(msg.getName());
-        });
-
     }
 
     /**

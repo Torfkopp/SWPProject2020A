@@ -10,7 +10,6 @@ import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
-import de.uol.swp.common.lobby.response.UserJoinLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
@@ -37,10 +36,7 @@ public class LobbyService extends AbstractService {
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final LobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
-
-    final private Map<Session, User> userSessions = new HashMap<>();
-
-    final private List<Lobby> lobbyList = new ArrayList<>();
+    private final List<Lobby> lobbyList = new ArrayList<>();
 
     /**
      * Constructor
@@ -91,27 +87,6 @@ public class LobbyService extends AbstractService {
     }
 
     /**
-     * Handles DeleteLobbyRequest found on the EventBus
-     * <p>
-     * If a DeleteLobbyRequest is detected on the EventBus, this method is called.
-     * It deletes the Lobby via the LobbyManagement using the parameter from the
-     * request and send a LobbyCreatedMessage to every connected user
-     *
-     * @param deleteLobbyRequest The DeleteLobbyRequest found on the EventBus
-     * @see de.uol.swp.common.lobby.message.DeleteLobbyRequest
-     * @see de.uol.swp.server.lobby.LobbyManagement#dropLobby(String)
-     * @since 2020-12-14
-     */
-    @Subscribe
-    public void onDeleteLobbyRequest(DeleteLobbyRequest deleteLobbyRequest) {
-        try {
-            lobbyManagement.dropLobby(deleteLobbyRequest.getLobbyName());
-        } catch (IllegalArgumentException e) {
-            LOG.debug(e.getMessage());
-        }
-    }
-
-    /**
      * Handles LobbyJoinUserRequests found on the EventBus
      * <p>
      * If a LobbyJoinUserRequest is detected on the EventBus, this method is called.
@@ -137,9 +112,6 @@ public class LobbyService extends AbstractService {
                     }
                     post(responseMessage);
                     sendToAllInLobby(lobbyJoinUserRequest.getName(), new UserJoinedLobbyMessage(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser()));
-                    UserJoinLobbyResponse response = new UserJoinLobbyResponse(lobbyJoinUserRequest.getName(), lobbyJoinUserRequest.getUser());
-                    response.initWithMessage(lobbyJoinUserRequest);
-                    post(response);
                 } else {
                     LobbyExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
                     if (lobbyJoinUserRequest.getMessageContext().isPresent()) {

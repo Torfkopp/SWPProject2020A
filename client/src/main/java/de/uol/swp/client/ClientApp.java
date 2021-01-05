@@ -6,7 +6,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
-import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
@@ -109,8 +108,6 @@ public class ClientApp extends Application implements ConnectionListener {
 		ClientConnectionFactory connectionFactory = injector.getInstance(ClientConnectionFactory.class);
 		clientConnection = connectionFactory.create(host, port);
 		clientConnection.addConnectionListener(this);
-
-		injector.getInstance(LobbyPresenter.class);
 		// JavaFX Thread should not be blocked to long!
 		Thread t = new Thread(() -> {
 			try {
