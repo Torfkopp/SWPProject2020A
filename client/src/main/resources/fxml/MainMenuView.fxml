@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane layoutX="-5.0" layoutY="-4.0" prefHeight="410.0" prefWidth="800.0">
@@ -57,10 +56,9 @@
                 </VBox.margin>
             </Button>
         </VBox>
+
         <MenuBar maxWidth="1.7976931348623157E308" prefHeight="25.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
-
             <Menu mnemonicParsing="false" text="Settings">
-
                 <MenuItem mnemonicParsing="false">
                     <graphic>
                         <Button mnemonicParsing="false" onAction="#onChangePasswordButtonPressed"
@@ -77,9 +75,7 @@
                         <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout"/>
                     </graphic>
                 </MenuItem>
-
             </Menu>
         </MenuBar>
-
     </GridPane>
 </AnchorPane>

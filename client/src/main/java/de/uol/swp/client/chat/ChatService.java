@@ -33,8 +33,14 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void newMessage(User currentUser, String msg) {
-        NewChatMessageRequest request = new NewChatMessageRequest(currentUser, msg);
+    public void newMessage(User author, String msg) {
+        NewChatMessageRequest request = new NewChatMessageRequest(author, msg);
+        bus.post(request);
+    }
+
+    @Override
+    public void newMessage(User author, String msg, String originLobby) {
+        NewChatMessageRequest request = new NewChatMessageRequest(author, msg, originLobby);
         bus.post(request);
     }
 
@@ -45,14 +51,32 @@ public class ChatService implements IChatService {
     }
 
     @Override
+    public void deleteMessage(int id, String originLobby) {
+        DeleteChatMessageRequest request = new DeleteChatMessageRequest(id, originLobby);
+        bus.post(request);
+    }
+
+    @Override
     public void editMessage(int id, String newContent) {
         EditChatMessageRequest request = new EditChatMessageRequest(id, newContent);
         bus.post(request);
     }
 
     @Override
+    public void editMessage(int id, String newContent, String originLobby) {
+        EditChatMessageRequest request = new EditChatMessageRequest(id, newContent, originLobby);
+        bus.post(request);
+    }
+
+    @Override
     public void askLatestMessages(int amount) {
         AskLatestChatMessageRequest request = new AskLatestChatMessageRequest(amount);
+        bus.post(request);
+    }
+
+    @Override
+    public void askLatestMessages(int amount, String originLobby) {
+        AskLatestChatMessageRequest request = new AskLatestChatMessageRequest(amount, originLobby);
         bus.post(request);
     }
 }

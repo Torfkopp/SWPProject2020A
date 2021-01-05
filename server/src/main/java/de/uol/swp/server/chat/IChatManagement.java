@@ -9,7 +9,7 @@ import java.util.List;
  * An interface for all methods of the ChatManagement
  *
  * @author Temmo Junkhoff
- * @author Phillip-André Suhr
+ * @author Phillip -André Suhr
  * @see de.uol.swp.server.chat.AbstractChatManagement
  * @see de.uol.swp.server.chat.ChatManagement
  * @see de.uol.swp.common.user.User
@@ -19,39 +19,78 @@ import java.util.List;
 public interface IChatManagement {
 
     /**
-     * Returns a List with ChatMessage objects of size [amount] or smaller
+     * Returns a List with ChatMessage objects of size {@literal <amount>} or smaller
+     * from the global Chat Store
      *
      * @param amount The amount of ChatMessages to be returned
-     * @return a List of ChatMessage objects of size [amount] or smaller
-     * @since 2020-12-16
+     * @return A List of ChatMessage objects of size {@literal <amount>} or smaller
      */
     List<ChatMessage> getLatestMessages(int amount);
 
     /**
-     * Create a new ChatMessage in the ChatMessageStore
+     * Returns a List with ChatMessage objects of size {@literal <amount>} or smaller
+     * from a Lobby Chat Store
      *
-     * @param author  the author of the ChatMessage
-     * @param content the content of the ChatMessage
-     * @return the created ChatMessage
-     * @since 2020-12-16
+     * @param amount      The amount of ChatMessages to be returned
+     * @param originLobby The Lobby the latest ChatMessages should be retrieved for
+     * @return A List of ChatMessage objects of size {@literal <amount>} or smaller
+     * @since 2020-12-30
+     */
+    List<ChatMessage> getLatestMessages(int amount, String originLobby);
+
+    /**
+     * Create a new ChatMessage in the ChatMessageStore of the global Chat Store
+     *
+     * @param author  The author of the ChatMessage
+     * @param content The content of the ChatMessage
+     * @return The created ChatMessage object
      */
     ChatMessage createChatMessage(User author, String content);
 
     /**
-     * Update content of ChatMessage.
+     * Create a new ChatMessage in the ChatMessageStore of a Lobby's Chat Store
      *
-     * @param id             the id of the ChatMessage to update
-     * @param updatedContent the new content of the ChatMessage
-     * @return the updated ChatMessage
-     * @since 2020-12-16
+     * @param author      The author of the ChatMessage
+     * @param content     The content of the ChatMessage
+     * @param originLobby The Lobby the ChatMessage was sent in
+     * @return The created ChatMessage object
+     * @since 2020-12-30
+     */
+    ChatMessage createChatMessage(User author, String content, String originLobby);
+
+    /**
+     * Update content of ChatMessage in the global Chat Store
+     *
+     * @param id             The id of the ChatMessage to update
+     * @param updatedContent The new content of the ChatMessage
+     * @return The updated ChatMessage object
      */
     ChatMessage updateChatMessage(int id, String updatedContent);
 
     /**
-     * Delete a ChatMessage.
+     * Update content of ChatMessage in a Lobby Chat Store
      *
-     * @param id the ID of the ChatMessage that should be deleted
-     * @since 2020-12-16
+     * @param id             The id of the ChatMessage to update
+     * @param updatedContent The new content of the ChatMessage
+     * @param originLobby    The Lobby the ChatMessage was sent in
+     * @return The updated ChatMessage object
+     * @since 2020-12-30
+     */
+    ChatMessage updateChatMessage(int id, String updatedContent, String originLobby);
+
+    /**
+     * Delete a ChatMessage from the global Chat Store
+     *
+     * @param id The ID of the ChatMessage that should be deleted
      */
     void dropChatMessage(int id);
+
+    /**
+     * Delete a ChatMessage from a Lobby Chat Store
+     *
+     * @param id          The ID of the ChatMessage that should be deleted
+     * @param originLobby The Lobby the ChatMessage was sent in
+     * @since 2020-12-30
+     */
+    void dropChatMessage(int id, String originLobby);
 }
