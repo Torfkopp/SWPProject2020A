@@ -62,7 +62,7 @@ class ChatManagementTest {
     /**
      * Test of the getLatestMessages routine
      * <p>
-     * Tests if the List of ChatMessage objects returned by getLatestMessages
+     * Tests if the list of ChatMessage objects returned by getLatestMessages
      * is equal to a local list of the created ChatMessages.
      * <p>
      * This test fails if the List of ChatMessage objects returned by
@@ -178,7 +178,7 @@ class ChatManagementTest {
 
     /**
      * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
-     * is called with null as author.
+     * is called with null as its author.
      *
      * @since 2020-12-19
      */

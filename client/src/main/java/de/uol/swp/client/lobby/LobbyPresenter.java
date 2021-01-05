@@ -51,7 +51,7 @@ public class LobbyPresenter extends AbstractPresenter {
     /**
      * Handles a new list of users
      * <p>
-     * If a new AllOnlineUsersResponse object is posted to the EventBus, the names
+     * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
      * of the currently logged in members are put into the list of lobby members.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of user
      * list" with the names of all currently logged in users is displayed in the
@@ -70,7 +70,7 @@ public class LobbyPresenter extends AbstractPresenter {
     /**
      * Handles new joined users
      * <p>
-     * If a new UserJoinedLobbyMessage object is posted to the EventBus, the name of the newly
+     * If a new UserJoinedLobbyMessage object is posted onto the EventBus, the name of the newly
      * joined user is appended to the user list in the lobby menu.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} joined Lobby." is displayed in the log.

@@ -74,7 +74,7 @@ public class UserService implements ClientUserService {
      * Method to delete a user's account
      * <p>
      * This method creates a new DeleteUserRequest object with the user as parameter,
-     * and posts this instance to the EventBus.
+     * and posts this instance onto the EventBus.
      *
      * @param user The user to remove
      * @see de.uol.swp.common.user.request.DeleteUserRequest
@@ -113,7 +113,7 @@ public class UserService implements ClientUserService {
 	 * <p>
 	 * This method creates a new UpdateUserPasswordRequest object
 	 * with the user and his oldPassword as parameter,
-	 * and post this instance to the EventBus.
+	 * and posts this instance onto the EventBus.
 	 *
 	 * @param user        The user to update
 	 * @param oldPassword The password to change and verified

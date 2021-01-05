@@ -85,7 +85,7 @@ class ChatServiceTest {
      * Test for the newMessage routine
      * <p>
      * Test if the ChatService creates a NewChatMessageRequest with
-     * the given User and Content, and posts it to the EventBus when newMessage is called.
+     * the given User and Content, and posts it onto the EventBus when newMessage is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
@@ -109,7 +109,7 @@ class ChatServiceTest {
      * Test for the deleteMessage routine
      * <p>
      * Tests if the ChatService creates a DeleteChatMessageRequest with
-     * the given ID, and posts it to the EventBus when deleteMessage is called.
+     * the given ID, and posts it onto the EventBus when deleteMessage is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
@@ -132,7 +132,7 @@ class ChatServiceTest {
      * Test for editMessage routine
      * <p>
      * Tests if the ChatService creates a EditChatMessageRequest with
-     * the given ID and content, and posts it to the EventBus when editMessage is called.
+     * the given ID and content, and posts it onto the EventBus when editMessage is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19
@@ -156,7 +156,7 @@ class ChatServiceTest {
      * Test for the askLatestMessages routine
      * <p>
      * Tests if the ChatService creates an AskLatestChatMessageRequest with
-     * the given amount, and posts it to the EventBus when askLatestMessages is called.
+     * the given amount, and posts it onto the EventBus when askLatestMessages is called.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-12-19

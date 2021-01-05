@@ -153,7 +153,7 @@ public class ClientConnection {
     /**
      * Processes incoming messages
 	 *<p>
-	 * This method posts the message it gets on the EventBus
+	 * This method posts the message it gets onto the EventBus
 	 * if it is a ServerMessage or a ResponseMessage.
 	 * It writes "Received message. Post on event bus " plus
      * the Message to the LOG if the LOG-Level is set to DEBUG or higher.

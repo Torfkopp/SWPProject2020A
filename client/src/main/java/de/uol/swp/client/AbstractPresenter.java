@@ -28,7 +28,7 @@ public class AbstractPresenter {
     /**
      * Sets the field eventBus
      * <p>
-     * This method sets the field eventBus to the EventBus given via parameter.
+     * This method sets the field EventBus to the EventBus given via parameter.
      * Afterwards it registers this class to the new EventBus.
      *
      * @param eventBus The EventBus this class should use.
@@ -43,12 +43,12 @@ public class AbstractPresenter {
     }
 
     /**
-     * Clears the field eventBus
+     * Clears the field EventBus
      * <p>
-     * This method clears the field eventBus. Before clearing, it unregisters this
+     * This method clears the field EventBus. Before clearing, it unregisters this
      * class from EventBus previously used.
      *
-     * @implNote This method does not check if the field eventBus is null.
+     * @implNote This method does not check if the field EventBus is null.
      * The field is cleared by setting it to null.
      * @since 2019-08-29
      */

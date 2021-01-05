@@ -6,7 +6,7 @@ import java.util.Objects;
 
 /**
  * A request sent from client to server when a user
- * tries to log in with an username and a password
+ * tries to log in with a username and a password
  * 
  * @author Marco Grawunder
  * @see de.uol.swp.common.message.AbstractRequestMessage

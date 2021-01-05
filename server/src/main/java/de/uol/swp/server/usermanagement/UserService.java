@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Optional;
 
 /**
- * Mapping vom event bus calls to user management calls
+ * Mapping EventBus calls to UserManagement calls
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.AbstractService
@@ -39,8 +39,8 @@ public class UserService extends AbstractService {
     /**
      * Constructor
      *
-     * @param eventBus       the EventBus used throughout the entire server (injected)
-     * @param userManagement object of the UserManagement to use
+     * @param eventBus       The EventBus used throughout the entire server (injected)
+     * @param userManagement Object of the UserManagement to use
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-05
      */
@@ -51,12 +51,12 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles RegisterUserRequests found on the EventBus
+     * Handles a RegisterUserRequest found on the EventBus
      * <p>
      * If a RegisterUserRequest is detected on the EventBus, this method is called.
-     * It tries to create a new user via the UserManagement. If this succeeds a
-     * RegistrationSuccessfulResponse is posted on the EventBus otherwise a RegistrationExceptionMessage
-     * gets posted there.
+     * It tries to create a new user via the UserManagement. If this succeeds,
+     * a RegistrationSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a RegistrationExceptionMessage gets posted there.
      *
      * @param msg The RegisterUserRequest found on the EventBus
      * @see de.uol.swp.server.usermanagement.UserManagement#createUser(User)
@@ -68,7 +68,7 @@ public class UserService extends AbstractService {
     @Subscribe
     private void onRegisterUserRequest(RegisterUserRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new registration message with " + msg.getUser());
+            LOG.debug("Got a new registration message with " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {
@@ -85,12 +85,12 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles DeleteUserRequest found on the EventBus
+     * Handles a DeleteUserRequest found on the EventBus
      * <p>
      * If a DeleteUserRequest is detected on the EventBus, this method is called.
-     * It requests the UserManagement to drop the user. If this succeeds, a
-     * UserDeletionSuccessfulResponse is posted on the EventBus, otherwise a UserDeletionExceptionMessage
-     * gets posted there.
+     * It requests the UserManagement to drop the user. If this succeeds,
+     * a UserDeletionSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a UserDeletionExceptionMessage gets posted there.
      *
      * @param msg The DeleteUserRequest found on the EventBus
      * @see de.uol.swp.server.usermanagement.UserManagement#dropUser(User)
@@ -119,12 +119,12 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles UpdateUserPasswordRequest found on the EventBus
+     * Handles a UpdateUserPasswordRequest found on the EventBus
      * <p>
      * If a UpdateUserPasswordRequest is detected on the EventBus, this method is called.
-     * It tries to change the Password of an User via the UserManagement.
-     * If this succeeds, a ChangePasswordSuccessfulResponse is posted on the EventBus,
-     * otherwise a ChangePasswordExceptionMessage gets posted there.
+     * It tries to change the Password of a user via the UserManagement.
+     * If this succeeds, a ChangePasswordSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a ChangePasswordExceptionMessage gets posted there.
      *
      * @param msg The ChangePasswordRequest found on the Eventbus
      * @author Eric Vuong
@@ -134,7 +134,7 @@ public class UserService extends AbstractService {
     @Subscribe
     private void onChangePasswordRequest(UpdateUserPasswordRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new ChangePassword message with " + msg.getUser());
+            LOG.debug("Got a new ChangePassword message with " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {

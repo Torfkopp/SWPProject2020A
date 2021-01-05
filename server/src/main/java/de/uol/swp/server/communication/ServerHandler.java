@@ -9,7 +9,7 @@ import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.server.message.ClientAuthorizedMessage;
+import de.uol.swp.server.message.ClientAuthorisedMessage;
 import de.uol.swp.server.message.ClientDisconnectedMessage;
 import de.uol.swp.server.message.ServerExceptionMessage;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +31,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     private static final Logger LOG = LogManager.getLogger(ServerHandler.class);
 
     /**
-     * Clients that are connected
+     * Connected Clients
      */
     private final List<MessageContext> connectedClients = new CopyOnWriteArrayList<>();
 
@@ -48,7 +48,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     /**
      * Constructor
      *
-     * @param eventBus the EventBus used throughout the entire server
+     * @param eventBus The EventBus used throughout the entire server
      * @see EventBus
      */
     @Inject
@@ -72,11 +72,11 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Helper method that check if a Message has the required authorisation
+     * Helper method checking if a message has the required authorisation
      *
-     * @param ctx The MessageContext connected to the message to check
+     * @param ctx The message's MessageContext to check
      * @param msg The message to check
-     * @throws SecurityException authorization requirement not met
+     * @throws SecurityException Authorisation requirement not met
      * @since 2019-11-20
      */
     private void checkIfMessageNeedsAuthorisation(MessageContext ctx, RequestMessage msg) {
@@ -91,9 +91,9 @@ public class ServerHandler implements ServerHandlerDelegate {
     /**
      * Handles exceptions on the Server
      * <p>
-     * If an ServerExceptionMessage is detected on the EventBus, this method is called.
-     * It sends the ServerExceptionMessage to the affiliated client if a client is
-     * affiliated.
+     * If a ServerExceptionMessage is detected on the EventBus, this method is called.
+     * It sends the ServerExceptionMessage to the affiliated client
+     * if a client is affiliated.
      *
      * @param msg The ServerExceptionMessage found on the EventBus
      * @since 2019-11-20
@@ -110,7 +110,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * <p>
      * If an DeadEvent object is detected on the EventBus, this method is called.
      * It writes "DeadEvent detected " and the error message of the detected DeadEvent
-     * object to the log, if the loglevel is set to WARN or higher.
+     * object to the log if the loglevel is set to WARN or higher.
      *
      * @param deadEvent The DeadEvent object found on the EventBus
      * @since 2019-11-20
@@ -148,20 +148,19 @@ public class ServerHandler implements ServerHandlerDelegate {
     // -------------------------------------------------------------------------------
 
     /**
-     * Handles ClientAuthorizedMessages found on the EventBus
+     * Handles ClientAuthorisedMessages found on the EventBus
      * <p>
-     * If a ClientAuthorizedMessage is detected on the EventBus, this method is called.
-     * It gets the MessageContext and then gives it and a new LoginSuccessfulResponse to
-     * sendToClient for sending as well as giving a new UserLoggedInMessage to sendMessage
-     * for notifying all connected clients.
+     * If a ClientAuthorisedMessage is detected on the EventBus, this method is called.
+     * It gets the MessageContext, then hands it over to sendToClient along with a new LoginSuccessfulResponse.
+     * It then gives a new UserLoggedInMessage to sendMessage in order to notify all connected clients.
      *
-     * @param msg The ClientAuthorizedMessage found on the EventBus
+     * @param msg The ClientAuthorisedMessage found on the EventBus
      * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
      * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @since 2019-11-20
      */
     @Subscribe
-    private void onClientAuthorized(ClientAuthorizedMessage msg) {
+    private void onClientAuthorised(ClientAuthorisedMessage msg) {
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent() && msg.getSession().isPresent()) {
             putSession(ctx.get(), msg.getSession().get());
@@ -173,11 +172,11 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Handles UserLoggedOutMessages found on the EventBus
+     * Handles an UserLoggedOutMessages found on the EventBus
      * <p>
      * If an UserLoggedOutMessage is detected on the EventBus, this method is called.
-     * It gets the MessageContext and then gives the message to sendMessage in order
-     * to send it to the connected client.
+     * It gets the MessageContext and then gives the message to sendMessage
+     * in order to send it to the connected client.
      *
      * @param msg The UserLoggedOutMessage found on the EventBus
      * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
@@ -195,11 +194,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     // -------------------------------------------------------------------------------
 
     /**
-     * Handles ResponseMessages found on the EventBus
+     * Handles a ResponseMessages found on the EventBus
      * <p>
-     * If an ResponseMessage is detected on the EventBus, this method is called.
-     * It gets the MessageContext and then gives it and the ResponseMessage to
-     * sendToClient for sending.
+     * If a ResponseMessage is detected on the EventBus, this method is called.
+     * It gets the MessageContext, then gives it and the ResponseMessage to sendToClient.
      *
      * @param msg The ResponseMessage found on the EventBus
      * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
@@ -221,10 +219,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     // -------------------------------------------------------------------------------
 
     /**
-     * Handles ServerMessages found on the EventBus
+     * Handles a ServerMessages found on the EventBus
      * <p>
-     * If an ServerMessage is detected on the EventBus, this method is called.
-     * It sets the Session and MessageContext to null and then gives the message
+     * If a ServerMessage is detected on the EventBus, this method is called.
+     * It sets the Session and MessageContext to null, then gives the message
      * to sendMessage in order to send it to all connected clients.
      *
      * @param msg The ServerMessage found on the EventBus
@@ -246,10 +244,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     // -------------------------------------------------------------------------------
 
     /**
-     * Adds a new Session to the activeSessions
+     * Adds a new session to the active sessions
      *
-     * @param ctx        The MessageContext belonging to the Session
-     * @param newSession the Session to add
+     * @param ctx        The MessageContext belonging to the session
+     * @param newSession The Session to add
      * @since 2019-11-20
      */
     private void putSession(MessageContext ctx, Session newSession) {
@@ -259,7 +257,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Removes a Session specified by MessageContext from the activeSessions
+     * Removes a session specified by MessageContext from the active sessions
      *
      * @param ctx the MessageContext
      * @since 2019-11-20
@@ -269,10 +267,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Gets the Session for a given MessageContext
+     * Gets the session for a given MessageContext
      *
      * @param ctx The MessageContext
-     * @return Optional containing the Session if found
+     * @return Optional Object containing the session if found
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
@@ -283,10 +281,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Gets MessageContext from Message
+     * Gets MessageContext from the message
      *
      * @param message Message to get the MessageContext from
-     * @return Optional containing the MessageContext if there is any
+     * @return Optional Object containing the MessageContext if there is any
      * @see de.uol.swp.common.message.Message
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
@@ -302,10 +300,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Gets MessageContext for specified receiver
+     * Gets MessageContext for a specified receiver
      *
      * @param session Session of the user to search
-     * @return Optional containing MessageContext if there is one
+     * @return Optional Object containing the MessageContext if there is any
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
@@ -320,7 +318,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Gets MessageContexts for specified receivers
+     * Gets the MessageContexts for specified receivers
      *
      * @param receiver A list containing the sessions of the users to search
      * @return List of MessageContexts for the given sessions
@@ -356,7 +354,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
-     * Sends a ServerMessage to either a specified receiver or all connected clients
+     * Sends a ServerMessage either to a specified receiver or to all connected clients
      *
      * @param msg ServerMessage to send
      * @see de.uol.swp.common.message.ServerMessage
@@ -384,7 +382,7 @@ public class ServerHandler implements ServerHandlerDelegate {
             try {
                 client.writeAndFlush(msg);
             } catch (Exception e) {
-                // TODO: Handle exception for unreachable clients
+                // TODO: Handle exceptions for unreachable clients
                 e.printStackTrace();
             }
         }

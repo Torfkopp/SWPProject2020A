@@ -4,7 +4,7 @@ package de.uol.swp.client.lobby.event;
  * Event used to show a window of a specified lobby
  * <p>
  * In order to show the lobby window using this event, post an instance of it
- * onto the eventBus the SceneManager is subscribed to.
+ * onto the EventBus the SceneManager is subscribed to.
  *
  * @author Mario
  * @see de.uol.swp.client.SceneManager

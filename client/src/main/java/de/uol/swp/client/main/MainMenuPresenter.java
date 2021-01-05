@@ -89,12 +89,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles a successful login
      * <p>
-     * If a LoginSuccessfulResponse is posted to the EventBus, the loggedInUser
+     * If a LoginSuccessfulResponse is posted onto the EventBus, the loggedInUser
      * of this client is set to the one in the message received.
      * Furthermore, the full list of users currently logged in is requested
      * as well as the list of lobbies.
      *
-     * @param message the LoginSuccessfulResponse object seen on the EventBus
+     * @param message The LoginSuccessfulResponse object seen on the EventBus
      * @see de.uol.swp.common.user.response.LoginSuccessfulResponse
      * @since 2019-09-05
      */
@@ -154,7 +154,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * If a lobby gets created, this method is called
      * to update the LobbyList.
      *
-     * @param lobbyCreatedMessage the LobbyCreatedMessage object seen on the EventBus
+     * @param lobbyCreatedMessage The LobbyCreatedMessage object seen on the EventBus
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2020-12-14
      */
@@ -166,7 +166,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles newly logged in users
      * <p>
-     * If a new UserLoggedInMessage object is posted to the EventBus, the name of the newly
+     * If a new UserLoggedInMessage object is posted onto the EventBus, the name of the newly
      * logged in user is appended to the user list in the main menu.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} logged in." is displayed in the log.
@@ -187,12 +187,12 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles newly logged out users
      * <p>
-     * If a new UserLoggedOutMessage object is posted to the EventBus, the name of the newly
+     * If a new UserLoggedOutMessage object is posted onto the EventBus, the name of the newly
      * logged out user is removed from the user list in the main menu.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "User {@literal
      * <Username>} logged out." is displayed in the log.
      *
-     * @param message the UserLoggedOutMessage object seen on the EventBus
+     * @param message The UserLoggedOutMessage object seen on the EventBus
      * @see de.uol.swp.common.user.message.UserLoggedOutMessage
      * @since 2019-08-29
      */
@@ -205,7 +205,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles a new list of users
      * <p>
-     * If a new AllOnlineUsersResponse object is posted to the EventBus, the names
+     * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
      * of the currently logged in users are put into the main menu's user list.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of user
      * list" with the names of all currently logged in users is displayed in the
@@ -265,7 +265,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles an incoming notification about an edition of a ChatMessage
      * <p>
-     * If an EditedChatMessageMessage is posted to the EventBus, this method
+     * If an EditedChatMessageMessage is posted onto the EventBus, this method
      * replaces the content in the chatMessageMap that is stored under the
      * edited ChatMessage's ID.
      *
@@ -391,7 +391,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Removes a deleted lobby from the LobbyList
      * <p>
-     * If a new LobbyDeletedMessage object is posted to the EventBus, the name
+     * If a new LobbyDeletedMessage object is posted onto the EventBus, the name
      * of the deleted lobby is removed from the main menu's lobby list.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Removed lobby from lobby
      * list" with the name of the removed lobby is displayed in the log.
@@ -415,7 +415,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Handles a JoinLobbyResponse found on the EventBus
      * <p>
      * If a new JoinLobbyResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyViewEvent to the EventBus the SceneManager is
+     * posts a new ShowLobbyViewEvent onto the EventBus the SceneManager is
      * subscribed to. Then it calls the LobbyService to retrieve
      * all members of that new lobby in order for the lobby window to be
      * able to display all members from the beginning.
@@ -437,7 +437,7 @@ public class MainMenuPresenter extends AbstractPresenter {
     /**
      * Handles a new list of lobbies
      * <p>
-     * If a new AllLobbiesResponse object is posted to the EventBus, the names
+     * If a new AllLobbiesResponse object is posted onto the EventBus, the names
      * of currently existing lobbies are put into the main menu's lobby list.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of lobby
      * list" with the names of all currently existing lobbies is displayed in the
@@ -535,7 +535,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * <p>
      * This method is called when the LogoutButton is pressed. It calls the
      * logout method of the UserService to log out the user, and posts an
-     * instance of the ShowLoginViewEvent to the EventBus the SceneManager
+     * instance of the ShowLoginViewEvent onto the EventBus the SceneManager
      * is subscribed to.
      *
      * @param event The ActionEvent generated by pressing the LogoutButton
@@ -555,7 +555,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * <p>
      * This method is called when the DeleteUserButton is pressed. It first calls the
      * UserService to log the user out, then posts an instance of the
-     * ShowLoginViewEvent to the EventBus the SceneManager is subscribed to, and finally
+     * ShowLoginViewEvent onto the EventBus the SceneManager is subscribed to, and finally
      * calls the UserService to drop the user.
      *
      * @param event The ActionEvent generated by pressing the DeleteUserButton
@@ -575,7 +575,7 @@ public class MainMenuPresenter extends AbstractPresenter {
      * Method called when the button to change a user's password is pressed
      * <p>
      * This method is called when the ChangePasswordButton is pressed.
-     * It posts an instance of the ShowChangePasswordViewEvent to the EventBus the SceneManager is subscribed to.
+     * It posts an instance of the ShowChangePasswordViewEvent onto the EventBus the SceneManager is subscribed to.
      *
      * @param event The ActionEvent generated by pressing the ChangePasswordButton.
      * @author Eric Vuong

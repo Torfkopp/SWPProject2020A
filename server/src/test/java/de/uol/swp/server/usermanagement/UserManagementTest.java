@@ -182,8 +182,8 @@ class UserManagementTest {
         Collections.sort(allUsers);
         assertEquals(allUsers, getDefaultUsers());
 
-        // check, if there are no passwords
-        // TODO: typically, there should be no logic in tests
+        // check if there are no passwords
+        // TODO: Normally, there should be no logic in tests
         allUsers.forEach(u -> assertEquals(u.getPassword(), ""));
     }
 }

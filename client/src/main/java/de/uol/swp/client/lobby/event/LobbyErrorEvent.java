@@ -4,7 +4,7 @@ package de.uol.swp.client.lobby.event;
  * Event used to show the LobbyError alert
  * <p>
  * In order to show the LobbyError alert using this event, post an instance of it
- * onto the eventBus the SceneManager is subscribed to.
+ * onto the EventBus the SceneManager is subscribed to.
  *
  * @author Marvin
  * @author Aldin

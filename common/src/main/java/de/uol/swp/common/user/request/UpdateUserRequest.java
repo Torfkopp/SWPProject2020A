@@ -6,7 +6,7 @@ import de.uol.swp.common.user.User;
 import java.util.Objects;
 
 /**
- * Request to update an user
+ * Request to update a user
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.user.User

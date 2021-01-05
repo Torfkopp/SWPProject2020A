@@ -6,7 +6,7 @@ import de.uol.swp.common.user.User;
  * Event used to show the ChangePassword window
  * <p>
  * In order to show the ChangePassword window using this event, post an instance of it
- * onto the eventBus the SceneManager is subscribed to.
+ * onto the EventBus the SceneManager is subscribed to.
  * It contains the user object of the user changing the password.
  *
  * @author Eric Vuong

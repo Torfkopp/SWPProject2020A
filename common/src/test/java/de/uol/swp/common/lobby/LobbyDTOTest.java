@@ -71,7 +71,7 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test checks if an user can join a lobby.
+     * This test checks if a user can join a lobby.
      * <p>
      * The test fails when the size of the lobby's user list does not get bigger,
      * or when a newly joined user is not in the list.

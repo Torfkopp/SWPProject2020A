@@ -79,7 +79,7 @@ class LobbyServiceTest {
      * This Test creates a new LobbyService object registered to the EventBus of
      * this test class. It then calls the createNewLobby function of the object using
      * the name "Test" and defaultUser as parameter, and waits for it to post a
-     * CreateLobbyRequest object on the EventBus.
+     * CreateLobbyRequest object onto the EventBus.
      * If this happens within one second, it checks the lobby name and
      * whether the user in the request object is the same as the default user.
      * If any of these checks fail or the method takes too long, this test is unsuccessful.

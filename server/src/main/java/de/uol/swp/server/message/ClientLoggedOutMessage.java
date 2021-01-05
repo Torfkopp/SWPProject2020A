@@ -1,7 +1,7 @@
 package de.uol.swp.server.message;
 
 /**
- * never used
+ * Never used
  */
 class ClientLoggedOutMessage extends AbstractServerInternalMessage {
 }

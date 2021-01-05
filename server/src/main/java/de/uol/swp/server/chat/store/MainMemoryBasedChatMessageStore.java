@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * This is a ChatMessage store.
  * <p>
  * This ChatMessage store only resides in the RAM of your computer
- * and only for as long as the server is running. Therefore the messages have to be
+ * and only for as long as the server is running. Therefore, the messages have to be
  * added every time the server is started.
  *
  * @author Temmo Junkhoff
@@ -45,9 +45,9 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
     @Override
     public List<ChatMessage> getLatestMessages(int amount) {
         List<Map.Entry<Integer, ChatMessage>> list = new LinkedList<>(chatHistory.entrySet());
-        Collections.reverse(list); // get the recentmost messages to top for proper [amount] limit
+        Collections.reverse(list); // put the most recent messages to the top for proper [amount] limit
         List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(Collectors.toList());
-        Collections.reverse(returnList); // re-order the messages oldest to newest (newest at the bottom in Chat)
+        Collections.reverse(returnList); // re-order the messages oldest to newest (newest at the bottom)
         return returnList;
     }
 

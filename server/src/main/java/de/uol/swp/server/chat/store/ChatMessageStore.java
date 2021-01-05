@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interface to unify different kinds of ChatMessageStores in order to able to exchange
- * them easily.
+ * Interface to unify different kinds of ChatMessageStores
+ * enabling an easy exchange.
  *
  * @author Temmo Junkhoff
  * @see de.uol.swp.server.chat.store.AbstractChatMessageStore
@@ -20,15 +20,15 @@ import java.util.Optional;
 public interface ChatMessageStore {
 
     /**
-     * Method to retrieve a ChatMessage from the Store through its ID
+     * Method to retrieve a ChatMessage from the store through its ID
      *
      * @param id The ID to look up
-     * @return The ChatMessage object with that ID, if found
+     * @return The ChatMessage object with that ID if found
      */
     Optional<ChatMessage> findMessage(int id);
 
     /**
-     * Method to get the last [amount] Messages
+     * Method to get the last [amount] of messages
      *
      * @param amount Amount of ChatMessages to be retrieved
      * @return List of latest ChatMessages, sorted newest to oldest
@@ -36,7 +36,7 @@ public interface ChatMessageStore {
     List<ChatMessage> getLatestMessages(int amount);
 
     /**
-     * Method to create a chat message
+     * Method to create a ChatMessage
      *
      * @param author  The User who wrote the ChatMessage
      * @param content The content of the message
@@ -46,11 +46,11 @@ public interface ChatMessageStore {
     ChatMessage createChatMessage(User author, String content);
 
     /**
-     * Method to update contents of chat message
+     * Method to update contents of ChatMessage
      *
      * @param id             The ChatMessage ID to update
      * @param updatedContent The new content of the message
-     * @return the chat message
+     * @return The ChatMessage
      */
     ChatMessage updateChatMessage(int id, String updatedContent);
 

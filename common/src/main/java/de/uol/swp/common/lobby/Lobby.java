@@ -50,7 +50,7 @@ public interface Lobby extends Serializable {
     void joinUser(User user);
 
     /**
-     * Removes an user from the lobby
+     * Removes a user from the lobby
      *
      * @param user The user to remove from the lobby
      * @since 2019-10-08

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * This is a test of the class used to handle the requests send by the client regarding the chat
+ * This is a test of the class used to handle the requests sent by the client regarding the chat
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -71,13 +71,13 @@ class ChatServiceTest {
     /**
      * Tests if the ChatService properly handles the NewChatMessageRequest.
      * <p>
-     * A NewChatMessageRequest is posted on the bus and it is checked if the
+     * A NewChatMessageRequest is posted onto the EventBus. It is checked if the
      * requested ChatMessage was created
      * <p>
      * This test fails if the List of ChatMessages returned by the chatManagement is
      * empty or the requested ChatMessage wasn't created with the requested attributes.
      *
-     * @throws java.lang.InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException The interrupted exception
      * @since 2020-12-19
      */
     @Test
@@ -98,13 +98,13 @@ class ChatServiceTest {
     /**
      * Tests if the ChatService properly handles the EditChatMessageRequest.
      * <p>
-     * An EditChatMessageRequest is posted on the EventBus and it is checked
+     * An EditChatMessageRequest is posted onto the EventBus. It is checked
      * if the requested ChatMessage was edited
      * <p>
      * This test fails if the List of ChatMessages returned by the chatManagement is
      * empty or the requested ChatMessage wasn't edited.
      *
-     * @throws java.lang.InterruptedException interrupted exception
+     * @throws java.lang.InterruptedException Interrupted exception
      * @since 2020-12-19
      */
     @Test
@@ -126,7 +126,7 @@ class ChatServiceTest {
     /**
      * Tests if the ChatService properly handles the DeleteChatMessageRequest.
      * <p>
-     * A new DeleteChatMessageRequest is posted on the bus and it is checked
+     * A new DeleteChatMessageRequest is posted onto the EventBus and it is checked
      * if only the ChatMessage with the specified ID was deleted.
      * <p>
      * This test fails if the List of ChatMessages returned by the chatManagement is

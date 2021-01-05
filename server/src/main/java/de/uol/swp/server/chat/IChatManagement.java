@@ -19,10 +19,10 @@ import java.util.List;
 public interface IChatManagement {
 
     /**
-     * Returns a List with ChatMessage objects of size [amount] or smaller
+     * Returns a list with ChatMessage objects of size [amount] or smaller
      *
      * @param amount The amount of ChatMessages to be returned
-     * @return a List of ChatMessage objects of size [amount] or smaller
+     * @return A list of ChatMessage objects of size [amount] or smaller
      * @since 2020-12-16
      */
     List<ChatMessage> getLatestMessages(int amount);
@@ -30,8 +30,8 @@ public interface IChatManagement {
     /**
      * Create a new ChatMessage in the ChatMessageStore
      *
-     * @param author  the author of the ChatMessage
-     * @param content the content of the ChatMessage
+     * @param author  The author of the ChatMessage
+     * @param content The content of the ChatMessage
      * @return the created ChatMessage
      * @since 2020-12-16
      */
@@ -40,9 +40,9 @@ public interface IChatManagement {
     /**
      * Update content of ChatMessage.
      *
-     * @param id             the id of the ChatMessage to update
-     * @param updatedContent the new content of the ChatMessage
-     * @return the updated ChatMessage
+     * @param id             The id of the ChatMessage to update
+     * @param updatedContent The new content of the ChatMessage
+     * @return The updated ChatMessage
      * @since 2020-12-16
      */
     ChatMessage updateChatMessage(int id, String updatedContent);
@@ -50,7 +50,7 @@ public interface IChatManagement {
     /**
      * Delete a ChatMessage.
      *
-     * @param id the ID of the ChatMessage that should be deleted
+     * @param id The ID of the ChatMessage that should be deleted
      * @since 2020-12-16
      */
     void dropChatMessage(int id);
