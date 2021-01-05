@@ -9,6 +9,7 @@ import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -32,6 +33,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     public static final String fxml = "/fxml/LobbyView.fxml";
 
     private ObservableList<String> lobbyMembers;
+    private User owner;
 
     @FXML
     private ListView<String> membersView;
@@ -77,16 +79,19 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * If a new AllOnlineUsersResponse object is posted to the EventBus the names
      * of currently logged in members are put onto the list of lobby members.
      * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
-     * list" with the names of all currently logged in users is displayed in the
+     * list" with the names of all currently logged in users as well as the message
+     * "Owner of this lobby: " with the name of the lobby's owner is displayed in the
      * log.
      *
      * @param allLobbyMembersResponse AllLobbyMembersResponse object seen on the EventBus
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
-     * @since 2020-11-22
+     * @since 2021-01-05
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
         LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
+        LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
+        this.owner = allLobbyMembersResponse.getOwner();
         updateUsersList(allLobbyMembersResponse.getUsers());
     }
 
@@ -117,13 +122,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * This method clears the entire member list and then adds the name of each user
      * in the list given to the lobby's member list. If there is no member list
      * this it creates one.
+     * If the owner is found among the users, their username is appended with a
+     * crown emoji.
      *
      * @param userLobbyList A list of UserDTO objects including all currently logged in
      *                      users
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.UserDTO
-     * @since 2020-11-22
+     * @since 2021-01-05
      */
     private void updateUsersList(List<UserDTO> userLobbyList) {
         // Attention: This must be done on the FX Thread!
@@ -133,7 +140,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 membersView.setItems(lobbyMembers);
             }
             lobbyMembers.clear();
-            userLobbyList.forEach(u -> lobbyMembers.add(u.getUsername()));
+            userLobbyList.forEach(u -> {
+                String username = u.getUsername();
+                lobbyMembers.add(username.equals(this.owner.getUsername()) ? username + "\uD83D\uDC51" : username);
+            });
         });
     }
 
