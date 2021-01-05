@@ -288,7 +288,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to delete Lobby without name from LobbyList ");
         } else {
-            lobbies.remove(msg.getName());
+            Platform.runLater(() -> lobbies.remove(msg.getName()));
             LOG.debug("Removed Lobby from LobbyList " + msg.getName());
         }
     }

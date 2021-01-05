@@ -163,7 +163,6 @@ public class LobbyService extends AbstractService {
                 sendToAll(new LobbyDeletedMessage(lobbyLeaveUserRequest.getName()));
             }
             }
-        // TODO: error handling not existing lobby
     }
 
     /**
