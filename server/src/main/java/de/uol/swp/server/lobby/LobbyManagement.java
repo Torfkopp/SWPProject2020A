@@ -17,7 +17,6 @@ import java.util.*;
 public class LobbyManagement {
 
     private final Map<String, Lobby> lobbies = new HashMap<>();
-    private final SortedMap<String, User> loggedInUsers = new TreeMap<>();
 
     /**
      * Creates a new lobby and adds it to the list
@@ -26,11 +25,8 @@ public class LobbyManagement {
      * @param owner the user who wants to create a lobby
      * @throws java.lang.IllegalArgumentException name already taken
      * @implNote the primary key of the lobbies is the name therefore the name has
-     *           to be unique
-     * @param name the name of the lobby to create
-     * @param owner the user who wants to create a lobby
+     * to be unique
      * @see de.uol.swp.common.user.User
-     * @throws IllegalArgumentException name already taken
      * @since 2019-10-08
      */
     public void createLobby(String name, User owner) throws IllegalArgumentException {

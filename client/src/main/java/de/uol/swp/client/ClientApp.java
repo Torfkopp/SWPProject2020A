@@ -105,20 +105,20 @@ public class ClientApp extends Application implements ConnectionListener {
         SceneManagerFactory sceneManagerFactory = injector.getInstance(SceneManagerFactory.class);
         this.sceneManager = sceneManagerFactory.create(primaryStage);
 
-		ClientConnectionFactory connectionFactory = injector.getInstance(ClientConnectionFactory.class);
-		clientConnection = connectionFactory.create(host, port);
-		clientConnection.addConnectionListener(this);
-		// JavaFX Thread should not be blocked to long!
-		Thread t = new Thread(() -> {
-			try {
-				clientConnection.start();
-			} catch (Exception e) {
-				exceptionOccurred(e.getMessage());
-			}
-		});
-		t.setDaemon(true);
-		t.start();
-	}
+        ClientConnectionFactory connectionFactory = injector.getInstance(ClientConnectionFactory.class);
+        clientConnection = connectionFactory.create(host, port);
+        clientConnection.addConnectionListener(this);
+        // JavaFX Thread should not be blocked to long!
+        Thread t = new Thread(() -> {
+            try {
+                clientConnection.start();
+            } catch (Exception e) {
+                exceptionOccurred(e.getMessage());
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+    }
 
     @Override
     public void stop() {
