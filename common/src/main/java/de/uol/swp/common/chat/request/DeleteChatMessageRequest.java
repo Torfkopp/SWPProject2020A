@@ -1,25 +1,42 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.message.AbstractRequestMessage;
-
 /**
  * Request sent by the client when a ChatMessage should be deleted.
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.chat.request.AbstractChatMessageRequest
  * @since 2020-12-17
  */
-public class DeleteChatMessageRequest extends AbstractRequestMessage {
+public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
     private final int id;
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for DeleteChatMessageRequests originating from
+     * the global chat. It sets the inherited originLobby attribute to null.
      *
      * @param id The ID of the ChatMessage that should be deleted
-     * @since 2020-12-17
      */
     public DeleteChatMessageRequest(int id) {
+        super(null);
+        this.id = id;
+    }
+
+    /**
+     * Constructor
+     * <p>
+     * This constructor is used for DeleteChatMessageRequests originating from
+     * a lobby chat. It sets the inherited originLobby attribute to the parameter
+     * provided upon calling the constructor.
+     *
+     * @param id          The ID of the ChatMessage that should be deleted
+     * @param originLobby The Lobby the DeleteChatMessageRequest originated from
+     * @since 2020-12-30
+     */
+    public DeleteChatMessageRequest(int id, String originLobby) {
+        super(originLobby);
         this.id = id;
     }
 
@@ -27,7 +44,6 @@ public class DeleteChatMessageRequest extends AbstractRequestMessage {
      * Getter for the ID attribute
      *
      * @return the ID of the ChatMessage that should be deleted
-     * @since 2020-12-17
      */
     public int getId() {
         return id;
