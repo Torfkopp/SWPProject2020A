@@ -36,8 +36,9 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
     public AllLobbyMembersResponse(Collection<User> users) {
         for (User user : users) {
             this.users.add(UserDTO.createWithoutPassword(user));
+
+            }
         }
-    }
 
     /**
      * Getter for the list of lobby members
