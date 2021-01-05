@@ -171,7 +171,6 @@ class UserServiceTest {
         assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
         assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
         assertFalse(request.authorizationNeeded());
-
     }
 
     /**
