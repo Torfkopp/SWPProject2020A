@@ -188,6 +188,7 @@ public class LobbyService extends AbstractService {
             sendToAllInLobby(lobbyLeaveUserRequest.getName(), new UserLeftLobbyMessage(lobbyLeaveUserRequest.getName(), lobbyLeaveUserRequest.getUser()));
             } catch (IllegalArgumentException exception) {
                 lobbyManagement.dropLobby(lobby.get().getName());
+                sendToAll(new LobbyDeletedMessage(lobbyLeaveUserRequest.getName()));
             }
             }
         // TODO: error handling not existing lobby
