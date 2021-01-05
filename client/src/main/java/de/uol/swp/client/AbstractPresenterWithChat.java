@@ -88,11 +88,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
-                    + ": '" + msg.getMsg().getContent() + " for Global chat");
+                    + ": '" + msg.getMsg().getContent() + " for " + msg.getLobbyName() + " chat");
             Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
-                    + ": '" + msg.getMsg().getContent() + " for " + msg.getLobbyName() + " chat");
+                    + ": '" + msg.getMsg().getContent() + " for Global chat");
             Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
         }
     }
