@@ -223,6 +223,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         closeWindow();
     }
 
+    /**
+     * Helper function to let the user leave the lobby and close the window
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-06
+     */
     private void closeWindow() {
         if (lobbyName != null || loggedInUser != null) {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
