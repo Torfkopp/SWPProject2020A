@@ -44,7 +44,7 @@ public class EditedChatMessageMessage extends AbstractChatMessageMessage {
     }
 
     /**
-     * Getter for the chatMsg attribute
+     * Gets the chatMsg attribute
      *
      * @return The edited ChatMessage
      */

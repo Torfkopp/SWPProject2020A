@@ -5,8 +5,8 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 import java.util.Objects;
 
 /**
- * This exception is thrown if something went wrong during the ChangePassword process.
- * e.g.: The old password is not correct and not verified.
+ * This exception is thrown if something went wrong during the ChangePassword process,
+ * e.g. the old password is not correct and not verified.
  *
  * @author Steven Luong
  * @author Eric Vuong
@@ -29,7 +29,7 @@ public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
 
     @Override
     public String toString() {
-        return "ChangePasswordExceptionMessage " + message;
+        return "ChangePasswordExceptionMessage: " + message;
     }
 
     @Override

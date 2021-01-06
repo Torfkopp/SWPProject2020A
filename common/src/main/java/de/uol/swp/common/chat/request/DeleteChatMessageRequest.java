@@ -41,9 +41,9 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
     }
 
     /**
-     * Getter for the ID attribute
+     * Gets the ID attribute
      *
-     * @return the ID of the ChatMessage that should be deleted
+     * @return The ID of the ChatMessage that should be deleted
      */
     public int getId() {
         return id;

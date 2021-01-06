@@ -41,8 +41,8 @@ class ChatServiceTest {
     /**
      * Handles DeadEvents detected on the EventBus
      * <p>
-     * If a DeadEvent is detected the event variable of this class gets updated
-     * to its event and its event is printed to the console output.
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
      *
      * @param e The DeadEvent detected on the EventBus
      */
@@ -79,14 +79,14 @@ class ChatServiceTest {
      * Test for the newMessage routine
      * <p>
      * Test if the ChatService creates a NewChatMessageRequest with the given
-     * User and Content and posts it to the EventBus when newMessage is called
+     * user and content, and posts it onto the EventBus when newMessage is called
      * without an originLobby parameter.
      * <p>
      * This test fails if the NewChatMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the Author or Content
+     * or if its originLobby attribute is not null, or if the author or content
      * aren't equal to what was sent originally.
      *
-     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      */
     @Test
     void newMessageTest() throws InterruptedException {
@@ -109,14 +109,14 @@ class ChatServiceTest {
      * Test for the newMessage routine
      * <p>
      * Test if the ChatService creates a NewChatMessageRequest with the given
-     * User and Content and posts it to the EventBus when newMessage is called
+     * user and content and posts it onto the EventBus when newMessage is called
      * with the originLobby parameter.
      * <p>
      * This test fails if the NewChatMessageRequest says it did not originate
-     * from a lobby, or if the Author or Content or originLobby attributes
+     * from a lobby, or if the author, or content, or originLobby attributes
      * aren't equal to what was sent originally.
      *
-     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      * @since 2021-01-03
      */
     @Test
@@ -140,11 +140,11 @@ class ChatServiceTest {
      * Test for the newMessage routine
      * <p>
      * Test if the ChatService creates a NewChatMessageRequest with the given
-     * User and Content and posts it to the EventBus when newMessage is called
+     * User and Content and posts it onto the EventBus when newMessage is called
      * with the originLobby parameter set to null.
      * <p>
      * This test fails if the NewChatMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the Author or Content
+     * or if its originLobby attribute is not null, or if the author or content
      * aren't equal to what was sent originally.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
@@ -170,15 +170,15 @@ class ChatServiceTest {
     /**
      * Test for the deleteMessage routine
      * <p>
-     * Tests if the ChatService creates a DeleteChatMessageRequest
-     * with the given ID and posts it to the EventBus when deleteMessage is called
+     * Tests if the ChatService creates a DeleteChatMessageRequest with
+     * the given ID, and posts it onto the EventBus when deleteMessage is called
      * without an originLobby parameter.
      * <p>
      * This test fails if the DeleteChatMessageRequest says it originated from a
      * lobby, or if its originLobby attribute is not null, or if the ID doesn't
      * equal the ID that was sent originally.
      *
-     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      */
     @Test
     void deleteMessageTest() throws InterruptedException {
@@ -200,7 +200,7 @@ class ChatServiceTest {
      * Test for the deleteMessage routine
      * <p>
      * Tests if the ChatService creates a DeleteChatMessageRequest
-     * with the given ID and posts it to the EventBus when deleteMessage is called
+     * with the given ID and posts it onto the EventBus when deleteMessage is called
      * with the originLobby parameter.
      * <p>
      * This test fails if the DeleteChatMessageRequest says it did not originate
@@ -230,7 +230,7 @@ class ChatServiceTest {
      * Test for the deleteMessage routine
      * <p>
      * Tests if the ChatService creates a DeleteChatMessageRequest
-     * with the given ID and posts it to the EventBus when deleteMessage is called
+     * with the given ID and posts it onto the EventBus when deleteMessage is called
      * with the originLobby parameter set to null.
      * <p>
      * This test fails if the DeleteChatMessageRequest says it originated from a
@@ -259,12 +259,12 @@ class ChatServiceTest {
     /**
      * Test for editMessage routine
      * <p>
-     * Tests if the ChatService creates a EditChatMessageRequest
-     * with the given ID and content and posts it to the EventBus when editMessage
+     * Tests if the ChatService creates a EditChatMessageRequest with
+     * the given ID and content, and posts it onto the EventBus when editMessage
      * is called without an originLobby parameter.
      * <p>
      * This test fails if the EditChatMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the ID or Content aren't
+     * or if its originLobby attribute is not null, or if the ID or content aren't
      * equal to what was sent originally.
      *
      * @throws InterruptedException thrown by lock.await()
@@ -290,11 +290,11 @@ class ChatServiceTest {
      * Test for editMessage routine
      * <p>
      * Tests if the ChatService creates a EditChatMessageRequest with the given
-     * ID and content and posts it to the EventBus when editMessage is called
+     * ID and content and posts it onto the EventBus when editMessage is called
      * with the originLobby parameter.
      * <p>
      * This test fails if the EditMessageRequest says it did not originate from
-     * a lobby, or if the originLobby, ID or Content aren't equal to what was
+     * a lobby, or if the originLobby, ID, or content aren't equal to what was
      * sent originally.
      *
      * @throws InterruptedException thrown by lock.await()
@@ -321,11 +321,11 @@ class ChatServiceTest {
      * Test for editMessage routine
      * <p>
      * Tests if the ChatService creates a EditChatMessageRequest with the given
-     * ID and content and posts it to the EventBus when editMessage is called
+     * ID and content and posts it onto the EventBus when editMessage is called
      * with the originLobby parameter set to null.
      * <p>
      * This test fails if the EditMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the ID or Content aren't
+     * or if its originLobby attribute is not null, or if the ID or content aren't
      * equal to what was sent originally.
      *
      * @throws InterruptedException thrown by lock.await()
@@ -351,12 +351,12 @@ class ChatServiceTest {
     /**
      * Test for the askLatestMessages routine
      * <p>
-     * Tests if the ChatService creates an AskLatestChatMessageRequest
-     * with the given amount and posts it to the EventBus when askLatestMessages is
+     * Tests if the ChatService creates an AskLatestChatMessageRequest with
+     * the given amount, and posts it onto the EventBus when askLatestMessages is
      * called without an originLobby parameter.
      * <p>
      * This test fails if the AskLatestMessagesRequest says it originated from a
-     * lobby, or if its originLobby attribute is not null, or if the Amount isn't
+     * lobby, or if its originLobby attribute is not null, or if the amount isn't
      * equal to what was sent originally.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
@@ -381,11 +381,11 @@ class ChatServiceTest {
      * Test for the askLatestMessages routine
      * <p>
      * Tests if the ChatService creates an AskLatestChatMessageRequest
-     * with the given amount and posts it to the EventBus when askLatestMessages is called
+     * with the given amount and posts it onto the EventBus when askLatestMessages is called
      * with the originLobby parameter.
      * <p>
      * This test fails if the AskLatestMessagesRequest says it did not originate from a lobby,
-     * or if the originLobby, the Author or Content aren't equal to what was sent originally.
+     * or if the originLobby, the author, or content aren't equal to what was sent originally.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2021-01-03
@@ -414,7 +414,7 @@ class ChatServiceTest {
      * with the originLobby parameter set to null.
      * <p>
      * This test fails if the AskLatestMessagesRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the Amount isn't equal to what
+     * or if its originLobby attribute is not null, or if the amount isn't equal to what
      * was sent originally.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()

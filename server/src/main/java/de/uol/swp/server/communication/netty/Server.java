@@ -30,7 +30,7 @@ public class Server {
     /**
      * Constructor
      * <p>
-     * Creates a new Server Object
+     * Creates a new Server object
      *
      * @see io.netty.channel.ChannelHandler
      * @see de.uol.swp.server.communication.ServerHandler
@@ -41,10 +41,10 @@ public class Server {
     }
 
     /**
-     * Start a new server on given port
+     * Start a new server on the given port
      *
-     * @param port port number the server shall be reachable on
-     * @throws java.lang.Exception server failed to start e.g. because the port is already in use
+     * @param port Port number the server shall be reachable on
+     * @throws java.lang.Exception Server failed to start, e.g. the port is already in use
      * @see java.net.InetSocketAddress
      * @since 2019-11-20
      */
@@ -58,11 +58,11 @@ public class Server {
 
                 @Override
                 protected void initChannel(SocketChannel ch) {
-                    // Encoder and decoder are both needed! Send and
-                    // receive serializable objects
+                    // Encoder and decoder are both needed!
+                    // Send and receive serialisable objects
                     ch.pipeline().addLast(new MyObjectEncoder());
                     ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                    // must be last in the pipeline else they will not
+                    // Must be last in the pipeline, else they will not
                     // get encoded/decoded objects but ByteBuf
                     ch.pipeline().addLast(serverHandler);
                 }

@@ -5,9 +5,9 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 import java.util.Objects;
 
 /**
- * A request send from client to server, trying to log in with
- * username and password
- *
+ * A request sent from client to server when a user
+ * tries to log in with a username and a password
+ * 
  * @author Marco Grawunder
  * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2017-03-17
@@ -18,55 +18,55 @@ public class LoginRequest extends AbstractRequestMessage {
     private String username;
     private String password;
 
-    /**
-     * Constructor
-     *
-     * @param username username the user tries to log in with
-     * @param password password the user tries to log in with
-     * @since 2017-03-17
-     */
-    public LoginRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param username The user's username
+	 * @param password The user's password
+	 * @since 2017-03-17
+	 */
+	public LoginRequest(String username, String password) {
+		this.username = username;
+		this.password = password;
+	}
 
     @Override
-    public boolean authorizationNeeded() {
+    public boolean authorisationNeeded() {
         return false;
     }
 
-    /**
-     * Getter for the username variable
-     *
-     * @return String containing the username the user tries to log in with
-     * @since 2017-03-17
-     */
-    public String getUsername() {
-        return username;
-    }
+	/**
+	 * Gets the username variable
+	 *
+	 * @return String containing the user's username
+	 * @since  2017-03-17
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/**
+	 * Sets the username variable
+	 *
+	 * @param username String containing the new username
+	 * @since 2017-03-17
+	 */
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	/**
+	 * Gets the password variable
+	 *
+	 * @return String containing the user's password
+	 * @since  2017-03-17
+	 */
+	public String getPassword() {
+		return password;
+	}
 
     /**
-     * Setter for the username variable
-     *
-     * @param username String containing the new username
-     * @since 2017-03-17
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * Getter for the password variable
-     *
-     * @return String containing the password the user tries to log in with
-     * @since 2017-03-17
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Setter for the password variable
+     * Sets the password variable
      *
      * @param password String containing the new password
      * @since 2017-03-17
@@ -75,10 +75,10 @@ public class LoginRequest extends AbstractRequestMessage {
         this.password = password;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(username, password);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(username, password);
+	}
 
     @Override
     public boolean equals(Object o) {

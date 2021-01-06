@@ -5,8 +5,8 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 /**
  * Request for initialising the user list in the client
  * <p>
- * This message is sent during the initialization of the user list. The server will
- * respond with a AllLobbyMembersResponse.
+ * This message is sent during the initialisation of the user list.
+ * The server will respond with an AllLobbyMembersResponse.
  *
  * @author Alwin Bossert
  * @author Steven Luong

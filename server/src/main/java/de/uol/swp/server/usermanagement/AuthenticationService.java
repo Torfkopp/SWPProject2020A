@@ -14,7 +14,7 @@ import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.communication.UUIDSession;
-import de.uol.swp.server.message.ClientAuthorizedMessage;
+import de.uol.swp.server.message.ClientAuthorisedMessage;
 import de.uol.swp.server.message.ServerExceptionMessage;
 import de.uol.swp.server.message.ServerInternalMessage;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +24,7 @@ import javax.security.auth.login.LoginException;
 import java.util.*;
 
 /**
- * Mapping authentication event bus calls to user management calls
+ * Mapping authentication's EventBus calls to UserManagement calls
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.AbstractService
@@ -36,7 +36,7 @@ public class AuthenticationService extends AbstractService {
     private static final Logger LOG = LogManager.getLogger(AuthenticationService.class);
 
     /**
-     * The list of current logged in users
+     * The list of all currently logged in users
      */
     private final Map<Session, User> userSessions = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class AuthenticationService extends AbstractService {
      * Constructor
      *
      * @param bus            The EventBus used throughout the entire server
-     * @param userManagement object of the UserManagement to use
+     * @param userManagement Object of the UserManagement to use
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-30
      */
@@ -57,10 +57,10 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
-     * Searches the Session for a given user
+     * Searches the session for a given user
      *
-     * @param user user whose Session is to be searched
-     * @return either empty Optional or Optional containing the Session
+     * @param user User whose session is to be searched
+     * @return Either an empty Optional or an Optional containing the session
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.user.User
      * @since 2019-09-04
@@ -71,10 +71,10 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
-     * Searches the Sessions for a Set of given users
+     * Searches the sessions for a set of given users
      *
-     * @param users Set of users whose Sessions are to be searched
-     * @return List containing the Sessions that where found
+     * @param users Set of users whose sessions are to be searched
+     * @return List containing the sessions that where found
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
@@ -89,17 +89,17 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
-     * Handles LoginRequests found on the EventBus
+     * Handles a LoginRequest found on the EventBus
      * <p>
-     * If a LoginRequest is detected on the EventBus, this method is called. It
-     * tries to login a user via the UserManagement. If this succeeds the user and
-     * his Session are stored in the userSessions Map and a ClientAuthorizedMessage
-     * is posted on the EventBus otherwise a ServerExceptionMessage gets posted
-     * there.
+     * If a LoginRequest is detected on the EventBus, this method is called.
+     * It tries to login a user via the UserManagement.
+     * If this succeeds, the user and his session are stored in the userSessions map,
+     * and a ClientAuthorisedMessage is posted onto the EventBus.
+     * Otherwise, a ServerExceptionMessage gets posted there.
      *
-     * @param msg the LoginRequest
+     * @param msg The LoginRequest
      * @see de.uol.swp.common.user.request.LoginRequest
-     * @see de.uol.swp.server.message.ClientAuthorizedMessage
+     * @see ClientAuthorisedMessage
      * @see de.uol.swp.server.message.ServerExceptionMessage
      * @since 2019-08-30
      */
@@ -111,7 +111,7 @@ public class AuthenticationService extends AbstractService {
         ServerInternalMessage returnMessage;
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
-            returnMessage = new ClientAuthorizedMessage(newUser);
+            returnMessage = new ClientAuthorisedMessage(newUser);
             Session newSession = UUIDSession.create(newUser);
             userSessions.put(newSession, newUser);
             returnMessage.setSession(newSession);
@@ -126,14 +126,14 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
-     * Handles LogoutRequests found on the EventBus
+     * Handles a LogoutRequest found on the EventBus
      * <p>
-     * If a LogoutRequest is detected on the EventBus, this method is called. It
-     * tries to logout a user via the UserManagement. If this succeeds the user and
-     * his Session are removed from the userSessions Map and a UserLoggedOutMessage
-     * is posted on the EventBus.
+     * If a LogoutRequest is detected on the EventBus, this method is called.
+     * It tries to log out a user via the UserManagement. If this succeeds,
+     * the user and his Session are removed from the userSessions Map,
+     * and a UserLoggedOutMessage is posted onto the EventBus.
      *
-     * @param msg the LogoutRequest
+     * @param msg The LogoutRequest
      * @see de.uol.swp.common.user.request.LogoutRequest
      * @see de.uol.swp.common.user.message.UserLoggedOutMessage
      * @since 2019-08-30
@@ -157,10 +157,10 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
-     * Handles RetrieveAllOnlineUsersRequests found on the EventBus
+     * Handles a RetrieveAllOnlineUsersRequest found on the EventBus
      * <p>
      * If a RetrieveAllOnlineUsersRequest is detected on the EventBus, this method
-     * is called. It posts a AllOnlineUsersResponse containing user objects for
+     * is called. It posts an AllOnlineUsersResponse containing User objects for
      * every logged in user on the EvenBus.
      *
      * @param msg RetrieveAllOnlineUsersRequest found on the EventBus

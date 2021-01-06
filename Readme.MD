@@ -20,7 +20,7 @@ Um den Client zu bauen:
 mvn clean package
 </code></pre>
 
-der Client ist dann unter target zu finden und kann dann z. B. wie folgt aufgerufen werden:
+Der Client ist dann unter Target zu finden und kann dann z. B. wie folgt aufgerufen werden:
 
 <pre><code>cd target
 java -jar client-1.0-SNAPSHOT-jar-with-dependencies.jar
