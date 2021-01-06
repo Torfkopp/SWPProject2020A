@@ -88,4 +88,5 @@ public interface ServerUserService {
     List<User> retrieveAllUsers();
 
     Optional<User> getUser(String userName);
+    Optional<User> getUserWithPassword(String userName, String password);
 }

@@ -5,6 +5,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("UnstableApiUsage")
 class LobbyServiceTest {
 
-    final UserDTO defaultUser = new UserDTO("chuck", "test", "chuck@norris.com");
+    final User defaultUser = new UserDTO("chuck", "test", "chuck@norris.com");
 
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);

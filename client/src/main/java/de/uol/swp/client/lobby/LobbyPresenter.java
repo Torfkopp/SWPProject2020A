@@ -161,7 +161,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.common.user.UserDTO
      * @since 2021-01-05
      */
-    private void updateUsersList(List<UserDTO> userLobbyList) {
+    private void updateUsersList(List<User> userLobbyList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
@@ -231,7 +231,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void closeWindow() {
         if (lobbyName != null || loggedInUser != null) {
-            lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
+            lobbyService.leaveLobby(lobbyName, loggedInUser);
         }
         ((Stage) window).close();
     }
