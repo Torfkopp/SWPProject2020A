@@ -28,8 +28,8 @@ class MainMemoryBasedUserStoreTest {
         return Collections.unmodifiableList(users);
     }
 
-    MainMemoryBasedUserStore getDefaultStore() {
-        MainMemoryBasedUserStore store = new MainMemoryBasedUserStore();
+    UserStore getDefaultStore() {
+        UserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return store;

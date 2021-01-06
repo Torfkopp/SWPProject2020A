@@ -33,7 +33,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     /**
      * Connected Clients
      */
-    private final Collection<MessageContext> connectedClients = new CopyOnWriteArrayList<>();
+    private final List<MessageContext> connectedClients = new CopyOnWriteArrayList<>();
 
     /**
      * Clients with logged in sessions
@@ -326,7 +326,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
      */
-    private Iterable<MessageContext> getCtx(Iterable<Session> receiver) {
+    private List<MessageContext> getCtx(Iterable<Session> receiver) {
         List<MessageContext> ctxs = new ArrayList<>();
         receiver.forEach(r -> {
             Optional<MessageContext> s = getCtx(r);
@@ -377,7 +377,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-11-20
      */
-    private void sendToMany(Iterable<MessageContext> sendTo, ServerMessage msg) {
+    private void sendToMany(List<MessageContext> sendTo, ServerMessage msg) {
         for (MessageContext client : sendTo) {
             try {
                 client.writeAndFlush(msg);

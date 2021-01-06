@@ -22,8 +22,8 @@ import java.util.Map;
  */
 public class AllLobbiesResponse extends AbstractResponseMessage {
 
-    final private List<String> lobbyNames = new ArrayList<>();
-    final private List<Lobby> lobbies = new ArrayList<>();
+    private final List<String> lobbyNames = new ArrayList<>();
+    private final List<Lobby> lobbies = new ArrayList<>();
 
     /**
      * Default Constructor

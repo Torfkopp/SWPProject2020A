@@ -34,7 +34,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      * @param latestMessages A list of ChatMessage objects smaller or as big as requested
      * @since 2020-12-17
      */
-    public AskLatestChatMessageResponse(Iterable<ChatMessage> latestMessages) {
+    public AskLatestChatMessageResponse(List<ChatMessage> latestMessages) {
         for (ChatMessage msg : latestMessages) {
             chatHistory.add(ChatMessageDTO.create(msg));
         }

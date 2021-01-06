@@ -5,9 +5,11 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.usermanagement.AuthenticationService;
+import de.uol.swp.server.usermanagement.ServerUserService;
 import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,7 @@ class LobbyServiceTest {
 
     @Test
     void createLobbyTest() {
-        final CreateLobbyRequest request = new CreateLobbyRequest("Testlobby", user1);
+        final Message request = new CreateLobbyRequest("Testlobby", user1);
 
         // The post will lead to a call of a LobbyService function
         bus.post(request);
@@ -48,8 +50,8 @@ class LobbyServiceTest {
 
     @Test
     void createSecondLobbyWithSameName() {
-        final CreateLobbyRequest request1 = new CreateLobbyRequest("Testlobby", user1);
-        final CreateLobbyRequest request2 = new CreateLobbyRequest("Testlobby", user2);
+        final Message request1 = new CreateLobbyRequest("Testlobby", user1);
+        final Message request2 = new CreateLobbyRequest("Testlobby", user2);
 
         bus.post(request1);
         bus.post(request2);
@@ -67,13 +69,13 @@ class LobbyServiceTest {
     @Test
     void userJoinLobbyRequest() {
         // Create a joinable lobby first
-        final CreateLobbyRequest request0 = new CreateLobbyRequest("Testlobby", user1);
+        final Message request0 = new CreateLobbyRequest("Testlobby", user1);
         // Create several join requests
-        final LobbyJoinUserRequest request1 = new LobbyJoinUserRequest("Testlobby", user1);
-        final LobbyJoinUserRequest request2 = new LobbyJoinUserRequest("Testlobby", user2);
-        final LobbyJoinUserRequest request3 = new LobbyJoinUserRequest("Testlobby", user3);
-        final LobbyJoinUserRequest request4 = new LobbyJoinUserRequest("Testlobby", user4);
-        final LobbyJoinUserRequest request5 = new LobbyJoinUserRequest("Testlobby", user5);
+        final Message request1 = new LobbyJoinUserRequest("Testlobby", user1);
+        final Message request2 = new LobbyJoinUserRequest("Testlobby", user2);
+        final Message request3 = new LobbyJoinUserRequest("Testlobby", user3);
+        final Message request4 = new LobbyJoinUserRequest("Testlobby", user4);
+        final Message request5 = new LobbyJoinUserRequest("Testlobby", user5);
         // post all requests
         bus.post(request0);
         bus.post(request1);

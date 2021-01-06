@@ -83,7 +83,7 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     private void loginUser() throws InterruptedException {
-        UserService userService = new UserService(bus);
+        ClientUserService userService = new UserService(bus);
         userService.login(defaultUser.getUsername(), defaultUser.getPassword());
         lock.await(1000, TimeUnit.MILLISECONDS);
     }
@@ -129,7 +129,7 @@ class UserServiceTest {
         loginUser();
         event = null;
 
-        UserService userService = new UserService(bus);
+        ClientUserService userService = new UserService(bus);
         userService.logout(defaultUser);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -158,7 +158,7 @@ class UserServiceTest {
      */
     @Test
     void createUserTest() throws InterruptedException {
-        UserService userService = new UserService(bus);
+        ClientUserService userService = new UserService(bus);
         userService.createUser(defaultUser);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -190,7 +190,7 @@ class UserServiceTest {
      */
     @Test
     void updateUserTest() throws InterruptedException {
-        UserService userService = new UserService(bus);
+        ClientUserService userService = new UserService(bus);
         userService.updateUser(defaultUser);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -222,7 +222,7 @@ class UserServiceTest {
      */
     @Test
     void dropUserTest() throws InterruptedException {
-        UserService userService = new UserService(bus);
+        ClientUserService userService = new UserService(bus);
 
         userService.dropUser(defaultUser);
 
@@ -251,7 +251,7 @@ class UserServiceTest {
      */
     @Test
     void retrieveAllUsersTest() throws InterruptedException {
-        UserService userService = new UserService(bus);
+        ClientUserService userService = new UserService(bus);
         userService.retrieveAllUsers();
 
         lock.await(1000, TimeUnit.MILLISECONDS);

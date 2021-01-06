@@ -6,6 +6,7 @@ import de.uol.swp.common.chat.request.AskLatestChatMessageRequest;
 import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 
 /**
@@ -34,49 +35,49 @@ public class ChatService implements IChatService {
 
     @Override
     public void newMessage(User author, String msg) {
-        NewChatMessageRequest request = new NewChatMessageRequest(author, msg);
+        Message request = new NewChatMessageRequest(author, msg);
         bus.post(request);
     }
 
     @Override
     public void newMessage(User author, String msg, String originLobby) {
-        NewChatMessageRequest request = new NewChatMessageRequest(author, msg, originLobby);
+        Message request = new NewChatMessageRequest(author, msg, originLobby);
         bus.post(request);
     }
 
     @Override
     public void deleteMessage(int id) {
-        DeleteChatMessageRequest request = new DeleteChatMessageRequest(id);
+        Message request = new DeleteChatMessageRequest(id);
         bus.post(request);
     }
 
     @Override
     public void deleteMessage(int id, String originLobby) {
-        DeleteChatMessageRequest request = new DeleteChatMessageRequest(id, originLobby);
+        Message request = new DeleteChatMessageRequest(id, originLobby);
         bus.post(request);
     }
 
     @Override
     public void editMessage(int id, String newContent) {
-        EditChatMessageRequest request = new EditChatMessageRequest(id, newContent);
+        Message request = new EditChatMessageRequest(id, newContent);
         bus.post(request);
     }
 
     @Override
     public void editMessage(int id, String newContent, String originLobby) {
-        EditChatMessageRequest request = new EditChatMessageRequest(id, newContent, originLobby);
+        Message request = new EditChatMessageRequest(id, newContent, originLobby);
         bus.post(request);
     }
 
     @Override
     public void askLatestMessages(int amount) {
-        AskLatestChatMessageRequest request = new AskLatestChatMessageRequest(amount);
+        Message request = new AskLatestChatMessageRequest(amount);
         bus.post(request);
     }
 
     @Override
     public void askLatestMessages(int amount, String originLobby) {
-        AskLatestChatMessageRequest request = new AskLatestChatMessageRequest(amount, originLobby);
+        Message request = new AskLatestChatMessageRequest(amount, originLobby);
         bus.post(request);
     }
 }

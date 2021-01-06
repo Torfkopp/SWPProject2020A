@@ -21,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -41,7 +40,7 @@ public class ClientConnection {
 
     private final String host;
     private final int port;
-    private final Collection<ConnectionListener> connectionListener = new CopyOnWriteArrayList<>();
+    private final List<ConnectionListener> connectionListener = new CopyOnWriteArrayList<>();
     private EventLoopGroup group;
     private EventBus eventBus;
     private Channel channel;

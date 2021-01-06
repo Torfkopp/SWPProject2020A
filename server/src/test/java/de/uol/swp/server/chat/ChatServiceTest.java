@@ -5,12 +5,14 @@ import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
+import de.uol.swp.server.usermanagement.ServerUserService;
 import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
@@ -89,7 +91,7 @@ class ChatServiceTest {
      */
     @Test
     void newChatMessageTest() throws InterruptedException {
-        final NewChatMessageRequest req = new NewChatMessageRequest(defaultUser, defaultContent);
+        final Message req = new NewChatMessageRequest(defaultUser, defaultContent);
         bus.post(req);
 
         lock.await(500, TimeUnit.MILLISECONDS);
@@ -116,7 +118,7 @@ class ChatServiceTest {
      */
     @Test
     void newChatMessageInLobbyTest() throws InterruptedException {
-        final NewChatMessageRequest req = new NewChatMessageRequest(defaultUser, defaultContent, defaultLobby);
+        final Message req = new NewChatMessageRequest(defaultUser, defaultContent, defaultLobby);
         bus.post(req);
 
         lock.await(500, TimeUnit.MILLISECONDS);
@@ -143,7 +145,7 @@ class ChatServiceTest {
     @Test
     void editChatMessageTest() throws InterruptedException {
         ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent);
-        final EditChatMessageRequest req = new EditChatMessageRequest(msg.getID(), secondContent);
+        final Message req = new EditChatMessageRequest(msg.getID(), secondContent);
         bus.post(req);
 
         lock.await(500, TimeUnit.MILLISECONDS);
@@ -171,7 +173,7 @@ class ChatServiceTest {
     @Test
     void editChatMessageInLobbyTest() throws InterruptedException {
         ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        final EditChatMessageRequest req = new EditChatMessageRequest(msg.getID(), secondContent, defaultLobby);
+        final Message req = new EditChatMessageRequest(msg.getID(), secondContent, defaultLobby);
         bus.post(req);
 
         lock.await(500, TimeUnit.MILLISECONDS);
@@ -199,7 +201,7 @@ class ChatServiceTest {
     void deleteChatMessageTest() throws InterruptedException {
         ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent);
         ChatMessage msg2 = chatManagement.createChatMessage(defaultUser, secondContent);
-        final DeleteChatMessageRequest req = new DeleteChatMessageRequest(msg2.getID());
+        final Message req = new DeleteChatMessageRequest(msg2.getID());
         bus.post(req);
 
         lock.await(500, TimeUnit.MILLISECONDS);
@@ -228,7 +230,7 @@ class ChatServiceTest {
     void deleteChatMessageInLobbyTest() throws InterruptedException {
         ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
         ChatMessage msg2 = chatManagement.createChatMessage(defaultUser, secondContent, defaultLobby);
-        final DeleteChatMessageRequest req = new DeleteChatMessageRequest(msg2.getID(), defaultLobby);
+        final Message req = new DeleteChatMessageRequest(msg2.getID(), defaultLobby);
         bus.post(req);
 
         lock.await(500, TimeUnit.MILLISECONDS);

@@ -27,7 +27,7 @@ class ChatMessageDTOTest {
     private static final String defaultContent = "I am intelligent content";
     private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
     private static final Instant defaultTimestamp = Instant.ofEpochMilli(1608370913852L); // 2020-12-19-09:41:53.852
-    private static final ChatMessageDTO defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
+    private static final ChatMessage defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
 
     /**
      * Tests instantiation of the ChatMessageDTO constructor without a timestamp,

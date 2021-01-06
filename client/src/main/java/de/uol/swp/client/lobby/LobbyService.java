@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.request.*;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
@@ -39,8 +40,8 @@ public class LobbyService {
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    public void createNewLobby(String name, UserDTO user) {
-        CreateLobbyRequest createLobbyRequest = new CreateLobbyRequest(name, user);
+    public void createNewLobby(String name, User user) {
+        Message createLobbyRequest = new CreateLobbyRequest(name, user);
         eventBus.post(createLobbyRequest);
     }
 
@@ -66,13 +67,13 @@ public class LobbyService {
      * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
      */
-    public void joinLobby(String name, UserDTO user) {
-        LobbyJoinUserRequest joinUserRequest = new LobbyJoinUserRequest(name, user);
+    public void joinLobby(String name, User user) {
+        Message joinUserRequest = new LobbyJoinUserRequest(name, user);
         eventBus.post(joinUserRequest);
     }
 
-    public void leaveLobby(String lobbyName, UserDTO user) {
-        LobbyLeaveUserRequest lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
+    public void leaveLobby(String lobbyName, User user) {
+        Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
     }
 
@@ -83,12 +84,12 @@ public class LobbyService {
      * @since 2020-12-12
      */
     public void retrieveAllLobbies() {
-        RetrieveAllLobbiesRequest retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
+        Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
         eventBus.post(retrieveAllLobbiesRequest);
     }
 
     public void retrieveAllLobbyMembers(String lobbyName) {
-        RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
+        Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
 }

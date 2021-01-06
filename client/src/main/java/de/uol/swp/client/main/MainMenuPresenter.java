@@ -15,6 +15,7 @@ import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
@@ -223,7 +224,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.common.user.UserDTO
      * @since 2019-08-29
      */
-    private void updateUsersList(List<UserDTO> userList) {
+    private void updateUsersList(List<User> userList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (users == null) {
@@ -344,7 +345,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
-        updateLobbyList(allLobbiesResponse.getLobbies());
+        updateLobbyList(allLobbiesResponse.getLobbyNames());
     }
 
     /**
@@ -397,7 +398,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(s -> lobbyService.createNewLobby(s, (UserDTO) loggedInUser));
+        result.ifPresent(s -> lobbyService.createNewLobby(s, loggedInUser));
     }
 
     /**
@@ -419,7 +420,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
             String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
-            lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
+            lobbyService.joinLobby(lobbyName, loggedInUser);
         }
     }
 

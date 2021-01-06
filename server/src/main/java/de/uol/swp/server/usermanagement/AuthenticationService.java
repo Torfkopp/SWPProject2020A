@@ -80,7 +80,7 @@ public class AuthenticationService extends AbstractService {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    public List<Session> getSessions(Iterable<User> users) {
+    public List<Session> getSessions(Set<User> users) {
         List<Session> sessions = new ArrayList<>();
         users.forEach(u -> {
             Optional<Session> session = getSession(u);

@@ -4,7 +4,7 @@ import de.uol.swp.common.user.User;
 
 public class LobbyDeletedMessage extends AbstractLobbyMessage {
 
-    public LobbyDeletedMessage(String name, User user) {
-        super(name, user);
+    public LobbyDeletedMessage(String name) {
+        super(name, null);
     }
 }
