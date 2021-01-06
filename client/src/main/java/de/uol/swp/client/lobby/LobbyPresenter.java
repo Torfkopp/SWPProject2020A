@@ -8,14 +8,20 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -37,6 +43,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     @FXML
     private ListView<String> membersView;
+
+    private Window window;
 
     /**
      * Constructor
@@ -71,6 +79,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             super.loggedInUser = lobbyUpdateEvent.getUser();
             super.chatService.askLatestMessages(10, super.lobbyName);
         }
+        window = membersView.getScene().getWindow();
+        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                closeWindow();
+            }
+        });
     }
 
     /**
@@ -114,6 +129,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
                 lobbyMembers.add(message.getUser().getUsername());
         });
+    }
+
+    @Subscribe
+    private void onUserLeftLobbyMessage(UserLeftLobbyMessage message) {
+        if (message.getUser().getUsername().equals(owner.getUsername())) {
+            LOG.debug("Owner " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
+        } else {
+            LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            Platform.runLater(() -> {
+                        lobbyMembers.remove(message.getUser().getUsername());
+                    }
+            );
+        }
     }
 
     /**
@@ -177,5 +206,33 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
+    }
+
+    /**
+     * Handles a click on the LeaveLobby button
+     * <p>
+     * Method called when the leaveLobby button is pressed.
+     * If the leaveLobby button is pressed this method requests
+     * the lobby service to leave the lobby.
+     *
+     * @param event The ActionEvent created by pressing the leave lobby Button
+     * @since 2020-12-14
+     */
+    @FXML
+    void onLeaveLobby(ActionEvent event) {
+        closeWindow();
+    }
+
+    /**
+     * Helper function to let the user leave the lobby and close the window
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-06
+     */
+    private void closeWindow() {
+        if (lobbyName != null || loggedInUser != null) {
+            lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
+        }
+        ((Stage) window).close();
     }
 }
