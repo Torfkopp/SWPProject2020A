@@ -44,7 +44,7 @@ public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
     }
 
     /**
-     * Getter for the created ChatMessage attribute
+     * Gets the created ChatMessage attribute
      *
      * @return The created ChatMessage
      */

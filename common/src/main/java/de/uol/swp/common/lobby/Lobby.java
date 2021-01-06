@@ -18,7 +18,7 @@ import java.util.Set;
 public interface Lobby extends Serializable {
 
     /**
-     * Getter for the lobby's name
+     * Gets the lobby's name
      *
      * @return A String containing the name of the lobby
      * @since 2019-10-08
@@ -34,7 +34,7 @@ public interface Lobby extends Serializable {
     void updateOwner(User user);
 
     /**
-     * Getter for the current owner of the lobby
+     * Gets the current owner of the lobby
      *
      * @return A User object containing the owner of the lobby
      * @since 2019-10-08
@@ -50,7 +50,7 @@ public interface Lobby extends Serializable {
     void joinUser(User user);
 
     /**
-     * Removes an user from the lobby
+     * Removes a user from the lobby
      *
      * @param user The user to remove from the lobby
      * @since 2019-10-08
@@ -58,7 +58,7 @@ public interface Lobby extends Serializable {
     void leaveUser(User user);
 
     /**
-     * Getter for all users in the lobby
+     * Gets all users in the lobby
      *
      * @return A Set containing all user in this lobby
      * @since 2019-10-08

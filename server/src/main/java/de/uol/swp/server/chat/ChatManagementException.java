@@ -3,7 +3,7 @@ package de.uol.swp.server.chat;
 /**
  * Exception thrown in ChatManagement
  * <p>
- * This exception is thrown if someone wants to create a ChatMessage without author or content
+ * This exception is thrown if someone wants to create a ChatMessage without an author or content,
  * or someone tries to modify or delete a ChatMessage that does not (yet)
  * exist within the ChatMessageStore.
  *
@@ -17,7 +17,7 @@ public class ChatManagementException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param s String containing the cause for the exception.
+     * @param s String containing the exception's cause.
      * @since 2020-12-16
      */
     ChatManagementException(String s) {

@@ -4,7 +4,7 @@ package de.uol.swp.client.register.event;
  * Event used to show the RegistrationError alert
  * <p>
  * In order to show the RegistrationError alert using this event, post an instance of it
- * onto the eventBus the SceneManager is subscribed to.
+ * onto the EventBus the SceneManager is subscribed to.
  *
  * @author Marco Grawunder
  * @see de.uol.swp.client.SceneManager
@@ -16,7 +16,7 @@ public class RegistrationErrorEvent {
     /**
      * Constructor
      *
-     * @param message Message containing the cause of the Error
+     * @param message Message containing the cause of the error
      * @since 2019-09-03
      */
     public RegistrationErrorEvent(String message) {

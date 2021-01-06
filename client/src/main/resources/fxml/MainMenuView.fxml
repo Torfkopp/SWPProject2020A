@@ -22,9 +22,9 @@
             <RowConstraints maxHeight="90.0" minHeight="28.0" prefHeight="38.0"/>
         </rowConstraints>
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647"/>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobby" text="CreateLobby"
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed" text="CreateLobby"
                 GridPane.columnIndex="2"/>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobby" text="JoinLobby"
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed" text="JoinLobby"
                 GridPane.columnIndex="2" GridPane.rowIndex="1"/>
         <ListView fx:id="lobbyView" prefHeight="372.0" prefWidth="200.0" GridPane.columnIndex="3"
                   GridPane.rowSpan="2147483647"/>
@@ -38,19 +38,19 @@
             </ListView>
             <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" prefHeight="25.0"/>
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
-                    text="Send Message">
+                    text="Send message">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
-                    text="Delete Message">
+                    text="Delete message">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
-                    text="Edit Message">
+                    text="Edit message">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>

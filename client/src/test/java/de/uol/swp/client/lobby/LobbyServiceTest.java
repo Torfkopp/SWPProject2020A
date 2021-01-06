@@ -35,8 +35,8 @@ class LobbyServiceTest {
     /**
      * Handles DeadEvents detected on the EventBus
      * <p>
-     * If a DeadEvent is detected the event variable of this class gets updated
-     * to its event and its event is printed to the console output.
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
      *
      * @param e The DeadEvent detected on the EventBus
      * @since 2020-11-26
@@ -79,11 +79,11 @@ class LobbyServiceTest {
      * <p>
      * This Test creates a new LobbyService object registered to the EventBus of
      * this test class. It then calls the createNewLobby function of the object using
-     * the name "Test" and defaultUser as parameter and waits for it to post a
-     * CreateLobbyRequest object on the EventBus.
+     * the name "Test" and defaultUser as parameter, and waits for it to post a
+     * CreateLobbyRequest object onto the EventBus.
      * If this happens within one second, it checks the lobby name and
-     * if the user in the request object is the same as the default user.
-     * If any of these checks fail or the method takes to long, this test is unsuccessful.
+     * whether the user in the request object is the same as the default user.
+     * If any of these checks fail or the method takes too long, this test is unsuccessful.
      *
      * @throws InterruptedException thrown by lock.await()
      * @since 2020-11-26

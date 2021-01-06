@@ -3,7 +3,7 @@ package de.uol.swp.client;
 import io.netty.channel.Channel;
 
 /**
- * This Interface is the base for creating a new ConnectionListener.
+ * This interface is the base for creating a new ConnectionListener.
  * <p>
  * This class forces the child classes to have the functions connectionEstablished
  * and exceptionOccurred in order to call them through a loop to reduce unnecessary

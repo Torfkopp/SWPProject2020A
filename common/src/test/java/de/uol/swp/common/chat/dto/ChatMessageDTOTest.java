@@ -29,10 +29,11 @@ class ChatMessageDTOTest {
     private static final ChatMessageDTO defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
 
     /**
-     * Test instantiation of the ChatMessageDTO constructor without timestamp
-     * and check all attributes to be equal to the parameters.
+     * Tests instantiation of the ChatMessageDTO constructor without a timestamp,
+     * and checks all attributes to be equal to the parameters.
      * <p>
-     * This test fails if any of the attributes of the new object are different from the parameters passed to the constructor
+     * This test fails if any of the attributes of the new object are different
+     * from the parameters passed to the constructor
      *
      * @since 2020-12-19
      */
@@ -46,8 +47,8 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test instantiation of the ChatMessageDTO constructor with a timestamp and
-     * check all attributes to be equal to the parameters.
+     * Tests instantiation of the ChatMessageDTO constructor with a timestamp,
+     * and checks all attributes to be equal to the parameters.
      * <p>
      * This test fails if any of the attributes of the new object are different
      * from the parameters passed to the constructor
@@ -65,7 +66,7 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test instantiation of the ChatMessageDTO constructor with the edited attribute
+     * Tests instantiation of the ChatMessageDTO constructor with the edited attribute
      * set to true.
      * <p>
      * This test fails if any of the attributes of the new object are different from
@@ -84,7 +85,7 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test that two ChatMessageDTO objects instantiated with different IDs are not equal.
+     * Tests if two ChatMessageDTO objects instantiated with different IDs are not equal.
      * <p>
      * This test fails if they are considered equal
      *
@@ -124,7 +125,7 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test that a ChatMessageDTO created with the copy constructor is equal to the original ChatMessageDTO.
+     * Tests if a ChatMessageDTO created with the copy constructor is equal to the original ChatMessageDTO.
      * <p>
      * This test fails if the two are not equal
      *
@@ -137,11 +138,11 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test that a ChatMessageDTO created with the copy constructor can be edited
+     * Tests if a ChatMessageDTO created with the copy constructor can be edited
      * without any changes occurring in the original ChatMessageDTO.
      * <p>
-     * This test fails if the content of the copied ChatMessage wasn't changed, or
-     * if the two objects are considered equal, or the edited attribute was not set.
+     * This test fails when the content of the copied ChatMessage wasn't changed,
+     * the two objects are considered equal, or when the edited attribute was not set.
      *
      * @since 2020-12-19
      */
@@ -156,7 +157,7 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test that setting the content with setContent to null doesn't change the content.
+     * Tests if setting the content with setContent to null doesn't change the content.
      * <p>
      * This test fails if the content of the ChatMessage has changed
      *
@@ -170,9 +171,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter.
+     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter.
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as author.
+     * This test fails if the ChatMessageDTO constructor allows a null object as its author.
      *
      * @since 2020-12-19
      */
@@ -182,9 +183,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter
+     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as content
+     * This test fails if the ChatMessageDTO constructor allows a null object as its content
      *
      * @since 2020-12-19
      */
@@ -194,9 +195,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the default ChatMessageDTO constructor fails on passing a null object for the content parameter
+     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the content parameter
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as content
+     * This test fails if the ChatMessageDTO constructor allows a null object as its content
      *
      * @since 2020-12-19
      */
@@ -206,9 +207,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the default ChatMessageDTO constructor fails on passing an empty String for the content parameter
+     * Tests if the default ChatMessageDTO constructor fails on passing an empty String for the content parameter
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows an empty String as content
+     * This test fails if the ChatMessageDTO constructor allows an empty string as its content
      *
      * @since 2020-12-19
      */
@@ -218,9 +219,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the author parameter
+     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the author parameter
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as author
+     * This test fails if the ChatMessageDTO constructor allows a null object as its author
      *
      * @since 2020-12-19
      */
@@ -230,9 +231,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the content parameter
+     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the content parameter
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as content
+     * This test fails if the ChatMessageDTO constructor allows a null object as its content
      *
      * @since 2020-12-19
      */
@@ -242,9 +243,9 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Test if the timestamp-less ChatMessageDTO constructor fails on passing an empty String for the content parameter
+     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing an empty String for the content parameter
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows an empty String as content
+     * This test fails if the ChatMessageDTO constructor allows an empty string as its content
      *
      * @since 2020-12-19
      */

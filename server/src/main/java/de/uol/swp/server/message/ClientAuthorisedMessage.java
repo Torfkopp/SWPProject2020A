@@ -5,34 +5,34 @@ import de.uol.swp.common.user.User;
 /**
  * This message is used if a successful login occurred
  * <p>
- * This message is used to signalize all Services it is relevant to, that someone
- * just logged in successfully
+ * This message is used to signalise all services it is relevant to
+ * that someone just logged in successfully
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.message.AbstractServerInternalMessage
  * @see de.uol.swp.server.usermanagement.AuthenticationService
  * @since 2019-08-07
  */
-public class ClientAuthorizedMessage extends AbstractServerInternalMessage {
+public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
 
     private final User user;
 
     /**
      * Constructor
      *
-     * @param user user whose client authorized successfully
+     * @param user User whose client authorised successfully
      * @see de.uol.swp.common.user.User
      * @since 2019-08-07
      */
-    public ClientAuthorizedMessage(User user) {
+    public ClientAuthorisedMessage(User user) {
         super();
         this.user = user;
     }
 
     /**
-     * Getter for the user attribute
+     * Gets the user attribute
      *
-     * @return the user whose client authorized successfully
+     * @return The user whose client authorised successfully
      * @see de.uol.swp.common.user.User
      * @since 2019-08-07
      */
