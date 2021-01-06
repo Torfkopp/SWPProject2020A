@@ -1,6 +1,5 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 
 /**
@@ -8,41 +7,60 @@ import de.uol.swp.common.user.User;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractRequestMessage
+ * @see de.uol.swp.common.chat.request.AbstractChatMessageRequest
  * @see de.uol.swp.common.user.User
  * @since 2020-12-17
  */
-public class NewChatMessageRequest extends AbstractRequestMessage {
+public class NewChatMessageRequest extends AbstractChatMessageRequest {
     private final User author;
     private final String content;
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for NewChatMessageRequests originating from
+     * the global chat. It sets the inherited originLobby attribute to null.
      *
      * @param author  The author of the ChatMessage that should be saved
      * @param content The content of the ChatMessage that should be saved
-     * @since 2020-12-17
      */
     public NewChatMessageRequest(User author, String content) {
+        super(null);
         this.author = author;
         this.content = content;
     }
 
     /**
-     * Getter for the author attribute
+     * Constructor
+     * <p>
+     * This constructor is used for NewChatMessageRequests originating from
+     * a lobby chat. It sets the inherited originLobby attribute to the parameter
+     * provided upon calling the constructor.
      *
-     * @return the author of the ChatMessage that should be saved
-     * @since 2020-12-17
+     * @param author      The author of the ChatMessage that should be saved
+     * @param content     The content of the ChatMessage that should be saved
+     * @param originLobby The Lobby the NewChatMessageRequest originated from
+     * @since 2020-12-30
+     */
+    public NewChatMessageRequest(User author, String content, String originLobby) {
+        super(originLobby);
+        this.author = author;
+        this.content = content;
+    }
+
+    /**
+     * Gets the author attribute
+     *
+     * @return The author of the ChatMessage that should be saved
      */
     public User getAuthor() {
         return author;
     }
 
     /**
-     * Getter for the content attribute
+     * Gets the content attribute
      *
-     * @return the content of the ChatMessage that should be saved
-     * @since 2020-12-17
+     * @return The content of the ChatMessage that should be saved
      */
     public String getContent() {
         return content;

@@ -11,7 +11,7 @@ import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.server.message.ClientAuthorizedMessage;
+import de.uol.swp.server.message.ClientAuthorisedMessage;
 import de.uol.swp.server.message.ServerExceptionMessage;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
@@ -64,7 +64,7 @@ class AuthenticationServiceTest {
         lock.await(1000, TimeUnit.MILLISECONDS);
         assertTrue(userManagement.isLoggedIn(user));
         // is message send
-        assertTrue(event instanceof ClientAuthorizedMessage);
+        assertTrue(event instanceof ClientAuthorisedMessage);
         userManagement.dropUser(user);
     }
 

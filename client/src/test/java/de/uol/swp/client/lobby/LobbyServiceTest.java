@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -35,8 +36,8 @@ class LobbyServiceTest {
     /**
      * Handles DeadEvents detected on the EventBus
      * <p>
-     * If a DeadEvent is detected the event variable of this class gets updated
-     * to its event and its event is printed to the console output.
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
      *
      * @param e The DeadEvent detected on the EventBus
      * @since 2020-11-26
@@ -79,11 +80,11 @@ class LobbyServiceTest {
      * <p>
      * This Test creates a new LobbyService object registered to the EventBus of
      * this test class. It then calls the createNewLobby function of the object using
-     * the name "Test" and defaultUser as parameter and waits for it to post a
-     * CreateLobbyRequest object on the EventBus.
+     * the name "Test" and defaultUser as parameter, and waits for it to post a
+     * CreateLobbyRequest object onto the EventBus.
      * If this happens within one second, it checks the lobby name and
-     * if the user in the request object is the same as the default user.
-     * If any of these checks fail or the method takes to long, this test is unsuccessful.
+     * whether the user in the request object is the same as the default user.
+     * If any of these checks fail or the method takes too long, this test is unsuccessful.
      *
      * @throws InterruptedException thrown by lock.await()
      * @since 2020-11-26
@@ -104,5 +105,36 @@ class LobbyServiceTest {
         assertEquals(request.getOwner().getUsername(), defaultUser.getUsername());
         assertEquals(request.getOwner().getPassword(), defaultUser.getPassword());
         assertEquals(request.getOwner().getEMail(), defaultUser.getEMail());
+    }
+
+    /**
+     * Test for the refreshLobbyPresenterFields routine
+     * <p>
+     * Test if the LobbyService creates a LobbyUpdateEvent with the given
+     * lobbyName and User and posts it to the EventBus when
+     * refreshLobbyPresenterFields is called.
+     * <p>
+     * This test fails if the lobbyName attribute of the LobbyUpdateEvent
+     * or any of the User details are not equal to what was sent originally.
+     *
+     * @throws InterruptedException thrown by lock.await()
+     * @since 2021-01-03
+     */
+    @Test
+    void refreshLobbyPresenterFieldsTest() throws InterruptedException {
+        LobbyService lobbyService = new LobbyService(bus);
+        lobbyService.refreshLobbyPresenterFields("Test", defaultUser);
+
+        lock.await(1000, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof LobbyUpdateEvent);
+
+        LobbyUpdateEvent lobbyUpdateEvent = (LobbyUpdateEvent) event;
+
+        assertEquals(lobbyUpdateEvent.getLobbyName(), "Test");
+
+        assertEquals(lobbyUpdateEvent.getUser().getUsername(), defaultUser.getUsername());
+        assertEquals(lobbyUpdateEvent.getUser().getPassword(), defaultUser.getPassword());
+        assertEquals(lobbyUpdateEvent.getUser().getEMail(), defaultUser.getEMail());
     }
 }

@@ -29,6 +29,8 @@ class ChatManagementTest {
     private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am new, more intelligent content";
+    private static final String defaultLobby = "I might be a lobby, or I might not be";
+    private static final String secondLobby = "I don't think I'm a lobby";
     private static ChatManagement chatManagement;
     private static ChatMessageStore chatMessageStore;
 
@@ -37,8 +39,6 @@ class ChatManagementTest {
      * <p>
      * This method instantiates a new ChatMessageStore and a new ChatManagement so that
      * one test's ChatMessage objects don't interfere with another test's
-     *
-     * @since 2020-12-19
      */
     @BeforeEach
     void setUp() {
@@ -50,8 +50,6 @@ class ChatManagementTest {
      * Helper method run after each test case
      * <p>
      * This method resets the chatManagement and chatMessageStore variables to null
-     *
-     * @since 2020-12-19
      */
     @AfterEach
     void tearDown() {
@@ -62,13 +60,15 @@ class ChatManagementTest {
     /**
      * Test of the getLatestMessages routine
      * <p>
-     * Tests if the List of ChatMessage objects returned by getLatestMessages
-     * is equal to a local list of the created ChatMessages.
+     * Tests if the local list of the created ChatMessages
+     * is equal to a list of ChatMessage objects returned by getLatestMessages for the MainMenu
+     * and not equal to lists of ChatMessage objects returned by getLatestMessages for defaultLobby and secondLobby.
      * <p>
-     * This test fails if the List of ChatMessage objects returned by
-     * getLatestMessages is not equal to the local list of created ChatMessages.
+     * This test fails if the created list of ChatMessages is equal to the list of ChatMessage objects returned by
+     * getLatestMessages for the defaultLobby or the second lobby, or if it is not equal to the list of ChatMessage objects
+     * returned by getLatestMessage for the MainMenuChat.
      *
-     * @since 2020-12-19
+     * @since 2021-01-03
      */
     @Test
     void getLatestMessagesTest() {
@@ -78,30 +78,98 @@ class ChatManagementTest {
         newMessages.add(msg1);
         newMessages.add(msg2);
 
-        List<ChatMessage> list = chatManagement.getLatestMessages(2);
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobby);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(2, secondLobby);
+        List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(2);
 
-        assertEquals(newMessages, list);
+        assertNotEquals(newMessages, listFirstLobby);
+        assertNotEquals(newMessages, listSecondLobby);
+        assertEquals(newMessages, listMainMenu);
+    }
+
+    /**
+     * Test of the getLatestMessages routine
+     * <p>
+     * Tests if the local list of the created ChatMessages
+     * is equal to a list of ChatMessage objects returned by getLatestMessages for defaultLobby
+     * and not equal to lists of ChatMessage objects returned by getLatestMessages for the MainMenu and secondLobby.
+     * <p>
+     * This test fails if the list created ChatMessages is equal to the list of ChatMessage objects returned by
+     * getLatestMessages for the MainMenu or secondLobby, or if it is not equal to the list of ChatMessage objects
+     * returned by getLatestMessage for defaultLobby.
+     *
+     * @since 2021-01-03
+     */
+    @Test
+    void getLatestMessagesForLobbyTest() {
+        ChatMessage msg1 = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, secondContent, defaultLobby);
+        List<ChatMessage> newMessages = new ArrayList<>();
+        newMessages.add(msg1);
+        newMessages.add(msg2);
+
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobby);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(2, secondLobby);
+        List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(2);
+
+        assertEquals(newMessages, listFirstLobby);
+        assertNotEquals(newMessages, listSecondLobby);
+        assertNotEquals(newMessages, listMainMenu);
     }
 
     /**
      * Test of the createChatMessage routine
      * <p>
-     * Tests if a ChatMessage was created by checking if the return of getLatestMessages
+     * Tests if a ChatMessage was created by checking if the return of getLatestMessages for MainMenu
      * contains the created ChatMessage object.
      * <p>
-     * This test fails if the List of ChatMessage objects returned by getLatestMessages
-     * is empty or if it doesn't contain the newly created ChatMessage.
+     * This test fails if the lists of ChatMessage objects returned by getLatestMessages for defaultLobby or secondLobby
+     * aren't empty, or if the list of ChatMessage objects returned by getLatestMessages for the MainMenu is empty.
+     * or it doesn't contain the newly created ChatMessage.
      *
-     * @since 2020-12-19
+     * @since 2021-01-03
      */
     @Test
     void createChatMessageTest() {
         ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent);
 
-        List<ChatMessage> list = chatMessageStore.getLatestMessages(1);
-        assertFalse(list.isEmpty());
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(1, defaultLobby);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(1, secondLobby);
+        List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(1);
 
-        assertTrue(list.contains(msg));
+        assertTrue(listFirstLobby.isEmpty());
+        assertTrue(listSecondLobby.isEmpty());
+        assertFalse(listMainMenu.isEmpty());
+
+        assertTrue(listMainMenu.contains(msg));
+    }
+
+    /**
+     * Test of the createChatMessage routine
+     * <p>
+     * Tests if a ChatMessage was created by checking if the return of getLatestMessages for defaultLobby
+     * contains the created ChatMessage object.
+     * <p>
+     * This test fails if the lists of ChatMessage objects returned by getLatestMessages for the MainMenu or secondLobby
+     * aren't empty or if the list of ChatMessage objects returned by getLatestMessages for defaultLobby is empty
+     * or it doesn't contain the newly created ChatMessage.
+     *
+     * @since 2021-01-03
+     */
+    @Test
+    void createChatMessageForLobbyTest() {
+        ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
+
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(1, defaultLobby);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(1, secondLobby);
+        List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(1);
+
+        assertFalse(listFirstLobby.isEmpty());
+        assertTrue(listSecondLobby.isEmpty());
+        assertTrue(listMainMenu.isEmpty());
+
+        assertTrue(listFirstLobby.contains(msg));
+        assertTrue(true);
     }
 
     /**
@@ -112,8 +180,6 @@ class ChatManagementTest {
      * <p>
      * This test fails if the List of ChatMessage objects returned by getLatestMessages
      * is empty or if one of the ChatMessages was inappropriately updated.
-     *
-     * @since 2020-12-19
      */
     @Test
     void updateChatMessageTest() {
@@ -121,11 +187,37 @@ class ChatManagementTest {
         ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, defaultContent);
         chatManagement.updateChatMessage(msg2.getID(), secondContent);
 
-        List<ChatMessage> list = chatMessageStore.getLatestMessages(2);
-        assertFalse(list.isEmpty());
+        List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(2);
 
-        assertEquals(list.get(0).getContent(), defaultContent);
-        assertEquals(list.get(1).getContent(), secondContent);
+        assertFalse(listMainMenu.isEmpty());
+
+        assertEquals(listMainMenu.get(0).getContent(), defaultContent);
+        assertEquals(listMainMenu.get(1).getContent(), secondContent);
+    }
+
+    /**
+     * Test of the updateChatMessage routine
+     * <p>
+     * Tests if a specified ChatMessage in a lobby gets updated with the provided content
+     * and no other ChatMessage gets changed when updateChatMessage is called.
+     * <p>
+     * This test fails if the list of ChatMessage objects returned by getLatestMessages for defaultLobby
+     * is empty, or if one of the ChatMessages was inappropriately updated.
+     *
+     * @since 2021-01-04
+     */
+    @Test
+    void updateChatMessageForLobbyTest() {
+        chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        chatManagement.updateChatMessage(msg2.getID(), secondContent, defaultLobby);
+
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobby);
+
+        assertFalse(listFirstLobby.isEmpty());
+
+        assertEquals(listFirstLobby.get(0).getContent(), defaultContent);
+        assertEquals(listFirstLobby.get(1).getContent(), secondContent);
     }
 
     /**
@@ -134,12 +226,10 @@ class ChatManagementTest {
      * Tests if a specified ChatMessage gets deleted from the chatMessageStore
      * and no other ChatMessage gets deleted when dropChatMessage is called.
      * <p>
-     * This test fails if the List of ChatMessage object returned by getLatestMessages
+     * This test fails if the list of ChatMessage object returned by getLatestMessages
      * is empty, or if the list doesn't contain the created test ChatMessage, or if
      * after calling dropChatMessage, the List of ChatMessage returned by
      * getLatestMessages still contains the supposedly deleted ChatMessage.
-     *
-     * @since 2020-12-19
      */
     @Test
     void dropChatMessageTest() {
@@ -155,57 +245,128 @@ class ChatManagementTest {
     }
 
     /**
-     * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
-     * is called with null as content.
+     * Test of the dropChatMessage routine
+     * <p>
+     * Tests if a specified ChatMessage in a lobby gets deleted from the chatMessageStore
+     * and if no other ChatMessage gets deleted when dropChatMessage is called.
+     * <p>
+     * This test fails if the list of ChatMessage object returned by getLatestMessages for defaultLobby
+     * is empty, or if the list doesn't contain the created test ChatMessage, or if
+     * after calling dropChatMessage, the List of ChatMessage returned by
+     * getLatestMessages still contains the supposedly deleted ChatMessage.
      *
-     * @since 2020-12-19
+     * @since 2021-01-04
      */
     @Test
-    void createChatMessageEmptyContent() {
+    void dropChatMessageForLobbyTest() {
+        ChatMessage msg = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        List<ChatMessage> list = chatMessageStore.getLatestMessages(1, defaultLobby);
+        assertFalse(list.isEmpty());
+        assertTrue(list.contains(msg));
+
+        chatManagement.dropChatMessage(msg.getID(), defaultLobby);
+
+        list = chatMessageStore.getLatestMessages(1, defaultLobby);
+        assertFalse(list.contains(msg));
+    }
+
+    /**
+     * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
+     * is called with null as content.
+     */
+    @Test
+    void createChatMessageWithEmptyContentTest() {
         assertThrows(ChatManagementException.class, () -> chatManagement.createChatMessage(defaultUser, null));
+    }
+
+    /**
+     * Tests if the ChatManagement throws a ChatManagementException when createChatMessage for defaultLobby
+     * is called with null as content.
+     *
+     * @since 2021-01-04
+     */
+    @Test
+    void createChatMessageForLobbyWithEmptyContentTest() {
+        assertThrows(ChatManagementException.class, () -> chatManagement.createChatMessage(defaultUser, null, defaultLobby));
     }
 
     /**
      * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
      * is called with an empty content.
-     *
-     * @since 2020-12-19
      */
     @Test
-    void createChatMessageEmptyStringContent() {
+    void createChatMessageWithEmptyStringContentTest() {
         assertThrows(ChatManagementException.class, () -> chatManagement.createChatMessage(defaultUser, ""));
     }
 
     /**
      * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
-     * is called with null as author.
+     * for defaultLobby is called with an empty content.
      *
-     * @since 2020-12-19
+     * @since 2021-01-04
      */
     @Test
-    void createChatMessageEmptyAuthor() {
+    void createChatMessageForLobbyWithEmptyStringContentTest() {
+        assertThrows(ChatManagementException.class, () -> chatManagement.createChatMessage(defaultUser, "", defaultLobby));
+    }
+
+    /**
+     * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
+     * is called with null as its author.
+     */
+    @Test
+    void createChatMessageWithEmptyAuthorTest() {
         assertThrows(ChatManagementException.class, () -> chatManagement.createChatMessage(null, defaultContent));
+    }
+
+    /**
+     * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
+     * for defaultLobby is called with null as author.
+     *
+     * @since 2021-01-04
+     */
+    @Test
+    void createChatMessageForLobbyWithEmptyAuthorTest() {
+        assertThrows(ChatManagementException.class, () -> chatManagement.createChatMessage(null, defaultContent, defaultLobby));
     }
 
     /**
      * Tests if the ChatManagement throws a ChatManagementException when updateChatMessage
      * is called with an ID not found in the chatMessageStore.
-     *
-     * @since 2020-12-19
      */
     @Test
-    void updateChatMessageUnknownId() {
+    void updateChatMessageWithUnknownIdTest() {
         assertThrows(ChatManagementException.class, () -> chatManagement.updateChatMessage(1, secondContent));
+    }
+
+    /**
+     * Tests if the ChatManagement throws a ChatManagementException when updateChatMessage
+     * for defaultLobby is called with an ID not found in the chatMessageStore.
+     *
+     * @since 2021-01-04
+     */
+    @Test
+    void updateChatMessageForLobbyWithUnknownIdTest() {
+        assertThrows(ChatManagementException.class, () -> chatManagement.updateChatMessage(1, secondContent, defaultLobby));
     }
 
     /**
      * Tests if the ChatManagement throws a ChatManagementException when dropChatMessage
      * is called with an ID not found in the chatMessageStore.
-     *
-     * @since 2020-12-19
      */
     @Test
-    void deleteChatMessageUnknownId() {
+    void deleteChatMessageWithUnknownIdTest() {
         assertThrows(ChatManagementException.class, () -> chatManagement.dropChatMessage(42));
+    }
+
+    /**
+     * Tests if the ChatManagement throws a ChatManagementException when dropChatMessage
+     * for defaultLobby is called with an ID not found in the chatMessageStore.
+     *
+     * @since 2021-01-04
+     */
+    @Test
+    void deleteChatMessageForLobbyWithUnknownIdTest() {
+        assertThrows(ChatManagementException.class, () -> chatManagement.dropChatMessage(42, defaultLobby));
     }
 }

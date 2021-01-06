@@ -22,7 +22,7 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     /**
      * Default constructor
      *
-     * @implNote this constructor is needed for serialization
+     * @implNote This constructor is needed for serialisation
      * @since 2019-10-08
      */
     public AbstractLobbyRequest() {
@@ -31,8 +31,8 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     /**
      * Constructor
      *
-     * @param name name of the lobby
-     * @param user user responsible for the creation of this message
+     * @param name Name of the lobby
+     * @param user User responsible for the creation of this message
      * @since 2019-10-08
      */
     public AbstractLobbyRequest(String name, User user) {
@@ -41,7 +41,7 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the name variable
+     * Gets the name variable
      *
      * @return String containing the lobby's name
      * @since 2019-10-08
@@ -51,7 +51,7 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Setter for the name variable
+     * Sets the name variable
      *
      * @param name String containing the lobby's name
      * @since 2019-10-08
@@ -61,7 +61,7 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Getter for the user variable
+     * Gets the user variable
      *
      * @return User responsible for the creation of this message
      * @since 2019-10-08
@@ -71,7 +71,7 @@ public class AbstractLobbyRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Setter for the user variable
+     * Sets the user variable
      *
      * @param user User responsible for the creation of this message
      * @since 2019-10-08

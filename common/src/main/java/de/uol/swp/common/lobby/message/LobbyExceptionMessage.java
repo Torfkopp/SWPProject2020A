@@ -4,8 +4,8 @@ import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 
 /**
- * This class returns exceptions to the client caused by various
- * serverside lobby related errors
+ * This class returns exceptions to the client caused by
+ * various lobby related errors on the server's side.
  *
  * @author Marvin
  * @see de.uol.swp.common.message.ResponseMessage
@@ -18,7 +18,7 @@ public class LobbyExceptionMessage extends ExceptionMessage implements ResponseM
     /**
      * Constructor
      *
-     * @param message Exception message returned by server
+     * @param message Exception message returned by the server
      * @since 2020-12-19
      */
     public LobbyExceptionMessage(String message) {

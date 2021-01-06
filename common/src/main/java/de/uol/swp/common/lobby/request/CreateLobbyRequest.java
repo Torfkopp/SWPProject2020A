@@ -1,6 +1,7 @@
 package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserDTO;
 
 /**
  * Request sent to the server when a user wants to create a new lobby
@@ -14,7 +15,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     /**
      * Default constructor
      *
-     * @implNote this constructor is needed for serialization
+     * @implNote This constructor is needed for serialisation
      * @since 2019-10-08
      */
     public CreateLobbyRequest() {
@@ -23,31 +24,31 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     /**
      * Constructor
      *
-     * @param name  name of the lobby
+     * @param name  Name of the lobby
      * @param owner User trying to create the lobby
      * @since 2019-10-08
      */
-    public CreateLobbyRequest(String name, User owner) {
+    public CreateLobbyRequest(String name, UserDTO owner) {
         super(name, owner);
     }
 
     /**
-     * Setter for the user variable
-     *
-     * @param owner  User trying to create the lobby
-     * @since 2019-10-08
-     */
-    public void setOwner(User owner) {
-        setUser(owner);
-    }
-
-    /**
-     * Getter for the user variable
+     * Gets the user variable
      *
      * @return User trying to create the lobby
      * @since 2019-10-08
      */
     public User getOwner() {
         return getUser();
+    }
+
+    /**
+     * Sets the user variable
+     *
+     * @param owner User trying to create the lobby
+     * @since 2019-10-08
+     */
+    public void setOwner(UserDTO owner) {
+        setUser(owner);
     }
 }

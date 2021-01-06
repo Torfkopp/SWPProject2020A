@@ -10,8 +10,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This handler is called from netty when communications happens e.g. a new connection
- * is established or data is received
+ * This handler is called from netty when communications happens,
+ * e.g. a new connection is established or data is received
  *
  * @author Marco Grawunder
  * @see io.netty.channel.ChannelInboundHandler

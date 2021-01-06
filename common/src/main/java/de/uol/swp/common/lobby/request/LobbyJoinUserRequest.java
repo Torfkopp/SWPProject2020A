@@ -16,7 +16,7 @@ public class LobbyJoinUserRequest extends AbstractLobbyRequest {
     /**
      * Default constructor
      *
-     * @implNote this constructor is needed for serialization
+     * @implNote This constructor is needed for serialisation
      * @since 2019-10-08
      */
     public LobbyJoinUserRequest() {
@@ -25,8 +25,8 @@ public class LobbyJoinUserRequest extends AbstractLobbyRequest {
     /**
      * Constructor
      *
-     * @param lobbyName name of the lobby
-     * @param user      user who wants to join the lobby
+     * @param lobbyName Name of the lobby
+     * @param user      User who wants to join the lobby
      * @since 2019-10-08
      */
     public LobbyJoinUserRequest(String lobbyName, User user) {

@@ -11,7 +11,7 @@ import java.util.List;
  * Response message for the AskLatestChatMessageRequest
  * <p>
  * This message gets sent to the client that sent an AskLatestChatMessageRequest.
- * It contains a List with ChatMessage objects of the specified length as specified in the
+ * It contains a list with ChatMessage objects of the specified length as specified in the
  * AskLatestChatMessageRequest.
  *
  * @author Temmo Junkhoff
@@ -23,26 +23,59 @@ import java.util.List;
  */
 public class AskLatestChatMessageResponse extends AbstractResponseMessage {
     private final List<ChatMessage> chatHistory = new LinkedList<>();
+    private final String lobbyName;
 
     /**
      * Constructor
+     * <p>
+     * This constructor is used for AskLatestChatMessageResponses that were
+     * requested for the global chat. It sets the lobbyName attribute to null.
      *
-     * @param latestMessages a List of ChatMessage object of size as requested or less
+     * @param latestMessages A list of ChatMessage objects smaller or as big as requested
      * @since 2020-12-17
      */
     public AskLatestChatMessageResponse(Iterable<ChatMessage> latestMessages) {
         for (ChatMessage msg : latestMessages) {
             chatHistory.add(ChatMessageDTO.create(msg));
         }
+        this.lobbyName = null;
     }
 
     /**
-     * Getter for the chatHistory attribute
+     * Constructor
+     * <p>
+     * This constructor is used for AskLatestChatMessageResponses that were
+     * requested for a lobby chat. It sets the lobbyName attribute to the
+     * parameter provided upon calling the constructor.
      *
-     * @return The List of ChatMessage object of size as requested or less
+     * @param latestMessages a List of ChatMessage object of size as requested or less
+     * @param lobbyName      The Lobby the AskLatestChatMessageResponse was requested for
+     * @since 2020-12-30
+     */
+    public AskLatestChatMessageResponse(List<ChatMessage> latestMessages, String lobbyName) {
+        for (ChatMessage msg : latestMessages) {
+            chatHistory.add(ChatMessageDTO.create(msg));
+        }
+        this.lobbyName = lobbyName;
+    }
+
+    /**
+     * Gets the chatHistory attribute
+     *
+     * @return A list of ChatMessage objects smaller or as big as requested
      * @since 2020-12-17
      */
     public List<ChatMessage> getChatHistory() {
         return chatHistory;
+    }
+
+    /**
+     * Getter for the lobbyName attribute
+     *
+     * @return The name of the Lobby this AskLatestChatMessageResponse was requested for
+     * @since 2021-01-02
+     */
+    public String getLobbyName() {
+        return lobbyName;
     }
 }

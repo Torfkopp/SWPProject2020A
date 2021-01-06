@@ -12,7 +12,7 @@ import java.util.Map;
  * Response message for the RetrieveAllLobbiesRequest
  * <p>
  * This message gets sent to the client that sent a RetrieveAllLobbiesRequest.
- * It contains a List of lobby names.
+ * It contains a list of lobby names.
  *
  * @author Mario
  * @see de.uol.swp.common.message.AbstractResponseMessage
@@ -28,7 +28,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     /**
      * Default Constructor
      *
-     * @implNote this constructor is needed for serialisation
+     * @implNote This constructor is needed for serialisation
      * @since 2020-12-12
      */
     public AllLobbiesResponse() {
@@ -38,7 +38,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     /**
      * Constructor
      *
-     * @param lobbies map of lobby's name and the lobby itself
+     * @param lobbies Map of lobby's name and the lobby itself
      * @since 2020-12-12
      */
     public AllLobbiesResponse(Map<String, Lobby> lobbies) {
@@ -46,7 +46,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Getter for the list of lobby names
+     * Gets the list of lobby names
      *
      * @return List of lobby names
      * @since 2020-12-12
@@ -58,7 +58,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     /**
      * Getter for the list of existing Lobby objects
      *
-     * @return list of existing lobbyDTOs
+     * @return List of existing lobbyDTOs
      * @author Marvin
      * @since 2020-12-16
      */

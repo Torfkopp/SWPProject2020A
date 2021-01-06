@@ -13,18 +13,18 @@ import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 /**
- * Mapping from EventBus calls to ChatManagement calls
+ * Mapping EventBus calls to ChatManagement calls
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -37,27 +37,31 @@ public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
 
-    private final IChatManagement chatManagement;
+    private final ChatManagement chatManagement;
+
+    private final LobbyService lobbyService;
 
     /**
      * Constructor
      *
-     * @param eventBus       the EventBus used throughout the entire server (injected)
+     * @param bus            the EventBus used throughout the entire server (injected)
      * @param chatManagement the ChatManagement to use (injected)
-     * @since 2020-12-16
+     * @param lobbyService   the LobbyService to use (injected)
+     * @since 2020-12-30
      */
     @Inject
-    public ChatService(EventBus eventBus, ChatManagement chatManagement) {
-        super(eventBus);
+    public ChatService(EventBus bus, ChatManagement chatManagement, LobbyService lobbyService) {
+        super(bus);
         this.chatManagement = chatManagement;
+        this.lobbyService = lobbyService;
     }
 
     /**
-     * Handles NewChatMessageRequest found on the EventBus
+     * Handles a NewChatMessageRequest found on the EventBus
      * <p>
      * If a NewChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to add a new message to the ChatMessageStore. If this succeeds, a
-     * CreatedChatMessageMessage is posted on the EventBus, otherwise nothing happens.
+     * It then requests the ChatManagement to add a new message to the ChatMessageStore. If this succeeds, a
+     * CreatedChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
      *
      * @param msg The NewChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#createChatMessage(User, String)
@@ -72,20 +76,26 @@ public class ChatService extends AbstractService {
                     + " with content '" + msg.getContent() + '\'');
         }
         try {
-            ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent());
-            ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
-            sendToAll(returnMessage);
+            if (msg.isFromLobby()) {
+                ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent(), msg.getOriginLobby());
+                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, msg.getOriginLobby());
+                lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            } else {
+                ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent());
+                ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
+                sendToAll(returnMessage);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
     }
 
     /**
-     * Handles DeleteChatMessageRequest found on the EventBus
+     * Handles a DeleteChatMessageRequest found on the EventBus
      * <p>
      * If a DeleteChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to delete the message. If this succeeds, a
-     * DeleteChatMessageMessage is posted on the EventBus, otherwise nothing happens.
+     * It then requests the ChatManagement to delete the message. If this succeeds, a
+     * DeleteChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#dropChatMessage(int)
@@ -99,20 +109,26 @@ public class ChatService extends AbstractService {
             LOG.debug("Got new DeleteChatMessage message for the ChatMessage ID " + msg.getId());
         }
         try {
-            chatManagement.dropChatMessage(msg.getId());
-            ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId());
-            sendToAll(returnMessage);
+            if (msg.isFromLobby()) {
+                chatManagement.dropChatMessage(msg.getId(), msg.getOriginLobby());
+                ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId(), msg.getOriginLobby());
+                lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            } else {
+                chatManagement.dropChatMessage(msg.getId());
+                ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId());
+                sendToAll(returnMessage);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
     }
 
     /**
-     * Handles EditChatMessageRequest found on the EventBus
+     * Handles an EditChatMessageRequest found on the EventBus
      * <p>
-     * If a EditChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to update the message. If this succeeds, a
-     * EditedChatMessageMessage is posted on the EventBus, otherwise nothing happens.
+     * If an EditChatMessageRequest is detected on the EventBus, this method is called.
+     * It then requests the ChatManagement to update the message. If this succeeds, a
+     * EditedChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#updateChatMessage(int, String)
@@ -123,24 +139,30 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new EditChatMessage message for the ChatMessage ID " + msg.getId()
+            LOG.debug("Got a new EditChatMessage message for the ChatMessage ID " + msg.getId()
                     + " and new content '" + msg.getContent() + '\'');
         }
         try {
-            ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());
-            ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
-            sendToAll(returnMessage);
+            if (msg.isFromLobby()) {
+                ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent(), msg.getOriginLobby());
+                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, msg.getOriginLobby());
+                lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            } else {
+                ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent());
+                ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
+                sendToAll(returnMessage);
+            }
         } catch (Exception e) {
             LOG.error(e);
         }
     }
 
     /**
-     * Handles AskLatestChatMessageRequest found on the EventBus
+     * Handles an AskLatestChatMessageRequest found on the EventBus
      * <p>
      * If a AskLatestChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to retrieve the latest messages.
-     * It then posts a AskLatestChatMessageResponse on the EventBus.
+     * It then requests the ChatManagement to retrieve the latest messages.
+     * It then posts a AskLatestChatMessageResponse onto the EventBus.
      *
      * @param msg The AskLatestChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#getLatestMessages(int)
@@ -153,8 +175,14 @@ public class ChatService extends AbstractService {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Got new AskLatestMessage with " + msg.getAmount() + " messages");
         }
-        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount());
-        Message returnMessage = new AskLatestChatMessageResponse(latestMessages);
+        ResponseMessage returnMessage;
+        if (msg.isFromLobby()) {
+            List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount(), msg.getOriginLobby());
+            returnMessage = new AskLatestChatMessageResponse(latestMessages, msg.getOriginLobby());
+        } else {
+            List<ChatMessage> latestMessages = chatManagement.getLatestMessages(msg.getAmount());
+            returnMessage = new AskLatestChatMessageResponse(latestMessages);
+        }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
         }

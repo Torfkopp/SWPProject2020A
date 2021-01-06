@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import java.util.Objects;
 
 /**
- * This class is used to encapsulate a netty channel handler context
+ * This class is used to encapsulate a Netty ChannelHandlerContext
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.message.MessageContext
@@ -21,7 +21,7 @@ class NettyMessageContext implements MessageContext {
     /**
      * Constructor
      *
-     * @param ctx the ChannelHandlerContext encapsulated by this
+     * @param ctx The encapsulated ChannelHandlerContext
      * @since 2019-11-20
      */
     public NettyMessageContext(ChannelHandlerContext ctx) {
@@ -29,9 +29,9 @@ class NettyMessageContext implements MessageContext {
     }
 
     /**
-     * Getter for the ChannelHandlerContext encapsulated by this class
+     * Gets the ChannelHandlerContext encapsulated by this class
      *
-     * @return the ChannelHandlerContext
+     * @return The ChannelHandlerContext
      * @see io.netty.channel.ChannelHandlerContext
      * @since 2019-11-20
      */

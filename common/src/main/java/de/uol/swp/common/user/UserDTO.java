@@ -21,9 +21,9 @@ public class UserDTO implements User {
     /**
      * Constructor
      *
-     * @param username username of the user
-     * @param password password the user uses
-     * @param eMail    email address the user is registered to
+     * @param username The user's username
+     * @param password The user's password
+     * @param eMail    The user's e-mail address
      * @since 2019-08-13
      */
     public UserDTO(String username, String password, String eMail) {
@@ -38,24 +38,24 @@ public class UserDTO implements User {
      * Copy constructor
      *
      * @param user User object to copy the values of
-     * @return User copy of User object
+     * @return User copy of the User object
      * @since 2019-08-13
      */
-    public static User create(User user) {
+    public static UserDTO create(User user) {
         return new UserDTO(user.getUsername(), user.getPassword(), user.getEMail());
     }
 
     /**
-     * Copy constructor leaving password variable empty
+     * Copy constructor leaving the password variable empty
      * <p>
-     * This constructor is used for the user list, because it would be a major security
+     * This constructor is used for the user list because it would be a major security
      * flaw to send all user data including passwords to everyone connected.
      *
      * @param user User object to copy the values of
-     * @return User copy of User object having the password variable left empty
+     * @return UserDTO Copy of User object with the password variable left empty
      * @since 2019-08-13
      */
-    public static User createWithoutPassword(User user) {
+    public static UserDTO createWithoutPassword(User user) {
         return new UserDTO(user.getUsername(), "", user.getEMail());
     }
 
