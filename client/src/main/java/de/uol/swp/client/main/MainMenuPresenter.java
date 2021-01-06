@@ -24,10 +24,14 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -58,6 +62,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private ListView<String> usersView;
 
+    private Window window;
+
     /**
      * Constructor
      * <p>
@@ -87,6 +93,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
+
+        window = lobbyView.getScene().getWindow();
+        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                logout();
+                ((Stage) window).close();
+            }
+        });
     }
 
     /**
@@ -426,9 +441,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-02
      */
     public void onLogoutButtonPressed(ActionEvent event) {
+        logout();
+        eventBus.post(showLoginViewMessage);
+    }
+
+    /**
+     * Helper function to log out the user
+     */
+    private void logout() {
         userService.logout(loggedInUser);
         resetCharVars();
-        eventBus.post(showLoginViewMessage);
     }
 
     /**
