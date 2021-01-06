@@ -16,10 +16,12 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -41,6 +43,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     @FXML
     private ListView<String> membersView;
+
+    private Window window;
 
     /**
      * Constructor
@@ -75,6 +79,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             super.loggedInUser = lobbyUpdateEvent.getUser();
             super.chatService.askLatestMessages(10, super.lobbyName);
         }
+        window = membersView.getScene().getWindow();
+        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                closeWindow();
+            }
+        });
     }
 
     /**
@@ -121,8 +132,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     @Subscribe
-    private void onUserLeftLobbyMessage(UserLeftLobbyMessage message){
-        if(message.getUser().getUsername().equals(owner.getUsername())){
+    private void onUserLeftLobbyMessage(UserLeftLobbyMessage message) {
+        if (message.getUser().getUsername().equals(owner.getUsername())) {
             LOG.debug("Owner " + message.getUser().getUsername() + " left Lobby " + message.getName());
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
@@ -209,9 +220,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     void onLeaveLobby(ActionEvent event) {
+        closeWindow();
+    }
+
+    private void closeWindow() {
         if (lobbyName != null || loggedInUser != null) {
             lobbyService.leaveLobby(lobbyName, (UserDTO) loggedInUser);
         }
-        ((Stage) (((Button) event.getSource()).getScene().getWindow())).close();
+        ((Stage) window).close();
     }
 }
