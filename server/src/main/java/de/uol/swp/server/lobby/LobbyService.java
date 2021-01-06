@@ -5,10 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
-import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
@@ -16,6 +13,7 @@ import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
@@ -23,10 +21,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Handles the lobby requests sent by the users
@@ -160,10 +155,14 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyLeaveUserRequest.getName());
 
         if (lobby.isPresent()) {
+            try {
             lobby.get().leaveUser(lobbyLeaveUserRequest.getUser());
             sendToAllInLobby(lobbyLeaveUserRequest.getName(), new UserLeftLobbyMessage(lobbyLeaveUserRequest.getName(), lobbyLeaveUserRequest.getUser()));
-        }
-        // TODO: error handling for a not existing lobby
+            } catch (IllegalArgumentException exception) {
+                lobbyManagement.dropLobby(lobby.get().getName());
+                sendToAll(new LobbyDeletedMessage(lobbyLeaveUserRequest.getName()));
+            }
+            }
     }
 
     /**
