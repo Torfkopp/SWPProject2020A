@@ -19,11 +19,11 @@ import java.util.List;
 public interface IChatManagement {
 
     /**
-     * Returns a List with ChatMessage objects of size {@literal <amount>} or smaller
+     * Returns a list with ChatMessage objects of size {@literal <amount>} or smaller
      * from the global Chat Store
      *
      * @param amount The amount of ChatMessages to be returned
-     * @return A List of ChatMessage objects of size {@literal <amount>} or smaller
+     * @return A list of ChatMessage objects of size {@literal <amount>} or smaller
      */
     List<ChatMessage> getLatestMessages(int amount);
 
@@ -32,14 +32,14 @@ public interface IChatManagement {
      * from a Lobby Chat Store
      *
      * @param amount      The amount of ChatMessages to be returned
-     * @param originLobby The Lobby the latest ChatMessages should be retrieved for
-     * @return A List of ChatMessage objects of size {@literal <amount>} or smaller
+     * @param originLobby The lobby the latest ChatMessages should be retrieved for
+     * @return A list of ChatMessage objects of size {@literal <amount>} or smaller
      * @since 2020-12-30
      */
     List<ChatMessage> getLatestMessages(int amount, String originLobby);
 
     /**
-     * Create a new ChatMessage in the ChatMessageStore of the global Chat Store
+     * Create a new ChatMessage in the ChatMessageStore of the global ChatStore
      *
      * @param author  The author of the ChatMessage
      * @param content The content of the ChatMessage
@@ -48,7 +48,7 @@ public interface IChatManagement {
     ChatMessage createChatMessage(User author, String content);
 
     /**
-     * Create a new ChatMessage in the ChatMessageStore of a Lobby's Chat Store
+     * Create a new ChatMessage in the ChatMessageStore of a lobby's ChatStore
      *
      * @param author      The author of the ChatMessage
      * @param content     The content of the ChatMessage

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A message containing all current logged in usernames
+ * A message containing all currently logged in usernames
  *
  * @author Alwin Bossert
  * @author Steven Luong
@@ -29,7 +29,7 @@ public class RetrieveAllLobbyMembersMessage extends AbstractServerMessage {
     }
 
     /**
-     * Getter for the List containing all users currently logged in
+     * Gets the List containing all users currently logged in
      *
      * @return List containing all users currently logged in
      * @since 2017-03-17

@@ -5,8 +5,8 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 /**
  * Request for initialising the user list in the client
  * <p>
- * This message is sent during the initialization of the user list. The server will
- * respond with a AllOnlineUsersResponse.
+ * This message is sent during the initialisation of the user list.
+ * The server will respond with an AllOnlineUsersResponse.
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.user.response.AllOnlineUsersResponse

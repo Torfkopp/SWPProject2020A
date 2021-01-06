@@ -61,11 +61,11 @@ class ChatManagementTest {
      * Test of the getLatestMessages routine
      * <p>
      * Tests if the local list of the created ChatMessages
-     * is equal to a List of ChatMessage objects returned by getLatestMessages for the MainMenu
+     * is equal to a list of ChatMessage objects returned by getLatestMessages for the MainMenu
      * and not equal to lists of ChatMessage objects returned by getLatestMessages for defaultLobby and secondLobby.
      * <p>
-     * This test fails if the list created ChatMessages is equal to the list of ChatMessage objects returned by
-     * getLatestMessages for defaultLobby or second lobby, or is not equal to the list of ChatMessage objects
+     * This test fails if the created list of ChatMessages is equal to the list of ChatMessage objects returned by
+     * getLatestMessages for the defaultLobby or the second lobby, or if it is not equal to the list of ChatMessage objects
      * returned by getLatestMessage for the MainMenuChat.
      *
      * @since 2021-01-03
@@ -91,11 +91,11 @@ class ChatManagementTest {
      * Test of the getLatestMessages routine
      * <p>
      * Tests if the local list of the created ChatMessages
-     * is equal to a List of ChatMessage objects returned by getLatestMessages for defaultLobby
+     * is equal to a list of ChatMessage objects returned by getLatestMessages for defaultLobby
      * and not equal to lists of ChatMessage objects returned by getLatestMessages for the MainMenu and secondLobby.
      * <p>
      * This test fails if the list created ChatMessages is equal to the list of ChatMessage objects returned by
-     * getLatestMessages for the MainMenu or secondLobby, or is not equal to the list of ChatMessage objects
+     * getLatestMessages for the MainMenu or secondLobby, or if it is not equal to the list of ChatMessage objects
      * returned by getLatestMessage for defaultLobby.
      *
      * @since 2021-01-03
@@ -124,7 +124,7 @@ class ChatManagementTest {
      * contains the created ChatMessage object.
      * <p>
      * This test fails if the lists of ChatMessage objects returned by getLatestMessages for defaultLobby or secondLobby
-     * aren't empty or if the list of ChatMessage objects returned by getLatestMessages for the MainMenu is empty
+     * aren't empty, or if the list of ChatMessage objects returned by getLatestMessages for the MainMenu is empty.
      * or it doesn't contain the newly created ChatMessage.
      *
      * @since 2021-01-03
@@ -201,8 +201,8 @@ class ChatManagementTest {
      * Tests if a specified ChatMessage in a lobby gets updated with the provided content
      * and no other ChatMessage gets changed when updateChatMessage is called.
      * <p>
-     * This test fails if the List of ChatMessage objects returned by getLatestMessages for defaultLobby
-     * is empty or if one of the ChatMessages was inappropriately updated.
+     * This test fails if the list of ChatMessage objects returned by getLatestMessages for defaultLobby
+     * is empty, or if one of the ChatMessages was inappropriately updated.
      *
      * @since 2021-01-04
      */
@@ -226,7 +226,7 @@ class ChatManagementTest {
      * Tests if a specified ChatMessage gets deleted from the chatMessageStore
      * and no other ChatMessage gets deleted when dropChatMessage is called.
      * <p>
-     * This test fails if the List of ChatMessage object returned by getLatestMessages
+     * This test fails if the list of ChatMessage object returned by getLatestMessages
      * is empty, or if the list doesn't contain the created test ChatMessage, or if
      * after calling dropChatMessage, the List of ChatMessage returned by
      * getLatestMessages still contains the supposedly deleted ChatMessage.
@@ -248,9 +248,9 @@ class ChatManagementTest {
      * Test of the dropChatMessage routine
      * <p>
      * Tests if a specified ChatMessage in a lobby gets deleted from the chatMessageStore
-     * and no other ChatMessage gets deleted when dropChatMessage is called.
+     * and if no other ChatMessage gets deleted when dropChatMessage is called.
      * <p>
-     * This test fails if the List of ChatMessage object returned by getLatestMessages for defaultLobby
+     * This test fails if the list of ChatMessage object returned by getLatestMessages for defaultLobby
      * is empty, or if the list doesn't contain the created test ChatMessage, or if
      * after calling dropChatMessage, the List of ChatMessage returned by
      * getLatestMessages still contains the supposedly deleted ChatMessage.
@@ -312,7 +312,7 @@ class ChatManagementTest {
 
     /**
      * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
-     * is called with null as author.
+     * is called with null as its author.
      */
     @Test
     void createChatMessageWithEmptyAuthorTest() {

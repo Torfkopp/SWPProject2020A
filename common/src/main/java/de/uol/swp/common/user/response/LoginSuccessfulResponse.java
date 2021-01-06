@@ -6,9 +6,9 @@ import de.uol.swp.common.user.User;
 import java.util.Objects;
 
 /**
- * A message containing the session (typically for a new logged in user)
+ * A message containing a session (typically for a new logged in user)
  * <p>
- * This response is sent to the Client whose LoginRequest was successful
+ * This response is sent to the client whose LoginRequest was successful
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.user.request.LoginRequest
@@ -25,7 +25,7 @@ public class LoginSuccessfulResponse extends AbstractResponseMessage {
     /**
      * Constructor
      *
-     * @param user the user who successfully logged in
+     * @param user The successfully logged in user
      * @since 2019-08-07
      */
     public LoginSuccessfulResponse(User user) {
@@ -33,9 +33,9 @@ public class LoginSuccessfulResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Getter for the User variable
+     * Gets the user variable
      *
-     * @return User object of the user who successfully logged in
+     * @return User object of the successfully logged in user
      * @since 2019-08-07
      */
     public User getUser() {

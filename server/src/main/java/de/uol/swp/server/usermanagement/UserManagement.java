@@ -11,7 +11,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Handles most user related issues e.g. login/logout
+ * Handles most user related issues, e.g. login/logout
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.usermanagement.AbstractUserManagement
@@ -25,7 +25,7 @@ public class UserManagement extends AbstractUserManagement {
     /**
      * Constructor
      *
-     * @param userStore object of the UserStore to be used
+     * @param userStore Object of the UserStore to be used
      * @see de.uol.swp.server.usermanagement.store.UserStore
      * @since 2019-08-05
      */
@@ -96,13 +96,13 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     /**
-     * Sub-function of update user
+     * Subfunction of the updateUser method
      * <p>
-     * This method is used to set the new user values to the old ones if the values
-     * in the update request were empty.
+     * This method is used to set the new user values to the old ones
+     * if the values in the update request were empty.
      *
-     * @param firstValue  value to update to, empty String or null
-     * @param secondValue the old value
+     * @param firstValue  Value to update to. Either an empty String or null
+     * @param secondValue The old value
      * @return String containing the value to be used in the update command
      * @since 2019-08-05
      */

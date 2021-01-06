@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import java.util.List;
 
 /**
- * Manages the lobby menu
+ * Manages the lobby's menu
  *
  * @see de.uol.swp.client.AbstractPresenter
  * @see de.uol.swp.client.AbstractPresenterWithChat
@@ -78,11 +78,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Handles new list of users
+     * Handles a new list of users
      * <p>
-     * If a new AllOnlineUsersResponse object is posted to the EventBus the names
-     * of currently logged in members are put onto the list of lobby members.
-     * Furthermore if the LOG-Level is set to DEBUG the message "Update of user
+     * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
+     * of the currently logged in members are put into the list of lobby members.
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of user
      * list" with the names of all currently logged in users as well as the message
      * "Owner of this lobby: " with the name of the lobby's owner is displayed in the
      * log.
@@ -102,9 +102,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Handles new joined users
      * <p>
-     * If a new UserJoinedLobbyMessage object is posted to the EventBus the name of the newly
+     * If a new UserJoinedLobbyMessage object is posted onto the EventBus, the name of the newly
      * joined user is appended to the user list in the lobby menu.
-     * Furthermore if the LOG-Level is set to DEBUG the message "New user {@literal
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} joined Lobby." is displayed in the log.
      *
      * @param message the UserJoinedLobbyMessage object seen on the EventBus
@@ -138,8 +138,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Updates the lobby's member list according to the list given
      * <p>
      * This method clears the entire member list and then adds the name of each user
-     * in the list given to the lobby's member list. If there is no member list
-     * this it creates one.
+     * in the list given to the lobby's member list.
+     * If there is no member list, it creates one.
      * If the owner is found among the users, their username is appended with a
      * crown emoji.
      *

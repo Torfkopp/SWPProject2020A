@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The type Chat management.
+ * The type chat's management.
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -28,7 +28,7 @@ public class ChatManagement extends AbstractChatManagement {
     /**
      * Constructor
      *
-     * @param chatMessageStore object of the ChatMessageStore to be used
+     * @param chatMessageStore Object of the ChatMessageStore to be used
      * @see de.uol.swp.server.chat.store.ChatMessageStore
      * @since 2020-12-16
      */

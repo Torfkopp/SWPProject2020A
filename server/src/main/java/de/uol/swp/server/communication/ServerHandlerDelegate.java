@@ -30,10 +30,10 @@ interface ServerHandlerDelegate {
     void clientDisconnected(MessageContext ctx);
 
     /**
-     * A message from a client connected via the ChannelHandlerContext ctx is received
-     * and can be processed
+     * A message from a client connected via the ChannelHandlerContext ctx
+     * is received and can be processed
      *
-     * @param msg The message send from the client
+     * @param msg The message sent from the client
      * @since 2017-03-17
      */
     void process(RequestMessage msg);

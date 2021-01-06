@@ -9,9 +9,9 @@ import java.util.*;
 /**
  * This is a user store.
  * <p>
- * This is the user store that is used for the start of the software project. The
+ * This is the user store that is used at the start of the software project. The
  * user accounts in this user store only reside within the RAM of your computer
- * and only for as long as the server is running. Therefore the users have to be
+ * and only for as long as the server is running. Therefore, the users have to be
  * added every time the server is started.
  *
  * @author Marco Grawunder

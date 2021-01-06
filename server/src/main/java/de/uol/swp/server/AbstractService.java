@@ -7,9 +7,9 @@ import de.uol.swp.common.message.ServerMessage;
 import java.util.Collections;
 
 /**
- * This class is the base for creating a new Service.
+ * This class is the base for creating a new service.
  * <p>
- * This class prepares the child classes to have the EventBus set and methods post
+ * This class prepares the child classes to have the EventBus set, and methods post
  * and sendToAll implemented in order to reduce unnecessary code repetition.
  *
  * @author Marco Grawunder
@@ -23,7 +23,7 @@ public class AbstractService {
     /**
      * Constructor
      *
-     * @param bus the EvenBus used throughout the server
+     * @param bus The EvenBus used throughout the server
      * @since 2019-10-08
      */
     public AbstractService(EventBus bus) {
@@ -32,9 +32,9 @@ public class AbstractService {
     }
 
     /**
-     * Posts a message on the EventBus
+     * Posts a message onto the EventBus
      *
-     * @param message the message to post
+     * @param message The message to post
      * @see de.uol.swp.common.message.Message
      * @since 2019-10-08
      */
@@ -43,10 +43,10 @@ public class AbstractService {
     }
 
     /**
-     * Prepares a ServerMessage to be send to all connected users and posts it to the
-     * EventBus.
+     * Prepares a ServerMessage to be sent to all connected users
+     * and posts it onto the EventBus.
      *
-     * @param message the message to be send to every user
+     * @param message The message to be sent to every user
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-10-08
      */

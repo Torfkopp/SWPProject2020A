@@ -15,20 +15,19 @@ import java.util.Optional;
 public interface Message extends Serializable {
 
     /**
-     * Retrieve the current message context
+     * Retrieves the current message context
      *
      * @return Empty optional object or MessageContext
-     * @implNote .isPresent() to check if the MessageContext got set
-     * @implNote .get() to get the MessageContext object
+     * @implNote .isPresent() Checks if the MessageContext got set
+     * @implNote .get() Gets the MessageContext object
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-09-09
      */
     Optional<MessageContext> getMessageContext();
-
     /**
-     * Allows to set a MessageContext, e.g. for network purposes
+     * Allows to set a MessageContext e.g. for network purposes
      *
-     * @param messageContext the MessageContext to be set
+     * @param messageContext The MessageContext to be set
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-08-13
      */
@@ -38,26 +37,26 @@ public interface Message extends Serializable {
      * Retrieve current session
      *
      * @return Empty optional object or MessageContext
-     * @implNote .isPresent() to check if the Session got set
-     * @implNote .get() to get the Session object
+     * @implNote .isPresent() Checks if the Session got set
+     * @implNote .get() Gets the Session object
      * @since 2019-09-09
      */
     Optional<Session> getSession();
 
     /**
-     * Set the current session
+     * Sets the current session
      *
-     * @param session the current session
+     * @param session The current session
      * @see de.uol.swp.common.user.Session
      * @since 2019-08-13
      */
     void setSession(Session session);
 
     /**
-     * Allow to create a new message, based on
-     * the given one (copy)
+     * Allows to create a new message
+	 * based on the given one (copy)
      *
-     * @param otherMessage original Message
+     * @param otherMessage Original Message
      * @since 2019-08-13
      */
     void initWithMessage(Message otherMessage);

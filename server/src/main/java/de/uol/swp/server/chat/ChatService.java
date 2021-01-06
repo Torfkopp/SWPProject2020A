@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 /**
- * Mapping from EventBus calls to ChatManagement calls
+ * Mapping EventBus calls to ChatManagement calls
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -57,11 +57,11 @@ public class ChatService extends AbstractService {
     }
 
     /**
-     * Handles NewChatMessageRequest found on the EventBus
+     * Handles a NewChatMessageRequest found on the EventBus
      * <p>
      * If a NewChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to add a new message to the ChatMessageStore. If this succeeds, a
-     * CreatedChatMessageMessage is posted on the EventBus, otherwise nothing happens.
+     * It then requests the ChatManagement to add a new message to the ChatMessageStore. If this succeeds, a
+     * CreatedChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
      *
      * @param msg The NewChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#createChatMessage(User, String)
@@ -91,11 +91,11 @@ public class ChatService extends AbstractService {
     }
 
     /**
-     * Handles DeleteChatMessageRequest found on the EventBus
+     * Handles a DeleteChatMessageRequest found on the EventBus
      * <p>
      * If a DeleteChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to delete the message. If this succeeds, a
-     * DeleteChatMessageMessage is posted on the EventBus, otherwise nothing happens.
+     * It then requests the ChatManagement to delete the message. If this succeeds, a
+     * DeleteChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#dropChatMessage(int)
@@ -124,11 +124,11 @@ public class ChatService extends AbstractService {
     }
 
     /**
-     * Handles EditChatMessageRequest found on the EventBus
+     * Handles an EditChatMessageRequest found on the EventBus
      * <p>
-     * If a EditChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to update the message. If this succeeds, a
-     * EditedChatMessageMessage is posted on the EventBus, otherwise nothing happens.
+     * If an EditChatMessageRequest is detected on the EventBus, this method is called.
+     * It then requests the ChatManagement to update the message. If this succeeds, a
+     * EditedChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#updateChatMessage(int, String)
@@ -139,7 +139,7 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new EditChatMessage message for the ChatMessage ID " + msg.getId()
+            LOG.debug("Got a new EditChatMessage message for the ChatMessage ID " + msg.getId()
                     + " and new content '" + msg.getContent() + '\'');
         }
         try {
@@ -158,11 +158,11 @@ public class ChatService extends AbstractService {
     }
 
     /**
-     * Handles AskLatestChatMessageRequest found on the EventBus
+     * Handles an AskLatestChatMessageRequest found on the EventBus
      * <p>
      * If a AskLatestChatMessageRequest is detected on the EventBus, this method is called.
-     * It requests the ChatManagement to retrieve the latest messages.
-     * It then posts a AskLatestChatMessageResponse on the EventBus.
+     * It then requests the ChatManagement to retrieve the latest messages.
+     * It then posts a AskLatestChatMessageResponse onto the EventBus.
      *
      * @param msg The AskLatestChatMessageRequest found on the EventBus
      * @see de.uol.swp.server.chat.ChatManagement#getLatestMessages(int)

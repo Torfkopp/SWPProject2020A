@@ -8,7 +8,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
 /**
- * Classes that manages lobbies
+ * Class that manages lobbies
  *
  * @author Marco Grawunder
  * @since 2019-11-20
@@ -32,10 +32,10 @@ public class LobbyService {
     }
 
     /**
-     * Posts a request to create a lobby on the EventBus
+     * Posts a request to create a lobby onto the EventBus
      *
      * @param name Name chosen for the new lobby
-     * @param user User who wants to create the new lobby
+     * @param user User wanting to create the new lobby
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
@@ -45,9 +45,9 @@ public class LobbyService {
     }
 
     /**
-     * Posts a new instance of the LobbyUpdateEvent on the Eventbus
+     * Posts a new instance of the LobbyUpdateEvent onto the Eventbus
      * <p>
-     * This ensures that a new LobbyPresenter will know what Lobby it is
+     * This ensures that a new LobbyPresenter will know what lobby it is
      * presenting and who the currently logged in User is.
      *
      * @param lobbyName The name of the Lobby
@@ -59,7 +59,7 @@ public class LobbyService {
     }
 
     /**
-     * Posts a request to join a specified lobby on the EventBus
+     * Posts a request to join a specified lobby onto the EventBus
      *
      * @param name Name of the lobby the user wants to join
      * @param user User who wants to join the lobby

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Class used to store connected clients and Users in an identifiable way
+ * Class used to store connected clients and users in an identifiable way
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.usermanagement.AuthenticationService#onLoginRequest(LoginRequest)
@@ -21,9 +21,9 @@ public class UUIDSession implements Session {
     private final User user;
 
     /**
-     * private Constructor
+     * Private constructor
      *
-     * @param user the user connected to the session
+     * @param user The user connected to the session
      * @since 2017-03-17
      */
     private UUIDSession(User user) {
@@ -36,10 +36,10 @@ public class UUIDSession implements Session {
     /**
      * Builder for the UUIDSession
      * <p>
-     * Builder exposed to every class in the server, used since the constructor is private
+     * Builder exposed to every class in the server. Used because the constructor is private
      *
-     * @param user the user connected to the session
-     * @return a new UUIDSession object for the user
+     * @param user The user connected to the session
+     * @return T new UUIDSession object for the user
      * @since 2019-08-07
      */
     public static Session create(User user) {

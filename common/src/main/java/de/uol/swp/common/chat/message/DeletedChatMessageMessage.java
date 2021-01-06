@@ -1,7 +1,7 @@
 package de.uol.swp.common.chat.message;
 
 /**
- * Message sent by the server when a ChatMessage was successfully deleted.
+ * Message sent by the server when a ChatMessage was deleted successfully.
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -17,7 +17,7 @@ public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
      * This constructor is used for DeletedChatMessageMessages sent to the global chat.
      * It sets the inherited isLobbyChatMessage to false and sets lobbyName to null.
      *
-     * @param id The ID of the ChatMessage that was deleted
+     * @param id The ID of the deleted ChatMessage
      */
     public DeletedChatMessageMessage(int id) {
         super(null);
@@ -41,9 +41,9 @@ public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
     }
 
     /**
-     * Getter for the ID attribute
+     * Gets the ID attribute
      *
-     * @return the ID of the ChatMessage that got deleted
+     * @return the ID of the deleted ChatMessage
      */
     public int getId() {
         return id;
