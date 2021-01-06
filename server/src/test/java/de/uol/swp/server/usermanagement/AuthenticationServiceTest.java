@@ -3,6 +3,7 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -59,7 +60,7 @@ class AuthenticationServiceTest {
     @Test
     void loginTest() throws InterruptedException {
         userManagement.createUser(user);
-        final LoginRequest loginRequest = new LoginRequest(user.getUsername(), user.getPassword());
+        final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword());
         bus.post(loginRequest);
         lock.await(1000, TimeUnit.MILLISECONDS);
         assertTrue(userManagement.isLoggedIn(user));
@@ -71,7 +72,7 @@ class AuthenticationServiceTest {
     @Test
     void loginTestFail() throws InterruptedException {
         userManagement.createUser(user);
-        final LoginRequest loginRequest = new LoginRequest(user.getUsername(), user.getPassword() + "äüö");
+        final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword() + "äüö");
         bus.post(loginRequest);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -86,7 +87,7 @@ class AuthenticationServiceTest {
         Optional<Session> session = authService.getSession(user);
 
         assertTrue(session.isPresent());
-        final LogoutRequest logoutRequest = new LogoutRequest();
+        final Message logoutRequest = new LogoutRequest();
         logoutRequest.setSession(session.get());
 
         bus.post(logoutRequest);
@@ -100,7 +101,7 @@ class AuthenticationServiceTest {
 
     private void loginUser(User userToLogin) {
         userManagement.createUser(userToLogin);
-        final LoginRequest loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
+        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
         bus.post(loginRequest);
 
         assertTrue(userManagement.isLoggedIn(userToLogin));
@@ -111,7 +112,7 @@ class AuthenticationServiceTest {
     void loggedInUsers() throws InterruptedException {
         loginUser(user);
 
-        RetrieveAllOnlineUsersRequest request = new RetrieveAllOnlineUsersRequest();
+        Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -131,7 +132,7 @@ class AuthenticationServiceTest {
 
         users.forEach(this::loginUser);
 
-        RetrieveAllOnlineUsersRequest request = new RetrieveAllOnlineUsersRequest();
+        Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -148,7 +149,7 @@ class AuthenticationServiceTest {
 
     @Test
     void loggedInUsersEmpty() throws InterruptedException {
-        RetrieveAllOnlineUsersRequest request = new RetrieveAllOnlineUsersRequest();
+        Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
 
         lock.await(1000, TimeUnit.MILLISECONDS);

@@ -135,7 +135,7 @@ public class ServerHandler implements ServerHandlerDelegate {
         LOG.debug("Client disconnected");
         Session session = this.activeSessions.get(ctx);
         if (session != null) {
-            ClientDisconnectedMessage msg = new ClientDisconnectedMessage();
+            Message msg = new ClientDisconnectedMessage();
             msg.setSession(session);
             eventBus.post(msg);
             removeSession(ctx);
@@ -326,7 +326,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
      */
-    private List<MessageContext> getCtx(List<Session> receiver) {
+    private List<MessageContext> getCtx(Iterable<Session> receiver) {
         List<MessageContext> ctxs = new ArrayList<>();
         receiver.forEach(r -> {
             Optional<MessageContext> s = getCtx(r);

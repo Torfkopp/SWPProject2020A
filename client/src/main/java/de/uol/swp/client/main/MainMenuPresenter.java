@@ -15,6 +15,7 @@ import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
@@ -24,10 +25,14 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -58,6 +63,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private ListView<String> usersView;
 
+    private Window window;
+
     /**
      * Constructor
      * <p>
@@ -87,6 +94,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
+
+        window = lobbyView.getScene().getWindow();
+        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                logout();
+                ((Stage) window).close();
+            }
+        });
     }
 
     /**
@@ -208,7 +224,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.common.user.UserDTO
      * @since 2019-08-29
      */
-    private void updateUsersList(List<UserDTO> userList) {
+    private void updateUsersList(List<User> userList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (users == null) {
@@ -285,7 +301,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to delete Lobby without name from LobbyList ");
         } else {
-            lobbies.remove(msg.getName());
+            Platform.runLater(() -> lobbies.remove(msg.getName()));
             LOG.debug("Removed Lobby from LobbyList " + msg.getName());
         }
     }
@@ -329,7 +345,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
-        updateLobbyList(allLobbiesResponse.getLobbies());
+        updateLobbyList(allLobbiesResponse.getLobbyNames());
     }
 
     /**
@@ -382,7 +398,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(s -> lobbyService.createNewLobby(s, (UserDTO) loggedInUser));
+        result.ifPresent(s -> lobbyService.createNewLobby(s, loggedInUser));
     }
 
     /**
@@ -404,7 +420,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
         } else {
             String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
-            lobbyService.joinLobby(lobbyName, (UserDTO) loggedInUser);
+            lobbyService.joinLobby(lobbyName, loggedInUser);
         }
     }
 
@@ -426,9 +442,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-02
      */
     public void onLogoutButtonPressed(ActionEvent event) {
+        logout();
+        eventBus.post(showLoginViewMessage);
+    }
+
+    /**
+     * Helper function to log out the user
+     */
+    private void logout() {
         userService.logout(loggedInUser);
         resetCharVars();
-        eventBus.post(showLoginViewMessage);
     }
 
     /**

@@ -4,16 +4,14 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Manages creation, deletion, and storing of lobbies
  *
- * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.Lobby
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
+ * @author Marco Grawunder
  * @since 2019-10-08
  */
 public class LobbyManagement {
@@ -45,7 +43,7 @@ public class LobbyManagement {
      * @throws java.lang.IllegalArgumentException There is no lobby with the requested name
      * @since 2019-10-08
      */
-    public void dropLobby(String name) {
+    public void dropLobby(String name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name " + name + " not found!");
         }

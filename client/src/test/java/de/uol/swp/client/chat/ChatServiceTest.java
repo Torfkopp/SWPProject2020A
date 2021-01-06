@@ -90,7 +90,7 @@ class ChatServiceTest {
      */
     @Test
     void newMessageTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -121,7 +121,7 @@ class ChatServiceTest {
      */
     @Test
     void newMessageWithOriginLobbyTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent, defaultLobby);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -152,7 +152,7 @@ class ChatServiceTest {
      */
     @Test
     void newMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent, null);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -182,7 +182,7 @@ class ChatServiceTest {
      */
     @Test
     void deleteMessageTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -212,7 +212,7 @@ class ChatServiceTest {
      */
     @Test
     void deleteMessageWithOriginLobbyTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId, defaultLobby);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -242,7 +242,7 @@ class ChatServiceTest {
      */
     @Test
     void deleteMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId, null);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -271,7 +271,7 @@ class ChatServiceTest {
      */
     @Test
     void editMessageTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -302,7 +302,7 @@ class ChatServiceTest {
      */
     @Test
     void editMessageWithOriginLobbyTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent, defaultLobby);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -333,7 +333,7 @@ class ChatServiceTest {
      */
     @Test
     void editMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -363,7 +363,7 @@ class ChatServiceTest {
      */
     @Test
     void askLatestMessagesTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -392,7 +392,7 @@ class ChatServiceTest {
      */
     @Test
     void askLatestMessagesWithOriginLobbyTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount, defaultLobby);
 
         lock.await(1000, TimeUnit.MILLISECONDS);
@@ -422,7 +422,7 @@ class ChatServiceTest {
      */
     @Test
     void askLatestMessagesWithOriginLobbyIsNullTest() throws InterruptedException {
-        ChatService chatService = new ChatService(bus);
+        IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount, null);
 
         lock.await(1000, TimeUnit.MILLISECONDS);

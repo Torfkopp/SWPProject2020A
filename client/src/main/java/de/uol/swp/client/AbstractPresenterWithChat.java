@@ -2,6 +2,7 @@ package de.uol.swp.client;
 
 import com.google.inject.Inject;
 import de.uol.swp.client.chat.ChatService;
+import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -40,7 +41,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected static Logger LOG;
 
     @Inject
-    protected ChatService chatService;
+    protected IChatService chatService;
 
     protected String lobbyName;
     protected User loggedInUser;

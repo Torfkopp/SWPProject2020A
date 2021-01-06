@@ -2,6 +2,7 @@ package de.uol.swp.client.user;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.*;
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +45,7 @@ public class UserService implements ClientUserService {
 	 */
 	@Override
 	public void login(String username, String password){
-		LoginRequest msg = new LoginRequest(username, password);
+		Message msg = new LoginRequest(username, password);
 		bus.post(msg);
 	}
 
@@ -55,7 +56,7 @@ public class UserService implements ClientUserService {
 	 */
 	@Override
 	public void logout(User username) {
-		LogoutRequest msg = new LogoutRequest();
+		Message msg = new LogoutRequest();
 		bus.post(msg);
 	}
 
@@ -66,7 +67,7 @@ public class UserService implements ClientUserService {
 	 */
 	@Override
 	public void createUser(User user) {
-		RegisterUserRequest request = new RegisterUserRequest(user);
+		Message request = new RegisterUserRequest(user);
 		bus.post(request);
 	}
 
@@ -81,7 +82,7 @@ public class UserService implements ClientUserService {
      * @since 2020-11-02
      */
     public void dropUser(User user) {
-        DeleteUserRequest request = new DeleteUserRequest(user);
+        Message request = new DeleteUserRequest(user);
         bus.post(request);
     }
 
@@ -94,7 +95,7 @@ public class UserService implements ClientUserService {
 	 */
 	@Override
 	public void updateUser(User user) {
-		UpdateUserRequest request = new UpdateUserRequest(user);
+		Message request = new UpdateUserRequest(user);
 		bus.post(request);
 	}
 
@@ -104,7 +105,7 @@ public class UserService implements ClientUserService {
 	 */
 	@Override
 	public void retrieveAllUsers() {
-		RetrieveAllOnlineUsersRequest cmd = new RetrieveAllOnlineUsersRequest();
+		Message cmd = new RetrieveAllOnlineUsersRequest();
 		bus.post(cmd);
 	}
 
@@ -123,7 +124,7 @@ public class UserService implements ClientUserService {
 	 */
 	@Override
 	public void updateUserPassword(User user, String oldPassword) {
-		UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(user, oldPassword);
+		Message request = new UpdateUserPasswordRequest(user, oldPassword);
 		bus.post(request);
 	}
 }

@@ -37,7 +37,7 @@ public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
 
-    private final ChatManagement chatManagement;
+    private final IChatManagement chatManagement;
 
     private final LobbyService lobbyService;
 

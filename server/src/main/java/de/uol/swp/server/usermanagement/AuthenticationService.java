@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
@@ -40,7 +41,7 @@ public class AuthenticationService extends AbstractService {
      */
     private final Map<Session, User> userSessions = new HashMap<>();
 
-    private final UserManagement userManagement;
+    private final ServerUserService userManagement;
 
     /**
      * Constructor
@@ -150,7 +151,7 @@ public class AuthenticationService extends AbstractService {
                 }
                 userManagement.logout(userToLogOut);
                 userSessions.remove(session);
-                ServerMessage returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
+                Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
                 post(returnMessage);
             }
         }
@@ -170,7 +171,7 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     public void onRetrieveAllOnlineUsersRequest(RetrieveAllOnlineUsersRequest msg) {
-        AllOnlineUsersResponse response = new AllOnlineUsersResponse(userSessions.values());
+        Message response = new AllOnlineUsersResponse(userSessions.values());
         response.initWithMessage(msg);
         post(response);
     }
