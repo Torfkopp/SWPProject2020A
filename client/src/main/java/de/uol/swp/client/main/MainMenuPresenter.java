@@ -16,7 +16,6 @@ import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
@@ -25,14 +24,12 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -82,11 +79,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a LoginSuccessfulResponse is posted onto the EventBus, the loggedInUser
      * of this client is set to the one in the message received.
-     * The list of the currently logged in users and the list of lobbies is requested.
+     * The list of the currently logged in users and the list of lobbies is requested,
+     * as well as a set amount of history for the global chat.
+     * Makes sure that the user is logged out gracefully
+     * should the window be closed without using the Logout button. Closing
+     * the window also clears the EventBus to avoid NullPointerExceptions.
      *
      * @param message The LoginSuccessfulResponse object seen on the EventBus
      * @see de.uol.swp.common.user.response.LoginSuccessfulResponse
-     * @since 2019-09-05
+     * @since 2021-01-07
      */
     @Subscribe
     public void loginSuccessful(LoginSuccessfulResponse message) {
@@ -95,13 +96,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
 
-        window = lobbyView.getScene().getWindow();
-        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                logout();
-                ((Stage) window).close();
-            }
+        if (this.window == null) {
+            this.window = this.usersView.getScene().getWindow();
+        }
+        this.window.setOnCloseRequest(event -> {
+            logout();
+            ((Stage) event.getSource()).close();
+            clearEventBus();
         });
     }
 
@@ -448,6 +449,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     /**
      * Helper function to log out the user
+     * <p>
+     * Makes sure the chat related variables are reset.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-06
      */
     private void logout() {
         userService.logout(loggedInUser);
