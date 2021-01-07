@@ -213,7 +213,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Override
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName().equals(super.lobbyName)) {
+        if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
     }

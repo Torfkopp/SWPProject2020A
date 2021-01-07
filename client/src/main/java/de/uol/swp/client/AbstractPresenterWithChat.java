@@ -286,13 +286,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             if (change.wasAdded() && !change.wasRemoved()) {
                 chatMessages.add(change.getValueAdded().toString());
             } else if (!change.wasAdded() && change.wasRemoved()) {
-                for (int i = 0; i < chatMessages.size(); i++) {
-                    String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved().toString())) {
-                        chatMessages.remove(i);
-                        break;
-                    }
-                }
                 chatMessages.remove(change.getValueRemoved().toString());
             } else if (change.wasAdded() && change.wasRemoved()) {
                 for (int i = 0; i < chatMessages.size(); i++) {
