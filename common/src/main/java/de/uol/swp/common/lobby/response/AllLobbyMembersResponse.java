@@ -25,7 +25,7 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * Default Constructor
      *
      * @implNote This constructor is needed for serialisation
-     * @since 2020.12.21
+     * @since 2020-12-21
      */
     public AllLobbyMembersResponse() {
         // needed for serialisation
@@ -55,7 +55,7 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * Gets the list of lobby members
      *
      * @return List of lobby members
-     * @since 2020.12.21
+     * @since 2020-12-21
      */
     public List<User> getUsers() {
         return users;
