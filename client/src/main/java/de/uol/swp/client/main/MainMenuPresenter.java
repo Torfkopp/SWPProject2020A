@@ -90,7 +90,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-07
      */
     @Subscribe
-    public void loginSuccessful(LoginSuccessfulResponse message) {
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
@@ -99,26 +99,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (this.window == null) {
             this.window = this.usersView.getScene().getWindow();
         }
-        this.window.setOnCloseRequest(event -> {
-            logout();
-            ((Stage) event.getSource()).close();
-            clearEventBus();
-        });
-    }
-
-    /**
-     * Handles a lobbyCreatedMessage
-     * <p>
-     * If a lobby gets created, this method is called.
-     * It updates the LobbyList.
-     *
-     * @param lobbyCreatedMessage The LobbyCreatedMessage object seen on the EventBus
-     * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
-     * @since 2020-12-14
-     */
-    @Subscribe
-    public void newLobby(LobbyCreatedMessage lobbyCreatedMessage) {
-        lobbyService.retrieveAllLobbies();
+        try {
+            this.window.setOnCloseRequest(event -> {
+                logout();
+                ((Stage) event.getSource()).close();
+                clearEventBus();
+            });
+        } catch (Exception e) {
+            LOG.error(e);
+        }
     }
 
     /**
@@ -134,7 +123,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2019-08-29
      */
     @Subscribe
-    public void newUser(UserLoggedInMessage message) {
+    private void onUserLoggedInMessage(UserLoggedInMessage message) {
         LOG.debug("New user " + message.getUsername() + " logged in");
         Platform.runLater(() -> {
             if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUsername()))
@@ -155,7 +144,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2019-08-29
      */
     @Subscribe
-    public void userLeft(UserLoggedOutMessage message) {
+    private void onUserLoggedOutMessage(UserLoggedOutMessage message) {
         LOG.debug("User " + message.getUsername() + " logged out");
         Platform.runLater(() -> users.remove(message.getUsername()));
     }
@@ -174,14 +163,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2019-08-29
      */
     @Subscribe
-    public void userList(AllOnlineUsersResponse allUsersResponse) {
+    private void onAllOnlineUsersResponse(AllOnlineUsersResponse allUsersResponse) {
         LOG.debug("Update of user list " + allUsersResponse.getUsers());
         updateUsersList(allUsersResponse.getUsers());
     }
 
     @Override
     @Subscribe
-    public void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) {
             super.onCreatedChatMessageMessage(msg);
         }
@@ -189,7 +178,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     @Override
     @Subscribe
-    public void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
+    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) {
             super.onDeletedChatMessageMessage(msg);
         }
@@ -197,7 +186,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     @Override
     @Subscribe
-    public void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
+    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) {
             super.onEditedChatMessageMessage(msg);
         }
@@ -205,7 +194,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     @Override
     @Subscribe
-    public void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
+    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
         if (msg.getLobbyName() == null) {
             super.onAskLatestChatMessageResponse(msg);
         }
@@ -242,16 +231,20 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new LobbyCreatedMessage object is posted onto the EventBus, the name
      * of the newly created lobby is put onto the LobbyList in the main menu.
+     * It also calls the LobbyService to retrieve all lobbies from the server
+     * so the SceneManager can properly keep track of the lobby scenes.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Added new lobby to lobby
      * list" with the name of the newly added lobby is displayed in the log.
      *
      * @param msg the LobbyCreatedMessage object seen on the EventBus
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
+     * @see de.uol.swp.client.SceneManager
      * @since 2020-12-17
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
+        lobbyService.retrieveAllLobbies();
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("Tried to add Lobby without name to LobbyList ");
         } else {
@@ -276,7 +269,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-20
      */
     @Subscribe
-    public void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
+    private void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getName()));
             lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getName());
@@ -323,7 +316,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-20
      */
     @Subscribe
-    public void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
+    private void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
             lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
@@ -345,7 +338,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-29
      */
     @Subscribe
-    public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
+    private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
         updateLobbyList(allLobbiesResponse.getLobbyNames());
     }
 
@@ -387,7 +380,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-11
      */
     @FXML
-    void onCreateLobbyButtonPressed(ActionEvent event) {
+    private void onCreateLobbyButtonPressed(ActionEvent event) {
         //give the lobby a default name
         String name = loggedInUser.getUsername() + "'s lobby";
 
@@ -414,7 +407,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-29
      */
     @FXML
-    void onJoinLobbyButtonPressed(ActionEvent event) {
+    private void onJoinLobbyButtonPressed(ActionEvent event) {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
@@ -442,7 +435,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.client.user.UserService
      * @since 2020-11-02
      */
-    public void onLogoutButtonPressed(ActionEvent event) {
+    @FXML
+    private void onLogoutButtonPressed(ActionEvent event) {
         logout();
         eventBus.post(showLoginViewMessage);
     }
@@ -477,7 +471,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.client.user.UserService
      * @since 2020-11-20
      */
-    public void onDeleteButtonPressed(ActionEvent event) {
+    @FXML
+    private void onDeleteButtonPressed(ActionEvent event) {
         userService.logout(loggedInUser);
         resetCharVars();
         eventBus.post(showLoginViewMessage);
@@ -497,7 +492,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-25
      */
     @FXML
-    void onChangePasswordButtonPressed(ActionEvent event) {
+    private void onChangePasswordButtonPressed(ActionEvent event) {
         eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
     }
 }
