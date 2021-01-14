@@ -40,7 +40,7 @@ class AuthenticationServiceTest {
     private Object event;
 
     @Subscribe
-    void handle(DeadEvent e) {
+    private void onDeadEvent(DeadEvent e) {
         this.event = e.getEvent();
         System.out.print(e.getEvent());
         lock.countDown();
@@ -145,7 +145,6 @@ class AuthenticationServiceTest {
         Collections.sort(returnedUsers);
         assertEquals(returnedUsers, users);
     }
-
 
     @Test
     void loggedInUsersEmpty() throws InterruptedException {
