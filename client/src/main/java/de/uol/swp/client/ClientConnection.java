@@ -188,7 +188,7 @@ public class ClientConnection {
      * @since 2019-08-29
      */
     @Subscribe
-    public void onRequestMessage(RequestMessage message) {
+    private void onRequestMessage(RequestMessage message) {
         if (channel != null) {
             channel.writeAndFlush(message);
         } else {

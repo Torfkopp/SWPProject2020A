@@ -215,7 +215,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-03
      */
     @Subscribe
-    public void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message) {
+    private void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message) {
         sceneManager.showServerError("Change Password error: " + message);
         LOG.error("Change Password error: " + message);
     }
