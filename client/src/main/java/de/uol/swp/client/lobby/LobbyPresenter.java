@@ -7,6 +7,8 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.message.DiceCastMessage;
+import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
@@ -16,11 +18,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -139,7 +146,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * {@literal <Username>} left Lobby {@literal <Lobbyname>}" is displayed
      * in the log, depending on whether the owner or a normal user left.
      *
-     * @param message the UserLeftLobbyMessage object seen on the EventBus
+     * @param message The UserLeftLobbyMessage object seen on the EventBus
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2021-01-05
@@ -156,19 +163,59 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles a DiceCastMessage
+     * <p>
+     * If a new DiceCastMessage object is posted onto the EventBus,
+     * this method is called.
+     * It enables the endTurnButton.
+     *
+     * @param message The DiceCastMessage object seen on the EventBus
+     * @see DiceCastMessage
+     * @since 2021-01-15
+     */
+    @Subscribe
+    private void onDiceCastMessage(DiceCastMessage message) throws IOException {
+        //THIS BITCH DOES NOT WANT TO WORK EITHER
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LobbyView.fxml"));
+        Parent root = loader.load();
+        Button endTurn = (Button) loader.getNamespace().get("endTurn");
+        endTurn.setDisable(true);
+    }
+
+    /**
+     * Handles a NextPlayerMessage
+     * <p>
+     * If a new NextPlayerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It changes the text of a textField to state whose turn it is.
+     *
+     * @param message The NextPlayerMessage object seen on the EventBus
+     */
+    @Subscribe
+    private void onNextPlayerMessage(NextPlayerMessage message) throws IOException {
+        //THIS BITCH DOES NOT WORK
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LobbyView.fxml"));
+        Parent root = loader.load();
+        Text text = (Text) loader.getNamespace().get("text");
+        text.setVisible(true);
+        text.setText("It's " + message.getActivePlayer() + "'s turn!");
+    }
+
+
+    /**
      * Updates the lobby's member list according to the list given
      * <p>
      * This method clears the entire member list and then adds the name of each user
      * in the list given to the lobby's member list.
      * If there is no member list, it creates one.
-     * If the owner is found among the users, their username is appended with a
-     * crown emoji.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
      *
-     * @param userLobbyList A list of UserDTO objects including all currently logged in
+     * @param userLobbyList A list of User objects including all currently logged in
      *                      users
      * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserDTO
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.user.User
      * @since 2021-01-05
      */
     private void updateUsersList(List<User> userLobbyList) {
@@ -234,6 +281,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the EndTurnButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests the LobbyService
+     * to end the current turn.
+     *
+     * @param actionEvent The ActionEvent created by pressing the EndTurnButton
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-1-15
+     */
+    public void onEndTurnButtonPressed(ActionEvent actionEvent) {
+        lobbyService.endTurn(loggedInUser, lobbyName);
+    }
+
+    /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
@@ -247,4 +308,5 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         ((Stage) window).close();
         clearEventBus();
     }
+
 }
