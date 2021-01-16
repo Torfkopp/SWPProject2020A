@@ -116,7 +116,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2019-11-20
      */
     @Subscribe
-    private void handleEventBusError(DeadEvent deadEvent) {
+    private void onDeadEvent(DeadEvent deadEvent) {
         LOG.error("DeadEvent detected " + deadEvent);
     }
 
@@ -160,7 +160,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2019-11-20
      */
     @Subscribe
-    private void onClientAuthorised(ClientAuthorisedMessage msg) {
+    private void onClientAuthorisedMessage(ClientAuthorisedMessage msg) {
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent() && msg.getSession().isPresent()) {
             putSession(ctx.get(), msg.getSession().get());

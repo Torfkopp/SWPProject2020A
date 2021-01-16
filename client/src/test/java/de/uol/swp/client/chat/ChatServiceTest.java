@@ -47,7 +47,7 @@ class ChatServiceTest {
      * @param e The DeadEvent detected on the EventBus
      */
     @Subscribe
-    void handle(DeadEvent e) {
+    private void onDeadEvent(DeadEvent e) {
         this.event = e.getEvent();
         System.out.println(e.getEvent());
         lock.countDown();

@@ -41,7 +41,7 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     @Subscribe
-    void handle(DeadEvent e) {
+    private void onDeadEvent(DeadEvent e) {
         this.event = e.getEvent();
         System.out.print(e.getEvent());
         lock.countDown();

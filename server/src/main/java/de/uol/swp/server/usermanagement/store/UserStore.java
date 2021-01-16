@@ -64,7 +64,6 @@ public interface UserStore {
      */
     void removeUser(String username);
 
-
     /**
      * Retrieves the list of all users.
      *

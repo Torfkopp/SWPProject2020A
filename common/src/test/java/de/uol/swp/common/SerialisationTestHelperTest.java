@@ -24,6 +24,4 @@ class SerialisationTestHelperTest {
         //Code Analysis: "Instantiating a 'Thread' with default 'run()' method" -Mario
         private final Thread thread = new Thread();
     }
-
-
 }

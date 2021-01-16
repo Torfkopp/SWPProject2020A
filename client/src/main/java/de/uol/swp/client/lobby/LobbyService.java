@@ -6,7 +6,6 @@ import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 
 /**
  * Class that manages lobbies
