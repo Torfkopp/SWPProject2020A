@@ -93,7 +93,7 @@ class ChatServiceTest {
         final Message req = new NewChatMessageRequest(defaultUser, defaultContent);
         bus.post(req);
 
-        lock.await(50, TimeUnit.MILLISECONDS);
+        lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1);
         assertFalse(latestMessages.isEmpty());
@@ -120,7 +120,7 @@ class ChatServiceTest {
         final Message req = new NewChatMessageRequest(defaultUser, defaultContent, defaultLobby);
         bus.post(req);
 
-        lock.await(50, TimeUnit.MILLISECONDS);
+        lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
         assertFalse(latestMessages.isEmpty());
@@ -147,7 +147,7 @@ class ChatServiceTest {
         final Message req = new EditChatMessageRequest(msg.getID(), secondContent);
         bus.post(req);
 
-        lock.await(50, TimeUnit.MILLISECONDS);
+        lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1);
         assertFalse(latestMessages.isEmpty());
@@ -175,7 +175,7 @@ class ChatServiceTest {
         final Message req = new EditChatMessageRequest(msg.getID(), secondContent, defaultLobby);
         bus.post(req);
 
-        lock.await(50, TimeUnit.MILLISECONDS);
+        lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
         assertFalse(latestMessages.isEmpty());
@@ -203,7 +203,7 @@ class ChatServiceTest {
         final Message req = new DeleteChatMessageRequest(msg2.getID());
         bus.post(req);
 
-        lock.await(50, TimeUnit.MILLISECONDS);
+        lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(2);
         assertEquals(latestMessages.size(), 1);
@@ -232,7 +232,7 @@ class ChatServiceTest {
         final Message req = new DeleteChatMessageRequest(msg2.getID(), defaultLobby);
         bus.post(req);
 
-        lock.await(50, TimeUnit.MILLISECONDS);
+        lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(2, defaultLobby);
         assertEquals(latestMessages.size(), 1);
