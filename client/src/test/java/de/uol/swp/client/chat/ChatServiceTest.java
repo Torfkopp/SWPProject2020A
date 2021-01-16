@@ -93,7 +93,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof NewChatMessageRequest);
 
@@ -124,7 +124,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent, defaultLobby);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof NewChatMessageRequest);
 
@@ -155,7 +155,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent, null);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof NewChatMessageRequest);
 
@@ -185,7 +185,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof DeleteChatMessageRequest);
 
@@ -215,7 +215,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId, defaultLobby);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof DeleteChatMessageRequest);
 
@@ -245,7 +245,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId, null);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof DeleteChatMessageRequest);
 
@@ -274,7 +274,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof EditChatMessageRequest);
 
@@ -305,7 +305,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent, defaultLobby);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof EditChatMessageRequest);
 
