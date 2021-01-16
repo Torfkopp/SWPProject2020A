@@ -160,7 +160,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2017-03-17
      */
     @Subscribe
-    public void userLoggedIn(LoginSuccessfulResponse message) {
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
         LOG.debug("User logged in successfully " + message.getUser().getUsername());
         this.user = message.getUser();
         sceneManager.showMainScreen(user);
@@ -179,7 +179,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2019-09-02
      */
     @Subscribe
-    public void onRegistrationExceptionMessage(RegistrationExceptionMessage message) {
+    private void onRegistrationExceptionMessage(RegistrationExceptionMessage message) {
         sceneManager.showServerError("Registration error " + message);
         LOG.error("Registration error " + message);
     }
@@ -197,29 +197,28 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2019-09-02
      */
     @Subscribe
-    public void onRegistrationSuccessfulMessage(RegistrationSuccessfulResponse message) {
+    private void onRegistrationSuccessfulMessage(RegistrationSuccessfulResponse message) {
         LOG.info("Registration successful.");
         sceneManager.showLoginScreen();
     }
 
-	/**
-	 * Handles an unsuccessful password changing process
-	 * <p>
-	 * If an ChangePasswordExceptionMessage object is detected on the EventBus, this
-	 * method is called. It tells the SceneManager to show the sever error alert.
-	 *
-	 * @param message The ChangePasswordExceptionMessage object detected on the EventBus
-	 * @author Eric Vuong
-	 * @author Steven Luong
-	 * @see de.uol.swp.client.SceneManager
-	 * @since 2020-12-03
-	 */
-
-	 @Subscribe
-	public void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message){
-		sceneManager.showServerError("Change Password error: " + message);
-		LOG.error("Change Password error: " + message);
-	}
+    /**
+     * Handles an unsuccessful password changing process
+     * <p>
+     * If an ChangePasswordExceptionMessage object is detected on the EventBus, this
+     * method is called. It tells the SceneManager to show the sever error alert.
+     *
+     * @param message The ChangePasswordExceptionMessage object detected on the EventBus
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @see de.uol.swp.client.SceneManager
+     * @since 2020-12-03
+     */
+    @Subscribe
+    private void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message) {
+        sceneManager.showServerError("Change Password error: " + message);
+        LOG.error("Change Password error: " + message);
+    }
 
     /**
      * Handles a successful password changing process
@@ -234,7 +233,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-03
      */
     @Subscribe
-    public void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
+    private void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
         LOG.info("Password change is successful.");
         sceneManager.showMainScreen(user);
     }
@@ -251,7 +250,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-17
      */
     @Subscribe
-    public void onUserDeletionExceptionMessage(UserDeletionExceptionMessage message) {
+    private void onUserDeletionExceptionMessage(UserDeletionExceptionMessage message) {
         sceneManager.showServerError("Error when deleting the user: " + message);
         LOG.error("User Deletion error: " + message);
     }
@@ -268,23 +267,23 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-17
      */
     @Subscribe
-    public void onUserDeletionSuccessfulMessage(UserDeletionSuccessfulResponse message) {
+    private void onUserDeletionSuccessfulMessage(UserDeletionSuccessfulResponse message) {
         LOG.info("Deletion of user successful.");
         sceneManager.showLoginScreen();
     }
 
-	/**
-	 * Handles errors produced by the EventBus
-	 * <p>
-	 * If an DeadEvent object is detected on the EventBus, this method is called.
-	 * It writes "DeadEvent detected " and the error message of the detected DeadEvent
-	 * object to the log if the loglevel is set to ERROR or higher.
-	 *
-	 * @param deadEvent The DeadEvent object found on the EventBus
-	 * @since 2019-08-07
-	 */
-	@Subscribe
-	private void handleEventBusError(DeadEvent deadEvent){
-		LOG.error("DeadEvent detected: "+deadEvent);
-	}
+    /**
+     * Handles errors produced by the EventBus
+     * <p>
+     * If an DeadEvent object is detected on the EventBus, this method is called.
+     * It writes "DeadEvent detected " and the error message of the detected DeadEvent
+     * object to the log if the loglevel is set to ERROR or higher.
+     *
+     * @param deadEvent The DeadEvent object found on the EventBus
+     * @since 2019-08-07
+     */
+    @Subscribe
+    private void onDeadEvent(DeadEvent deadEvent) {
+        LOG.error("DeadEvent detected: " + deadEvent);
+    }
 }
