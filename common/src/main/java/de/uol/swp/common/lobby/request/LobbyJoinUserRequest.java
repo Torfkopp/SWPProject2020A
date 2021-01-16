@@ -2,7 +2,6 @@ package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.user.User;
 
-
 /**
  * Request sent to the server when a user wants to join a lobby
  *
