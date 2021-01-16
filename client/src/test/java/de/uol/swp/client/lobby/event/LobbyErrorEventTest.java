@@ -16,7 +16,7 @@ class LobbyErrorEventTest {
 
     /**
      * Test for the creation of LobbyErrorEvents
-     *
+     * <p>
      * This test checks if the error message of the LobbyErrorEvents gets
      * set correctly during the creation of a new event
      */

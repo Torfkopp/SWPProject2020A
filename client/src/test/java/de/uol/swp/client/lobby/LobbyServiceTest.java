@@ -43,7 +43,7 @@ class LobbyServiceTest {
      * @since 2020-11-26
      */
     @Subscribe
-    void handle(DeadEvent e) {
+    private void onDeadEvent(DeadEvent e) {
         this.event = e.getEvent();
         System.out.print(e.getEvent());
         lock.countDown();

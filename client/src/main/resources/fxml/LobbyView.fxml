@@ -45,5 +45,6 @@
     </GridPane>
     <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"/>
     <ListView fx:id="membersView" layoutY="7.0" maxHeight="95.0" maxWidth="190.0" prefHeight="95.0" prefWidth="180.0"/>
-    <Button layoutX="51.0" layoutY="125.0" mnemonicParsing="false" onAction="#onLeaveLobby" text="Leave Lobby"/>
+    <Button layoutX="51.0" layoutY="125.0" mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed"
+            text="Leave Lobby"/>
 </AnchorPane>
