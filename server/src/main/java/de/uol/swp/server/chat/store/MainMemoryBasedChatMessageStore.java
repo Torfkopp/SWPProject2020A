@@ -153,6 +153,13 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         }
     }
 
+    @Override
+    public void removeLobbyHistory(String originLobby) {
+        if (originLobby != null) {
+            lobbyChatHistories.remove(originLobby);
+        }
+    }
+
     /**
      * Helper method to ensure a Map for the originLobby exists before trying
      * to access it in order to avoid a NullPointerException.
