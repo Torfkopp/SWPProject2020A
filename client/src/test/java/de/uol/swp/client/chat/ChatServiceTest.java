@@ -336,7 +336,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent);
 
-        lock.await(150, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof EditChatMessageRequest);
 
@@ -366,7 +366,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof AskLatestChatMessageRequest);
 
@@ -395,7 +395,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount, defaultLobby);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof AskLatestChatMessageRequest);
 
@@ -425,7 +425,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount, null);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof AskLatestChatMessageRequest);
 
