@@ -193,7 +193,7 @@ class UserServiceTest {
         ClientUserService userService = new UserService(bus);
         userService.updateUser(defaultUser);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        // lock.await(1000, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof UpdateUserRequest);
 
