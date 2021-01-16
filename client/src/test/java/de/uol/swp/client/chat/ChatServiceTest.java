@@ -93,7 +93,7 @@ class ChatServiceTest {
         IChatService chatService = new ChatService(bus);
         chatService.newMessage(defaultUser, defaultContent);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(500, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof NewChatMessageRequest);
 

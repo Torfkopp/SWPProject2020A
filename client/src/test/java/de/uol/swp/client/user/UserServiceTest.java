@@ -132,7 +132,7 @@ class UserServiceTest {
         ClientUserService userService = new UserService(bus);
         userService.logout(defaultUser);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+       // lock.await(1000, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof LogoutRequest);
 
