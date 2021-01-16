@@ -85,7 +85,7 @@ class UserServiceTest {
     private void loginUser() throws InterruptedException {
         ClientUserService userService = new UserService(bus);
         userService.login(defaultUser.getUsername(), defaultUser.getPassword());
-        lock.await(1, TimeUnit.MILLISECONDS);
+        lock.await(100, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -161,7 +161,7 @@ class UserServiceTest {
         ClientUserService userService = new UserService(bus);
         userService.createUser(defaultUser);
 
-        lock.await(1, TimeUnit.MILLISECONDS);
+        lock.await(100, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof RegisterUserRequest);
 
@@ -193,7 +193,7 @@ class UserServiceTest {
         ClientUserService userService = new UserService(bus);
         userService.updateUser(defaultUser);
 
-        lock.await(1, TimeUnit.MILLISECONDS);
+        lock.await(100, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof UpdateUserRequest);
 
@@ -226,7 +226,7 @@ class UserServiceTest {
 
         userService.dropUser(defaultUser);
 
-        lock.await(1, TimeUnit.MILLISECONDS);
+        lock.await(100, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof DeleteUserRequest);
 
@@ -254,7 +254,7 @@ class UserServiceTest {
         ClientUserService userService = new UserService(bus);
         userService.retrieveAllUsers();
 
-        lock.await(1, TimeUnit.MILLISECONDS);
+        lock.await(100, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof RetrieveAllOnlineUsersRequest);
     }
