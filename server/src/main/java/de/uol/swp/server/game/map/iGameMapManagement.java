@@ -1,6 +1,5 @@
 package de.uol.swp.server.game.map;
 
-import de.uol.swp.server.game.exceptions.placementException;
 
 /**
  * Interface for the game's map
@@ -22,24 +21,22 @@ public interface iGameMapManagement {
     /**
      * Places a settlement
      *
-     * @param player The number of the player
-     *               wanting to build the settlement (1-4)
-     * @param hexes  The places of the three hexes around
-     *               the intersection (lowest to highest)
+     * @param player   The number of the player
+     *                 wanting to build the settlement (1-4)
+     * @param position The position of the intersection
      * @return true if placement was successful; false if not
      */
-    boolean placeSettlement(int player, int[] hexes) throws placementException;
+    boolean placeSettlement(int player, int position);
 
     /**
      * Places a street
      *
-     * @param player The number of the player
-     *               wanting to build the street (1-4)
-     * @param hexes  The places of the two hexes around
-     *               the edge (lowest to highest)
+     * @param player   The number of the player
+     *                 wanting to build the street (1-4)
+     * @param position The position of the road
      * @return true if placement was successful; false if not
      */
-    boolean placeRoad(int player, int[] hexes) throws placementException;
+    boolean placeRoad(int player, int position);
 
     /**
      * Moves the robber
@@ -51,35 +48,32 @@ public interface iGameMapManagement {
     /**
      * Upgrades a settlement
      *
-     * @param player The number of the player
-     *               wanting to upgrade the settlement (1-4)
-     * @param hexes  The places of the three hexes around
-     *               the intersection (lowest to highest)
+     * @param player   The number of the player
+     *                 wanting to upgrade the settlement (1-4)
+     * @param position The position of the intersection
      * @return true if placement was successful; false if not
      */
-    boolean upgradeSettlement(int player, int[] hexes);
+    boolean upgradeSettlement(int player, int position);
 
     /**
      * Checks if a settlement is placeable
      *
-     * @param player The number of the player
-     *               wanting to place the settlement (1-4)
-     * @param hexes  The places of the three hexes around
-     *               the intersection (lowest to highest)
+     * @param player   The number of the player
+     *                 wanting to place the settlement (1-4)
+     * @param position The position of the intersection
      * @return true if placement is possible; false if not
      */
-    boolean settlementPlaceable(int player, int[] hexes);
+    boolean settlementPlaceable(int player, int position);
 
     /**
      * Checks if a street is placeable
      *
-     * @param player The number of the player
-     *               wanting to place the street (1-4)
-     * @param hexes  The places of the two hexes around
-     *               the edge (lowest to highest)
+     * @param player   The number of the player
+     *                 wanting to place the street (1-4)
+     * @param position The position of the road
      * @return true if placement is possible; false if not
      */
-    boolean roadPlaceable(int player, int[] hexes);
+    boolean roadPlaceable(int player, int position);
 
     /**
      * Interface for an edge

@@ -1,7 +1,5 @@
 package de.uol.swp.server.game.map;
 
-import de.uol.swp.server.game.exceptions.placementException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,10 +16,8 @@ public class gameMapManagement implements iGameMapManagement {
     // ab Z.37 "Unchecked call to 'put(K, V)' as a member of raw type 'java.util.Map'
     Map hexes = new HashMap<Integer, iGameHex>();
 
-    Map findEdge = new HashMap<Integer[], Integer>();
     Map edges = new HashMap<Integer, iEdge>(); //Amount: 72
 
-    Map findIntersection = new HashMap<Integer[], Integer>();
     Map intersections = new HashMap<Integer, iIntersection>(); //Amount: 54
 
     int robberPosition = 37;
@@ -79,19 +75,17 @@ public class gameMapManagement implements iGameMapManagement {
         //
         //Circle of coast edges (clockwise)
         edges.put(1, new edge(new int[]{2, 30}, 0));
-        findEdge.put(new int[]{1, 19}, 1);
         //...
         //----------------------------------------------------------------------------------------------------
         //Creating the intersections
         //
         //Circle of coast intersections (clockwise)
         intersections.put(1, new intersection(new int[]{2, 30}, "f"));
-        findIntersection.put(new int[]{1, 18, 19}, 1);
         //...
         //----------------------------------------------------------------------------------------------------
 
         //todo: Gucken, obs eine schönere Möglichkeit gibt. Gehe davon aus, dass es so funktionieren würde,
-        //      aber man müsste (71 * 2) + (53 * 2) weitere Zeilen hinzufügen :D.
+        //      aber man müsste (71) + (53) weitere Zeilen hinzufügen :D.
 
     }
 
@@ -101,12 +95,10 @@ public class gameMapManagement implements iGameMapManagement {
     }
 
     @Override
-    public boolean placeSettlement(int player, int[] hexes) throws placementException {
-        if (hexes.length != 3) {
-            throw new placementException("Need three hexes to find intersections");
-        }
-        intersection i = (intersection) intersections.get(findIntersection.get(hexes));
-        if (settlementPlaceable(player, hexes)) {
+    public boolean placeSettlement(int player, int position) {
+
+        intersection i = (intersection) intersections.get(position);
+        if (settlementPlaceable(player, position)) {
             i.setState(player + "s");
             for (int iPos : i.getNeighbours()) {
                 intersection i2 = (intersection) intersections.get(iPos);
@@ -118,12 +110,10 @@ public class gameMapManagement implements iGameMapManagement {
     }
 
     @Override
-    public boolean placeRoad(int player, int[] hexes) throws placementException {
-        if (hexes.length != 2) {
-            throw new placementException("Need two hexes to find edges");
-        }
-        if (roadPlaceable(player, hexes)) {
-            edge e = (edge) edges.get(findEdge.get(hexes));
+    public boolean placeRoad(int player, int position) {
+
+        if (roadPlaceable(player, position)) {
+            edge e = (edge) edges.get(position);
             e.setState(player);
             return true;
         }
@@ -136,8 +126,8 @@ public class gameMapManagement implements iGameMapManagement {
     }
 
     @Override
-    public boolean upgradeSettlement(int player, int[] hexes) {
-        intersection i = (intersection) intersections.get(findIntersection.get(hexes));
+    public boolean upgradeSettlement(int player, int position) {
+        intersection i = (intersection) intersections.get(position);
         if (i.getState().equals(player + "s")) {
             i.setState(player + "c");
         }
@@ -145,14 +135,14 @@ public class gameMapManagement implements iGameMapManagement {
     }
 
     @Override
-    public boolean settlementPlaceable(int player, int[] hexes) {
-        intersection i = (intersection) intersections.get(findIntersection.get(hexes));
+    public boolean settlementPlaceable(int player, int position) {
+        intersection i = (intersection) intersections.get(position);
         return i.getState().equals("f");
     }
 
     @Override
-    public boolean roadPlaceable(int player, int[] hexes) {
-        edge e = (edge) edges.get(findEdge.get(hexes));
+    public boolean roadPlaceable(int player, int position) {
+        edge e = (edge) edges.get(position);
         boolean isBuildable = false;
         if (e.getState() == 0) {
             for (int ePos : e.getNeighbours()) {
