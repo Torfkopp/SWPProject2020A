@@ -16,9 +16,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -35,11 +37,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
-    private ObservableList<String> lobbyMembers;
+    private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
 
     @FXML
-    private ListView<String> membersView;
+    private ListView<Pair<String, String>> membersView;
 
     private Window window;
 
@@ -53,6 +55,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     public LobbyPresenter() {
         super.init(LogManager.getLogger(LobbyPresenter.class));
+    }
+
+    public void initialize(){
+        membersView.setCellFactory(lv -> new ListCell<Pair<String, String>>() {
+            @Override
+            protected void updateItem(Pair<String, String> item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getValue());
+            }
+        });
     }
 
     /**
@@ -123,7 +135,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
-                lobbyMembers.add(message.getUser().getUsername());
+                lobbyMembers.add(new Pair(message.getUser().getUsername(), message.getUser().getUsername()));
         });
     }
 
@@ -151,7 +163,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
             LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
-            Platform.runLater(() -> lobbyMembers.remove(message.getUser().getUsername()));
+            Platform.runLater(() -> lobbyMembers.remove(findMember(message.getUser().getUsername())));
         }
     }
 
@@ -179,9 +191,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 membersView.setItems(lobbyMembers);
             }
             lobbyMembers.clear();
+
             userLobbyList.forEach(u -> {
                 String username = u.getUsername();
-                lobbyMembers.add(username.equals(this.owner.getUsername()) ? username + "\uD83D\uDC51" : username);
+                Pair<String, String> item = new Pair<>(username,
+                        username.equals(this.owner.getUsername()) ? username + "\uD83D\uDC51" : username);
+                lobbyMembers.add(item);
             });
         });
     }
@@ -246,5 +261,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
         ((Stage) window).close();
         clearEventBus();
+    }
+
+    private Pair<String, String> findMember(String name){
+        for(int i = 0; i < lobbyMembers.size(); i++){
+            if(lobbyMembers.get(i).getKey() == name) return lobbyMembers.get(i);
+        }
+        return null;
     }
 }
