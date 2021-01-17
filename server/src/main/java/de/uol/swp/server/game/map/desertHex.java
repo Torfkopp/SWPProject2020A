@@ -8,10 +8,8 @@ package de.uol.swp.server.game.map;
  * @since 2021-01-16
  */
 public class desertHex implements iGameMapManagement.iGameHex.iLandHex {
-    private int[] neighbours;
 
-    public desertHex(int[] neighbours) {
-        this.neighbours = neighbours;
+    public desertHex() {
     }
 
     @Override
@@ -19,8 +17,4 @@ public class desertHex implements iGameMapManagement.iGameHex.iLandHex {
         return type.Desert;
     }
 
-    @Override
-    public int[] getNeighbours() {
-        return neighbours;
-    }
 }

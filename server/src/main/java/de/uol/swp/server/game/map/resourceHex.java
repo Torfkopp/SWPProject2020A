@@ -10,19 +10,16 @@ package de.uol.swp.server.game.map;
 public class resourceHex implements iGameMapManagement.iGameHex.iResourceHex {
     private resource resource;
     private int token;
-    private int[] neighbours;
 
     /**
      * Constructor
      *
-     * @param resource   The hex's resource
-     * @param token      The hex's token
-     * @param neighbours Array of the six neighbours (clockwise)
+     * @param resource The hex's resource
+     * @param token    The hex's token
      */
-    public resourceHex(resource resource, int token, int[] neighbours) {
+    public resourceHex(resource resource, int token) {
         this.resource = resource;
         this.token = token;
-        this.neighbours = neighbours;
     }
 
     @Override
@@ -33,11 +30,6 @@ public class resourceHex implements iGameMapManagement.iGameHex.iResourceHex {
     @Override
     public resource getResource() {
         return resource;
-    }
-
-    @Override
-    public int[] getNeighbours() {
-        return neighbours;
     }
 
     @Override

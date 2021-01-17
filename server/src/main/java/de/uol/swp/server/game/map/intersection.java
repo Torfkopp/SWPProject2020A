@@ -9,20 +9,28 @@ package de.uol.swp.server.game.map;
  */
 public class intersection implements iGameMapManagement.iIntersection {
 
+    private int[] hexes;
     private int[] neighbours;
     private String state;
 
     /**
      * Constructor
      *
+     * @param hexes      The surrounding hexes
      * @param neighbours The position of the neighbouring intersections
      * @param state      "f" if free,
      *                   "b" if blocked, or
      *                   1-4 for owner plus s (settlement) or c (city)
      */
-    public intersection(int[] neighbours, String state) {
+    public intersection(int[] hexes, int[] neighbours, String state) {
+        this.hexes = hexes;
         this.neighbours = neighbours;
         this.state = state;
+    }
+
+    @Override
+    public int[] getHexes() {
+        return hexes;
     }
 
     @Override

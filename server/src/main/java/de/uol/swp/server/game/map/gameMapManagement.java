@@ -49,27 +49,27 @@ public class gameMapManagement implements iGameMapManagement {
         hexes.put(17, new harborHex(4, iGameHex.iHarborHex.resource.Lumber));
         hexes.put(18, new waterHex());
         //Outer circle of resource hexes (clockwise)
-        hexes.put(19, new resourceHex(iGameHex.iResourceHex.resource.Fields, 4, new int[]{1, 2, 20, 31, 30, 18}));
-        hexes.put(20, new resourceHex(iGameHex.iResourceHex.resource.Forest, 6, new int[]{2, 3, 21, 32, 31, 19}));
-        hexes.put(21, new resourceHex(iGameHex.iResourceHex.resource.Fields, 9, new int[]{3, 4, 5, 22, 32, 20}));
-        hexes.put(22, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 4, new int[]{21, 5, 6, 23, 33, 32}));
-        hexes.put(23, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 10, new int[]{22, 6, 7, 8, 24, 33}));
-        hexes.put(24, new resourceHex(iGameHex.iResourceHex.resource.Forest, 11, new int[]{33, 23, 8, 9, 25, 34}));
-        hexes.put(25, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 11, new int[]{34, 24, 9, 10, 11, 26}));
-        hexes.put(26, new resourceHex(iGameHex.iResourceHex.resource.Fields, 6, new int[]{35, 34, 25, 11, 12, 27}));
-        hexes.put(27, new resourceHex(iGameHex.iResourceHex.resource.Fields, 3, new int[]{28, 35, 26, 12, 13, 14}));
-        hexes.put(28, new resourceHex(iGameHex.iResourceHex.resource.Forest, 3, new int[]{29, 36, 35, 27, 14, 15}));
-        hexes.put(29, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 9, new int[]{17, 30, 36, 28, 15, 16}));
-        hexes.put(30, new resourceHex(iGameHex.iResourceHex.resource.Hills, 2, new int[]{18, 19, 31, 36, 29, 17}));
+        hexes.put(19, new resourceHex(iGameHex.iResourceHex.resource.Fields, 4));
+        hexes.put(20, new resourceHex(iGameHex.iResourceHex.resource.Forest, 6));
+        hexes.put(21, new resourceHex(iGameHex.iResourceHex.resource.Fields, 9));
+        hexes.put(22, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 4));
+        hexes.put(23, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 10));
+        hexes.put(24, new resourceHex(iGameHex.iResourceHex.resource.Forest, 11));
+        hexes.put(25, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 11));
+        hexes.put(26, new resourceHex(iGameHex.iResourceHex.resource.Fields, 6));
+        hexes.put(27, new resourceHex(iGameHex.iResourceHex.resource.Fields, 3));
+        hexes.put(28, new resourceHex(iGameHex.iResourceHex.resource.Forest, 3));
+        hexes.put(29, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 9));
+        hexes.put(30, new resourceHex(iGameHex.iResourceHex.resource.Hills, 2));
         //Inner circle of resource hexes (clockwise)
-        hexes.put(31, new resourceHex(iGameHex.iResourceHex.resource.Forest, 5, new int[]{19, 20, 32, 37, 36, 30}));
-        hexes.put(32, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 12, new int[]{20, 21, 22, 33, 37, 31}));
-        hexes.put(33, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 8, new int[]{32, 22, 23, 24, 34, 37}));
-        hexes.put(34, new resourceHex(iGameHex.iResourceHex.resource.Hills, 10, new int[]{37, 33, 24, 25, 26, 35}));
-        hexes.put(35, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 5, new int[]{36, 37, 34, 26, 27, 28}));
-        hexes.put(36, new resourceHex(iGameHex.iResourceHex.resource.Hills, 8, new int[]{30, 31, 37, 35, 28, 29}));
+        hexes.put(31, new resourceHex(iGameHex.iResourceHex.resource.Forest, 5));
+        hexes.put(32, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 12));
+        hexes.put(33, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 8));
+        hexes.put(34, new resourceHex(iGameHex.iResourceHex.resource.Hills, 10));
+        hexes.put(35, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 5));
+        hexes.put(36, new resourceHex(iGameHex.iResourceHex.resource.Hills, 8));
         //Desert field in the middle
-        hexes.put(37, new desertHex(new int[]{31, 32, 33, 34, 35, 36}));
+        hexes.put(37, new desertHex());
         //----------------------------------------------------------------------------------------------------
         //Creating the edges
         //
@@ -80,7 +80,7 @@ public class gameMapManagement implements iGameMapManagement {
         //Creating the intersections
         //
         //Circle of coast intersections (clockwise)
-        intersections.put(1, new intersection(new int[]{2, 30}, "f"));
+        intersections.put(1, new intersection(new int[]{1, 18, 19}, new int[]{2, 30}, "f"));
         //...
         //----------------------------------------------------------------------------------------------------
 

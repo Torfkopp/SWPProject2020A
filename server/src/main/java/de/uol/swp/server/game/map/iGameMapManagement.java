@@ -115,6 +115,13 @@ public interface iGameMapManagement {
     interface iIntersection {
 
         /**
+         * Gets the surrounding hexes
+         *
+         * @return Array of three hex positions
+         */
+        int[] getHexes();
+
+        /**
          * Gets neighbouring intersections
          *
          * @return Array of positions
@@ -154,13 +161,14 @@ public interface iGameMapManagement {
 
         type type();
 
+        /**
+         * Interface for a land hex
+         *
+         * @author Mario
+         * @author Steven
+         * @since 2021-01-16
+         */
         interface iLandHex extends iGameHex {
-            /**
-             * Gets the hex's neighbours
-             *
-             * @return Int[]
-             */
-            int[] getNeighbours();
         }
 
         /**
