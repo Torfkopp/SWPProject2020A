@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.Logger;
@@ -44,11 +45,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected String lobbyName;
     protected User loggedInUser;
-    protected ObservableList<String> chatMessages;
-    protected ObservableMap<Integer, ChatMessage> chatMessageMap;
+    protected ObservableList<ChatMessage> chatMessages;
 
     @FXML
-    protected ListView<String> chatView;
+    protected ListView<ChatMessage> chatView;
 
     @FXML
     protected TextField messageField;
@@ -83,18 +83,17 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @param msg The CreatedChatMessageMessage object found on the EventBus
      * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
-     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
      */
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
                     + ": '" + msg.getMsg().getContent() + "' for " + msg.getLobbyName() + " chat");
-            Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
                     + ": '" + msg.getMsg().getContent() + "' for Global chat");
-            Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
         }
+        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+
     }
 
     /**
@@ -105,17 +104,21 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @param msg The DeletedChatMessageMessage found on the EventBus
      * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
-     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
      */
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in lobby "
                     + msg.getLobbyName());
-            Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in Global chat");
-            Platform.runLater(() -> chatMessageMap.remove(msg.getId()));
         }
+        Platform.runLater(() -> {
+            for(int i=0; i < chatMessages.size(); i++){
+                if(chatMessages.get(i).getID() == msg.getId()){
+                    chatMessages.remove(i);
+                }
+        }});
+
     }
 
     /**
@@ -127,18 +130,21 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @param msg The EditedChatMessageMessage found on the EventBus
      * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
-     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
      */
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '"
                     + msg.getMsg().getContent() + "' in lobby " + msg.getLobbyName());
-            Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '"
                     + msg.getMsg().getContent() + "' in Global Chat");
-            Platform.runLater(() -> chatMessageMap.replace(msg.getMsg().getID(), msg.getMsg()));
         }
+        Platform.runLater(() -> {
+            for(int i=0; i < chatMessages.size(); i++){
+                if(chatMessages.get(i).getID() == msg.getMsg().getID()){
+                    chatMessages.set(i, msg.getMsg());
+                }
+            }});
     }
 
     /**
@@ -171,7 +177,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onDeleteMessageButtonPressed(ActionEvent event) {
-        Integer msgId = findId();
+        ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
+        Integer msgId = chatMsg.getID();
         if (msgId != null) {
             if (lobbyName != null) {
                 LOG.debug("Requesting to delete ChatMessage with ID " + msgId + " from lobby " + lobbyName);
@@ -221,7 +228,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onEditMessageButtonPressed(ActionEvent event) {
-        Integer msgId = findId();
+        ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
+        Integer msgId = chatMsg.getID();
         if (msgId != null) {
             if (lobbyName != null) {
                 LOG.debug("Sending request to edit ChatMessage with ID " + msgId + " in lobby " + lobbyName
@@ -238,32 +246,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
         Platform.runLater(() -> {
-            if (chatMessages == null || chatMessageMap == null) prepareChatVars();
+            if (chatMessages == null) prepareChatVars();
             chatMessages.clear();
-            chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), m));
+            chatMessages.addAll(chatMessageList);
         });
-    }
-
-    /**
-     * Method to find the ID of a message in the chatView
-     *
-     * @return The ID of the message that was searched
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
-     * @since 2020-12-17
-     */
-    private Integer findId() {
-        String msgText = chatView.getSelectionModel().getSelectedItem();
-        Integer msgId = null;
-        for (Map.Entry<Integer, ChatMessage> entry : chatMessageMap.entrySet()) {
-            final ChatMessage selectedMessage = entry.getValue();
-            if (selectedMessage.toString().equals(msgText) && selectedMessage.getAuthor().equals(loggedInUser)) {
-                msgId = entry.getKey();
-                break;
-            }
-        }
-        return msgId;
     }
 
     /**
@@ -279,25 +265,15 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @since 2020-12-20
      */
     private void prepareChatVars() {
-        if (chatMessageMap == null) chatMessageMap = FXCollections.observableHashMap();
         if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
-        chatView.setItems(chatMessages);
-        chatMessageMap.addListener((MapChangeListener<Integer, ChatMessage>) change -> {
-            if (change.wasAdded() && !change.wasRemoved()) {
-                chatMessages.add(change.getValueAdded().toString());
-            } else if (!change.wasAdded() && change.wasRemoved()) {
-                chatMessages.remove(change.getValueRemoved().toString());
-            } else if (change.wasAdded() && change.wasRemoved()) {
-                for (int i = 0; i < chatMessages.size(); i++) {
-                    String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved().toString())) {
-                        chatMessages.remove(i);
-                        chatMessages.add(i, change.getValueAdded().toString());
-                        break;
-                    }
-                }
+        chatView.setCellFactory(lv -> new ListCell<ChatMessage>() {
+            @Override
+            protected void updateItem(ChatMessage item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.toString());
             }
         });
+        chatView.setItems(chatMessages);
     }
 
     /**
@@ -315,7 +291,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @since 2020-12-26
      */
     protected void resetCharVars() {
-        chatMessageMap = null;
         chatMessages = null;
     }
 }
