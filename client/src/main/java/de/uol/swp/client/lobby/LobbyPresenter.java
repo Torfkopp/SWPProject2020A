@@ -20,6 +20,7 @@ import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 
@@ -231,6 +232,26 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onLeaveLobbyButtonPressed(ActionEvent event) {
         closeWindow();
+    }
+
+    /**
+     * Handles a click on the StartSession Button
+     *
+     * Method called when the StartSessionButton is pressed.
+     * If the StartSession Button is pressed this method requests the lobby service to open the playingfield board
+     * @param event The ActionEvent created by pressing the Start Session Button
+     * @author Eric Vuong
+     * @since 2021-01-17
+     *
+     */
+    @FXML
+    private void onStartSessionButtonPressed(ActionEvent event) {
+    }
+
+
+    @FXML
+    private void onReadyCheckBoxClicked (ActionEvent event){
+
     }
 
     /**
