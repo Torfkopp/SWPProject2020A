@@ -1,8 +1,5 @@
 package de.uol.swp.server.game.map;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Management of the gameMap
  *
@@ -12,13 +9,10 @@ import java.util.Map;
  */
 public class gameMapManagement implements iGameMapManagement {
 
-    //Warnungen wegen "Raw use of parameterised class 'Map' und
-    // ab Z.37 "Unchecked call to 'put(K, V)' as a member of raw type 'java.util.Map'
-    Map hexes = new HashMap<Integer, iGameHex>();
-
-    Map edges = new HashMap<Integer, iEdge>(); //Amount: 72
-
-    Map intersections = new HashMap<Integer, iIntersection>(); //Amount: 54
+    //The first index (0) of each array is left open to ease mapping
+    iGameHex[] hexes = new iGameHex[38]; //37 tiles
+    iEdge[] edges = new iEdge[73]; //72 edges
+    iIntersection[] intersections = new iIntersection[55]; //54 intersections
 
     int robberPosition = 37;
 
@@ -30,57 +24,57 @@ public class gameMapManagement implements iGameMapManagement {
         //Creating the hexes
         //
         //Circle of water and harbor hexes (clockwise)
-        hexes.put(1, new harborHex(1, iGameHex.iHarborHex.resource.Ore));
-        hexes.put(2, new waterHex());
-        hexes.put(3, new harborHex(2, iGameHex.iHarborHex.resource.Wool));
-        hexes.put(4, new waterHex());
-        hexes.put(5, new harborHex(3, iGameHex.iHarborHex.resource.Any));
-        hexes.put(6, new waterHex());
-        hexes.put(7, new harborHex(12, iGameHex.iHarborHex.resource.Any));
-        hexes.put(8, new waterHex());
-        hexes.put(9, new harborHex(19, iGameHex.iHarborHex.resource.Grain));
-        hexes.put(10, new waterHex());
-        hexes.put(11, new harborHex(19, iGameHex.iHarborHex.resource.Any));
-        hexes.put(12, new waterHex());
-        hexes.put(13, new harborHex(17, iGameHex.iHarborHex.resource.Brick));
-        hexes.put(14, new waterHex());
-        hexes.put(15, new harborHex(8, iGameHex.iHarborHex.resource.Any));
-        hexes.put(16, new waterHex());
-        hexes.put(17, new harborHex(4, iGameHex.iHarborHex.resource.Lumber));
-        hexes.put(18, new waterHex());
+        hexes[1] = new harborHex(1, iGameHex.iHarborHex.resource.Ore);
+        hexes[2] = new waterHex();
+        hexes[3] = new harborHex(2, iGameHex.iHarborHex.resource.Wool);
+        hexes[4] = new waterHex();
+        hexes[5] = new harborHex(3, iGameHex.iHarborHex.resource.Any);
+        hexes[6] = new waterHex();
+        hexes[7] = new harborHex(12, iGameHex.iHarborHex.resource.Any);
+        hexes[8] = new waterHex();
+        hexes[9] = new harborHex(19, iGameHex.iHarborHex.resource.Grain);
+        hexes[10] = new waterHex();
+        hexes[11] = new harborHex(19, iGameHex.iHarborHex.resource.Any);
+        hexes[12] = new waterHex();
+        hexes[13] = new harborHex(17, iGameHex.iHarborHex.resource.Brick);
+        hexes[14] = new waterHex();
+        hexes[15] = new harborHex(8, iGameHex.iHarborHex.resource.Any);
+        hexes[16] = new waterHex();
+        hexes[17] = new harborHex(4, iGameHex.iHarborHex.resource.Lumber);
+        hexes[18] = new waterHex();
         //Outer circle of resource hexes (clockwise)
-        hexes.put(19, new resourceHex(iGameHex.iResourceHex.resource.Fields, 4));
-        hexes.put(20, new resourceHex(iGameHex.iResourceHex.resource.Forest, 6));
-        hexes.put(21, new resourceHex(iGameHex.iResourceHex.resource.Fields, 9));
-        hexes.put(22, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 4));
-        hexes.put(23, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 10));
-        hexes.put(24, new resourceHex(iGameHex.iResourceHex.resource.Forest, 11));
-        hexes.put(25, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 11));
-        hexes.put(26, new resourceHex(iGameHex.iResourceHex.resource.Fields, 6));
-        hexes.put(27, new resourceHex(iGameHex.iResourceHex.resource.Fields, 3));
-        hexes.put(28, new resourceHex(iGameHex.iResourceHex.resource.Forest, 3));
-        hexes.put(29, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 9));
-        hexes.put(30, new resourceHex(iGameHex.iResourceHex.resource.Hills, 2));
+        hexes[19] = new resourceHex(iGameHex.iResourceHex.resource.Fields, 4);
+        hexes[20] = new resourceHex(iGameHex.iResourceHex.resource.Forest, 6);
+        hexes[21] = new resourceHex(iGameHex.iResourceHex.resource.Fields, 9);
+        hexes[22] = new resourceHex(iGameHex.iResourceHex.resource.Pasture, 4);
+        hexes[23] = new resourceHex(iGameHex.iResourceHex.resource.Pasture, 10);
+        hexes[24] = new resourceHex(iGameHex.iResourceHex.resource.Forest, 11);
+        hexes[25] = new resourceHex(iGameHex.iResourceHex.resource.Mountains, 11);
+        hexes[26] = new resourceHex(iGameHex.iResourceHex.resource.Fields, 6);
+        hexes[27] = new resourceHex(iGameHex.iResourceHex.resource.Fields, 3);
+        hexes[28] = new resourceHex(iGameHex.iResourceHex.resource.Forest, 3);
+        hexes[29] = new resourceHex(iGameHex.iResourceHex.resource.Pasture, 9);
+        hexes[30] = new resourceHex(iGameHex.iResourceHex.resource.Hills, 2);
         //Inner circle of resource hexes (clockwise)
-        hexes.put(31, new resourceHex(iGameHex.iResourceHex.resource.Forest, 5));
-        hexes.put(32, new resourceHex(iGameHex.iResourceHex.resource.Pasture, 12));
-        hexes.put(33, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 8));
-        hexes.put(34, new resourceHex(iGameHex.iResourceHex.resource.Hills, 10));
-        hexes.put(35, new resourceHex(iGameHex.iResourceHex.resource.Mountains, 5));
-        hexes.put(36, new resourceHex(iGameHex.iResourceHex.resource.Hills, 8));
+        hexes[31] = new resourceHex(iGameHex.iResourceHex.resource.Forest, 5);
+        hexes[32] = new resourceHex(iGameHex.iResourceHex.resource.Pasture, 12);
+        hexes[33] = new resourceHex(iGameHex.iResourceHex.resource.Mountains, 8);
+        hexes[34] = new resourceHex(iGameHex.iResourceHex.resource.Hills, 10);
+        hexes[35] = new resourceHex(iGameHex.iResourceHex.resource.Mountains, 5);
+        hexes[36] = new resourceHex(iGameHex.iResourceHex.resource.Hills, 8);
         //Desert field in the middle
-        hexes.put(37, new desertHex());
+        hexes[37] = new desertHex();
         //----------------------------------------------------------------------------------------------------
         //Creating the edges
         //
         //Circle of coast edges (clockwise)
-        edges.put(1, new edge(new int[]{2, 30}, 0));
+        edges[1] = new edge(new int[]{2, 30}, 0);
         //...
         //----------------------------------------------------------------------------------------------------
         //Creating the intersections
         //
         //Circle of coast intersections (clockwise)
-        intersections.put(1, new intersection(new int[]{1, 18, 19}, new int[]{2, 30}, "f"));
+        intersections[1] = new intersection(new int[]{1, 18, 19}, new int[]{2, 30}, "f");
         //...
         //----------------------------------------------------------------------------------------------------
 
@@ -91,18 +85,16 @@ public class gameMapManagement implements iGameMapManagement {
 
     @Override
     public iGameHex getHex(int place) {
-        return (iGameHex) hexes.get(place);
+        return hexes[place];
     }
 
     @Override
     public boolean placeSettlement(int player, int position) {
 
-        intersection i = (intersection) intersections.get(position);
         if (settlementPlaceable(player, position)) {
-            i.setState(player + "s");
-            for (int iPos : i.getNeighbours()) {
-                intersection i2 = (intersection) intersections.get(iPos);
-                i2.setState("b");
+            intersections[player].setState(player + "s");
+            for (int iPos : intersections[player].getNeighbours()) {
+                intersections[iPos].setState("b");
             }
             return true;
         }
@@ -113,8 +105,7 @@ public class gameMapManagement implements iGameMapManagement {
     public boolean placeRoad(int player, int position) {
 
         if (roadPlaceable(player, position)) {
-            edge e = (edge) edges.get(position);
-            e.setState(player);
+            edges[player].setState(player);
             return true;
         }
         return false;
@@ -127,27 +118,23 @@ public class gameMapManagement implements iGameMapManagement {
 
     @Override
     public boolean upgradeSettlement(int player, int position) {
-        intersection i = (intersection) intersections.get(position);
-        if (i.getState().equals(player + "s")) {
-            i.setState(player + "c");
+        if (intersections[player].getState().equals(player + "s")) {
+            intersections[player].setState(player + "c");
         }
         return false;
     }
 
     @Override
     public boolean settlementPlaceable(int player, int position) {
-        intersection i = (intersection) intersections.get(position);
-        return i.getState().equals("f");
+        return intersections[position].getState().equals("f");
     }
 
     @Override
     public boolean roadPlaceable(int player, int position) {
-        edge e = (edge) edges.get(position);
         boolean isBuildable = false;
-        if (e.getState() == 0) {
-            for (int ePos : e.getNeighbours()) {
-                edge e2 = (edge) edges.get(ePos);
-                if (e2.getState() == player) isBuildable = true;
+        if (edges[player].getState() == 0) {
+            for (int ePos : edges[player].getNeighbours()) {
+                if (edges[ePos].getState() == player) isBuildable = true;
             }
         }
         return isBuildable;
