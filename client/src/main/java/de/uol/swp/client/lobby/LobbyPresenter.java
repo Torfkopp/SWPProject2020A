@@ -57,7 +57,18 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         super.init(LogManager.getLogger(LobbyPresenter.class));
     }
 
+    /**
+     * Initialises the Presenter by setting up the membersView.
+     *
+     * @implNote Called automatically by JavaFX
+     * @author Temmo Junkhoff
+     * @author Timo Gerken
+     * @since 2021-01-18
+     */
+    @Override
+    @FXML
     public void initialize(){
+        super.initialize();
         membersView.setCellFactory(lv -> new ListCell<Pair<String, String>>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
@@ -263,6 +274,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         clearEventBus();
     }
 
+    /**
+     * Helper function to find the Pair for a given key
+     *
+     * @param name the key of the pair that should be returned
+     * @return the pair matched by the name
+     * @author Temmo Junkhoff
+     * @author Timo Gerken
+     * @since 2021-01-18
+     */
     private Pair<String, String> findMember(String name){
         for(int i = 0; i < lobbyMembers.size(); i++){
             if(lobbyMembers.get(i).getKey() == name) return lobbyMembers.get(i);

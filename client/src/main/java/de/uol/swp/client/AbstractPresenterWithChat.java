@@ -256,9 +256,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Prepares the variables used for the chat storage and management
      * <p>
      * This method is called on a successful login and ensures that
-     * the used variables chatMessageMap and chatMessages aren't null,
+     * the used variable chatMessages isn't null,
      * sets the items of the chatView to the chatMessages observableList,
-     * and adds a MapChangeListener that manages the displayed ChatMessages.
+     * and sets up the chatView.
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
