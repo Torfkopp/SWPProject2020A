@@ -266,7 +266,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     private void prepareChatVars() {
         if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
-        chatView.setCellFactory(lv -> new ListCell<ChatMessage>() {
+        chatView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(ChatMessage item, boolean empty) {
                 super.updateItem(item, empty);
@@ -284,8 +284,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * multiple instances of the chat being displayed in the chatView.
      *
      * @author Finn Haase
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessageMap
+     * @author Phillip-André Suhr3
      * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessages
      * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
      * @since 2020-12-26
