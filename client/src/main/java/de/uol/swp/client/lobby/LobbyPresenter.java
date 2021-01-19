@@ -9,22 +9,28 @@ import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.UserReadyMessage;
+import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
-import org.checkerframework.checker.units.qual.A;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Manages the lobby's menu
@@ -40,9 +46,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
+    private Set<User> readyUsers;
 
     @FXML
     private ListView<Pair<String, String>> membersView;
+    @FXML
+    private CheckBox ReadyCheckBox;
+    @FXML
+    private Button StartSession;
 
     private Window window;
 
@@ -115,9 +126,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Handles LobbyUpdateEvents on the EventBus
      * <p>
      * If a new LobbyUpdateEvent is posted to the EventBus, this method checks
-     * whether the lobbyName and/or loggedInUser attributes of the current
+     * whether the lobbyName, loggedInUser, or readyUsers attributes of the current
      * LobbyPresenter are null. If they are, it sets these attributes to the
-     * values found in the LobbyUpdateEvent.
+     * values found in the LobbyUpdateEvent or creates a new, empty instance.
      * Also makes sure that the lobby will be left gracefully should the window
      * be closed without using the Leave Lobby button.
      *
@@ -125,7 +136,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
-     * @since 2021-01-07
+     * @since 2021-01-19
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent lobbyUpdateEvent) {
@@ -137,6 +148,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (this.window == null) {
             this.window = membersView.getScene().getWindow();
         }
+        if (this.readyUsers == null) {
+            this.readyUsers = new HashSet<>();
+        }
         this.window.setOnCloseRequest(event -> closeWindow());
     }
 
@@ -145,20 +159,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
      * of the currently logged in members are put into the list of lobby members.
-     * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of user
-     * list" with the names of all currently logged in users as well as the message
-     * "Owner of this lobby: " with the name of the lobby's owner is displayed in the
-     * log.
+     * The owner attribute is set and the set of ready Users is updated.
+     * Furthermore, if the LOG-Level is set to DEBUG, the messages "Update of user
+     * list" with the names of all currently logged in users, "Owner of this
+     * lobby: " with the name of the lobby's owner, and "Update of ready users "
+     * are displayed in the log.
      *
      * @param allLobbyMembersResponse AllLobbyMembersResponse object seen on the EventBus
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
-     * @since 2021-01-05
+     * @since 2021-01-19
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
         LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
         LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
+        LOG.debug("Update of ready users " + allLobbyMembersResponse.getReadyUsers());
         this.owner = allLobbyMembersResponse.getOwner();
+        this.readyUsers = allLobbyMembersResponse.getReadyUsers();
         updateUsersList(allLobbyMembersResponse.getUsers());
     }
 
@@ -179,7 +196,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
-                lobbyMembers.add(new Pair(message.getUser().getUsername(), message.getUser().getUsername()));
+                lobbyMembers.add(new Pair<>(message.getUser().getUsername(), message.getUser().getUsername()));
         });
     }
 
@@ -190,7 +207,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * the leaving user was the lobby owner, the entire list of member is
      * requested from the server to ensure a new owner is decided. If the
      * leaving user wasn't the owner, their name is removed from the list
-     * of members.
+     * of members. If they were marked as ready, they are removed from the
+     * Set of ready users.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Owner/User
      * {@literal <Username>} left Lobby {@literal <Lobbyname>}" is displayed
      * in the log, depending on whether the owner or a normal user left.
@@ -198,7 +216,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @param message the UserLeftLobbyMessage object seen on the EventBus
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
-     * @since 2021-01-05
+     * @since 2021-01-19
      */
     @Subscribe
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage message) {
@@ -208,7 +226,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         } else {
             LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
         }
-        Platform.runLater(() -> lobbyMembers.remove(findMember(message.getUser().getUsername())));
+        Platform.runLater(() -> {
+            lobbyMembers.remove(findMember(message.getUser().getUsername()));
+            readyUsers.remove(message.getUser());
+        });
     }
 
     /**
@@ -217,14 +238,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * This method clears the entire member list and then adds the name of each user
      * in the list given to the lobby's member list.
      * If there is no member list, it creates one.
+     * <p>
+     * If a user is marked as ready in the readyUsers Set, their name is prepended
+     * with a checkmark.
      * If the owner is found among the users, their username is appended with a
      * crown emoji.
      *
-     * @param userLobbyList A list of UserDTO objects including all currently logged in
+     * @param userLobbyList A list of User objects including all currently logged in
      *                      users
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserDTO
+     * @see de.uol.swp.common.user.User
      * @since 2021-01-05
      */
     private void updateUsersList(List<User> userLobbyList) {
@@ -238,8 +262,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
             userLobbyList.forEach(u -> {
                 String username = u.getUsername();
+                if (readyUsers.contains(u)) {
+                    username = "\u2713 " + username;
+                }
                 Pair<String, String> item = new Pair<>(username,
-                        username.equals(this.owner.getUsername()) ? username + "\uD83D\uDC51" : username);
+                        u.getUsername().equals(this.owner.getUsername()) ? username + "\uD83D\uDC51" : username);
                 lobbyMembers.add(item);
             });
         });
@@ -262,22 +289,53 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     /**
      * Handles a click on the StartSession Button
-     *
+     * <p>
      * Method called when the StartSessionButton is pressed.
-     * If the StartSession Button is pressed this method requests the lobby service to open the playingfield board
+     *
      * @param event The ActionEvent created by pressing the Start Session Button
      * @author Eric Vuong
+     * @author Maximilian Lindner
      * @since 2021-01-17
-     *
      */
     @FXML
     private void onStartSessionButtonPressed(ActionEvent event) {
     }
 
-
+    /**
+     * Handles the click on the ReadyCheckBox
+     * <p>
+     * Method called when the Ready Checkbox is clicked. It checks whether the
+     * CheckBox is selected or not and then posts a UserReadyRequest onto the
+     * EventBus with the appropriate parameters.
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
     @FXML
-    private void onReadyCheckBoxClicked (ActionEvent event){
+    private void onReadyCheckBoxClicked(ActionEvent event) {
+        boolean isReady = ReadyCheckBox.isSelected();
+        RequestMessage userReadyRequest = new UserReadyRequest(this.lobbyName, this.loggedInUser, isReady);
+        eventBus.post(userReadyRequest);
+    }
 
+    /**
+     * Handles the UserReadyMessage
+     * <p>
+     * If the UserReadyMessage belongs to this lobby, it calls the LobbyService
+     * to retrieve all lobby members, which will also mark all ready users as
+     * such.
+     *
+     * @param userReadyMessage The UserReadyMessage found on the EventBus
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
+    @Subscribe
+    private void onUserReadyMessage(UserReadyMessage userReadyMessage) {
+        if (userReadyMessage.getName().equals(this.lobbyName)) {
+            lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
+        }
     }
 
     /**
@@ -297,16 +355,19 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     /**
      * Helper function to find the Pair for a given key
+     * <p>
+     * Also checks if the username was marked as ready with a prepended checkmark.
      *
      * @param name the key of the pair that should be returned
      * @return the pair matched by the name
      * @author Temmo Junkhoff
      * @author Timo Gerken
-     * @since 2021-01-18
+     * @since 2021-01-19
      */
     private Pair<String, String> findMember(String name) {
-        for (int i = 0; i < lobbyMembers.size(); i++) {
-            if (lobbyMembers.get(i).getKey().equals(name)) return lobbyMembers.get(i);
+        for (Pair<String, String> lobbyMember : lobbyMembers) {
+            String key = lobbyMember.getKey();
+            if (key.equals(name) || key.equals("\u2713 " + name)) return lobbyMember;
         }
         return null;
     }

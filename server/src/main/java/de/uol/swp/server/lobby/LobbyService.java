@@ -20,10 +20,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Handles the lobby requests sent by the users
@@ -144,8 +141,8 @@ public class LobbyService extends AbstractService {
      * Handles a LobbyLeaveUserRequest found on the EventBus
      * <p>
      * If a LobbyLeaveUserRequest is detected on the EventBus, this method is called.
-     * It removes a user from a lobby stored in the LobbyManagement and sends a
-     * UserLeftLobbyMessage to every user in the lobby.
+     * It marks a user as not ready, removes them from a lobby stored in the
+     * LobbyManagement and sends a UserLeftLobbyMessage to every user in the lobby.
      *
      * @param lobbyLeaveUserRequest The LobbyJoinUserRequest found on the EventBus
      * @see de.uol.swp.common.lobby.Lobby
@@ -157,6 +154,7 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyLeaveUserRequest.getName());
 
         if (lobby.isPresent()) {
+            lobby.get().unsetUserReady(lobbyLeaveUserRequest.getUser());
             try {
                 lobby.get().leaveUser(lobbyLeaveUserRequest.getUser());
                 sendToAllInLobby(lobbyLeaveUserRequest.getName(), new UserLeftLobbyMessage(lobbyLeaveUserRequest.getName(), lobbyLeaveUserRequest.getUser()));
@@ -220,11 +218,38 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             Set<User> lobbyMembers = lobby.get().getUsers();
-            Message response = new AllLobbyMembersResponse(lobbyMembers, lobby.get().getOwner());
+            Message response = new AllLobbyMembersResponse(lobbyMembers, lobby.get().getOwner(), lobby.get().getReadyUsers());
             response.initWithMessage(retrieveAllLobbyMembersRequest);
             post(response);
         } else {
             LOG.error("Lobby " + lobbyName + " not found.");
+        }
+    }
+
+    /**
+     * Handles a UserReadyRequest found on the EventBus
+     * <p>
+     * If a UserReadyRequest is detected on the EventBus, this method is called.
+     * It posts a UserReadyMessage containing a set of all the lobby's members
+     * that are marked as ready onto the EventBus.
+     *
+     * @param userReadyRequest The UserReadyRequest found on the EventBus
+     * @author Maxmilian Lindner
+     * @author Eric Vuong
+     * @see de.uol.swp.common.lobby.message.UserReadyMessage
+     * @since 2021-01-19
+     */
+    @Subscribe
+    private void onUserReadyRequest(UserReadyRequest userReadyRequest) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(userReadyRequest.getName());
+        if (lobby.isPresent()) {
+            if (userReadyRequest.isReady()) {
+                lobby.get().setUserReady(userReadyRequest.getUser());
+            } else {
+                lobby.get().unsetUserReady(userReadyRequest.getUser());
+            }
+            ServerMessage msg = new UserReadyMessage(userReadyRequest.getName(), userReadyRequest.getUser());
+            sendToAllInLobby(userReadyRequest.getName(), msg);
         }
     }
 }
