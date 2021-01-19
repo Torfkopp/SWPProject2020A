@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The type chat's management.
+ * Handles most chat related issues, e.g. creating/removing ChatMessages
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
@@ -101,5 +101,10 @@ public class ChatManagement extends AbstractChatManagement {
             throw new ChatManagementException("ChatMessage ID unknown");
         }
         chatMessageStore.removeChatMessage(id, originLobby);
+    }
+
+    @Override
+    public void dropLobbyHistory(String originLobby) {
+        chatMessageStore.removeLobbyHistory(originLobby);
     }
 }
