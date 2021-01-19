@@ -95,6 +95,10 @@ public class UserManagement extends AbstractUserManagement {
         return userStore.findUser(userName);
     }
 
+    public Optional<User> getUserWithPassword(String userName, String password) {
+        return userStore.findUser(userName, password);
+    }
+
     /**
      * Subfunction of the updateUser method
      * <p>
@@ -108,9 +112,5 @@ public class UserManagement extends AbstractUserManagement {
      */
     private String firstNotNull(String firstValue, String secondValue) {
         return Strings.isNullOrEmpty(firstValue) ? secondValue : firstValue;
-    }
-
-    public Optional<User> getUserWithPassword(String userName, String password) {
-        return userStore.findUser(userName, password);
     }
 }

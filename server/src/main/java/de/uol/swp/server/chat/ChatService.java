@@ -13,6 +13,7 @@ import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -37,7 +38,7 @@ public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
 
-    private final ChatManagement chatManagement;
+    private final IChatManagement chatManagement;
 
     private final LobbyService lobbyService;
 
@@ -187,5 +188,29 @@ public class ChatService extends AbstractService {
             returnMessage.setMessageContext(msg.getMessageContext().get());
         }
         post(returnMessage);
+    }
+
+    /**
+     * Handles a LobbyDeletedMessage found on the EventBus
+     * <p>
+     * If a LobbyDeletedMessage is detected on the EventBus, this method is called.
+     * It then requests the ChatManagement to drop the Chat History associated
+     * with the now deleted Lobby.
+     * <p>
+     * Furthermore, if the LOG-level is set to DEBUG, the message "Lobby
+     * {@literal <lobbyName>} was deleted, removing its chat history..." is
+     * displayed in the LOG.
+     *
+     * @param msg The LobbyDeletedMessage found on the EventBus
+     * @author Phillip-André Suhr
+     * @author Sven Ahrens
+     * @see de.uol.swp.server.chat.IChatManagement#dropLobbyHistory(String)
+     * @see de.uol.swp.common.lobby.message.LobbyDeletedMessage
+     * @since 2021-01-16
+     */
+    @Subscribe
+    private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
+        LOG.debug("Lobby " + msg.getName() + " was deleted, removing its chat history...");
+        chatManagement.dropLobbyHistory(msg.getName());
     }
 }

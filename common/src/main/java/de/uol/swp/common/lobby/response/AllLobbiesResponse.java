@@ -1,7 +1,6 @@
 package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.ArrayList;
@@ -22,8 +21,8 @@ import java.util.Map;
  */
 public class AllLobbiesResponse extends AbstractResponseMessage {
 
-    private final ArrayList<String> lobbies = new ArrayList<>();
-    private final ArrayList<LobbyDTO> lobbyDTOs = new ArrayList<>();
+    private final List<String> lobbyNames = new ArrayList<>();
+    private final List<Lobby> lobbies = new ArrayList<>();
 
     /**
      * Default Constructor
@@ -42,7 +41,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * @since 2020-12-12
      */
     public AllLobbiesResponse(Map<String, Lobby> lobbies) {
-        this.lobbies.addAll(lobbies.keySet());
+        this.lobbyNames.addAll(lobbies.keySet());
     }
 
     /**
@@ -51,18 +50,18 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * @return List of lobby names
      * @since 2020-12-12
      */
-    public ArrayList<String> getLobbies() {
-        return lobbies;
+    public List<String> getLobbyNames() {
+        return lobbyNames;
     }
 
     /**
-     * Gets the list of existing lobbyDTOs
+     * Getter for the list of existing Lobby objects
      *
      * @return List of existing lobbyDTOs
      * @author Marvin
      * @since 2020-12-16
      */
-    public List<LobbyDTO> getDTO() {
-        return lobbyDTOs;
+    public List<Lobby> getLobbies() {
+        return lobbies;
     }
 }

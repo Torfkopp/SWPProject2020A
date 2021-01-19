@@ -8,14 +8,17 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -38,6 +41,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private ListView<String> membersView;
 
+    private Window window;
+
     /**
      * Constructor
      *
@@ -57,12 +62,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * whether the lobbyName and/or loggedInUser attributes of the current
      * LobbyPresenter are null. If they are, it sets these attributes to the
      * values found in the LobbyUpdateEvent.
+     * Also makes sure that the lobby will be left gracefully should the window
+     * be closed without using the Leave Lobby button.
      *
      * @param lobbyUpdateEvent the lobby update event
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
-     * @since 2020-12-30
+     * @since 2021-01-07
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent lobbyUpdateEvent) {
@@ -71,6 +78,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             super.loggedInUser = lobbyUpdateEvent.getUser();
             super.chatService.askLatestMessages(10, super.lobbyName);
         }
+        if (this.window == null) {
+            this.window = membersView.getScene().getWindow();
+        }
+        this.window.setOnCloseRequest(event -> closeWindow());
     }
 
     /**
@@ -117,6 +128,34 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles users leaving a lobby
+     * <p>
+     * If a new UserLeftLobbyMessage object is posted onto the EventBus and
+     * the leaving user was the lobby owner, the entire list of member is
+     * requested from the server to ensure a new owner is decided. If the
+     * leaving user wasn't the owner, their name is removed from the list
+     * of members.
+     * Furthermore, if the LOG-Level is set to DEBUG, the message "Owner/User
+     * {@literal <Username>} left Lobby {@literal <Lobbyname>}" is displayed
+     * in the log, depending on whether the owner or a normal user left.
+     *
+     * @param message the UserLeftLobbyMessage object seen on the EventBus
+     * @author Temmo Junkhoff
+     * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
+     * @since 2021-01-05
+     */
+    @Subscribe
+    private void onUserLeftLobbyMessage(UserLeftLobbyMessage message) {
+        if (message.getUser().getUsername().equals(owner.getUsername())) {
+            LOG.debug("Owner " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
+        } else {
+            LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            Platform.runLater(() -> lobbyMembers.remove(message.getUser().getUsername()));
+        }
+    }
+
+    /**
      * Updates the lobby's member list according to the list given
      * <p>
      * This method clears the entire member list and then adds the name of each user
@@ -132,7 +171,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.common.user.UserDTO
      * @since 2021-01-05
      */
-    private void updateUsersList(List<UserDTO> userLobbyList) {
+    private void updateUsersList(List<User> userLobbyList) {
         // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
@@ -174,8 +213,38 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Override
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName().equals(super.lobbyName)) {
+        if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
+    }
+
+    /**
+     * Handles a click on the LeaveLobby button
+     * <p>
+     * Method called when the leaveLobby button is pressed.
+     * If the leaveLobby button is pressed this method requests
+     * the lobby service to leave the lobby.
+     *
+     * @param event The ActionEvent created by pressing the leave lobby Button
+     * @since 2020-12-14
+     */
+    @FXML
+    private void onLeaveLobbyButtonPressed(ActionEvent event) {
+        closeWindow();
+    }
+
+    /**
+     * Helper function to let the user leave the lobby and close the window
+     * Also clears the EventBus of the instance to avoid NullPointerExceptions.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-06
+     */
+    private void closeWindow() {
+        if (lobbyName != null || loggedInUser != null) {
+            lobbyService.leaveLobby(lobbyName, loggedInUser);
+        }
+        ((Stage) window).close();
+        clearEventBus();
     }
 }

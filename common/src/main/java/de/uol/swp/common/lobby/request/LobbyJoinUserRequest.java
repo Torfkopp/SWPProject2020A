@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
-import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.User;
 
 /**
  * Request sent to the server when a user wants to join a lobby
@@ -28,7 +28,7 @@ public class LobbyJoinUserRequest extends AbstractLobbyRequest {
      * @param user      User who wants to join the lobby
      * @since 2019-10-08
      */
-    public LobbyJoinUserRequest(String lobbyName, UserDTO user) {
+    public LobbyJoinUserRequest(String lobbyName, User user) {
         super(lobbyName, user);
     }
 }

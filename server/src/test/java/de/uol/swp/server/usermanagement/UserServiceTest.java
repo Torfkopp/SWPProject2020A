@@ -1,6 +1,7 @@
 package de.uol.swp.server.usermanagement;
 
 import com.google.common.eventbus.EventBus;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.request.RegisterUserRequest;
@@ -21,7 +22,7 @@ class UserServiceTest {
 
     @Test
     void registerUserTest() {
-        final RegisterUserRequest request = new RegisterUserRequest(userToRegister);
+        final Message request = new RegisterUserRequest(userToRegister);
 
         // The post will lead to a call of a UserService function
         bus.post(request);
@@ -35,8 +36,8 @@ class UserServiceTest {
 
     @Test
     void registerSecondUserWithSameName() {
-        final RegisterUserRequest request = new RegisterUserRequest(userToRegister);
-        final RegisterUserRequest request2 = new RegisterUserRequest(userWithSameName);
+        final Message request = new RegisterUserRequest(userToRegister);
+        final Message request2 = new RegisterUserRequest(userWithSameName);
 
         bus.post(request);
         bus.post(request2);

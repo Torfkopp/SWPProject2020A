@@ -18,14 +18,14 @@ import java.util.List;
  */
 public class AllLobbyMembersResponse extends AbstractResponseMessage {
 
-    private final List<UserDTO> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
     private User owner;
 
     /**
      * Default Constructor
      *
      * @implNote This constructor is needed for serialisation
-     * @since 2020.12.21
+     * @since 2020-12-21
      */
     public AllLobbyMembersResponse() {
         // needed for serialisation
@@ -55,9 +55,9 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * Gets the list of lobby members
      *
      * @return List of lobby members
-     * @since 2020.12.21
+     * @since 2020-12-21
      */
-    public List<UserDTO> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 

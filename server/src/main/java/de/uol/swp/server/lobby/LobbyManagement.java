@@ -45,7 +45,7 @@ public class LobbyManagement {
      * @throws java.lang.IllegalArgumentException There is no lobby with the requested name
      * @since 2019-10-08
      */
-    public void dropLobby(String name) {
+    public void dropLobby(String name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name " + name + " not found!");
         }

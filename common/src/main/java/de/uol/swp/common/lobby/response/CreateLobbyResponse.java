@@ -10,7 +10,7 @@ public class CreateLobbyResponse extends AbstractResponseMessage {
      * Constructor
      *
      * @param name The name for the new lobby
-     * @since 2020.12.21
+     * @since 2020-12-21
      **/
     public CreateLobbyResponse(String name) {
         this.name = name;
@@ -20,7 +20,7 @@ public class CreateLobbyResponse extends AbstractResponseMessage {
      * Gets the name of the created lobby
      *
      * @return Name name of the created lobby
-     * @since 2020.12.21
+     * @since 2020-12-21
      */
     public String getName() {
         return name;

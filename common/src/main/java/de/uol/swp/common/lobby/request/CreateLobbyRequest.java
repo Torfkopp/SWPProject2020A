@@ -1,7 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 
 /**
  * Request sent to the server when a user wants to create a new lobby
@@ -28,7 +27,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      * @param owner User trying to create the lobby
      * @since 2019-10-08
      */
-    public CreateLobbyRequest(String name, UserDTO owner) {
+    public CreateLobbyRequest(String name, User owner) {
         super(name, owner);
     }
 
@@ -48,7 +47,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      * @param owner User trying to create the lobby
      * @since 2019-10-08
      */
-    public void setOwner(UserDTO owner) {
+    public void setOwner(User owner) {
         setUser(owner);
     }
 }

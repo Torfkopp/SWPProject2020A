@@ -41,7 +41,7 @@ public class UserDTO implements User {
      * @return User copy of the User object
      * @since 2019-08-13
      */
-    public static UserDTO create(User user) {
+    public static User create(User user) {
         return new UserDTO(user.getUsername(), user.getPassword(), user.getEMail());
     }
 
@@ -55,7 +55,7 @@ public class UserDTO implements User {
      * @return UserDTO Copy of User object with the password variable left empty
      * @since 2019-08-13
      */
-    public static UserDTO createWithoutPassword(User user) {
+    public static User createWithoutPassword(User user) {
         return new UserDTO(user.getUsername(), "", user.getEMail());
     }
 

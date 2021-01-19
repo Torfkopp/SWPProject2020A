@@ -1,7 +1,7 @@
 package de.uol.swp.client;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.chat.ChatService;
+import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -40,7 +40,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected static Logger LOG;
 
     @Inject
-    protected ChatService chatService;
+    protected IChatService chatService;
 
     protected String lobbyName;
     protected User loggedInUser;
@@ -88,11 +88,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
-                    + ": '" + msg.getMsg().getContent() + " for " + msg.getLobbyName() + " chat");
+                    + ": '" + msg.getMsg().getContent() + "' for " + msg.getLobbyName() + " chat");
             Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
-                    + ": '" + msg.getMsg().getContent() + " for Global chat");
+                    + ": '" + msg.getMsg().getContent() + "' for Global chat");
             Platform.runLater(() -> chatMessageMap.put(msg.getMsg().getID(), msg.getMsg()));
         }
     }
@@ -238,6 +238,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
         Platform.runLater(() -> {
+            if (chatMessages == null || chatMessageMap == null) prepareChatVars();
             chatMessages.clear();
             chatMessageList.forEach(m -> chatMessageMap.put(m.getID(), m));
         });
@@ -285,13 +286,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             if (change.wasAdded() && !change.wasRemoved()) {
                 chatMessages.add(change.getValueAdded().toString());
             } else if (!change.wasAdded() && change.wasRemoved()) {
-                for (int i = 0; i < chatMessages.size(); i++) {
-                    String text = chatMessages.get(i);
-                    if (text.equals(change.getValueRemoved().toString())) {
-                        chatMessages.remove(i);
-                        break;
-                    }
-                }
                 chatMessages.remove(change.getValueRemoved().toString());
             } else if (change.wasAdded() && change.wasRemoved()) {
                 for (int i = 0; i < chatMessages.size(); i++) {
