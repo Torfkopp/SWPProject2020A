@@ -271,6 +271,33 @@ class ChatManagementTest {
     }
 
     /**
+     * Test of the dropLobbyHistory routine
+     * <p>
+     * Tests if a lobby's entire Chat History gets properly dropped from the
+     * chatMessageStore.
+     * <p>
+     * This test fails if the list of ChatMessage object returned by
+     * getLatestMessages for defaultLobby is empty before calling dropLobbyHistory,
+     * or if the list of ChatMessage objects returned by getLatestMessages for defaultLobby
+     * is not empty after calling dropLobbyHistory.
+     *
+     * @author Phillip-André Suhr
+     * @author Sven Ahrens
+     * @since 2021-01-16
+     */
+    @Test
+    void dropLobbyHistoryTest() {
+        chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        List<ChatMessage> list = chatMessageStore.getLatestMessages(1, defaultLobby);
+        assertFalse(list.isEmpty());
+
+        chatMessageStore.removeLobbyHistory(defaultLobby);
+
+        List<ChatMessage> list1 = chatMessageStore.getLatestMessages(1, defaultLobby);
+        assertTrue(list1.isEmpty());
+    }
+
+    /**
      * Tests if the ChatManagement throws a ChatManagementException when createChatMessage
      * is called with null as content.
      */
