@@ -8,7 +8,7 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public interface iGameMapManagement {
+public interface IGameMapManagement {
 
     /**
      * Gets the hex at a specified place
@@ -16,7 +16,7 @@ public interface iGameMapManagement {
      * @param place The hex's place (int)
      * @return The hex
      */
-    iGameHex getHex(int place);
+    IGameHex getHex(int place);
 
     /**
      * Places a settlement
@@ -44,6 +44,13 @@ public interface iGameMapManagement {
      * @param newHex The hex the robber has moved to
      */
     void moveRobber(int newHex);
+
+    /**
+     * Gets the robber's position
+     *
+     * @return int Position of the robber
+     */
+    int getRobberPos();
 
     /**
      * Upgrades a settlement
@@ -81,7 +88,14 @@ public interface iGameMapManagement {
      * @author Mario
      * @since 2021-01-17
      */
-    interface iEdge {
+    interface IEdge {
+
+        /**
+         * Gets the two surrounding intersections
+         *
+         * @return Array of two positions
+         */
+        int[] getNeiInt();
 
         /**
          * Gets neighbouring edges
@@ -112,7 +126,7 @@ public interface iGameMapManagement {
      * @author Mario
      * @since 2021-01-17
      */
-    interface iIntersection {
+    interface IIntersection {
 
         /**
          * Gets the surrounding hexes
@@ -153,13 +167,13 @@ public interface iGameMapManagement {
      * @author Steven
      * @since 2021-01-16
      */
-    interface iGameHex {
+    interface IGameHex {
 
         enum type {
             Water, Desert, Resource, Harbor
         }
 
-        type type();
+        type getType();
 
         /**
          * Interface for a land hex
@@ -168,7 +182,7 @@ public interface iGameMapManagement {
          * @author Steven
          * @since 2021-01-16
          */
-        interface iLandHex extends iGameHex {
+        interface ILandHex extends IGameHex {
         }
 
         /**
@@ -178,7 +192,7 @@ public interface iGameMapManagement {
          * @author Steven
          * @since 2021-01-16
          */
-        interface iResourceHex extends iLandHex {
+        interface IResourceHex extends ILandHex {
 
             /**
              * Enum for all five resource giving hex types
@@ -199,7 +213,7 @@ public interface iGameMapManagement {
              *
              * @return Resource
              */
-            iResourceHex.resource getResource();
+            IResourceHex.resource getResource();
 
         }
 
@@ -210,7 +224,7 @@ public interface iGameMapManagement {
          * @author Steven
          * @since 2021-01-16
          */
-        interface iWaterHex extends iGameHex {
+        interface IWaterHex extends IGameHex {
 
         }
 
@@ -221,7 +235,7 @@ public interface iGameMapManagement {
          * @author Steven
          * @since 2021-01-16
          */
-        interface iHarborHex extends iWaterHex {
+        interface IHarborHex extends IWaterHex {
 
             /**
              * Enum for the five resources a harbor can trade
@@ -236,7 +250,7 @@ public interface iGameMapManagement {
              *
              * @return Resource
              */
-            iHarborHex.resource getResource();
+            IHarborHex.resource getResource();
 
         }
 

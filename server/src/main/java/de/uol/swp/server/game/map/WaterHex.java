@@ -7,13 +7,13 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public class waterHex implements iGameMapManagement.iGameHex.iWaterHex {
+public class WaterHex implements IGameMapManagement.IGameHex.IWaterHex {
 
-    public waterHex() {
+    public WaterHex() {
     }
 
     @Override
-    public type type() {
+    public type getType() {
         return type.Water;
     }
 }

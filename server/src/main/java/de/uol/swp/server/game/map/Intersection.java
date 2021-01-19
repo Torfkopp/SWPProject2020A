@@ -7,7 +7,7 @@ package de.uol.swp.server.game.map;
  * @author Mario
  * @since 2021-01-17
  */
-public class intersection implements iGameMapManagement.iIntersection {
+public class Intersection implements IGameMapManagement.IIntersection {
 
     private int[] hexes;
     private int[] neighbours;
@@ -22,7 +22,7 @@ public class intersection implements iGameMapManagement.iIntersection {
      *                   "b" if blocked, or
      *                   1-4 for owner plus s (settlement) or c (city)
      */
-    public intersection(int[] hexes, int[] neighbours, String state) {
+    public Intersection(int[] hexes, int[] neighbours, String state) {
         this.hexes = hexes;
         this.neighbours = neighbours;
         this.state = state;

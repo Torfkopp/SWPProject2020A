@@ -7,7 +7,7 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public class resourceHex implements iGameMapManagement.iGameHex.iResourceHex {
+public class ResourceHex implements IGameMapManagement.IGameHex.IResourceHex {
     private resource resource;
     private int token;
 
@@ -17,7 +17,7 @@ public class resourceHex implements iGameMapManagement.iGameHex.iResourceHex {
      * @param resource The hex's resource
      * @param token    The hex's token
      */
-    public resourceHex(resource resource, int token) {
+    public ResourceHex(resource resource, int token) {
         this.resource = resource;
         this.token = token;
     }
@@ -33,7 +33,7 @@ public class resourceHex implements iGameMapManagement.iGameHex.iResourceHex {
     }
 
     @Override
-    public iGameMapManagement.iGameHex.type type() {
-        return iGameMapManagement.iGameHex.type.Resource;
+    public IGameMapManagement.IGameHex.type getType() {
+        return IGameMapManagement.IGameHex.type.Resource;
     }
 }

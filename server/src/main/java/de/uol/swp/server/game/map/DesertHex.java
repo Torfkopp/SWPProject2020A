@@ -7,13 +7,13 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public class desertHex implements iGameMapManagement.iGameHex.iLandHex {
+public class DesertHex implements IGameMapManagement.IGameHex.ILandHex {
 
-    public desertHex() {
+    public DesertHex() {
     }
 
     @Override
-    public type type() {
+    public type getType() {
         return type.Desert;
     }
 

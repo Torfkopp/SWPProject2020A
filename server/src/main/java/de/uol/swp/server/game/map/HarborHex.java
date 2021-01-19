@@ -7,12 +7,12 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public class harborHex implements iGameMapManagement.iGameHex.iHarborHex {
+public class HarborHex implements IGameMapManagement.IGameHex.IHarborHex {
 
     private int belongingHex;
     private resource resource;
 
-    public harborHex(int belongingHex, resource resource) {
+    public HarborHex(int belongingHex, resource resource) {
         this.belongingHex = belongingHex;
         this.resource = resource;
     }
@@ -23,7 +23,7 @@ public class harborHex implements iGameMapManagement.iGameHex.iHarborHex {
     }
 
     @Override
-    public type type() {
+    public type getType() {
         return type.Harbor;
     }
 }

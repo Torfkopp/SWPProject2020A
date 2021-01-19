@@ -6,23 +6,31 @@ package de.uol.swp.server.game.map;
  * @author Mario
  * @since 2021-01-17
  */
-public class edge implements iGameMapManagement.iEdge {
+public class Edge implements IGameMapManagement.IEdge {
 
+    private int[] neiInt;
     private int[] neighbours;
     private int state;
 
     /**
      * Constructor
      *
+     * @param neiInt     The two neighbouring intersections
      * @param neighbours The two to four neighbouring edges
      * @param state      0 if undeveloped;
      *                   1-4 for road's owner
      */
-    public edge(int[] neighbours, int state) {
+    public Edge(int[] neiInt, int[] neighbours, int state) {
+        this.neiInt = neiInt;
         this.neighbours = neighbours;
         this.state = state;
     }
 
+
+    @Override
+    public int[] getNeiInt() {
+        return new int[0];
+    }
 
     @Override
     public int[] getNeighbours() {
