@@ -936,6 +936,33 @@ class MainMemoryBasedChatMessageStoreTest {
     }
 
     /**
+     * Test of the removeLobbyHistory routine
+     * <p>
+     * Tests if a lobby's Chat History is properly removed when calling
+     * removeLobbyHistory.
+     * <p>
+     * This test fails if the list of ChatMessage object returned by getLatestMessages
+     * is empty before removeLobbyHistory was called, or if the List of ChatMessage
+     * returned by getLatestMessages is not empty for the lobby whose Chat
+     * History was removed by removeLobbyHistory.
+     *
+     * @author Phillip-André Suhr
+     * @author Sven Ahrens
+     * @since 2021-01-16
+     */
+    @Test
+    void removeLobbyHistoryTest() {
+        store.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
+        List<ChatMessage> list = store.getLatestMessages(1, defaultLobbyName);
+        assertFalse(list.isEmpty());
+
+        store.removeLobbyHistory(defaultLobbyName);
+
+        List<ChatMessage> list2 = store.getLatestMessages(1, defaultLobbyName);
+        assertTrue(list2.isEmpty());
+    }
+
+    /**
      * Test for the createChatMessage routine
      * <p>
      * Tests if the createChatMessage routine correctly throws an

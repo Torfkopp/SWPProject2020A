@@ -93,4 +93,14 @@ public interface IChatManagement {
      * @since 2020-12-30
      */
     void dropChatMessage(int id, String originLobby);
+
+    /**
+     * Drop a Lobby's entire Chat History
+     *
+     * @param originLobby The Lobby whose Chat History should be dropped
+     * @author Phillip-André Suhr
+     * @author Sven Ahrens
+     * @since 2021-01-16
+     */
+    void dropLobbyHistory(String originLobby);
 }
