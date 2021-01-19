@@ -10,9 +10,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -21,7 +19,6 @@ import javafx.scene.control.TextField;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is the base for creating a new Presenter that uses some form of Chat function.
@@ -93,7 +90,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                     + ": '" + msg.getMsg().getContent() + "' for Global chat");
         }
         Platform.runLater(() -> chatMessages.add(msg.getMsg()));
-
     }
 
     /**
@@ -113,12 +109,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in Global chat");
         }
         Platform.runLater(() -> {
-            for(int i=0; i < chatMessages.size(); i++){
-                if(chatMessages.get(i).getID() == msg.getId()){
+            for (int i = 0; i < chatMessages.size(); i++) {
+                if (chatMessages.get(i).getID() == msg.getId()) {
                     chatMessages.remove(i);
                 }
-        }});
-
+            }
+        });
     }
 
     /**
@@ -140,11 +136,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                     + msg.getMsg().getContent() + "' in Global Chat");
         }
         Platform.runLater(() -> {
-            for(int i=0; i < chatMessages.size(); i++){
-                if(chatMessages.get(i).getID() == msg.getMsg().getID()){
+            for (int i = 0; i < chatMessages.size(); i++) {
+                if (chatMessages.get(i).getID() == msg.getMsg().getID()) {
                     chatMessages.set(i, msg.getMsg());
                 }
-            }});
+            }
+        });
     }
 
     /**

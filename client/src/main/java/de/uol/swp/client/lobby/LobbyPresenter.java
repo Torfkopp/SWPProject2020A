@@ -67,7 +67,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Override
     @FXML
-    public void initialize(){
+    public void initialize() {
         super.initialize();
         membersView.setCellFactory(lv -> new ListCell<Pair<String, String>>() {
             @Override
@@ -76,6 +76,38 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 setText(empty || item == null ? "" : item.getValue());
             }
         });
+    }
+
+    @Override
+    @Subscribe
+    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onCreatedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onDeletedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onEditedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
+        if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
+            super.onAskLatestChatMessageResponse(rsp);
+        }
     }
 
     /**
@@ -174,8 +206,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
             LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
-            Platform.runLater(() -> lobbyMembers.remove(findMember(message.getUser().getUsername())));
         }
+        Platform.runLater(() -> lobbyMembers.remove(findMember(message.getUser().getUsername())));
     }
 
     /**
@@ -210,38 +242,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 lobbyMembers.add(item);
             });
         });
-    }
-
-    @Override
-    @Subscribe
-    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
-            super.onCreatedChatMessageMessage(msg);
-        }
-    }
-
-    @Override
-    @Subscribe
-    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
-            super.onDeletedChatMessageMessage(msg);
-        }
-    }
-
-    @Override
-    @Subscribe
-    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
-            super.onEditedChatMessageMessage(msg);
-        }
-    }
-
-    @Override
-    @Subscribe
-    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
-            super.onAskLatestChatMessageResponse(rsp);
-        }
     }
 
     /**
@@ -283,9 +283,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Timo Gerken
      * @since 2021-01-18
      */
-    private Pair<String, String> findMember(String name){
-        for(int i = 0; i < lobbyMembers.size(); i++){
-            if(lobbyMembers.get(i).getKey() == name) return lobbyMembers.get(i);
+    private Pair<String, String> findMember(String name) {
+        for (int i = 0; i < lobbyMembers.size(); i++) {
+            if (lobbyMembers.get(i).getKey().equals(name)) return lobbyMembers.get(i);
         }
         return null;
     }
