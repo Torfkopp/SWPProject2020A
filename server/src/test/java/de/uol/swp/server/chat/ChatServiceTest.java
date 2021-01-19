@@ -266,7 +266,7 @@ class ChatServiceTest {
         final Message msg = new LobbyDeletedMessage(defaultLobby);
         bus.post(msg);
 
-        lock.await(500, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages1 = chatManagement.getLatestMessages(1, defaultLobby);
         assertTrue(latestMessages1.isEmpty());
