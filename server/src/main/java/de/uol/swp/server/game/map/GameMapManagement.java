@@ -42,7 +42,7 @@ public class GameMapManagement implements IGameMapManagement {
         hexes[16] = new WaterHex();
         hexes[17] = new HarborHex(4, IGameHex.IHarborHex.resource.Lumber);
         hexes[18] = new WaterHex();
-        //Outer circle of resource hexes (clockwise)
+        //Outer circle of resource hexes
         hexes[19] = new ResourceHex(IGameHex.IResourceHex.resource.Fields, 4);
         hexes[20] = new ResourceHex(IGameHex.IResourceHex.resource.Forest, 6);
         hexes[21] = new ResourceHex(IGameHex.IResourceHex.resource.Fields, 9);
@@ -55,7 +55,7 @@ public class GameMapManagement implements IGameMapManagement {
         hexes[28] = new ResourceHex(IGameHex.IResourceHex.resource.Forest, 3);
         hexes[29] = new ResourceHex(IGameHex.IResourceHex.resource.Pasture, 9);
         hexes[30] = new ResourceHex(IGameHex.IResourceHex.resource.Hills, 2);
-        //Inner circle of resource hexes (clockwise)
+        //Inner circle of resource hexes
         hexes[31] = new ResourceHex(IGameHex.IResourceHex.resource.Forest, 5);
         hexes[32] = new ResourceHex(IGameHex.IResourceHex.resource.Pasture, 12);
         hexes[33] = new ResourceHex(IGameHex.IResourceHex.resource.Mountains, 8);
@@ -144,18 +144,67 @@ public class GameMapManagement implements IGameMapManagement {
         edges[70] = new Edge(new int[]{52, 53}, new int[]{63, 64, 69, 71}, 0);
         edges[71] = new Edge(new int[]{53, 54}, new int[]{64, 65, 70, 72}, 0);
         edges[72] = new Edge(new int[]{49, 54}, new int[]{65, 66, 67, 71}, 0);
-        //...
         //----------------------------------------------------------------------------------------------------
         //Creating the intersections
         //
         //Circle of coast intersections (clockwise)
         intersections[1] = new Intersection(new int[]{1, 18, 19}, new int[]{2, 30}, "f");
-        //...
+        intersections[2] = new Intersection(new int[]{1, 2, 19}, new int[]{1, 3}, "f");
+        intersections[3] = new Intersection(new int[]{2, 19, 20}, new int[]{2, 4, 32}, "f");
+        intersections[4] = new Intersection(new int[]{2, 3, 20}, new int[]{3, 5}, "f");
+        intersections[5] = new Intersection(new int[]{3, 20, 21}, new int[]{4, 6, 34}, "f");
+        intersections[6] = new Intersection(new int[]{3, 4, 21}, new int[]{5, 7}, "f");
+        intersections[7] = new Intersection(new int[]{4, 5, 21}, new int[]{6, 8}, "f");
+        intersections[8] = new Intersection(new int[]{5, 21, 22}, new int[]{7, 9, 35}, "f");
+        intersections[9] = new Intersection(new int[]{5, 6, 22}, new int[]{8, 10}, "f");
+        intersections[10] = new Intersection(new int[]{6, 22, 23}, new int[]{9, 11, 37}, "f");
+        intersections[11] = new Intersection(new int[]{6, 7, 23}, new int[]{10, 12}, "f");
+        intersections[12] = new Intersection(new int[]{7, 8, 23}, new int[]{11, 13}, "f");
+        intersections[13] = new Intersection(new int[]{8, 23, 24}, new int[]{12, 14, 38}, "f");
+        intersections[14] = new Intersection(new int[]{8, 9, 24}, new int[]{13, 15}, "f");
+        intersections[15] = new Intersection(new int[]{9, 24, 25}, new int[]{14, 16, 40}, "f");
+        intersections[16] = new Intersection(new int[]{9, 10, 25}, new int[]{15, 17}, "f");
+        intersections[17] = new Intersection(new int[]{10, 11, 25}, new int[]{16, 18}, "f");
+        intersections[18] = new Intersection(new int[]{11, 25, 26}, new int[]{17, 19, 41}, "f");
+        intersections[19] = new Intersection(new int[]{11, 12, 26}, new int[]{18, 20}, "f");
+        intersections[20] = new Intersection(new int[]{12, 26, 27}, new int[]{19, 21, 43}, "f");
+        intersections[21] = new Intersection(new int[]{12, 13, 27}, new int[]{20, 22}, "f");
+        intersections[22] = new Intersection(new int[]{13, 14, 27}, new int[]{21, 23}, "f");
+        intersections[23] = new Intersection(new int[]{14, 27, 28}, new int[]{22, 24, 44}, "f");
+        intersections[24] = new Intersection(new int[]{14, 15, 28}, new int[]{23, 25}, "f");
+        intersections[25] = new Intersection(new int[]{15, 28, 29}, new int[]{24, 26, 46}, "f");
+        intersections[26] = new Intersection(new int[]{15, 16, 29}, new int[]{25, 27}, "f");
+        intersections[27] = new Intersection(new int[]{16, 17, 29}, new int[]{26, 28}, "f");
+        intersections[28] = new Intersection(new int[]{18, 29, 30}, new int[]{27, 29, 47}, "f");
+        intersections[29] = new Intersection(new int[]{17, 18, 30}, new int[]{28, 30}, "f");
+        intersections[30] = new Intersection(new int[]{18, 19, 30}, new int[]{1, 29, 31}, "f");
+        //Circle of middle intersections
+        intersections[31] = new Intersection(new int[]{19, 30, 31}, new int[]{30, 32, 48}, "f");
+        intersections[32] = new Intersection(new int[]{19, 20, 31}, new int[]{3, 31, 33}, "f");
+        intersections[33] = new Intersection(new int[]{20, 31, 32}, new int[]{32, 34, 50}, "f");
+        intersections[34] = new Intersection(new int[]{20, 21, 32}, new int[]{5, 33, 35}, "f");
+        intersections[35] = new Intersection(new int[]{21, 22, 32}, new int[]{8, 34, 36}, "f");
+        intersections[36] = new Intersection(new int[]{22, 32, 33}, new int[]{35, 37, 51}, "f");
+        intersections[37] = new Intersection(new int[]{22, 23, 33}, new int[]{10, 36, 38}, "f");
+        intersections[38] = new Intersection(new int[]{23, 24, 33}, new int[]{13, 37, 39}, "f");
+        intersections[39] = new Intersection(new int[]{24, 33, 34}, new int[]{38, 40, 52}, "f");
+        intersections[40] = new Intersection(new int[]{24, 25, 34}, new int[]{15, 39, 41}, "f");
+        intersections[41] = new Intersection(new int[]{25, 26, 34}, new int[]{18, 40, 42}, "f");
+        intersections[42] = new Intersection(new int[]{26, 34, 35}, new int[]{41, 43, 53}, "f");
+        intersections[43] = new Intersection(new int[]{26, 27, 35}, new int[]{20, 42, 44}, "f");
+        intersections[44] = new Intersection(new int[]{27, 28, 35}, new int[]{23, 43, 45}, "f");
+        intersections[45] = new Intersection(new int[]{28, 35, 36}, new int[]{44, 46, 54}, "f");
+        intersections[46] = new Intersection(new int[]{28, 29, 36}, new int[]{25, 45, 47}, "f");
+        intersections[47] = new Intersection(new int[]{29, 30, 36}, new int[]{28, 46, 48}, "f");
+        intersections[48] = new Intersection(new int[]{30, 31, 36}, new int[]{31, 47, 49}, "f");
+        //Circle of inner intersections
+        intersections[49] = new Intersection(new int[]{31, 36, 37}, new int[]{48, 50, 54}, "f");
+        intersections[50] = new Intersection(new int[]{31, 32, 37}, new int[]{33, 49, 51}, "f");
+        intersections[51] = new Intersection(new int[]{32, 33, 37}, new int[]{36, 50, 52}, "f");
+        intersections[52] = new Intersection(new int[]{33, 34, 37}, new int[]{39, 51, 53}, "f");
+        intersections[53] = new Intersection(new int[]{34, 35, 37}, new int[]{42, 52, 54}, "f");
+        intersections[54] = new Intersection(new int[]{35, 36, 37}, new int[]{45, 49, 53}, "f");
         //----------------------------------------------------------------------------------------------------
-
-        //todo: Gucken, obs eine schönere Möglichkeit gibt. Gehe davon aus, dass es so funktionieren würde,
-        //      aber man müsste (71) + (53) weitere Zeilen hinzufügen :D.
-
     }
 
     @Override
@@ -166,7 +215,7 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public boolean placeSettlement(int player, int position) {
         if (settlementPlaceable(player, position)) {
-            intersections[player].setState(player + "s");
+            intersections[position].setState(player + "s");
             for (int iPos : intersections[player].getNeighbours()) {
                 intersections[iPos].setState("b");
             }
@@ -178,7 +227,7 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public boolean placeRoad(int player, int position) {
         if (roadPlaceable(player, position)) {
-            edges[player].setState(player);
+            edges[position].setState(player);
             return true;
         }
         return false;
@@ -198,6 +247,7 @@ public class GameMapManagement implements IGameMapManagement {
     public boolean upgradeSettlement(int player, int position) {
         if (intersections[player].getState().equals(player + "s")) {
             intersections[player].setState(player + "c");
+            return true;
         }
         return false;
     }
@@ -210,14 +260,15 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public boolean roadPlaceable(int player, int position) {
         boolean isBuildable = false;
-        if (edges[player].getState() == 0) {
-            for (int ePos : edges[player].getNeighbours()) {
+        if (edges[position].getState() == 0) {
+            for (int ePos : edges[position].getNeighbours()) {
                 if (edges[ePos].getState() == player) isBuildable = true;
             }
-        }
-        if (!isBuildable) {
-            for (int i : edges[player].getNeiInt()) {
-                if (intersections[i].getState().charAt(0) == player) isBuildable = true;
+            if (!isBuildable) {
+                for (int i : edges[position].getNeiInt()) {
+                    //ASCII 49 -> 1; 50 -> 2; 51 -> 3; 52 -> 4
+                    if (intersections[i].getState().charAt(0) == player + 48) isBuildable = true;
+                }
             }
         }
         return isBuildable;

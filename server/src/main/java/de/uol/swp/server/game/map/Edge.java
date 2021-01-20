@@ -29,7 +29,7 @@ public class Edge implements IGameMapManagement.IEdge {
 
     @Override
     public int[] getNeiInt() {
-        return new int[0];
+        return neiInt;
     }
 
     @Override
