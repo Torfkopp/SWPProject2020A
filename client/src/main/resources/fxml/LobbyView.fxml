@@ -48,10 +48,16 @@
 
     <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"/>
     <ListView fx:id="membersView" layoutY="7.0" maxHeight="95.0" maxWidth="190.0" prefHeight="95.0" prefWidth="180.0"/>
-    <Button layoutX="51.0" layoutY="170.0" mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed"
+    <HBox layoutY="110.0" prefHeight="101.0" prefWidth="180.0" spacing="16">
+        <CheckBox fx:id="readyCheckBox" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked" prefHeight="22.0"
+                  prefWidth="70.0" text="Ready">
+            <HBox.margin>
+                <Insets left="10"/>
+            </HBox.margin>
+        </CheckBox>
+        <Button fx:id="startSession" disable="true" mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
+                text="Start Session" visible="false"/>
+    </HBox>
+    <Button layoutX="205.0" layoutY="42.0" mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed"
             text="Leave Lobby"/>
-    <Button fx:id="StartSession" layoutX="51.0" layoutY="125.0" mnemonicParsing="false"
-            onAction="#onStartSessionButtonPressed" text="Start Session"/>
-    <CheckBox fx:id="ReadyCheckBox" layoutX="150.0" layoutY="123.0" mnemonicParsing="false"
-              onAction="#onReadyCheckBoxClicked" prefHeight="32.0" prefWidth="122.0" text="Ready"/>
 </AnchorPane>

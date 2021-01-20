@@ -51,9 +51,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private ListView<Pair<String, String>> membersView;
     @FXML
-    private CheckBox ReadyCheckBox;
+    private CheckBox readyCheckBox;
     @FXML
-    private Button StartSession;
+    private Button startSession;
 
     private Window window;
 
@@ -160,6 +160,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
      * of the currently logged in members are put into the list of lobby members.
      * The owner attribute is set and the set of ready Users is updated.
+     * Additionally, the state of the "Start Session" button is set
+     * appropriately.
+     * <p>
      * Furthermore, if the LOG-Level is set to DEBUG, the messages "Update of user
      * list" with the names of all currently logged in users, "Owner of this
      * lobby: " with the name of the lobby's owner, and "Update of ready users "
@@ -177,6 +180,28 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.owner = allLobbyMembersResponse.getOwner();
         this.readyUsers = allLobbyMembersResponse.getReadyUsers();
         updateUsersList(allLobbyMembersResponse.getUsers());
+        setStartSessionButtonState();
+    }
+
+    /**
+     * Helper function that sets the Visible and Disable states of the "Start
+     * Session" button.
+     * <p>
+     * The Button is only ever visible to the lobby owner, and is only enabled
+     * if there are 3 or more lobby members, and all members are marked as ready.
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-20
+     */
+    private void setStartSessionButtonState() {
+        if (super.loggedInUser.equals(this.owner)) {
+            this.startSession.setVisible(true);
+            this.startSession.setDisable(this.lobbyMembers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+        } else {
+            this.startSession.setDisable(true);
+            this.startSession.setVisible(false);
+        }
     }
 
     /**
@@ -184,6 +209,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new UserJoinedLobbyMessage object is posted onto the EventBus, the name of the newly
      * joined user is appended to the user list in the lobby menu.
+     * The state of the "Start Session" button is updated accordingly.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} joined Lobby." is displayed in the log.
      *
@@ -197,6 +223,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(message.getUser().getUsername(), message.getUser().getUsername()));
+            setStartSessionButtonState();
         });
     }
 
@@ -208,7 +235,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * requested from the server to ensure a new owner is decided. If the
      * leaving user wasn't the owner, their name is removed from the list
      * of members. If they were marked as ready, they are removed from the
-     * Set of ready users.
+     * Set of ready users. Afterwards, the "Start Session" button is set to
+     * the appropriate state.
+     * <p>
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Owner/User
      * {@literal <Username>} left Lobby {@literal <Lobbyname>}" is displayed
      * in the log, depending on whether the owner or a normal user left.
@@ -216,7 +245,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @param message the UserLeftLobbyMessage object seen on the EventBus
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
-     * @since 2021-01-19
+     * @since 2021-01-20
      */
     @Subscribe
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage message) {
@@ -229,6 +258,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             lobbyMembers.remove(findMember(message.getUser().getUsername()));
             readyUsers.remove(message.getUser());
+            setStartSessionButtonState();
         });
     }
 
@@ -299,6 +329,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onStartSessionButtonPressed(ActionEvent event) {
+        // TODO: call method to display game board
     }
 
     /**
@@ -314,7 +345,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onReadyCheckBoxClicked(ActionEvent event) {
-        boolean isReady = ReadyCheckBox.isSelected();
+        boolean isReady = readyCheckBox.isSelected();
         RequestMessage userReadyRequest = new UserReadyRequest(this.lobbyName, this.loggedInUser, isReady);
         eventBus.post(userReadyRequest);
     }
