@@ -20,7 +20,7 @@ public class GameMapTest {
         // Tests getting the resource type of a hex
         ResourceHex rh = (ResourceHex) map.getHex(20);
         assertEquals(rh.getType(), IGameMapManagement.IGameHex.type.Resource);
-        assertEquals(rh.getResource(), IGameMapManagement.IGameHex.IResourceHex.resource.Fields);
+        assertEquals(rh.getResource(), IGameMapManagement.IGameHex.IResourceHex.resource.Forest);
     }
 
     @Test
