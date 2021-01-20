@@ -16,11 +16,17 @@ public class GameMapManagement implements IGameMapManagement {
 
     int robberPosition = 37;
 
+    public GameMapManagement() {
+        createBeginnerMap();
+        createEdges();
+        createIntersections();
+    }
+
     /**
      * Creates the beginner's map as shown in the manual
      * of "Die Siedler von Catan" [Art.-Nr.: 684617]
      */
-    public GameMapManagement() {
+    private void createBeginnerMap() {
         //Creating the hexes
         //
         //Circle of water and harbor hexes (clockwise)
@@ -64,7 +70,12 @@ public class GameMapManagement implements IGameMapManagement {
         hexes[36] = new ResourceHex(IGameHex.IResourceHex.resource.Hills, 8);
         //Desert field in the middle
         hexes[37] = new DesertHex();
-        //----------------------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates edges (usable for every map)
+     */
+    private void createEdges() {
         //Creating the edges
         //
         //Circle of coast edges (clockwise)
@@ -144,7 +155,12 @@ public class GameMapManagement implements IGameMapManagement {
         edges[70] = new Edge(new int[]{52, 53}, new int[]{63, 64, 69, 71}, 0);
         edges[71] = new Edge(new int[]{53, 54}, new int[]{64, 65, 70, 72}, 0);
         edges[72] = new Edge(new int[]{49, 54}, new int[]{65, 66, 67, 71}, 0);
-        //----------------------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Creates intersections (usable for every map)
+     */
+    private void createIntersections() {
         //Creating the intersections
         //
         //Circle of coast intersections (clockwise)
