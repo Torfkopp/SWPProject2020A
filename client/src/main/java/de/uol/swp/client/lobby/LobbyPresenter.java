@@ -23,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -56,6 +57,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private Button startSession;
 
     private Window window;
+    @FXML
+    private GridPane playField;
 
     /**
      * Constructor
@@ -195,9 +198,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-20
      */
     private void setStartSessionButtonState() {
+
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
-            this.startSession.setDisable(this.lobbyMembers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+            this.startSession.setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
@@ -296,7 +300,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     username = "\u2713 " + username;
                 }
                 Pair<String, String> item = new Pair<>(username,
-                        u.getUsername().equals(this.owner.getUsername()) ? username + "\uD83D\uDC51" : username);
+                        u.getUsername().equals(this.owner.getUsername()) ? username + " \uD83D\uDC51" : username);  //Leerzeile vor Krone hinzugefügt
                 lobbyMembers.add(item);
             });
         });
@@ -321,15 +325,21 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
+     * The lobby window gets a min width and a min width.
+     * The play fields get visible when the button is pressed
+     * and a full screen of the lobby appears.
      *
      * @param event The ActionEvent created by pressing the Start Session Button
      * @author Eric Vuong
      * @author Maximilian Lindner
-     * @since 2021-01-17
+     * @since 2021-01-20
      */
     @FXML
     private void onStartSessionButtonPressed(ActionEvent event) {
-        // TODO: call method to display game board
+        ((Stage) window).setMinWidth(600);
+        ((Stage) window).setMinHeight(800);
+        ((Stage) window).setFullScreen(true);
+        playField.setVisible(true);
     }
 
     /**
