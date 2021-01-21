@@ -94,7 +94,7 @@ class LobbyServiceTest {
         LobbyService lobbyService = new LobbyService(bus);
         lobbyService.createNewLobby("Test", defaultUser);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof CreateLobbyRequest);
 
@@ -125,7 +125,7 @@ class LobbyServiceTest {
         LobbyService lobbyService = new LobbyService(bus);
         lobbyService.refreshLobbyPresenterFields("Test", defaultUser);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof LobbyUpdateEvent);
 
