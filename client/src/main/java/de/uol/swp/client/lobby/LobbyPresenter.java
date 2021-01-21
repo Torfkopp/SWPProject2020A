@@ -198,7 +198,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-20
      */
     private void setStartSessionButtonState() {
-
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession.setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
