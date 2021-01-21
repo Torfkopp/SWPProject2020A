@@ -20,7 +20,10 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Handles the lobby requests sent by the users
@@ -223,6 +226,27 @@ public class LobbyService extends AbstractService {
             post(response);
         } else {
             LOG.error("Lobby " + lobbyName + " not found.");
+        }
+    }
+
+    /**
+     * Handles a StartSessionRequest found on the EventBus
+     * <p>
+     * If a StartSessionRequest is detected on the EventBus, this method is called.
+     * It posts a StartSessionMessage including the lobby name and the user onto the EventBus.
+     *
+     * @param startSessionRequest The StartSessionMessage found on the EventBus
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.lobby.message.StartSessionMessage
+     * @since 2021-01-21
+     */
+    @Subscribe
+    private void onStartSessionRequest(StartSessionRequest startSessionRequest) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(startSessionRequest.getName());
+        if (lobby.isPresent()) {
+            ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), startSessionRequest.getUser());
+            sendToAllInLobby(lobby.get().getName(), startSessionMessage);
         }
     }
 

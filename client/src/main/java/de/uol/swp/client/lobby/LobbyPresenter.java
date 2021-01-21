@@ -7,9 +7,11 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
+import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.message.RequestMessage;
@@ -324,9 +326,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
-     * The lobby window gets a min width and a min width.
-     * The play fields get visible when the button is pressed
-     * and a full screen of the lobby appears.
+     * The Method posts a StartSessionRequest including the lobby name and the
+     * logged in user onto the EventBus.
      *
      * @param event The ActionEvent created by pressing the Start Session Button
      * @author Eric Vuong
@@ -335,10 +336,31 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onStartSessionButtonPressed(ActionEvent event) {
-        ((Stage) window).setMinWidth(600);
-        ((Stage) window).setMinHeight(800);
-        ((Stage) window).setFullScreen(true);
-        playField.setVisible(true);
+        RequestMessage startSessionRequest = new StartSessionRequest(this.lobbyName, this.loggedInUser);
+        eventBus.post(startSessionRequest);
+    }
+
+    /**
+     * Handles a StartSessionMessage found on the EventBus
+     * <p>
+     * The lobby window gets a minimum width and height, and sets the play field
+     * to be visible.
+     *
+     * @param startSessionMessage The StartSessionMessage found on the EventBus
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-21
+     */
+    @Subscribe
+    private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
+        if (startSessionMessage.getName().equals(this.lobbyName)) {
+            Platform.runLater(() -> {
+                window.setY(window.getY() - 200);
+                ((Stage) window).setMinWidth(610);
+                ((Stage) window).setMinHeight(800);
+                playField.setVisible(true);
+            });
+        }
     }
 
     /**
