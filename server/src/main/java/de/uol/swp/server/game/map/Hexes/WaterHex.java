@@ -1,5 +1,7 @@
 package de.uol.swp.server.game.map.Hexes;
 
+import de.uol.swp.server.game.Renderable;
+
 /**
  * Class for the water hex
  *
@@ -7,7 +9,7 @@ package de.uol.swp.server.game.map.Hexes;
  * @author Steven
  * @since 2021-01-16
  */
-public class WaterHex implements IWaterHex {
+public class WaterHex implements IWaterHex, Renderable {
 
     public WaterHex() {
     }
@@ -16,4 +18,7 @@ public class WaterHex implements IWaterHex {
     public type getType() {
         return type.Water;
     }
+
+    @Override
+    public void render(int x, int y, int size){}
 }

@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
@@ -42,6 +43,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     @FXML
     private ListView<Pair<String, String>> membersView;
+
+    @FXML
+    private Canvas gameMapCanvas;
 
     private Window window;
 
@@ -76,6 +80,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 setText(empty || item == null ? "" : item.getValue());
             }
         });
+        renderGameMap();
     }
 
     @Override
@@ -288,5 +293,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMembers.get(i).getKey().equals(name)) return lobbyMembers.get(i);
         }
         return null;
+    }
+
+    private void renderGameMap() {
+        //Terrains
+
+        //Game Grid?
+        //Edges
+        //Intersections
+        //Points and Robber
+
     }
 }

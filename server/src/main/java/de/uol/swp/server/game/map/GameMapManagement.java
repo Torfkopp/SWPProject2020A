@@ -231,6 +231,59 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public IGameHex[][] getHexesAsJaggedArray() {
+        IGameHex[][] map;
+        map = new IGameHex[7][];
+        map[0] = new IGameHex[4];
+        map[1] = new IGameHex[5];
+        map[2] = new IGameHex[6];
+        map[3] = new IGameHex[7];
+        map[4] = new IGameHex[6];
+        map[5] = new IGameHex[5];
+        map[6] = new IGameHex[4];
+
+        map[0][0] = getHex(1);
+        map[0][1] = getHex(2);
+        map[0][2] = getHex(3);
+        map[0][3] = getHex(4);
+        map[1][0] = getHex(18);
+        map[1][1] = getHex(19);
+        map[1][2] = getHex(20);
+        map[1][3] = getHex(21);
+        map[1][4] = getHex(5);
+        map[2][0] = getHex(17);
+        map[2][1] = getHex(30);
+        map[2][2] = getHex(31);
+        map[2][3] = getHex(32);
+        map[2][4] = getHex(22);
+        map[2][5] = getHex(6);
+        map[3][0] = getHex(16);
+        map[3][1] = getHex(29);
+        map[3][2] = getHex(36);
+        map[3][3] = getHex(37);
+        map[3][4] = getHex(33);
+        map[3][5] = getHex(23);
+        map[3][6] = getHex(7);
+        map[4][0] = getHex(15);
+        map[4][1] = getHex(28);
+        map[4][2] = getHex(35);
+        map[4][3] = getHex(34);
+        map[4][4] = getHex(24);
+        map[4][5] = getHex(8);
+        map[5][0] = getHex(14);
+        map[5][1] = getHex(27);
+        map[5][2] = getHex(26);
+        map[5][3] = getHex(25);
+        map[5][4] = getHex(9);
+        map[6][0] = getHex(13);
+        map[6][1] = getHex(12);
+        map[6][2] = getHex(11);
+        map[6][3] = getHex(10);
+
+        return map;
+    }
+
+    @Override
     public boolean placeSettlement(int player, int position) {
         if (settlementPlaceable(player, position)) {
             intersections[position].setState(player + "s");

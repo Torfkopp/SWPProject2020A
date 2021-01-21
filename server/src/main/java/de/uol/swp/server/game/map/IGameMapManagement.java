@@ -20,6 +20,7 @@ public interface IGameMapManagement {
      */
     IGameHex getHex(int place);
 
+    IGameHex[][] getHexesAsJaggedArray();
     /**
      * Places a settlement
      *
