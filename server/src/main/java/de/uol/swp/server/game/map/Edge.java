@@ -6,7 +6,7 @@ package de.uol.swp.server.game.map;
  * @author Mario
  * @since 2021-01-17
  */
-public class Edge implements IGameMapManagement.IEdge {
+public class Edge implements IEdge {
 
     private int[] neiInt;
     private int[] neighbours;

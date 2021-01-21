@@ -1,4 +1,4 @@
-package de.uol.swp.server.game.map;
+package de.uol.swp.server.game.map.Hexes;
 
 /**
  * Class for the harbor hex
@@ -7,7 +7,7 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public class HarborHex implements IGameMapManagement.IGameHex.IHarborHex {
+public class HarborHex implements IHarborHex {
 
     private int belongingHex;
     private resource resource;

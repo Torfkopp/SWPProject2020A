@@ -1,4 +1,4 @@
-package de.uol.swp.server.game.map;
+package de.uol.swp.server.game.map.Hexes;
 
 /**
  * Class for the resource hex
@@ -7,7 +7,7 @@ package de.uol.swp.server.game.map;
  * @author Steven
  * @since 2021-01-16
  */
-public class ResourceHex implements IGameMapManagement.IGameHex.IResourceHex {
+public class ResourceHex implements IResourceHex {
     private resource resource;
     private int token;
 
@@ -33,7 +33,7 @@ public class ResourceHex implements IGameMapManagement.IGameHex.IResourceHex {
     }
 
     @Override
-    public IGameMapManagement.IGameHex.type getType() {
-        return IGameMapManagement.IGameHex.type.Resource;
+    public IGameHex.type getType() {
+        return IGameHex.type.Resource;
     }
 }

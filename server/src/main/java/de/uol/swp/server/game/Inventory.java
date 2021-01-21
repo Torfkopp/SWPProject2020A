@@ -1,5 +1,7 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.user.User;
+
 /**
  * The player's inventory
  *
@@ -8,6 +10,11 @@ package de.uol.swp.server.game;
  * @since 2021-01-16
  */
 public class Inventory {
+
+    private User player;
+
+    private int totalResources = 0;
+
     private int brick = 0;
     private int grain = 0;
     private int lumber = 0;
@@ -23,7 +30,16 @@ public class Inventory {
     private boolean longestRoad = false;
     private boolean largestArmy = false;
 
-    public Inventory() {
+    public Inventory(User player) {
+        this.player = player;
+    }
+
+    public int getTotalResources() {
+        return totalResources;
+    }
+
+    public void setTotalResources(int totalResources) {
+        this.totalResources = totalResources;
     }
 
     public int getBrick() {

@@ -1,8 +1,9 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.server.game.map.GameMapManagement;
-import de.uol.swp.server.game.map.IGameMapManagement;
-import de.uol.swp.server.game.map.ResourceHex;
+import de.uol.swp.server.game.map.Hexes.IGameHex;
+import de.uol.swp.server.game.map.Hexes.IResourceHex;
+import de.uol.swp.server.game.map.Hexes.ResourceHex;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,12 +16,12 @@ public class GameMapTest {
     void getHexTest() {
         // Tests getting a hex
         assertNotNull(map.getHex(2));
-        assertEquals(map.getHex(1).getType(), IGameMapManagement.IGameHex.type.Harbor);
-        assertEquals(map.getHex(19).getType(), IGameMapManagement.IGameHex.type.Resource);
+        assertEquals(map.getHex(1).getType(), IGameHex.type.Harbor);
+        assertEquals(map.getHex(19).getType(), IGameHex.type.Resource);
         // Tests getting the resource type of a hex
         ResourceHex rh = (ResourceHex) map.getHex(20);
-        assertEquals(rh.getType(), IGameMapManagement.IGameHex.type.Resource);
-        assertEquals(rh.getResource(), IGameMapManagement.IGameHex.IResourceHex.resource.Forest);
+        assertEquals(rh.getType(), IGameHex.type.Resource);
+        assertEquals(rh.getResource(), IResourceHex.resource.Forest);
     }
 
     @Test

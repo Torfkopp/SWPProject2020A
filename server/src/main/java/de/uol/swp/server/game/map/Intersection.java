@@ -7,7 +7,7 @@ package de.uol.swp.server.game.map;
  * @author Mario
  * @since 2021-01-17
  */
-public class Intersection implements IGameMapManagement.IIntersection {
+public class Intersection implements IIntersection {
 
     private int[] hexes;
     private int[] neighbours;
