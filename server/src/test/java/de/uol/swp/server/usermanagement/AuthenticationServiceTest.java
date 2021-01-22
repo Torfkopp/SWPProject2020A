@@ -62,7 +62,7 @@ class AuthenticationServiceTest {
         userManagement.createUser(user);
         final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword());
         bus.post(loginRequest);
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
         assertTrue(userManagement.isLoggedIn(user));
         // is message send
         assertTrue(event instanceof ClientAuthorisedMessage);
@@ -75,7 +75,7 @@ class AuthenticationServiceTest {
         final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword() + "äüö");
         bus.post(loginRequest);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
         assertFalse(userManagement.isLoggedIn(user));
         assertTrue(event instanceof ServerExceptionMessage);
         userManagement.dropUser(user);
@@ -92,7 +92,7 @@ class AuthenticationServiceTest {
 
         bus.post(logoutRequest);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
 
         assertFalse(userManagement.isLoggedIn(user));
         assertFalse(authService.getSession(user).isPresent());
@@ -115,7 +115,7 @@ class AuthenticationServiceTest {
         Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
         assertTrue(event instanceof AllOnlineUsersResponse);
 
         assertEquals(((AllOnlineUsersResponse) event).getUsers().size(), 1);
@@ -135,7 +135,7 @@ class AuthenticationServiceTest {
         Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
         assertTrue(event instanceof AllOnlineUsersResponse);
 
         List<User> returnedUsers = new ArrayList<>(((AllOnlineUsersResponse) event).getUsers());
@@ -151,7 +151,7 @@ class AuthenticationServiceTest {
         Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
 
-        lock.await(1000, TimeUnit.MILLISECONDS);
+        lock.await(250, TimeUnit.MILLISECONDS);
         assertTrue(event instanceof AllOnlineUsersResponse);
 
         assertTrue(((AllOnlineUsersResponse) event).getUsers().isEmpty());
