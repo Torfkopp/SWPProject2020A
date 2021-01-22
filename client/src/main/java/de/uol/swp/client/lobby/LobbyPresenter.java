@@ -356,7 +356,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (startSessionMessage.getName().equals(this.lobbyName)) {
             Platform.runLater(() -> {
                 window.setY(window.getY() - 200);
-                ((Stage) window).setMinWidth(610);
+                ((Stage) window).setMinWidth(630);
                 ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
             });
