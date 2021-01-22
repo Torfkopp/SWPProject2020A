@@ -5,6 +5,7 @@ import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
+import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -12,7 +13,6 @@ import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
-import de.uol.swp.server.usermanagement.ServerUserService;
 import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This is a test of the class used to handle the requests sent by the client regarding the chat
@@ -87,7 +86,7 @@ class ChatServiceTest {
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage wasn't created with the requested attributes.
      *
-     * @throws java.lang.InterruptedException The interrupted exception
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      */
     @Test
     void newChatMessageTest() throws InterruptedException {
@@ -113,7 +112,7 @@ class ChatServiceTest {
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage wasn't created with the requested attributes.
      *
-     * @throws java.lang.InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      * @since 2021-01-04
      */
     @Test
@@ -140,7 +139,7 @@ class ChatServiceTest {
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage wasn't edited.
      *
-     * @throws java.lang.InterruptedException Interrupted exception
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      */
     @Test
     void editChatMessageTest() throws InterruptedException {
@@ -167,7 +166,7 @@ class ChatServiceTest {
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage wasn't edited.
      *
-     * @throws java.lang.InterruptedException interrupted exception
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      * @since 2021-01-04
      */
     @Test
@@ -195,7 +194,7 @@ class ChatServiceTest {
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage still exists.
      *
-     * @throws java.lang.InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      */
     @Test
     void deleteChatMessageTest() throws InterruptedException {
@@ -223,7 +222,7 @@ class ChatServiceTest {
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage still exists.
      *
-     * @throws java.lang.InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      * @since 2021-01-04
      */
     @Test
@@ -241,5 +240,35 @@ class ChatServiceTest {
         ChatMessage latestMessage = latestMessages.get(0);
         assertEquals(latestMessage.getID(), msg1.getID());
         assertEquals(latestMessage.getContent(), defaultContent);
+    }
+
+    /**
+     * Tests if the ChatService properly handles the LobbyDeletedMessage.
+     * <p>
+     * A new LobbyDeletedMessage with a lobby name is posted onto the EventBus
+     * and it is checked if the Chat History of the specified lobby was dropped
+     * entirely.
+     * <p>
+     * This test fails if the list of ChatMessage objects returned by the
+     * chatManagement is empty before the LobbyDeletedMessage was posted, or
+     * if it is empty after the LobbyDeletedMessage was posted.
+     *
+     * @throws java.lang.InterruptedException Thrown by lock.await()
+     * @author Phillip-André Suhr
+     * @author Sven Ahrens
+     * @since 2021-01-16
+     */
+    @Test
+    void onLobbyDeletedMessageTest() throws InterruptedException {
+        chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
+        assertFalse(latestMessages.isEmpty());
+        final Message msg = new LobbyDeletedMessage(defaultLobby);
+        bus.post(msg);
+
+        lock.await(500, TimeUnit.MILLISECONDS);
+
+        List<ChatMessage> latestMessages1 = chatManagement.getLatestMessages(1, defaultLobby);
+        assertTrue(latestMessages1.isEmpty());
     }
 }

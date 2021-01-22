@@ -190,7 +190,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
+    private void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
         showRegistrationScreen();
     }
 
@@ -206,7 +206,7 @@ public class SceneManager {
      * @since 2020-12-19
      */
     @Subscribe
-    public void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
+    private void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
         showChangePasswordScreen(event.getUser());
     }
 
@@ -221,7 +221,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onShowLoginViewEvent(ShowLoginViewEvent event) {
+    private void onShowLoginViewEvent(ShowLoginViewEvent event) {
         showLoginScreen();
     }
 
@@ -236,7 +236,7 @@ public class SceneManager {
      * @since 2020-12-12
      */
     @Subscribe
-    public void lobbyList(AllLobbiesResponse allLobbiesResponse) {
+    private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
         LOG.debug("Retrieval of lobby map");
         for (String name : allLobbiesResponse.getLobbyNames()) {
             lobbyScenes.put(name, null);
@@ -254,7 +254,7 @@ public class SceneManager {
      * @since 2020-11-21
      */
     @Subscribe
-    public void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
+    private void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
         String lobbyName = event.getName();
         //New window (Stage)
@@ -289,7 +289,7 @@ public class SceneManager {
      * @since 2020-12-18
      */
     @Subscribe
-    public void onLobbyErrorEvent(LobbyErrorEvent event) {
+    private void onLobbyErrorEvent(LobbyErrorEvent event) {
         showError(event.getMessage());
     }
 
@@ -304,7 +304,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
+    private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
         showScene(lastScene, lastTitle);
     }
 
@@ -319,7 +319,7 @@ public class SceneManager {
      * @since 2020-12-19
      */
     @Subscribe
-    public void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
+    private void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
         showScene(lastScene, lastTitle);
     }
 
@@ -334,7 +334,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     @Subscribe
-    public void onRegistrationErrorEvent(RegistrationErrorEvent event) {
+    private void onRegistrationErrorEvent(RegistrationErrorEvent event) {
         showError(event.getMessage());
     }
 
@@ -349,7 +349,7 @@ public class SceneManager {
      * @since 2020-12-19
      */
     @Subscribe
-    public void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
+    private void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
         showError(event.getMessage());
     }
 

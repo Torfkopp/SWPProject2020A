@@ -70,7 +70,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @since 2019-09-02
      */
     @FXML
-    void onCancelButtonPressed(ActionEvent event) {
+    private void onCancelButtonPressed(ActionEvent event) {
         eventBus.post(registrationCanceledEvent);
     }
 
@@ -90,7 +90,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @since 2019-09-02
      */
     @FXML
-    void onRegisterButtonPressed(ActionEvent event) {
+    private void onRegisterButtonPressed(ActionEvent event) {
         if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent("Username cannot be empty"));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {

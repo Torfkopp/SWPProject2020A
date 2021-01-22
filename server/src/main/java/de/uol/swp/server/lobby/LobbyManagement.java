@@ -4,14 +4,16 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manages creation, deletion, and storing of lobbies
  *
+ * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.Lobby
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
- * @author Marco Grawunder
  * @since 2019-10-08
  */
 public class LobbyManagement {

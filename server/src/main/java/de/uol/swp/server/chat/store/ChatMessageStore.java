@@ -112,4 +112,14 @@ public interface ChatMessageStore {
      * @since 2020-12-30
      */
     void removeChatMessage(int id, String originLobby);
+
+    /**
+     * Method to remove a Lobby's entire Chat Store
+     *
+     * @param originLobby The lobby whose Chat Store should be removed
+     * @author Phillip-André Suhr
+     * @author Sven Ahrens
+     * @since 2021-01-16
+     */
+    void removeLobbyHistory(String originLobby);
 }
