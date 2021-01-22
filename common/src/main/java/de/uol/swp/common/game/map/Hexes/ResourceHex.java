@@ -37,6 +37,4 @@ public class ResourceHex implements IResourceHex {
         return IGameHex.type.Resource;
     }
 
-    @Override
-    public void render(int x, int y, int size){}
 }

@@ -7,8 +7,11 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.game.Renderable;
 import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.Hexes.DesertHex;
+import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.Hexes.IWaterHex;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
@@ -300,37 +303,49 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     private void renderGameMap(GameMapManagement gameMapManagement) {
-        Renderable[][] hexes = gameMapManagement.getHexesAsJaggedArray();
-        int width = (int) gameMapCanvas.getWidth();
-        int height = (int) gameMapCanvas.getHeight();
+        IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
+        double width = gameMapCanvas.getWidth();
+        double height = gameMapCanvas.getHeight();
         int maxHexesInRow = hexes[4].length;
 
 
-        int hexWidth = (int) gameMapCanvas.getWidth() / maxHexesInRow;
-        int hexHeight = (int) gameMapCanvas.getHeight() / hexes.length;
+        double hexWidth = gameMapCanvas.getWidth() / 7.0;
+        double hexHeight = gameMapCanvas.getHeight() / 7.0;
+        System.out.println(hexWidth);
+        System.out.println(hexHeight);
 
-        int currentX = 0;
-        int currentY = 0;
+        double currentX = 0;
+        double currentY = 0;
 
         GraphicsContext map = gameMapCanvas.getGraphicsContext2D();
-        map.setFill(Color.BLUE);
+        map.setFill(Color.LIGHTBLUE);
         map.fillRect(0, 0, width, height);
+        map.setStroke(Color.BLACK);
+        map.strokeRect(0, 0, width, height);
 
         //Terrains
         for(int y = 0; y < hexes.length; y++){
+            currentX = hexWidth / 2;
             if( hexes[y].length % 2 == 0){
+                System.out.println("Even");
                 //Even Row
                 currentX += hexWidth / 2;
-                currentX += (maxHexesInRow - 1 - hexes[y].length) / 2;
+                currentX += ((maxHexesInRow - 1 - hexes[y].length) / 2.0) * hexWidth;
 
             } else {
+                System.out.println("Odd");
                 //Odd Row
-                currentX += (maxHexesInRow - hexes[y].length) / 2;
+                currentX += ((maxHexesInRow - hexes[y].length) / 2.0) * hexWidth;
             }
 
             for(int x = 0; x < hexes[y].length; x++){
-                hexes[y][x].render(currentX, currentY, hexWidth, map);
+                System.out.print(x);
+                System.out.print(":");
+                System.out.println(y);
+                renderObject(currentX, currentY, hexWidth/2, hexes[y][x], map);
+                currentX += hexWidth;
             }
+            currentY += hexHeight;
         }
 
         //Game Grid?
@@ -339,4 +354,37 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         //Points and Robber
 
     }
+
+    private void renderObject(double x, double y, double radius, Object object, GraphicsContext map){
+        if        (object instanceof IWaterHex){
+            map.setFill(Color.BLUE);
+            fillHexagon(x, y, radius, map);
+        } else if (object instanceof DesertHex){
+            map.setFill(Color.WHITE);
+            fillHexagon(x, y, radius, map);
+        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Hills) {
+            map.setFill(Color.DARKORANGE);
+            fillHexagon(x, y, radius, map);
+        }  else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Forest) {
+            map.setFill(Color.DARKGREEN);
+            fillHexagon(x, y, radius, map);
+        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Mountains) {
+            map.setFill(Color.DARKGREY);
+            fillHexagon(x, y, radius, map);
+        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Fields) {
+            map.setFill(Color.YELLOW);
+            fillHexagon(x, y, radius, map);
+        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Pasture) {
+            map.setFill(Color.LIGHTGREEN);
+            fillHexagon(x, y, radius, map);
+        }
+    }
+
+    private void fillHexagon(double x, double y, double radius, GraphicsContext graphicsContext){
+        graphicsContext.fillPolygon(
+                new double[]{ x + radius, x + radius*2, x + radius*2,     x + radius,   x,                x           },
+                new double[]{ y,           y + radius/2, y + (radius/2)*3, y + radius*2, y + (radius/2)*3, y + radius/2}, 6);
+    }
+
+
 }

@@ -27,6 +27,4 @@ public class HarborHex implements IHarborHex {
         return type.Harbor;
     }
 
-    @Override
-    public void render(int x, int y, int size){}
 }

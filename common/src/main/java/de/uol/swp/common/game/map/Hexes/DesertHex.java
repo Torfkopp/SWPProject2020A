@@ -17,6 +17,5 @@ public class DesertHex implements ILandHex {
         return type.Desert;
     }
 
-    @Override
-    public void render(int x, int y, int size){}
+
 }
