@@ -1,7 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 
 /**
  * Request sent to the server when a user wants to create a new lobby

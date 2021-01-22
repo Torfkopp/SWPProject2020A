@@ -70,7 +70,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
      * @since 2020-11-25
      */
     @FXML
-    void onCancelButtonPressed(ActionEvent event) {
+    private void onCancelButtonPressed(ActionEvent event) {
         eventBus.post(ChangePasswordCanceledEvent);
     }
 
@@ -92,7 +92,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
      * @since 2020-12-05
      */
     @FXML
-    void onChangePasswordButtonPressed(ActionEvent event) {
+    private void onChangePasswordButtonPressed(ActionEvent event) {
         //the UserData is set in the showChangePasswordScreen Method in the SceneManager
         User user = (User) OldPasswordField1.getScene().getUserData();
 

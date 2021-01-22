@@ -3,8 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane layoutX="-5.0" layoutY="-4.0" prefHeight="410.0" prefWidth="800.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="60.0"/>
@@ -22,9 +22,11 @@
             <RowConstraints maxHeight="90.0" minHeight="28.0" prefHeight="38.0"/>
         </rowConstraints>
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647"/>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed" text="CreateLobby"
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed"
+                text="CreateLobby"
                 GridPane.columnIndex="2"/>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed" text="JoinLobby"
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
+                text="JoinLobby"
                 GridPane.columnIndex="2" GridPane.rowIndex="1"/>
         <ListView fx:id="lobbyView" prefHeight="372.0" prefWidth="200.0" GridPane.columnIndex="3"
                   GridPane.rowSpan="2147483647"/>

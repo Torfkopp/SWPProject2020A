@@ -24,6 +24,7 @@ public interface Message extends Serializable {
      * @since 2019-09-09
      */
     Optional<MessageContext> getMessageContext();
+
     /**
      * Allows to set a MessageContext e.g. for network purposes
      *
@@ -54,7 +55,7 @@ public interface Message extends Serializable {
 
     /**
      * Allows to create a new message
-	 * based on the given one (copy)
+     * based on the given one (copy)
      *
      * @param otherMessage Original Message
      * @since 2019-08-13

@@ -276,7 +276,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-14
      */
     @FXML
-    void onLeaveLobby(ActionEvent event) {
+    private void onLeaveLobbyButtonPressed(ActionEvent event) {
         closeWindow();
     }
 
