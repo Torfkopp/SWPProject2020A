@@ -233,7 +233,8 @@ public class LobbyService extends AbstractService {
      * Handles a StartSessionRequest found on the EventBus
      * <p>
      * If a StartSessionRequest is detected on the EventBus, this method is called.
-     * It posts a StartSessionMessage including the lobby name and the user onto the EventBus.
+     * It posts a StartSessionMessage including the lobby name and the user onto the EventBus if there are
+     * at least 3 player in the lobby and every player is ready.
      *
      * @param startSessionRequest The StartSessionMessage found on the EventBus
      * @author Eric Vuong
@@ -245,8 +246,11 @@ public class LobbyService extends AbstractService {
     private void onStartSessionRequest(StartSessionRequest startSessionRequest) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(startSessionRequest.getName());
         if (lobby.isPresent()) {
-            ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), startSessionRequest.getUser());
-            sendToAllInLobby(lobby.get().getName(), startSessionMessage);
+            if (lobby.get().getUsers().size() >= 3 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
+                LOG.debug("All Members are ready, proceeding with sending of StartSessionMessage...");
+                ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), startSessionRequest.getUser());
+                sendToAllInLobby(lobby.get().getName(), startSessionMessage);
+            }
         }
     }
 

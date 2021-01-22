@@ -300,7 +300,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 if (readyUsers.contains(u)) {
                     username = "\u2713 " + username;
                 }
-                Pair<String, String> item = new Pair<>(username,
+                Pair<String, String> item = new Pair<>(u.getUsername(),
                         u.getUsername().equals(this.owner.getUsername()) ? username + " \uD83D\uDC51" : username);  //Leerzeile vor Krone hinzugefügt
                 lobbyMembers.add(item);
             });
@@ -417,8 +417,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     /**
      * Helper function to find the Pair for a given key
-     * <p>
-     * Also checks if the username was marked as ready with a prepended checkmark.
      *
      * @param name the key of the pair that should be returned
      * @return the pair matched by the name
@@ -427,9 +425,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-19
      */
     private Pair<String, String> findMember(String name) {
-        for (Pair<String, String> lobbyMember : lobbyMembers) {
-            String key = lobbyMember.getKey();
-            if (key.equals(name) || key.equals("\u2713 " + name)) return lobbyMember;
+        for (int i = 0; i < lobbyMembers.size(); i++) {
+            if (lobbyMembers.get(i).getKey().equals(name)) return lobbyMembers.get(i);
         }
         return null;
     }

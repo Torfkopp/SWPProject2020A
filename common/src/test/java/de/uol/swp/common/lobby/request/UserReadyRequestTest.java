@@ -37,7 +37,7 @@ class UserReadyRequestTest {
     /**
      * Tests the userReadyRequest when isReady is false
      * <p>
-     * This tests fails if any of the parameters is as expected.
+     * This tests fails if any of the parameters is not as expected.
      */
     @Test
     void UserIsNotReadyTest() {
