@@ -7,6 +7,8 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.Renderable;
+import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
@@ -17,8 +19,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -80,7 +84,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 setText(empty || item == null ? "" : item.getValue());
             }
         });
-        renderGameMap();
+        renderGameMap(new GameMapManagement());
     }
 
     @Override
@@ -295,8 +299,39 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         return null;
     }
 
-    private void renderGameMap() {
+    private void renderGameMap(GameMapManagement gameMapManagement) {
+        Renderable[][] hexes = gameMapManagement.getHexesAsJaggedArray();
+        int width = (int) gameMapCanvas.getWidth();
+        int height = (int) gameMapCanvas.getHeight();
+        int maxHexesInRow = hexes[4].length;
+
+
+        int hexWidth = (int) gameMapCanvas.getWidth() / maxHexesInRow;
+        int hexHeight = (int) gameMapCanvas.getHeight() / hexes.length;
+
+        int currentX = 0;
+        int currentY = 0;
+
+        GraphicsContext map = gameMapCanvas.getGraphicsContext2D();
+        map.setFill(Color.BLUE);
+        map.fillRect(0, 0, width, height);
+
         //Terrains
+        for(int y = 0; y < hexes.length; y++){
+            if( hexes[y].length % 2 == 0){
+                //Even Row
+                currentX += hexWidth / 2;
+                currentX += (maxHexesInRow - 1 - hexes[y].length) / 2;
+
+            } else {
+                //Odd Row
+                currentX += (maxHexesInRow - hexes[y].length) / 2;
+            }
+
+            for(int x = 0; x < hexes[y].length; x++){
+                hexes[y][x].render(currentX, currentY, hexWidth, map);
+            }
+        }
 
         //Game Grid?
         //Edges

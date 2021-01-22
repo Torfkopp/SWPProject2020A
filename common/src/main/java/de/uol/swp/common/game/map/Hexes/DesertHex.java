@@ -1,4 +1,4 @@
-package de.uol.swp.server.game.map.Hexes;
+package de.uol.swp.common.game.map.Hexes;
 
 /**
  * Class for the desert hex
@@ -17,4 +17,6 @@ public class DesertHex implements ILandHex {
         return type.Desert;
     }
 
+    @Override
+    public void render(int x, int y, int size){}
 }

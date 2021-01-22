@@ -1,9 +1,9 @@
-package de.uol.swp.server.game;
+package de.uol.swp.common.game;
 
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
-import de.uol.swp.server.game.map.GameMapManagement;
-import de.uol.swp.server.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.IGameMapManagement;
 
 /**
  * Class for a game

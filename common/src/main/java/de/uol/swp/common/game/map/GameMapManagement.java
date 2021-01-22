@@ -1,6 +1,6 @@
-package de.uol.swp.server.game.map;
+package de.uol.swp.common.game.map;
 
-import de.uol.swp.server.game.map.Hexes.*;
+import de.uol.swp.common.game.map.Hexes.*;
 
 /**
  * Management of the gameMap

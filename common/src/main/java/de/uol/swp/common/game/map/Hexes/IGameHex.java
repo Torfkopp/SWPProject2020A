@@ -1,4 +1,6 @@
-package de.uol.swp.server.game.map.Hexes;
+package de.uol.swp.common.game.map.Hexes;
+
+import de.uol.swp.common.game.Renderable;
 
 /**
  * Interface for a hex
@@ -7,7 +9,7 @@ package de.uol.swp.server.game.map.Hexes;
  * @author Steven
  * @since 2021-01-16
  */
-public interface IGameHex {
+public interface IGameHex extends Renderable {
 
     enum type {
         Water, Desert, Resource, Harbor

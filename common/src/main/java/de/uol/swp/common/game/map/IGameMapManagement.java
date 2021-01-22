@@ -1,7 +1,7 @@
-package de.uol.swp.server.game.map;
+package de.uol.swp.common.game.map;
 
 
-import de.uol.swp.server.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IGameHex;
 
 /**
  * Interface for the game's map
