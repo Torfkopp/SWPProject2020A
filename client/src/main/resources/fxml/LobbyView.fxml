@@ -8,17 +8,18 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
-    <GridPane layoutX="-5.0" layoutY="-4.0" prefHeight="410.0" prefWidth="600.0">
+    <GridPane minWidth="605.0" prefHeight="350.0" prefWidth="605.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="182.0" minWidth="10.0" prefWidth="182.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="118.0"/>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
         </columnConstraints>
         <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
         </rowConstraints>
 
-        <VBox prefHeight="372.0" prefWidth="169.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647">
+        <VBox prefHeight="372.0" prefWidth="169.0" GridPane.columnIndex="2" GridPane.columnSpan="2147483647">
             <ListView fx:id="chatView" prefHeight="154.0" prefWidth="362.0">
                 <VBox.margin>
                     <Insets bottom="10.0" top="10.0"/>
@@ -47,9 +48,34 @@
         <Button id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
                 prefHeight="24.0" prefWidth="64.0" text="End Turn"/>
     </GridPane>
+
     <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"/>
     <ListView fx:id="membersView" layoutY="7.0" maxHeight="95.0" maxWidth="190.0" prefHeight="95.0" prefWidth="180.0"/>
-    <Button layoutX="51.0" layoutY="125.0" mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed"
+    <HBox layoutY="110.0" prefHeight="101.0" prefWidth="180.0" spacing="16">
+        <CheckBox fx:id="readyCheckBox" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked" prefHeight="22.0"
+                  prefWidth="70.0" text="Ready">
+            <HBox.margin>
+                <Insets left="10"/>
+            </HBox.margin>
+        </CheckBox>
+        <Button fx:id="startSession" disable="true" mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
+                text="Start Session" visible="false"/>
+    </HBox>
+    <Button layoutX="205.0" layoutY="42.0" mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed"
             text="Leave Lobby"/>
+
+    <GridPane fx:id="playField" layoutX="-5.0" layoutY="350.0" prefHeight="450.0" prefWidth="600.0" visible="false">
+        <columnConstraints>
+            <ColumnConstraints/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints/>
+        </rowConstraints>
+        <Label text="Hier kommt das Spielfeld">
+            <GridPane.margin>
+                <Insets bottom="225.0" left="225.0" right="225.0" top="100.0"/>
+            </GridPane.margin>
+        </Label>
+    </GridPane>
     <Text id="text" layoutX="21.0" layoutY="124.0"/>
 </AnchorPane>
