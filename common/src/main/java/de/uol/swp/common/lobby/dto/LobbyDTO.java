@@ -23,6 +23,7 @@ public class LobbyDTO implements Lobby {
     private final String name;
     private final Set<User> users = new TreeSet<>();
     private User owner;
+    private final Set<User> readyUsers = new TreeSet<>();
 
     /**
      * Constructor
@@ -44,7 +45,6 @@ public class LobbyDTO implements Lobby {
      * @return Lobby copy of Lobby object
      * @since 2020-11-29
      */
-
     public static Lobby create(Lobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getOwner());
     }
@@ -88,5 +88,20 @@ public class LobbyDTO implements Lobby {
     @Override
     public Set<User> getUsers() {
         return Collections.unmodifiableSet(users);
+    }
+
+    @Override
+    public void setUserReady(User user) {
+        this.readyUsers.add(user);
+    }
+
+    @Override
+    public void unsetUserReady(User user) {
+        this.readyUsers.remove(user);
+    }
+
+    @Override
+    public Set<User> getReadyUsers() {
+        return readyUsers;
     }
 }
