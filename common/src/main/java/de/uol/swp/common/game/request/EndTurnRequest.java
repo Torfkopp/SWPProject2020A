@@ -10,7 +10,7 @@ import de.uol.swp.common.user.User;
  * @author Marvin Drees
  * @see de.uol.swp.common.lobby.request.AbstractLobbyRequest
  * @see de.uol.swp.common.user.User
- * @since 2019-10-08
+ * @since 2021-1-15
  */
 public class EndTurnRequest extends AbstractGameRequest {
     private final User user;

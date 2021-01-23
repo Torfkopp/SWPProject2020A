@@ -9,6 +9,7 @@ import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +65,7 @@ public class GameService extends AbstractService {
             LOG.debug("User " + msg.getUser().getUsername() + " wants to end his turn.");
         }
         try {
-            ServerMessage returnMessage = new NextPlayerMessage(gameManagement.nextPlayer());
+            ServerMessage returnMessage = new NextPlayerMessage(msg.getOriginLobby(),gameManagement.nextPlayer());
             lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);

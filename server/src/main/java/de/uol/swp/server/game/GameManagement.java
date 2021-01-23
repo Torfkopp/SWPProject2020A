@@ -1,11 +1,6 @@
 package de.uol.swp.server.game;
 
-import com.google.inject.Inject;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.server.chat.store.ChatMessageStore;
-
-import java.util.List;
 
 /**
  * The game management class.
@@ -15,25 +10,20 @@ import java.util.List;
  * @author Marvin Drees
  * @since 2021-01-15
  */
-public class GameManagement {
+public class GameManagement extends AbstractGameManagement {
 
+    private String lobby;
     private User[] players;
     private User ActivePlayer;
-    private int turn;
+    private int turn = 0;
 
     /**
      * Constructor
      *
      * @since 2021-01-15
      */
-    @Inject
-    public GameManagement() {
-    }
-
-    public GameManagement(List<User> players) {
-        turn = 0;
-        this.players = players.toArray(new User[0]);
-        ActivePlayer = this.players[0];
+    public GameManagement(String lobby) {
+        this.lobby = lobby;
     }
 
     /**
@@ -41,9 +31,10 @@ public class GameManagement {
      *
      * @return User
      */
+    @Override
     public User nextPlayer() {
-        //ActivePlayer = players[++turn % players.length];
-        ActivePlayer = new UserDTO("Geralt", "", "");
+        ActivePlayer = players[++turn % players.length];
+        //ActivePlayer = new UserDTO("Geralt", "", "");
         return ActivePlayer;
     }
 
@@ -52,7 +43,22 @@ public class GameManagement {
      *
      * @return User
      */
+    @Override
     public User getActivePlayer() {
         return ActivePlayer;
+    }
+
+    /**
+     * Gets the lobby
+     *
+     * @return String The lobby
+     */
+    @Override
+    public String getLobby() {
+        return lobby;
+    }
+
+    private void setPlayers(User[] players) {
+        this.players = players;
     }
 }

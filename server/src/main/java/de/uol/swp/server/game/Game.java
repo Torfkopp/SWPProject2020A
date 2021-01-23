@@ -3,6 +3,7 @@ package de.uol.swp.server.game;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.game.map.GameMapManagement;
+import de.uol.swp.server.game.map.Hexes.IGameHex;
 import de.uol.swp.server.game.map.IGameMapManagement;
 
 /**
@@ -16,10 +17,12 @@ public class Game {
     private Lobby lobby;
     private Inventory[] inventories;
     private IGameMapManagement map;
+    private IGameManagement game;
 
     public Game(Lobby lobby) {
         this.lobby = lobby;
         map = new GameMapManagement();
+        game = new GameManagement(lobby.getName());
         int i = 0;
         for (User u : lobby.getUsers()) {
             inventories[i++] = new Inventory(u);
