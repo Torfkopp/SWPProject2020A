@@ -7,9 +7,9 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
-import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
@@ -23,22 +23,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListCell;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.text.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.IOException;
 import java.util.HashSet;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -370,20 +369,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Method called when the EndTurnButton is pressed
-     * <p>
-     * If the EndTurnButton is pressed, this method requests the LobbyService
-     * to end the current turn.
-     *
-     * @param actionEvent The ActionEvent created by pressing the EndTurnButton
-     * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2021-1-15
-     */
-    public void onEndTurnButtonPressed(ActionEvent actionEvent) {
-        lobbyService.endTurn(loggedInUser, lobbyName);
-    }
-
-    /**
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
@@ -462,6 +447,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the EndTurnButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests the LobbyService
+     * to end the current turn.
+     *
+     * @param actionEvent The ActionEvent created by pressing the EndTurnButton
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-1-15
+     */
+    public void onEndTurnButtonPressed(ActionEvent actionEvent) {
+        lobbyService.endTurn(loggedInUser, lobbyName);
+    }
+
+    /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
@@ -491,5 +490,4 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
         return null;
     }
-
 }
