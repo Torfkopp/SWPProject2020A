@@ -8,6 +8,7 @@ import de.uol.swp.common.user.User;
  * @since 2021-01-15
  */
 public class NextPlayerMessage extends AbstractGameMessage {
+    String lobby;
     User activePlayer;
 
     /**
@@ -15,7 +16,8 @@ public class NextPlayerMessage extends AbstractGameMessage {
      *
      * @param ActivePlayer The active player
      */
-    public NextPlayerMessage(User ActivePlayer) {
+    public NextPlayerMessage(String lobby, User ActivePlayer) {
+        this.lobby = lobby;
         this.activePlayer = ActivePlayer;
     }
 

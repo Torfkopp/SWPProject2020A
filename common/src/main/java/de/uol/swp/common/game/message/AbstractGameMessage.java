@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.message.AbstractServerMessage;
+import de.uol.swp.common.user.User;
 
 /**
  * Base class of all game messages.
@@ -15,7 +16,9 @@ import de.uol.swp.common.message.AbstractServerMessage;
  * @since 2021-01-15
  */
 public abstract class AbstractGameMessage extends AbstractServerMessage {
+
     private String lobbyName;
+    private User user;
 
     /**
      * Default constructor
@@ -27,22 +30,48 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
 
     /**
      * Constructor
-     * <p>
-     * This constructor sets the lobbyName attribute to the parameters
-     * provided upon calling the constructor.
      *
-     * @param lobbyName the lobby name
+     * @param lobbyName The lobby name
+     * @param user      The user
      */
-    public AbstractGameMessage(String lobbyName) {
+    public AbstractGameMessage(String lobbyName, User user) {
         this.lobbyName = lobbyName;
+        this.user = user;
     }
 
     /**
-     * Getter for the lobbyName attribute
+     * Gets the lobbyName attribute
      *
      * @return The lobbyName of the destination lobby
      */
     public String getLobbyName() {
         return lobbyName;
+    }
+
+    /**
+     * Sets the lobbyName
+     *
+     * @param lobbyName Lobby's name
+     */
+    public void setLobbyName(String lobbyName) {
+        this.lobbyName = lobbyName;
+    }
+
+    /**
+     * Gets the user
+     *
+     * @return user The user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * Sets the user
+     *
+     * @param user The user
+     */
+    public void setUser(User user) {
+        this.user = user;
     }
 }

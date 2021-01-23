@@ -23,12 +23,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
@@ -63,10 +60,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private CheckBox readyCheckBox;
     @FXML
     private Button startSession;
+    @FXML
+    private Button endTurn;
+    @FXML
+    private Text text;
 
     private Window window;
     @FXML
     private GridPane playField;
+
 
     /**
      * Constructor
@@ -198,7 +200,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function that sets the Visible and Disable states of the "Start
      * Session" button.
      * <p>
-     * The Button is only ever visible to the lobby owner, and is only enabled
+     * The button is only ever visible to the lobby owner, and is only enabled
      * if there are 3 or more lobby members, and all members are marked as ready.
      *
      * @author Eric Vuong
@@ -213,6 +215,39 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Helper function that sets the disable state of the endTurnButton.
+     * <p>
+     * The button is only enabled to the active player when the
+     * obligatory part of the turn is done.
+     *
+     * @author Alwin
+     * @author Mario
+     * @author Marvin
+     * @since 2021-01-23
+     */
+    private void setEndTurnButtonState(User player) {
+        if (super.loggedInUser.equals(player)) {
+            this.endTurn.setDisable(false);
+        } else {
+            this.endTurn.setDisable(true);
+        }
+    }
+
+    /**
+     * Helper function that sets the text's text.
+     * <p>
+     * The text states whose turn it is.
+     *
+     * @author Alwin
+     * @author Mario
+     * @author Marvin
+     * @since 2021-01-23
+     */
+    private void setTextText(User player) {
+        text.setText("It's " + player.getUsername() + "'s turn!");
     }
 
     /**
@@ -285,12 +320,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-15
      */
     @Subscribe
-    private void onDiceCastMessage(DiceCastMessage message) throws IOException {
-        //THIS BITCH DOES NOT WANT TO WORK EITHER
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LobbyView.fxml"));
-        Parent root = loader.load();
-        Button endTurn = (Button) loader.getNamespace().get("endTurn");
-        endTurn.setDisable(true);
+    private void onDiceCastMessage(DiceCastMessage message){
+        setEndTurnButtonState(message.getUser());
     }
 
     /**
@@ -303,13 +334,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @param message The NextPlayerMessage object seen on the EventBus
      */
     @Subscribe
-    private void onNextPlayerMessage(NextPlayerMessage message) throws IOException {
-        //THIS BITCH DOES NOT WORK
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LobbyView.fxml"));
-        Parent root = loader.load();
-        Text text = (Text) loader.getNamespace().get("text");
-        text.setVisible(true);
-        text.setText("It's " + message.getActivePlayer() + "'s turn!");
+    private void onNextPlayerMessage(NextPlayerMessage message) {
+        setTextText(message.getActivePlayer());
     }
 
 
@@ -405,6 +431,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 ((Stage) window).setMinWidth(630);
                 ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
+                setTextText(startSessionMessage.getUser());
+                eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
         }
     }
