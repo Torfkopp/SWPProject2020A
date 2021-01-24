@@ -250,7 +250,7 @@ public class LobbyService extends AbstractService {
             if (lobby.get().getUsers().size() >= 3 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
                 LOG.debug("All Members are ready, proceeding with sending of StartSessionMessage...");
                 ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), startSessionRequest.getUser());
-                post(new CreateGameMessage(lobbyManagement.getLobby2(startSessionRequest.getName()), startSessionRequest.getUser()));
+                post(new CreateGameMessage(lobby.get(), startSessionRequest.getUser()));
                 sendToAllInLobby(lobby.get().getName(), startSessionMessage);
             }
         }

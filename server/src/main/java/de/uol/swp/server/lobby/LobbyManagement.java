@@ -69,17 +69,6 @@ public class LobbyManagement {
     }
 
     /**
-     * Searches for the lobby with the requested name
-     *
-     * @param name String containing the name of the lobby to search for
-     * @return The Lobby object
-     * @since 2021-01-24
-     */
-    public Lobby getLobby2(String name) {
-        return lobbies.get(name);
-    }
-
-    /**
      * Gets the map
      *
      * @return Map with the lobby's name and its Lobby object
