@@ -15,6 +15,8 @@ import java.util.Optional;
  */
 public interface UserStore {
 
+    void createTable();
+
     /**
      * Find a user by its username and password
      *

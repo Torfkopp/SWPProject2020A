@@ -25,6 +25,9 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     private final Map<String, User> users = new HashMap<>();
 
     @Override
+    public void createTable() {};
+
+    @Override
     public Optional<User> findUser(String username, String password) {
         User usr = users.get(username);
         if (usr != null && Objects.equals(usr.getPassword(), hash(password))) {
