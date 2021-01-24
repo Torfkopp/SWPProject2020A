@@ -22,6 +22,15 @@ public class NextPlayerMessage extends AbstractGameMessage {
     }
 
     /**
+     * Gets the lobby
+     *
+     * @return String The lobby's name
+     */
+    public String getLobby() {
+        return lobby;
+    }
+
+    /**
      * Gets the player whose turn it is
      *
      * @return User

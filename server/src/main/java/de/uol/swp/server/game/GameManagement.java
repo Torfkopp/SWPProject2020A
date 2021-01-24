@@ -1,64 +1,72 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * The game management class.
+ * Manages creation, deletion, and storing of games
  *
  * @author Alwin Bossert
  * @author Mario Fokken
  * @author Marvin Drees
  * @since 2021-01-15
  */
-public class GameManagement extends AbstractGameManagement {
+public class GameManagement {
 
-    private String lobby;
-    private User[] players;
-    private User ActivePlayer;
-    private int turn = 0;
+    private final Map<String, Game> games = new HashMap<>();
 
     /**
-     * Constructor
+     * Creates a new game and adds it to the list
      *
-     * @since 2021-01-15
+     * @param lobby The game's lobby
+     * @throws java.lang.IllegalArgumentException Lobby already has a game
+     * @implNote The primary key of games is the lobby's name, therefore
+     * only one game per lobby is possible
+     * @since 2021-01-24
      */
-    public GameManagement(String lobby) {
-        this.lobby = lobby;
-    }
-
-    /**
-     * Returns the next player
-     *
-     * @return User
-     */
-    @Override
-    public User nextPlayer() {
-        ActivePlayer = players[++turn % players.length];
-        //ActivePlayer = new UserDTO("Geralt", "", "");
-        return ActivePlayer;
+    public void createGame(Lobby lobby, User first) throws IllegalArgumentException {
+        if (games.containsKey(lobby.getName())) {
+            throw new IllegalArgumentException("Game of lobby " + lobby.getName() + " already exists!");
+        }
+        games.put(lobby.getName(), new Game(lobby, first));
     }
 
     /**
-     * Gets the active player
+     * Deletes a game with its lobby's name
      *
-     * @return User
+     * @param lobbyName The name of the lobby
+     * @throws java.lang.IllegalArgumentException There is no game with the requested name
+     * @since 2021-01-24
      */
-    @Override
-    public User getActivePlayer() {
-        return ActivePlayer;
+    public void dropGame(String lobbyName) throws IllegalArgumentException {
+        if (!games.containsKey(lobbyName)) {
+            throw new IllegalArgumentException("Game of lobby " + lobbyName + " not found!");
+        }
+        games.remove(lobbyName);
     }
 
     /**
-     * Gets the lobby
+     * Searches for the game with the requested name
      *
-     * @return String The lobby
+     * @param lobbyName The name of the lobby
+     * @return The requested game
+     * @since 2021-01-24
      */
-    @Override
-    public String getLobby() {
-        return lobby;
+    public Game getGame(String lobbyName) {
+        return games.get(lobbyName);
     }
 
-    private void setPlayers(User[] players) {
-        this.players = players;
+    /**
+     * Gets the map
+     *
+     * @return Map with the lobby's name and its Game object
+     * @since 2021-01-24
+     */
+    public Map<String, Game> getGames() {
+        return games;
     }
+
 }

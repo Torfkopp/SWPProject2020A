@@ -94,7 +94,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     public void initialize() {
         super.initialize();
-        membersView.setCellFactory(lv -> new ListCell<Pair<String, String>>() {
+        membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
                 super.updateItem(item, empty);
@@ -229,11 +229,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-23
      */
     private void setEndTurnButtonState(User player) {
-        if (super.loggedInUser.equals(player)) {
-            this.endTurn.setDisable(false);
-        } else {
-            this.endTurn.setDisable(true);
-        }
+        this.endTurn.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**
@@ -336,6 +332,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage message) {
         setTextText(message.getActivePlayer());
+        //In here to test the endTurnButton
+        onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
     }
 
 
@@ -432,6 +430,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
                 setTextText(startSessionMessage.getUser());
+                //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
         }
@@ -513,8 +512,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-19
      */
     private Pair<String, String> findMember(String name) {
-        for (int i = 0; i < lobbyMembers.size(); i++) {
-            if (lobbyMembers.get(i).getKey().equals(name)) return lobbyMembers.get(i);
+        for (Pair<String, String> lobbyMember : lobbyMembers) {
+            if (lobbyMember.getKey().equals(name)) return lobbyMember;
         }
         return null;
     }

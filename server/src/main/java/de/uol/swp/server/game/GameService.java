@@ -4,12 +4,11 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import de.uol.swp.common.game.message.DiceCastMessage;
+import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,14 +61,28 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onEndTurnRequest(EndTurnRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("User " + msg.getUser().getUsername() + " wants to end his turn.");
+            LOG.debug(msg.getOriginLobby() + ": User " + msg.getUser().getUsername() + " wants to end his turn.");
         }
         try {
-            ServerMessage returnMessage = new NextPlayerMessage(msg.getOriginLobby(),gameManagement.nextPlayer());
+            Game game = gameManagement.getGame(msg.getOriginLobby());
+            ServerMessage returnMessage = new NextPlayerMessage(msg.getOriginLobby(), game.nextPlayer());
             lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);
         }
     }
 
+    /**
+     * Handles a CreateGameMessage found on the EventBus
+     * <p>
+     * If a CreateGameMessage is detected on the Eventbus, this method is called.
+     * It then requests the GameManagement to create a game.
+     *
+     * @param message The CreateGameMessage
+     * @since 2021-01-24
+     */
+    @Subscribe
+    private void onCreateGameMessage(CreateGameMessage message) {
+        gameManagement.createGame(message.getLobby(), message.getFirst());
+    }
 }
