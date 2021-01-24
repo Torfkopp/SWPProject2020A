@@ -50,4 +50,6 @@ public class Game {
     public Lobby getLobby() {
         return lobby;
     }
+
+    public User[] getPlayers() { return players; }
 }
