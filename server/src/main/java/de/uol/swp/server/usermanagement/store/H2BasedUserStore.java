@@ -27,7 +27,7 @@ import java.util.Optional;
 public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
     static final String JDBC_DRIVER = "org.h2.Driver";
-    static final String DB_URL = "jdbc:h2:mem:userdb";
+    static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
     static final String USER = "H2";
     static final String PASS = "123456";
     Connection conn = null;
@@ -45,7 +45,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             System.out.println("Creating table in given database...");
             stmt = conn.createStatement();
 
-            String sql = "CREATE TABLE USERDB (" +
+            String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
                     "username VARCHAR(255), " +
                     "mail VARCHAR(255), " +
                     "pass VARCHAR(255), " +
@@ -160,7 +160,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
-                if (user == username) {
+                if (user.equals(username)) {
                     User usr = new UserDTO(user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
@@ -212,11 +212,12 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
             stmt = conn.createStatement();
             String sql = "INSERT INTO USERDB " +
-                    "VALUES (" +
-                    username + ", " +
-                    eMail + ", " +
+                    "VALUES ('" +
+                    username + "', '" +
+                    eMail + "', '" +
                     passwordHash +
-                    ")";
+                    "') ON DUPLICATE KEY UPDATE username = '" + username + "'," +
+                    "mail = '" + eMail + "', pass='" + passwordHash + "'";
             stmt.executeUpdate(sql);
             System.out.println("Inserted records into the table...");
 
@@ -267,9 +268,9 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             // STEP 3: Execute a query
             System.out.println("Connected database successfully...");
             stmt = conn.createStatement();
-            String sql = "UPDATE USERDB " + "SET password = " + passwordHash + " WHERE username in " + username;
+            String sql = "UPDATE USERDB " + "SET pass = '" + passwordHash + "' WHERE username = '" + username + "'";
             stmt.executeUpdate(sql);
-            String sql2 = "UPDATE USERDB " + "SET mail = " + eMail + " WHERE username in " + username;
+            String sql2 = "UPDATE USERDB " + "SET mail = '" + eMail + "' WHERE username = '" + username + "'";
             stmt.executeUpdate(sql2);
         } catch (SQLException se) {
             // Handle errors for JDBC
@@ -309,7 +310,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             // STEP 3: Execute a query
             System.out.println("Creating table in given database...");
             stmt = conn.createStatement();
-            String sql = "DELETE FROM USERDB WHERE username = " + username;
+            String sql = "DELETE FROM USERDB WHERE username = '" + username + "'";
             stmt.executeUpdate(sql);
         } catch (SQLException se) {
             // Handle errors for JDBC
