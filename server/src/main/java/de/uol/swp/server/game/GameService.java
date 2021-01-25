@@ -141,7 +141,7 @@ public class GameService extends AbstractService {
         ressourceList.add(longestRoad);
         ressourceList.add(largestArmy);
 
-        ServerMessage returnMassage = new UpdateInventoryMessage(game);
+        ServerMessage returnMassage = new UpdateInventoryMessage();
 
     }
 }

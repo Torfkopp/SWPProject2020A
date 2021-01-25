@@ -110,7 +110,7 @@ public class LobbyService {
      * Posts a request to update ones Inventory
      *
      * @param lobbyName name of the lobby the user wants to update his Inventory in
-     * @param user User who wants to update his Inventory
+     * @param user User who wants to update his Inventory.
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest
      * @author Sven Ahrens
      * @author Finn Haase
