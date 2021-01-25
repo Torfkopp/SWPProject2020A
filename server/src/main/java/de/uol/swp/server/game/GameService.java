@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.message.UpdateInventoryMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.message.ServerMessage;
@@ -13,6 +14,9 @@ import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Mapping EventBus calls to GameManagement calls
@@ -32,6 +36,9 @@ public class GameService extends AbstractService {
     private final GameManagement gameManagement;
 
     private final LobbyService lobbyService;
+
+
+
 
     /**
      * Constructor

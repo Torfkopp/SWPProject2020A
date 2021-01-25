@@ -105,4 +105,19 @@ public class LobbyService {
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
+
+    /**
+     * Posts a request to update ones Inventory
+     *
+     * @param lobbyName name of the lobby the user wants to update his Inventory in
+     * @param user User who wants to update his Inventory
+     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
+     * @author Sven Ahrens
+     * @author Finn Haase
+     * @since 2021-1-25
+     */
+    public void updateInventory(String lobbyName, User user){
+        Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
+        eventBus.post(updateInventoryRequest);
+    }
 }
