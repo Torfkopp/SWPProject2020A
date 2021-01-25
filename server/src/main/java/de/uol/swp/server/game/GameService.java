@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.lobby.LobbyService;
@@ -84,5 +85,56 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onCreateGameMessage(CreateGameMessage message) {
         gameManagement.createGame(message.getLobby(), message.getFirst());
+    }
+
+    /**
+     * Handles a UpdateInventoryRequest found on the EventBus
+     * <p>
+     * It searches the inventories in the current game for the one that belongs
+     * to the player sending the request. It then gets the latest ressource
+     * variables out of said inventory.
+     *
+     * @author Sven Ahrens
+     * @author Finn Haase
+     * @param msg The UpdateInventoryRequest
+     * @since 2021-01-25
+     */
+    @Subscribe
+    private void onUpdateInventoryRequest(UpdateInventoryRequest msg) {
+        Game game = gameManagement.getGame(msg.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (int i=0; i<= game.getInventories().length;i++) {
+            if( inventories[i].getPlayer() == msg.getUser()) {
+                inventory = inventories[i];
+                break;
+            }
+
+        }
+        int brick = inventory.getBrick();
+        int grain = inventory.getGrain();
+        int lumber = inventory.getLumber();
+        int ore = inventory.getOre();
+        int wool = inventory.getWool();
+
+        int victoryPointCards = inventory.getVictoryPointCards();
+
+        boolean longestRoad = inventory.isLongestRoad();
+        boolean largestArmy = inventory.isLargestArmy();
+
+        List ressourceList = new ArrayList();
+        ressourceList.add(brick);
+        ressourceList.add(grain);
+        ressourceList.add(lumber);
+        ressourceList.add(ore);
+        ressourceList.add(wool);
+
+        ressourceList.add(victoryPointCards);
+
+        ressourceList.add(longestRoad);
+        ressourceList.add(largestArmy);
+
+        ServerMessage returnMassage = new UpdateInventoryMessage(game);
+
     }
 }
