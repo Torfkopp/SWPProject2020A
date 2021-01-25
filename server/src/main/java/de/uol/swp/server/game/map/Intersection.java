@@ -9,8 +9,8 @@ package de.uol.swp.server.game.map;
  */
 public class Intersection implements IIntersection {
 
-    private int[] hexes;
-    private int[] neighbours;
+    private final int[] hexes;
+    private final int[] neighbours;
     private String state;
 
     /**

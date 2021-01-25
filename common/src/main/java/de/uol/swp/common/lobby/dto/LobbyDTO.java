@@ -22,8 +22,8 @@ public class LobbyDTO implements Lobby {
 
     private final String name;
     private final Set<User> users = new TreeSet<>();
-    private User owner;
     private final Set<User> readyUsers = new TreeSet<>();
+    private User owner;
 
     /**
      * Constructor

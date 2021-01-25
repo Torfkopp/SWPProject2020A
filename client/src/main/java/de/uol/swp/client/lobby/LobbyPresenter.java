@@ -7,6 +7,8 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.message.DiceCastMessage;
+import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
@@ -26,6 +28,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -57,10 +60,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private CheckBox readyCheckBox;
     @FXML
     private Button startSession;
+    @FXML
+    private Button endTurn;
+    @FXML
+    private Text text;
 
     private Window window;
     @FXML
     private GridPane playField;
+
 
     /**
      * Constructor
@@ -86,7 +94,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     public void initialize() {
         super.initialize();
-        membersView.setCellFactory(lv -> new ListCell<Pair<String, String>>() {
+        membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
                 super.updateItem(item, empty);
@@ -192,7 +200,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function that sets the Visible and Disable states of the "Start
      * Session" button.
      * <p>
-     * The Button is only ever visible to the lobby owner, and is only enabled
+     * The button is only ever visible to the lobby owner, and is only enabled
      * if there are 3 or more lobby members, and all members are marked as ready.
      *
      * @author Eric Vuong
@@ -207,6 +215,35 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Helper function that sets the disable state of the endTurnButton.
+     * <p>
+     * The button is only enabled to the active player when the
+     * obligatory part of the turn is done.
+     *
+     * @author Alwin
+     * @author Mario
+     * @author Marvin
+     * @since 2021-01-23
+     */
+    private void setEndTurnButtonState(User player) {
+        this.endTurn.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the text's text.
+     * <p>
+     * The text states whose turn it is.
+     *
+     * @author Alwin
+     * @author Mario
+     * @author Marvin
+     * @since 2021-01-23
+     */
+    private void setTextText(User player) {
+        text.setText("It's " + player.getUsername() + "'s turn!");
     }
 
     /**
@@ -247,7 +284,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * {@literal <Username>} left Lobby {@literal <Lobbyname>}" is displayed
      * in the log, depending on whether the owner or a normal user left.
      *
-     * @param message the UserLeftLobbyMessage object seen on the EventBus
+     * @param message The UserLeftLobbyMessage object seen on the EventBus
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2021-01-20
@@ -268,6 +305,39 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles a DiceCastMessage
+     * <p>
+     * If a new DiceCastMessage object is posted onto the EventBus,
+     * this method is called.
+     * It enables the endTurnButton.
+     *
+     * @param message The DiceCastMessage object seen on the EventBus
+     * @see DiceCastMessage
+     * @since 2021-01-15
+     */
+    @Subscribe
+    private void onDiceCastMessage(DiceCastMessage message) {
+        setEndTurnButtonState(message.getUser());
+    }
+
+    /**
+     * Handles a NextPlayerMessage
+     * <p>
+     * If a new NextPlayerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It changes the text of a textField to state whose turn it is.
+     *
+     * @param message The NextPlayerMessage object seen on the EventBus
+     */
+    @Subscribe
+    private void onNextPlayerMessage(NextPlayerMessage message) {
+        setTextText(message.getActivePlayer());
+        //In here to test the endTurnButton
+        onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
+    }
+
+
+    /**
      * Updates the lobby's member list according to the list given
      * <p>
      * This method clears the entire member list and then adds the name of each user
@@ -276,13 +346,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a user is marked as ready in the readyUsers Set, their name is prepended
      * with a checkmark.
-     * If the owner is found among the users, their username is appended with a
-     * crown emoji.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
      *
      * @param userLobbyList A list of User objects including all currently logged in
      *                      users
      * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore it is crucial not to remove the {@code Platform.runLater()}
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.User
      * @since 2021-01-05
      */
@@ -359,6 +429,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 ((Stage) window).setMinWidth(630);
                 ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
+                setTextText(startSessionMessage.getUser());
+                //In here to test the endTurnButton.
+                eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
         }
     }
@@ -401,6 +474,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the EndTurnButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests the LobbyService
+     * to end the current turn.
+     *
+     * @param actionEvent The ActionEvent created by pressing the EndTurnButton
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-1-15
+     */
+    public void onEndTurnButtonPressed(ActionEvent actionEvent) {
+        lobbyService.endTurn(loggedInUser, lobbyName);
+    }
+
+    /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
@@ -425,8 +512,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-19
      */
     private Pair<String, String> findMember(String name) {
-        for (int i = 0; i < lobbyMembers.size(); i++) {
-            if (lobbyMembers.get(i).getKey().equals(name)) return lobbyMembers.get(i);
+        for (Pair<String, String> lobbyMember : lobbyMembers) {
+            if (lobbyMember.getKey().equals(name)) return lobbyMember;
         }
         return null;
     }

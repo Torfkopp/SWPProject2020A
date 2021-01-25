@@ -10,18 +10,18 @@ package de.uol.swp.server.game.map.Hexes;
 public interface IHarborHex extends IWaterHex {
 
     /**
+     * Gets the harbor's resource
+     *
+     * @return Resource
+     */
+    resource getResource();
+
+    /**
      * Enum for the five resources a harbor can trade
      * and 'any' if every resource is tradeable
      */
     enum resource {
         Brick, Lumber, Ore, Grain, Wool, Any
     }
-
-    /**
-     * Gets the harbor's resource
-     *
-     * @return Resource
-     */
-    resource getResource();
 
 }

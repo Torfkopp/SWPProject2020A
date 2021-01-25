@@ -8,8 +8,8 @@ package de.uol.swp.server.game.map.Hexes;
  * @since 2021-01-16
  */
 public class ResourceHex implements IResourceHex {
-    private resource resource;
-    private int token;
+    private final resource resource;
+    private final int token;
 
     /**
      * Constructor
