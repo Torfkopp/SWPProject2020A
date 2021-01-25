@@ -9,10 +9,10 @@ package de.uol.swp.server.game.map.Hexes;
  */
 public interface IGameHex {
 
+    type getType();
+
     enum type {
         Water, Desert, Resource, Harbor
     }
-
-    type getType();
 
 }

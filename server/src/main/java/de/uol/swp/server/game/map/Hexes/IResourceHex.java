@@ -10,13 +10,6 @@ package de.uol.swp.server.game.map.Hexes;
 public interface IResourceHex extends ILandHex {
 
     /**
-     * Enum for all five resource giving hex types
-     */
-    enum resource {
-        Hills, Forest, Mountains, Fields, Pasture
-    }
-
-    /**
      * Gets the number of the hex's token
      *
      * @return int Token number
@@ -29,5 +22,12 @@ public interface IResourceHex extends ILandHex {
      * @return Resource
      */
     resource getResource();
+
+    /**
+     * Enum for all five resource giving hex types
+     */
+    enum resource {
+        Hills, Forest, Mountains, Fields, Pasture
+    }
 
 }

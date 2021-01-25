@@ -8,8 +8,8 @@ package de.uol.swp.server.game.map;
  */
 public class Edge implements IEdge {
 
-    private int[] neiInt;
-    private int[] neighbours;
+    private final int[] neiInt;
+    private final int[] neighbours;
     private int state;
 
     /**

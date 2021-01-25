@@ -13,12 +13,11 @@ import de.uol.swp.server.game.map.IGameMapManagement;
  */
 public class Game {
 
-    private Lobby lobby;
-    private Inventory[] inventories;
-    private IGameMapManagement map;
-
+    private final Lobby lobby;
+    private final Inventory[] inventories;
+    private final IGameMapManagement map;
+    private final User[] players;
     private int activePlayer;
-    private User[] players;
 
     public Game(Lobby lobby, User first) {
         this.lobby = lobby;
@@ -51,5 +50,7 @@ public class Game {
         return lobby;
     }
 
-    public User[] getPlayers() { return players; }
+    public User[] getPlayers() {
+        return players;
+    }
 }
