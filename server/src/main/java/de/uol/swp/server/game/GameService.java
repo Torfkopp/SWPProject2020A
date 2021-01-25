@@ -6,9 +6,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
-import de.uol.swp.common.game.message.UpdateInventoryMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
+import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.lobby.LobbyService;
@@ -36,8 +37,6 @@ public class GameService extends AbstractService {
     private final GameManagement gameManagement;
 
     private final LobbyService lobbyService;
-
-
 
 
     /**
@@ -101,9 +100,9 @@ public class GameService extends AbstractService {
      * to the player sending the request. It then gets the latest ressource
      * variables out of said inventory.
      *
+     * @param msg The UpdateInventoryRequest
      * @author Sven Ahrens
      * @author Finn Haase
-     * @param msg The UpdateInventoryRequest
      * @since 2021-01-25
      */
     @Subscribe
@@ -111,8 +110,8 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(msg.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
-        for (int i=0; i<= game.getInventories().length;i++) {
-            if( inventories[i].getPlayer() == msg.getUser()) {
+        for (int i = 0; i <= game.getInventories().length; i++) {
+            if (inventories[i].getPlayer() == msg.getUser()) {
                 inventory = inventories[i];
                 break;
             }
@@ -141,7 +140,8 @@ public class GameService extends AbstractService {
         ressourceList.add(longestRoad);
         ressourceList.add(largestArmy);
 
-        ServerMessage returnMassage = new UpdateInventoryMessage();
+        AbstractResponseMessage message = new UpdateInventoryResponse(ressourceList, msg.getUser());
+//        AbstractService.post(message);
 
     }
 }

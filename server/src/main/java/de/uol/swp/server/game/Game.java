@@ -55,6 +55,7 @@ public class Game {
     public User[] getPlayers() {
         return players;
     }
+
     public Inventory[] getInventories() {
         return inventories;
     }

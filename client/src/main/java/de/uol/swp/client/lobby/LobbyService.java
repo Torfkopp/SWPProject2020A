@@ -110,13 +110,13 @@ public class LobbyService {
      * Posts a request to update ones Inventory
      *
      * @param lobbyName name of the lobby the user wants to update his Inventory in
-     * @param user User who wants to update his Inventory.
-     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
+     * @param user      User who wants to update his Inventory.
      * @author Sven Ahrens
      * @author Finn Haase
+     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
      * @since 2021-1-25
      */
-    public void updateInventory(String lobbyName, User user){
+    public void updateInventory(String lobbyName, User user) {
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
     }

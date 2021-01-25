@@ -35,7 +35,9 @@ public class Inventory {
         this.player = player;
     }
 
-    public User getPlayer() { return player;  }
+    public User getPlayer() {
+        return player;
+    }
 
     public int getTotalResources() {
         return totalResources;

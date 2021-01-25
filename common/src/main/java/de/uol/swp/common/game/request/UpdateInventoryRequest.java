@@ -10,10 +10,9 @@ import de.uol.swp.common.user.User;
  * @see de.uol.swp.common.game.request.AbstractGameRequest
  * @see de.uol.swp.common.user.User
  * @since 2021-1-25
- *
  */
 
-public class UpdateInventoryRequest extends AbstractGameRequest{
+public class UpdateInventoryRequest extends AbstractGameRequest {
     private final User user;
 
     /**
@@ -21,7 +20,8 @@ public class UpdateInventoryRequest extends AbstractGameRequest{
      * <p>
      * This constructor is used to determine the user that
      * sent this request.
-     * @param user The User wanting to update his Inventory
+     *
+     * @param user        The User wanting to update his Inventory
      * @param originLobby The Lobby from which a request originated from
      */
     public UpdateInventoryRequest(User user, String originLobby) {
