@@ -31,39 +31,29 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
     static final String USER = "H2";
     static final String PASS = "123456";
     Connection conn = null;
-    Statement stmt = null;
+    PreparedStatement pstmt = null;
 
     @Override
     public void createTable() {
         try {
             Class.forName(JDBC_DRIVER);
-
-            System.out.println("Connection to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-
-            System.out.println("Creating table in given database...");
-            stmt = conn.createStatement();
 
             String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
                     "username VARCHAR(255), " +
                     "mail VARCHAR(255), " +
                     "pass VARCHAR(255), " +
                     "PRIMARY KEY (username))";
-            stmt.executeUpdate(sql);
-            System.out.println("Created table in given database...");
 
-            stmt.close();
-            conn.close();
-        } catch (SQLException se) {
-            se.printStackTrace();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException sqle2) {
-                sqle2.printStackTrace();
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
             }
             try {
                 if (conn != null) conn.close();
@@ -71,32 +61,22 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 se.printStackTrace();
             }
         }
-        System.out.println("Database closed.");
     }
 
     @Override
     public Optional<User> findUser(String username, String password) {
-
         String passwordHash = hash(password);
 
         try {
-            // STEP 1: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            // STEP 2: Open a connection
-            System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            // STEP 3: Execute a query
-            System.out.println("Connected database successfully...");
-            stmt = conn.createStatement();
             String sql = "SELECT username, mail, pass FROM USERDB";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
 
-            // STEP 4: Extract data from result set
             while (rs.next()) {
-                // Retrieve by column name
                 String user = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
@@ -105,57 +85,37 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                     User usr = new UserDTO(user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
-
-                // Display values
-                System.out.print(", Username: " + user);
-                System.out.print(", Mail: " + mail);
-                System.out.println(", Pass: " + pass);
             }
-            // STEP 5: Clean-up environment
             rs.close();
-        } catch (SQLException se) {
-            // Handle errors for JDBC
-            se.printStackTrace();
         } catch (Exception e) {
-            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            // finally block used to close resources
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException se2) {
-            } // nothing we can do
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
             try {
                 if (conn != null) conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
-            } // end finally try
-        } // end try
+            }
+        }
 
         return Optional.empty();
     }
 
     @Override
     public Optional<User> findUser(String username) {
-
         try {
-            // STEP 1: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            // STEP 2: Open a connection
-            System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            // STEP 3: Execute a query
-            System.out.println("Connected database successfully...");
-            stmt = conn.createStatement();
             String sql = "SELECT username, mail, pass FROM USERDB";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
 
-            // STEP 4: Extract data from result set
             while (rs.next()) {
-                // Retrieve by column name
                 String user = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
@@ -164,32 +124,21 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                     User usr = new UserDTO(user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
-
-                // Display values
-                System.out.print(", Username: " + user);
-                System.out.print(", Mail: " + mail);
-                System.out.println(", Pass: " + pass);
             }
-            // STEP 5: Clean-up environment
             rs.close();
-        } catch (SQLException se) {
-            // Handle errors for JDBC
-            se.printStackTrace();
         } catch (Exception e) {
-            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            // finally block used to close resources
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException se2) {
-            } // nothing we can do
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
             try {
                 if (conn != null) conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
-            } // end finally try
-        } // end try
+            }
+        }
 
         return Optional.empty();
     }
@@ -204,52 +153,37 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
         try {
             Class.forName(JDBC_DRIVER);
-
-            System.out.println("Connecting to a selected database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
-            System.out.println("Connected database successfully...");
 
-            stmt = conn.createStatement();
-            String sql = "INSERT INTO USERDB " +
-                    "VALUES ('" +
-                    username + "', '" +
-                    eMail + "', '" +
-                    passwordHash +
-                    "') ON DUPLICATE KEY UPDATE username = '" + username + "'," +
-                    "mail = '" + eMail + "', pass='" + passwordHash + "'";
-            stmt.executeUpdate(sql);
-            System.out.println("Inserted records into the table...");
-
-            stmt.close();
-            conn.close();
-        } catch (SQLException se) {
-            // Handle errors for JDBC
-            se.printStackTrace();
+            String sql = "INSERT INTO USERDB VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, mail = ?, pass = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.setString(2, eMail);
+            pstmt.setString(3, passwordHash);
+            pstmt.setString(4, username);
+            pstmt.setString(5, eMail);
+            pstmt.setString(6, passwordHash);
+            pstmt.executeUpdate();
         } catch (Exception e) {
-            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            // finally block used to close resources
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException se2) {
-            } // nothing we can do
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
             try {
                 if (conn != null) conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
-            } // end finally try
-        } // end try
-        System.out.println("Connection closed.");
+            }
+        }
 
-        User usr = new UserDTO(username, passwordHash, eMail);
-        return usr;
+        return new UserDTO(username, passwordHash, eMail);
     }
 
     @Override
     public User updateUser(String username, String password, String eMail) {
-
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -257,80 +191,57 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         String passwordHash = hash(password);
 
         try {
-            // STEP 1: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            // STEP 2: Open a connection
-            System.out.println("Connecting to a database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            // STEP 3: Execute a query
-            System.out.println("Connected database successfully...");
-            stmt = conn.createStatement();
-            String sql = "UPDATE USERDB " + "SET pass = '" + passwordHash + "' WHERE username = '" + username + "'";
-            stmt.executeUpdate(sql);
-            String sql2 = "UPDATE USERDB " + "SET mail = '" + eMail + "' WHERE username = '" + username + "'";
-            stmt.executeUpdate(sql2);
-        } catch (SQLException se) {
-            // Handle errors for JDBC
-            se.printStackTrace();
+            String sql = "UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, passwordHash);
+            pstmt.setString(2, eMail);
+            pstmt.setString(3, username);
+            pstmt.executeUpdate();
         } catch (Exception e) {
-            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            // finally block used to close resources
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException se2) {
-            } // nothing we can do
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
             try {
                 if (conn != null) conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
-            } // end finally try
-        } // end try
+            }
+        }
 
-        User usr = new UserDTO(username, passwordHash, eMail);
-        return usr;
+        return new UserDTO(username, passwordHash, eMail);
     }
 
     @Override
     public void removeUser(String username) {
-
         try {
-            // STEP 1: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            // STEP 2: Open a connection
-            System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            // STEP 3: Execute a query
-            System.out.println("Creating table in given database...");
-            stmt = conn.createStatement();
-            String sql = "DELETE FROM USERDB WHERE username = '" + username + "'";
-            stmt.executeUpdate(sql);
-        } catch (SQLException se) {
-            // Handle errors for JDBC
-            se.printStackTrace();
+            String sql = "DELETE FROM USERDB WHERE username = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
         } catch (Exception e) {
-            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            // finally block used to close resources
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException se2) {
-            } // nothing we can do
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
             try {
                 if (conn != null) conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
-            } // end finally try
-        } // end try
-        System.out.println("Connection closed.");
+            }
+        }
     }
 
     @Override
@@ -338,55 +249,36 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         List<User> retUsers = new ArrayList<>();
 
         try {
-            // STEP 1: Register JDBC driver
             Class.forName(JDBC_DRIVER);
-
-            // STEP 2: Open a connection
-            System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            // STEP 3: Execute a query
-            System.out.println("Connected database successfully...");
-            stmt = conn.createStatement();
             String sql = "SELECT username, mail, pass FROM USERDB";
-            ResultSet rs = stmt.executeQuery(sql);
+            pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
 
-            // STEP 4: Extract data from result set
             while (rs.next()) {
-                // Retrieve by column name
                 String username = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
                 User usr = new UserDTO(username, pass, mail);
                 retUsers.add(usr.getWithoutPassword());
-
-                // Display values
-                System.out.print(", Username: " + username);
-                System.out.print(", Mail: " + mail);
-                System.out.println(", Pass: " + pass);
             }
-            // STEP 5: Clean-up environment
             rs.close();
-        } catch (SQLException se) {
-            // Handle errors for JDBC
-            se.printStackTrace();
         } catch (Exception e) {
-            // Handle errors for Class.forName
             e.printStackTrace();
         } finally {
-            // finally block used to close resources
             try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException se2) {
-            } // nothing we can do
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
             try {
                 if (conn != null) conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
-            } // end finally try
-        } // end try
+            }
+        }
 
         return retUsers;
     }
