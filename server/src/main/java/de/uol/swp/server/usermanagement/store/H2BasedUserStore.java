@@ -32,9 +32,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
     static final String PASS = "123456";
     Connection conn = null;
     PreparedStatement pstmt = null;
-
-    @Override
-    public void createTable() {
+    
+    private void createTable() {
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -65,6 +64,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
     @Override
     public Optional<User> findUser(String username, String password) {
+        createTable();
+
         String passwordHash = hash(password);
 
         try {
@@ -106,6 +107,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
     @Override
     public Optional<User> findUser(String username) {
+        createTable();
+
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -149,6 +152,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             throw new IllegalArgumentException("Username must not be null");
         }
 
+        createTable();
+
         String passwordHash = hash(password);
 
         try {
@@ -188,6 +193,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             throw new IllegalArgumentException("Username must not be null");
         }
 
+        createTable();
+
         String passwordHash = hash(password);
 
         try {
@@ -220,6 +227,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
     @Override
     public void removeUser(String username) {
+        createTable();
+
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -246,6 +255,8 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
     @Override
     public List<User> getAllUsers() {
+        createTable();
+
         List<User> retUsers = new ArrayList<>();
 
         try {

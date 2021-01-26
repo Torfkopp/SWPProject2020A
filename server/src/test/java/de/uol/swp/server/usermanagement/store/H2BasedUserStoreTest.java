@@ -30,7 +30,6 @@ class H2BasedUserStoreTest {
 
     UserStore getDefaultStore() {
         UserStore store = new H2BasedUserStore();
-        store.createTable();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return store;
