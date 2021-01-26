@@ -9,8 +9,8 @@ package de.uol.swp.common.game.map.Hexes;
  */
 public class HarborHex implements IHarborHex {
 
-    private int belongingHex;
-    private resource resource;
+    private final int belongingHex;
+    private final resource resource;
 
     public HarborHex(int belongingHex, resource resource) {
         this.belongingHex = belongingHex;

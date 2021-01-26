@@ -11,7 +11,7 @@ import de.uol.swp.common.user.User;
  */
 public class Inventory {
 
-    private User player;
+    private final User player;
 
     private int totalResources = 0;
 

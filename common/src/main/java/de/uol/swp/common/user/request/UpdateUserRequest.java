@@ -22,7 +22,7 @@ public class UpdateUserRequest extends AbstractRequestMessage {
      *
      * @param user The user object the sender shall be updated to unchanged fields
      *             being empty
-     * //Unfortunately, I don't know what he wants to say -Mario
+     *             //Unfortunately, I don't know what he wants to say -Mario
      * @since 2019-09-02
      */
     public UpdateUserRequest(User user) {

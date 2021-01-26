@@ -1,7 +1,7 @@
 package de.uol.swp.common.exception;
 
 /**
- * Exception to state e.g. that a authorisation is required
+ * Exception to state, e.g. that a authorisation is required
  *
  * @author Marco Grawunder
  * @since 2017-03-17

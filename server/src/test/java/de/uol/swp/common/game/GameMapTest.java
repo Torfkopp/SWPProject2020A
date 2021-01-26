@@ -8,6 +8,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This tests the game map
+ *
+ * @author Mario
+ */
 public class GameMapTest {
 
     static final GameMapManagement map = new GameMapManagement();
