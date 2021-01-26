@@ -4,9 +4,7 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Response to the AllLobbyMembersRequest
@@ -19,6 +17,7 @@ import java.util.List;
 public class AllLobbyMembersResponse extends AbstractResponseMessage {
 
     private final List<User> users = new ArrayList<>();
+    private final Set<User> readyUsers = new TreeSet<>();
     private User owner;
 
     /**
@@ -38,15 +37,20 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * Collection. The significant difference between the two is that the new
      * List contains copies of the User objects. These copies have their password
      * variable set to an empty String.
+     * The same is done for the Set of ready users in the lobby.
      * The same method is used to provide the User object for the lobby owner.
      *
-     * @param users Collection of all lobby members
-     * @param owner Owner of the lobby
-     * @since 2021-01-05
+     * @param users      Collection of all lobby members
+     * @param owner      Owner of the lobby
+     * @param readyUsers Set of all ready lobby members
+     * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(Collection<User> users, User owner) {
+    public AllLobbyMembersResponse(Collection<User> users, User owner, Set<User> readyUsers) {
         for (User user : users) {
             this.users.add(UserDTO.createWithoutPassword(user));
+        }
+        for (User user : readyUsers) {
+            this.readyUsers.add(UserDTO.createWithoutPassword(user));
         }
         this.owner = UserDTO.createWithoutPassword(owner);
     }
@@ -69,5 +73,17 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      */
     public User getOwner() {
         return owner;
+    }
+
+    /**
+     * Gets the set of all ready users
+     *
+     * @return A Set of ready Users
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
+    public Set<User> getReadyUsers() {
+        return this.readyUsers;
     }
 }
