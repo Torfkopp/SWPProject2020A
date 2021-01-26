@@ -9,7 +9,7 @@ import de.uol.swp.common.user.User;
  * @author Finn Haase
  * @see de.uol.swp.common.game.request.AbstractGameRequest
  * @see de.uol.swp.common.user.User
- * @since 2021-1-25
+ * @since 2021-01-25
  */
 
 public class UpdateInventoryRequest extends AbstractGameRequest {

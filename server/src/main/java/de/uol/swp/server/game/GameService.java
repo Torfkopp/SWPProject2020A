@@ -16,8 +16,9 @@ import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Mapping EventBus calls to GameManagement calls
@@ -37,7 +38,6 @@ public class GameService extends AbstractService {
     private final GameManagement gameManagement;
 
     private final LobbyService lobbyService;
-
 
     /**
      * Constructor
@@ -97,10 +97,12 @@ public class GameService extends AbstractService {
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
-     * to the player sending the request. It then gets the latest ressource
-     * variables out of said inventory.
+     * to the player sending the request. It then posts a UpdateInventoryResponse
+     * that contains all the user's items, saved in a resourceMap for
+     * counted items (bricks, grain, etc.) and a armyAndRoadMap which
+     * contains the boolean attributes longestRoad and largestArmy.
      *
-     * @param msg The UpdateInventoryRequest
+     * @param msg The UpdateInventoryRequest found on the EventBus
      * @author Sven Ahrens
      * @author Finn Haase
      * @since 2021-01-25
@@ -115,33 +117,29 @@ public class GameService extends AbstractService {
                 inventory = inventories[i];
                 break;
             }
-
         }
-        int brick = inventory.getBrick();
-        int grain = inventory.getGrain();
-        int lumber = inventory.getLumber();
-        int ore = inventory.getOre();
-        int wool = inventory.getWool();
+        if (inventory != null) {
+            Map<String, Integer> resourceMap = new HashMap<>();
+            resourceMap.put("Brick", inventory.getBrick());
+            resourceMap.put("Grain", inventory.getGrain());
+            resourceMap.put("Lumber", inventory.getLumber());
+            resourceMap.put("Ore", inventory.getOre());
+            resourceMap.put("Wool", inventory.getWool());
+            resourceMap.put("Victory Point Cards", inventory.getVictoryPointCards());
+            resourceMap.put("Knight Cards", inventory.getKnightCards());
+            resourceMap.put("Road Building Cards", inventory.getRoadBuildingCards());
+            resourceMap.put("Year of Plenty Cards", inventory.getYearOfPlentyCards());
+            resourceMap.put("Monopoly Cards", inventory.getMonopolyCards());
 
-        int victoryPointCards = inventory.getVictoryPointCards();
+            Map<String, Boolean> armyAndRoadMap = Map.of("Longest Road", inventory.isLongestRoad(),"Largest Army", inventory.isLargestArmy());
 
-        boolean longestRoad = inventory.isLongestRoad();
-        boolean largestArmy = inventory.isLargestArmy();
+            resourceMap = Collections.unmodifiableMap(resourceMap);
 
-        List ressourceList = new ArrayList();
-        ressourceList.add(brick);
-        ressourceList.add(grain);
-        ressourceList.add(lumber);
-        ressourceList.add(ore);
-        ressourceList.add(wool);
-
-        ressourceList.add(victoryPointCards);
-
-        ressourceList.add(longestRoad);
-        ressourceList.add(largestArmy);
-
-        AbstractResponseMessage message = new UpdateInventoryResponse(ressourceList, msg.getUser());
-//        AbstractService.post(message);
-
+            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(), resourceMap, armyAndRoadMap);
+            if (msg.getMessageContext().isPresent()) {
+                returnMessage.setMessageContext(msg.getMessageContext().get());
+            }
+            post(returnMessage);
+        }
     }
 }
