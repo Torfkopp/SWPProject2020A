@@ -283,6 +283,65 @@ public class GameMapManagement implements IGameMapManagement {
         return map;
     }
 
+    public IIntersection[][] getIntersectionsAsJaggedArray() {
+        IIntersection[][] intersec;
+        intersec = new IIntersection[6][];
+        intersec[0] = new IIntersection[7];
+        intersec[1] = new IIntersection[9];
+        intersec[2] = new IIntersection[11];
+        intersec[3] = new IIntersection[11];
+        intersec[4] = new IIntersection[9];
+        intersec[5] = new IIntersection[7];
+        for (int i = 0; i < 7; i++) {
+            intersec[0][i] = intersections[i+1];
+        }
+
+        for (int i = 0; i < 7; i++) {
+            intersec[1][i] = intersections[i + 30];
+        }
+        intersec[1][7] = intersections[8];
+        intersec[1][8] = intersections[9];
+
+        intersec[2][0] = intersections[27];
+        intersec[2][1] = intersections[28];
+        intersec[2][2] = intersections[47];
+        intersec[2][3] = intersections[48];
+        intersec[2][4] = intersections[49];
+        intersec[2][5] = intersections[50];
+        intersec[2][6] = intersections[51];
+        intersec[2][7] = intersections[36];
+        intersec[2][8] = intersections[37];
+        intersec[2][9] = intersections[10];
+        intersec[2][10] = intersections[11];
+
+        intersec[3][0] = intersections[26];
+        intersec[3][1] = intersections[25];
+        intersec[3][2] = intersections[46];
+        intersec[3][3] = intersections[45];
+        intersec[3][4] = intersections[54];
+        intersec[3][5] = intersections[53];
+        intersec[3][6] = intersections[52];
+        intersec[3][7] = intersections[39];
+        intersec[3][8] = intersections[38];
+        intersec[3][9] = intersections[13];
+        intersec[3][10] = intersections[12];
+
+        intersec[4][0] = intersections[24];
+        intersec[4][1] = intersections[23];
+        intersec[4][2] = intersections[44];
+        intersec[4][3] = intersections[43];
+        intersec[4][4] = intersections[42];
+        intersec[4][5] = intersections[41];
+        intersec[4][6] = intersections[40];
+        intersec[4][7] = intersections[14];
+        intersec[4][8] = intersections[15];
+
+        for(int i = 0; i < 7; i++){
+            intersec[5][i] = intersections[21 - i];
+        }
+        return intersec;
+    }
+
     @Override
     public boolean placeSettlement(int player, int position) {
         if (settlementPlaceable(player, position)) {

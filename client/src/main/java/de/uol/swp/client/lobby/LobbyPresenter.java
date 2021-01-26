@@ -54,13 +54,14 @@ import java.util.Set;
  * @since 2020-11-21
  */
 @SuppressWarnings("UnstableApiUsage")
-public class LobbyPresenter extends AbstractPresenterWithChat {
+public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
     private Set<User> readyUsers;
+
 
     @FXML
     private ListView<Pair<String, String>> membersView;
@@ -73,15 +74,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Text text;
 
-    @FXML
-    private Canvas gameMapCanvas;
-
     private Window window;
     @FXML
     private GridPane playField;
-
-
-    private Double hexHeight, hexWidth;
 
     /**
      * Constructor
@@ -114,9 +109,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 setText(empty || item == null ? "" : item.getValue());
             }
         });
-        hexHeight = gameMapCanvas.getHeight() / 7.0;
-        hexWidth = (Math.sqrt(3) / 2) * hexHeight;
-        renderGameMap(new GameMapManagement());
     }
 
     @Override
@@ -226,7 +218,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void setStartSessionButtonState() {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
-            this.startSession.setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+            //TODO: Change back to 3
+            this.startSession.setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
@@ -404,7 +397,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-14
      */
     @FXML
-    private void onLeaveLobbyButtonPressed(ActionEvent event) {
+    private void onLeaveLobbyButtonPressed() {
         closeWindow();
     }
 
@@ -421,7 +414,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-20
      */
     @FXML
-    private void onStartSessionButtonPressed(ActionEvent event) {
+    private void onStartSessionButtonPressed(
+    ) {
         RequestMessage startSessionRequest = new StartSessionRequest(this.lobbyName, this.loggedInUser);
         eventBus.post(startSessionRequest);
     }
@@ -449,6 +443,26 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
+            //Create Test Gamemap and create Settlements, Cities and Roads
+            GameMapManagement gamemap = new GameMapManagement();
+            gamemap.placeSettlement(1, 31);
+            gamemap.placeSettlement(4, 13);
+            gamemap.placeSettlement(2, 54);
+            gamemap.placeSettlement(2, 3);
+            gamemap.placeSettlement(1, 16);
+            gamemap.placeSettlement(3, 27);
+            gamemap.placeSettlement(4, 44);
+            gamemap.placeSettlement(1, 23);
+            gamemap.placeSettlement(2, 10);
+            gamemap.placeSettlement(3, 7);
+            gamemap.placeSettlement(4, 48);
+
+            gamemap.upgradeSettlement(1, 23);
+            gamemap.upgradeSettlement(2, 10);
+            gamemap.upgradeSettlement(3, 7);
+            gamemap.upgradeSettlement(4, 48);
+
+            renderGameMap(gamemap);
         }
     }
 
@@ -499,7 +513,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2021-1-15
      */
-    public void onEndTurnButtonPressed(ActionEvent actionEvent) {
+    public void onEndTurnButtonPressed() {
         lobbyService.endTurn(loggedInUser, lobbyName);
     }
 
@@ -532,78 +546,5 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMember.getKey().equals(name)) return lobbyMember;
         }
         return null;
-    }
-
-    private void renderGameMap(GameMapManagement gameMapManagement) {
-        IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
-        double width = gameMapCanvas.getWidth();
-        double height = gameMapCanvas.getHeight();
-        int maxHexesInRow = hexes[4].length;
-
-        double currentX = 0;
-        double currentY = 0;
-
-        GraphicsContext map = gameMapCanvas.getGraphicsContext2D();
-        map.setFill(Color.LIGHTBLUE);
-        map.fillRect(0, 0, width, height);
-        map.setStroke(Color.BLACK);
-        map.strokeRect(0, 0, width, height);
-
-        //Terrains
-        for (int y = 0; y < hexes.length; y++) {
-            currentX = hexWidth / 2;
-            if (hexes[y].length % 2 == 0) {
-                //Even Row
-                currentX += hexWidth / 2;
-                currentX += ((maxHexesInRow - 1 - hexes[y].length) / 2.0) * hexWidth;
-            } else {
-                //Odd Row
-                currentX += ((maxHexesInRow - hexes[y].length) / 2.0) * hexWidth;
-            }
-
-            for (int x = 0; x < hexes[y].length; x++) {
-
-                renderObject(currentX, currentY, hexes[y][x], map);
-                currentX += hexWidth;
-            }
-            currentY += (hexHeight / 4) * 3;
-        }
-
-        //Game Grid?
-        //Edges
-        //Intersections
-        //Points and Robber
-
-    }
-
-    private void renderObject(double x, double y, Object object, GraphicsContext map) {
-        if (object instanceof IWaterHex) {
-            map.setFill(Color.BLUE);
-            fillHexagon(x, y, map);
-        } else if (object instanceof DesertHex) {
-            map.setFill(Color.WHITE);
-            fillHexagon(x, y, map);
-        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Hills) {
-            map.setFill(Color.DARKORANGE);
-            fillHexagon(x, y, map);
-        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Forest) {
-            map.setFill(Color.DARKGREEN);
-            fillHexagon(x, y, map);
-        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Mountains) {
-            map.setFill(Color.DARKGREY);
-            fillHexagon(x, y, map);
-        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Fields) {
-            map.setFill(Color.YELLOW);
-            fillHexagon(x, y, map);
-        } else if (object instanceof IResourceHex && ((IResourceHex) object).getResource() == IResourceHex.resource.Pasture) {
-            map.setFill(Color.LIGHTGREEN);
-            fillHexagon(x, y, map);
-        }
-    }
-
-    private void fillHexagon(double x, double y, GraphicsContext graphicsContext) {
-        double[] xCords = {x, x + hexWidth / 2, x + hexWidth, x + hexWidth, x + hexWidth / 2, x};
-        double[] yCords = {y + (hexHeight / 4), y, y + (hexHeight / 4), y + (hexHeight / 4) * 3, y + hexHeight, y + (hexHeight / 4) * 3};
-        graphicsContext.fillPolygon(xCords, yCords, 6);
     }
 }
