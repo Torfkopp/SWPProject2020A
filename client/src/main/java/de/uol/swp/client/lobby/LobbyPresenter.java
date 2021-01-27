@@ -210,6 +210,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> lobbyMembers.remove(findMember(message.getUser().getUsername())));
     }
 
+
+
     /**
      * Updates the lobby's member list according to the list given
      * <p>

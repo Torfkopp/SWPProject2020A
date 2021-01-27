@@ -353,6 +353,20 @@ public class SceneManager {
         showError(event.getMessage());
     }
 
+    @Subscribe
+    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response){
+        Map<String, Lobby> lobbiesWithUser = response.getLobbiesWithUser();
+        for(Map.Entry<String, Lobby> entry : lobbiesWithUser.entrySet()){
+            for(int i = 0; i <= lobbyStages.size(); i++){
+                if(lobbyStages.get(i).getTitle() == entry.getKey()){
+                    lobbyStages.get(i).close();
+                    LOG.debug("Stage: " + lobbyStages.get(i).getTitle() + "wurde geschlossen");
+                }
+
+            }
+        }
+    }
+
     /**
      * Shows an error message inside an error alert
      *
