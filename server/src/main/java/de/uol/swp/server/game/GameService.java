@@ -131,11 +131,11 @@ public class GameService extends AbstractService {
             resourceMap.put("Year of Plenty Cards", inventory.getYearOfPlentyCards());
             resourceMap.put("Monopoly Cards", inventory.getMonopolyCards());
 
-            Map<String, Boolean> armyAndRoadMap = Map.of("Longest Road", inventory.isLongestRoad(),"Largest Army", inventory.isLargestArmy());
+            Map<String, Boolean> armyAndRoadMap = new HashMap<>();
+            armyAndRoadMap.put("Largest Army", inventory.isLargestArmy());
+            armyAndRoadMap.put("Longest Road", inventory.isLongestRoad());
 
-            resourceMap = Collections.unmodifiableMap(resourceMap);
-
-            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(), resourceMap, armyAndRoadMap);
+            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(), Collections.unmodifiableMap(resourceMap), Collections.unmodifiableMap(armyAndRoadMap));
             if (msg.getMessageContext().isPresent()) {
                 returnMessage.setMessageContext(msg.getMessageContext().get());
             }

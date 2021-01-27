@@ -16,6 +16,7 @@ import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -36,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -51,6 +53,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     public static final String fxml = "/fxml/LobbyView.fxml";
 
     private ObservableList<Pair<String, String>> lobbyMembers;
+    private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
 
@@ -64,11 +67,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private Button endTurn;
     @FXML
     private Text text;
+    @FXML
+    private ListView<Pair<String, String>> inventoryView;
 
     private Window window;
     @FXML
     private GridPane playField;
-
 
     /**
      * Constructor
@@ -99,6 +103,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             protected void updateItem(Pair<String, String> item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? "" : item.getValue());
+            }
+        });
+        inventoryView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Pair<String, String> item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getValue() + " " + item.getKey()); // looks like: "1 Brick"
             }
         });
     }
@@ -336,7 +347,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
     }
 
-
     /**
      * Updates the lobby's member list according to the list given
      * <p>
@@ -452,6 +462,25 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         boolean isReady = readyCheckBox.isSelected();
         RequestMessage userReadyRequest = new UserReadyRequest(this.lobbyName, this.loggedInUser, isReady);
         eventBus.post(userReadyRequest);
+    }
+
+    @Subscribe
+    private void onUpdateInventoryResponse(UpdateInventoryResponse resp) {
+        if (resp.getLobbyName().equals(this.lobbyName)) {
+            if (resourceList == null) {
+                resourceList = FXCollections.observableArrayList();
+                inventoryView.setItems(resourceList);
+            }
+            resourceList.clear();
+            for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
+                Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
+                resourceList.add(resource);
+            }
+            for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
+                Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? "Has" : "Not");
+                resourceList.add(property);
+            }
+        }
     }
 
     /**
