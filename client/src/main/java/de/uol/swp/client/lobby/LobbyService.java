@@ -91,4 +91,9 @@ public class LobbyService {
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
+
+    public void removeFromLobbies(User user){
+        Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
+        eventBus.post(removeFromLobbiesRequest);
+    }
 }

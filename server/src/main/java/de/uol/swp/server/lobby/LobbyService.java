@@ -7,10 +7,7 @@ import com.google.inject.Singleton;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
-import de.uol.swp.common.lobby.response.CreateLobbyResponse;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ServerMessage;
@@ -20,10 +17,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Handles the lobby requests sent by the users
@@ -226,5 +220,17 @@ public class LobbyService extends AbstractService {
         } else {
             LOG.error("Lobby " + lobbyName + " not found.");
         }
+    }
+
+    @Subscribe
+    private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest removeFromLobbiesRequest) {
+        User user = removeFromLobbiesRequest.getUser();
+        System.out.println(user.toString());
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()){
+            System.out.println(entry.getKey() + "/" + entry.getValue());
+        }
+        Message response = new RemoveFromLobbiesResponse();
+        post(response);
     }
 }

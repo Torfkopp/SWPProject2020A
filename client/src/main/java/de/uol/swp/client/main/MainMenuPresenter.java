@@ -437,6 +437,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onLogoutButtonPressed(ActionEvent event) {
+        lobbyService.removeFromLobbies(loggedInUser);
         logout();
         eventBus.post(showLoginViewMessage);
     }
