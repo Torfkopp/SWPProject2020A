@@ -2,14 +2,17 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -24,6 +27,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages the lobby's menu
@@ -39,6 +43,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
+    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
 
     @FXML
     private ListView<Pair<String, String>> membersView;
@@ -208,6 +213,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
         }
         Platform.runLater(() -> lobbyMembers.remove(findMember(message.getUser().getUsername())));
+    }
+
+    /**
+     * Handles leaving all Lobbies when a user logged out
+     * @param response
+     */
+    @Subscribe
+    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response){
+        for(Map.Entry<String, Lobby> entry : response.getLobbiesWithUser().entrySet()){
+            lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+        }
     }
 
 

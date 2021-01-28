@@ -12,6 +12,7 @@ import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
+import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
@@ -32,7 +33,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +52,7 @@ public class SceneManager {
 
     private final Stage primaryStage;
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
+    private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
     private Scene loginScene;
     private String lastTitle;
@@ -225,6 +229,11 @@ public class SceneManager {
         showLoginScreen();
     }
 
+    @Subscribe
+    private void onCloseLobbiesViewEvent(CloseLobbiesViewEvent event) {
+        closeLobbies();
+    }
+
     /**
      * Handles an incoming LobbyListMessage
      * <p>
@@ -276,6 +285,7 @@ public class SceneManager {
         lobbyStage.setY(primaryStage.getY() + 100);
         //Shows the window
         lobbyStage.show();
+        lobbyStages.add(lobbyStage);
     }
 
     /**
@@ -351,20 +361,6 @@ public class SceneManager {
     @Subscribe
     private void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
         showError(event.getMessage());
-    }
-
-    @Subscribe
-    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response){
-        Map<String, Lobby> lobbiesWithUser = response.getLobbiesWithUser();
-        for(Map.Entry<String, Lobby> entry : lobbiesWithUser.entrySet()){
-            for(int i = 0; i <= lobbyStages.size(); i++){
-                if(lobbyStages.get(i).getTitle() == entry.getKey()){
-                    lobbyStages.get(i).close();
-                    LOG.debug("Stage: " + lobbyStages.get(i).getTitle() + "wurde geschlossen");
-                }
-
-            }
-        }
     }
 
     /**
@@ -458,6 +454,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
+        System.out.println(lobbyStages.toString());
         showScene(loginScene, "Login");
     }
 
@@ -487,5 +484,17 @@ public class SceneManager {
     public void showChangePasswordScreen(User user) {
         ChangePasswordScene.setUserData(user);
         showScene(ChangePasswordScene, "Change Password");
+    }
+
+    /**
+     * Closes all Lobbies
+     *
+     * @since 2021-01-28
+     */
+    public void closeLobbies(){
+        for(int i= 0; i<= lobbyStages.size(); i++){
+            lobbyStages.get(i).close();
+        }
+        lobbyStages.clear();
     }
 }
