@@ -1,17 +1,12 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
-import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
-import de.uol.swp.common.game.map.Hexes.DesertHex;
-import de.uol.swp.common.game.map.Hexes.IGameHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
-import de.uol.swp.common.game.map.Hexes.IWaterHex;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
@@ -28,15 +23,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -61,7 +53,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
     private Set<User> readyUsers;
-
 
     @FXML
     private ListView<Pair<String, String>> membersView;
@@ -345,7 +336,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
         onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
     }
 
-
     /**
      * Updates the lobby's member list according to the list given
      * <p>
@@ -443,26 +433,15 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
-            //Create Test Gamemap and create Settlements, Cities and Roads
-            GameMapManagement gamemap = new GameMapManagement();
-            gamemap.placeSettlement(1, 31);
-            gamemap.placeSettlement(4, 13);
-            gamemap.placeSettlement(2, 54);
-            gamemap.placeSettlement(2, 3);
-            gamemap.placeSettlement(1, 16);
-            gamemap.placeSettlement(3, 27);
-            gamemap.placeSettlement(4, 44);
-            gamemap.placeSettlement(1, 23);
-            gamemap.placeSettlement(2, 10);
-            gamemap.placeSettlement(3, 7);
-            gamemap.placeSettlement(4, 48);
+            //Create Test GameMap and create Settlements, Cities and Roads
+            GameMapManagement gameMap = new GameMapManagement();
+            for (int i = 1; i< 55; i++) gameMap.placeSettlement((i%4)+1, i);
+            gameMap.upgradeSettlement(1, 23);
+            gameMap.upgradeSettlement(2, 10);
+            gameMap.upgradeSettlement(3, 7);
+            gameMap.upgradeSettlement(4, 48);
 
-            gamemap.upgradeSettlement(1, 23);
-            gamemap.upgradeSettlement(2, 10);
-            gamemap.upgradeSettlement(3, 7);
-            gamemap.upgradeSettlement(4, 48);
-
-            renderGameMap(gamemap);
+            renderGameMap(gameMap);
         }
     }
 

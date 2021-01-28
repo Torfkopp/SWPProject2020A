@@ -346,9 +346,10 @@ public class GameMapManagement implements IGameMapManagement {
     public boolean placeSettlement(int player, int position) {
         if (settlementPlaceable(player, position)) {
             intersections[position].setState(player + "s");
-            for (int iPos : intersections[player].getNeighbours()) {
-                intersections[iPos].setState("b");
-            }
+            //TODO: Remove comment
+//            for (int iPos : intersections[player].getNeighbours()) {
+//                intersections[iPos].setState("b");
+//            }
             return true;
         }
         return false;
@@ -375,11 +376,12 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public boolean upgradeSettlement(int player, int position) {
-        if (intersections[player].getState().equals(player + "s")) {
-            intersections[player].setState(player + "c");
+        //TODO: Remove Comment, change position to player
+        //if (intersections[position].getState().equals(player + "s")) {
+            intersections[position].setState(player + "c");
             return true;
-        }
-        return false;
+        //}
+        //return false;
     }
 
     @Override
