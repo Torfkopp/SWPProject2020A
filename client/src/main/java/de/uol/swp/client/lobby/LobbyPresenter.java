@@ -341,6 +341,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
     }
 
+
     /**
      * Updates the lobby's member list according to the list given
      * <p>
@@ -392,7 +393,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @since 2020-12-14
      */
     @FXML
-    private void onLeaveLobbyButtonPressed() {
+    private void onLeaveLobbyButtonPressed(ActionEvent event) {
         closeWindow();
     }
 
@@ -409,8 +410,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @since 2021-01-20
      */
     @FXML
-    private void onStartSessionButtonPressed(
-    ) {
+    private void onStartSessionButtonPressed(ActionEvent event) {
         RequestMessage startSessionRequest = new StartSessionRequest(this.lobbyName, this.loggedInUser);
         eventBus.post(startSessionRequest);
     }
@@ -498,7 +498,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2021-1-15
      */
-    public void onEndTurnButtonPressed() {
+    public void onEndTurnButtonPressed(ActionEvent actionEvent) {
         lobbyService.endTurn(loggedInUser, lobbyName);
     }
 

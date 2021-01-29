@@ -292,13 +292,8 @@ public class GameMapManagement implements IGameMapManagement {
         intersec[3] = new IIntersection[11];
         intersec[4] = new IIntersection[9];
         intersec[5] = new IIntersection[7];
-        for (int i = 0; i < 7; i++) {
-            intersec[0][i] = intersections[i+1];
-        }
-
-        for (int i = 0; i < 7; i++) {
-            intersec[1][i] = intersections[i + 30];
-        }
+        System.arraycopy(intersections, 1, intersec[0], 0, 7);
+        System.arraycopy(intersections, 30, intersec[1], 0, 7);
         intersec[1][7] = intersections[8];
         intersec[1][8] = intersections[9];
 
