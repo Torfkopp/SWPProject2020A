@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -23,6 +24,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
@@ -46,7 +48,7 @@ import java.util.Set;
  * @since 2020-11-21
  */
 @SuppressWarnings("UnstableApiUsage")
-public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
+public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRendering {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
 
@@ -64,6 +66,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     private Button endTurn;
     @FXML
     private Text text;
+    @FXML
+    private Canvas gameMapCanvas;
 
     private Window window;
     @FXML
@@ -441,7 +445,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
             gameMap.upgradeSettlement(3, 7);
             gameMap.upgradeSettlement(4, 48);
 
-            renderGameMap(gameMap);
+            renderGameMap(gameMap, gameMapCanvas.getWidth(), gameMapCanvas.getHeight(), gameMapCanvas.getGraphicsContext2D());
         }
     }
 
