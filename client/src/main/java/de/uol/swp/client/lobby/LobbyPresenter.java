@@ -448,7 +448,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             gameMap.upgradeSettlement(4, 48);
 
             for (int i = 1; i < 72; i++) gameMap.placeRoad((i%4)+1, i);
-            renderGameMap(gameMap, gameMapCanvas.getWidth(), gameMapCanvas.getHeight(), gameMapCanvas.getGraphicsContext2D());
+            drawGameMap(gameMap, gameMapCanvas.getWidth(), gameMapCanvas.getHeight(), gameMapCanvas.getGraphicsContext2D());
         }
     }
 
