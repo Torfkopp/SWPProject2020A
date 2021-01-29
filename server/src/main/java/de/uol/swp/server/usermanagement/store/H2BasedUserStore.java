@@ -22,7 +22,7 @@ import java.util.Optional;
  * @implNote This store will never return the password of a user!
  * @see de.uol.swp.server.usermanagement.store.AbstractUserStore
  * @see de.uol.swp.server.usermanagement.store.UserStore
- * @since 2020-01-20
+ * @since 2021-01-20
  */
 public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
@@ -40,10 +40,12 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             conn.setAutoCommit(true);
 
             String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
+                    "id int NOT NULL AUTO_INCREMENT, " +
                     "username VARCHAR(255), " +
                     "mail VARCHAR(255), " +
                     "pass VARCHAR(255), " +
-                    "PRIMARY KEY (username))";
+                    "PRIMARY KEY (username)," +
+                    "UNIQUE (id))";
 
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
@@ -73,8 +75,9 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT username, mail, pass FROM USERDB";
+            String sql = "SELECT * FROM USERDB WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -114,8 +117,9 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT username, mail, pass FROM USERDB";
+            String sql = "SELECT * FROM USERDB WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -161,7 +165,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "INSERT INTO USERDB VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, mail = ?, pass = ?";
+            String sql = "INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, mail = ?, pass = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.setString(2, eMail);
@@ -253,6 +257,15 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         }
     }
 
+    /**
+     * This method dumps the whole database and puts
+     * the data from each row into a UserDTO which then
+     * gets put into a list.
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     @Override
     public List<User> getAllUsers() {
         createTable();
@@ -264,7 +277,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT username, mail, pass FROM USERDB";
+            String sql = "SELECT * FROM USERDB";
             pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
 
