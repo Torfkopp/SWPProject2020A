@@ -243,7 +243,6 @@ public class LobbyService extends AbstractService {
     @Subscribe
     private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest removeFromLobbiesRequest) {
         User user = removeFromLobbiesRequest.getUser();
-        System.out.println(user.toString());
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
         Map<String, Lobby> lobbiesWithUser = new HashMap<>();
         for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
@@ -259,7 +258,6 @@ public class LobbyService extends AbstractService {
                     sendToAll(new LobbyDeletedMessage(lobbyName));
                 }
             }
-            System.out.println(lobbiesWithUser.toString());
         }
         Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
         post(response);
