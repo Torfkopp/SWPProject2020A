@@ -282,7 +282,7 @@ public class SceneManager {
         lobbyStage.setTitle(lobbyName);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 600, 400);
+        Scene lobbyScene = new Scene(rootPane, 630, 400);
         lobbyScene.getStylesheets().add(styleSheet);
         lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene

@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
@@ -74,6 +75,18 @@ public class LobbyService {
     public void leaveLobby(String lobbyName, User user) {
         Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
+    }
+
+    /**
+     * Posts a request to end the turn onto the Event
+     *
+     * @param user User who wants to end the turn
+     * @see EndTurnRequest
+     * @since 2021-1-15
+     */
+    public void endTurn(User user, String lobbyName) {
+        Message endTurnRequest = new EndTurnRequest(user, lobbyName);
+        eventBus.post(endTurnRequest);
     }
 
     /**

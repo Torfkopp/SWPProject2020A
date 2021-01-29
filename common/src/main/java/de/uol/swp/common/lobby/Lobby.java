@@ -64,4 +64,34 @@ public interface Lobby extends Serializable {
      * @since 2019-10-08
      */
     Set<User> getUsers();
+
+    /**
+     * Sets a user as ready
+     *
+     * @param user The user to mark as ready
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
+    void setUserReady(User user);
+
+    /**
+     * Marks a user as not ready.
+     *
+     * @param user The user to mark as not ready
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
+    void unsetUserReady(User user);
+
+    /**
+     * Gets a set of all users marked as ready.
+     *
+     * @return A Set containing all ready users
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-19
+     */
+    Set<User> getReadyUsers();
 }

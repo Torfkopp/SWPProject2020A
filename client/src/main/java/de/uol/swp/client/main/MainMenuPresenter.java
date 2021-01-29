@@ -378,7 +378,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * to create a new lobby. This lobby will get a unique name and registers the user as its creator.
      *
      * @param event The ActionEvent created by pressing the CreateLobbyButton
-     * @author Mario and Marvin
+     * @author Mario
+     * @author Marvin
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2020-12-11
      */
