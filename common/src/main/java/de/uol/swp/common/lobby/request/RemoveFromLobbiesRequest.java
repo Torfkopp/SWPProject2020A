@@ -7,21 +7,18 @@ public class RemoveFromLobbiesRequest extends AbstractRequestMessage {
 
     private User user;
 
-    public RemoveFromLobbiesRequest() {
-    }
-
     /**
      * Constructor
      *
-     * @param user      User who wants to logout
+     * @param user User who wants to logout
+     * @author Finn Haase
      * @since 2021-01-28
      */
-    public RemoveFromLobbiesRequest(User user){
-        System.out.println("Request");
+    public RemoveFromLobbiesRequest(User user) {
         this.user = user;
     }
 
-    public User getUser(){
+    public User getUser() {
         return user;
     }
 }

@@ -435,6 +435,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
+     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2020-11-02

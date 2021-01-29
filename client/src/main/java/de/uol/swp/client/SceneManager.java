@@ -229,6 +229,17 @@ public class SceneManager {
         showLoginScreen();
     }
 
+    /**
+     * Handles the CloseLobbiesViewEvent detected on the EventBus
+     * <p>
+     * If a CloseLobbiesEvent is detected on the EventBus, this method gets called.
+     * It calls a method to close all lobby screens.
+     *
+     * @param event The CloseLobbiesViewEvent detected on the EventBus
+     * @author Finn Haase
+     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
+     * @since 2021-01-28
+     */
     @Subscribe
     private void onCloseLobbiesViewEvent(CloseLobbiesViewEvent event) {
         closeLobbies();
@@ -489,11 +500,13 @@ public class SceneManager {
     /**
      * Closes all Lobbies
      *
+     * @author Finn Haase
+     * @author Aldin Dervisi
      * @since 2021-01-28
      */
-    public void closeLobbies(){
-        for(int i= 0; i<= lobbyStages.size(); i++){
-            lobbyStages.get(i).close();
+    public void closeLobbies() {
+        for (Stage lobbyStage : lobbyStages) {
+            lobbyStage.close();
         }
         lobbyStages.clear();
     }

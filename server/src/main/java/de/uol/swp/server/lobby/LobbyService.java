@@ -224,13 +224,15 @@ public class LobbyService extends AbstractService {
 
     /**
      * Handles a RemoveFromLobbiesRequest found on the EventBus
-     *
+     * <p>
      * If a RemoveFromLobbiesRequest is detected on the EventBus, this method is called.
      * It removes a user from a lobby stored in the LobbyManagement and sends a
      * UserLeftLobbyMessage to every user in the lobby.
      * It posts a RemoveFromLobbiesResponse containing a Map of the Lobbies where the user is in.
      *
      * @param removeFromLobbiesRequest The RemoveFromLobbiesRequest found on the EventBus
+     * @author Finn Haase
+     * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
      * @see de.uol.swp.common.lobby.Lobby
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
@@ -242,25 +244,22 @@ public class LobbyService extends AbstractService {
         System.out.println(user.toString());
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
         Map<String, Lobby> lobbiesWithUser = new HashMap<>();
-        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()){
-            if(entry.getValue().getUsers().contains(user)){
-                Optional<Lobby> lobby = lobbyManagement.getLobby(entry.getKey());
-                lobbiesWithUser.put(entry.getKey(), entry.getValue());
-                if(lobby.isPresent()) {
-                    try {
-                        lobby.get().leaveUser(user);
-                        sendToAllInLobby(entry.getKey(), new UserLeftLobbyMessage(entry.getKey(), user));
-                    } catch (IllegalArgumentException exception) {
-                        lobbyManagement.dropLobby(lobby.get().getName());
-                        sendToAll(new LobbyDeletedMessage(entry.getKey()));
-                    }
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            if (entry.getValue().getUsers().contains(user)) {
+                Lobby lobby = entry.getValue();
+                String lobbyName = entry.getKey();
+                lobbiesWithUser.put(entry.getKey(), lobby);
+                try {
+                    lobby.leaveUser(user);
+                    sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, user));
+                } catch (IllegalArgumentException exception) {
+                    lobbyManagement.dropLobby(lobbyName);
+                    sendToAll(new LobbyDeletedMessage(lobbyName));
                 }
             }
             System.out.println(lobbiesWithUser.toString());
-
         }
         Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
         post(response);
-
     }
 }

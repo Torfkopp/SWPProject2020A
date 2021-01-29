@@ -9,14 +9,15 @@ public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
 
     private final Map<String, Lobby> lobbiesWithUser;
 
-
     /**
      * Constructor
      *
      * @param lobbiesWithUser The Map with the Lobbies
+     * @author Finn Haase
+     * @author Aldin Dervisi
      * @since 2020-01-28
      **/
-    public RemoveFromLobbiesResponse(Map<String, Lobby> lobbiesWithUser){
+    public RemoveFromLobbiesResponse(Map<String, Lobby> lobbiesWithUser) {
         this.lobbiesWithUser = lobbiesWithUser;
     }
 
@@ -26,7 +27,7 @@ public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
      * @return Map getLobbiesWithUser
      * @since 2020-01-28
      */
-    public Map<String, Lobby> getLobbiesWithUser(){
+    public Map<String, Lobby> getLobbiesWithUser() {
         return lobbiesWithUser;
     }
 }

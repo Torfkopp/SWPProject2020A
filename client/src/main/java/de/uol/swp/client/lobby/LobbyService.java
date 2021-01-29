@@ -92,7 +92,14 @@ public class LobbyService {
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
 
-    public void removeFromLobbies(User user){
+    /**
+     * Posts a request to remove the user from all lobbies
+     *
+     * @param user the logged in user
+     * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
+     * @since 2021-01-28
+     */
+    public void removeFromLobbies(User user) {
         Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
         eventBus.post(removeFromLobbiesRequest);
     }

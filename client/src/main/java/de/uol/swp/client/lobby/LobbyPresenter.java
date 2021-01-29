@@ -217,16 +217,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     /**
      * Handles leaving all Lobbies when a user logged out
-     * @param response
+     * <p>
+     * If a new RemoveFromLobbiesResponse is posted onto the EventBus the
+     * method leaveLobby in LobbyService is called for every Lobby the user
+     * is in.
+     *
+     * @param response the RemoveFromLobbiesResponse seen on the EventBus
+     * @author Finn Haase
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
+     * @since 2021-01-28
      */
     @Subscribe
-    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response){
-        for(Map.Entry<String, Lobby> entry : response.getLobbiesWithUser().entrySet()){
+    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response) {
+        for (Map.Entry<String, Lobby> entry : response.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
         }
     }
-
-
 
     /**
      * Updates the lobby's member list according to the list given
