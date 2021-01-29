@@ -441,12 +441,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             //TODO: Remove following Code
             //Create Test GameMap and create Settlements, Cities and Roads
             GameMapManagement gameMap = new GameMapManagement();
-            for (int i = 1; i< 55; i++) gameMap.placeSettlement((i%4)+1, i);
+            for (int i = 1; i < 55; i++) gameMap.placeSettlement((i%4)+1, i);
             gameMap.upgradeSettlement(1, 23);
             gameMap.upgradeSettlement(2, 10);
             gameMap.upgradeSettlement(3, 7);
             gameMap.upgradeSettlement(4, 48);
 
+            for (int i = 1; i < 72; i++) gameMap.placeRoad((i%4)+1, i);
             renderGameMap(gameMap, gameMapCanvas.getWidth(), gameMapCanvas.getHeight(), gameMapCanvas.getGraphicsContext2D());
         }
     }

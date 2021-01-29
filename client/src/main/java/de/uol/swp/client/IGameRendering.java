@@ -5,20 +5,24 @@ import de.uol.swp.common.game.map.Hexes.DesertHex;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
 import de.uol.swp.common.game.map.Hexes.IWaterHex;
+import de.uol.swp.common.game.map.IEdge;
 import de.uol.swp.common.game.map.IIntersection;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.Arrays;
+
 public interface IGameRendering {
 
     default void renderGameMap(GameMapManagement gameMapManagement, double width, double height, GraphicsContext mapCtx) {
-        double hexHeight, hexWidth, settlementSize, citySize, startX;
+        double hexHeight, hexWidth, settlementSize, roadWidth, citySize, startX;
         int maxHexesInRow, maxIntersectionsInRow;
 
         hexHeight = height / 7.0;
         hexWidth = (Math.sqrt(3) / 2) * hexHeight;
         settlementSize = hexHeight / 5.0;
         citySize = hexHeight / 4.0;
+        roadWidth = settlementSize / 4.0;
         maxHexesInRow = 7;
         maxIntersectionsInRow = 11;
         //startX = hexWidth / 2.0;
@@ -26,6 +30,7 @@ public interface IGameRendering {
 
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
+        IEdge[][] edges = gameMapManagement.getEdgesAsJaggedArrayWithNullFiller();
 
         mapCtx.setFill(Color.LIGHTBLUE);
         mapCtx.fillRect(0, 0, width, height);
@@ -33,8 +38,9 @@ public interface IGameRendering {
         mapCtx.strokeRect(0, 0, width, height);
 
         drawHexTiles(hexes, startX, hexWidth, hexHeight, maxHexesInRow, mapCtx);
-        drawIntersections(intersections, startX, hexWidth, hexHeight, maxIntersectionsInRow, settlementSize, citySize, mapCtx);
+        drawIntersections(intersections, edges, startX, hexWidth, hexHeight, maxIntersectionsInRow, settlementSize, citySize, roadWidth, mapCtx);
 
+        //Harbors
         //Edges
         //Robber
 
@@ -63,9 +69,9 @@ public interface IGameRendering {
         }
     }
 
-    private void drawIntersections(IIntersection[][] intersections,
+    private void drawIntersections(IIntersection[][] intersections, IEdge[][] edges,
                                    double startX, double hexWidth, double hexHeight, int maxIntersectionsInRow,
-                                   double settlementSize, double citySize, GraphicsContext mapCtx) {
+                                   double settlementSize, double citySize, double roadWidth, GraphicsContext mapCtx) {
         double currentX = startX;
         double currentY = 0;
         currentY = hexHeight * (3.0 / 4.0);
@@ -80,7 +86,8 @@ public interface IGameRendering {
 
             currentX = rowStartX + hexWidth;
             currentY += (hexHeight / 4.0);
-            for (int x = 0; x < intersections[y].length; x = x + 2) {
+            for (int x = 0, xEdges = 0; x < intersections[y].length; x = x + 2, xEdges = xEdges + 3) {
+                renderEdges(currentX, currentY, Arrays.copyOfRange(edges[y], xEdges, xEdges + 3), roadWidth, hexWidth, hexHeight, mapCtx);
                 renderIntersection(currentX, currentY, intersections[y][x], settlementSize, citySize, mapCtx);
                 currentX += hexWidth;
             }
@@ -98,12 +105,43 @@ public interface IGameRendering {
 
             currentX = rowStartX + hexWidth + startX + hexWidth / 2.0;
             currentY += (hexHeight / 4.0);
-            for (int x = 1; x < intersections[y].length; x = x + 2) {
+            for (int x = 1, xEdges = 0; x < intersections[y].length; x = x + 2, xEdges = xEdges + 3) {
+                renderEdges(currentX, currentY, Arrays.copyOfRange(edges[y], xEdges, xEdges + 3), roadWidth, hexWidth, hexHeight, mapCtx);
                 renderIntersection(currentX, currentY, intersections[y][x], settlementSize, citySize, mapCtx);
                 currentX += hexWidth;
             }
             currentY += hexHeight / 2.0;
         }
+    }
+
+    private void renderEdges(double currentX, double currentY, IEdge[] edges, double roadWidth, double hexWidth, double hexHeight, GraphicsContext mapCtx){
+        IEdge leftRoad = edges[0];
+        IEdge downRoad = edges[1];
+        IEdge rightRoad = edges[2];
+        //leftRoad
+        mapCtx.setLineWidth(roadWidth);
+
+        System.out.println("-----------------");
+
+        if (leftRoad != null && leftRoad.getState() != 0) {
+            System.out.println(String.valueOf(leftRoad.getState()));
+            mapCtx.setStroke(setColor(String.valueOf(leftRoad.getState())));
+            mapCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+        }
+
+        if (rightRoad != null && rightRoad.getState() != 0) {
+            System.out.println(rightRoad.getState());
+            mapCtx.setStroke(setColor(String.valueOf(rightRoad.getState())));
+            mapCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+
+        }
+
+        if (downRoad != null && downRoad.getState() != 0) {
+            System.out.println(downRoad.getState());
+            mapCtx.setStroke(setColor(String.valueOf(downRoad.getState())));
+            mapCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
+        }
+
     }
 
     private void renderIntersection(double x, double y, IIntersection intersection,
@@ -124,13 +162,13 @@ public interface IGameRendering {
     }
 
     private Color setColor(String player) {
-        if (player.startsWith("1")) {
+        if (player.startsWith("1") || player.equals("1")) {
             return Color.BLACK;
-        } else if (player.startsWith("2")) {
+        } else if (player.startsWith("2") || player.equals("2")) {
             return Color.RED;
-        } else if (player.startsWith("3")) {
-            return Color.ORANGE;
-        } else if (player.startsWith("4")) {
+        } else if (player.startsWith("3") || player.equals("3")) {
+            return Color.PINK;
+        } else if (player.startsWith("4") || player.equals("4")) {
             return Color.WHITE;
         }
         return null;

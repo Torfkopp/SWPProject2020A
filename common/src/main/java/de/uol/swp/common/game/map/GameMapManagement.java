@@ -337,6 +337,107 @@ public class GameMapManagement implements IGameMapManagement {
         return intersec;
     }
 
+    public IEdge[][] getEdgesAsJaggedArrayWithNullFiller(){
+        IEdge[][] edgeArray;
+        edgeArray = new IEdge[6][];
+        edgeArray[0] = new IEdge[12];
+        edgeArray[1] = new IEdge[15];
+        edgeArray[2] = new IEdge[18];
+        edgeArray[3] = new IEdge[15];
+        edgeArray[4] = new IEdge[12];
+        edgeArray[5] = new IEdge[9];
+
+        edgeArray[0][0] = null;
+        edgeArray[0][1] = edges[30];
+        edgeArray[0][2] = edges[1];
+        edgeArray[0][3] = edges[2];
+        edgeArray[0][4] = edges[31];
+        edgeArray[0][5] = edges[3];
+        edgeArray[0][6] = edges[4];
+        edgeArray[0][7] = edges[32];
+        edgeArray[0][8] = edges[5];
+        edgeArray[0][9] = edges[6];
+        edgeArray[0][10] = edges[33];
+        edgeArray[0][11] = null;
+
+        edgeArray[1][0] = null;
+        edgeArray[1][1] = edges[28];
+        edgeArray[1][2] = edges[29];
+        edgeArray[1][3] = edges[42];
+        edgeArray[1][4] = edges[60];
+        edgeArray[1][5] = edges[43];
+        edgeArray[1][6] = edges[44];
+        edgeArray[1][7] = edges[61];
+        edgeArray[1][8] = edges[45];
+        edgeArray[1][9] = edges[46];
+        edgeArray[1][10] = edges[1];
+        edgeArray[1][11] = edges[62];
+        edgeArray[1][12] = edges[33];
+        edgeArray[1][13] = edges[8];
+        edgeArray[1][14] = null;
+
+        edgeArray[2][0] = null;
+        edgeArray[2][1] = edges[26];
+        edgeArray[2][2] = edges[27];
+        edgeArray[2][3] = edges[41];
+        edgeArray[2][4] = edges[58];
+        edgeArray[2][5] = edges[59];
+        edgeArray[2][6] = edges[66];
+        edgeArray[2][7] = edges[72];
+        edgeArray[2][8] = edges[67];
+        edgeArray[2][9] = edges[68];
+        edgeArray[2][10] = edges[69];
+        edgeArray[2][11] = edges[62];
+        edgeArray[2][12] = edges[48];
+        edgeArray[2][13] = edges[49];
+        edgeArray[2][14] = edges[34];
+        edgeArray[2][15] = edges[10];
+        edgeArray[2][16] = edges[11];
+        edgeArray[2][17] = null;
+
+        edgeArray[3][0] = edges[25];
+        edgeArray[3][1] = edges[24];
+        edgeArray[3][2] = edges[40];
+        edgeArray[3][3] = edges[57];
+        edgeArray[3][4] = edges[56];
+        edgeArray[3][5] = edges[65];
+        edgeArray[3][6] = edges[71];
+        edgeArray[3][7] = edges[64];
+        edgeArray[3][8] = edges[70];
+        edgeArray[3][9] = edges[63];
+        edgeArray[3][10] = edges[51];
+        edgeArray[3][11] = edges[50];
+        edgeArray[3][12] = edges[35];
+        edgeArray[3][13] = edges[13];
+        edgeArray[3][14] = edges[12];
+
+        edgeArray[4][0] = edges[23];
+        edgeArray[4][1] = edges[22];
+        edgeArray[4][2] = edges[39];
+        edgeArray[4][3] = edges[55];
+        edgeArray[4][4] = edges[38];
+        edgeArray[4][5] = edges[54];
+        edgeArray[4][6] = edges[53];
+        edgeArray[4][7] = edges[37];
+        edgeArray[4][8] = edges[52];
+        edgeArray[4][9] = edges[36];
+        edgeArray[4][10] = edges[15];
+        edgeArray[4][11] = edges[14];
+
+        edgeArray[5][0] = null;
+        edgeArray[5][1] = edges[21];
+        edgeArray[5][1] = null;
+        edgeArray[5][2] = edges[20];
+        edgeArray[5][3] = edges[19];
+        edgeArray[5][4] = null;
+        edgeArray[5][5] = edges[18];
+        edgeArray[5][6] = edges[17];
+        edgeArray[5][7] = null;
+        edgeArray[5][8] = edges[16];
+
+        return edgeArray;
+    }
+
     @Override
     public boolean placeSettlement(int player, int position) {
         if (settlementPlaceable(player, position)) {
@@ -352,11 +453,12 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public boolean placeRoad(int player, int position) {
-        if (roadPlaceable(player, position)) {
+        //TODO: Uncomment
+        //if (roadPlaceable(player, position)) {
             edges[position].setState(player);
             return true;
-        }
-        return false;
+        //}
+        //return false;
     }
 
     @Override
@@ -371,7 +473,7 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public boolean upgradeSettlement(int player, int position) {
-        //TODO: Remove Comment, change position to player
+        //TODO: Remove Comment
         //if (intersections[position].getState().equals(player + "s")) {
             intersections[position].setState(player + "c");
             return true;
