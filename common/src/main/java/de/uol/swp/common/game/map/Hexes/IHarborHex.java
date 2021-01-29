@@ -10,6 +10,13 @@ package de.uol.swp.common.game.map.Hexes;
 public interface IHarborHex extends IWaterHex {
 
     /**
+     * Gets the side to which the harbor faces
+     *
+     * @return Side
+     */
+    int getSide();
+
+    /**
      * Gets the harbor's resource
      *
      * @return Resource

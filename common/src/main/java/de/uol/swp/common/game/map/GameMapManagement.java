@@ -32,23 +32,23 @@ public class GameMapManagement implements IGameMapManagement {
         //Creating the hexes
         //
         //Circle of water and harbor hexes (clockwise)
-        hexes[1] = new HarborHex(1, IHarborHex.resource.Ore);
+        hexes[1] = new HarborHex(1, 4, IHarborHex.resource.Ore);
         hexes[2] = new WaterHex();
-        hexes[3] = new HarborHex(2, IHarborHex.resource.Wool);
+        hexes[3] = new HarborHex(2, 5, IHarborHex.resource.Wool);
         hexes[4] = new WaterHex();
-        hexes[5] = new HarborHex(3, IHarborHex.resource.Any);
+        hexes[5] = new HarborHex(3, 0, IHarborHex.resource.Any);
         hexes[6] = new WaterHex();
-        hexes[7] = new HarborHex(12, IHarborHex.resource.Any);
+        hexes[7] = new HarborHex(12, 0, IHarborHex.resource.Any);
         hexes[8] = new WaterHex();
-        hexes[9] = new HarborHex(19, IHarborHex.resource.Grain);
+        hexes[9] = new HarborHex(19, 0, IHarborHex.resource.Grain);
         hexes[10] = new WaterHex();
-        hexes[11] = new HarborHex(19, IHarborHex.resource.Any);
+        hexes[11] = new HarborHex(19, 2, IHarborHex.resource.Any);
         hexes[12] = new WaterHex();
-        hexes[13] = new HarborHex(17, IHarborHex.resource.Brick);
+        hexes[13] = new HarborHex(17, 2, IHarborHex.resource.Brick);
         hexes[14] = new WaterHex();
-        hexes[15] = new HarborHex(8, IHarborHex.resource.Any);
+        hexes[15] = new HarborHex(8, 2, IHarborHex.resource.Any);
         hexes[16] = new WaterHex();
-        hexes[17] = new HarborHex(4, IHarborHex.resource.Lumber);
+        hexes[17] = new HarborHex(4, 3, IHarborHex.resource.Lumber);
         hexes[18] = new WaterHex();
         //Outer circle of resource hexes
         hexes[19] = new ResourceHex(IResourceHex.resource.Fields, 4);

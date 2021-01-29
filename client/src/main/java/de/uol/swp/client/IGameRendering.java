@@ -1,10 +1,7 @@
 package de.uol.swp.client;
 
 import de.uol.swp.common.game.map.GameMapManagement;
-import de.uol.swp.common.game.map.Hexes.DesertHex;
-import de.uol.swp.common.game.map.Hexes.IGameHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
-import de.uol.swp.common.game.map.Hexes.IWaterHex;
+import de.uol.swp.common.game.map.Hexes.*;
 import de.uol.swp.common.game.map.IEdge;
 import de.uol.swp.common.game.map.IIntersection;
 import javafx.scene.canvas.GraphicsContext;
@@ -40,8 +37,6 @@ public interface IGameRendering {
         drawHexTiles(hexes, startX, hexWidth, hexHeight, maxHexesInRow, mapCtx);
         drawIntersections(intersections, edges, startX, hexWidth, hexHeight, maxIntersectionsInRow, settlementSize, citySize, roadWidth, mapCtx);
 
-        //Harbors
-        //Edges
         //Robber
 
     }
@@ -121,23 +116,18 @@ public interface IGameRendering {
         //leftRoad
         mapCtx.setLineWidth(roadWidth);
 
-        System.out.println("-----------------");
-
         if (leftRoad != null && leftRoad.getState() != 0) {
-            System.out.println(String.valueOf(leftRoad.getState()));
             mapCtx.setStroke(setColor(String.valueOf(leftRoad.getState())));
             mapCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
         }
 
         if (rightRoad != null && rightRoad.getState() != 0) {
-            System.out.println(rightRoad.getState());
             mapCtx.setStroke(setColor(String.valueOf(rightRoad.getState())));
             mapCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
 
         }
 
         if (downRoad != null && downRoad.getState() != 0) {
-            System.out.println(downRoad.getState());
             mapCtx.setStroke(setColor(String.valueOf(downRoad.getState())));
             mapCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
         }
@@ -176,7 +166,7 @@ public interface IGameRendering {
 
     private void renderHex(double x, double y, IGameHex hex, double hexWidth, double hexHeight, GraphicsContext mapCtx) {
         if (hex instanceof IWaterHex) {
-            mapCtx.setFill(Color.BLUE);
+            mapCtx.setFill(Color.CORNFLOWERBLUE);
         } else if (hex instanceof DesertHex) {
             mapCtx.setFill(Color.WHITE);
         } else if (hex instanceof IResourceHex && ((IResourceHex) hex).getResource() == IResourceHex.resource.Hills) {
@@ -200,5 +190,54 @@ public interface IGameRendering {
         mapCtx.setStroke(Color.BLACK);
         mapCtx.setLineWidth(2);
         mapCtx.strokePolygon(xCords, yCords, 6);
+
+        if (hex instanceof IHarborHex) {
+            mapCtx.setStroke(Color.SLATEGREY);
+            mapCtx.setLineWidth(hexWidth / 5.0);
+            switch (((IHarborHex) hex).getSide()) {
+                case 0:
+                    mapCtx.strokeLine(x + hexWidth / 8.0, y + hexHeight / 4.0, x + hexWidth / 8.0, y + hexHeight * (3.0 / 4.0));
+                    break;
+                case 1:
+                    mapCtx.strokeLine( x + hexWidth / 8.0, y + hexHeight / 4.0, x + hexWidth * ( 3.0/ 8.0), y);
+                    break;
+                case 2:
+                    mapCtx.strokeLine(  x + hexWidth * ( 3.0/ 8.0), y, x + hexWidth * ( 7.0 / 8.0), y + hexHeight / 4.0);
+                    break;
+                case 3:
+                    mapCtx.strokeLine(x + hexWidth * ( 15.0 / 16.0), y + hexHeight *( 5.0 / 16.0), x + hexWidth * ( 15.0 / 16.0), y + hexHeight * (11.0 / 16.0));
+                    break;
+                case 4:
+                    mapCtx.strokeLine( x + hexWidth * ( 9.0 / 16.0), y + hexHeight * ( 15.0 / 16.0) , x + hexWidth * ( 15.0/ 16.0), y + hexHeight * (13.0 / 16.0));
+                    break;
+                case 5:
+                    mapCtx.strokeLine( x + hexWidth / 16.0, y + hexHeight * (13.0 / 16.0), x + hexWidth * (7.0 / 16.0), y + hexHeight * (15.0 / 16.0));
+                    break;
+            }
+            String text = "";
+            switch (((IHarborHex) hex).getResource()) {
+                case Brick:
+                    text = "Brick";
+                    break;
+                case Lumber:
+                    text = "Lumber";
+                    break;
+                case Ore:
+                    text = "Ore";
+                    break;
+                case Grain:
+                    text = "Grain";
+                    break;
+                case Wool:
+                    text = "Whool";
+                    break;
+                case Any:
+                    text = "Any";
+                    break;
+            }
+            mapCtx.setFill(Color.BLACK);
+            mapCtx.fillText(text, x + hexWidth / 8.0, y + hexHeight / 2.0);
+            return;
+        }
     }
 }
