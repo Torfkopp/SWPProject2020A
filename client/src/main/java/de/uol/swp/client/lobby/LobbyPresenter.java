@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.IGameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -437,6 +438,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
+            //TODO: Remove following Code
             //Create Test GameMap and create Settlements, Cities and Roads
             GameMapManagement gameMap = new GameMapManagement();
             for (int i = 1; i< 55; i++) gameMap.placeSettlement((i%4)+1, i);

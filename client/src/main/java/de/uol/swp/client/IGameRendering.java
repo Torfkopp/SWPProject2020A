@@ -1,4 +1,4 @@
-package de.uol.swp.client.lobby;
+package de.uol.swp.client;
 
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.Hexes.DesertHex;
