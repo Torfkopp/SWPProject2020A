@@ -1,210 +1,417 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Diagram>
   <ID>JAVA</ID>
-  <OriginalElement />
+  <OriginalElement>de.uol.swp.common</OriginalElement>
   <nodes>
-    <node x="306.0" y="405.0">de.uol.swp.common.exception.SecurityException</node>
-    <node x="3004.0" y="250.0">de.uol.swp.common.user.message.UserLoggedInMessage</node>
-    <node x="535.0" y="405.0">de.uol.swp.common.MyObjectDecoder</node>
-    <node x="169.0" y="405.0">de.uol.swp.common.user.User</node>
-    <node x="157.0" y="485.0">de.uol.swp.common.user.UserDTO</node>
-    <node x="336.0" y="250.0">de.uol.swp.common.user.request.RegisterUserRequest</node>
-    <node x="2682.0" y="170.0">de.uol.swp.common.message.AbstractServerMessage</node>
-    <node x="2108.0" y="330.0">de.uol.swp.common.lobby.message.UserJoinedLobbyMessage</node>
-    <node x="1800.0" y="250.0">de.uol.swp.common.user.response.AllOnlineUsersResponse</node>
-    <node x="1548.0" y="170.0">de.uol.swp.common.message.AbstractResponseMessage</node>
-    <node x="2580.0" y="250.0">de.uol.swp.common.user.message.UserLoggedOutMessage</node>
-    <node x="2808.0" y="250.0">de.uol.swp.common.user.message.UsersListMessage</node>
-    <node x="2580.0" y="330.0">de.uol.swp.common.lobby.message.LobbyCreatedMessage</node>
-    <node x="324.0" y="170.0">de.uol.swp.common.message.AbstractRequestMessage</node>
-    <node x="2352.0" y="330.0">de.uol.swp.common.lobby.message.UserLeftLobbyMessage</node>
-    <node x="1166.0" y="405.0">de.uol.swp.common.user.Session</node>
-    <node x="748.0" y="405.0">de.uol.swp.common.MyObjectEncoder</node>
-    <node x="0.0" y="250.0">de.uol.swp.common.user.request.LogoutRequest</node>
-    <node x="1548.0" y="250.0">de.uol.swp.common.user.response.LoginSuccessfulResponse</node>
-    <node x="1825.292" y="80.0">de.uol.swp.common.message.AbstractMessage</node>
-    <node x="2044.0" y="250.0">de.uol.swp.common.user.response.RegistrationSuccessfulResponse</node>
-    <node x="172.0" y="250.0">de.uol.swp.common.user.request.LoginRequest</node>
-    <node x="1352.0" y="250.0">de.uol.swp.common.message.ExceptionMessage</node>
-    <node x="12.000000000000114" y="405.0">de.uol.swp.common.lobby.Lobby</node>
-    <node x="556.0" y="250.0">de.uol.swp.common.user.request.UpdateUserRequest</node>
-    <node x="2352.0" y="250.0">de.uol.swp.common.lobby.message.AbstractLobbyMessage</node>
-    <node x="1060.0" y="250.0">de.uol.swp.common.user.exception.RegistrationExceptionMessage</node>
-    <node x="1486.0" y="80.0">de.uol.swp.common.message.ResponseMessage</node>
-    <node x="961.0" y="405.0">de.uol.swp.common.message.MessageContext</node>
-    <node x="2768.0" y="80.0">de.uol.swp.common.message.ServerMessage</node>
-    <node x="1612.0" y="0.0">de.uol.swp.common.message.Message</node>
-    <node x="300.0" y="80.0">de.uol.swp.common.message.RequestMessage</node>
-    <node x="760.0" y="250.0">de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest</node>
-    <node x="0.0" y="485.0">de.uol.swp.common.lobby.dto.LobbyDTO</node>
+    <node x="2104.0" y="300.0">de.uol.swp.common.user.response.UserDeletionSuccessfulResponse</node>
+    <node x="5671.0" y="380.0">de.uol.swp.common.chat.request.NewChatMessageRequest</node>
+    <node x="4128.0" y="300.0">de.uol.swp.common.user.message.UserLoggedInMessage</node>
+    <node x="374.0" y="455.0">de.uol.swp.common.user.User</node>
+    <node x="740.0" y="455.0">de.uol.swp.common.MyObjectDecoder</node>
+    <node x="8143.0" y="300.0">de.uol.swp.common.user.request.DeleteUserRequest</node>
+    <node x="362.0" y="535.0">de.uol.swp.common.user.UserDTO</node>
+    <node x="6435.0" y="380.0">de.uol.swp.common.lobby.request.LobbyJoinUserRequest</node>
+    <node x="7923.0" y="300.0">de.uol.swp.common.user.request.RegisterUserRequest</node>
+    <node x="3043.254320987655" y="380.0">de.uol.swp.common.lobby.message.UserJoinedLobbyMessage</node>
+    <node x="4232.0" y="170.0">de.uol.swp.common.message.AbstractServerMessage</node>
+    <node x="6151.0" y="380.0">de.uol.swp.common.chat.request.AskLatestChatMessageRequest</node>
+    <node x="0.0" y="535.0">de.uol.swp.common.chat.dto.ChatMessageDTO</node>
+    <node x="3460.0" y="300.0">de.uol.swp.common.user.response.AllOnlineUsersResponse</node>
+    <node x="4348.0" y="300.0">de.uol.swp.common.user.message.UserLoggedOutMessage</node>
+    <node x="6655.0" y="300.0">de.uol.swp.common.lobby.request.AbstractLobbyRequest</node>
+    <node x="3592.0" y="380.0">de.uol.swp.common.lobby.message.UserLeftLobbyMessage</node>
+    <node x="1371.0" y="455.0">de.uol.swp.common.user.Session</node>
+    <node x="5411.0" y="380.0">de.uol.swp.common.chat.request.DeleteChatMessageRequest</node>
+    <node x="953.0" y="455.0">de.uol.swp.common.MyObjectEncoder</node>
+    <node x="1812.0" y="300.0">de.uol.swp.common.chat.response.AskLatestChatMessageResponse</node>
+    <node x="3820.0" y="380.0">de.uol.swp.common.lobby.message.LobbyDeletedMessage</node>
+    <node x="960.0" y="300.0">de.uol.swp.common.user.response.LoginSuccessfulResponse</node>
+    <node x="6883.0" y="300.0">de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest</node>
+    <node x="1212.0" y="300.0">de.uol.swp.common.user.exception.ChangePasswordExceptionMessage</node>
+    <node x="7759.0" y="300.0">de.uol.swp.common.user.request.LoginRequest</node>
+    <node x="220.0" y="300.0">de.uol.swp.common.message.ExceptionMessage</node>
+    <node x="217.0" y="455.0">de.uol.swp.common.lobby.Lobby</node>
+    <node x="5175.0" y="300.0">de.uol.swp.common.user.request.UpdateUserRequest</node>
+    <node x="3704.0" y="300.0">de.uol.swp.common.lobby.message.AbstractLobbyMessage</node>
+    <node x="1520.0" y="300.0">de.uol.swp.common.user.exception.RegistrationExceptionMessage</node>
+    <node x="1166.0" y="455.0">de.uol.swp.common.message.MessageContext</node>
+    <node x="4174.0" y="80.0">de.uol.swp.common.message.ServerMessage</node>
+    <node x="4599.0" y="380.0">de.uol.swp.common.chat.message.EditedChatMessageMessage</node>
+    <node x="7459.0" y="300.0">de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest</node>
+    <node x="205.0" y="535.0">de.uol.swp.common.lobby.dto.LobbyDTO</node>
+    <node x="416.0" y="300.0">de.uol.swp.common.user.exception.UserDeletionExceptionMessage</node>
+    <node x="511.0" y="455.0">de.uol.swp.common.exception.SecurityException</node>
+    <node x="6875.0" y="380.0">de.uol.swp.common.lobby.request.LobbyLeaveUserRequest</node>
+    <node x="2412.0" y="300.0">de.uol.swp.common.lobby.response.AllLobbiesResponse</node>
+    <node x="708.0" y="300.0">de.uol.swp.common.lobby.response.AllLobbyMembersResponse</node>
+    <node x="12.0" y="455.0">de.uol.swp.common.chat.ChatMessage</node>
+    <node x="5796.420634920636" y="300.0">de.uol.swp.common.chat.request.AbstractChatMessageRequest</node>
+    <node x="4867.0" y="300.0">de.uol.swp.common.lobby.message.RetrieveAllLobbyMembersMessage</node>
+    <node x="1686.0" y="170.0">de.uol.swp.common.message.AbstractResponseMessage</node>
+    <node x="3932.0" y="300.0">de.uol.swp.common.user.message.UsersListMessage</node>
+    <node x="4111.0" y="380.0">de.uol.swp.common.lobby.message.LobbyCreatedMessage</node>
+    <node x="7039.0" y="170.0">de.uol.swp.common.message.AbstractRequestMessage</node>
+    <node x="4867.0" y="380.0">de.uol.swp.common.chat.message.DeletedChatMessageMessage</node>
+    <node x="4331.0" y="380.0">de.uol.swp.common.chat.message.CreatedChatMessageMessage</node>
+    <node x="6227.80511463845" y="300.0">de.uol.swp.common.user.request.LogoutRequest</node>
+    <node x="5143.0" y="380.0">de.uol.swp.common.user.request.UpdateUserPasswordRequest</node>
+    <node x="2624.0" y="300.0">de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse</node>
+    <node x="2948.0" y="300.0">de.uol.swp.common.lobby.response.JoinLobbyResponse</node>
+    <node x="4505.254320987655" y="80.0">de.uol.swp.common.message.AbstractMessage</node>
+    <node x="5907.0" y="380.0">de.uol.swp.common.chat.request.EditChatMessageRequest</node>
+    <node x="3152.0" y="300.0">de.uol.swp.common.user.response.RegistrationSuccessfulResponse</node>
+    <node x="1660.0" y="80.0">de.uol.swp.common.message.ResponseMessage</node>
+    <node x="7151.0" y="300.0">de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest</node>
+    <node x="4591.0" y="300.0">de.uol.swp.common.chat.message.AbstractChatMessageMessage</node>
+    <node x="6663.0" y="380.0">de.uol.swp.common.lobby.request.CreateLobbyRequest</node>
+    <node x="4288.0" y="0.0">de.uol.swp.common.message.Message</node>
+    <node x="7127.0" y="80.0">de.uol.swp.common.message.RequestMessage</node>
+    <node x="0.0" y="300.0">de.uol.swp.common.lobby.response.CreateLobbyResponse</node>
+    <node x="200.0" y="380.0">de.uol.swp.common.lobby.message.LobbyExceptionMessage</node>
   </nodes>
   <notes />
   <edges>
-    <edge source="de.uol.swp.common.message.AbstractRequestMessage" target="de.uol.swp.common.message.AbstractMessage">
-      <point x="56.0" y="-15.0" />
-      <point x="492.0" y="140.0" />
-      <point x="1853.292" y="140.0" />
-      <point x="-56.0" y="15.0" />
-    </edge>
     <edge source="de.uol.swp.common.user.UserDTO" target="de.uol.swp.common.user.User">
       <point x="0.0" y="-15.0" />
       <point x="0.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.message.AbstractMessage" target="de.uol.swp.common.message.Message">
-      <point x="-2.2737367544323206E-13" y="-15.0" />
-      <point x="1909.2919999999997" y="60.0" />
-      <point x="1677.0" y="60.0" />
-      <point x="13.0" y="15.0" />
-    </edge>
-    <edge source="de.uol.swp.common.user.response.RegistrationSuccessfulResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+    <edge source="de.uol.swp.common.lobby.message.LobbyExceptionMessage" target="de.uol.swp.common.message.ExceptionMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2188.0" y="220.0" />
-      <point x="1756.8000000000002" y="220.0" />
-      <point x="92.80000000000018" y="15.0" />
-    </edge>
-    <edge source="de.uol.swp.common.message.AbstractResponseMessage" target="de.uol.swp.common.message.AbstractMessage">
-      <point x="58.0" y="-15.0" />
-      <point x="1722.0" y="150.0" />
-      <point x="1909.292" y="150.0" />
       <point x="0.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.user.message.UserLoggedInMessage" target="de.uol.swp.common.message.AbstractServerMessage">
+    <edge source="de.uol.swp.common.chat.dto.ChatMessageDTO" target="de.uol.swp.common.chat.ChatMessage">
       <point x="0.0" y="-15.0" />
-      <point x="3104.0" y="220.0" />
-      <point x="2871.0" y="220.0" />
-      <point x="81.0" y="15.0" />
+      <point x="0.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.user.exception.RegistrationExceptionMessage" target="de.uol.swp.common.message.AbstractResponseMessage">
+    <edge source="de.uol.swp.common.message.AbstractMessage" target="de.uol.swp.common.message.Message">
       <point x="0.0" y="-15.0" />
-      <point x="1196.0" y="220.0" />
-      <point x="1571.1999999999998" y="220.0" />
-      <point x="-92.80000000000018" y="15.0" />
+      <point x="4589.254320987655" y="60.0" />
+      <point x="4353.0" y="60.0" />
+      <point x="13.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.message.ServerMessage" target="de.uol.swp.common.message.Message">
+    <edge source="de.uol.swp.common.lobby.response.AllLobbiesResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2844.0" y="50.0" />
-      <point x="1703.0" y="50.0" />
-      <point x="39.0" y="15.0" />
+      <point x="2508.0" y="260.0" />
+      <point x="1843.4285714285716" y="260.0" />
+      <point x="41.42857142857156" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.request.AskLatestChatMessageRequest" target="de.uol.swp.common.chat.request.AbstractChatMessageRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="6283.0" y="350.0" />
+      <point x="6020.420634920636" y="350.0" />
+      <point x="96.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.user.response.LoginSuccessfulResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
       <point x="0.0" y="-15.0" />
-      <point x="0.0" y="15.0" />
-    </edge>
-    <edge source="de.uol.swp.common.message.AbstractResponseMessage" target="de.uol.swp.common.message.ResponseMessage">
-      <point x="-58.0" y="-15.0" />
-      <point x="1606.0" y="130.0" />
-      <point x="1570.0" y="130.0" />
-      <point x="0.0" y="15.0" />
-    </edge>
-    <edge source="de.uol.swp.common.message.AbstractRequestMessage" target="de.uol.swp.common.message.RequestMessage">
-      <point x="-56.0" y="-15.0" />
-      <point x="0.0" y="15.0" />
+      <point x="1076.0" y="260.0" />
+      <point x="1760.5714285714284" y="260.0" />
+      <point x="-41.42857142857156" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.user.message.UserLoggedOutMessage" target="de.uol.swp.common.message.AbstractServerMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2684.0" y="230.0" />
-      <point x="2763.0" y="230.0" />
-      <point x="-27.0" y="15.0" />
+      <point x="4452.0" y="280.0" />
+      <point x="4358.0" y="280.0" />
+      <point x="18.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.message.DeletedChatMessageMessage" target="de.uol.swp.common.chat.message.AbstractChatMessageMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="4991.0" y="360.0" />
+      <point x="4804.333333333334" y="360.0" />
+      <point x="85.33333333333326" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.request.DeleteChatMessageRequest" target="de.uol.swp.common.chat.request.AbstractChatMessageRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="5531.0" y="350.0" />
+      <point x="5828.420634920636" y="350.0" />
+      <point x="-96.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.lobby.message.LobbyCreatedMessage" target="de.uol.swp.common.lobby.message.AbstractLobbyMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2680.0" y="305.0" />
-      <point x="2525.3333333333335" y="305.0" />
+      <point x="4211.0" y="350.0" />
+      <point x="3886.0" y="350.0" />
+      <point x="78.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.request.UpdateUserPasswordRequest" target="de.uol.swp.common.user.request.UpdateUserRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.request.CreateLobbyRequest" target="de.uol.swp.common.lobby.request.AbstractLobbyRequest">
+      <point x="2.2737367544323206E-13" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.request.LobbyJoinUserRequest" target="de.uol.swp.common.lobby.request.AbstractLobbyRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="6539.0" y="360.0" />
+      <point x="6689.666666666667" y="360.0" />
+      <point x="-69.33333333333348" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.message.UserLeftLobbyMessage" target="de.uol.swp.common.lobby.message.AbstractLobbyMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="3696.0" y="360.0" />
+      <point x="3782.0" y="360.0" />
+      <point x="-26.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="7599.0" y="270.0" />
+      <point x="7184.6" y="270.0" />
+      <point x="33.59999999999991" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.AbstractServerMessage" target="de.uol.swp.common.message.ServerMessage">
+      <point x="-54.0" y="-15.0" />
+      <point x="4286.0" y="130.0" />
+      <point x="4250.0" y="130.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.exception.ChangePasswordExceptionMessage" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="1356.0" y="270.0" />
+      <point x="1777.1428571428569" y="270.0" />
+      <point x="-24.857142857143117" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.message.RetrieveAllLobbyMembersMessage" target="de.uol.swp.common.message.AbstractServerMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="5011.0" y="260.0" />
+      <point x="4430.0" y="260.0" />
+      <point x="90.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.response.AllLobbyMembersResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="824.0" y="250.0" />
+      <point x="1744.0" y="250.0" />
+      <point x="-58.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.response.AllOnlineUsersResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="3572.0" y="220.0" />
+      <point x="1909.7142857142862" y="220.0" />
+      <point x="107.71428571428623" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.request.AbstractLobbyRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="6759.0" y="270.0" />
+      <point x="7117.400000000001" y="270.0" />
+      <point x="-33.59999999999991" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.request.LogoutRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="6303.80511463845" y="260.0" />
+      <point x="7095.0" y="260.0" />
+      <point x="-56.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.response.UserDeletionSuccessfulResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="2248.0" y="270.0" />
+      <point x="1826.8571428571431" y="270.0" />
+      <point x="24.857142857143117" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.response.CreateLobbyResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="100.0" y="220.0" />
+      <point x="1694.2857142857147" y="220.0" />
+      <point x="-107.71428571428532" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.AbstractRequestMessage" target="de.uol.swp.common.message.AbstractMessage">
+      <point x="-56.0" y="-15.0" />
+      <point x="7095.0" y="150.0" />
+      <point x="4645.254320987655" y="150.0" />
+      <point x="56.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.message.EditedChatMessageMessage" target="de.uol.swp.common.chat.message.AbstractChatMessageMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.response.JoinLobbyResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="3040.0" y="240.0" />
+      <point x="1876.5714285714284" y="240.0" />
+      <point x="74.57142857142844" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.response.RegistrationSuccessfulResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="3296.0" y="230.0" />
+      <point x="1893.1428571428569" y="230.0" />
+      <point x="91.14285714285688" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.request.NewChatMessageRequest" target="de.uol.swp.common.chat.request.AbstractChatMessageRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="5779.0" y="360.0" />
+      <point x="5892.420634920636" y="360.0" />
+      <point x="-32.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.AbstractResponseMessage" target="de.uol.swp.common.message.AbstractMessage">
+      <point x="58.0" y="-15.0" />
+      <point x="1860.0" y="140.0" />
+      <point x="4533.254320987655" y="140.0" />
+      <point x="-56.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.message.UserLoggedInMessage" target="de.uol.swp.common.message.AbstractServerMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="4228.0" y="280.0" />
+      <point x="4322.0" y="280.0" />
+      <point x="-18.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.exception.RegistrationExceptionMessage" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="1656.0" y="280.0" />
+      <point x="1793.7142857142853" y="280.0" />
+      <point x="-8.285714285714675" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.ServerMessage" target="de.uol.swp.common.message.Message">
+      <point x="0.0" y="-15.0" />
+      <point x="4250.0" y="60.0" />
+      <point x="4327.0" y="60.0" />
+      <point x="-13.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.AbstractResponseMessage" target="de.uol.swp.common.message.ResponseMessage">
+      <point x="-58.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.request.AbstractChatMessageRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="5924.420634920636" y="250.0" />
+      <point x="7072.6" y="250.0" />
+      <point x="-78.40000000000009" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.response.AskLatestChatMessageResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="1948.0" y="280.0" />
+      <point x="1810.2857142857147" y="280.0" />
+      <point x="8.285714285714675" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="7295.0" y="280.0" />
+      <point x="7162.200000000001" y="280.0" />
+      <point x="11.199999999999818" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.user.request.DeleteUserRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="8235.0" y="240.0" />
+      <point x="7251.800000000001" y="240.0" />
+      <point x="100.80000000000018" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.AbstractRequestMessage" target="de.uol.swp.common.message.RequestMessage">
+      <point x="56.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.chat.request.EditChatMessageRequest" target="de.uol.swp.common.chat.request.AbstractChatMessageRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="6019.0" y="360.0" />
+      <point x="5956.420634920636" y="360.0" />
+      <point x="32.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.request.LobbyLeaveUserRequest" target="de.uol.swp.common.lobby.request.AbstractLobbyRequest">
+      <point x="0.0" y="-15.0" />
+      <point x="6983.0" y="360.0" />
+      <point x="6828.333333333334" y="360.0" />
       <point x="69.33333333333348" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.lobby.dto.LobbyDTO" target="de.uol.swp.common.lobby.Lobby">
-      <point x="1.1368683772161603E-13" y="-15.0" />
+      <point x="0.0" y="-15.0" />
       <point x="0.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.user.request.LoginRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
       <point x="0.0" y="-15.0" />
-      <point x="244.0" y="230.0" />
-      <point x="391.20000000000005" y="230.0" />
-      <point x="-44.799999999999955" y="15.0" />
+      <point x="7831.0" y="260.0" />
+      <point x="7207.0" y="260.0" />
+      <point x="56.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.message.AbstractServerMessage" target="de.uol.swp.common.message.AbstractMessage">
-      <point x="-54.0" y="-15.0" />
-      <point x="2736.0" y="150.0" />
-      <point x="1965.292" y="150.0" />
-      <point x="56.0" y="15.0" />
+      <point x="54.0" y="-15.0" />
+      <point x="4394.0" y="150.0" />
+      <point x="4589.254320987655" y="150.0" />
+      <point x="0.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.message.RequestMessage" target="de.uol.swp.common.message.Message">
       <point x="0.0" y="-15.0" />
-      <point x="380.0" y="50.0" />
-      <point x="1625.0" y="50.0" />
-      <point x="-39.0" y="15.0" />
+      <point x="7207.0" y="50.0" />
+      <point x="4379.0" y="50.0" />
+      <point x="39.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.user.message.UsersListMessage" target="de.uol.swp.common.message.AbstractServerMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2896.0" y="230.0" />
-      <point x="2817.0" y="230.0" />
-      <point x="27.0" y="15.0" />
+      <point x="4020.0" y="270.0" />
+      <point x="4286.0" y="270.0" />
+      <point x="-54.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.message.ExceptionMessage" target="de.uol.swp.common.message.AbstractResponseMessage">
       <point x="0.0" y="-15.0" />
-      <point x="1440.0" y="230.0" />
-      <point x="1617.6" y="230.0" />
-      <point x="-46.40000000000009" y="15.0" />
-    </edge>
-    <edge source="de.uol.swp.common.lobby.message.UserLeftLobbyMessage" target="de.uol.swp.common.lobby.message.AbstractLobbyMessage">
-      <point x="0.0" y="-15.0" />
-      <point x="0.0" y="15.0" />
+      <point x="308.0" y="230.0" />
+      <point x="1710.8571428571431" y="230.0" />
+      <point x="-91.14285714285688" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.user.request.RegisterUserRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
       <point x="0.0" y="-15.0" />
-      <point x="0.0" y="15.0" />
+      <point x="8023.0" y="250.0" />
+      <point x="7229.400000000001" y="250.0" />
+      <point x="78.40000000000009" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+    <edge source="de.uol.swp.common.chat.message.AbstractChatMessageMessage" target="de.uol.swp.common.message.AbstractServerMessage">
       <point x="0.0" y="-15.0" />
-      <point x="900.0" y="220.0" />
-      <point x="525.6000000000001" y="220.0" />
-      <point x="89.60000000000002" y="15.0" />
+      <point x="4719.0" y="270.0" />
+      <point x="4394.0" y="270.0" />
+      <point x="54.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.lobby.message.UserJoinedLobbyMessage" target="de.uol.swp.common.lobby.message.AbstractLobbyMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2220.0" y="305.0" />
-      <point x="2386.666666666667" y="305.0" />
-      <point x="-69.33333333333326" y="15.0" />
+      <point x="3155.254320987655" y="350.0" />
+      <point x="3730.0" y="350.0" />
+      <point x="-78.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.message.AbstractServerMessage" target="de.uol.swp.common.message.ServerMessage">
-      <point x="54.0" y="-15.0" />
-      <point x="0.0" y="15.0" />
+    <edge source="de.uol.swp.common.chat.message.CreatedChatMessageMessage" target="de.uol.swp.common.chat.message.AbstractChatMessageMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="4455.0" y="360.0" />
+      <point x="4633.666666666667" y="360.0" />
+      <point x="-85.33333333333337" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.message.ResponseMessage" target="de.uol.swp.common.message.Message">
-      <point x="2.2737367544323206E-13" y="-15.0" />
-      <point x="1570.0000000000002" y="60.0" />
-      <point x="1651.0" y="60.0" />
-      <point x="-13.0" y="15.0" />
+    <edge source="de.uol.swp.common.lobby.message.LobbyDeletedMessage" target="de.uol.swp.common.lobby.message.AbstractLobbyMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="3920.0" y="360.0" />
+      <point x="3834.0" y="360.0" />
+      <point x="26.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.user.request.UpdateUserRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
       <point x="0.0" y="-15.0" />
-      <point x="648.0" y="230.0" />
-      <point x="480.79999999999995" y="230.0" />
-      <point x="44.799999999999955" y="15.0" />
+      <point x="5267.0" y="240.0" />
+      <point x="7050.200000000001" y="240.0" />
+      <point x="-100.80000000000018" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.message.ResponseMessage" target="de.uol.swp.common.message.Message">
+      <point x="0.0" y="-15.0" />
+      <point x="1744.0" y="50.0" />
+      <point x="4301.0" y="50.0" />
+      <point x="-39.0" y="15.0" />
     </edge>
     <edge source="de.uol.swp.common.lobby.message.AbstractLobbyMessage" target="de.uol.swp.common.message.AbstractServerMessage">
       <point x="0.0" y="-15.0" />
-      <point x="2456.0" y="220.0" />
-      <point x="2709.0" y="220.0" />
-      <point x="-81.0" y="15.0" />
+      <point x="3808.0" y="260.0" />
+      <point x="4250.0" y="260.0" />
+      <point x="-90.0" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.user.response.AllOnlineUsersResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
+    <edge source="de.uol.swp.common.user.exception.UserDeletionExceptionMessage" target="de.uol.swp.common.message.AbstractResponseMessage">
       <point x="0.0" y="-15.0" />
-      <point x="1912.0" y="230.0" />
-      <point x="1710.4" y="230.0" />
-      <point x="46.40000000000009" y="15.0" />
+      <point x="552.0" y="240.0" />
+      <point x="1727.4285714285716" y="240.0" />
+      <point x="-74.57142857142844" y="15.0" />
     </edge>
-    <edge source="de.uol.swp.common.user.request.LogoutRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+    <edge source="de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse" target="de.uol.swp.common.message.AbstractResponseMessage">
       <point x="0.0" y="-15.0" />
-      <point x="76.0" y="220.0" />
-      <point x="346.39999999999986" y="220.0" />
-      <point x="-89.60000000000002" y="15.0" />
+      <point x="2776.0" y="250.0" />
+      <point x="1860.0" y="250.0" />
+      <point x="58.0" y="15.0" />
+    </edge>
+    <edge source="de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest" target="de.uol.swp.common.message.AbstractRequestMessage">
+      <point x="0.0" y="-15.0" />
+      <point x="7007.0" y="280.0" />
+      <point x="7139.800000000001" y="280.0" />
+      <point x="-11.199999999999818" y="15.0" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.5000000000000001" x="1309.0" y="352.0" />
+  <settings layout="Hierarchic Group" zoom="0.19611836587995687" x="4163.5" y="282.5" />
   <SelectedNodes />
   <Categories />
-  <SCOPE>All</SCOPE>
+  <SCOPE>Production</SCOPE>
   <VISIBILITY>private</VISIBILITY>
 </Diagram>
 
