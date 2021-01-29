@@ -7,9 +7,10 @@ package de.uol.swp.common.game.map.Hexes;
  * @author Steven
  * @since 2021-01-16
  */
-public class DesertHex implements ILandHex {
+public class DesertHex extends AbstractLandHex {
 
     public DesertHex() {
+        setRobberOnField(false);
     }
 
     @Override

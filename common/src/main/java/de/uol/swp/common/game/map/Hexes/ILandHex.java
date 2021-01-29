@@ -8,4 +8,8 @@ package de.uol.swp.common.game.map.Hexes;
  * @since 2021-01-16
  */
 public interface ILandHex extends IGameHex {
+
+    boolean isRobberOnField();
+    void setRobberOnField(boolean robberOnField);
+
 }

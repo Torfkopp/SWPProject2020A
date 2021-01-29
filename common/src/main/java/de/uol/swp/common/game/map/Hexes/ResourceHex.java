@@ -7,7 +7,7 @@ package de.uol.swp.common.game.map.Hexes;
  * @author Steven
  * @since 2021-01-16
  */
-public class ResourceHex implements IResourceHex {
+public class ResourceHex extends AbstractLandHex implements IResourceHex {
     private final resource resource;
     private final int token;
 
@@ -20,6 +20,7 @@ public class ResourceHex implements IResourceHex {
     public ResourceHex(resource resource, int token) {
         this.resource = resource;
         this.token = token;
+        setRobberOnField(false);
     }
 
     @Override
