@@ -101,13 +101,13 @@ public interface IGameRendering {
                                  IIntersection[] intersections, IEdge[] edges, double settlementSize, double citySize,
                                  double roadWidth, double hexWidth, double hexHeight, GraphicsContext mapCtx) {
         for (int x = startOn, xEdges = 0; x < intersections.length; x = x + 2, xEdges = xEdges + 3) {
-            if (renderEdges)
+            if (renderEdges) {
                 renderEdges(currentX, currentY, Arrays.copyOfRange(edges, xEdges, xEdges + 3), roadWidth, hexWidth, hexHeight, mapCtx);
+            }
             renderIntersection(currentX, currentY, intersections[x], settlementSize, citySize, mapCtx);
             currentX += hexWidth;
         }
     }
-
 
     private Color getColor(String player) {
         if (player.startsWith("1") || player.equals("1")) {
@@ -194,22 +194,22 @@ public interface IGameRendering {
             mapCtx.setLineWidth(hexWidth / 5.0);
             switch (((IHarborHex) hex).getSide()) {
                 case 0:
-                    mapCtx.strokeLine(x + hexWidth / 8.0, y + hexHeight / 4.0, x + hexWidth / 8.0, y + hexHeight * (3.0 / 4.0));
+                    mapCtx.strokeLine(x + hexWidth * (1.0 / 8.0), y + hexHeight * (11.0 / 16.0), x + hexWidth * (1.0 / 8.0), y + hexHeight * (5.0 / 16.0));
                     break;
                 case 1:
-                    mapCtx.strokeLine(x + hexWidth / 8.0, y + hexHeight / 4.0, x + hexWidth * (3.0 / 8.0), y);
+                    mapCtx.strokeLine(x + hexWidth * (1.0 / 8.0), y + hexHeight * (2.0 / 8.0), x + hexWidth * (4.0 / 8.0), y + hexHeight * (1.0 / 16.0));
                     break;
                 case 2:
-                    mapCtx.strokeLine(x + hexWidth * (3.0 / 8.0), y, x + hexWidth * (7.0 / 8.0), y + hexHeight / 4.0);
+                    mapCtx.strokeLine(x + hexWidth * (4.0 / 8.0), y + hexHeight * (1.0 / 16.0), x + hexWidth * (7.0 / 8.0), y + hexHeight * (2.0 / 8.0));
                     break;
                 case 3:
-                    mapCtx.strokeLine(x + hexWidth * (15.0 / 16.0), y + hexHeight * (5.0 / 16.0), x + hexWidth * (15.0 / 16.0), y + hexHeight * (11.0 / 16.0));
+                    mapCtx.strokeLine(x + hexWidth * (7.0 / 8.0), y + hexHeight * (5.0 / 16.0), x + hexWidth * (7.0 / 8.0), y + hexHeight * (11.0 / 16.0));
                     break;
                 case 4:
-                    mapCtx.strokeLine(x + hexWidth * (9.0 / 16.0), y + hexHeight * (15.0 / 16.0), x + hexWidth * (15.0 / 16.0), y + hexHeight * (13.0 / 16.0));
+                    mapCtx.strokeLine(x + hexWidth * (7.0 / 8.0), y + hexHeight * (11.0 / 16.0), x + hexWidth * (4.0 / 8.0), y + hexHeight * (7.0 / 8.0));
                     break;
                 case 5:
-                    mapCtx.strokeLine(x + hexWidth / 16.0, y + hexHeight * (13.0 / 16.0), x + hexWidth * (7.0 / 16.0), y + hexHeight * (15.0 / 16.0));
+                    mapCtx.strokeLine(x + hexWidth * (4.0 / 8.0), y + hexHeight * (7.0 / 8.0), x + hexWidth * (1.0 / 8.0), y + hexHeight * (11.0 / 16.0));
                     break;
             }
             String text = "";
