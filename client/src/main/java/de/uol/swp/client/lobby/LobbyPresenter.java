@@ -442,6 +442,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 setTextText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
+                lobbyService.updateInventory(lobbyName, loggedInUser);
             });
         }
     }
@@ -514,6 +515,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     public void onEndTurnButtonPressed(ActionEvent actionEvent) {
         lobbyService.endTurn(loggedInUser, lobbyName);
+        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
