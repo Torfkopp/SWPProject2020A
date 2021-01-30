@@ -32,7 +32,18 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
     static final String PASS = "123456";
     Connection conn = null;
     PreparedStatement pstmt = null;
-    
+
+    /**
+     * This method creates the table containing the user information
+     *
+     * IMPORTANT: This method is only needed for H2 as this database
+     * gets generated dynamically on ServerApp start. Other databases
+     * might not need it!
+     * 
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     private void createTable() {
         try {
             Class.forName(JDBC_DRIVER);
@@ -64,6 +75,15 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         }
     }
 
+    /**
+     * This method searches for a user that matches both
+     * the provided username and password and returns a
+     * UserDTO for the matching result.
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     @Override
     public Optional<User> findUser(String username, String password) {
         createTable();
@@ -108,6 +128,14 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         return Optional.empty();
     }
 
+    /**
+     * This method finds and returns the specific user
+     * from the database without the password.
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     @Override
     public Optional<User> findUser(String username) {
         createTable();
@@ -150,6 +178,14 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         return Optional.empty();
     }
 
+    /**
+     * This method registers the user with its specific and unique username,
+     * password and e-mail and saves it in the H2 Database.
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     @Override
     public User createUser(String username, String password, String eMail) {
         if (Strings.isNullOrEmpty(username)) {
@@ -191,6 +227,14 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         return new UserDTO(username, passwordHash, eMail);
     }
 
+    /**
+     * This method allows the user to change his unique username, password or e-mail.
+     * The user will not be able to update his username or e-mail into already registered once.
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     @Override
     public User updateUser(String username, String password, String eMail) {
         if (Strings.isNullOrEmpty(username)) {
@@ -229,6 +273,13 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
         return new UserDTO(username, passwordHash, eMail);
     }
 
+    /**
+     * This method removes the row matching the provided username.
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-01-20
+     */
     @Override
     public void removeUser(String username) {
         createTable();
