@@ -11,19 +11,15 @@ import java.util.Arrays;
 
 public interface IGameRendering {
 
-    default void drawGameMap(GameMapManagement gameMapManagement, double width, double height, GraphicsContext mapCtx) {
-        double hexHeight, hexWidth, settlementSize, roadWidth, citySize, startX;
-        int maxHexesInRow, maxIntersectionsInRow;
+    double HEXHEIGHTFACTOR = 1.0 / 5.5;
+    double HEXWIDTHFACTOR = HEXHEIGHTFACTOR * (Math.sqrt(3) / 2);
+    double SETTLEMENTSIZEFACTOR = HEXHEIGHTFACTOR / 5.0;
+    double CITYSIZEFACTOR = SETTLEMENTSIZEFACTOR * 1.25;
+    double ROADWIDTHFACTOR = SETTLEMENTSIZEFACTOR / 4.0;
 
-        hexHeight = height / 7.0;
-        hexWidth = (Math.sqrt(3) / 2) * hexHeight;
-        settlementSize = hexHeight / 5.0;
-        citySize = hexHeight / 4.0;
-        roadWidth = settlementSize / 4.0;
-        maxHexesInRow = 7;
-        maxIntersectionsInRow = 11;
-        //startX = hexWidth / 2.0;
-        startX = 0;
+    default void drawGameMap(GameMapManagement gameMapManagement, double width, double height, GraphicsContext mapCtx) {
+        double effectiveHeight = (HEXWIDTHFACTOR * height * 7 < width) ? height : width / (7 * HEXHEIGHTFACTOR * (Math.sqrt(3) / 2));
+
 
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
@@ -34,135 +30,124 @@ public interface IGameRendering {
         mapCtx.setStroke(Color.BLACK);
         mapCtx.strokeRect(0, 0, width, height);
 
-        drawHexTiles(hexes, startX, hexWidth, hexHeight, maxHexesInRow, mapCtx);
-        drawIntersectionsAndEdges(intersections, edges, startX, hexWidth, hexHeight, maxIntersectionsInRow, settlementSize, citySize, roadWidth, mapCtx);
+        drawHexTiles(hexes, effectiveHeight, mapCtx);
+        drawIntersectionsAndEdges(intersections, edges, effectiveHeight, mapCtx);
     }
 
-    private void drawHexTiles(IGameHex[][] hexes,
-                              double startX, double hexWidth, double hexHeight,
-                              int maxHexesInRow, GraphicsContext mapCtx) {
-        double currentX = 0;
+    private void drawHexTiles(IGameHex[][] hexes, double effectiveHeight, GraphicsContext mapCtx) {
         double currentY = 0;
         //double currentY = hexHeight / 2.0;
         for (int y = 0; y < hexes.length; y++) {
-            currentX = startX;
+            double currentX = 0;
             //Set the indentation for the current row of hex tiles
             if (hexes[y].length % 2 == 0) { //Row with an even amount of hex tiles
-                currentX += hexWidth / 2.0;
-                currentX += ((maxHexesInRow - 1 - hexes[y].length) / 2.0) * hexWidth;
+                currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
+                currentX += ((hexes[hexes.length/2].length - 1 - hexes[y].length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
             } else {//Row with an odd amount of hex tiles
-                currentX += ((maxHexesInRow - hexes[y].length) / 2.0) * hexWidth;
+                currentX += ((hexes[hexes.length/2].length - hexes[y].length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
             }
+
             for (int x = 0; x < hexes[y].length; x++) {
-                renderHex(currentX, currentY, hexes[y][x], hexWidth, hexHeight, mapCtx);
-                currentX += hexWidth;
+                renderHex(currentX, currentY, hexes[y][x], effectiveHeight, mapCtx);
+                currentX += (HEXWIDTHFACTOR * effectiveHeight);
             }
-            currentY += (hexHeight / 4) * 3;
+            currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3;
         }
     }
 
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IEdge[][] edges,
-                                           double startX, double hexWidth, double hexHeight, int maxIntersectionsInRow,
-                                           double settlementSize, double citySize, double roadWidth, GraphicsContext mapCtx) {
-        double currentX = startX;
-        double currentY = 0;
-        currentY = hexHeight * (3.0 / 4.0);
-
-        currentY = goThroughHalfMap(true, 0, 3, true, intersections, edges, hexWidth, hexHeight,
-                startX, currentY, citySize, roadWidth, settlementSize, maxIntersectionsInRow, mapCtx);
-        currentY = goThroughHalfMap(false, 3, intersections.length, false, intersections, edges, hexWidth, hexHeight,
-                startX, currentY, citySize, roadWidth, settlementSize, maxIntersectionsInRow, mapCtx);
+    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IEdge[][] edges, double effectiveHeight, GraphicsContext mapCtx) {
+        goThroughHalfMap(true, true, intersections, edges, effectiveHeight, mapCtx);
+        goThroughHalfMap(false, false, intersections, edges, effectiveHeight, mapCtx);
     }
 
-    private double goThroughHalfMap(boolean topHalf, int startOn, int endOn, boolean startFirstSubRowWithOne,
-                                    IIntersection[][] intersections, IEdge[][] edges, double hexWidth,
-                                    double hexHeight, double startX, double currentY, double citySize,
-                                    double roadWidth, double settlementSize, int maxIntersectionsInRow,
+    private void goThroughHalfMap(boolean topHalf, boolean startFirstSubRowWithOne,
+                                    IIntersection[][] intersections, IEdge[][] edges, double effectiveHeight,
                                     GraphicsContext mapCtx) {
-        double currentX;
-        for (int y = startOn; y < endOn; y++) {
-            double rowStartX = ((maxIntersectionsInRow - intersections[y].length) / 4.0) * hexWidth;
-            currentX = rowStartX + hexWidth + startX;
-            if (topHalf) currentX += hexWidth / 2.0;
+        double currentY = (topHalf) ? ((HEXHEIGHTFACTOR * effectiveHeight) * (3.0 / 4.0)) : ((effectiveHeight / 2) + ((HEXHEIGHTFACTOR * effectiveHeight) / 4));
+        for (int y = ((topHalf) ? 0 : intersections.length / 2); y < ((topHalf) ? intersections.length / 2 : intersections.length); y++) {
+            double rowStartX = ((intersections[intersections.length/2].length - intersections[y].length) / 4.0) * (HEXWIDTHFACTOR * effectiveHeight);
+            double currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
+            if (topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
             goThroughSubRow(startFirstSubRowWithOne ? 1 : 0, false, currentX, currentY, intersections[y], edges[y],
-                    settlementSize, citySize, roadWidth, hexWidth, hexHeight, mapCtx);
+                    effectiveHeight, mapCtx);
 
-            currentX = rowStartX + hexWidth + startX;
-            if (!topHalf) currentX += hexWidth / 2.0;
-            currentY += (hexHeight / 4.0);
+            currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
+            if (!topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
+            currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0);
             goThroughSubRow(startFirstSubRowWithOne ? 0 : 1, true, currentX, currentY, intersections[y], edges[y],
-                    settlementSize, citySize, roadWidth, hexWidth, hexHeight, mapCtx);
-            currentY += hexHeight / 2.0;
+                    effectiveHeight, mapCtx);
+            currentY += (HEXHEIGHTFACTOR * effectiveHeight) / 2.0;
         }
-        return currentY;
     }
 
     private void goThroughSubRow(int startOn, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IEdge[] edges, double settlementSize, double citySize,
-                                 double roadWidth, double hexWidth, double hexHeight, GraphicsContext mapCtx) {
+                                 IIntersection[] intersections, IEdge[] edges, double effectiveHeight, GraphicsContext mapCtx) {
         for (int x = startOn, xEdges = 0; x < intersections.length; x = x + 2, xEdges = xEdges + 3) {
             if (renderEdges) {
-                renderEdges(currentX, currentY, Arrays.copyOfRange(edges, xEdges, xEdges + 3), roadWidth, hexWidth, hexHeight, mapCtx);
+                renderEdges(currentX, currentY, Arrays.copyOfRange(edges, xEdges, xEdges + 3), effectiveHeight, mapCtx);
             }
-            renderIntersection(currentX, currentY, intersections[x], settlementSize, citySize, mapCtx);
-            currentX += hexWidth;
+            renderIntersection(currentX, currentY, intersections[x], effectiveHeight, mapCtx);
+            currentX += (HEXWIDTHFACTOR * effectiveHeight);
         }
     }
 
-    private Color getColor(String player) {
-        if (player.startsWith("1") || player.equals("1")) {
+    private Color getPlayerColor(String player) {
+        if (player.startsWith("1")) {
             return Color.BLACK;
-        } else if (player.startsWith("2") || player.equals("2")) {
+        } else if (player.startsWith("2")) {
             return Color.RED;
-        } else if (player.startsWith("3") || player.equals("3")) {
+        } else if (player.startsWith("3")) {
             return Color.PINK;
-        } else if (player.startsWith("4") || player.equals("4")) {
+        } else if (player.startsWith("4")) {
             return Color.WHITE;
         }
         return null;
     }
 
-    private void renderEdges(double currentX, double currentY, IEdge[] edges, double roadWidth, double hexWidth, double hexHeight, GraphicsContext mapCtx) {
+    private Color getPlayerColor(int player) {
+        return getPlayerColor(String.valueOf(player));
+    }
+
+    private void renderEdges(double currentX, double currentY, IEdge[] edges, double effectiveHeight, GraphicsContext mapCtx) {
         IEdge leftRoad = edges[0];
         IEdge downRoad = edges[1];
         IEdge rightRoad = edges[2];
         //leftRoad
-        mapCtx.setLineWidth(roadWidth);
+        mapCtx.setLineWidth(ROADWIDTHFACTOR * effectiveHeight);
 
         if (leftRoad != null && leftRoad.getState() != 0) {
-            mapCtx.setStroke(getColor(String.valueOf(leftRoad.getState())));
-            mapCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+            mapCtx.setStroke(getPlayerColor(leftRoad.getState()));
+            mapCtx.strokeLine(currentX, currentY, currentX - ((HEXWIDTHFACTOR * effectiveHeight) / 2.0), currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
         }
 
         if (rightRoad != null && rightRoad.getState() != 0) {
-            mapCtx.setStroke(getColor(String.valueOf(rightRoad.getState())));
-            mapCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+            mapCtx.setStroke(getPlayerColor(rightRoad.getState()));
+            mapCtx.strokeLine(currentX, currentY, currentX + ((HEXWIDTHFACTOR * effectiveHeight) / 2.0), currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
         }
 
         if (downRoad != null && downRoad.getState() != 0) {
-            mapCtx.setStroke(getColor(String.valueOf(downRoad.getState())));
-            mapCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
+            mapCtx.setStroke(getPlayerColor(downRoad.getState()));
+            mapCtx.strokeLine(currentX, currentY, currentX, currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 2.0));
         }
     }
 
-    private void renderIntersection(double x, double y, IIntersection intersection,
-                                    double settlementSize, double citySize, GraphicsContext mapCtx) {
+    private void renderIntersection(double x, double y, IIntersection intersection, double effectiveHeight, GraphicsContext mapCtx) {
         String state = intersection.getState();
         if (state.equals("f")) { //Free intersection
             //Free intersections don't need to be marked, but it could easily be added here
         } else if (state.equals("b")) { //Blocked intersection
             //Blocked intersections don't need to be marked, but it could easily be added here
         } else if (state.endsWith("s")) { //Intersection with settlement
-            mapCtx.setFill(getColor(state));
-            mapCtx.fillOval(x - (settlementSize / 2.0), y - (settlementSize / 2.0), settlementSize, settlementSize);
+            mapCtx.setFill(getPlayerColor(state));
+            mapCtx.fillOval(x - ((SETTLEMENTSIZEFACTOR * effectiveHeight) / 2.0), y - ((SETTLEMENTSIZEFACTOR * effectiveHeight) / 2.0), (SETTLEMENTSIZEFACTOR * effectiveHeight), (SETTLEMENTSIZEFACTOR * effectiveHeight));
         } else if (state.endsWith("c")) { //Intersection with city
-            mapCtx.setFill(getColor(state));
-            mapCtx.fillRoundRect(x - (citySize / 2.0), y - (citySize / 2.0), citySize, citySize,
-                    citySize / 2.0, citySize / 2.0);
+            mapCtx.setFill(getPlayerColor(state));
+            mapCtx.fillRoundRect(x - ((CITYSIZEFACTOR * effectiveHeight) / 2.0), y - ((CITYSIZEFACTOR * effectiveHeight) / 2.0), (CITYSIZEFACTOR * effectiveHeight), (CITYSIZEFACTOR * effectiveHeight),
+                    (CITYSIZEFACTOR * effectiveHeight) / 2.0, (CITYSIZEFACTOR * effectiveHeight) / 2.0);
         }
     }
 
-    private void renderHex(double x, double y, IGameHex hex, double hexWidth, double hexHeight, GraphicsContext mapCtx) {
+    private void renderHex(double x, double y, IGameHex hex, double effectiveHeight, GraphicsContext mapCtx) {
         if (hex instanceof IWaterHex) {
             mapCtx.setFill(Color.CORNFLOWERBLUE);
         } else if (hex instanceof DesertHex) {
@@ -181,9 +166,9 @@ public interface IGameRendering {
             return;
         }
         //Draw a hexagon in the set Color with a black 2px border around it
-        double[] xCords = {x, x + hexWidth / 2, x + hexWidth, x + hexWidth, x + hexWidth / 2, x};
-        double[] yCords = {y + (hexHeight / 4), y, y + (hexHeight / 4), y + (hexHeight / 4) * 3,
-                y + hexHeight, y + (hexHeight / 4) * 3};
+        double[] xCords = {x, x + (HEXWIDTHFACTOR * effectiveHeight) / 2, x + (HEXWIDTHFACTOR * effectiveHeight), x + (HEXWIDTHFACTOR * effectiveHeight), x + (HEXWIDTHFACTOR * effectiveHeight) / 2, x};
+        double[] yCords = {y + ((HEXHEIGHTFACTOR * effectiveHeight) / 4), y, y + ((HEXHEIGHTFACTOR * effectiveHeight) / 4), y + ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3,
+                y + (HEXHEIGHTFACTOR * effectiveHeight), y + ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3};
         mapCtx.fillPolygon(xCords, yCords, 6);
         mapCtx.setStroke(Color.BLACK);
         mapCtx.setLineWidth(2);
@@ -191,25 +176,25 @@ public interface IGameRendering {
 
         if (hex instanceof IHarborHex) {
             mapCtx.setStroke(Color.SLATEGREY);
-            mapCtx.setLineWidth(hexWidth / 5.0);
+            mapCtx.setLineWidth((HEXWIDTHFACTOR * effectiveHeight) / 5.0);
             switch (((IHarborHex) hex).getSide()) {
                 case 0:
-                    mapCtx.strokeLine(x + hexWidth * (1.0 / 8.0), y + hexHeight * (11.0 / 16.0), x + hexWidth * (1.0 / 8.0), y + hexHeight * (5.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0));
                     break;
                 case 1:
-                    mapCtx.strokeLine(x + hexWidth * (1.0 / 8.0), y + hexHeight * (2.0 / 8.0), x + hexWidth * (4.0 / 8.0), y + hexHeight * (1.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0));
                     break;
                 case 2:
-                    mapCtx.strokeLine(x + hexWidth * (4.0 / 8.0), y + hexHeight * (1.0 / 16.0), x + hexWidth * (7.0 / 8.0), y + hexHeight * (2.0 / 8.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0));
                     break;
                 case 3:
-                    mapCtx.strokeLine(x + hexWidth * (7.0 / 8.0), y + hexHeight * (5.0 / 16.0), x + hexWidth * (7.0 / 8.0), y + hexHeight * (11.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
                     break;
                 case 4:
-                    mapCtx.strokeLine(x + hexWidth * (7.0 / 8.0), y + hexHeight * (11.0 / 16.0), x + hexWidth * (4.0 / 8.0), y + hexHeight * (7.0 / 8.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0));
                     break;
                 case 5:
-                    mapCtx.strokeLine(x + hexWidth * (4.0 / 8.0), y + hexHeight * (7.0 / 8.0), x + hexWidth * (1.0 / 8.0), y + hexHeight * (11.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
                     break;
             }
             String text = "";
@@ -234,8 +219,7 @@ public interface IGameRendering {
                     break;
             }
             mapCtx.setFill(Color.BLACK);
-            mapCtx.fillText(text, x + hexWidth / 8.0, y + hexHeight / 2.0);
-            return;
+            mapCtx.fillText(text, x + (HEXWIDTHFACTOR * effectiveHeight) / 8.0, y + (HEXHEIGHTFACTOR * effectiveHeight) / 2.0);
         }
     }
 }
