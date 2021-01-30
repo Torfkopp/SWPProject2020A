@@ -310,7 +310,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * <<<<<<< HEAD
      * Handles leaving all Lobbies when a user logged out
      * <p>
      * If a new RemoveFromLobbiesResponse is posted onto the EventBus the
@@ -331,7 +330,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * =======
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -364,7 +362,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * >>>>>>> 7f2133491c32596254625a8b5b2670f8d520b4b2
      * Updates the lobby's member list according to the list given
      * <p>
      * This method clears the entire member list and then adds the name of each user
