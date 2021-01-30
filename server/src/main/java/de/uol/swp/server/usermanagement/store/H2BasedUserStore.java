@@ -24,7 +24,7 @@ import java.util.Optional;
  * @see de.uol.swp.server.usermanagement.store.UserStore
  * @since 2021-01-20
  */
-public class H2BasedUserStore extends AbstractUserStore implements UserStore {
+public class H2BasedUserStore extends AbstractUserStore {
 
     static final String JDBC_DRIVER = "org.h2.Driver";
     static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
@@ -35,11 +35,11 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
 
     /**
      * This method creates the table containing the user information
-     *
+     * <p>
      * IMPORTANT: This method is only needed for H2 as this database
      * gets generated dynamically on ServerApp start. Other databases
      * might not need it!
-     * 
+     *
      * @author Aldin Dervisi
      * @author Marvin Drees
      * @since 2021-01-20
@@ -124,7 +124,6 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 se.printStackTrace();
             }
         }
-
         return Optional.empty();
     }
 
@@ -174,7 +173,6 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 se.printStackTrace();
             }
         }
-
         return Optional.empty();
     }
 
@@ -223,8 +221,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 se.printStackTrace();
             }
         }
-
-        return new UserDTO(username, passwordHash, eMail);
+        return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
     }
 
     /**
@@ -269,8 +266,7 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 se.printStackTrace();
             }
         }
-
-        return new UserDTO(username, passwordHash, eMail);
+        return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
     }
 
     /**
@@ -354,7 +350,6 @@ public class H2BasedUserStore extends AbstractUserStore implements UserStore {
                 se.printStackTrace();
             }
         }
-
         return retUsers;
     }
 }
