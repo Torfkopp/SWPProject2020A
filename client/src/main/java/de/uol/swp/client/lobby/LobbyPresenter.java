@@ -33,7 +33,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -56,11 +56,9 @@ import java.util.Set;
 public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRendering {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-
+    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
-    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-
     private Set<User> readyUsers;
 
     @FXML
@@ -75,10 +73,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private Text text;
     @FXML
     private Canvas gameMapCanvas;
+    @FXML
+    private VBox playField;
 
     private Window window;
-    @FXML
-    private GridPane playField;
 
     /**
      * Constructor
@@ -220,8 +218,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void setStartSessionButtonState() {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
-            //TODO: Change back to 3
-            this.startSession.setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
+            this.startSession.setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
@@ -459,21 +456,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 ((Stage) window).setMinWidth(630);
                 ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
+                //This Line needs to be changed/ removed in the Future
+                drawGameMap(new GameMapManagement(), gameMapCanvas);
                 setTextText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
             });
-            //TODO: Remove following Code
-            //Create Test GameMap and create Settlements, Cities and Roads
-            GameMapManagement gameMap = new GameMapManagement();
-            for (int i = 1; i < 55; i++) gameMap.placeSettlement((i%4)+1, i);
-            gameMap.upgradeSettlement(1, 23);
-            gameMap.upgradeSettlement(2, 10);
-            gameMap.upgradeSettlement(3, 7);
-            gameMap.upgradeSettlement(4, 48);
-
-            for (int i = 1; i < 72; i++) gameMap.placeRoad((i%4)+1, i);
-            drawGameMap(gameMap, gameMapCanvas);
         }
     }
 
