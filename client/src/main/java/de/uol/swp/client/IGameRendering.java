@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.Hexes.*;
 import de.uol.swp.common.game.map.IEdge;
+import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.game.map.IIntersection;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -31,7 +32,7 @@ public interface IGameRendering {
     double SETTLEMENTSIZEFACTOR = HEXHEIGHTFACTOR / 5.0;
     double CITYSIZEFACTOR = SETTLEMENTSIZEFACTOR * 1.25;
     double ROADWIDTHFACTOR = SETTLEMENTSIZEFACTOR / 4.0;
-    double ROBBERLINEWIDTHFACTOR = ROADWIDTHFACTOR / 2.0;
+    double ROBBERLINEWIDTHFACTOR = ROADWIDTHFACTOR;
 
     /**
      * drawGameMap Method
