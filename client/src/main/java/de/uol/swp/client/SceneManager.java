@@ -294,8 +294,6 @@ public class SceneManager {
         //Set position of second window, related to primary window
         lobbyStage.setX(primaryStage.getX() + 100);
         lobbyStage.setY(10);
-        lobbyStage.setMinWidth(600);
-        lobbyStage.setMinHeight(600);
         //Shows the window
         lobbyStage.show();
         lobbyStages.add(lobbyStage);

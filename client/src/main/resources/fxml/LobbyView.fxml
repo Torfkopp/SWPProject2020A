@@ -5,11 +5,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="600.0" minWidth="600" minHeight="600" xmlns="http://javafx.com/javafx/11.0.1"
       fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <VBox>
         <HBox.margin>
-            <Insets right="10" left="10"></Insets>
+            <Insets right="10" left="10" bottom="10"></Insets>
         </HBox.margin>
         <VBox>
             <ListView fx:id="membersView" prefHeight="100" minHeight="100">
