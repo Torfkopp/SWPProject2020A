@@ -8,10 +8,7 @@ import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
-import de.uol.swp.common.lobby.response.CreateLobbyResponse;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ServerMessage;
@@ -21,10 +18,7 @@ import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Handles the lobby requests sent by the users
@@ -228,6 +222,45 @@ public class LobbyService extends AbstractService {
         } else {
             LOG.error("Lobby " + lobbyName + " not found.");
         }
+    }
+
+    /**
+     * Handles a RemoveFromLobbiesRequest found on the EventBus
+     * <p>
+     * If a RemoveFromLobbiesRequest is detected on the EventBus, this method is called.
+     * It removes a user from a lobby stored in the LobbyManagement and sends a
+     * UserLeftLobbyMessage to every user in the lobby.
+     * It posts a RemoveFromLobbiesResponse containing a Map of the Lobbies where the user is in.
+     *
+     * @param removeFromLobbiesRequest The RemoveFromLobbiesRequest found on the EventBus
+     * @author Finn Haase
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
+     * @see de.uol.swp.common.lobby.Lobby
+     * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
+     * @since 2021-01-28
+     */
+    @Subscribe
+    private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest removeFromLobbiesRequest) {
+        User user = removeFromLobbiesRequest.getUser();
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        Map<String, Lobby> lobbiesWithUser = new HashMap<>();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            if (entry.getValue().getUsers().contains(user)) {
+                Lobby lobby = entry.getValue();
+                String lobbyName = entry.getKey();
+                lobbiesWithUser.put(entry.getKey(), lobby);
+                try {
+                    lobby.leaveUser(user);
+                    sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, user));
+                } catch (IllegalArgumentException exception) {
+                    lobbyManagement.dropLobby(lobbyName);
+                    sendToAll(new LobbyDeletedMessage(lobbyName));
+                }
+            }
+        }
+        Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
+        post(response);
     }
 
     /**
