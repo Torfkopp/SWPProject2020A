@@ -193,35 +193,36 @@ public class H2BasedUserStore extends AbstractUserStore {
         createTable();
 
         String passwordHash = hash(password);
-
-        try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-
-            String sql = "INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, mail = ?, pass = ?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, username);
-            pstmt.setString(2, eMail);
-            pstmt.setString(3, passwordHash);
-            pstmt.setString(4, username);
-            pstmt.setString(5, eMail);
-            pstmt.setString(6, passwordHash);
-            pstmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+        
+        if (findUser(username).isEmpty()) {
             try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
+                Class.forName(JDBC_DRIVER);
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                conn.setAutoCommit(true);
+
+                String sql = "INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, username);
+                pstmt.setString(2, eMail);
+                pstmt.setString(3, passwordHash);
+                pstmt.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (pstmt != null) pstmt.close();
+                } catch (SQLException ignored) {
+                }
+                try {
+                    if (conn != null) conn.close();
+                } catch (SQLException se) {
+                    se.printStackTrace();
+                }
             }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
+        } else {
+            throw new IllegalArgumentException("Username must not be taken already");
         }
-        return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
     }
 
     /**

@@ -2,6 +2,8 @@ package de.uol.swp.server.usermanagement.store;
 
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -29,24 +31,32 @@ class H2BasedUserStoreTest {
     }
 
     UserStore getDefaultStore() {
-        UserStore store = new H2BasedUserStore();
+        return new H2BasedUserStore();
+    }
+
+    @BeforeEach
+    void fillDatabase() {
+        UserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
-        return store;
+    }
+    
+    @AfterEach
+    void cleanDatabase() {
+        UserStore store = getDefaultStore();
+        List<User> users = getDefaultUsers();
+        users.forEach(u -> store.removeUser(u.getUsername()));
     }
 
     @Test
     void findUserByName() {
-        // arrange
         UserStore store = getDefaultStore();
-        User userToCreate = getDefaultUsers().get(0);
+        User userToFind = getDefaultUsers().get(0);
 
-        // act
-        Optional<User> userFound = store.findUser(userToCreate.getUsername());
+        Optional<User> userFound = store.findUser(userToFind.getUsername());
 
-        // assert
         assertTrue(userFound.isPresent());
-        assertEquals(userToCreate, userFound.get());
+        assertEquals(userToFind, userFound.get());
         assertEquals(userFound.get().getPassword(), "");
     }
 
@@ -63,13 +73,12 @@ class H2BasedUserStoreTest {
     @Test
     void findUserByNameAndPassword() {
         UserStore store = getDefaultStore();
-        User userToCreate = getDefaultUsers().get(1);
-        store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
+        User userToFind = getDefaultUsers().get(0);
 
-        Optional<User> userFound = store.findUser(userToCreate.getUsername(), userToCreate.getPassword());
+        Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userToCreate, userFound.get());
+        assertEquals(userToFind, userFound.get());
         assertEquals(userFound.get().getPassword(), "");
     }
 
@@ -96,14 +105,10 @@ class H2BasedUserStoreTest {
     void overwriteUser() {
         UserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
-        store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
-        store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
 
-        Optional<User> userFound = store.findUser(userToCreate.getUsername(), userToCreate.getPassword());
-
-        assertEquals(store.getAllUsers().size(), NO_USERS);
-        assertTrue(userFound.isPresent());
-        assertEquals(userToCreate, userFound.get());
+        assertThrows(IllegalArgumentException.class,
+                () -> store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail())
+        );
     }
 
     @Test
