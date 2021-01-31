@@ -1,7 +1,7 @@
-package de.uol.swp.server.game.map;
+package de.uol.swp.common.game.map;
 
 
-import de.uol.swp.server.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IGameHex;
 
 /**
  * Interface for the game's map
@@ -19,6 +19,27 @@ public interface IGameMapManagement {
      * @return The hex
      */
     IGameHex getHex(int place);
+
+    /**
+     * Gets the hexes in a usable format for rendering them as a jagged array
+     *
+     * @return a jagged array containing the hexes
+     */
+    IGameHex[][] getHexesAsJaggedArray();
+
+    /**
+     * Gets the edges in a usable format for rendering them as a jagged array with some extra positions filled with null
+     *
+     * @return a jagged array containing the hexes
+     */
+    IEdge[][] getEdgesAsJaggedArrayWithNullFiller();
+
+    /**
+     * Gets the intersections in a usable format for rendering them as a jagged array
+     *
+     * @return a jagged array containing the intersections
+     */
+    IIntersection[][] getIntersectionsAsJaggedArray();
 
     /**
      * Places a settlement

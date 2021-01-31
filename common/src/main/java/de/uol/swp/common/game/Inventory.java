@@ -1,4 +1,4 @@
-package de.uol.swp.server.game;
+package de.uol.swp.common.game;
 
 import de.uol.swp.common.user.User;
 

@@ -2,12 +2,14 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.IGameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.Lobby;
@@ -26,11 +28,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -50,14 +53,12 @@ import java.util.Set;
  * @since 2020-11-21
  */
 @SuppressWarnings("UnstableApiUsage")
-public class LobbyPresenter extends AbstractPresenterWithChat {
+public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRendering {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-
+    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
-    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-
     private Set<User> readyUsers;
 
     @FXML
@@ -70,10 +71,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private Button endTurn;
     @FXML
     private Text text;
+    @FXML
+    private Canvas gameMapCanvas;
+    @FXML
+    private VBox playField;
 
     private Window window;
-    @FXML
-    private GridPane playField;
 
     /**
      * Constructor
@@ -437,8 +440,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Handles a StartSessionMessage found on the EventBus
      * <p>
-     * The lobby window gets a minimum width and height, and sets the play field
-     * to be visible.
+     * Sets the play field visible.
      *
      * @param startSessionMessage The StartSessionMessage found on the EventBus
      * @author Eric Vuong
@@ -449,10 +451,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
         if (startSessionMessage.getName().equals(this.lobbyName)) {
             Platform.runLater(() -> {
-                window.setY(window.getY() - 200);
-                ((Stage) window).setMinWidth(630);
-                ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
+                //This Line needs to be changed/ removed in the Future
+                drawGameMap(new GameMapManagement(), gameMapCanvas);
                 setTextText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));

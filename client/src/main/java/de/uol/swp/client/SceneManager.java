@@ -282,7 +282,7 @@ public class SceneManager {
         lobbyStage.setTitle(lobbyName);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 630, 400);
+        Scene lobbyScene = new Scene(rootPane, 600, 600);
         lobbyScene.getStylesheets().add(styleSheet);
         lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene
@@ -292,8 +292,8 @@ public class SceneManager {
         //Specifies the owner Window (parent) for new window
         lobbyStage.initOwner(primaryStage);
         //Set position of second window, related to primary window
-        lobbyStage.setX(primaryStage.getX() + 200);
-        lobbyStage.setY(primaryStage.getY() + 100);
+        lobbyStage.setX(primaryStage.getX() + 100);
+        lobbyStage.setY(10);
         //Shows the window
         lobbyStage.show();
         lobbyStages.add(lobbyStage);

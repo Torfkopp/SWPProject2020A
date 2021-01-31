@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;

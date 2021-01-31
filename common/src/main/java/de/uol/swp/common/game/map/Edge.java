@@ -1,4 +1,4 @@
-package de.uol.swp.server.game.map;
+package de.uol.swp.common.game.map;
 
 /**
  * Class for an edge

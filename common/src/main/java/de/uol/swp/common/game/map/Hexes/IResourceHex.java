@@ -1,4 +1,4 @@
-package de.uol.swp.server.game.map.Hexes;
+package de.uol.swp.common.game.map.Hexes;
 
 /**
  * Interface for a resource hex

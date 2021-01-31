@@ -1,75 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
-    <GridPane minWidth="605.0" prefHeight="350.0" prefWidth="605.0">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="182.0" minWidth="10.0" prefWidth="182.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="118.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-
-        <VBox prefHeight="372.0" prefWidth="169.0" GridPane.columnIndex="2" GridPane.columnSpan="2147483647">
-            <ListView fx:id="chatView" prefHeight="154.0" prefWidth="362.0">
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="600.0" minWidth="600" minHeight="600" xmlns="http://javafx.com/javafx/11.0.1"
+      fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+    <VBox>
+        <HBox.margin>
+            <Insets right="10" left="10" bottom="10"></Insets>
+        </HBox.margin>
+        <VBox>
+            <ListView fx:id="membersView" prefHeight="100" minHeight="100">
                 <VBox.margin>
-                    <Insets bottom="10.0" top="10.0" />
+                    <Insets top="10"></Insets>
                 </VBox.margin>
             </ListView>
-            <TextField fx:id="messageField" prefColumnCount="1" prefHeight="25.0" prefWidth="150.0" />
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="Send message">
+            <ListView fx:id="chatView">
                 <VBox.margin>
-                    <Insets top="10.0" />
+                    <Insets top="10"></Insets>
+                </VBox.margin>
+            </ListView>
+            <TextField fx:id="messageField"></TextField>
+            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" text="Send message">
+                <VBox.margin>
+                    <Insets top="5"></Insets>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="Delete message">
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" text="Delete message">
                 <VBox.margin>
-                    <Insets top="10.0" />
+                    <Insets top="5"></Insets>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="Edit message">
+            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" text="Edit message">
                 <VBox.margin>
-                    <Insets top="10.0" />
+                    <Insets top="5"></Insets>
                 </VBox.margin>
             </Button>
         </VBox>
-    </GridPane>
-
-    <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-    <ListView fx:id="membersView" layoutY="7.0" maxHeight="95.0" maxWidth="190.0" prefHeight="95.0" prefWidth="180.0" />
-    <HBox layoutY="110.0" prefHeight="101.0" prefWidth="180.0" spacing="16">
-        <CheckBox fx:id="readyCheckBox" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked" prefHeight="22.0" prefWidth="70.0" text="Ready">
-            <HBox.margin>
-                <Insets left="10" />
-            </HBox.margin>
-        </CheckBox>
-        <Button fx:id="startSession" disable="true" mnemonicParsing="false" onAction="#onStartSessionButtonPressed" text="Start Session" visible="false" />
-    </HBox>
-    <Button layoutX="205.0" layoutY="42.0" mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" text="Leave Lobby" />
-
-    <GridPane fx:id="playField" layoutX="-5.0" layoutY="350.0" prefHeight="450.0" prefWidth="600.0" visible="false">
-        <columnConstraints>
-         <ColumnConstraints maxWidth="98.0" minWidth="10.0" prefWidth="98.0" />
-            <ColumnConstraints maxWidth="537.0" minWidth="502.0" prefWidth="502.0" />
-        </columnConstraints>
-        <rowConstraints>
-         <RowConstraints maxHeight="78.0" minHeight="10.0" prefHeight="78.0" />
-            <RowConstraints maxHeight="337.0" minHeight="294.0" prefHeight="294.0" />
-        </rowConstraints>
-        <Label text="Hier kommt das Spielfeld" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            <GridPane.margin>
-                <Insets bottom="225.0" left="225.0" right="225.0" top="100.0" />
-            </GridPane.margin>
-        </Label>
-        <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed" prefHeight="25.0" prefWidth="71.0" text="End Turn" />
-
-        <Text fx:id="text" layoutX="205.0" layoutY="42.0" text="Dies ist ein Text" wrappingWidth="75.0" GridPane.columnIndex="1" />
-    </GridPane>
-</AnchorPane>
+    </VBox>
+    <VBox>
+        <HBox.margin>
+            <Insets right="10" left="10"></Insets>
+        </HBox.margin>
+        <VBox fx:id="playField">
+            <VBox.margin>
+                <Insets top="10"></Insets>
+            </VBox.margin>
+            <Canvas fx:id="gameMapCanvas" width="380" height="380"></Canvas>
+            <HBox>
+                <VBox.margin>
+                    <Insets top="10"></Insets>
+                </VBox.margin>
+                <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
+                        text="End Turn">
+                    <HBox.margin>
+                        <Insets right="10"></Insets>
+                    </HBox.margin>
+                </Button>
+                <Text fx:id="text" text="Dies ist ein Text" wrappingWidth="75.0">
+                    <HBox.margin>
+                        <Insets right="10"></Insets>
+                    </HBox.margin>
+                </Text>
+            </HBox>
+        </VBox>
+        <HBox>
+            <VBox.margin>
+                <Insets top="20"></Insets>
+            </VBox.margin>
+            <CheckBox fx:id="readyCheckBox" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked"
+                      text="Ready">
+                <HBox.margin>
+                    <Insets right="10"></Insets>
+                </HBox.margin>
+            </CheckBox>
+            <Button fx:id="startSession" disable="true" mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
+                    text="Start Session" visible="false">
+                <HBox.margin>
+                    <Insets right="10"></Insets>
+                </HBox.margin>
+            </Button>
+        </HBox>
+        <HBox>
+            <VBox.margin>
+                <Insets top="50"></Insets>
+            </VBox.margin>
+            <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" text="Leave Lobby"></Button>
+        </HBox>
+    </VBox>
+</HBox>
