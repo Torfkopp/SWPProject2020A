@@ -26,6 +26,8 @@ import java.util.Arrays;
 public interface IGameRendering {
 
     //Constants used to calculate different values relative to the size of the canvas
+    double OFFSETY = 3.0;
+    double OFFSETX = 3.0;
     double HEXHEIGHTFACTOR = 1.0 / 5.5;
     double HEXWIDTHFACTOR = HEXHEIGHTFACTOR * (Math.sqrt(3) / 2);
     double SETTLEMENTSIZEFACTOR = HEXHEIGHTFACTOR / 5.0;
@@ -43,12 +45,12 @@ public interface IGameRendering {
      * @param canvas            A canvas to draw on
      */
     default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas) {
-        double width = canvas.getWidth(), height = canvas.getHeight();
+        double width = canvas.getWidth(), height = canvas.getHeight() - OFFSETY * 2;
         GraphicsContext mapCtx = canvas.getGraphicsContext2D();
 
         //Sets an effectiveHeight depending on the height and width of the game map
         double effectiveHeight = (HEXWIDTHFACTOR * height * 7 < width) ? height :
-                width / (7 * HEXHEIGHTFACTOR * (Math.sqrt(3) / 2));
+                (width - OFFSETX * 2.0) / (7 * HEXHEIGHTFACTOR * (Math.sqrt(3) / 2));
 
         //Get hexes, intersections, and edges in a usable format from the gameMapManagement
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
@@ -70,10 +72,9 @@ public interface IGameRendering {
      * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawHexTiles(IGameHex[][] hexes, double effectiveHeight, GraphicsContext mapCtx) {
-        double currentY = 0;
-        //double currentY = hexHeight / 2.0;
+        double currentY = OFFSETY;
         for (IGameHex[] hex : hexes) {
-            double currentX = 0;
+            double currentX = OFFSETX;
             //Set the indentation for the current row of hex tiles
             if (hex.length % 2 == 0) { //Row with an even amount of hex tiles
                 currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
@@ -122,19 +123,19 @@ public interface IGameRendering {
     private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections,
                                   IEdge[][] edges, double effectiveHeight, GraphicsContext mapCtx) {
         //Sets currentY depending on topHalf
-        double currentY = (topHalf) ? ((HEXHEIGHTFACTOR * effectiveHeight) * (3.0 / 4.0)) :
-                ((effectiveHeight / 2) + ((HEXHEIGHTFACTOR * effectiveHeight) / 4));
+        double currentY = ((topHalf) ? ((HEXHEIGHTFACTOR * effectiveHeight) * (3.0 / 4.0)) :
+                ((effectiveHeight / 2) + ((HEXHEIGHTFACTOR * effectiveHeight) / 4))) + OFFSETY;
         //Goes through all rows in the current half of the game map
         for (int y = ((topHalf) ? 0 : intersections.length / 2); y < ((topHalf) ? intersections.length / 2 :
                 intersections.length); y++) {
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) *
                     (HEXWIDTHFACTOR * effectiveHeight);
-            double currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
+            double currentX = OFFSETX + rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
             if (topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
             goThroughSubRow(topHalf, false, currentX, currentY, intersections[y],
                     edges[y], effectiveHeight, mapCtx);
 
-            currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
+            currentX = OFFSETX + rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
             if (!topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
             currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0);
             goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y],
