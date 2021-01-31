@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.IGameRendering;
+import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -11,6 +12,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
@@ -18,6 +20,7 @@ import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -39,6 +42,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -55,6 +59,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
 
     private ObservableList<Pair<String, String>> lobbyMembers;
     private User owner;
+    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+
     private Set<User> readyUsers;
 
     @FXML
@@ -310,6 +316,26 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     }
 
     /**
+     * Handles leaving all Lobbies when a user logged out
+     * <p>
+     * If a new RemoveFromLobbiesResponse is posted onto the EventBus the
+     * method leaveLobby in LobbyService is called for every Lobby the user
+     * is in.
+     *
+     * @param response the RemoveFromLobbiesResponse seen on the EventBus
+     * @author Finn Haase
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
+     * @since 2021-01-28
+     */
+    @Subscribe
+    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response) {
+        for (Map.Entry<String, Lobby> entry : response.getLobbiesWithUser().entrySet()) {
+            lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+        }
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -340,7 +366,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         //In here to test the endTurnButton
         onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
     }
-
 
     /**
      * Updates the lobby's member list according to the list given
