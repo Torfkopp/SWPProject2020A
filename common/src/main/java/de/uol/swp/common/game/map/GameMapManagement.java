@@ -22,6 +22,8 @@ public class GameMapManagement implements IGameMapManagement {
         createBeginnerMap();
         createEdges();
         createIntersections();
+
+        hexes[robberPosition].setRobberOnField(true);
     }
 
     /**
@@ -463,7 +465,9 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public void moveRobber(int newHex) {
+        hexes[robberPosition].setRobberOnField(false);
         robberPosition = newHex;
+        hexes[robberPosition].setRobberOnField(true);
     }
 
     @Override

@@ -11,8 +11,11 @@ public interface IGameHex {
 
     type getType();
 
+    boolean isRobberOnField();
+
+    void setRobberOnField(boolean robberOnField);
+
     enum type {
         Water, Desert, Resource, Harbor
     }
-
 }

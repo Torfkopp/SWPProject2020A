@@ -7,7 +7,7 @@ package de.uol.swp.common.game.map.Hexes;
  * @author Steven
  * @since 2021-01-16
  */
-public class WaterHex implements IWaterHex {
+public class WaterHex extends AbstractHex implements IWaterHex {
 
     public WaterHex() {
     }

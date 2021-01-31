@@ -7,7 +7,7 @@ package de.uol.swp.common.game.map.Hexes;
  * @author Steven
  * @since 2021-01-16
  */
-public class HarborHex implements IHarborHex {
+public class HarborHex extends AbstractHex implements IHarborHex {
 
     private final int belongingHex, side;
     private final resource resource;

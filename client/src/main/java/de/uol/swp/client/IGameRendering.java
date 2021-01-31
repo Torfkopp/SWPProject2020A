@@ -4,6 +4,7 @@ import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.Hexes.*;
 import de.uol.swp.common.game.map.IEdge;
 import de.uol.swp.common.game.map.IIntersection;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -17,19 +18,19 @@ public interface IGameRendering {
     double CITYSIZEFACTOR = SETTLEMENTSIZEFACTOR * 1.25;
     double ROADWIDTHFACTOR = SETTLEMENTSIZEFACTOR / 4.0;
 
-    default void drawGameMap(GameMapManagement gameMapManagement, double width, double height, GraphicsContext mapCtx) {
+    default void drawGameMap(GameMapManagement gameMapManagement, Canvas canvas) {
+        double width = canvas.getWidth(), height = canvas.getHeight();
+        GraphicsContext mapCtx = canvas.getGraphicsContext2D();
+
+        //Sets an effectiveHeight depending on the height and width of the game map
         double effectiveHeight = (HEXWIDTHFACTOR * height * 7 < width) ? height : width / (7 * HEXHEIGHTFACTOR * (Math.sqrt(3) / 2));
 
-
+        //Get hexes, intersections and edges in a usable format from the gameMapManagement
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
         IEdge[][] edges = gameMapManagement.getEdgesAsJaggedArrayWithNullFiller();
 
-        mapCtx.setFill(Color.LIGHTBLUE);
-        mapCtx.fillRect(0, 0, width, height);
-        mapCtx.setStroke(Color.BLACK);
-        mapCtx.strokeRect(0, 0, width, height);
-
+        //Call functions to draw hexes, intersections and edges
         drawHexTiles(hexes, effectiveHeight, mapCtx);
         drawIntersectionsAndEdges(intersections, edges, effectiveHeight, mapCtx);
     }
@@ -37,18 +38,18 @@ public interface IGameRendering {
     private void drawHexTiles(IGameHex[][] hexes, double effectiveHeight, GraphicsContext mapCtx) {
         double currentY = 0;
         //double currentY = hexHeight / 2.0;
-        for (int y = 0; y < hexes.length; y++) {
+        for (IGameHex[] hex : hexes) {
             double currentX = 0;
             //Set the indentation for the current row of hex tiles
-            if (hexes[y].length % 2 == 0) { //Row with an even amount of hex tiles
+            if (hex.length % 2 == 0) { //Row with an even amount of hex tiles
                 currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
-                currentX += ((hexes[hexes.length/2].length - 1 - hexes[y].length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
+                currentX += ((hexes[hexes.length / 2].length - 1 - hex.length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
             } else {//Row with an odd amount of hex tiles
-                currentX += ((hexes[hexes.length/2].length - hexes[y].length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
+                currentX += ((hexes[hexes.length / 2].length - hex.length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
             }
 
-            for (int x = 0; x < hexes[y].length; x++) {
-                renderHex(currentX, currentY, hexes[y][x], effectiveHeight, mapCtx);
+            for (IGameHex iGameHex : hex) {
+                renderHex(currentX, currentY, iGameHex, effectiveHeight, mapCtx);
                 currentX += (HEXWIDTHFACTOR * effectiveHeight);
             }
             currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3;
@@ -61,11 +62,11 @@ public interface IGameRendering {
     }
 
     private void goThroughHalfMap(boolean topHalf, boolean startFirstSubRowWithOne,
-                                    IIntersection[][] intersections, IEdge[][] edges, double effectiveHeight,
-                                    GraphicsContext mapCtx) {
+                                  IIntersection[][] intersections, IEdge[][] edges, double effectiveHeight,
+                                  GraphicsContext mapCtx) {
         double currentY = (topHalf) ? ((HEXHEIGHTFACTOR * effectiveHeight) * (3.0 / 4.0)) : ((effectiveHeight / 2) + ((HEXHEIGHTFACTOR * effectiveHeight) / 4));
         for (int y = ((topHalf) ? 0 : intersections.length / 2); y < ((topHalf) ? intersections.length / 2 : intersections.length); y++) {
-            double rowStartX = ((intersections[intersections.length/2].length - intersections[y].length) / 4.0) * (HEXWIDTHFACTOR * effectiveHeight);
+            double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * (HEXWIDTHFACTOR * effectiveHeight);
             double currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
             if (topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
             goThroughSubRow(startFirstSubRowWithOne ? 1 : 0, false, currentX, currentY, intersections[y], edges[y],
@@ -174,27 +175,59 @@ public interface IGameRendering {
         mapCtx.setLineWidth(2);
         mapCtx.strokePolygon(xCords, yCords, 6);
 
+        //Draw Robber
+        mapCtx.setLineWidth(5);
+        mapCtx.setStroke(Color.BLACK);
+        if (hex.isRobberOnField()) {
+            mapCtx.strokePolygon( new double[]{x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 4.0),
+                    x + (HEXWIDTHFACTOR * effectiveHeight) * (3.0 / 4.0),
+                    x + (HEXWIDTHFACTOR * effectiveHeight) * (2.0 / 4.0)},
+            new double[]{y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.75 / 4.0),
+                    y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.75 / 4.0),
+                    y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.125 / 4.0)},
+            3);
+        }
+
+        //Draw Harbors
         if (hex instanceof IHarborHex) {
             mapCtx.setStroke(Color.SLATEGREY);
             mapCtx.setLineWidth((HEXWIDTHFACTOR * effectiveHeight) / 5.0);
             switch (((IHarborHex) hex).getSide()) {
                 case 0:
-                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0),
+                            x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0));
                     break;
                 case 1:
-                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0),
+                            x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0));
                     break;
                 case 2:
-                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0),
+                            x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0));
                     break;
                 case 3:
-                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0),
+                            x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
                     break;
                 case 4:
-                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0),
+                            x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0));
                     break;
                 case 5:
-                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0), x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0), y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
+                    mapCtx.strokeLine(x + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0),
+                            x + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
+                            y + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
                     break;
             }
             String text = "";
@@ -212,7 +245,7 @@ public interface IGameRendering {
                     text = "Grain";
                     break;
                 case Wool:
-                    text = "Whool";
+                    text = "Wool";
                     break;
                 case Any:
                     text = "Any";

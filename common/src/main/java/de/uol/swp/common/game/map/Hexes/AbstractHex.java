@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.Hexes;
 
-public abstract class AbstractLandHex implements ILandHex{
+public abstract class AbstractHex implements IGameHex{
     private boolean robberOnField;
 
     @Override
