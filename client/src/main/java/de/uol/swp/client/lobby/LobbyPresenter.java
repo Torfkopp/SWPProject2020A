@@ -440,8 +440,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     /**
      * Handles a StartSessionMessage found on the EventBus
      * <p>
-     * The lobby window gets a minimum width and height, and sets the play field
-     * to be visible.
+     * Sets the play field visible.
      *
      * @param startSessionMessage The StartSessionMessage found on the EventBus
      * @author Eric Vuong
@@ -452,9 +451,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
         if (startSessionMessage.getName().equals(this.lobbyName)) {
             Platform.runLater(() -> {
-                window.setY(window.getY() - 200);
-                ((Stage) window).setMinWidth(630);
-                ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future
                 drawGameMap(new GameMapManagement(), gameMapCanvas);

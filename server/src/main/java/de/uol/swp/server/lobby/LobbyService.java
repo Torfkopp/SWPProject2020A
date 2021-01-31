@@ -280,8 +280,7 @@ public class LobbyService extends AbstractService {
     private void onStartSessionRequest(StartSessionRequest startSessionRequest) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(startSessionRequest.getName());
         if (lobby.isPresent()) {
-            //TODO: Change back to 3
-            if (lobby.get().getUsers().size() >= 1 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
+            if (lobby.get().getUsers().size() >= 3 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
                 LOG.debug("All Members are ready, proceeding with sending of StartSessionMessage...");
                 ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), startSessionRequest.getUser());
                 post(new CreateGameMessage(lobby.get(), startSessionRequest.getUser()));

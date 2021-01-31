@@ -12,7 +12,7 @@
             <Insets right="10" left="10"></Insets>
         </HBox.margin>
         <VBox>
-            <ListView fx:id="membersView" prefHeight="100">
+            <ListView fx:id="membersView" prefHeight="100" minHeight="100">
                 <VBox.margin>
                     <Insets top="10"></Insets>
                 </VBox.margin>
@@ -48,7 +48,7 @@
             <VBox.margin>
                 <Insets top="10"></Insets>
             </VBox.margin>
-            <Canvas fx:id="gameMapCanvas" width="500" height="500"></Canvas>
+            <Canvas fx:id="gameMapCanvas" width="380" height="380"></Canvas>
             <HBox>
                 <VBox.margin>
                     <Insets top="10"></Insets>
