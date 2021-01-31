@@ -131,13 +131,13 @@ public interface IGameRendering {
                     (HEXWIDTHFACTOR * effectiveHeight);
             double currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
             if (topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
-            goThroughSubRow(topHalf ? 1 : 0, false, currentX, currentY, intersections[y],
+            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y],
                     edges[y], effectiveHeight, mapCtx);
 
             currentX = rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
             if (!topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
             currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0);
-            goThroughSubRow(topHalf ? 0 : 1, true, currentX, currentY, intersections[y],
+            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y],
                     edges[y], effectiveHeight, mapCtx);
             currentY += (HEXHEIGHTFACTOR * effectiveHeight) / 2.0;
         }
@@ -149,7 +149,7 @@ public interface IGameRendering {
      * This method is called by goThroughHalfMap to draw all intersections and optionally all edges in a given sub row.
      * Every Row is separated in to two sub row which have slightly different y-coordinates.
      *
-     * @param startOn         Used to indicate which sub row should be accessed
+     * @param firstSubRow     Used to indicate which sub row should be accessed
      * @param renderEdges     Used to indicate whether edges should be drawn
      * @param currentX        The current x-coordinate
      * @param currentY        The current y-coordinate
@@ -158,10 +158,10 @@ public interface IGameRendering {
      * @param effectiveHeight The effective height of the game map
      * @param mapCtx          A GraphicsContext needed to draw
      */
-    private void goThroughSubRow(int startOn, boolean renderEdges, double currentX, double currentY,
+    private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
                                  IIntersection[] intersections, IEdge[] edges, double effectiveHeight,
                                  GraphicsContext mapCtx) {
-        for (int x = startOn, xEdges = 0; x < intersections.length; x = x + 2, xEdges = xEdges + 3) {
+        for (int x = firstSubRow ? 1 : 0, xEdges = 0; x < intersections.length; x = x + 2, xEdges = xEdges + 3) {
             if (renderEdges) {
                 renderEdges(currentX, currentY, Arrays.copyOfRange(edges, xEdges, xEdges + 3),
                         effectiveHeight, mapCtx);
