@@ -1,6 +1,5 @@
 package de.uol.swp.client;
 
-import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.Hexes.*;
 import de.uol.swp.common.game.map.IEdge;
 import de.uol.swp.common.game.map.IGameMapManagement;
@@ -13,16 +12,16 @@ import java.util.Arrays;
 
 /**
  * IGameRendering Interface
- *
+ * <p>
  * Interface that can be used to draw a game map on a canvas.
- * This provides one default method drawGameMap that can be called to draw a given game map on a given canvas
+ * This provides one default method drawGameMap that can be called to draw a given game map on a given canvas.
  *
- * @implNote No methods of this interface need to be implemented
  * @author Timo Gerken
  * @author Temmo Junkhoff
- * @since 2021-01-31
+ * @implNote No methods of this interface need to be implemented
  * @see de.uol.swp.common.game.map.GameMapManagement
  * @see javafx.scene.canvas.Canvas
+ * @since 2021-01-31
  */
 public interface IGameRendering {
 
@@ -36,12 +35,12 @@ public interface IGameRendering {
 
     /**
      * drawGameMap Method
-     *
+     * <p>
      * This method draws the game map represented in the given GameMapManagement on the given canvas
-     * This method is the only that ever needs to be accessed from outside this interface
+     * This method is the only one that ever needs to be accessed from outside this interface.
      *
-     * @param gameMapManagement with the game map to draw
-     * @param canvas to draw on
+     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param canvas            A canvas to draw on
      */
     default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas) {
         double width = canvas.getWidth(), height = canvas.getHeight();
@@ -51,24 +50,24 @@ public interface IGameRendering {
         double effectiveHeight = (HEXWIDTHFACTOR * height * 7 < width) ? height :
                 width / (7 * HEXHEIGHTFACTOR * (Math.sqrt(3) / 2));
 
-        //Get hexes, intersections and edges in a usable format from the gameMapManagement
+        //Get hexes, intersections, and edges in a usable format from the gameMapManagement
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
         IEdge[][] edges = gameMapManagement.getEdgesAsJaggedArrayWithNullFiller();
 
-        //Call functions to draw hexes, intersections and edges
+        //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes, effectiveHeight, mapCtx);
         drawIntersectionsAndEdges(intersections, edges, effectiveHeight, mapCtx);
     }
 
     /**
      * drawHexTiles method
+     * <p>
+     * This method draws the hex tiles when given an array of hexes, a height, and a GraphicsContext.
      *
-     * This method draws the hex tiles when given an array of hexes, a height and a GraphicsContext
-     *
-     * @param hexes array of hex tiles
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param hexes           An array of hex tiles
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawHexTiles(IGameHex[][] hexes, double effectiveHeight, GraphicsContext mapCtx) {
         double currentY = 0;
@@ -94,31 +93,31 @@ public interface IGameRendering {
 
     /**
      * drawIntersectionsAndEdges method
+     * <p>
+     * This Method draws the intersections and edges.
      *
-     * This Method draws the intersections and edges
-     *
-     * @param intersections array of intersections
-     * @param edges array of edges
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param intersections   An array containing all intersections
+     * @param edges           An array containing all edges
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawIntersectionsAndEdges(IIntersection[][] intersections, IEdge[][] edges, double effectiveHeight,
                                            GraphicsContext mapCtx) {
-        goThroughHalfMap(true,  intersections, edges, effectiveHeight, mapCtx);
-        goThroughHalfMap(false,  intersections, edges, effectiveHeight, mapCtx);
+        goThroughHalfMap(true, intersections, edges, effectiveHeight, mapCtx);
+        goThroughHalfMap(false, intersections, edges, effectiveHeight, mapCtx);
     }
 
     /**
      * goThroughHalfMap method
-     *
+     * <p>
      * This methods is called by drawIntersectionsAndEdges to draw all intersections and edges in the top or bottom
-     * half of the map
+     * half of the map.
      *
-     * @param topHalf boolean indicating which half of the map needs to be drawn on
-     * @param intersections array of the intersections
-     * @param edges array of the edges
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param topHalf         A boolean indicating which half of the map needs to be drawn on
+     * @param intersections   An array containing all intersections
+     * @param edges           An array containing all edges
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections,
                                   IEdge[][] edges, double effectiveHeight, GraphicsContext mapCtx) {
@@ -146,18 +145,18 @@ public interface IGameRendering {
 
     /**
      * goThroughSubRow method
-     *
+     * <p>
      * This method is called by goThroughHalfMap to draw all intersections and optionally all edges in a given sub row.
      * Every Row is separated in to two sub row which have slightly different y-coordinates.
      *
-     * @param startOn used to indicate which sub row should be accessed
-     * @param renderEdges used to indicate whether edges should be drawn
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param intersections array of all intersections
-     * @param edges array of all edges
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param startOn         Used to indicate which sub row should be accessed
+     * @param renderEdges     Used to indicate whether edges should be drawn
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param intersections   An array containing all intersections
+     * @param edges           An array containing all edges
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void goThroughSubRow(int startOn, boolean renderEdges, double currentX, double currentY,
                                  IIntersection[] intersections, IEdge[] edges, double effectiveHeight,
@@ -173,14 +172,14 @@ public interface IGameRendering {
     }
 
     /**
-     * getPlayerColor(String) method
+     * getPlayerColour(String) method
+     * <p>
+     * This method gets the colour of the indicated player.
      *
-     * This method gets the color of the indicated player
-     *
-     * @param player indicates a player
-     * @return Color of the indicated player
+     * @param player Indicates a player
+     * @return The colour of the indicated player
      */
-    private Color getPlayerColor(String player) {
+    private Color getPlayerColour(String player) {
         if (player.startsWith("1")) {
             return Color.BLACK;
         } else if (player.startsWith("2")) {
@@ -194,49 +193,50 @@ public interface IGameRendering {
     }
 
     /**
-     * getPlayerColor(int) method
+     * getPlayerColour(int) method
+     * <p>
+     * This method gets the colour of the indicated player.
      *
-     * This method gets the color of the indicated player
-     *
-     * @param player indicates a player
-     * @return Color of the indicated player
+     * @param player Indicates a player
+     * @return The colour of the indicated player
      */
-    private Color getPlayerColor(int player) {
-        return getPlayerColor(String.valueOf(player));
+    private Color getPlayerColour(int player) {
+        return getPlayerColour(String.valueOf(player));
     }
 
     /**
      * renderEdges method
+     * <p>
+     * This Method draws the 3 edges around an intersection at the given coordinates.
      *
-     * This Method draws the 3 edges around an intersection at the given coordinates
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param edges the array containing all edges
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param edges           An array containing all edges
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void renderEdges(double currentX, double currentY, IEdge[] edges, double effectiveHeight,
                              GraphicsContext mapCtx) {
         mapCtx.setLineWidth(ROADWIDTHFACTOR * effectiveHeight);
 
-        //northwest road
+        //Northwest road
         if (edges[0] != null && edges[0].getState() != 0) {
-            mapCtx.setStroke(getPlayerColor(edges[0].getState()));
+            mapCtx.setStroke(getPlayerColour(edges[0].getState()));
             mapCtx.strokeLine(currentX, currentY,
                     currentX - ((HEXWIDTHFACTOR * effectiveHeight) / 2.0),
                     currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
         }
 
-        //northeast road
+        //Northeast road
         if (edges[1] != null && edges[1].getState() != 0) {
-            mapCtx.setStroke(getPlayerColor(edges[1].getState()));
+            mapCtx.setStroke(getPlayerColour(edges[1].getState()));
             mapCtx.strokeLine(currentX, currentY,
                     currentX, currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 2.0));
         }
 
-        //south road
+        //South road
         if (edges[2] != null && edges[2].getState() != 0) {
-            mapCtx.setStroke(getPlayerColor(edges[2].getState()));
+            mapCtx.setStroke(getPlayerColour(edges[2].getState()));
             mapCtx.strokeLine(currentX, currentY,
                     currentX + ((HEXWIDTHFACTOR * effectiveHeight) / 2.0),
                     currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
@@ -245,18 +245,18 @@ public interface IGameRendering {
 
     /**
      * renderIntersection method
-     *
+     * <p>
      * This method renders an intersection.
-     * It draws a settlement or a city on it when the intersection is marked as such
+     * It draws a settlement or a city on it when the intersection is marked as such.
      *
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param intersection the intersection to draw
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param intersection    The intersection to draw
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
-    private void renderIntersection(double currentX, double currentY, IIntersection intersection, double effectiveHeight,
-                                    GraphicsContext mapCtx) {
+    private void renderIntersection(double currentX, double currentY, IIntersection intersection,
+                                    double effectiveHeight, GraphicsContext mapCtx) {
         String state = intersection.getState();
         if (state.equals("f")) { //Free intersection
             //Free intersections don't need to be marked, but it could easily be added here
@@ -271,17 +271,18 @@ public interface IGameRendering {
 
     /**
      * drawCity method
+     * <p>
+     * This method draws a city at the given coordinates.
      *
-     * This method draws a city at the given coordinates
-     *
-     * @param state needed to access the color of player
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param state           Needed to access the color of player
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
-    private void drawCity(String state, double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
-        mapCtx.setFill(getPlayerColor(state));
+    private void drawCity(String state, double currentX, double currentY, double effectiveHeight,
+                          GraphicsContext mapCtx) {
+        mapCtx.setFill(getPlayerColour(state));
         mapCtx.fillRoundRect(currentX - ((CITYSIZEFACTOR * effectiveHeight) / 2.0),
                 currentY - ((CITYSIZEFACTOR * effectiveHeight) / 2.0),
                 (CITYSIZEFACTOR * effectiveHeight),
@@ -292,17 +293,17 @@ public interface IGameRendering {
 
     /**
      * drawSettlement method
+     * <p>
+     * This method draws a settlement at the given coordinates.
      *
-     * This method draws a settlement at the given coordinates
-     *
-     * @param state needed to access the color of player
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param state           Needed to access the color of player
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawSettlement(String state, double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
-        mapCtx.setFill(getPlayerColor(state));
+        mapCtx.setFill(getPlayerColour(state));
         mapCtx.fillOval(currentX - ((SETTLEMENTSIZEFACTOR * effectiveHeight) / 2.0),
                 currentY - ((SETTLEMENTSIZEFACTOR * effectiveHeight) / 2.0),
                 (SETTLEMENTSIZEFACTOR * effectiveHeight),
@@ -311,16 +312,17 @@ public interface IGameRendering {
 
     /**
      * renderHex method
+     * <p>
+     * This Method draws the given hex at the given coordinates.
      *
-     * This Method draws the given hex at the given coordinates
-     * @param hex the hex tile that needs to be drawn
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param hex             The hex tile that needs to be drawn
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void renderHex(IGameHex hex, double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
-        if (setHexColor(hex, mapCtx)) return;
+        if (setHexColour(hex, mapCtx)) return;
 
         drawHex(currentX, currentY, effectiveHeight, mapCtx);
 
@@ -332,15 +334,15 @@ public interface IGameRendering {
     }
 
     /**
-     * setHexColor Method
+     * setHexColour Method
+     * <p>
+     * This method sets the colour according to a hex tile.
      *
-     * This method sets the color according to a hex tile.
-     *
-     * @param hex the hex tile the color should be set accordingly to
-     * @param mapCtx GraphicsContext needed to set the color
-     * @return true if the color couldn't be set
+     * @param hex    The hex tile the colour should be set accordingly to
+     * @param mapCtx A GraphicsContext needed to set the colour
+     * @return True if the colour couldn't be set, false otherwise
      */
-    private boolean setHexColor(IGameHex hex, GraphicsContext mapCtx) {
+    private boolean setHexColour(IGameHex hex, GraphicsContext mapCtx) {
         if (hex instanceof IWaterHex) {
             mapCtx.setFill(Color.CORNFLOWERBLUE);
         } else if (hex instanceof DesertHex) {
@@ -363,12 +365,13 @@ public interface IGameRendering {
 
     /**
      * drawHex method
+     * <p>
+     * This Method draws a hexagon at the given coordinates.
      *
-     * This Method draws a hexagon at the given coordinates
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawHex(double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
         double[] xCords = {currentX,
@@ -391,14 +394,15 @@ public interface IGameRendering {
 
     /**
      * drawHarbor method
+     * <p>
+     * This method draws a harbor at the given coordinate in the correct orientation
+     * together with a text indicating which resource the harbor harbors.
      *
-     * This method draws a harbor at the given coordinate in the correct orientation with an text indicating which
-     * resource the harbor harbors
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param hex the harbor hex with the information about the harbor
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param hex             The harbor hex with the information about the harbor
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawHarbor(double currentX, double currentY, IHarborHex hex, double effectiveHeight, GraphicsContext mapCtx) {
         mapCtx.setStroke(Color.SLATEGREY);
@@ -469,13 +473,13 @@ public interface IGameRendering {
 
     /**
      * drawRobber method
+     * <p>
+     * This method draws a robber at the given coordinates.
      *
-     * This method draws a robber at the given coordinates
-     *
-     * @param currentX the current x-coordinate
-     * @param currentY the current y-coordinate
-     * @param effectiveHeight effective height of the game map
-     * @param mapCtx GraphicsContext needed to draw
+     * @param currentX        The current x-coordinate
+     * @param currentY        The current y-coordinate
+     * @param effectiveHeight The effective height of the game map
+     * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawRobber(double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
         mapCtx.setLineWidth((ROBBERLINEWIDTHFACTOR * effectiveHeight));
