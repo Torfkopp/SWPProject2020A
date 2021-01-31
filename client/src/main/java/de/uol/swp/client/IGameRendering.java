@@ -31,7 +31,7 @@ public interface IGameRendering {
     double SETTLEMENTSIZEFACTOR = HEXHEIGHTFACTOR / 5.0;
     double CITYSIZEFACTOR = SETTLEMENTSIZEFACTOR * 1.25;
     double ROADWIDTHFACTOR = SETTLEMENTSIZEFACTOR / 4.0;
-    double ROBBERLINEWIDTHFACTOR = ROADWIDTHFACTOR / 8.0;
+    double ROBBERLINEWIDTHFACTOR = ROADWIDTHFACTOR / 2.0;
 
     /**
      * drawGameMap Method
@@ -42,7 +42,7 @@ public interface IGameRendering {
      * @param gameMapManagement with the game map to draw
      * @param canvas to draw on
      */
-    default void drawGameMap(GameMapManagement gameMapManagement, Canvas canvas) {
+    default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas) {
         double width = canvas.getWidth(), height = canvas.getHeight();
         GraphicsContext mapCtx = canvas.getGraphicsContext2D();
 
@@ -230,15 +230,15 @@ public interface IGameRendering {
         if (edges[1] != null && edges[1].getState() != 0) {
             mapCtx.setStroke(getPlayerColor(edges[1].getState()));
             mapCtx.strokeLine(currentX, currentY,
-                    currentX + ((HEXWIDTHFACTOR * effectiveHeight) / 2.0),
-                    currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
+                    currentX, currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 2.0));
         }
 
         //south road
         if (edges[2] != null && edges[2].getState() != 0) {
             mapCtx.setStroke(getPlayerColor(edges[2].getState()));
             mapCtx.strokeLine(currentX, currentY,
-                    currentX, currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 2.0));
+                    currentX + ((HEXWIDTHFACTOR * effectiveHeight) / 2.0),
+                    currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
         }
     }
 

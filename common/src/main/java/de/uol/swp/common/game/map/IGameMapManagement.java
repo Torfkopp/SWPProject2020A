@@ -20,7 +20,27 @@ public interface IGameMapManagement {
      */
     IGameHex getHex(int place);
 
+    /**
+     * Gets the hexes in a usable format for rendering them as a jagged array
+     *
+     * @return a jagged array containing the hexes
+     */
     IGameHex[][] getHexesAsJaggedArray();
+
+    /**
+     * Gets the edges in a usable format for rendering them as a jagged array with some extra positions filled with null
+     *
+     * @return a jagged array containing the hexes
+     */
+    IEdge[][] getEdgesAsJaggedArrayWithNullFiller();
+
+    /**
+     * Gets the intersections in a usable format for rendering them as a jagged array
+     *
+     * @return a jagged array containing the intersections
+     */
+    IIntersection[][] getIntersectionsAsJaggedArray();
+
     /**
      * Places a settlement
      *

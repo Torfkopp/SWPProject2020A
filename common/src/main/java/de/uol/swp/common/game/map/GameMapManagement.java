@@ -285,6 +285,7 @@ public class GameMapManagement implements IGameMapManagement {
         return map;
     }
 
+    @Override
     public IIntersection[][] getIntersectionsAsJaggedArray() {
         IIntersection[][] intersec;
         intersec = new IIntersection[6][];
@@ -338,7 +339,7 @@ public class GameMapManagement implements IGameMapManagement {
         }
         return intersec;
     }
-
+    @Override
     public IEdge[][] getEdgesAsJaggedArrayWithNullFiller(){
         IEdge[][] edgeArray;
         edgeArray = new IEdge[6][];
