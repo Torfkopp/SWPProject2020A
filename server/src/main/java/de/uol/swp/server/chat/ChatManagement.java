@@ -29,22 +29,13 @@ public class ChatManagement extends AbstractChatManagement {
      * Constructor
      *
      * @param chatMessageStore Object of the ChatMessageStore to be used
+     *
      * @see de.uol.swp.server.chat.store.ChatMessageStore
      * @since 2020-12-16
      */
     @Inject
     public ChatManagement(ChatMessageStore chatMessageStore) {
         this.chatMessageStore = chatMessageStore;
-    }
-
-    @Override
-    public List<ChatMessage> getLatestMessages(int amount) {
-        return chatMessageStore.getLatestMessages(amount);
-    }
-
-    @Override
-    public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
-        return chatMessageStore.getLatestMessages(amount, originLobby);
     }
 
     @Override
@@ -68,24 +59,6 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public ChatMessage updateChatMessage(int id, String updatedContent) {
-        Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id);
-        if (chatMessage.isEmpty()) {
-            throw new ChatManagementException("ChatMessage ID unknown");
-        }
-        return chatMessageStore.updateChatMessage(id, updatedContent);
-    }
-
-    @Override
-    public ChatMessage updateChatMessage(int id, String updatedContent, String originLobby) {
-        Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
-        if (chatMessage.isEmpty()) {
-            throw new ChatManagementException("ChatMessage ID unknown");
-        }
-        return chatMessageStore.updateChatMessage(id, updatedContent, originLobby);
-    }
-
-    @Override
     public void dropChatMessage(int id) {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id);
         if (chatMessage.isEmpty()) {
@@ -106,5 +79,33 @@ public class ChatManagement extends AbstractChatManagement {
     @Override
     public void dropLobbyHistory(String originLobby) {
         chatMessageStore.removeLobbyHistory(originLobby);
+    }
+
+    @Override
+    public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
+        return chatMessageStore.getLatestMessages(amount, originLobby);
+    }
+
+    @Override
+    public List<ChatMessage> getLatestMessages(int amount) {
+        return chatMessageStore.getLatestMessages(amount);
+    }
+
+    @Override
+    public ChatMessage updateChatMessage(int id, String updatedContent, String originLobby) {
+        Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
+        if (chatMessage.isEmpty()) {
+            throw new ChatManagementException("ChatMessage ID unknown");
+        }
+        return chatMessageStore.updateChatMessage(id, updatedContent, originLobby);
+    }
+
+    @Override
+    public ChatMessage updateChatMessage(int id, String updatedContent) {
+        Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id);
+        if (chatMessage.isEmpty()) {
+            throw new ChatManagementException("ChatMessage ID unknown");
+        }
+        return chatMessageStore.updateChatMessage(id, updatedContent);
     }
 }

@@ -9,6 +9,7 @@ package de.uol.swp.common.chat.message;
  * @since 2020-12-17
  */
 public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
+
     private final int id;
 
     /**
@@ -33,6 +34,7 @@ public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
      *
      * @param id        The ID of the ChatMessage that was deleted
      * @param lobbyName The Lobby this DeletedChatMessageMessage is being sent to
+     *
      * @since 2020-12-30
      */
     public DeletedChatMessageMessage(int id, String lobbyName) {

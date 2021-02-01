@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * This tests the game map
  *
- * @author Mario
+ * @author Mario Fokken
  */
 public class GameMapTest {
 
@@ -27,6 +27,13 @@ public class GameMapTest {
         ResourceHex rh = (ResourceHex) map.getHex(20);
         assertEquals(rh.getType(), IGameHex.type.Resource);
         assertEquals(rh.getResource(), IResourceHex.resource.Forest);
+    }
+
+    @Test
+    void moveRobberTest() {
+        int robberPos = map.getRobberPos();
+        map.moveRobber(36);
+        assertNotEquals(robberPos, map.getRobberPos());
     }
 
     @Test
@@ -64,12 +71,4 @@ public class GameMapTest {
         assertFalse(map.placeRoad(2, 2));
         assertTrue(map.placeRoad(1, 2));
     }
-
-    @Test
-    void moveRobberTest() {
-        int robberPos = map.getRobberPos();
-        map.moveRobber(36);
-        assertNotEquals(robberPos, map.getRobberPos());
-    }
-
 }

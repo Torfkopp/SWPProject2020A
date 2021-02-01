@@ -21,6 +21,7 @@ public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
      * Constructor
      *
      * @param user User whose client authorised successfully
+     *
      * @see de.uol.swp.common.user.User
      * @since 2019-08-07
      */
@@ -33,6 +34,7 @@ public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
      * Gets the user attribute
      *
      * @return The user whose client authorised successfully
+     *
      * @see de.uol.swp.common.user.User
      * @since 2019-08-07
      */

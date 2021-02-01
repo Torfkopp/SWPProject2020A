@@ -9,23 +9,6 @@ import java.io.*;
  */
 public class SerialisationTestHelper {
 
-    public static <T extends Serializable> byte[] pickle(T obj)
-            throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(obj);
-        oos.close();
-        return baos.toByteArray();
-    }
-
-    public static <T extends Serializable> T unpickle(byte[] b, Class<T> cl)
-            throws IOException, ClassNotFoundException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(b);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Object o = ois.readObject();
-        return cl.cast(o);
-    }
-
     public static <T extends Serializable> boolean checkSerialisableAndDeserialisable(T obj, Class<T> cl) {
         try {
             byte[] bytes = pickle(obj);
@@ -34,5 +17,20 @@ public class SerialisationTestHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T extends Serializable> byte[] pickle(T obj) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        oos.close();
+        return baos.toByteArray();
+    }
+
+    public static <T extends Serializable> T unpickle(byte[] b, Class<T> cl) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(b);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object o = ois.readObject();
+        return cl.cast(o);
     }
 }

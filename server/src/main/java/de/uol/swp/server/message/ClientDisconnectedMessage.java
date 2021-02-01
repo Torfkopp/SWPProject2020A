@@ -13,5 +13,4 @@ package de.uol.swp.server.message;
  * @see de.uol.swp.server.usermanagement.AuthenticationService
  * @since 2019-08-07
  */
-public class ClientDisconnectedMessage extends AbstractServerInternalMessage {
-}
+public class ClientDisconnectedMessage extends AbstractServerInternalMessage {}

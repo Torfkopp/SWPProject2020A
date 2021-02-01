@@ -10,5 +10,4 @@ package de.uol.swp.client.register.event;
  * @see de.uol.swp.client.SceneManager
  * @since 2019-09-03
  */
-public class RegistrationCanceledEvent {
-}
+public class RegistrationCanceledEvent {}

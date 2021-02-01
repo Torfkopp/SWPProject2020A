@@ -15,24 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 2021-01-21
  */
 class UserReadyRequestTest {
+
     private static final User defaultUser = new UserDTO("chuck", "test", "chuck@norris.com");
-
-    /**
-     * Tests the userReadyRequest when isReady is true
-     * <p>
-     * This tests fails if any of the parameters is not as expected.
-     */
-    @Test
-    void UserIsReadyTest() {
-        UserReadyRequest userReadyRequest = new UserReadyRequest("Lobby", defaultUser, true);
-
-        assertEquals(userReadyRequest.getName(), "Lobby");
-        assertEquals(userReadyRequest.getUser(), defaultUser);
-        assertEquals(userReadyRequest.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(userReadyRequest.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(userReadyRequest.getUser().getEMail(), defaultUser.getEMail());
-        assertTrue(userReadyRequest.isReady());
-    }
 
     /**
      * Tests the userReadyRequest when isReady is false
@@ -49,5 +33,22 @@ class UserReadyRequestTest {
         assertEquals(userReadyRequest.getUser().getPassword(), defaultUser.getPassword());
         assertEquals(userReadyRequest.getUser().getEMail(), defaultUser.getEMail());
         assertFalse(userReadyRequest.isReady());
+    }
+
+    /**
+     * Tests the userReadyRequest when isReady is true
+     * <p>
+     * This tests fails if any of the parameters is not as expected.
+     */
+    @Test
+    void UserIsReadyTest() {
+        UserReadyRequest userReadyRequest = new UserReadyRequest("Lobby", defaultUser, true);
+
+        assertEquals(userReadyRequest.getName(), "Lobby");
+        assertEquals(userReadyRequest.getUser(), defaultUser);
+        assertEquals(userReadyRequest.getUser().getUsername(), defaultUser.getUsername());
+        assertEquals(userReadyRequest.getUser().getPassword(), defaultUser.getPassword());
+        assertEquals(userReadyRequest.getUser().getEMail(), defaultUser.getEMail());
+        assertTrue(userReadyRequest.isReady());
     }
 }

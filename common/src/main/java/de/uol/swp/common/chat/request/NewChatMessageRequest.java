@@ -12,6 +12,7 @@ import de.uol.swp.common.user.User;
  * @since 2020-12-17
  */
 public class NewChatMessageRequest extends AbstractChatMessageRequest {
+
     private final User author;
     private final String content;
 
@@ -40,6 +41,7 @@ public class NewChatMessageRequest extends AbstractChatMessageRequest {
      * @param author      The author of the ChatMessage that should be saved
      * @param content     The content of the ChatMessage that should be saved
      * @param originLobby The Lobby the NewChatMessageRequest originated from
+     *
      * @since 2020-12-30
      */
     public NewChatMessageRequest(User author, String content, String originLobby) {

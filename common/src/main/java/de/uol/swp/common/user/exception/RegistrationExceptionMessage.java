@@ -20,6 +20,7 @@ public class RegistrationExceptionMessage extends AbstractResponseMessage {
      * Constructor
      *
      * @param message String containing the reason why the registration failed
+     *
      * @since 2019-09-02
      */
     public RegistrationExceptionMessage(String message) {

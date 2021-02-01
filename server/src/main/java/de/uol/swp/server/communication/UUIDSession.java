@@ -24,6 +24,7 @@ public class UUIDSession implements Session {
      * Private constructor
      *
      * @param user The user connected to the session
+     *
      * @since 2017-03-17
      */
     private UUIDSession(User user) {
@@ -39,7 +40,9 @@ public class UUIDSession implements Session {
      * Builder exposed to every class in the server. Used because the constructor is private
      *
      * @param user The user connected to the session
+     *
      * @return T new UUIDSession object for the user
+     *
      * @since 2019-08-07
      */
     public static Session create(User user) {

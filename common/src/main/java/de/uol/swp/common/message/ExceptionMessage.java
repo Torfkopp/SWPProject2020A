@@ -16,6 +16,7 @@ public class ExceptionMessage extends AbstractResponseMessage {
      * Constructor
      *
      * @param message String containing the cause of the exception
+     *
      * @since 2017-03-17
      */
     public ExceptionMessage(String message) {
@@ -26,6 +27,7 @@ public class ExceptionMessage extends AbstractResponseMessage {
      * Gets the exception message
      *
      * @return String containing the cause of the exception
+     *
      * @since 2017-03-17
      */
     public String getException() {

@@ -21,6 +21,7 @@ import de.uol.swp.common.user.User;
  * @since 2020-12-30
  */
 public class LobbyUpdateEvent {
+
     private final String lobbyName;
     private final User user;
 

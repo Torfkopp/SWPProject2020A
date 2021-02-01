@@ -33,20 +33,11 @@ public class UserLoggedInMessage extends AbstractServerMessage {
      * Constructor
      *
      * @param username The username of the newly logged in user
+     *
      * @since 2017-03-17
      */
     public UserLoggedInMessage(String username) {
         this.username = username;
-    }
-
-    /**
-     * Gets the username
-     *
-     * @return String containing the username
-     * @since 2017-03-17
-     */
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -60,5 +51,16 @@ public class UserLoggedInMessage extends AbstractServerMessage {
         if (o == null || getClass() != o.getClass()) return false;
         UserLoggedInMessage that = (UserLoggedInMessage) o;
         return Objects.equals(username, that.username);
+    }
+
+    /**
+     * Gets the username
+     *
+     * @return String containing the username
+     *
+     * @since 2017-03-17
+     */
+    public String getUsername() {
+        return username;
     }
 }

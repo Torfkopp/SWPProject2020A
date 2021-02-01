@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 2021-01-21
  */
 class UserReadyMessageTest {
+
     private static final User defaultUser = new UserDTO("chuck", "test", "chuck@norris.com");
 
     /**

@@ -3,25 +3,11 @@ package de.uol.swp.common.game.map.Hexes;
 /**
  * Interface for a harbor hex
  *
- * @author Mario
- * @author Steven
+ * @author Mario Fokken
+ * @author Steven Luong
  * @since 2021-01-16
  */
 public interface IHarborHex extends IWaterHex {
-
-    /**
-     * Gets the side to which the harbor faces
-     *
-     * @return Side
-     */
-    int getSide();
-
-    /**
-     * Gets the harbor's resource
-     *
-     * @return Resource
-     */
-    resource getResource();
 
     /**
      * Enum for the five resources a harbor can trade
@@ -31,4 +17,17 @@ public interface IHarborHex extends IWaterHex {
         Brick, Lumber, Ore, Grain, Wool, Any
     }
 
+    /**
+     * Gets the harbor's resource
+     *
+     * @return Resource
+     */
+    resource getResource();
+
+    /**
+     * Gets the side to which the harbor faces
+     *
+     * @return Side
+     */
+    int getSide();
 }

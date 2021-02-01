@@ -3,7 +3,7 @@ package de.uol.swp.common.game.map;
 /**
  * Interface for an intersection
  *
- * @author Mario
+ * @author Mario Fokken
  * @since 2021-01-17
  */
 public interface IIntersection {
@@ -37,5 +37,4 @@ public interface IIntersection {
      *              1-4 for owner plus s (settlement) or c (city)
      */
     void setState(String state);
-
 }

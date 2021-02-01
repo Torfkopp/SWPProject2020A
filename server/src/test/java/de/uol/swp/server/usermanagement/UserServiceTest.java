@@ -21,20 +21,6 @@ class UserServiceTest {
     final UserService userService = new UserService(bus, userManagement);
 
     @Test
-    void registerUserTest() {
-        final Message request = new RegisterUserRequest(userToRegister);
-
-        // The post will lead to a call of a UserService function
-        bus.post(request);
-
-        // can only test, if something in the state has changed
-        final User loggedInUser = userManagement.login(userToRegister.getUsername(), userToRegister.getPassword());
-
-        assertNotNull(loggedInUser);
-        assertEquals(loggedInUser, userToRegister);
-    }
-
-    @Test
     void registerSecondUserWithSameName() {
         final Message request = new RegisterUserRequest(userToRegister);
         final Message request2 = new RegisterUserRequest(userWithSameName);
@@ -50,5 +36,19 @@ class UserServiceTest {
 
         // old user should not be overwritten!
         assertNotEquals(loggedInUser.getEMail(), userWithSameName.getEMail());
+    }
+
+    @Test
+    void registerUserTest() {
+        final Message request = new RegisterUserRequest(userToRegister);
+
+        // The post will lead to a call of a UserService function
+        bus.post(request);
+
+        // can only test, if something in the state has changed
+        final User loggedInUser = userManagement.login(userToRegister.getUsername(), userToRegister.getPassword());
+
+        assertNotNull(loggedInUser);
+        assertEquals(loggedInUser, userToRegister);
     }
 }

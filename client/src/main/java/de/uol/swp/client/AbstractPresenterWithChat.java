@@ -46,7 +46,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     @FXML
     protected ListView<ChatMessage> chatView;
-
     @FXML
     protected TextField messageField;
 
@@ -70,87 +69,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Handles new incoming ChatMessage
-     * <p>
-     * If a CreatedChatMessageMessage is posted to the EventBus, this method
-     * puts the incoming ChatMessage's content into the chatMessageMap with the
-     * ChatMessage's ID as the key.
-     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
-     * the incoming ChatMessage's content is displayed in the log.
-     *
-     * @param msg The CreatedChatMessageMessage object found on the EventBus
-     * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
-     */
-    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
-                    + ": '" + msg.getMsg().getContent() + "' for " + msg.getLobbyName() + " chat");
-        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
-            LOG.debug("Received ChatMessage from " + msg.getMsg().getAuthor().getUsername()
-                    + ": '" + msg.getMsg().getContent() + "' for Global chat");
-        }
-        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
-    }
-
-    /**
-     * Handles incoming notification that a ChatMessage was deleted
-     * <p>
-     * If a DeletedChatMessageMessage is posted to the EventBus, this method
-     * removes the ChatMessage with the corresponding ID from the chatMessageMap.
-     *
-     * @param msg The DeletedChatMessageMessage found on the EventBus
-     * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
-     */
-    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in lobby "
-                    + msg.getLobbyName());
-        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
-            LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in Global chat");
-        }
-        Platform.runLater(() -> {
-            for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i).getID() == msg.getId()) {
-                    chatMessages.remove(i);
-                }
-            }
-        });
-    }
-
-    /**
-     * Handles incoming notification that a ChatMessage was edited
-     * <p>
-     * If an EditedChatMessageMessage is posted to the EventBus, this method
-     * replaces the content in the chatMessageMap that is stored under the
-     * edited ChatMessage's ID.
-     *
-     * @param msg The EditedChatMessageMessage found on the EventBus
-     * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
-     */
-    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '"
-                    + msg.getMsg().getContent() + "' in lobby " + msg.getLobbyName());
-        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
-            LOG.debug("Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '"
-                    + msg.getMsg().getContent() + "' in Global Chat");
-        }
-        Platform.runLater(() -> {
-            for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i).getID() == msg.getMsg().getID()) {
-                    chatMessages.set(i, msg.getMsg());
-                }
-            }
-        });
-    }
-
-    /**
      * Handles AskLatestChatMessageResponse
      * <p>
      * If a AskLatestChatMessageResponse is found on the EventBus,
      * this method calls updateChatMessageList to fill or update the ChatMessageList.
      *
      * @param rsp The AskLatestChatMessageResponse found on the EventBus
+     *
      * @see de.uol.swp.common.chat.response.AskLatestChatMessageResponse
      */
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
@@ -164,12 +89,37 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
+     * Handles new incoming ChatMessage
+     * <p>
+     * If a CreatedChatMessageMessage is posted to the EventBus, this method
+     * puts the incoming ChatMessage's content into the chatMessageMap with the
+     * ChatMessage's ID as the key.
+     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
+     * the incoming ChatMessage's content is displayed in the log.
+     *
+     * @param msg The CreatedChatMessageMessage object found on the EventBus
+     *
+     * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
+     */
+    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug(
+                    "Received ChatMessage from " + msg.getMsg().getAuthor().getUsername() + ": '" + msg.getMsg().getContent() + "' for " + msg.getLobbyName() + " chat");
+        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug(
+                    "Received ChatMessage from " + msg.getMsg().getAuthor().getUsername() + ": '" + msg.getMsg().getContent() + "' for Global chat");
+        }
+        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+    }
+
+    /**
      * Method called when the DeleteMessageButton is pressed
      * <p>
      * This method is called when the DeleteMessageButton is pressed. It calls the chatService
      * to delete the message currently selected in the chatView.
      *
      * @param event The ActionEvent generated by pressing the Delete Message button
+     *
      * @see de.uol.swp.client.chat.ChatService
      */
     @FXML
@@ -188,26 +138,29 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Method called when the SendMessageButton is pressed
+     * Handles incoming notification that a ChatMessage was deleted
      * <p>
-     * This Method is called when the SendMessageButton is pressed. It calls the chatService
-     * to create a new message with the contents of the messageField as its content and
-     * the currently logged in user as author. It also clears the messageField.
+     * If a DeletedChatMessageMessage is posted to the EventBus, this method
+     * removes the ChatMessage with the corresponding ID from the chatMessageMap.
      *
-     * @param event The ActionEvent generated by pressing the Send Message button
-     * @see de.uol.swp.client.chat.ChatService
+     * @param msg The DeletedChatMessageMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
      */
-    @FXML
-    protected void onSendMessageButtonPressed(ActionEvent event) {
-        String msg = messageField.getText();
-        messageField.clear();
-        if (lobbyName != null) {
-            LOG.debug("Sending ChatMessage for lobby " + lobbyName + " ('" + msg + "') from " + loggedInUser.getUsername());
-            chatService.newMessage(loggedInUser, msg, lobbyName);
-        } else {
-            LOG.debug("Sending ChatMessage for Global chat ('" + msg + "') from " + loggedInUser.getUsername());
-            chatService.newMessage(loggedInUser, msg);
+    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug(
+                    "Received instruction to delete ChatMessage with ID " + msg.getId() + " in lobby " + msg.getLobbyName());
+        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug("Received instruction to delete ChatMessage with ID " + msg.getId() + " in Global chat");
         }
+        Platform.runLater(() -> {
+            for (int i = 0; i < chatMessages.size(); i++) {
+                if (chatMessages.get(i).getID() == msg.getId()) {
+                    chatMessages.remove(i);
+                }
+            }
+        });
     }
 
     /**
@@ -218,6 +171,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * with the content found in the messageField.
      *
      * @param event The ActionEvent generated by pressing the Edit Message button
+     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.chat.ChatService
@@ -229,24 +183,69 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         Integer msgId = chatMsg.getID();
         if (msgId != null) {
             if (lobbyName != null) {
-                LOG.debug("Sending request to edit ChatMessage with ID " + msgId + " in lobby " + lobbyName
-                        + " to new content '" + messageField.getText() + '\'');
+                LOG.debug(
+                        "Sending request to edit ChatMessage with ID " + msgId + " in lobby " + lobbyName + " to new content '" + messageField.getText() + '\'');
                 chatService.editMessage(msgId, messageField.getText(), lobbyName);
             } else {
-                LOG.debug("Sending request to edit ChatMessage with ID " + msgId + " in Global chat to new content: '"
-                        + messageField.getText() + '\'');
+                LOG.debug(
+                        "Sending request to edit ChatMessage with ID " + msgId + " in Global chat to new content: '" + messageField.getText() + '\'');
                 chatService.editMessage(msgId, messageField.getText());
             }
             messageField.clear();
         }
     }
 
-    private void updateChatMessageList(List<ChatMessage> chatMessageList) {
+    /**
+     * Handles incoming notification that a ChatMessage was edited
+     * <p>
+     * If an EditedChatMessageMessage is posted to the EventBus, this method
+     * replaces the content in the chatMessageMap that is stored under the
+     * edited ChatMessage's ID.
+     *
+     * @param msg The EditedChatMessageMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
+     */
+    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug(
+                    "Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '" + msg.getMsg().getContent() + "' in lobby " + msg.getLobbyName());
+        } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug(
+                    "Received instruction to edit ChatMessage with ID " + msg.getMsg().getID() + " to: '" + msg.getMsg().getContent() + "' in Global Chat");
+        }
         Platform.runLater(() -> {
-            if (chatMessages == null) prepareChatVars();
-            chatMessages.clear();
-            chatMessages.addAll(chatMessageList);
+            for (int i = 0; i < chatMessages.size(); i++) {
+                if (chatMessages.get(i).getID() == msg.getMsg().getID()) {
+                    chatMessages.set(i, msg.getMsg());
+                }
+            }
         });
+    }
+
+    /**
+     * Method called when the SendMessageButton is pressed
+     * <p>
+     * This Method is called when the SendMessageButton is pressed. It calls the chatService
+     * to create a new message with the contents of the messageField as its content and
+     * the currently logged in user as author. It also clears the messageField.
+     *
+     * @param event The ActionEvent generated by pressing the Send Message button
+     *
+     * @see de.uol.swp.client.chat.ChatService
+     */
+    @FXML
+    protected void onSendMessageButtonPressed(ActionEvent event) {
+        String msg = messageField.getText();
+        messageField.clear();
+        if (lobbyName != null) {
+            LOG.debug(
+                    "Sending ChatMessage for lobby " + lobbyName + " ('" + msg + "') from " + loggedInUser.getUsername());
+            chatService.newMessage(loggedInUser, msg, lobbyName);
+        } else {
+            LOG.debug("Sending ChatMessage for Global chat ('" + msg + "') from " + loggedInUser.getUsername());
+            chatService.newMessage(loggedInUser, msg);
+        }
     }
 
     /**
@@ -281,12 +280,20 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * multiple instances of the chat being displayed in the chatView.
      *
      * @author Finn Haase
-     * @author Phillip-André Suhr3
+     * @author Phillip-André Suhr
      * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessages
      * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
      * @since 2020-12-26
      */
     protected void resetCharVars() {
         chatMessages = null;
+    }
+
+    private void updateChatMessageList(List<ChatMessage> chatMessageList) {
+        Platform.runLater(() -> {
+            if (chatMessages == null) prepareChatVars();
+            chatMessages.clear();
+            chatMessages.addAll(chatMessageList);
+        });
     }
 }

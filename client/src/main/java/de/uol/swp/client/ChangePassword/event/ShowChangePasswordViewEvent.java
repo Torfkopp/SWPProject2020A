@@ -14,12 +14,13 @@ import de.uol.swp.common.user.User;
  * @since 2020-11-25
  */
 public class ShowChangePasswordViewEvent {
+
     private User user;
 
     /**
      * Default constructor
      *
-     * @author Mario
+     * @author Mario Fokken
      * @since 2020-12-16
      */
     public ShowChangePasswordViewEvent() {
@@ -29,7 +30,8 @@ public class ShowChangePasswordViewEvent {
      * Constructor
      *
      * @param user The user changing his password
-     * @author Mario
+     *
+     * @author Mario Fokken
      * since 2020-12-16
      */
     public ShowChangePasswordViewEvent(User user) {
@@ -40,7 +42,8 @@ public class ShowChangePasswordViewEvent {
      * Gets the user
      *
      * @return user object
-     * @author Mario
+     *
+     * @author Mario Fokken
      * @since 2020-12-16
      */
     public User getUser() {

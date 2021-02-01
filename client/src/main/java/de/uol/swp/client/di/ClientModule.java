@@ -3,10 +3,7 @@ package de.uol.swp.client.di;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import de.uol.swp.client.ClientConnection;
-import de.uol.swp.client.ClientConnectionFactory;
-import de.uol.swp.client.SceneManager;
-import de.uol.swp.client.SceneManagerFactory;
+import de.uol.swp.client.*;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.user.ClientUserService;
@@ -21,6 +18,7 @@ import javafx.fxml.FXMLLoader;
  */
 @SuppressWarnings("UnstableApiUsage")
 public class ClientModule extends AbstractModule {
+
     final EventBus eventBus = new EventBus();
 
     @Override

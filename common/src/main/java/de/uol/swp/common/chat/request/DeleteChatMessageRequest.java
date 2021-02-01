@@ -9,6 +9,7 @@ package de.uol.swp.common.chat.request;
  * @since 2020-12-17
  */
 public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
+
     private final int id;
 
     /**
@@ -33,6 +34,7 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @param id          The ID of the ChatMessage that should be deleted
      * @param originLobby The Lobby the DeleteChatMessageRequest originated from
+     *
      * @since 2020-12-30
      */
     public DeleteChatMessageRequest(int id, String originLobby) {

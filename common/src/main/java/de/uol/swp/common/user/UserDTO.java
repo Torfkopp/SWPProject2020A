@@ -24,6 +24,7 @@ public class UserDTO implements User {
      * @param username The user's username
      * @param password The user's password
      * @param eMail    The user's e-mail address
+     *
      * @since 2019-08-13
      */
     public UserDTO(String username, String password, String eMail) {
@@ -38,7 +39,9 @@ public class UserDTO implements User {
      * Copy constructor
      *
      * @param user User object to copy the values of
+     *
      * @return User copy of the User object
+     *
      * @since 2019-08-13
      */
     public static User create(User user) {
@@ -52,7 +55,9 @@ public class UserDTO implements User {
      * flaw to send all user data including passwords to everyone connected.
      *
      * @param user User object to copy the values of
+     *
      * @return UserDTO Copy of User object with the password variable left empty
+     *
      * @since 2019-08-13
      */
     public static User createWithoutPassword(User user) {
@@ -60,8 +65,8 @@ public class UserDTO implements User {
     }
 
     @Override
-    public String getUsername() {
-        return username;
+    public String getEMail() {
+        return eMail;
     }
 
     @Override
@@ -70,8 +75,8 @@ public class UserDTO implements User {
     }
 
     @Override
-    public String getEMail() {
-        return eMail;
+    public String getUsername() {
+        return username;
     }
 
     @Override

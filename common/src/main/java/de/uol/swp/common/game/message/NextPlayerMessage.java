@@ -8,8 +8,9 @@ import de.uol.swp.common.user.User;
  * @since 2021-01-15
  */
 public class NextPlayerMessage extends AbstractGameMessage {
-    String lobby;
-    User activePlayer;
+
+    private final String lobby;
+    private final User activePlayer;
 
     /**
      * Constructor
@@ -22,20 +23,20 @@ public class NextPlayerMessage extends AbstractGameMessage {
     }
 
     /**
-     * Gets the lobby
-     *
-     * @return String The lobby's name
-     */
-    public String getLobby() {
-        return lobby;
-    }
-
-    /**
      * Gets the player whose turn it is
      *
      * @return User
      */
     public User getActivePlayer() {
         return activePlayer;
+    }
+
+    /**
+     * Gets the lobby
+     *
+     * @return String The lobby's name
+     */
+    public String getLobby() {
+        return lobby;
     }
 }

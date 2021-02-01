@@ -5,12 +5,11 @@ import de.uol.swp.common.user.User;
 /**
  * The player's inventory
  *
- * @author Mario
- * @author Steven
+ * @author Mario Fokken
+ * @author Steven Luong
  * @since 2021-01-16
  */
 public class Inventory {
-
 
     private final User player;
 
@@ -35,18 +34,6 @@ public class Inventory {
         this.player = player;
     }
 
-    public User getPlayer() {
-        return player;
-    }
-
-    public int getTotalResources() {
-        return totalResources;
-    }
-
-    public void setTotalResources(int totalResources) {
-        this.totalResources = totalResources;
-    }
-
     public int getBrick() {
         return brick;
     }
@@ -63,38 +50,6 @@ public class Inventory {
         this.grain = grain;
     }
 
-    public int getLumber() {
-        return lumber;
-    }
-
-    public void setLumber(int lumber) {
-        this.lumber = lumber;
-    }
-
-    public int getOre() {
-        return ore;
-    }
-
-    public void setOre(int ore) {
-        this.ore = ore;
-    }
-
-    public int getWool() {
-        return wool;
-    }
-
-    public void setWool(int wool) {
-        this.wool = wool;
-    }
-
-    public int getVictoryPointCards() {
-        return victoryPointCards;
-    }
-
-    public void setVictoryPointCards(int victoryPointCards) {
-        this.victoryPointCards = victoryPointCards;
-    }
-
     public int getKnightCards() {
         return knightCards;
     }
@@ -103,20 +58,12 @@ public class Inventory {
         this.knightCards = knightCards;
     }
 
-    public int getRoadBuildingCards() {
-        return roadBuildingCards;
+    public int getLumber() {
+        return lumber;
     }
 
-    public void setRoadBuildingCards(int roadBuildingCards) {
-        this.roadBuildingCards = roadBuildingCards;
-    }
-
-    public int getYearOfPlentyCards() {
-        return yearOfPlentyCards;
-    }
-
-    public void setYearOfPlentyCards(int yearOfPlentyCards) {
-        this.yearOfPlentyCards = yearOfPlentyCards;
+    public void setLumber(int lumber) {
+        this.lumber = lumber;
     }
 
     public int getMonopolyCards() {
@@ -127,12 +74,56 @@ public class Inventory {
         this.monopolyCards = monopolyCards;
     }
 
-    public boolean isLongestRoad() {
-        return longestRoad;
+    public int getOre() {
+        return ore;
     }
 
-    public void setLongestRoad(boolean longestRoad) {
-        this.longestRoad = longestRoad;
+    public void setOre(int ore) {
+        this.ore = ore;
+    }
+
+    public User getPlayer() {
+        return player;
+    }
+
+    public int getRoadBuildingCards() {
+        return roadBuildingCards;
+    }
+
+    public void setRoadBuildingCards(int roadBuildingCards) {
+        this.roadBuildingCards = roadBuildingCards;
+    }
+
+    public int getTotalResources() {
+        return totalResources;
+    }
+
+    public void setTotalResources(int totalResources) {
+        this.totalResources = totalResources;
+    }
+
+    public int getVictoryPointCards() {
+        return victoryPointCards;
+    }
+
+    public void setVictoryPointCards(int victoryPointCards) {
+        this.victoryPointCards = victoryPointCards;
+    }
+
+    public int getWool() {
+        return wool;
+    }
+
+    public void setWool(int wool) {
+        this.wool = wool;
+    }
+
+    public int getYearOfPlentyCards() {
+        return yearOfPlentyCards;
+    }
+
+    public void setYearOfPlentyCards(int yearOfPlentyCards) {
+        this.yearOfPlentyCards = yearOfPlentyCards;
     }
 
     public boolean isLargestArmy() {
@@ -141,5 +132,13 @@ public class Inventory {
 
     public void setLargestArmy(boolean largestArmy) {
         this.largestArmy = largestArmy;
+    }
+
+    public boolean isLongestRoad() {
+        return longestRoad;
+    }
+
+    public void setLongestRoad(boolean longestRoad) {
+        this.longestRoad = longestRoad;
     }
 }

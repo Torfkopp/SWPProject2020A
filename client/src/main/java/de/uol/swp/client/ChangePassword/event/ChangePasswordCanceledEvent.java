@@ -10,6 +10,4 @@ package de.uol.swp.client.ChangePassword.event;
  * @see de.uol.swp.client.SceneManager
  * @since 2020-11-25
  */
-
-public class ChangePasswordCanceledEvent {
-}
+public class ChangePasswordCanceledEvent {}

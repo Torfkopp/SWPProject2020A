@@ -36,6 +36,32 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
     private int id_count;
 
     @Override
+    public ChatMessage createChatMessage(User author, String content) {
+        if (author == null) {
+            throw new IllegalArgumentException("Message author must not be null");
+        }
+        id_count += 1;
+        ChatMessage chatMessage = new ChatMessageDTO(id_count, author, content);
+        chatHistory.put(id_count, chatMessage);
+        return chatMessage;
+    }
+
+    @Override
+    public ChatMessage createChatMessage(User author, String content, String originLobby) {
+        if (author == null) {
+            throw new IllegalArgumentException("Message author must not be null");
+        } else if (originLobby == null) {
+            return createChatMessage(author, content);
+        } else {
+            ensureLobbyChatHistory(originLobby);
+            id_count += 1;
+            ChatMessage chatMessage = new ChatMessageDTO(id_count, author, content);
+            lobbyChatHistories.get(originLobby).put(id_count, chatMessage);
+            return chatMessage;
+        }
+    }
+
+    @Override
     public Optional<ChatMessage> findMessage(int id) {
         ChatMessage chatMessage = chatHistory.get(id);
         if (chatMessage != null) {
@@ -62,7 +88,8 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
     public List<ChatMessage> getLatestMessages(int amount) {
         List<Map.Entry<Integer, ChatMessage>> list = new LinkedList<>(chatHistory.entrySet());
         Collections.reverse(list); // put the most recent messages to the top for proper [amount] limit
-        List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(Collectors.toList());
+        List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(
+                Collectors.toList());
         Collections.reverse(returnList); // re-order the messages oldest to newest (newest at the bottom)
         return returnList;
     }
@@ -73,37 +100,35 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
             return getLatestMessages(amount);
         } else {
             ensureLobbyChatHistory(originLobby);
-            List<Map.Entry<Integer, ChatMessage>> list = new LinkedList<>(lobbyChatHistories.get(originLobby).entrySet());
+            List<Map.Entry<Integer, ChatMessage>> list = new LinkedList<>(
+                    lobbyChatHistories.get(originLobby).entrySet());
             Collections.reverse(list);
-            List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(Collectors.toList());
+            List<ChatMessage> returnList = list.stream().limit(amount).map(Map.Entry::getValue).collect(
+                    Collectors.toList());
             Collections.reverse(returnList);
             return returnList;
         }
     }
 
     @Override
-    public ChatMessage createChatMessage(User author, String content) {
-        if (author == null) {
-            throw new IllegalArgumentException("Message author must not be null");
-        }
-        id_count += 1;
-        ChatMessage chatMessage = new ChatMessageDTO(id_count, author, content);
-        chatHistory.put(id_count, chatMessage);
-        return chatMessage;
+    public void removeChatMessage(int id) {
+        chatHistory.remove(id);
     }
 
     @Override
-    public ChatMessage createChatMessage(User author, String content, String originLobby) {
-        if (author == null) {
-            throw new IllegalArgumentException("Message author must not be null");
-        } else if (originLobby == null) {
-            return createChatMessage(author, content);
+    public void removeChatMessage(int id, String originLobby) {
+        if (originLobby == null) {
+            removeChatMessage(id);
         } else {
             ensureLobbyChatHistory(originLobby);
-            id_count += 1;
-            ChatMessage chatMessage = new ChatMessageDTO(id_count, author, content);
-            lobbyChatHistories.get(originLobby).put(id_count, chatMessage);
-            return chatMessage;
+            lobbyChatHistories.get(originLobby).remove(id);
+        }
+    }
+
+    @Override
+    public void removeLobbyHistory(String originLobby) {
+        if (originLobby != null) {
+            lobbyChatHistories.remove(originLobby);
         }
     }
 
@@ -138,33 +163,12 @@ public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
         }
     }
 
-    @Override
-    public void removeChatMessage(int id) {
-        chatHistory.remove(id);
-    }
-
-    @Override
-    public void removeChatMessage(int id, String originLobby) {
-        if (originLobby == null) {
-            removeChatMessage(id);
-        } else {
-            ensureLobbyChatHistory(originLobby);
-            lobbyChatHistories.get(originLobby).remove(id);
-        }
-    }
-
-    @Override
-    public void removeLobbyHistory(String originLobby) {
-        if (originLobby != null) {
-            lobbyChatHistories.remove(originLobby);
-        }
-    }
-
     /**
      * Helper method to ensure a Map for the originLobby exists before trying
      * to access it in order to avoid a NullPointerException.
      *
      * @param originLobby The Lobby for which to ensure a Map of ChatMessages exists
+     *
      * @since 2021-01-02
      */
     private void ensureLobbyChatHistory(String originLobby) {

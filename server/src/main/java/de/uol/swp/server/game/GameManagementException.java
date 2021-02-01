@@ -17,6 +17,7 @@ public class GameManagementException extends RuntimeException {
      * Constructor
      *
      * @param s String containing the exception's cause.
+     *
      * @since 2020-12-16
      */
     GameManagementException(String s) {

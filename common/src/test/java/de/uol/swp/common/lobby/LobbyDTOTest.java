@@ -39,6 +39,20 @@ class LobbyDTOTest {
     }
 
     /**
+     * This test checks if a lobby can be empty.
+     * <p>
+     * If the leaveUser method does not throw an exception, this test fails.
+     *
+     * @since 2019-10-08
+     */
+    @Test
+    void assureNonEmptyLobbyTest() {
+        Lobby lobby = new LobbyDTO("test", defaultUser);
+
+        assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
+    }
+
+    /**
      * This test checks if a lobby is created correctly.
      * <p>
      * If the variables are not set correctly, this test fails.
@@ -152,19 +166,5 @@ class LobbyDTOTest {
         assertEquals(lobby.getOwner(), users.get(6));
 
         assertThrows(IllegalArgumentException.class, () -> lobby.updateOwner(notInLobbyUser));
-    }
-
-    /**
-     * This test checks if a lobby can be empty.
-     * <p>
-     * If the leaveUser method does not throw an exception, this test fails.
-     *
-     * @since 2019-10-08
-     */
-    @Test
-    void assureNonEmptyLobbyTest() {
-        Lobby lobby = new LobbyDTO("test", defaultUser);
-
-        assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
     }
 }

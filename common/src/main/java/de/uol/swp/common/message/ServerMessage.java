@@ -20,6 +20,7 @@ public interface ServerMessage extends Message {
      * Gets the receiver list
      *
      * @return List of session objects defining the receivers
+     *
      * @since 2019-10-08
      */
     List<Session> getReceiver();
@@ -28,6 +29,7 @@ public interface ServerMessage extends Message {
      * Sets the receivers of this message
      *
      * @param receiver List of session objects defining the receivers
+     *
      * @since 2019-10-08
      */
     void setReceiver(List<Session> receiver);

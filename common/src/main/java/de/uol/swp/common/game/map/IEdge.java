@@ -3,7 +3,7 @@ package de.uol.swp.common.game.map;
 /**
  * Interface for an edge
  *
- * @author Mario
+ * @author Mario Fokken
  * @since 2021-01-17
  */
 public interface IEdge {

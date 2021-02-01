@@ -3,10 +3,7 @@ package de.uol.swp.client.chat;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import de.uol.swp.common.chat.request.AskLatestChatMessageRequest;
-import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
-import de.uol.swp.common.chat.request.EditChatMessageRequest;
-import de.uol.swp.common.chat.request.NewChatMessageRequest;
+import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -76,95 +73,91 @@ class ChatServiceTest {
     }
 
     /**
-     * Test for the newMessage routine
+     * Test for the askLatestMessages routine
      * <p>
-     * Test if the ChatService creates a NewChatMessageRequest with the given
-     * user and content, and posts it onto the EventBus when newMessage is called
-     * without an originLobby parameter.
+     * Tests if the ChatService creates an AskLatestChatMessageRequest with
+     * the given amount, and posts it onto the EventBus when askLatestMessages is
+     * called without an originLobby parameter.
      * <p>
-     * This test fails if the NewChatMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the author or content
-     * aren't equal to what was sent originally.
+     * This test fails if the AskLatestMessagesRequest says it originated from a
+     * lobby, or if its originLobby attribute is not null, or if the amount isn't
+     * equal to what was sent originally.
      *
-     * @throws java.lang.InterruptedException Thrown by lock.await()
+     * @throws java.lang.InterruptedException thrown by lock.await()
      */
     @Test
-    void newMessageTest() throws InterruptedException {
+    void askLatestMessagesTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.newMessage(defaultUser, defaultContent);
+        chatService.askLatestMessages(defaultAmount);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof NewChatMessageRequest);
+        assertTrue(event instanceof AskLatestChatMessageRequest);
 
-        NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
+        AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
     }
 
     /**
-     * Test for the newMessage routine
+     * Test for the askLatestMessages routine
      * <p>
-     * Test if the ChatService creates a NewChatMessageRequest with the given
-     * user and content and posts it onto the EventBus when newMessage is called
-     * with the originLobby parameter.
-     * <p>
-     * This test fails if the NewChatMessageRequest says it did not originate
-     * from a lobby, or if the author, or content, or originLobby attributes
-     * aren't equal to what was sent originally.
-     *
-     * @throws java.lang.InterruptedException Thrown by lock.await()
-     * @since 2021-01-03
-     */
-    @Test
-    void newMessageWithOriginLobbyTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.newMessage(defaultUser, defaultContent, defaultLobby);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof NewChatMessageRequest);
-
-        NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
-
-        assertTrue(chatMessageRequest.isFromLobby());
-        assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
-        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
-    }
-
-    /**
-     * Test for the newMessage routine
-     * <p>
-     * Test if the ChatService creates a NewChatMessageRequest with the given
-     * User and Content and posts it onto the EventBus when newMessage is called
+     * Tests if the ChatService creates an AskLatestChatMessageRequest
+     * with the given amount and posts it to the EventBus when askLatestMessages is called
      * with the originLobby parameter set to null.
      * <p>
-     * This test fails if the NewChatMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the author or content
-     * aren't equal to what was sent originally.
+     * This test fails if the AskLatestMessagesRequest says it originated from a lobby,
+     * or if its originLobby attribute is not null, or if the amount isn't equal to what
+     * was sent originally.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2021-01-03
      */
     @Test
-    void newMessageWithOriginLobbyIsNullTest() throws InterruptedException {
+    void askLatestMessagesWithOriginLobbyIsNullTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.newMessage(defaultUser, defaultContent, null);
+        chatService.askLatestMessages(defaultAmount, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof NewChatMessageRequest);
+        assertTrue(event instanceof AskLatestChatMessageRequest);
 
-        NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
+        AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
+    }
+
+    /**
+     * Test for the askLatestMessages routine
+     * <p>
+     * Tests if the ChatService creates an AskLatestChatMessageRequest
+     * with the given amount and posts it onto the EventBus when askLatestMessages is called
+     * with the originLobby parameter.
+     * <p>
+     * This test fails if the AskLatestMessagesRequest says it did not originate from a lobby,
+     * or if the originLobby, the author, or content aren't equal to what was sent originally.
+     *
+     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @since 2021-01-03
+     */
+    @Test
+    void askLatestMessagesWithOriginLobbyTest() throws InterruptedException {
+        IChatService chatService = new ChatService(bus);
+        chatService.askLatestMessages(defaultAmount, defaultLobby);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof AskLatestChatMessageRequest);
+
+        AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
+
+        assertTrue(chatMessageRequest.isFromLobby());
+        assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
+        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
     }
 
     /**
@@ -184,6 +177,36 @@ class ChatServiceTest {
     void deleteMessageTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
         chatService.deleteMessage(defaultId);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof DeleteChatMessageRequest);
+
+        DeleteChatMessageRequest chatMessageRequest = (DeleteChatMessageRequest) event;
+
+        assertFalse(chatMessageRequest.isFromLobby());
+        assertNull(chatMessageRequest.getOriginLobby());
+        assertEquals(chatMessageRequest.getId(), defaultId);
+    }
+
+    /**
+     * Test for the deleteMessage routine
+     * <p>
+     * Tests if the ChatService creates a DeleteChatMessageRequest
+     * with the given ID and posts it onto the EventBus when deleteMessage is called
+     * with the originLobby parameter set to null.
+     * <p>
+     * This test fails if the DeleteChatMessageRequest says it originated from a
+     * lobby, or if its originLobby attribute is not null, or if the ID doesn't
+     * equal the ID that was sent originally.
+     *
+     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @since 2021-01-03
+     */
+    @Test
+    void deleteMessageWithOriginLobbyIsNullTest() throws InterruptedException {
+        IChatService chatService = new ChatService(bus);
+        chatService.deleteMessage(defaultId, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -227,36 +250,6 @@ class ChatServiceTest {
     }
 
     /**
-     * Test for the deleteMessage routine
-     * <p>
-     * Tests if the ChatService creates a DeleteChatMessageRequest
-     * with the given ID and posts it onto the EventBus when deleteMessage is called
-     * with the originLobby parameter set to null.
-     * <p>
-     * This test fails if the DeleteChatMessageRequest says it originated from a
-     * lobby, or if its originLobby attribute is not null, or if the ID doesn't
-     * equal the ID that was sent originally.
-     *
-     * @throws java.lang.InterruptedException thrown by lock.await()
-     * @since 2021-01-03
-     */
-    @Test
-    void deleteMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId, null);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof DeleteChatMessageRequest);
-
-        DeleteChatMessageRequest chatMessageRequest = (DeleteChatMessageRequest) event;
-
-        assertFalse(chatMessageRequest.isFromLobby());
-        assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getId(), defaultId);
-    }
-
-    /**
      * Test for editMessage routine
      * <p>
      * Tests if the ChatService creates a EditChatMessageRequest with
@@ -271,6 +264,37 @@ class ChatServiceTest {
      */
     @Test
     void editMessageTest() throws InterruptedException {
+        IChatService chatService = new ChatService(bus);
+        chatService.editMessage(defaultId, defaultContent);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof EditChatMessageRequest);
+
+        EditChatMessageRequest chatMessageRequest = (EditChatMessageRequest) event;
+
+        assertFalse(chatMessageRequest.isFromLobby());
+        assertNull(chatMessageRequest.getOriginLobby());
+        assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getContent(), defaultContent);
+    }
+
+    /**
+     * Test for editMessage routine
+     * <p>
+     * Tests if the ChatService creates a EditChatMessageRequest with the given
+     * ID and content and posts it onto the EventBus when editMessage is called
+     * with the originLobby parameter set to null.
+     * <p>
+     * This test fails if the EditMessageRequest says it originated from a lobby,
+     * or if its originLobby attribute is not null, or if the ID or content aren't
+     * equal to what was sent originally.
+     *
+     * @throws InterruptedException thrown by lock.await()
+     * @since 2021-01-03
+     */
+    @Test
+    void editMessageWithOriginLobbyIsNullTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
         chatService.editMessage(defaultId, defaultContent);
 
@@ -318,121 +342,94 @@ class ChatServiceTest {
     }
 
     /**
-     * Test for editMessage routine
+     * Test for the newMessage routine
      * <p>
-     * Tests if the ChatService creates a EditChatMessageRequest with the given
-     * ID and content and posts it onto the EventBus when editMessage is called
-     * with the originLobby parameter set to null.
+     * Test if the ChatService creates a NewChatMessageRequest with the given
+     * user and content, and posts it onto the EventBus when newMessage is called
+     * without an originLobby parameter.
      * <p>
-     * This test fails if the EditMessageRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the ID or content aren't
-     * equal to what was sent originally.
+     * This test fails if the NewChatMessageRequest says it originated from a lobby,
+     * or if its originLobby attribute is not null, or if the author or content
+     * aren't equal to what was sent originally.
      *
-     * @throws InterruptedException thrown by lock.await()
-     * @since 2021-01-03
+     * @throws java.lang.InterruptedException Thrown by lock.await()
      */
     @Test
-    void editMessageWithOriginLobbyIsNullTest() throws InterruptedException {
+    void newMessageTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent);
+        chatService.newMessage(defaultUser, defaultContent);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof EditChatMessageRequest);
+        assertTrue(event instanceof NewChatMessageRequest);
 
-        EditChatMessageRequest chatMessageRequest = (EditChatMessageRequest) event;
+        NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 
     /**
-     * Test for the askLatestMessages routine
+     * Test for the newMessage routine
      * <p>
-     * Tests if the ChatService creates an AskLatestChatMessageRequest with
-     * the given amount, and posts it onto the EventBus when askLatestMessages is
-     * called without an originLobby parameter.
+     * Test if the ChatService creates a NewChatMessageRequest with the given
+     * User and Content and posts it onto the EventBus when newMessage is called
+     * with the originLobby parameter set to null.
      * <p>
-     * This test fails if the AskLatestMessagesRequest says it originated from a
-     * lobby, or if its originLobby attribute is not null, or if the amount isn't
-     * equal to what was sent originally.
-     *
-     * @throws java.lang.InterruptedException thrown by lock.await()
-     */
-    @Test
-    void askLatestMessagesTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.askLatestMessages(defaultAmount);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof AskLatestChatMessageRequest);
-
-        AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
-
-        assertFalse(chatMessageRequest.isFromLobby());
-        assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
-    }
-
-    /**
-     * Test for the askLatestMessages routine
-     * <p>
-     * Tests if the ChatService creates an AskLatestChatMessageRequest
-     * with the given amount and posts it onto the EventBus when askLatestMessages is called
-     * with the originLobby parameter.
-     * <p>
-     * This test fails if the AskLatestMessagesRequest says it did not originate from a lobby,
-     * or if the originLobby, the author, or content aren't equal to what was sent originally.
+     * This test fails if the NewChatMessageRequest says it originated from a lobby,
+     * or if its originLobby attribute is not null, or if the author or content
+     * aren't equal to what was sent originally.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2021-01-03
      */
     @Test
-    void askLatestMessagesWithOriginLobbyTest() throws InterruptedException {
+    void newMessageWithOriginLobbyIsNullTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.askLatestMessages(defaultAmount, defaultLobby);
+        chatService.newMessage(defaultUser, defaultContent, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof AskLatestChatMessageRequest);
+        assertTrue(event instanceof NewChatMessageRequest);
 
-        AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
+        NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
+
+        assertFalse(chatMessageRequest.isFromLobby());
+        assertNull(chatMessageRequest.getOriginLobby());
+        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
+        assertEquals(chatMessageRequest.getContent(), defaultContent);
+    }
+
+    /**
+     * Test for the newMessage routine
+     * <p>
+     * Test if the ChatService creates a NewChatMessageRequest with the given
+     * user and content and posts it onto the EventBus when newMessage is called
+     * with the originLobby parameter.
+     * <p>
+     * This test fails if the NewChatMessageRequest says it did not originate
+     * from a lobby, or if the author, or content, or originLobby attributes
+     * aren't equal to what was sent originally.
+     *
+     * @throws java.lang.InterruptedException Thrown by lock.await()
+     * @since 2021-01-03
+     */
+    @Test
+    void newMessageWithOriginLobbyTest() throws InterruptedException {
+        IChatService chatService = new ChatService(bus);
+        chatService.newMessage(defaultUser, defaultContent, defaultLobby);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof NewChatMessageRequest);
+
+        NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
 
         assertTrue(chatMessageRequest.isFromLobby());
         assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
-        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
-    }
-
-    /**
-     * Test for the askLatestMessages routine
-     * <p>
-     * Tests if the ChatService creates an AskLatestChatMessageRequest
-     * with the given amount and posts it to the EventBus when askLatestMessages is called
-     * with the originLobby parameter set to null.
-     * <p>
-     * This test fails if the AskLatestMessagesRequest says it originated from a lobby,
-     * or if its originLobby attribute is not null, or if the amount isn't equal to what
-     * was sent originally.
-     *
-     * @throws java.lang.InterruptedException thrown by lock.await()
-     * @since 2021-01-03
-     */
-    @Test
-    void askLatestMessagesWithOriginLobbyIsNullTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.askLatestMessages(defaultAmount, null);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof AskLatestChatMessageRequest);
-
-        AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
-
-        assertFalse(chatMessageRequest.isFromLobby());
-        assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
+        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
+        assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 }

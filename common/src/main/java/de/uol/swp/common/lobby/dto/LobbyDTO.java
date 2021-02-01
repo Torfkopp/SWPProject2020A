@@ -30,6 +30,7 @@ public class LobbyDTO implements Lobby {
      *
      * @param name    The requested name the lobby
      * @param creator The user who created the lobby and therefore its owner
+     *
      * @since 2019-10-08
      */
     public LobbyDTO(String name, User creator) {
@@ -42,7 +43,9 @@ public class LobbyDTO implements Lobby {
      * Copy constructor
      *
      * @param lobby Lobby object to copy the values of
+     *
      * @return Lobby copy of Lobby object
+     *
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
@@ -55,16 +58,18 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void updateOwner(User user) {
-        if (!this.users.contains(user)) {
-            throw new IllegalArgumentException("User " + user.getUsername() + " not found. Owner must be member of lobby!");
-        }
-        this.owner = user;
+    public User getOwner() {
+        return owner;
     }
 
     @Override
-    public User getOwner() {
-        return owner;
+    public Set<User> getReadyUsers() {
+        return readyUsers;
+    }
+
+    @Override
+    public Set<User> getUsers() {
+        return Collections.unmodifiableSet(users);
     }
 
     @Override
@@ -86,11 +91,6 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public Set<User> getUsers() {
-        return Collections.unmodifiableSet(users);
-    }
-
-    @Override
     public void setUserReady(User user) {
         this.readyUsers.add(user);
     }
@@ -101,7 +101,11 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public Set<User> getReadyUsers() {
-        return readyUsers;
+    public void updateOwner(User user) {
+        if (!this.users.contains(user)) {
+            throw new IllegalArgumentException(
+                    "User " + user.getUsername() + " not found. Owner must be member of lobby!");
+        }
+        this.owner = user;
     }
 }

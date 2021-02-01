@@ -13,7 +13,7 @@ import java.util.Map;
  * This message gets sent to the client that sent a RetrieveAllLobbiesRequest.
  * It contains a list of lobby names.
  *
- * @author Mario
+ * @author Mario Fokken
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
  * @see de.uol.swp.common.lobby.Lobby
@@ -58,7 +58,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * Getter for the list of existing Lobby objects
      *
      * @return List of existing lobbyDTOs
-     * @author Marvin
+     * @author Marvin Drees
      * @since 2020-12-16
      */
     public List<Lobby> getLobbies() {

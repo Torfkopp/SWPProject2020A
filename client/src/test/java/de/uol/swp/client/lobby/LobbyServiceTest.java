@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This a test of the class is used to hide the communication details
  *
- * @author Marvin
- * @see LobbyService
+ * @author Marvin Drees
+ * @see de.uol.swp.client.lobby.LobbyService
  * @since 2020-11-26
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -40,6 +40,7 @@ class LobbyServiceTest {
      * to its event, and its event is printed to the console output.
      *
      * @param e The DeadEvent detected on the EventBus
+     *
      * @since 2020-11-26
      */
     @Subscribe

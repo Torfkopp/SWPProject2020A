@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  * It implements de.uol.common.user.UserService
  *
  * @author Marco Grawunder
- * @see ClientUserService
+ * @see de.uol.swp.client.user.ClientUserService
  * @since 2017-03-17
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -26,6 +26,7 @@ public class UserService implements ClientUserService {
      * Constructor
      *
      * @param bus The EventBus set in ClientModule
+     *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2017-03-17
      */
@@ -34,30 +35,6 @@ public class UserService implements ClientUserService {
         this.bus = bus;
         // Currently not needed, will only post on bus
         // bus.register(this);
-    }
-
-    /**
-     * Posts a LoginRequest onto the EventBus
-     *
-     * @param username the user's name
-     * @param password the user's password
-     * @since 2017-03-17
-     */
-    @Override
-    public void login(String username, String password) {
-        Message msg = new LoginRequest(username, password);
-        bus.post(msg);
-    }
-
-    /**
-     * Posts a LogoutRequest onto the EventBus
-     *
-     * @param username the user's name
-     */
-    @Override
-    public void logout(User username) {
-        Message msg = new LogoutRequest();
-        bus.post(msg);
     }
 
     /**
@@ -78,12 +55,47 @@ public class UserService implements ClientUserService {
      * and posts this instance onto the EventBus.
      *
      * @param user The user to remove
+     *
      * @see de.uol.swp.common.user.request.DeleteUserRequest
      * @since 2020-11-02
      */
     public void dropUser(User user) {
         Message request = new DeleteUserRequest(user);
         bus.post(request);
+    }
+
+    /**
+     * Posts a LoginRequest onto the EventBus
+     *
+     * @param username the user's name
+     * @param password the user's password
+     *
+     * @since 2017-03-17
+     */
+    @Override
+    public void login(String username, String password) {
+        Message msg = new LoginRequest(username, password);
+        bus.post(msg);
+    }
+
+    /**
+     * Posts a LogoutRequest onto the EventBus
+     *
+     * @param username the user's name
+     */
+    @Override
+    public void logout(User username) {
+        Message msg = new LogoutRequest();
+        bus.post(msg);
+    }
+
+    /**
+     * Posts a RetrieveAllOnlineUsersRequest onto the EventBus.
+     */
+    @Override
+    public void retrieveAllUsers() {
+        Message cmd = new RetrieveAllOnlineUsersRequest();
+        bus.post(cmd);
     }
 
     /**
@@ -100,15 +112,6 @@ public class UserService implements ClientUserService {
     }
 
     /**
-     * Posts a RetrieveAllOnlineUsersRequest onto the EventBus.
-     */
-    @Override
-    public void retrieveAllUsers() {
-        Message cmd = new RetrieveAllOnlineUsersRequest();
-        bus.post(cmd);
-    }
-
-    /**
      * Method to change a user's password
      * <p>
      * This method creates a new UpdateUserPasswordRequest object
@@ -117,6 +120,7 @@ public class UserService implements ClientUserService {
      *
      * @param user        The user to update
      * @param oldPassword The password to change and verified
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17

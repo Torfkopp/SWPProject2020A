@@ -58,6 +58,57 @@ class AuthenticationServiceTest {
     }
 
     @Test
+    void getSessionsForUsersTest() {
+        loginUser(user);
+        loginUser(user2);
+        loginUser(user3);
+        Set<User> users = new TreeSet<>();
+        users.add(user);
+        users.add(user2);
+        users.add(user3);
+
+        Optional<Session> session1 = authService.getSession(user);
+        Optional<Session> session2 = authService.getSession(user2);
+        Optional<Session> session3 = authService.getSession(user2);
+
+        assertTrue(session1.isPresent());
+        assertTrue(session2.isPresent());
+        assertTrue(session3.isPresent());
+
+        List<Session> sessions = authService.getSessions(users);
+
+        assertEquals(sessions.size(), 3);
+        assertTrue(sessions.contains(session1.get()));
+        assertTrue(sessions.contains(session2.get()));
+        assertTrue(sessions.contains(session3.get()));
+    }
+
+    @Test
+    void loggedInUsers() throws InterruptedException {
+        loginUser(user);
+
+        Message request = new RetrieveAllOnlineUsersRequest();
+        bus.post(request);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+        assertTrue(event instanceof AllOnlineUsersResponse);
+
+        assertEquals(((AllOnlineUsersResponse) event).getUsers().size(), 1);
+        assertEquals(((AllOnlineUsersResponse) event).getUsers().get(0), user);
+    }
+
+    @Test
+    void loggedInUsersEmpty() throws InterruptedException {
+        Message request = new RetrieveAllOnlineUsersRequest();
+        bus.post(request);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+        assertTrue(event instanceof AllOnlineUsersResponse);
+
+        assertTrue(((AllOnlineUsersResponse) event).getUsers().isEmpty());
+    }
+
+    @Test
     void loginTest() throws InterruptedException {
         userManagement.createUser(user);
         final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword());
@@ -81,6 +132,15 @@ class AuthenticationServiceTest {
         userManagement.dropUser(user);
     }
 
+    private void loginUser(User userToLogin) {
+        userManagement.createUser(userToLogin);
+        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
+        bus.post(loginRequest);
+
+        assertTrue(userManagement.isLoggedIn(userToLogin));
+        userManagement.dropUser(userToLogin);
+    }
+
     @Test
     void logoutTest() throws InterruptedException {
         loginUser(user);
@@ -97,29 +157,6 @@ class AuthenticationServiceTest {
         assertFalse(userManagement.isLoggedIn(user));
         assertFalse(authService.getSession(user).isPresent());
         assertTrue(event instanceof UserLoggedOutMessage);
-    }
-
-    private void loginUser(User userToLogin) {
-        userManagement.createUser(userToLogin);
-        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
-        bus.post(loginRequest);
-
-        assertTrue(userManagement.isLoggedIn(userToLogin));
-        userManagement.dropUser(userToLogin);
-    }
-
-    @Test
-    void loggedInUsers() throws InterruptedException {
-        loginUser(user);
-
-        Message request = new RetrieveAllOnlineUsersRequest();
-        bus.post(request);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-        assertTrue(event instanceof AllOnlineUsersResponse);
-
-        assertEquals(((AllOnlineUsersResponse) event).getUsers().size(), 1);
-        assertEquals(((AllOnlineUsersResponse) event).getUsers().get(0), user);
     }
 
     // TODO: replace with parametrized test
@@ -144,42 +181,5 @@ class AuthenticationServiceTest {
 
         Collections.sort(returnedUsers);
         assertEquals(returnedUsers, users);
-    }
-
-    @Test
-    void loggedInUsersEmpty() throws InterruptedException {
-        Message request = new RetrieveAllOnlineUsersRequest();
-        bus.post(request);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-        assertTrue(event instanceof AllOnlineUsersResponse);
-
-        assertTrue(((AllOnlineUsersResponse) event).getUsers().isEmpty());
-    }
-
-    @Test
-    void getSessionsForUsersTest() {
-        loginUser(user);
-        loginUser(user2);
-        loginUser(user3);
-        Set<User> users = new TreeSet<>();
-        users.add(user);
-        users.add(user2);
-        users.add(user3);
-
-        Optional<Session> session1 = authService.getSession(user);
-        Optional<Session> session2 = authService.getSession(user2);
-        Optional<Session> session3 = authService.getSession(user2);
-
-        assertTrue(session1.isPresent());
-        assertTrue(session2.isPresent());
-        assertTrue(session3.isPresent());
-
-        List<Session> sessions = authService.getSessions(users);
-
-        assertEquals(sessions.size(), 3);
-        assertTrue(sessions.contains(session1.get()));
-        assertTrue(sessions.contains(session2.get()));
-        assertTrue(sessions.contains(session3.get()));
     }
 }

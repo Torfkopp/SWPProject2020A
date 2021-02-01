@@ -11,8 +11,8 @@ import de.uol.swp.common.user.User;
  * @see de.uol.swp.common.user.User
  * @since 2021-01-25
  */
-
 public class UpdateInventoryRequest extends AbstractGameRequest {
+
     private final User user;
 
     /**

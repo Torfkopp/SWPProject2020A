@@ -9,5 +9,4 @@ package de.uol.swp.common.message;
  * @see de.uol.swp.common.message.ResponseMessage
  * @since 2019-08-07
  */
-public abstract class AbstractResponseMessage extends AbstractMessage implements ResponseMessage {
-}
+public abstract class AbstractResponseMessage extends AbstractMessage implements ResponseMessage {}

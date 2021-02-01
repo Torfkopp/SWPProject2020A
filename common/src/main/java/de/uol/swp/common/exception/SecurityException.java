@@ -14,6 +14,7 @@ public class SecurityException extends RuntimeException {
      * Constructor
      *
      * @param message The exception's text
+     *
      * @since 2017-03-17
      */
     public SecurityException(String message) {

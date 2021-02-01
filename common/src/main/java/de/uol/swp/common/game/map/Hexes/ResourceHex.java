@@ -3,11 +3,12 @@ package de.uol.swp.common.game.map.Hexes;
 /**
  * Class for the resource hex
  *
- * @author Mario
- * @author Steven
+ * @author Mario Fokken
+ * @author Steven Luong
  * @since 2021-01-16
  */
 public class ResourceHex extends AbstractHex implements IResourceHex {
+
     private final resource resource;
     private final int token;
 
@@ -24,18 +25,17 @@ public class ResourceHex extends AbstractHex implements IResourceHex {
     }
 
     @Override
-    public int getToken() {
-        return token;
+    public resource getResource() {
+        return resource;
     }
 
     @Override
-    public resource getResource() {
-        return resource;
+    public int getToken() {
+        return token;
     }
 
     @Override
     public IGameHex.type getType() {
         return IGameHex.type.Resource;
     }
-
 }

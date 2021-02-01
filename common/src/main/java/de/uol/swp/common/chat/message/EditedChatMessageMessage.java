@@ -12,6 +12,7 @@ import de.uol.swp.common.chat.ChatMessage;
  * @since 2020-12-17
  */
 public class EditedChatMessageMessage extends AbstractChatMessageMessage {
+
     private final ChatMessage chatMsg;
 
     /**
@@ -36,6 +37,7 @@ public class EditedChatMessageMessage extends AbstractChatMessageMessage {
      *
      * @param chatMsg   The edited ChatMessage
      * @param lobbyName The Lobby this EditedChatMessageMessage is being sent to
+     *
      * @since 2020-12-30
      */
     public EditedChatMessageMessage(ChatMessage chatMsg, String lobbyName) {

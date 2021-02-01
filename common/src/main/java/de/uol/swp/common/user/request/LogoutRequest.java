@@ -11,7 +11,6 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2019-08-07
  */
-
 public class LogoutRequest extends AbstractRequestMessage {
 
     private static final long serialVersionUID = -5912075449879112061L;

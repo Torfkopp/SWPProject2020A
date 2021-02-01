@@ -5,16 +5,16 @@ import de.uol.swp.common.game.map.Hexes.*;
 /**
  * Management of the gameMap
  *
- * @author Mario
- * @author Steven
+ * @author Mario Fokken
+ * @author Steven Luong
  * @since 2021-01-16
  */
 public class GameMapManagement implements IGameMapManagement {
 
     //The first index (0) of each array is left open to ease mapping
-    IGameHex[] hexes = new IGameHex[38]; //37 tiles
-    IEdge[] edges = new IEdge[73]; //72 edges
-    IIntersection[] intersections = new IIntersection[55]; //54 intersections
+    private final IGameHex[] hexes = new IGameHex[38]; //37 tiles
+    private final IEdge[] edges = new IEdge[73]; //72 edges
+    private final IIntersection[] intersections = new IIntersection[55]; //54 intersections
 
     int robberPosition = 37;
 
@@ -24,6 +24,285 @@ public class GameMapManagement implements IGameMapManagement {
         createIntersections();
 
         hexes[robberPosition].setRobberOnField(true);
+    }
+
+    @Override
+    public IEdge[][] getEdgesAsJaggedArrayWithNullFiller() {
+        IEdge[][] edgeArray;
+        edgeArray = new IEdge[6][];
+        edgeArray[0] = new IEdge[12];
+        edgeArray[1] = new IEdge[15];
+        edgeArray[2] = new IEdge[18];
+        edgeArray[3] = new IEdge[15];
+        edgeArray[4] = new IEdge[12];
+        edgeArray[5] = new IEdge[9];
+
+        edgeArray[0][0] = null;
+        edgeArray[0][1] = edges[30];
+        edgeArray[0][2] = edges[1];
+        edgeArray[0][3] = edges[2];
+        edgeArray[0][4] = edges[31];
+        edgeArray[0][5] = edges[3];
+        edgeArray[0][6] = edges[4];
+        edgeArray[0][7] = edges[32];
+        edgeArray[0][8] = edges[5];
+        edgeArray[0][9] = edges[6];
+        edgeArray[0][10] = edges[33];
+        edgeArray[0][11] = null;
+
+        edgeArray[1][0] = null;
+        edgeArray[1][1] = edges[28];
+        edgeArray[1][2] = edges[29];
+        edgeArray[1][3] = edges[42];
+        edgeArray[1][4] = edges[60];
+        edgeArray[1][5] = edges[43];
+        edgeArray[1][6] = edges[44];
+        edgeArray[1][7] = edges[61];
+        edgeArray[1][8] = edges[45];
+        edgeArray[1][9] = edges[46];
+        edgeArray[1][10] = edges[1];
+        edgeArray[1][11] = edges[62];
+        edgeArray[1][12] = edges[33];
+        edgeArray[1][13] = edges[8];
+        edgeArray[1][14] = null;
+
+        edgeArray[2][0] = null;
+        edgeArray[2][1] = edges[26];
+        edgeArray[2][2] = edges[27];
+        edgeArray[2][3] = edges[41];
+        edgeArray[2][4] = edges[58];
+        edgeArray[2][5] = edges[59];
+        edgeArray[2][6] = edges[66];
+        edgeArray[2][7] = edges[72];
+        edgeArray[2][8] = edges[67];
+        edgeArray[2][9] = edges[68];
+        edgeArray[2][10] = edges[69];
+        edgeArray[2][11] = edges[62];
+        edgeArray[2][12] = edges[48];
+        edgeArray[2][13] = edges[49];
+        edgeArray[2][14] = edges[34];
+        edgeArray[2][15] = edges[10];
+        edgeArray[2][16] = edges[11];
+        edgeArray[2][17] = null;
+
+        edgeArray[3][0] = edges[25];
+        edgeArray[3][1] = edges[24];
+        edgeArray[3][2] = edges[40];
+        edgeArray[3][3] = edges[57];
+        edgeArray[3][4] = edges[56];
+        edgeArray[3][5] = edges[65];
+        edgeArray[3][6] = edges[71];
+        edgeArray[3][7] = edges[64];
+        edgeArray[3][8] = edges[70];
+        edgeArray[3][9] = edges[63];
+        edgeArray[3][10] = edges[51];
+        edgeArray[3][11] = edges[50];
+        edgeArray[3][12] = edges[35];
+        edgeArray[3][13] = edges[13];
+        edgeArray[3][14] = edges[12];
+
+        edgeArray[4][0] = edges[23];
+        edgeArray[4][1] = edges[22];
+        edgeArray[4][2] = edges[39];
+        edgeArray[4][3] = edges[55];
+        edgeArray[4][4] = edges[38];
+        edgeArray[4][5] = edges[54];
+        edgeArray[4][6] = edges[53];
+        edgeArray[4][7] = edges[37];
+        edgeArray[4][8] = edges[52];
+        edgeArray[4][9] = edges[36];
+        edgeArray[4][10] = edges[15];
+        edgeArray[4][11] = edges[14];
+
+        edgeArray[5][0] = null;
+        edgeArray[5][1] = edges[21];
+        edgeArray[5][1] = null;
+        edgeArray[5][2] = edges[20];
+        edgeArray[5][3] = edges[19];
+        edgeArray[5][4] = null;
+        edgeArray[5][5] = edges[18];
+        edgeArray[5][6] = edges[17];
+        edgeArray[5][7] = null;
+        edgeArray[5][8] = edges[16];
+
+        return edgeArray;
+    }
+
+    @Override
+    public IGameHex getHex(int place) {
+        return hexes[place];
+    }
+
+    @Override
+    public IGameHex[][] getHexesAsJaggedArray() {
+        IGameHex[][] map;
+        map = new IGameHex[7][];
+        map[0] = new IGameHex[4];
+        map[1] = new IGameHex[5];
+        map[2] = new IGameHex[6];
+        map[3] = new IGameHex[7];
+        map[4] = new IGameHex[6];
+        map[5] = new IGameHex[5];
+        map[6] = new IGameHex[4];
+
+        map[0][0] = getHex(1);
+        map[0][1] = getHex(2);
+        map[0][2] = getHex(3);
+        map[0][3] = getHex(4);
+        map[1][0] = getHex(18);
+        map[1][1] = getHex(19);
+        map[1][2] = getHex(20);
+        map[1][3] = getHex(21);
+        map[1][4] = getHex(5);
+        map[2][0] = getHex(17);
+        map[2][1] = getHex(30);
+        map[2][2] = getHex(31);
+        map[2][3] = getHex(32);
+        map[2][4] = getHex(22);
+        map[2][5] = getHex(6);
+        map[3][0] = getHex(16);
+        map[3][1] = getHex(29);
+        map[3][2] = getHex(36);
+        map[3][3] = getHex(37);
+        map[3][4] = getHex(33);
+        map[3][5] = getHex(23);
+        map[3][6] = getHex(7);
+        map[4][0] = getHex(15);
+        map[4][1] = getHex(28);
+        map[4][2] = getHex(35);
+        map[4][3] = getHex(34);
+        map[4][4] = getHex(24);
+        map[4][5] = getHex(8);
+        map[5][0] = getHex(14);
+        map[5][1] = getHex(27);
+        map[5][2] = getHex(26);
+        map[5][3] = getHex(25);
+        map[5][4] = getHex(9);
+        map[6][0] = getHex(13);
+        map[6][1] = getHex(12);
+        map[6][2] = getHex(11);
+        map[6][3] = getHex(10);
+
+        return map;
+    }
+
+    @Override
+    public IIntersection[][] getIntersectionsAsJaggedArray() {
+        IIntersection[][] intersec;
+        intersec = new IIntersection[6][];
+        intersec[0] = new IIntersection[7];
+        intersec[1] = new IIntersection[9];
+        intersec[2] = new IIntersection[11];
+        intersec[3] = new IIntersection[11];
+        intersec[4] = new IIntersection[9];
+        intersec[5] = new IIntersection[7];
+        System.arraycopy(intersections, 1, intersec[0], 0, 7);
+        System.arraycopy(intersections, 30, intersec[1], 0, 7);
+        intersec[1][7] = intersections[8];
+        intersec[1][8] = intersections[9];
+
+        intersec[2][0] = intersections[27];
+        intersec[2][1] = intersections[28];
+        intersec[2][2] = intersections[47];
+        intersec[2][3] = intersections[48];
+        intersec[2][4] = intersections[49];
+        intersec[2][5] = intersections[50];
+        intersec[2][6] = intersections[51];
+        intersec[2][7] = intersections[36];
+        intersec[2][8] = intersections[37];
+        intersec[2][9] = intersections[10];
+        intersec[2][10] = intersections[11];
+
+        intersec[3][0] = intersections[26];
+        intersec[3][1] = intersections[25];
+        intersec[3][2] = intersections[46];
+        intersec[3][3] = intersections[45];
+        intersec[3][4] = intersections[54];
+        intersec[3][5] = intersections[53];
+        intersec[3][6] = intersections[52];
+        intersec[3][7] = intersections[39];
+        intersec[3][8] = intersections[38];
+        intersec[3][9] = intersections[13];
+        intersec[3][10] = intersections[12];
+
+        intersec[4][0] = intersections[24];
+        intersec[4][1] = intersections[23];
+        intersec[4][2] = intersections[44];
+        intersec[4][3] = intersections[43];
+        intersec[4][4] = intersections[42];
+        intersec[4][5] = intersections[41];
+        intersec[4][6] = intersections[40];
+        intersec[4][7] = intersections[14];
+        intersec[4][8] = intersections[15];
+
+        for (int i = 0; i < 7; i++) {
+            intersec[5][i] = intersections[21 - i];
+        }
+        return intersec;
+    }
+
+    @Override
+    public int getRobberPos() {
+        return robberPosition;
+    }
+
+    @Override
+    public void moveRobber(int newHex) {
+        hexes[robberPosition].setRobberOnField(false);
+        robberPosition = newHex;
+        hexes[robberPosition].setRobberOnField(true);
+    }
+
+    @Override
+    public boolean placeRoad(int player, int position) {
+        if (roadPlaceable(player, position)) {
+            edges[position].setState(player);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean placeSettlement(int player, int position) {
+        if (settlementPlaceable(player, position)) {
+            intersections[position].setState(player + "s");
+            for (int iPos : intersections[player].getNeighbours()) {
+                intersections[iPos].setState("b");
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean roadPlaceable(int player, int position) {
+        boolean isBuildable = false;
+        if (edges[position].getState() == 0) {
+            for (int ePos : edges[position].getNeighbours()) {
+                if (edges[ePos].getState() == player) isBuildable = true;
+            }
+            if (!isBuildable) {
+                for (int i : edges[position].getNeiInt()) {
+                    //ASCII 49 -> 1; 50 -> 2; 51 -> 3; 52 -> 4
+                    if (intersections[i].getState().charAt(0) == player + 48) isBuildable = true;
+                }
+            }
+        }
+        return isBuildable;
+    }
+
+    @Override
+    public boolean settlementPlaceable(int player, int position) {
+        return intersections[position].getState().equals("f");
+    }
+
+    @Override
+    public boolean upgradeSettlement(int player, int position) {
+        if (intersections[position].getState().equals(player + "s")) {
+            intersections[position].setState(player + "c");
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -225,283 +504,5 @@ public class GameMapManagement implements IGameMapManagement {
         intersections[53] = new Intersection(new int[]{34, 35, 37}, new int[]{42, 52, 54}, "f");
         intersections[54] = new Intersection(new int[]{35, 36, 37}, new int[]{45, 49, 53}, "f");
         //----------------------------------------------------------------------------------------------------
-    }
-
-    @Override
-    public IGameHex getHex(int place) {
-        return hexes[place];
-    }
-
-    @Override
-    public IGameHex[][] getHexesAsJaggedArray() {
-        IGameHex[][] map;
-        map = new IGameHex[7][];
-        map[0] = new IGameHex[4];
-        map[1] = new IGameHex[5];
-        map[2] = new IGameHex[6];
-        map[3] = new IGameHex[7];
-        map[4] = new IGameHex[6];
-        map[5] = new IGameHex[5];
-        map[6] = new IGameHex[4];
-
-        map[0][0] = getHex(1);
-        map[0][1] = getHex(2);
-        map[0][2] = getHex(3);
-        map[0][3] = getHex(4);
-        map[1][0] = getHex(18);
-        map[1][1] = getHex(19);
-        map[1][2] = getHex(20);
-        map[1][3] = getHex(21);
-        map[1][4] = getHex(5);
-        map[2][0] = getHex(17);
-        map[2][1] = getHex(30);
-        map[2][2] = getHex(31);
-        map[2][3] = getHex(32);
-        map[2][4] = getHex(22);
-        map[2][5] = getHex(6);
-        map[3][0] = getHex(16);
-        map[3][1] = getHex(29);
-        map[3][2] = getHex(36);
-        map[3][3] = getHex(37);
-        map[3][4] = getHex(33);
-        map[3][5] = getHex(23);
-        map[3][6] = getHex(7);
-        map[4][0] = getHex(15);
-        map[4][1] = getHex(28);
-        map[4][2] = getHex(35);
-        map[4][3] = getHex(34);
-        map[4][4] = getHex(24);
-        map[4][5] = getHex(8);
-        map[5][0] = getHex(14);
-        map[5][1] = getHex(27);
-        map[5][2] = getHex(26);
-        map[5][3] = getHex(25);
-        map[5][4] = getHex(9);
-        map[6][0] = getHex(13);
-        map[6][1] = getHex(12);
-        map[6][2] = getHex(11);
-        map[6][3] = getHex(10);
-
-        return map;
-    }
-
-    @Override
-    public IIntersection[][] getIntersectionsAsJaggedArray() {
-        IIntersection[][] intersec;
-        intersec = new IIntersection[6][];
-        intersec[0] = new IIntersection[7];
-        intersec[1] = new IIntersection[9];
-        intersec[2] = new IIntersection[11];
-        intersec[3] = new IIntersection[11];
-        intersec[4] = new IIntersection[9];
-        intersec[5] = new IIntersection[7];
-        System.arraycopy(intersections, 1, intersec[0], 0, 7);
-        System.arraycopy(intersections, 30, intersec[1], 0, 7);
-        intersec[1][7] = intersections[8];
-        intersec[1][8] = intersections[9];
-
-        intersec[2][0] = intersections[27];
-        intersec[2][1] = intersections[28];
-        intersec[2][2] = intersections[47];
-        intersec[2][3] = intersections[48];
-        intersec[2][4] = intersections[49];
-        intersec[2][5] = intersections[50];
-        intersec[2][6] = intersections[51];
-        intersec[2][7] = intersections[36];
-        intersec[2][8] = intersections[37];
-        intersec[2][9] = intersections[10];
-        intersec[2][10] = intersections[11];
-
-        intersec[3][0] = intersections[26];
-        intersec[3][1] = intersections[25];
-        intersec[3][2] = intersections[46];
-        intersec[3][3] = intersections[45];
-        intersec[3][4] = intersections[54];
-        intersec[3][5] = intersections[53];
-        intersec[3][6] = intersections[52];
-        intersec[3][7] = intersections[39];
-        intersec[3][8] = intersections[38];
-        intersec[3][9] = intersections[13];
-        intersec[3][10] = intersections[12];
-
-        intersec[4][0] = intersections[24];
-        intersec[4][1] = intersections[23];
-        intersec[4][2] = intersections[44];
-        intersec[4][3] = intersections[43];
-        intersec[4][4] = intersections[42];
-        intersec[4][5] = intersections[41];
-        intersec[4][6] = intersections[40];
-        intersec[4][7] = intersections[14];
-        intersec[4][8] = intersections[15];
-
-        for(int i = 0; i < 7; i++){
-            intersec[5][i] = intersections[21 - i];
-        }
-        return intersec;
-    }
-    @Override
-    public IEdge[][] getEdgesAsJaggedArrayWithNullFiller(){
-        IEdge[][] edgeArray;
-        edgeArray = new IEdge[6][];
-        edgeArray[0] = new IEdge[12];
-        edgeArray[1] = new IEdge[15];
-        edgeArray[2] = new IEdge[18];
-        edgeArray[3] = new IEdge[15];
-        edgeArray[4] = new IEdge[12];
-        edgeArray[5] = new IEdge[9];
-
-        edgeArray[0][0] = null;
-        edgeArray[0][1] = edges[30];
-        edgeArray[0][2] = edges[1];
-        edgeArray[0][3] = edges[2];
-        edgeArray[0][4] = edges[31];
-        edgeArray[0][5] = edges[3];
-        edgeArray[0][6] = edges[4];
-        edgeArray[0][7] = edges[32];
-        edgeArray[0][8] = edges[5];
-        edgeArray[0][9] = edges[6];
-        edgeArray[0][10] = edges[33];
-        edgeArray[0][11] = null;
-
-        edgeArray[1][0] = null;
-        edgeArray[1][1] = edges[28];
-        edgeArray[1][2] = edges[29];
-        edgeArray[1][3] = edges[42];
-        edgeArray[1][4] = edges[60];
-        edgeArray[1][5] = edges[43];
-        edgeArray[1][6] = edges[44];
-        edgeArray[1][7] = edges[61];
-        edgeArray[1][8] = edges[45];
-        edgeArray[1][9] = edges[46];
-        edgeArray[1][10] = edges[1];
-        edgeArray[1][11] = edges[62];
-        edgeArray[1][12] = edges[33];
-        edgeArray[1][13] = edges[8];
-        edgeArray[1][14] = null;
-
-        edgeArray[2][0] = null;
-        edgeArray[2][1] = edges[26];
-        edgeArray[2][2] = edges[27];
-        edgeArray[2][3] = edges[41];
-        edgeArray[2][4] = edges[58];
-        edgeArray[2][5] = edges[59];
-        edgeArray[2][6] = edges[66];
-        edgeArray[2][7] = edges[72];
-        edgeArray[2][8] = edges[67];
-        edgeArray[2][9] = edges[68];
-        edgeArray[2][10] = edges[69];
-        edgeArray[2][11] = edges[62];
-        edgeArray[2][12] = edges[48];
-        edgeArray[2][13] = edges[49];
-        edgeArray[2][14] = edges[34];
-        edgeArray[2][15] = edges[10];
-        edgeArray[2][16] = edges[11];
-        edgeArray[2][17] = null;
-
-        edgeArray[3][0] = edges[25];
-        edgeArray[3][1] = edges[24];
-        edgeArray[3][2] = edges[40];
-        edgeArray[3][3] = edges[57];
-        edgeArray[3][4] = edges[56];
-        edgeArray[3][5] = edges[65];
-        edgeArray[3][6] = edges[71];
-        edgeArray[3][7] = edges[64];
-        edgeArray[3][8] = edges[70];
-        edgeArray[3][9] = edges[63];
-        edgeArray[3][10] = edges[51];
-        edgeArray[3][11] = edges[50];
-        edgeArray[3][12] = edges[35];
-        edgeArray[3][13] = edges[13];
-        edgeArray[3][14] = edges[12];
-
-        edgeArray[4][0] = edges[23];
-        edgeArray[4][1] = edges[22];
-        edgeArray[4][2] = edges[39];
-        edgeArray[4][3] = edges[55];
-        edgeArray[4][4] = edges[38];
-        edgeArray[4][5] = edges[54];
-        edgeArray[4][6] = edges[53];
-        edgeArray[4][7] = edges[37];
-        edgeArray[4][8] = edges[52];
-        edgeArray[4][9] = edges[36];
-        edgeArray[4][10] = edges[15];
-        edgeArray[4][11] = edges[14];
-
-        edgeArray[5][0] = null;
-        edgeArray[5][1] = edges[21];
-        edgeArray[5][1] = null;
-        edgeArray[5][2] = edges[20];
-        edgeArray[5][3] = edges[19];
-        edgeArray[5][4] = null;
-        edgeArray[5][5] = edges[18];
-        edgeArray[5][6] = edges[17];
-        edgeArray[5][7] = null;
-        edgeArray[5][8] = edges[16];
-
-        return edgeArray;
-    }
-
-    @Override
-    public boolean placeSettlement(int player, int position) {
-        if (settlementPlaceable(player, position)) {
-            intersections[position].setState(player + "s");
-            for (int iPos : intersections[player].getNeighbours()) {
-                intersections[iPos].setState("b");
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean placeRoad(int player, int position) {
-        if (roadPlaceable(player, position)) {
-            edges[position].setState(player);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void moveRobber(int newHex) {
-        hexes[robberPosition].setRobberOnField(false);
-        robberPosition = newHex;
-        hexes[robberPosition].setRobberOnField(true);
-    }
-
-    @Override
-    public int getRobberPos() {
-        return robberPosition;
-    }
-
-    @Override
-    public boolean upgradeSettlement(int player, int position) {
-        if (intersections[position].getState().equals(player + "s")) {
-            intersections[position].setState(player + "c");
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean settlementPlaceable(int player, int position) {
-        return intersections[position].getState().equals("f");
-    }
-
-    @Override
-    public boolean roadPlaceable(int player, int position) {
-        boolean isBuildable = false;
-        if (edges[position].getState() == 0) {
-            for (int ePos : edges[position].getNeighbours()) {
-                if (edges[ePos].getState() == player) isBuildable = true;
-            }
-            if (!isBuildable) {
-                for (int i : edges[position].getNeiInt()) {
-                    //ASCII 49 -> 1; 50 -> 2; 51 -> 3; 52 -> 4
-                    if (intersections[i].getState().charAt(0) == player + 48) isBuildable = true;
-                }
-            }
-        }
-        return isBuildable;
     }
 }

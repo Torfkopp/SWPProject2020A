@@ -14,12 +14,26 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests the Game object and GameManagement
  *
- * @author Alwin
- * @author Mario
- * @author Marvin
+ * @author Alwin Bossert
+ * @author Mario Fokken
+ * @author Marvin Drees
  * @since 2021-01-24
  */
 class GameTest {
+
+    @Test
+    void gameManagementTest() {
+        GameManagement gm = new GameManagement();
+        User user = new UserDTO("", "", "");
+        Lobby lobby = new LobbyDTO("testLobby", user);
+        gm.createGame(lobby, user);
+        assertNotNull(gm.getGame("testLobby"));
+        Map<String, Game> map = gm.getGames();
+        assertEquals(map.size(), 1);
+        gm.dropGame("testLobby");
+        map = gm.getGames();
+        assertTrue(map.isEmpty());
+    }
 
     @Test
     void gameTest() {
@@ -40,19 +54,5 @@ class GameTest {
         assertEquals(game.nextPlayer(), user[1]);
         assertEquals(game.nextPlayer(), user[2]);
         assertEquals(game.nextPlayer(), user[0]);
-    }
-
-    @Test
-    void gameManagementTest() {
-        GameManagement gm = new GameManagement();
-        User user = new UserDTO("", "", "");
-        Lobby lobby = new LobbyDTO("testLobby", user);
-        gm.createGame(lobby, user);
-        assertNotNull(gm.getGame("testLobby"));
-        Map<String, Game> map = gm.getGames();
-        assertEquals(map.size(), 1);
-        gm.dropGame("testLobby");
-        map = gm.getGames();
-        assertTrue(map.isEmpty());
     }
 }

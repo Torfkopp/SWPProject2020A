@@ -22,6 +22,7 @@ public class DeleteUserRequest extends AbstractRequestMessage {
      * Constructor
      *
      * @param toDelete The user to delete
+     *
      * @since 2020-11-02
      */
     public DeleteUserRequest(User toDelete) {
@@ -31,16 +32,6 @@ public class DeleteUserRequest extends AbstractRequestMessage {
     @Override
     public boolean authorisationNeeded() {
         return true;
-    }
-
-    /**
-     * Gets the user variable
-     *
-     * @return The user to delete
-     * @since 2020-11-02
-     */
-    public User getUser() {
-        return toDelete;
     }
 
     @Override
@@ -54,5 +45,16 @@ public class DeleteUserRequest extends AbstractRequestMessage {
         if (o == null || getClass() != o.getClass()) return false;
         DeleteUserRequest that = (DeleteUserRequest) o;
         return Objects.equals(toDelete, that.toDelete);
+    }
+
+    /**
+     * Gets the user variable
+     *
+     * @return The user to delete
+     *
+     * @since 2020-11-02
+     */
+    public User getUser() {
+        return toDelete;
     }
 }

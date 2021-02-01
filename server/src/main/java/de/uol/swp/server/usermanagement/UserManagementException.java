@@ -17,6 +17,7 @@ class UserManagementException extends RuntimeException {
      * Constructor
      *
      * @param s String containing the cause for the exception.
+     *
      * @since 2019-07-08
      */
     UserManagementException(String s) {

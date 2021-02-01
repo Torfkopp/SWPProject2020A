@@ -16,7 +16,8 @@ class UserManagementTest {
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
-    private static final User userNotInStore = new UserDTO("marco" + NO_USERS, "marco" + NO_USERS, "marco" + NO_USERS + "@grawunder.de");
+    private static final User userNotInStore = new UserDTO("marco" + NO_USERS, "marco" + NO_USERS,
+                                                           "marco" + NO_USERS + "@grawunder.de");
 
     static {
         users = new ArrayList<>();
@@ -26,15 +27,55 @@ class UserManagementTest {
         Collections.sort(users);
     }
 
-    List<User> getDefaultUsers() {
-        return Collections.unmodifiableList(users);
-    }
-
     ServerUserService getDefaultManagement() {
         UserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return new UserManagement(store);
+    }
+
+    List<User> getDefaultUsers() {
+        return Collections.unmodifiableList(users);
+    }
+
+    @Test
+    void createUser() {
+        ServerUserService management = getDefaultManagement();
+
+        management.createUser(userNotInStore);
+
+        // Creation leads not to log in
+        assertFalse(management.isLoggedIn(userNotInStore));
+
+        // Only way to test, if user is stored
+        management.login(userNotInStore.getUsername(), userNotInStore.getPassword());
+
+        assertTrue(management.isLoggedIn(userNotInStore));
+    }
+
+    @Test
+    void createUserAlreadyExisting() {
+        ServerUserService management = getDefaultManagement();
+        User userToCreate = users.get(0);
+
+        assertThrows(UserManagementException.class, () -> management.createUser(userToCreate));
+    }
+
+    @Test
+    void dropUser() {
+        ServerUserService management = getDefaultManagement();
+        management.createUser(userNotInStore);
+
+        management.dropUser(userNotInStore);
+
+        assertThrows(SecurityException.class,
+                     () -> management.login(userNotInStore.getUsername(), userNotInStore.getPassword()));
+    }
+
+    @Test
+    void dropUserNotExisting() {
+        ServerUserService management = getDefaultManagement();
+        assertThrows(UserManagementException.class, () -> management.dropUser(userNotInStore));
     }
 
     @Test
@@ -63,7 +104,8 @@ class UserManagementTest {
         User userToLogIn = users.get(0);
         User secondUser = users.get(1);
 
-        assertThrows(SecurityException.class, () -> management.login(userToLogIn.getUsername(), secondUser.getPassword()));
+        assertThrows(SecurityException.class,
+                     () -> management.login(userToLogIn.getUsername(), secondUser.getPassword()));
 
         assertFalse(management.isLoggedIn(userToLogIn));
     }
@@ -83,44 +125,42 @@ class UserManagementTest {
     }
 
     @Test
-    void createUser() {
+    void retrieveAllUsers() {
         ServerUserService management = getDefaultManagement();
 
-        management.createUser(userNotInStore);
+        List<User> allUsers = management.retrieveAllUsers();
 
-        // Creation leads not to log in
-        assertFalse(management.isLoggedIn(userNotInStore));
+        Collections.sort(allUsers);
+        assertEquals(allUsers, getDefaultUsers());
 
-        // Only way to test, if user is stored
-        management.login(userNotInStore.getUsername(), userNotInStore.getPassword());
-
-        assertTrue(management.isLoggedIn(userNotInStore));
+        // check if there are no passwords
+        // TODO: Normally, there should be no logic in tests
+        allUsers.forEach(u -> assertEquals(u.getPassword(), ""));
     }
 
     @Test
-    void dropUser() {
+    void updateUnknownUser() {
         ServerUserService management = getDefaultManagement();
-        management.createUser(userNotInStore);
-
-        management.dropUser(userNotInStore);
-
-        assertThrows(SecurityException.class,
-                () -> management.login(userNotInStore.getUsername(), userNotInStore.getPassword()));
+        assertThrows(UserManagementException.class, () -> management.updateUser(userNotInStore));
     }
 
     @Test
-    void dropUserNotExisting() {
+    void updateUserPassword_LoggedIn() {
         ServerUserService management = getDefaultManagement();
-        assertThrows(UserManagementException.class,
-                () -> management.dropUser(userNotInStore));
-    }
+        User userToUpdate = users.get(0);
+        User updatedUser = new UserDTO(userToUpdate.getUsername(), "newPassword", null);
 
-    @Test
-    void createUserAlreadyExisting() {
-        ServerUserService management = getDefaultManagement();
-        User userToCreate = users.get(0);
+        management.login(userToUpdate.getUsername(), userToUpdate.getPassword());
+        assertTrue(management.isLoggedIn(userToUpdate));
 
-        assertThrows(UserManagementException.class, () -> management.createUser(userToCreate));
+        management.updateUser(updatedUser);
+        assertTrue(management.isLoggedIn(updatedUser));
+
+        management.logout(updatedUser);
+        assertFalse(management.isLoggedIn(updatedUser));
+
+        management.login(updatedUser.getUsername(), updatedUser.getPassword());
+        assertTrue(management.isLoggedIn(updatedUser));
     }
 
     @Test
@@ -147,44 +187,5 @@ class UserManagementTest {
         User user = management.login(updatedUser.getUsername(), updatedUser.getPassword());
         assertTrue(management.isLoggedIn(updatedUser));
         assertEquals(user.getEMail(), updatedUser.getEMail());
-    }
-
-    @Test
-    void updateUserPassword_LoggedIn() {
-        ServerUserService management = getDefaultManagement();
-        User userToUpdate = users.get(0);
-        User updatedUser = new UserDTO(userToUpdate.getUsername(), "newPassword", null);
-
-        management.login(userToUpdate.getUsername(), userToUpdate.getPassword());
-        assertTrue(management.isLoggedIn(userToUpdate));
-
-        management.updateUser(updatedUser);
-        assertTrue(management.isLoggedIn(updatedUser));
-
-        management.logout(updatedUser);
-        assertFalse(management.isLoggedIn(updatedUser));
-
-        management.login(updatedUser.getUsername(), updatedUser.getPassword());
-        assertTrue(management.isLoggedIn(updatedUser));
-    }
-
-    @Test
-    void updateUnknownUser() {
-        ServerUserService management = getDefaultManagement();
-        assertThrows(UserManagementException.class, () -> management.updateUser(userNotInStore));
-    }
-
-    @Test
-    void retrieveAllUsers() {
-        ServerUserService management = getDefaultManagement();
-
-        List<User> allUsers = management.retrieveAllUsers();
-
-        Collections.sort(allUsers);
-        assertEquals(allUsers, getDefaultUsers());
-
-        // check if there are no passwords
-        // TODO: Normally, there should be no logic in tests
-        allUsers.forEach(u -> assertEquals(u.getPassword(), ""));
     }
 }

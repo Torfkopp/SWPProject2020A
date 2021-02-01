@@ -12,7 +12,7 @@ import de.uol.swp.common.user.User;
  * @author Alwin Bossert
  * @author Mario Fokken
  * @author Marvin Drees
- * @see AbstractServerMessage
+ * @see de.uol.swp.common.message.AbstractServerMessage
  * @since 2021-01-15
  */
 public abstract class AbstractGameMessage extends AbstractServerMessage {

@@ -44,6 +44,7 @@ public class AllOnlineUsersResponse extends AbstractResponseMessage {
      * These copies have their password variable set to an empty string.
      *
      * @param users Collection of all currently logged in users
+     *
      * @since 2019-08-13
      */
     public AllOnlineUsersResponse(Collection<User> users) {
@@ -56,6 +57,7 @@ public class AllOnlineUsersResponse extends AbstractResponseMessage {
      * Gets the list of all currently logged in users
      *
      * @return list of currently logged in users
+     *
      * @since 2019-08-13
      */
     public List<User> getUsers() {

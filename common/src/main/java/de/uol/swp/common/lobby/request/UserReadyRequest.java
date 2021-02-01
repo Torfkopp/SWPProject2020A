@@ -15,6 +15,7 @@ import de.uol.swp.common.user.User;
  * @since 2021-01-19
  */
 public class UserReadyRequest extends AbstractLobbyRequest {
+
     private final boolean isReady;
 
     /**

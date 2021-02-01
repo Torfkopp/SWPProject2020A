@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 2021-01-03
  */
 class LobbyUpdateEventTest {
+
     private static final User defaultUser = new UserDTO("I'm tree", "I'm pretty sure I'm a tree", "tree@tree.test");
 
     /**

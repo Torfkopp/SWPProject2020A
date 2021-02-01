@@ -12,10 +12,11 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * @author Alwin Bossert
  * @author Mario Fokken
  * @author Marvin Drees
- * @see AbstractRequestMessage
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2021-01-15
  */
 public class AbstractGameRequest extends AbstractRequestMessage {
+
     private final String originLobby;
 
     /**

@@ -33,10 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class that manages which window/scene is currently shown
@@ -93,7 +90,9 @@ public class SceneManager {
      * If it fails to load the view, a RuntimeException is thrown.
      *
      * @param fxmlFile FXML file to load the view from
+     *
      * @return View loaded from FXML or null
+     *
      * @since 2019-09-03
      */
     private Parent initPresenter(String fxmlFile) {
@@ -190,6 +189,7 @@ public class SceneManager {
      * screen.
      *
      * @param event The ShowRegistrationViewEvent detected on the EventBus
+     *
      * @see de.uol.swp.client.register.event.ShowRegistrationViewEvent
      * @since 2019-09-03
      */
@@ -221,6 +221,7 @@ public class SceneManager {
      * called. It calls a method to switch the current screen to the login screen.
      *
      * @param event The ShowLoginViewEvent detected on the EventBus
+     *
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @since 2019-09-03
      */
@@ -236,6 +237,7 @@ public class SceneManager {
      * It calls a method to close all lobby screens.
      *
      * @param event The CloseLobbiesViewEvent detected on the EventBus
+     *
      * @author Finn Haase
      * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
      * @since 2021-01-28
@@ -252,6 +254,7 @@ public class SceneManager {
      * is updated to know the same lobbies as the server
      *
      * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
+     *
      * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-12-12
      */
@@ -270,6 +273,7 @@ public class SceneManager {
      * called. It opens the lobby in a new window.
      *
      * @param event The ShowLobbyViewEvent detected on the EventBus
+     *
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
      * @since 2020-11-21
      */
@@ -321,6 +325,7 @@ public class SceneManager {
      * called. It calls a method to show the screen shown before registration.
      *
      * @param event The RegistrationCanceledEvent detected on the EventBus
+     *
      * @see de.uol.swp.client.register.event.RegistrationCanceledEvent
      * @since 2019-09-03
      */
@@ -351,6 +356,7 @@ public class SceneManager {
      * called. It shows the error message of the event in a error alert.
      *
      * @param event The RegistrationErrorEvent detected on the EventBus
+     *
      * @see de.uol.swp.client.register.event.RegistrationErrorEvent
      * @since 2019-09-03
      */
@@ -379,6 +385,7 @@ public class SceneManager {
      *
      * @param message The type of error to be shown
      * @param e       The error message
+     *
      * @since 2019-09-03
      */
     public void showError(String message, String e) {
@@ -392,6 +399,7 @@ public class SceneManager {
      * Shows a server error message inside an error alert
      *
      * @param e The error message
+     *
      * @since 2019-09-03
      */
     public void showServerError(String e) {
@@ -402,6 +410,7 @@ public class SceneManager {
      * Shows an error message inside an error alert
      *
      * @param e The error message
+     *
      * @since 2019-09-03
      */
     public void showError(String e) {
@@ -416,6 +425,7 @@ public class SceneManager {
      *
      * @param scene New scene to show
      * @param title New window title
+     *
      * @since 2019-09-03
      */
     private void showScene(final Scene scene, final String title) {
@@ -489,7 +499,7 @@ public class SceneManager {
      * and sets the window's title to "Change Password"
      *
      * @author Eric Vuong
-     * @author Mario
+     * @author Mario Fokken
      * @since 2020-12-19
      */
     public void showChangePasswordScreen(User user) {

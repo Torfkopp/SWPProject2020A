@@ -32,20 +32,11 @@ public class UserLoggedOutMessage extends AbstractServerMessage {
      * Constructor
      *
      * @param username The username of the newly logged out user
+     *
      * @since 2017-03-17
      */
     public UserLoggedOutMessage(String username) {
         this.username = username;
-    }
-
-    /**
-     * Gets the username
-     *
-     * @return String containing the username
-     * @since 2017-03-17
-     */
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -59,5 +50,16 @@ public class UserLoggedOutMessage extends AbstractServerMessage {
         if (o == null || getClass() != o.getClass()) return false;
         UserLoggedOutMessage that = (UserLoggedOutMessage) o;
         return Objects.equals(username, that.username);
+    }
+
+    /**
+     * Gets the username
+     *
+     * @return String containing the username
+     *
+     * @since 2017-03-17
+     */
+    public String getUsername() {
+        return username;
     }
 }

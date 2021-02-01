@@ -3,7 +3,7 @@ package de.uol.swp.common.game.map;
 /**
  * Class for an edge
  *
- * @author Mario
+ * @author Mario Fokken
  * @since 2021-01-17
  */
 public class Edge implements IEdge {
@@ -25,7 +25,6 @@ public class Edge implements IEdge {
         this.neighbours = neighbours;
         this.state = state;
     }
-
 
     @Override
     public int[] getNeiInt() {

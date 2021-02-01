@@ -35,12 +35,13 @@ public class UpdateInventoryResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Gets the user whose inventory is being updated
+     * Gets the army and road map, containing mappings of "Largest Army" and
+     * "Longest Road" to their appropriate boolean values.
      *
-     * @return The User whose inventory is being updated
+     * @return The army and road map
      */
-    public User getUser() {
-        return user;
+    public Map<String, Boolean> getArmyAndRoadMap() {
+        return armyAndRoadMap;
     }
 
     /**
@@ -64,12 +65,11 @@ public class UpdateInventoryResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Gets the army and road map, containing mappings of "Largest Army" and
-     * "Longest Road" to their appropriate boolean values.
+     * Gets the user whose inventory is being updated
      *
-     * @return The army and road map
+     * @return The User whose inventory is being updated
      */
-    public Map<String, Boolean> getArmyAndRoadMap() {
-        return armyAndRoadMap;
+    public User getUser() {
+        return user;
     }
 }

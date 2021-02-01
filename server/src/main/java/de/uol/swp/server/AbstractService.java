@@ -24,6 +24,7 @@ public class AbstractService {
      * Constructor
      *
      * @param bus The EvenBus used throughout the server
+     *
      * @since 2019-10-08
      */
     public AbstractService(EventBus bus) {
@@ -35,6 +36,7 @@ public class AbstractService {
      * Posts a message onto the EventBus
      *
      * @param message The message to post
+     *
      * @see de.uol.swp.common.message.Message
      * @since 2019-10-08
      */
@@ -47,6 +49,7 @@ public class AbstractService {
      * and posts it onto the EventBus.
      *
      * @param message The message to be sent to every user
+     *
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-10-08
      */

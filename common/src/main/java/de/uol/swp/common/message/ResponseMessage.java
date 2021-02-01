@@ -8,6 +8,4 @@ package de.uol.swp.common.message;
  * @see de.uol.swp.common.message.Message
  * @since 2019-08-07
  */
-
-public interface ResponseMessage extends Message {
-}
+public interface ResponseMessage extends Message {}

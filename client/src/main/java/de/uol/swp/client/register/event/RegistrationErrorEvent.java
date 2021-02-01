@@ -11,12 +11,14 @@ package de.uol.swp.client.register.event;
  * @since 2019-09-03
  */
 public class RegistrationErrorEvent {
+
     private final String message;
 
     /**
      * Constructor
      *
      * @param message Message containing the cause of the error
+     *
      * @since 2019-09-03
      */
     public RegistrationErrorEvent(String message) {
@@ -27,6 +29,7 @@ public class RegistrationErrorEvent {
      * Gets the error message
      *
      * @return A String containing the error message
+     *
      * @since 2019-09-03
      */
     public String getMessage() {
