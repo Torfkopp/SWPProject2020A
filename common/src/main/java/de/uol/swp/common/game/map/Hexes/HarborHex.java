@@ -3,8 +3,8 @@ package de.uol.swp.common.game.map.Hexes;
 /**
  * Class for the harbor hex
  *
- * @author Mario
- * @author Steven
+ * @author Mario Fokken
+ * @author Steven Luong
  * @since 2021-01-16
  */
 public class HarborHex extends AbstractHex implements IHarborHex {
@@ -30,5 +30,4 @@ public class HarborHex extends AbstractHex implements IHarborHex {
     public type getType() {
         return type.Harbor;
     }
-
 }

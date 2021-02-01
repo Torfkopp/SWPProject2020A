@@ -9,6 +9,7 @@ package de.uol.swp.common.chat.request;
  * @since 2020-12-17
  */
 public class AskLatestChatMessageRequest extends AbstractChatMessageRequest {
+
     private final int amount;
 
     /**
@@ -33,6 +34,7 @@ public class AskLatestChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @param amount      The amount of messages that should be sent back
      * @param originLobby The Lobby the AskLatestChatMessageRequest originated from
+     *
      * @since 2020-12-30
      */
     public AskLatestChatMessageRequest(int amount, String originLobby) {

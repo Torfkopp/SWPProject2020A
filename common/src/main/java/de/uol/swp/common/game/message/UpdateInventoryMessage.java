@@ -8,13 +8,12 @@ package de.uol.swp.common.game.message;
  * @see de.uol.swp.common.game.message.AbstractGameMessage
  * @since 2021-1-25
  */
+public class UpdateInventoryMessage extends AbstractGameMessage {
 
-public class UpdateInventoryMessage extends AbstractGameMessage{
-    String lobby;
+    private final String lobbyName;
 
-
-    public UpdateInventoryMessage(String game){
-
+    public UpdateInventoryMessage(String lobbyName) {
+        this.lobbyName = lobbyName;
     }
 
     /**
@@ -22,7 +21,7 @@ public class UpdateInventoryMessage extends AbstractGameMessage{
      *
      * @return String The lobby's name
      */
-    public String getLobby() {
-        return lobby;
+    public String getLobbyName() {
+        return lobbyName;
     }
 }

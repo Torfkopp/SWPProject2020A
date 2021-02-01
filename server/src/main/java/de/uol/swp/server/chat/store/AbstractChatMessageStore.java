@@ -8,5 +8,4 @@ package de.uol.swp.server.chat.store;
  * @see de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore
  * @since 2020-12-16
  */
-public abstract class AbstractChatMessageStore implements ChatMessageStore {
-}
+public abstract class AbstractChatMessageStore implements ChatMessageStore {}

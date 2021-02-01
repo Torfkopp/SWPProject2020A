@@ -22,21 +22,11 @@ class NettyMessageContext implements MessageContext {
      * Constructor
      *
      * @param ctx The encapsulated ChannelHandlerContext
+     *
      * @since 2019-11-20
      */
     public NettyMessageContext(ChannelHandlerContext ctx) {
         this.ctx = ctx;
-    }
-
-    /**
-     * Gets the ChannelHandlerContext encapsulated by this class
-     *
-     * @return The ChannelHandlerContext
-     * @see io.netty.channel.ChannelHandlerContext
-     * @since 2019-11-20
-     */
-    ChannelHandlerContext getCtx() {
-        return ctx;
     }
 
     @Override
@@ -60,5 +50,17 @@ class NettyMessageContext implements MessageContext {
         if (o == null || getClass() != o.getClass()) return false;
         NettyMessageContext that = (NettyMessageContext) o;
         return Objects.equals(ctx, that.ctx);
+    }
+
+    /**
+     * Gets the ChannelHandlerContext encapsulated by this class
+     *
+     * @return The ChannelHandlerContext
+     *
+     * @see io.netty.channel.ChannelHandlerContext
+     * @since 2019-11-20
+     */
+    ChannelHandlerContext getCtx() {
+        return ctx;
     }
 }

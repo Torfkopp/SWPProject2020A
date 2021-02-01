@@ -38,6 +38,7 @@ class UserServiceTest {
      * to its event, and its event is printed to the console output.
      *
      * @param e The DeadEvent detected on the EventBus
+     *
      * @since 2019-10-10
      */
     @Subscribe
@@ -86,6 +87,71 @@ class UserServiceTest {
         ClientUserService userService = new UserService(bus);
         userService.login(defaultUser.getUsername(), defaultUser.getPassword());
         lock.await(250, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Test for the createUser routine
+     * <p>
+     * This Test creates a new UserService object registered to the EventBus of
+     * this test class. It then calls the createUser function of the object using
+     * the defaultUser as parameter and waits for it to post an UpdateUserRequest
+     * object onto the EventBus.
+     * If this happens within one second, it checks if the user in the request object
+     * is the same as the default user and if authorisation is needed.
+     * Authorisation should not be needed.
+     * If any of these checks fail or the method takes too long, this test is unsuccessful.
+     *
+     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @since 2019-10-10
+     */
+    @Test
+    void createUserTest() throws InterruptedException {
+        ClientUserService userService = new UserService(bus);
+        userService.createUser(defaultUser);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof RegisterUserRequest);
+
+        RegisterUserRequest request = (RegisterUserRequest) event;
+
+        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
+        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
+        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
+        assertFalse(request.authorisationNeeded());
+    }
+
+    /**
+     * Test for the dropUser routine
+     * <p>
+     * This Test creates a new UserService object registered to the EventBus of
+     * this test class. It then calls the dropUser function of the object using
+     * the defaultUser as parameter and waits for it to post a DeleteUserRequest
+     * object onto the EventBus.
+     * If this happens within one second, it checks if authorisation is needed.
+     * Authorisation should be needed.
+     * If any of these checks fail or the method takes too long, this test is unsuccessful.
+     *
+     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @author Phillip-André Suhr
+     * @since 2019-10-10
+     */
+    @Test
+    void dropUserTest() throws InterruptedException {
+        ClientUserService userService = new UserService(bus);
+
+        userService.dropUser(defaultUser);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof DeleteUserRequest);
+
+        DeleteUserRequest request = (DeleteUserRequest) event;
+
+        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
+        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
+        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
+        assertTrue(request.authorisationNeeded());
     }
 
     /**
@@ -142,35 +208,24 @@ class UserServiceTest {
     }
 
     /**
-     * Test for the createUser routine
+     * Test for the retrieveAllUsers routine
      * <p>
      * This Test creates a new UserService object registered to the EventBus of
-     * this test class. It then calls the createUser function of the object using
-     * the defaultUser as parameter and waits for it to post an UpdateUserRequest
-     * object onto the EventBus.
-     * If this happens within one second, it checks if the user in the request object
-     * is the same as the default user and if authorisation is needed.
-     * Authorisation should not be needed.
-     * If any of these checks fail or the method takes too long, this test is unsuccessful.
+     * this test class. It then calls the retrieveAllUsers function of the object
+     * and waits for it to post a retrieveAllUsersRequest object onto the EventBus.
+     * If this happens within one second, the test is successful.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2019-10-10
      */
     @Test
-    void createUserTest() throws InterruptedException {
+    void retrieveAllUsersTest() throws InterruptedException {
         ClientUserService userService = new UserService(bus);
-        userService.createUser(defaultUser);
+        userService.retrieveAllUsers();
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof RegisterUserRequest);
-
-        RegisterUserRequest request = (RegisterUserRequest) event;
-
-        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
-        assertFalse(request.authorisationNeeded());
+        assertTrue(event instanceof RetrieveAllOnlineUsersRequest);
     }
 
     /**
@@ -203,59 +258,5 @@ class UserServiceTest {
         assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
         assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
         assertTrue(request.authorisationNeeded());
-    }
-
-    /**
-     * Test for the dropUser routine
-     * <p>
-     * This Test creates a new UserService object registered to the EventBus of
-     * this test class. It then calls the dropUser function of the object using
-     * the defaultUser as parameter and waits for it to post a DeleteUserRequest
-     * object onto the EventBus.
-     * If this happens within one second, it checks if authorisation is needed.
-     * Authorisation should be needed.
-     * If any of these checks fail or the method takes too long, this test is unsuccessful.
-     *
-     * @throws java.lang.InterruptedException thrown by lock.await()
-     * @author Phillip-André Suhr
-     * @since 2019-10-10
-     */
-    @Test
-    void dropUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-
-        userService.dropUser(defaultUser);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof DeleteUserRequest);
-
-        DeleteUserRequest request = (DeleteUserRequest) event;
-
-        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
-        assertTrue(request.authorisationNeeded());
-    }
-
-    /**
-     * Test for the retrieveAllUsers routine
-     * <p>
-     * This Test creates a new UserService object registered to the EventBus of
-     * this test class. It then calls the retrieveAllUsers function of the object
-     * and waits for it to post a retrieveAllUsersRequest object onto the EventBus.
-     * If this happens within one second, the test is successful.
-     *
-     * @throws java.lang.InterruptedException thrown by lock.await()
-     * @since 2019-10-10
-     */
-    @Test
-    void retrieveAllUsersTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-        userService.retrieveAllUsers();
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof RetrieveAllOnlineUsersRequest);
     }
 }

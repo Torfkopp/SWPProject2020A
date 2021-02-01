@@ -13,6 +13,7 @@ import de.uol.swp.common.message.AbstractServerMessage;
  * @since 2020-12-30
  */
 public abstract class AbstractChatMessageMessage extends AbstractServerMessage {
+
     private final boolean isLobbyChatMessage;
     private final String lobbyName;
 

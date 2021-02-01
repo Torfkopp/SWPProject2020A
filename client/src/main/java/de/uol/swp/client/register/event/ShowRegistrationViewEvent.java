@@ -10,5 +10,4 @@ package de.uol.swp.client.register.event;
  * @see de.uol.swp.client.SceneManager
  * @since 2019-09-02
  */
-public class ShowRegistrationViewEvent {
-}
+public class ShowRegistrationViewEvent {}

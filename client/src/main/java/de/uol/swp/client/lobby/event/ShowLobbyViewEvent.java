@@ -6,11 +6,12 @@ package de.uol.swp.client.lobby.event;
  * In order to show the lobby window using this event, post an instance of it
  * onto the EventBus the SceneManager is subscribed to.
  *
- * @author Mario
+ * @author Mario Fokken
  * @see de.uol.swp.client.SceneManager
  * @since 2020-11-21
  */
 public class ShowLobbyViewEvent {
+
     private final String name;
 
     /**

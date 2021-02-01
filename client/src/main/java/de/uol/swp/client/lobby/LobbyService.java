@@ -24,6 +24,7 @@ public class LobbyService {
      * Constructor
      *
      * @param eventBus The EventBus set in ClientModule
+     *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2019-11-20
      */
@@ -38,6 +39,7 @@ public class LobbyService {
      *
      * @param name Name chosen for the new lobby
      * @param user User wanting to create the new lobby
+     *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
@@ -47,17 +49,16 @@ public class LobbyService {
     }
 
     /**
-     * Posts a new instance of the LobbyUpdateEvent onto the Eventbus
-     * <p>
-     * This ensures that a new LobbyPresenter will know what lobby it is
-     * presenting and who the currently logged in User is.
+     * Posts a request to end the turn onto the Event
      *
-     * @param lobbyName The name of the Lobby
-     * @param user      The currently logged in User
-     * @since 2020-12-30
+     * @param user User who wants to end the turn
+     *
+     * @see de.uol.swp.common.game.request.EndTurnRequest
+     * @since 2021-1-15
      */
-    public void refreshLobbyPresenterFields(String lobbyName, User user) {
-        eventBus.post(new LobbyUpdateEvent(lobbyName, user));
+    public void endTurn(User user, String lobbyName) {
+        Message endTurnRequest = new EndTurnRequest(user, lobbyName);
+        eventBus.post(endTurnRequest);
     }
 
     /**
@@ -65,6 +66,7 @@ public class LobbyService {
      *
      * @param name Name of the lobby the user wants to join
      * @param user User who wants to join the lobby
+     *
      * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
      */
@@ -79,15 +81,31 @@ public class LobbyService {
     }
 
     /**
-     * Posts a request to end the turn onto the Event
+     * Posts a new instance of the LobbyUpdateEvent onto the Eventbus
+     * <p>
+     * This ensures that a new LobbyPresenter will know what lobby it is
+     * presenting and who the currently logged in User is.
      *
-     * @param user User who wants to end the turn
-     * @see EndTurnRequest
-     * @since 2021-1-15
+     * @param lobbyName The name of the Lobby
+     * @param user      The currently logged in User
+     *
+     * @since 2020-12-30
      */
-    public void endTurn(User user, String lobbyName) {
-        Message endTurnRequest = new EndTurnRequest(user, lobbyName);
-        eventBus.post(endTurnRequest);
+    public void refreshLobbyPresenterFields(String lobbyName, User user) {
+        eventBus.post(new LobbyUpdateEvent(lobbyName, user));
+    }
+
+    /**
+     * Posts a request to remove the user from all lobbies
+     *
+     * @param user the logged in user
+     *
+     * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
+     * @since 2021-01-28
+     */
+    public void removeFromLobbies(User user) {
+        Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
+        eventBus.post(removeFromLobbiesRequest);
     }
 
     /**
@@ -107,22 +125,11 @@ public class LobbyService {
     }
 
     /**
-     * Posts a request to remove the user from all lobbies
-     *
-     * @param user the logged in user
-     * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
-     * @since 2021-01-28
-     */
-    public void removeFromLobbies(User user) {
-        Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
-        eventBus.post(removeFromLobbiesRequest);
-    }
-
-    /**
      * Posts a request to update ones Inventory
      *
      * @param lobbyName name of the lobby the user wants to update his Inventory in
      * @param user      User who wants to update his Inventory.
+     *
      * @author Sven Ahrens
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest

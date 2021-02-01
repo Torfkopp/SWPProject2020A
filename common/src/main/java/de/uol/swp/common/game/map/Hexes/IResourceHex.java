@@ -3,18 +3,18 @@ package de.uol.swp.common.game.map.Hexes;
 /**
  * Interface for a resource hex
  *
- * @author Mario
- * @author Steven
+ * @author Mario Fokken
+ * @author Steven Luong
  * @since 2021-01-16
  */
 public interface IResourceHex extends ILandHex {
 
     /**
-     * Gets the number of the hex's token
-     *
-     * @return int Token number
+     * Enum for all five resource giving hex types
      */
-    int getToken();
+    enum resource {
+        Hills, Forest, Mountains, Fields, Pasture
+    }
 
     /**
      * Gets the hex's resource
@@ -24,10 +24,9 @@ public interface IResourceHex extends ILandHex {
     resource getResource();
 
     /**
-     * Enum for all five resource giving hex types
+     * Gets the number of the hex's token
+     *
+     * @return int Token number
      */
-    enum resource {
-        Hills, Forest, Mountains, Fields, Pasture
-    }
-
+    int getToken();
 }

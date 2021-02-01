@@ -23,20 +23,11 @@ public class UpdateUserRequest extends AbstractRequestMessage {
      * @param user The user object the sender shall be updated to unchanged fields
      *             being empty
      *             //Unfortunately, I don't know what he wants to say -Mario
+     *
      * @since 2019-09-02
      */
     public UpdateUserRequest(User user) {
         this.toUpdate = user;
-    }
-
-    /**
-     * Gets the updated User object
-     *
-     * @return The updated User object
-     * @since 2019-09-02
-     */
-    public User getUser() {
-        return toUpdate;
     }
 
     @Override
@@ -50,5 +41,16 @@ public class UpdateUserRequest extends AbstractRequestMessage {
         if (o == null || getClass() != o.getClass()) return false;
         UpdateUserRequest that = (UpdateUserRequest) o;
         return Objects.equals(toUpdate, that.toUpdate);
+    }
+
+    /**
+     * Gets the updated User object
+     *
+     * @return The updated User object
+     *
+     * @since 2019-09-02
+     */
+    public User getUser() {
+        return toUpdate;
     }
 }

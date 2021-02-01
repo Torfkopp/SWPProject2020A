@@ -26,20 +26,11 @@ public class LoginSuccessfulResponse extends AbstractResponseMessage {
      * Constructor
      *
      * @param user The successfully logged in user
+     *
      * @since 2019-08-07
      */
     public LoginSuccessfulResponse(User user) {
         this.user = user;
-    }
-
-    /**
-     * Gets the user variable
-     *
-     * @return User object of the successfully logged in user
-     * @since 2019-08-07
-     */
-    public User getUser() {
-        return user;
     }
 
     @Override
@@ -53,5 +44,16 @@ public class LoginSuccessfulResponse extends AbstractResponseMessage {
         if (o == null || getClass() != o.getClass()) return false;
         LoginSuccessfulResponse that = (LoginSuccessfulResponse) o;
         return Objects.equals(user, that.user);
+    }
+
+    /**
+     * Gets the user variable
+     *
+     * @return User object of the successfully logged in user
+     *
+     * @since 2019-08-07
+     */
+    public User getUser() {
+        return user;
     }
 }

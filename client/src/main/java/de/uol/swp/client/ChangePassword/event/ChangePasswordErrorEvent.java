@@ -11,6 +11,7 @@ package de.uol.swp.client.ChangePassword.event;
  * @since 2020-11-25
  */
 public class ChangePasswordErrorEvent {
+
     private final String message;
 
     /**

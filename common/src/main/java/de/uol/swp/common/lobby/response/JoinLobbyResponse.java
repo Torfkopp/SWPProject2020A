@@ -10,6 +10,7 @@ public class JoinLobbyResponse extends AbstractResponseMessage {
      * Constructor
      *
      * @param name The name for the new lobby
+     *
      * @since 2020-12-21
      **/
     public JoinLobbyResponse(String name) {
@@ -20,6 +21,7 @@ public class JoinLobbyResponse extends AbstractResponseMessage {
      * Gets the name of the created lobby
      *
      * @return Name name of the created lobby
+     *
      * @since 2020-12-21
      */
     public String getName() {

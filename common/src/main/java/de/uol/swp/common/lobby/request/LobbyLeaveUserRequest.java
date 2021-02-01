@@ -26,6 +26,7 @@ public class LobbyLeaveUserRequest extends AbstractLobbyRequest {
      *
      * @param lobbyName Name of the lobby
      * @param user      User who wants to leave the lobby
+     *
      * @since 2019-10-08
      */
     public LobbyLeaveUserRequest(String lobbyName, User user) {

@@ -11,8 +11,9 @@ class SerialisationTestHelperTest {
 
     @Test
     void checkNonSerialisable() {
-        assertThrows(RuntimeException.class, () ->
-                SerialisationTestHelper.checkSerialisableAndDeserialisable(new NotSerialisable(), NotSerialisable.class));
+        assertThrows(RuntimeException.class,
+                     () -> SerialisationTestHelper.checkSerialisableAndDeserialisable(new NotSerialisable(),
+                                                                                      NotSerialisable.class));
     }
 
     @Test
@@ -21,6 +22,7 @@ class SerialisationTestHelperTest {
     }
 
     private static class NotSerialisable implements Serializable {
+
         //Code Analysis: "Instantiating a 'Thread' with default 'run()' method" -Mario
         private final Thread thread = new Thread();
     }

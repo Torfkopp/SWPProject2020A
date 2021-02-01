@@ -27,76 +27,8 @@ class ChatMessageDTOTest {
     private static final String defaultContent = "I am intelligent content";
     private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
     private static final Instant defaultTimestamp = Instant.ofEpochMilli(1608370913852L); // 2020-12-19-09:41:53.852
-    private static final ChatMessage defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
-
-    /**
-     * Tests instantiation of the ChatMessageDTO constructor without a timestamp,
-     * and checks all attributes to be equal to the parameters.
-     * <p>
-     * This test fails if any of the attributes of the new object are different
-     * from the parameters passed to the constructor
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithoutTimestamp() {
-        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultContent);
-        assertEquals(chatMessage.getID(), defaultID);
-        assertEquals(chatMessage.getAuthor(), defaultUser);
-        assertEquals(chatMessage.getContent(), defaultContent);
-        assertFalse(chatMessage.isEdited());
-    }
-
-    /**
-     * Tests instantiation of the ChatMessageDTO constructor with a timestamp,
-     * and checks all attributes to be equal to the parameters.
-     * <p>
-     * This test fails if any of the attributes of the new object are different
-     * from the parameters passed to the constructor
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithTimestamp() {
-        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
-        assertEquals(chatMessage.getID(), defaultID);
-        assertEquals(chatMessage.getAuthor(), defaultUser);
-        assertEquals(chatMessage.getTimestamp(), defaultTimestamp);
-        assertEquals(chatMessage.getContent(), defaultContent);
-        assertFalse(chatMessage.isEdited());
-    }
-
-    /**
-     * Tests instantiation of the ChatMessageDTO constructor with the edited attribute
-     * set to true.
-     * <p>
-     * This test fails if any of the attributes of the new object are different from
-     * the parameters passed to the constructor.
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithEdited() {
-        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent, true);
-        assertEquals(chatMessage.getID(), defaultID);
-        assertEquals(chatMessage.getAuthor(), defaultUser);
-        assertEquals(chatMessage.getTimestamp(), defaultTimestamp);
-        assertEquals(chatMessage.getContent(), defaultContent);
-        assertTrue(chatMessage.isEdited());
-    }
-
-    /**
-     * Tests if two ChatMessageDTO objects instantiated with different IDs are not equal.
-     * <p>
-     * This test fails if they are considered equal
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void messageNotEqualDifferentIds() {
-        ChatMessage chatMessage = new ChatMessageDTO(42, defaultUser, defaultTimestamp, defaultContent);
-        assertNotEquals(chatMessage, defaultMessage);
-    }
+    private static final ChatMessage defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp,
+                                                                         defaultContent);
 
     /**
      * Test of compareTo function. Tests that two ChatMessageDTO objects instantiated
@@ -123,6 +55,146 @@ class ChatMessageDTOTest {
     void compareToSameIds() {
         ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
         assertEquals(chatMessage.compareTo(defaultMessage), 0);
+    }
+
+    /**
+     * Tests instantiation of the ChatMessageDTO constructor with the edited attribute
+     * set to true.
+     * <p>
+     * This test fails if any of the attributes of the new object are different from
+     * the parameters passed to the constructor.
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithEdited() {
+        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent, true);
+        assertEquals(chatMessage.getID(), defaultID);
+        assertEquals(chatMessage.getAuthor(), defaultUser);
+        assertEquals(chatMessage.getTimestamp(), defaultTimestamp);
+        assertEquals(chatMessage.getContent(), defaultContent);
+        assertTrue(chatMessage.isEdited());
+    }
+
+    /**
+     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter.
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows a null object as its author.
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithEmptyAuthor() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, null, defaultTimestamp, defaultContent));
+    }
+
+    /**
+     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the content parameter
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows a null object as its content
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithEmptyContent() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, null));
+    }
+
+    /**
+     * Tests if the default ChatMessageDTO constructor fails on passing an empty String for the content parameter
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows an empty string as its content
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithEmptyStringContent() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, ""));
+    }
+
+    /**
+     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows a null object as its content
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithEmptyTimestamp() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, null, defaultContent));
+    }
+
+    /**
+     * Tests instantiation of the ChatMessageDTO constructor with a timestamp,
+     * and checks all attributes to be equal to the parameters.
+     * <p>
+     * This test fails if any of the attributes of the new object are different
+     * from the parameters passed to the constructor
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithTimestamp() {
+        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
+        assertEquals(chatMessage.getID(), defaultID);
+        assertEquals(chatMessage.getAuthor(), defaultUser);
+        assertEquals(chatMessage.getTimestamp(), defaultTimestamp);
+        assertEquals(chatMessage.getContent(), defaultContent);
+        assertFalse(chatMessage.isEdited());
+    }
+
+    /**
+     * Tests instantiation of the ChatMessageDTO constructor without a timestamp,
+     * and checks all attributes to be equal to the parameters.
+     * <p>
+     * This test fails if any of the attributes of the new object are different
+     * from the parameters passed to the constructor
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithoutTimestamp() {
+        ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultContent);
+        assertEquals(chatMessage.getID(), defaultID);
+        assertEquals(chatMessage.getAuthor(), defaultUser);
+        assertEquals(chatMessage.getContent(), defaultContent);
+        assertFalse(chatMessage.isEdited());
+    }
+
+    /**
+     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the author parameter
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows a null object as its author
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithoutTimestampWithEmptyAuthor() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, null, defaultContent));
+    }
+
+    /**
+     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the content parameter
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows a null object as its content
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithoutTimestampWithEmptyContent() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, null));
+    }
+
+    /**
+     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing an empty String for the content parameter
+     * <p>
+     * This test fails if the ChatMessageDTO constructor allows an empty string as its content
+     *
+     * @since 2020-12-19
+     */
+    @Test
+    void createMessageWithoutTimestampWithEmptyStringContent() {
+        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, ""));
     }
 
     /**
@@ -172,86 +244,15 @@ class ChatMessageDTOTest {
     }
 
     /**
-     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter.
+     * Tests if two ChatMessageDTO objects instantiated with different IDs are not equal.
      * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as its author.
+     * This test fails if they are considered equal
      *
      * @since 2020-12-19
      */
     @Test
-    void createMessageWithEmptyAuthor() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, null, defaultTimestamp, defaultContent));
-    }
-
-    /**
-     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the timestamp parameter
-     * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as its content
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithEmptyTimestamp() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, null, defaultContent));
-    }
-
-    /**
-     * Tests if the default ChatMessageDTO constructor fails on passing a null object for the content parameter
-     * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as its content
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithEmptyContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, null));
-    }
-
-    /**
-     * Tests if the default ChatMessageDTO constructor fails on passing an empty String for the content parameter
-     * <p>
-     * This test fails if the ChatMessageDTO constructor allows an empty string as its content
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithEmptyStringContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, ""));
-    }
-
-    /**
-     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the author parameter
-     * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as its author
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithoutTimestampWithEmptyAuthor() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, null, defaultContent));
-    }
-
-    /**
-     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing a null object for the content parameter
-     * <p>
-     * This test fails if the ChatMessageDTO constructor allows a null object as its content
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithoutTimestampWithEmptyContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, null));
-    }
-
-    /**
-     * Tests if the timestamp-less ChatMessageDTO constructor fails on passing an empty String for the content parameter
-     * <p>
-     * This test fails if the ChatMessageDTO constructor allows an empty string as its content
-     *
-     * @since 2020-12-19
-     */
-    @Test
-    void createMessageWithoutTimestampWithEmptyStringContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, ""));
+    void messageNotEqualDifferentIds() {
+        ChatMessage chatMessage = new ChatMessageDTO(42, defaultUser, defaultTimestamp, defaultContent);
+        assertNotEquals(chatMessage, defaultMessage);
     }
 }

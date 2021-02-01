@@ -43,6 +43,7 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * @param users      Collection of all lobby members
      * @param owner      Owner of the lobby
      * @param readyUsers Set of all ready lobby members
+     *
      * @since 2021-01-19
      */
     public AllLobbyMembersResponse(Collection<User> users, User owner, Set<User> readyUsers) {
@@ -56,19 +57,10 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Gets the list of lobby members
-     *
-     * @return List of lobby members
-     * @since 2020-12-21
-     */
-    public List<User> getUsers() {
-        return users;
-    }
-
-    /**
      * Getter for the Owner attribute
      *
      * @return Owner/Creator of the lobby
+     *
      * @since 2021-01-05
      */
     public User getOwner() {
@@ -79,11 +71,23 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * Gets the set of all ready users
      *
      * @return A Set of ready Users
+     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
     public Set<User> getReadyUsers() {
         return this.readyUsers;
+    }
+
+    /**
+     * Gets the list of lobby members
+     *
+     * @return List of lobby members
+     *
+     * @since 2020-12-21
+     */
+    public List<User> getUsers() {
+        return users;
     }
 }

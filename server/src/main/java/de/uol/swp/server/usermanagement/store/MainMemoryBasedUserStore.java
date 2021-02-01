@@ -25,12 +25,13 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     private final Map<String, User> users = new HashMap<>();
 
     @Override
-    public Optional<User> findUser(String username, String password) {
-        User usr = users.get(username);
-        if (usr != null && Objects.equals(usr.getPassword(), hash(password))) {
-            return Optional.of(usr.getWithoutPassword());
+    public User createUser(String username, String password, String eMail) {
+        if (Strings.isNullOrEmpty(username)) {
+            throw new IllegalArgumentException("Username must not be null");
         }
-        return Optional.empty();
+        User usr = new UserDTO(username, hash(password), eMail);
+        users.put(username, usr);
+        return usr;
     }
 
     @Override
@@ -43,18 +44,19 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     }
 
     @Override
-    public User createUser(String username, String password, String eMail) {
-        if (Strings.isNullOrEmpty(username)) {
-            throw new IllegalArgumentException("Username must not be null");
+    public Optional<User> findUser(String username, String password) {
+        User usr = users.get(username);
+        if (usr != null && Objects.equals(usr.getPassword(), hash(password))) {
+            return Optional.of(usr.getWithoutPassword());
         }
-        User usr = new UserDTO(username, hash(password), eMail);
-        users.put(username, usr);
-        return usr;
+        return Optional.empty();
     }
 
     @Override
-    public User updateUser(String username, String password, String eMail) {
-        return createUser(username, password, eMail);
+    public List<User> getAllUsers() {
+        List<User> retUsers = new ArrayList<>();
+        users.values().forEach(u -> retUsers.add(u.getWithoutPassword()));
+        return retUsers;
     }
 
     @Override
@@ -63,9 +65,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     }
 
     @Override
-    public List<User> getAllUsers() {
-        List<User> retUsers = new ArrayList<>();
-        users.values().forEach(u -> retUsers.add(u.getWithoutPassword()));
-        return retUsers;
+    public User updateUser(String username, String password, String eMail) {
+        return createUser(username, password, eMail);
     }
 }

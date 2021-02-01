@@ -25,6 +25,7 @@ public class MyObjectDecoder extends ObjectDecoder {
      * Constructor
      *
      * @param classResolver The ClassResolver the decoder should use
+     *
      * @since 2019-08-13
      */
     public MyObjectDecoder(ClassResolver classResolver) {

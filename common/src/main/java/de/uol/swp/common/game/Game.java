@@ -1,21 +1,19 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.user.User;
 
 /**
  * Class for a game
  *
- * @author Mario
+ * @author Mario Fokken
  * @since 2021-01-21
  */
 public class Game {
 
     private final Lobby lobby;
-
-
     private final Inventory[] inventories;
     private final IGameMapManagement map;
     private final User[] players;
@@ -38,14 +36,8 @@ public class Game {
         }
     }
 
-    /**
-     * Gets the next player
-     *
-     * @return User object of the next player
-     */
-    public User nextPlayer() {
-        activePlayer = (activePlayer + 1) % players.length;
-        return players[activePlayer];
+    public Inventory[] getInventories() {
+        return inventories;
     }
 
     public Lobby getLobby() {
@@ -56,7 +48,13 @@ public class Game {
         return players;
     }
 
-    public Inventory[] getInventories() {
-        return inventories;
+    /**
+     * Gets the next player
+     *
+     * @return User object of the next player
+     */
+    public User nextPlayer() {
+        activePlayer = (activePlayer + 1) % players.length;
+        return players[activePlayer];
     }
 }

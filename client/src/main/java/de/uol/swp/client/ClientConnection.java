@@ -8,10 +8,7 @@ import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.common.MyObjectDecoder;
 import de.uol.swp.common.message.*;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -50,6 +47,7 @@ public class ClientConnection {
      *
      * @param host The server name or IP to connect to
      * @param port The server port to connect to
+     *
      * @since 2017-03-17
      */
     @Inject
@@ -65,6 +63,7 @@ public class ClientConnection {
      * Sets the EventBus for the object and registers the object to it.
      *
      * @param eventBus The new EventBus to set
+     *
      * @implNote If the object already has an EventBus, it is replaced but not unregistered
      * @since 2019-09-18
      */
@@ -89,9 +88,8 @@ public class ClientConnection {
         group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port))
-                    .handler(new ChannelInitializer<SocketChannel>() {
-
+            b.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port)).handler(
+                    new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             // Add both Encoder and Decoder to send and receive serialisable objects
@@ -129,6 +127,7 @@ public class ClientConnection {
      * to this class.
      *
      * @param channel The netty channel the new connection is established on
+     *
      * @see de.uol.swp.client.ConnectionListener
      * @since 2017-03-17
      */
@@ -143,6 +142,7 @@ public class ClientConnection {
      * Add a new ConnectionListener to the ConnectionListener array of this object
      *
      * @param listener The ConnectionListener to add to the array
+     *
      * @see de.uol.swp.client.ConnectionListener
      * @since 2017-03-17
      */
@@ -163,6 +163,7 @@ public class ClientConnection {
      * and the message are written to the LOG.
      *
      * @param in The incoming messages read by the ClientHandler
+     *
      * @see de.uol.swp.client.ClientHandler
      * @since 2017-03-17
      */
@@ -184,6 +185,7 @@ public class ClientConnection {
      * written to the LOG if the LOG-Level is set to WARN or higher.
      *
      * @param message The RequestMessage object found on the EventBus
+     *
      * @see de.uol.swp.common.message.RequestMessage
      * @since 2019-08-29
      */
@@ -205,6 +207,7 @@ public class ClientConnection {
      * ConnectionListener array.
      *
      * @param message The ExceptionMessage object found on the EventBus
+     *
      * @see de.uol.swp.common.message.ExceptionMessage
      * @since 2017-03-17
      */
@@ -223,6 +226,7 @@ public class ClientConnection {
      * object to the log if the loglevel is set to WARN or higher.
      *
      * @param deadEvent The DeadEvent object found on the EventBus
+     *
      * @since 2017-03-17
      */
     @Subscribe
@@ -238,6 +242,7 @@ public class ClientConnection {
      * ConnectionListener array and passes the message to them.
      *
      * @param message The ExceptionMessage object found on the EventBus
+     *
      * @see de.uol.swp.client.ClientHandler
      * @since 2017-03-17
      */

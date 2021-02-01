@@ -13,5 +13,4 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  * @author Eric Vuong
  * @since 2020-12-03
  */
-public class ChangePasswordSuccessfulResponse extends AbstractResponseMessage {
-}
+public class ChangePasswordSuccessfulResponse extends AbstractResponseMessage {}

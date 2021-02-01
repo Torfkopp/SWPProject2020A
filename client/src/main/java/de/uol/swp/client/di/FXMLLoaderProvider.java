@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
  * @since 2019-09-18
  */
 public class FXMLLoaderProvider implements Provider<FXMLLoader> {
+
     @Inject
     Injector injector;
 

@@ -9,6 +9,7 @@ package de.uol.swp.common.chat.request;
  * @since 2020-12-17
  */
 public class EditChatMessageRequest extends AbstractChatMessageRequest {
+
     private final int id;
     private final String content;
 
@@ -37,6 +38,7 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      * @param id          The ID of the ChatMessage that should be edited
      * @param content     The content of the ChatMessage that should be updated
      * @param originLobby The Lobby the EditChatMessageRequest originated from
+     *
      * @since 2020-12-30
      */
     public EditChatMessageRequest(int id, String content, String originLobby) {
@@ -46,20 +48,20 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
     }
 
     /**
-     * Gets the ID attribute
-     *
-     * @return The ID of the ChatMessage that should be updated
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
      * Gets the content attribute
      *
      * @return The content of the ChatMessage that should be updated
      */
     public String getContent() {
         return content;
+    }
+
+    /**
+     * Gets the ID attribute
+     *
+     * @return The ID of the ChatMessage that should be updated
+     */
+    public int getId() {
+        return id;
     }
 }

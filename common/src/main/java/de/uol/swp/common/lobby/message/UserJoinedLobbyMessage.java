@@ -11,6 +11,7 @@ import de.uol.swp.common.user.User;
  * @since 2019-10-08
  */
 public class UserJoinedLobbyMessage extends AbstractLobbyMessage {
+
     /**
      * Default constructor
      *
@@ -25,6 +26,7 @@ public class UserJoinedLobbyMessage extends AbstractLobbyMessage {
      *
      * @param lobbyName Name of the lobby
      * @param user      User who joined the lobby
+     *
      * @since 2019-10-08
      */
     public UserJoinedLobbyMessage(String lobbyName, User user) {

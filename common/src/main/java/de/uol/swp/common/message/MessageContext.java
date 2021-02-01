@@ -18,6 +18,7 @@ public interface MessageContext extends Serializable {
      * Sends a ResponseMessage
      *
      * @param message The message that should be sent
+     *
      * @since 2019-11-20
      */
     void writeAndFlush(ResponseMessage message);
@@ -26,6 +27,7 @@ public interface MessageContext extends Serializable {
      * Sends a ServerMessage
      *
      * @param message The server message that should be sent
+     *
      * @since 2019-11-20
      */
     void writeAndFlush(ServerMessage message);

@@ -20,6 +20,7 @@ public class UserDeletionExceptionMessage extends AbstractResponseMessage {
      * Constructor
      *
      * @param message String containing the reason why the deletion failed
+     *
      * @since 2020-11-02
      */
     public UserDeletionExceptionMessage(String message) {

@@ -18,33 +18,37 @@ import java.io.Serializable;
 public interface User extends Serializable, Comparable<User> {
 
     /**
-     * Gets the username variable
-     *
-     * @return Username of the user as a string
-     * @since 2019-08-05
-     */
-    String getUsername();
-
-    /**
-     * Gets the password variable
-     *
-     * @return Password of the user as a string
-     * @since 2019-08-05
-     */
-    String getPassword();
-
-    /**
      * Gets the e-mail variable
      *
      * @return E-mail address of the user as a string
+     *
      * @since 2019-08-05
      */
     String getEMail();
 
     /**
+     * Gets the password variable
+     *
+     * @return Password of the user as a string
+     *
+     * @since 2019-08-05
+     */
+    String getPassword();
+
+    /**
+     * Gets the username variable
+     *
+     * @return Username of the user as a string
+     *
+     * @since 2019-08-05
+     */
+    String getUsername();
+
+    /**
      * Creates a duplicate of this object leaving its password empty
      *
      * @return Copy of this with an empty password field
+     *
      * @since 2019-08-05
      */
     User getWithoutPassword();

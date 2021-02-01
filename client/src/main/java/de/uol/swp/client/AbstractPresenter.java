@@ -26,23 +26,6 @@ public abstract class AbstractPresenter {
     protected EventBus eventBus;
 
     /**
-     * Sets the field eventBus
-     * <p>
-     * This method sets the field EventBus to the EventBus given via parameter.
-     * Afterwards it registers this class to the new EventBus.
-     *
-     * @param eventBus The EventBus this class should use.
-     * @implNote This method does not unregister this class from any EventBus it
-     * may already be registered to.
-     * @since 2019-08-29
-     */
-    @Inject
-    public void setEventBus(EventBus eventBus) {
-        this.eventBus = eventBus;
-        eventBus.register(this);
-    }
-
-    /**
      * Clears the field EventBus
      * <p>
      * This method clears the field EventBus. Before clearing, it unregisters this
@@ -55,5 +38,23 @@ public abstract class AbstractPresenter {
     public void clearEventBus() {
         this.eventBus.unregister(this);
         this.eventBus = null;
+    }
+
+    /**
+     * Sets the field eventBus
+     * <p>
+     * This method sets the field EventBus to the EventBus given via parameter.
+     * Afterwards it registers this class to the new EventBus.
+     *
+     * @param eventBus The EventBus this class should use.
+     *
+     * @implNote This method does not unregister this class from any EventBus it
+     * may already be registered to.
+     * @since 2019-08-29
+     */
+    @Inject
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
+        eventBus.register(this);
     }
 }

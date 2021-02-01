@@ -10,5 +10,4 @@ import de.uol.swp.common.message.AbstractMessage;
  * @see de.uol.swp.server.message.ServerInternalMessage
  * @since 2019-08-07
  */
-abstract class AbstractServerInternalMessage extends AbstractMessage implements ServerInternalMessage {
-}
+abstract class AbstractServerInternalMessage extends AbstractMessage implements ServerInternalMessage {}

@@ -18,6 +18,7 @@ public class ChatManagementException extends RuntimeException {
      * Constructor
      *
      * @param s String containing the exception's cause.
+     *
      * @since 2020-12-16
      */
     ChatManagementException(String s) {

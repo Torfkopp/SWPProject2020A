@@ -13,5 +13,4 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2020-11-02
  */
-public class UserDeletionSuccessfulResponse extends AbstractResponseMessage {
-}
+public class UserDeletionSuccessfulResponse extends AbstractResponseMessage {}

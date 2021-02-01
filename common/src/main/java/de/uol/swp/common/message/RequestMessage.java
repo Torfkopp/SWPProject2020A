@@ -7,7 +7,6 @@ package de.uol.swp.common.message;
  * @see de.uol.swp.common.message.Message
  * @since 2019-08-07
  */
-
 public interface RequestMessage extends Message {
 
     /**
@@ -15,6 +14,7 @@ public interface RequestMessage extends Message {
      * authorised users (typically has a valid auth)
      *
      * @return True if valid authorisation is needed
+     *
      * @since 2019-08-07
      */
     boolean authorisationNeeded();

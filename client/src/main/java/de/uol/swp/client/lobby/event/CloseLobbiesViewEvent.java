@@ -1,4 +1,3 @@
 package de.uol.swp.client.lobby.event;
 
-public class CloseLobbiesViewEvent {
-}
+public class CloseLobbiesViewEvent {}

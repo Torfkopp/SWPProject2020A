@@ -11,10 +11,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
-import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
-import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import io.netty.channel.Channel;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -60,6 +57,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * Default startup method for javafx applications
      *
      * @param args Any arguments given when starting the application
+     *
      * @since 2017-03-17
      */
     public static void main(String[] args) {
@@ -156,6 +154,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * logged in user are written to the log.
      *
      * @param message The LoginSuccessfulResponse object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2017-03-17
      */
@@ -175,6 +174,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * error message are written to the log.
      *
      * @param message The RegistrationExceptionMessage object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2019-09-02
      */
@@ -193,6 +193,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * to the log.
      *
      * @param message The RegistrationSuccessfulResponse object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2019-09-02
      */
@@ -209,6 +210,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * method is called. It tells the SceneManager to show the sever error alert.
      *
      * @param message The ChangePasswordExceptionMessage object detected on the EventBus
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
@@ -227,6 +229,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * method is called. It tells the SceneManager to show the MainScreen window.
      *
      * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
@@ -246,6 +249,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * higher, "User Deletion error " and the error message are written to the log.
      *
      * @param message The UserDeletionExceptionMessage object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2020-12-17
      */
@@ -263,6 +267,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * "Deletion of user successful." is written to the log.
      *
      * @param message The UserDeletionSuccessfulResponse object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2020-12-17
      */
@@ -280,6 +285,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * object to the log if the loglevel is set to ERROR or higher.
      *
      * @param deadEvent The DeadEvent object found on the EventBus
+     *
      * @since 2019-08-07
      */
     @Subscribe

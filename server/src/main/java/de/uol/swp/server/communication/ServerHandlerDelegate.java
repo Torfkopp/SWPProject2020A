@@ -14,26 +14,29 @@ import de.uol.swp.common.message.RequestMessage;
 interface ServerHandlerDelegate {
 
     /**
-     * Is called when a new client connects
-     *
-     * @param ctx The MessageContext for this client
-     * @since 2017-03-17
-     */
-    void newClientConnected(MessageContext ctx);
-
-    /**
      * Is called when a client disconnects
      *
      * @param ctx The MessageContext for this client
+     *
      * @since 2017-03-17
      */
     void clientDisconnected(MessageContext ctx);
+
+    /**
+     * Is called when a new client connects
+     *
+     * @param ctx The MessageContext for this client
+     *
+     * @since 2017-03-17
+     */
+    void newClientConnected(MessageContext ctx);
 
     /**
      * A message from a client connected via the ChannelHandlerContext ctx
      * is received and can be processed
      *
      * @param msg The message sent from the client
+     *
      * @since 2017-03-17
      */
     void process(RequestMessage msg);

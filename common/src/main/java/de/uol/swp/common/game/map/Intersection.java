@@ -1,10 +1,9 @@
 package de.uol.swp.common.game.map;
 
-
 /**
  * Class for an intersection
  *
- * @author Mario
+ * @author Mario Fokken
  * @since 2021-01-17
  */
 public class Intersection implements IIntersection {

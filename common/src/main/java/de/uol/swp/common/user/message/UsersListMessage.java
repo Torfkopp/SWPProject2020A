@@ -22,20 +22,11 @@ public class UsersListMessage extends AbstractServerMessage {
      * Constructor
      *
      * @param users List containing all users currently logged in
+     *
      * @since 2017-03-17
      */
     public UsersListMessage(List<String> users) {
         this.users = new ArrayList<>(users);
-    }
-
-    /**
-     * Gets the List containing all currently logged in users
-     *
-     * @return List containing all currently logged in users
-     * @since 2017-03-17
-     */
-    public ArrayList<String> getUsers() {
-        return users;
     }
 
     @Override
@@ -49,5 +40,16 @@ public class UsersListMessage extends AbstractServerMessage {
         if (o == null || getClass() != o.getClass()) return false;
         UsersListMessage that = (UsersListMessage) o;
         return Objects.equals(users, that.users);
+    }
+
+    /**
+     * Gets the List containing all currently logged in users
+     *
+     * @return List containing all currently logged in users
+     *
+     * @since 2017-03-17
+     */
+    public ArrayList<String> getUsers() {
+        return users;
     }
 }

@@ -21,6 +21,7 @@ public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
      * Constructor
      *
      * @param message String containing the reason why the ChangePassword process failed
+     *
      * @since 2020-12-03
      */
     public ChangePasswordExceptionMessage(String message) {

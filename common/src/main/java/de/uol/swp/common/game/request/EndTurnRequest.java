@@ -13,6 +13,7 @@ import de.uol.swp.common.user.User;
  * @since 2021-1-15
  */
 public class EndTurnRequest extends AbstractGameRequest {
+
     private final User user;
 
     /**
@@ -22,6 +23,7 @@ public class EndTurnRequest extends AbstractGameRequest {
      * sent this request.
      *
      * @param user The user wanting to end the turn
+     *
      * @since 2021-1-15
      */
     public EndTurnRequest(User user, String originLobby) {

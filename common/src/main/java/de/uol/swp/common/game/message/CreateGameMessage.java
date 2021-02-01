@@ -6,24 +6,24 @@ import de.uol.swp.common.user.User;
 /**
  * Message sent to create a new game
  *
- * @author Mario
+ * @author Mario Fokken
  * @since 2021-01-24
  */
 public class CreateGameMessage extends AbstractGameMessage {
 
-    Lobby lobby;
-    User first;
+    private final Lobby lobby;
+    private final User first;
 
     public CreateGameMessage(Lobby lobby, User first) {
         this.lobby = lobby;
         this.first = first;
     }
 
-    public Lobby getLobby() {
-        return lobby;
-    }
-
     public User getFirst() {
         return first;
+    }
+
+    public Lobby getLobby() {
+        return lobby;
     }
 }

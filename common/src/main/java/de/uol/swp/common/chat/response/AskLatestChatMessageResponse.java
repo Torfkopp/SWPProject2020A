@@ -22,6 +22,7 @@ import java.util.List;
  * @since 2020-12-17
  */
 public class AskLatestChatMessageResponse extends AbstractResponseMessage {
+
     private final List<ChatMessage> chatHistory = new LinkedList<>();
     private final String lobbyName;
 
@@ -32,6 +33,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      * requested for the global chat. It sets the lobbyName attribute to null.
      *
      * @param latestMessages A list of ChatMessage objects smaller or as big as requested
+     *
      * @since 2020-12-17
      */
     public AskLatestChatMessageResponse(List<ChatMessage> latestMessages) {
@@ -50,6 +52,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      *
      * @param latestMessages a List of ChatMessage object of size as requested or less
      * @param lobbyName      The Lobby the AskLatestChatMessageResponse was requested for
+     *
      * @since 2020-12-30
      */
     public AskLatestChatMessageResponse(List<ChatMessage> latestMessages, String lobbyName) {
@@ -63,6 +66,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      * Gets the chatHistory attribute
      *
      * @return A list of ChatMessage objects smaller or as big as requested
+     *
      * @since 2020-12-17
      */
     public List<ChatMessage> getChatHistory() {
@@ -73,6 +77,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      * Getter for the lobbyName attribute
      *
      * @return The name of the Lobby this AskLatestChatMessageResponse was requested for
+     *
      * @since 2021-01-02
      */
     public String getLobbyName() {

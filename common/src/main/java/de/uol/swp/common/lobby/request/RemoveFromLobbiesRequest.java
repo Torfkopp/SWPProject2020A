@@ -5,12 +5,13 @@ import de.uol.swp.common.user.User;
 
 public class RemoveFromLobbiesRequest extends AbstractRequestMessage {
 
-    private User user;
+    private final User user;
 
     /**
      * Constructor
      *
      * @param user User who wants to logout
+     *
      * @author Finn Haase
      * @since 2021-01-28
      */

@@ -49,7 +49,8 @@ public class ServerHandler implements ServerHandlerDelegate {
      * Constructor
      *
      * @param eventBus The EventBus used throughout the entire server
-     * @see EventBus
+     *
+     * @see com.google.common.eventbus.EventBus
      */
     @Inject
     public ServerHandler(EventBus eventBus) {
@@ -76,6 +77,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      *
      * @param ctx The message's MessageContext to check
      * @param msg The message to check
+     *
      * @throws SecurityException Authorisation requirement not met
      * @since 2019-11-20
      */
@@ -89,6 +91,22 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
+     * Handles errors produced by the EventBus
+     * <p>
+     * If an DeadEvent object is detected on the EventBus, this method is called.
+     * It writes "DeadEvent detected " and the error message of the detected DeadEvent
+     * object to the log if the loglevel is set to WARN or higher.
+     *
+     * @param deadEvent The DeadEvent object found on the EventBus
+     *
+     * @since 2019-11-20
+     */
+    @Subscribe
+    private void onDeadEvent(DeadEvent deadEvent) {
+        LOG.error("DeadEvent detected " + deadEvent);
+    }
+
+    /**
      * Handles exceptions on the Server
      * <p>
      * If a ServerExceptionMessage is detected on the EventBus, this method is called.
@@ -96,6 +114,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * if a client is affiliated.
      *
      * @param msg The ServerExceptionMessage found on the EventBus
+     *
      * @since 2019-11-20
      */
     @Subscribe
@@ -105,30 +124,9 @@ public class ServerHandler implements ServerHandlerDelegate {
         ctx.ifPresent(channelHandlerContext -> sendToClient(channelHandlerContext, new ExceptionMessage(msg.getException().getMessage())));
     }
 
-    /**
-     * Handles errors produced by the EventBus
-     * <p>
-     * If an DeadEvent object is detected on the EventBus, this method is called.
-     * It writes "DeadEvent detected " and the error message of the detected DeadEvent
-     * object to the log if the loglevel is set to WARN or higher.
-     *
-     * @param deadEvent The DeadEvent object found on the EventBus
-     * @since 2019-11-20
-     */
-    @Subscribe
-    private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.error("DeadEvent detected " + deadEvent);
-    }
-
     // -------------------------------------------------------------------------------
     // Handling of connected clients
     // -------------------------------------------------------------------------------
-
-    @Override
-    public void newClientConnected(MessageContext ctx) {
-        LOG.debug("New client " + ctx + " connected");
-        connectedClients.add(ctx);
-    }
 
     @Override
     public void clientDisconnected(MessageContext ctx) {
@@ -143,6 +141,12 @@ public class ServerHandler implements ServerHandlerDelegate {
         connectedClients.remove(ctx);
     }
 
+    @Override
+    public void newClientConnected(MessageContext ctx) {
+        LOG.debug("New client " + ctx + " connected");
+        connectedClients.add(ctx);
+    }
+
     // -------------------------------------------------------------------------------
     // User Management Events (from event bus)
     // -------------------------------------------------------------------------------
@@ -155,6 +159,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * It then gives a new UserLoggedInMessage to sendMessage in order to notify all connected clients.
      *
      * @param msg The ClientAuthorisedMessage found on the EventBus
+     *
      * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
      * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @since 2019-11-20
@@ -179,6 +184,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * in order to send it to the connected client.
      *
      * @param msg The UserLoggedOutMessage found on the EventBus
+     *
      * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @since 2019-11-20
      */
@@ -200,6 +206,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * It gets the MessageContext, then gives it and the ResponseMessage to sendToClient.
      *
      * @param msg The ResponseMessage found on the EventBus
+     *
      * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
      * @since 2019-11-20
      */
@@ -226,6 +233,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * to sendMessage in order to send it to all connected clients.
      *
      * @param msg The ServerMessage found on the EventBus
+     *
      * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @since 2019-11-20
      */
@@ -234,7 +242,8 @@ public class ServerHandler implements ServerHandlerDelegate {
         msg.setSession(null);
         msg.setMessageContext(null);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Send " + msg + " to " + (msg.getReceiver().isEmpty() || msg.getReceiver() == null ? "all" : msg.getReceiver()));
+            LOG.debug(
+                    "Send " + msg + " to " + (msg.getReceiver().isEmpty() || msg.getReceiver() == null ? "all" : msg.getReceiver()));
         }
         sendMessage(msg);
     }
@@ -244,47 +253,12 @@ public class ServerHandler implements ServerHandlerDelegate {
     // -------------------------------------------------------------------------------
 
     /**
-     * Adds a new session to the active sessions
-     *
-     * @param ctx        The MessageContext belonging to the session
-     * @param newSession The Session to add
-     * @since 2019-11-20
-     */
-    private void putSession(MessageContext ctx, Session newSession) {
-
-        // TODO: check if session is already bound to connection
-        activeSessions.put(ctx, newSession);
-    }
-
-    /**
-     * Removes a session specified by MessageContext from the active sessions
-     *
-     * @param ctx the MessageContext
-     * @since 2019-11-20
-     */
-    private void removeSession(MessageContext ctx) {
-        activeSessions.remove(ctx);
-    }
-
-    /**
-     * Gets the session for a given MessageContext
-     *
-     * @param ctx The MessageContext
-     * @return Optional Object containing the session if found
-     * @see de.uol.swp.common.user.Session
-     * @see de.uol.swp.common.message.MessageContext
-     * @since 2019-11-20
-     */
-    private Optional<Session> getSession(MessageContext ctx) {
-        Session session = activeSessions.get(ctx);
-        return session != null ? Optional.of(session) : Optional.empty();
-    }
-
-    /**
      * Gets MessageContext from the message
      *
      * @param message Message to get the MessageContext from
+     *
      * @return Optional Object containing the MessageContext if there is any
+     *
      * @see de.uol.swp.common.message.Message
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
@@ -303,7 +277,9 @@ public class ServerHandler implements ServerHandlerDelegate {
      * Gets MessageContext for a specified receiver
      *
      * @param session Session of the user to search
+     *
      * @return Optional Object containing the MessageContext if there is any
+     *
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
@@ -321,7 +297,9 @@ public class ServerHandler implements ServerHandlerDelegate {
      * Gets the MessageContexts for specified receivers
      *
      * @param receiver A list containing the sessions of the users to search
+     *
      * @return List of MessageContexts for the given sessions
+     *
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
@@ -335,28 +313,56 @@ public class ServerHandler implements ServerHandlerDelegate {
         return ctxs;
     }
 
+    /**
+     * Gets the session for a given MessageContext
+     *
+     * @param ctx The MessageContext
+     *
+     * @return Optional Object containing the session if found
+     *
+     * @see de.uol.swp.common.user.Session
+     * @see de.uol.swp.common.message.MessageContext
+     * @since 2019-11-20
+     */
+    private Optional<Session> getSession(MessageContext ctx) {
+        Session session = activeSessions.get(ctx);
+        return session != null ? Optional.of(session) : Optional.empty();
+    }
+
+    /**
+     * Adds a new session to the active sessions
+     *
+     * @param ctx        The MessageContext belonging to the session
+     * @param newSession The Session to add
+     *
+     * @since 2019-11-20
+     */
+    private void putSession(MessageContext ctx, Session newSession) {
+
+        // TODO: check if session is already bound to connection
+        activeSessions.put(ctx, newSession);
+    }
+
+    /**
+     * Removes a session specified by MessageContext from the active sessions
+     *
+     * @param ctx the MessageContext
+     *
+     * @since 2019-11-20
+     */
+    private void removeSession(MessageContext ctx) {
+        activeSessions.remove(ctx);
+    }
+
     // -------------------------------------------------------------------------------
     // Help methods: Send only objects of type Message
     // -------------------------------------------------------------------------------
 
     /**
-     * Sends a ResponseMessage to a client specified by a MessageContext
-     *
-     * @param ctx     The MessageContext containing the specified client
-     * @param message The Message to send
-     * @see de.uol.swp.common.message.ResponseMessage
-     * @see de.uol.swp.common.message.MessageContext
-     * @since 2019-11-20
-     */
-    private void sendToClient(MessageContext ctx, ResponseMessage message) {
-        LOG.trace("Trying to sendMessage to client: " + ctx + " " + message);
-        ctx.writeAndFlush(message);
-    }
-
-    /**
      * Sends a ServerMessage either to a specified receiver or to all connected clients
      *
      * @param msg ServerMessage to send
+     *
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-11-20
      */
@@ -369,10 +375,26 @@ public class ServerHandler implements ServerHandlerDelegate {
     }
 
     /**
+     * Sends a ResponseMessage to a client specified by a MessageContext
+     *
+     * @param ctx     The MessageContext containing the specified client
+     * @param message The Message to send
+     *
+     * @see de.uol.swp.common.message.ResponseMessage
+     * @see de.uol.swp.common.message.MessageContext
+     * @since 2019-11-20
+     */
+    private void sendToClient(MessageContext ctx, ResponseMessage message) {
+        LOG.trace("Trying to sendMessage to client: " + ctx + " " + message);
+        ctx.writeAndFlush(message);
+    }
+
+    /**
      * Sends a ServerMessage to multiple users specified by a list of MessageContexts
      *
      * @param sendTo List of MessageContexts to send the message to
      * @param msg    Message to send
+     *
      * @see de.uol.swp.common.message.MessageContext
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-11-20

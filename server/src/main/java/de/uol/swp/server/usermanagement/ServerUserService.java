@@ -14,38 +14,12 @@ import java.util.Optional;
 public interface ServerUserService {
 
     /**
-     * Login with username and password
-     *
-     * @param username The name of the user
-     * @param password The password of the user
-     * @return A new user object
-     * @since 2017-03-17
-     */
-    User login(String username, String password);
-
-    /**
-     * Test if given user is logged in
-     *
-     * @param user The user to check for
-     * @return True if the User is logged in
-     * @since 2019-09-04
-     */
-    boolean isLoggedIn(User user);
-
-    /**
-     * Log out from server
-     *
-     * @implNote The User object has to contain a unique identifier in order to
-     * remove the correct user
-     * @since 2017-03-17
-     */
-    void logout(User user);
-
-    /**
      * Create a new permanent user
      *
      * @param user The user to create
+     *
      * @return The newly created user
+     *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
      * @since 2019-09-02
@@ -58,11 +32,57 @@ public interface ServerUserService {
      * Removes the user specified by the User object.
      *
      * @param user The user to remove
+     *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
      * @since 2019-10-10
      */
     void dropUser(User user);
+
+    Optional<User> getUser(String userName);
+
+    Optional<User> getUserWithPassword(String userName, String password);
+
+    /**
+     * Test if given user is logged in
+     *
+     * @param user The user to check for
+     *
+     * @return True if the User is logged in
+     *
+     * @since 2019-09-04
+     */
+    boolean isLoggedIn(User user);
+
+    /**
+     * Login with username and password
+     *
+     * @param username The name of the user
+     * @param password The password of the user
+     *
+     * @return A new user object
+     *
+     * @since 2017-03-17
+     */
+    User login(String username, String password);
+
+    /**
+     * Log out from server
+     *
+     * @implNote The User object has to contain a unique identifier in order to
+     * remove the correct user
+     * @since 2017-03-17
+     */
+    void logout(User user);
+
+    /**
+     * Retrieve the list of all currently logged in users
+     *
+     * @return A list of users
+     *
+     * @since 2017-03-17
+     */
+    List<User> retrieveAllUsers();
 
     /**
      * Update a user
@@ -72,22 +92,12 @@ public interface ServerUserService {
      * @param user The user object containing all infos to
      *             update, if some values are not set, (e.g. password is "")
      *             these fields are not updated
+     *
      * @return The updated user object
+     *
      * @implNote The User object has to contain a unique identifier in order to
      * update the correct user
      * @since 2019-09-02
      */
     User updateUser(User user);
-
-    /**
-     * Retrieve the list of all currently logged in users
-     *
-     * @return A list of users
-     * @since 2017-03-17
-     */
-    List<User> retrieveAllUsers();
-
-    Optional<User> getUser(String userName);
-
-    Optional<User> getUserWithPassword(String userName, String password);
 }

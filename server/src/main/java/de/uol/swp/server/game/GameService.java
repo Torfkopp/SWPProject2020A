@@ -28,7 +28,7 @@ import java.util.Map;
  * @author Alwin Bossert
  * @author Mario Fokken
  * @author Marvin Drees
- * @see AbstractService
+ * @see de.uol.swp.server.AbstractService
  * @since 2021-01-15
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -38,7 +38,6 @@ public class GameService extends AbstractService {
     private static final Logger LOG = LogManager.getLogger(GameService.class);
 
     private final GameManagement gameManagement;
-
     private final LobbyService lobbyService;
 
     /**
@@ -47,6 +46,7 @@ public class GameService extends AbstractService {
      * @param bus            The EventBus used throughout the entire server (injected)
      * @param gameManagement The ChatManagement to use (injected)
      * @param lobbyService   The LobbyService to use (injected)
+     *
      * @since 2021-01-15
      */
     @Inject
@@ -57,12 +57,28 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a CreateGameMessage found on the EventBus
+     * <p>
+     * If a CreateGameMessage is detected on the Eventbus, this method is called.
+     * It then requests the GameManagement to create a game.
+     *
+     * @param message The CreateGameMessage
+     *
+     * @since 2021-01-24
+     */
+    @Subscribe
+    private void onCreateGameMessage(CreateGameMessage message) {
+        gameManagement.createGame(message.getLobby(), message.getFirst());
+    }
+
+    /**
      * Handles a EndTurnRequest found on the EventBus
      * <p>
      * If a EndTurnRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to change to current active player.
      *
      * @param msg The EndTurnRequest found on the EventBus
+     *
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @see de.uol.swp.common.game.message.NextPlayerMessage
      * @since 2021-01-15
@@ -82,20 +98,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a CreateGameMessage found on the EventBus
-     * <p>
-     * If a CreateGameMessage is detected on the Eventbus, this method is called.
-     * It then requests the GameManagement to create a game.
-     *
-     * @param message The CreateGameMessage
-     * @since 2021-01-24
-     */
-    @Subscribe
-    private void onCreateGameMessage(CreateGameMessage message) {
-        gameManagement.createGame(message.getLobby(), message.getFirst());
-    }
-
-    /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -105,6 +107,7 @@ public class GameService extends AbstractService {
      * contains the boolean attributes longestRoad and largestArmy.
      *
      * @param msg The UpdateInventoryRequest found on the EventBus
+     *
      * @author Sven Ahrens
      * @author Finn Haase
      * @since 2021-01-25
@@ -138,7 +141,9 @@ public class GameService extends AbstractService {
             armyAndRoadMap.put("Largest Army", inventory.isLargestArmy());
             armyAndRoadMap.put("Longest Road", inventory.isLongestRoad());
 
-            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(), Collections.unmodifiableMap(resourceMap), Collections.unmodifiableMap(armyAndRoadMap));
+            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(),
+                                                                                Collections.unmodifiableMap(resourceMap),
+                                                                                Collections.unmodifiableMap(armyAndRoadMap));
             if (msg.getMessageContext().isPresent()) {
                 returnMessage.setMessageContext(msg.getMessageContext().get());
             }

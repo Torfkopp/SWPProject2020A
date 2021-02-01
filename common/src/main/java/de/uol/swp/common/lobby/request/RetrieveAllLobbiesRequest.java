@@ -8,7 +8,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * This message is sent during the initialisation of the lobby list.
  * The server will respond with a AllLobbiesResponse
  *
- * @author Mario
+ * @author Mario Fokken
  * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
  * @since 2020-12-12
  */

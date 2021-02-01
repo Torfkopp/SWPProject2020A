@@ -32,50 +32,11 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
      *
      * @param name name of the lobby
      * @param user user responsible for the creation of this message
+     *
      * @since 2019-10-08
      */
     public AbstractLobbyMessage(String name, User user) {
         this.name = name;
-        this.user = user;
-    }
-
-    /**
-     * Gets the name variable
-     *
-     * @return String containing the lobby's name
-     * @since 2019-10-08
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name variable
-     *
-     * @param name String containing the lobby's name
-     * @since 2019-10-08
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the user variable
-     *
-     * @return User responsible for the creation of this message
-     * @since 2019-10-08
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     * Sets the user variable
-     *
-     * @param user User responsible for the creation of this message
-     * @since 2019-10-08
-     */
-    public void setUser(User user) {
         this.user = user;
     }
 
@@ -89,7 +50,50 @@ public class AbstractLobbyMessage extends AbstractServerMessage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractLobbyMessage that = (AbstractLobbyMessage) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(user, that.user);
+        return Objects.equals(name, that.name) && Objects.equals(user, that.user);
+    }
+
+    /**
+     * Gets the name variable
+     *
+     * @return String containing the lobby's name
+     *
+     * @since 2019-10-08
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name variable
+     *
+     * @param name String containing the lobby's name
+     *
+     * @since 2019-10-08
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets the user variable
+     *
+     * @return User responsible for the creation of this message
+     *
+     * @since 2019-10-08
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * Sets the user variable
+     *
+     * @param user User responsible for the creation of this message
+     *
+     * @since 2019-10-08
+     */
+    public void setUser(User user) {
+        this.user = user;
     }
 }

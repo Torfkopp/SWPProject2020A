@@ -5,10 +5,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.server.usermanagement.store.UserStore;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Handles most user related issues, e.g. login/logout
@@ -26,33 +23,13 @@ public class UserManagement extends AbstractUserManagement {
      * Constructor
      *
      * @param userStore Object of the UserStore to be used
+     *
      * @see de.uol.swp.server.usermanagement.store.UserStore
      * @since 2019-08-05
      */
     @Inject
     public UserManagement(UserStore userStore) {
         this.userStore = userStore;
-    }
-
-    @Override
-    public User login(String username, String password) {
-        Optional<User> user = userStore.findUser(username, password);
-        if (user.isPresent()) {
-            this.loggedInUsers.put(username, user.get());
-            return user.get();
-        } else {
-            throw new SecurityException("Cannot auth user " + username);
-        }
-    }
-
-    @Override
-    public boolean isLoggedIn(User username) {
-        return loggedInUsers.containsKey(username.getUsername());
-    }
-
-    @Override
-    public void logout(User user) {
-        loggedInUsers.remove(user.getUsername());
     }
 
     @Override
@@ -74,6 +51,42 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
+    public Optional<User> getUser(String userName) {
+        return userStore.findUser(userName);
+    }
+
+    @Override
+    public Optional<User> getUserWithPassword(String userName, String password) {
+        return userStore.findUser(userName, password);
+    }
+
+    @Override
+    public boolean isLoggedIn(User username) {
+        return loggedInUsers.containsKey(username.getUsername());
+    }
+
+    @Override
+    public User login(String username, String password) {
+        Optional<User> user = userStore.findUser(username, password);
+        if (user.isPresent()) {
+            this.loggedInUsers.put(username, user.get());
+            return user.get();
+        } else {
+            throw new SecurityException("Cannot auth user " + username);
+        }
+    }
+
+    @Override
+    public void logout(User user) {
+        loggedInUsers.remove(user.getUsername());
+    }
+
+    @Override
+    public List<User> retrieveAllUsers() {
+        return userStore.getAllUsers();
+    }
+
+    @Override
     public User updateUser(User userToUpdate) {
         Optional<User> user = userStore.findUser(userToUpdate.getUsername());
         if (user.isEmpty()) {
@@ -85,20 +98,6 @@ public class UserManagement extends AbstractUserManagement {
         return userStore.updateUser(userToUpdate.getUsername(), newPassword, newEMail);
     }
 
-    @Override
-    public List<User> retrieveAllUsers() {
-        return userStore.getAllUsers();
-    }
-
-    @Override
-    public Optional<User> getUser(String userName) {
-        return userStore.findUser(userName);
-    }
-
-    public Optional<User> getUserWithPassword(String userName, String password) {
-        return userStore.findUser(userName, password);
-    }
-
     /**
      * Subfunction of the updateUser method
      * <p>
@@ -107,7 +106,9 @@ public class UserManagement extends AbstractUserManagement {
      *
      * @param firstValue  Value to update to. Either an empty String or null
      * @param secondValue The old value
+     *
      * @return String containing the value to be used in the update command
+     *
      * @since 2019-08-05
      */
     private String firstNotNull(String firstValue, String secondValue) {

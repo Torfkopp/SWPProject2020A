@@ -14,12 +14,39 @@ import de.uol.swp.common.user.User;
 public interface ClientUserService {
 
     /**
+     * Create a new permanent user
+     * <p>
+     * This method creates the user specified by the User object permanently.
+     *
+     * @param user The user to create
+     *
+     * @implNote The User object has to contain a unique identifier in order to
+     * remove the correct user
+     * @since 2019-09-02
+     */
+    void createUser(User user);
+
+    /**
+     * Remove a user from the server
+     * <p>
+     * This method removes the user specified by the User object.
+     *
+     * @param user The user to remove
+     *
+     * @implNote The User object has to contain a unique identifier in order to
+     * remove the correct user
+     * @since 2019-10-10
+     */
+    void dropUser(User user);
+
+    /**
      * Login with a username and a password
      * <p>
      * This method logs the user in.
      *
      * @param username the user's name
      * @param password the user's password
+     *
      * @since 2017-03-17
      */
     void login(String username, String password);
@@ -36,28 +63,11 @@ public interface ClientUserService {
     void logout(User user);
 
     /**
-     * Create a new permanent user
-     * <p>
-     * This method creates the user specified by the User object permanently.
+     * Retrieve the list of all currently logged in users
      *
-     * @param user The user to create
-     * @implNote The User object has to contain a unique identifier in order to
-     * remove the correct user
-     * @since 2019-09-02
+     * @since 2017-03-17
      */
-    void createUser(User user);
-
-    /**
-     * Remove a user from the server
-     * <p>
-     * This method removes the user specified by the User object.
-     *
-     * @param user The user to remove
-     * @implNote The User object has to contain a unique identifier in order to
-     * remove the correct user
-     * @since 2019-10-10
-     */
-    void dropUser(User user);
+    void retrieveAllUsers();
 
     /**
      * Update a user
@@ -67,6 +77,7 @@ public interface ClientUserService {
      * @param user The User object containing all infos to update.
      *             If some values are not set (e.g. password is ""),
      *             these fields are not updated
+     *
      * @implNote The User object has to contain a unique identifier in order to
      * update the correct user
      * @since 2019-09-02
@@ -74,17 +85,11 @@ public interface ClientUserService {
     void updateUser(User user);
 
     /**
-     * Retrieve the list of all currently logged in users
-     *
-     * @since 2017-03-17
-     */
-    void retrieveAllUsers();
-
-    /**
      * Update a user's password
      *
      * @param user        The user changing the password
      * @param oldPassword The password that is to be changed
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17

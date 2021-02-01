@@ -16,6 +16,7 @@ public interface Session {
      * Gets the SessionID
      *
      * @return ID of the session as a string
+     *
      * @since 2019-08-05
      */
     String getSessionId();
@@ -24,6 +25,7 @@ public interface Session {
      * Gets the user using the session
      *
      * @return The session's user as an object implementing the user
+     *
      * @see de.uol.swp.common.user.User
      * @since 2019-08-13
      */

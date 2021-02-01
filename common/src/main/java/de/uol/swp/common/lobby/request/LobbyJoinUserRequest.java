@@ -26,6 +26,7 @@ public class LobbyJoinUserRequest extends AbstractLobbyRequest {
      *
      * @param lobbyName Name of the lobby
      * @param user      User who wants to join the lobby
+     *
      * @since 2019-10-08
      */
     public LobbyJoinUserRequest(String lobbyName, User user) {

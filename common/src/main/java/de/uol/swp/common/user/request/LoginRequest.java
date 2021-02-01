@@ -23,6 +23,7 @@ public class LoginRequest extends AbstractRequestMessage {
      *
      * @param username The user's username
      * @param password The user's password
+     *
      * @since 2017-03-17
      */
     public LoginRequest(String username, String password) {
@@ -35,46 +36,6 @@ public class LoginRequest extends AbstractRequestMessage {
         return false;
     }
 
-    /**
-     * Gets the username variable
-     *
-     * @return String containing the user's username
-     * @since 2017-03-17
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * Sets the username variable
-     *
-     * @param username String containing the new username
-     * @since 2017-03-17
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * Gets the password variable
-     *
-     * @return String containing the user's password
-     * @since 2017-03-17
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Sets the password variable
-     *
-     * @param password String containing the new password
-     * @since 2017-03-17
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(username, password);
@@ -85,7 +46,50 @@ public class LoginRequest extends AbstractRequestMessage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LoginRequest that = (LoginRequest) o;
-        return Objects.equals(username, that.username) &&
-                Objects.equals(password, that.password);
+        return Objects.equals(username, that.username) && Objects.equals(password, that.password);
+    }
+
+    /**
+     * Gets the password variable
+     *
+     * @return String containing the user's password
+     *
+     * @since 2017-03-17
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Sets the password variable
+     *
+     * @param password String containing the new password
+     *
+     * @since 2017-03-17
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * Gets the username variable
+     *
+     * @return String containing the user's username
+     *
+     * @since 2017-03-17
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Sets the username variable
+     *
+     * @param username String containing the new username
+     *
+     * @since 2017-03-17
+     */
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

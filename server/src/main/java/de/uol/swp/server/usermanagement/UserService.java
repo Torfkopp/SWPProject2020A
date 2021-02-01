@@ -41,6 +41,7 @@ public class UserService extends AbstractService {
      *
      * @param eventBus       The EventBus used throughout the entire server (injected)
      * @param userManagement Object of the UserManagement to use
+     *
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-05
      */
@@ -51,37 +52,44 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles a RegisterUserRequest found on the EventBus
+     * Handles a UpdateUserPasswordRequest found on the EventBus
      * <p>
-     * If a RegisterUserRequest is detected on the EventBus, this method is called.
-     * It tries to create a new user via the UserManagement. If this succeeds,
-     * a RegistrationSuccessfulResponse is posted onto the EventBus.
-     * Otherwise, a RegistrationExceptionMessage gets posted there.
+     * If a UpdateUserPasswordRequest is detected on the EventBus, this method is called.
+     * It tries to change the Password of a user via the UserManagement.
+     * If this succeeds, a ChangePasswordSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a ChangePasswordExceptionMessage gets posted there.
      *
-     * @param msg The RegisterUserRequest found on the EventBus
-     * @see de.uol.swp.server.usermanagement.UserManagement#createUser(User)
-     * @see de.uol.swp.common.user.request.RegisterUserRequest
-     * @see de.uol.swp.common.user.response.RegistrationSuccessfulResponse
-     * @see de.uol.swp.common.user.exception.RegistrationExceptionMessage
-     * @since 2019-09-02
+     * @param msg The ChangePasswordRequest found on the Eventbus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @since 2020-12-03
      */
     @Subscribe
-    private void onRegisterUserRequest(RegisterUserRequest msg) {
+    private void onChangePasswordRequest(UpdateUserPasswordRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new registration message with " + msg.getUser());
+            LOG.debug("Got a new ChangePassword message with " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {
-            User newUser = userManagement.createUser(msg.getUser());
-            returnMessage = new RegistrationSuccessfulResponse();
+            Optional<User> optionalUser = userManagement.getUserWithPassword(msg.getUser().getUsername(),
+                                                                             msg.getOldPassword());
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                userManagement.updateUser(msg.getUser());
+                returnMessage = new ChangePasswordSuccessfulResponse();
+            } else {
+                returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
+            }
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new RegistrationExceptionMessage("Cannot create user " + msg.getUser() + " " + e.getMessage());
+            returnMessage = new ChangePasswordExceptionMessage(
+                    "Cannot change Password of " + msg.getUser() + " " + e.getMessage());
         }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
+            post(returnMessage);
         }
-        post(returnMessage);
     }
 
     /**
@@ -93,6 +101,7 @@ public class UserService extends AbstractService {
      * Otherwise, a UserDeletionExceptionMessage gets posted there.
      *
      * @param msg The DeleteUserRequest found on the EventBus
+     *
      * @see de.uol.swp.server.usermanagement.UserManagement#dropUser(User)
      * @see de.uol.swp.common.user.request.DeleteUserRequest
      * @see de.uol.swp.common.user.response.UserDeletionSuccessfulResponse
@@ -110,7 +119,8 @@ public class UserService extends AbstractService {
             returnMessage = new UserDeletionSuccessfulResponse();
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new UserDeletionExceptionMessage("Cannot delete user " + msg.getUser() + " " + e.getMessage());
+            returnMessage = new UserDeletionExceptionMessage(
+                    "Cannot delete user " + msg.getUser() + " " + e.getMessage());
         }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
@@ -119,40 +129,38 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles a UpdateUserPasswordRequest found on the EventBus
+     * Handles a RegisterUserRequest found on the EventBus
      * <p>
-     * If a UpdateUserPasswordRequest is detected on the EventBus, this method is called.
-     * It tries to change the Password of a user via the UserManagement.
-     * If this succeeds, a ChangePasswordSuccessfulResponse is posted onto the EventBus.
-     * Otherwise, a ChangePasswordExceptionMessage gets posted there.
+     * If a RegisterUserRequest is detected on the EventBus, this method is called.
+     * It tries to create a new user via the UserManagement. If this succeeds,
+     * a RegistrationSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a RegistrationExceptionMessage gets posted there.
      *
-     * @param msg The ChangePasswordRequest found on the Eventbus
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @since 2020-12-03
+     * @param msg The RegisterUserRequest found on the EventBus
+     *
+     * @see de.uol.swp.server.usermanagement.UserManagement#createUser(User)
+     * @see de.uol.swp.common.user.request.RegisterUserRequest
+     * @see de.uol.swp.common.user.response.RegistrationSuccessfulResponse
+     * @see de.uol.swp.common.user.exception.RegistrationExceptionMessage
+     * @since 2019-09-02
      */
     @Subscribe
-    private void onChangePasswordRequest(UpdateUserPasswordRequest msg) {
+    private void onRegisterUserRequest(RegisterUserRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new ChangePassword message with " + msg.getUser());
+            LOG.debug("Got a new registration message with " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {
-            Optional<User> optionalUser = userManagement.getUserWithPassword(msg.getUser().getUsername(), msg.getOldPassword());
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                userManagement.updateUser(msg.getUser());
-                returnMessage = new ChangePasswordSuccessfulResponse();
-            } else {
-                returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
-            }
+            User newUser = userManagement.createUser(msg.getUser());
+            returnMessage = new RegistrationSuccessfulResponse();
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new ChangePasswordExceptionMessage("Cannot change Password of " + msg.getUser() + " " + e.getMessage());
+            returnMessage = new RegistrationExceptionMessage(
+                    "Cannot create user " + msg.getUser() + " " + e.getMessage());
         }
         if (msg.getMessageContext().isPresent()) {
             returnMessage.setMessageContext(msg.getMessageContext().get());
-            post(returnMessage);
         }
+        post(returnMessage);
     }
 }

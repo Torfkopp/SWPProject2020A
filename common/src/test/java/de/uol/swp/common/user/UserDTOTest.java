@@ -98,27 +98,16 @@ class UserDTOTest {
     }
 
     /**
-     * Tests if two different users are equal.
+     * Tests if the HashCode of a copied object matches the one of the original.
      * <p>
-     * This test fails when they are considered equal.
+     * This test fails when the codes do not match.
      *
      * @since 2019-09-04
      */
     @Test
-    void usersNotEquals_User() {
-        assertNotEquals(defaultUser, secondsUser);
-    }
-
-    /**
-     * Tests if a UserDTO object is different from a String.
-     * <p>
-     * This test fails when the UserDTO object is considered equal to the String "Test".
-     *
-     * @since 2019-09-04
-     */
-    @Test
-    void usersNotEquals_String() {
-        assertNotEquals(defaultUser, "Test");
+    void testHashCode() {
+        User newUser = UserDTO.create(defaultUser);
+        assertEquals(newUser.hashCode(), defaultUser.hashCode());
     }
 
     /**
@@ -135,15 +124,26 @@ class UserDTOTest {
     }
 
     /**
-     * Tests if the HashCode of a copied object matches the one of the original.
+     * Tests if a UserDTO object is different from a String.
      * <p>
-     * This test fails when the codes do not match.
+     * This test fails when the UserDTO object is considered equal to the String "Test".
      *
      * @since 2019-09-04
      */
     @Test
-    void testHashCode() {
-        User newUser = UserDTO.create(defaultUser);
-        assertEquals(newUser.hashCode(), defaultUser.hashCode());
+    void usersNotEquals_String() {
+        assertNotEquals(defaultUser, "Test");
+    }
+
+    /**
+     * Tests if two different users are equal.
+     * <p>
+     * This test fails when they are considered equal.
+     *
+     * @since 2019-09-04
+     */
+    @Test
+    void usersNotEquals_User() {
+        assertNotEquals(defaultUser, secondsUser);
     }
 }

@@ -14,6 +14,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * @since 2020-12-30
  */
 public abstract class AbstractChatMessageRequest extends AbstractRequestMessage {
+
     private final boolean fromLobby;
     private final String originLobby;
 
@@ -33,20 +34,20 @@ public abstract class AbstractChatMessageRequest extends AbstractRequestMessage 
     }
 
     /**
-     * Check if the ChatMessage request originated from a lobby chat
-     *
-     * @return True, if the ChatMessage request originated from a lobby chat; False if not
-     */
-    public boolean isFromLobby() {
-        return fromLobby;
-    }
-
-    /**
      * Getter for the lobbyName attribute
      *
      * @return The name of the Lobby the ChatMessage request originated from (null if from global chat)
      */
     public String getOriginLobby() {
         return originLobby;
+    }
+
+    /**
+     * Check if the ChatMessage request originated from a lobby chat
+     *
+     * @return True, if the ChatMessage request originated from a lobby chat; False if not
+     */
+    public boolean isFromLobby() {
+        return fromLobby;
     }
 }

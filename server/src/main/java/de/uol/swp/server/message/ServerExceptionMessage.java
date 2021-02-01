@@ -18,6 +18,7 @@ public class ServerExceptionMessage extends AbstractServerInternalMessage {
      * Constructor
      *
      * @param e The exception that is the reason for the creation of this
+     *
      * @since 2019-08-07
      */
     public ServerExceptionMessage(Exception e) {
@@ -29,6 +30,7 @@ public class ServerExceptionMessage extends AbstractServerInternalMessage {
      * Gets the Exception
      *
      * @return Exception passed in the constructor
+     *
      * @since 2019-08-07
      */
     public Exception getException() {

@@ -21,6 +21,7 @@ public class RegisterUserRequest extends AbstractRequestMessage {
      * Constructor
      *
      * @param user The new user to create
+     *
      * @since 2019-09-02
      */
     public RegisterUserRequest(User user) {
@@ -30,16 +31,6 @@ public class RegisterUserRequest extends AbstractRequestMessage {
     @Override
     public boolean authorisationNeeded() {
         return false;
-    }
-
-    /**
-     * Gets the user variable
-     *
-     * @return The new user to create
-     * @since 2019-09-02
-     */
-    public User getUser() {
-        return toCreate;
     }
 
     @Override
@@ -53,5 +44,16 @@ public class RegisterUserRequest extends AbstractRequestMessage {
         if (o == null || getClass() != o.getClass()) return false;
         RegisterUserRequest that = (RegisterUserRequest) o;
         return Objects.equals(toCreate, that.toCreate);
+    }
+
+    /**
+     * Gets the user variable
+     *
+     * @return The new user to create
+     *
+     * @since 2019-09-02
+     */
+    public User getUser() {
+        return toCreate;
     }
 }

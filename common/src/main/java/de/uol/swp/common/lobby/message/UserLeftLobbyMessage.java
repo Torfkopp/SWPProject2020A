@@ -26,6 +26,7 @@ public class UserLeftLobbyMessage extends AbstractLobbyMessage {
      *
      * @param lobbyName Name of the lobby
      * @param user      User who left the lobby
+     *
      * @since 2019-10-08
      */
     public UserLeftLobbyMessage(String lobbyName, User user) {

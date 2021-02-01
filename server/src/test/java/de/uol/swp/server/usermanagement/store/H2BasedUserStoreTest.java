@@ -6,10 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,12 +23,12 @@ class H2BasedUserStoreTest {
         Collections.sort(users);
     }
 
-    List<User> getDefaultUsers() {
-        return Collections.unmodifiableList(users);
-    }
-
     UserStore getDefaultStore() {
         return new H2BasedUserStore();
+    }
+
+    List<User> getDefaultUsers() {
+        return Collections.unmodifiableList(users);
     }
 
     @BeforeEach
@@ -40,88 +37,12 @@ class H2BasedUserStoreTest {
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
     }
-    
+
     @AfterEach
     void cleanDatabase() {
         UserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.removeUser(u.getUsername()));
-    }
-
-    @Test
-    void findUserByName() {
-        UserStore store = getDefaultStore();
-        User userToFind = getDefaultUsers().get(0);
-
-        Optional<User> userFound = store.findUser(userToFind.getUsername());
-
-        assertTrue(userFound.isPresent());
-        assertEquals(userToFind, userFound.get());
-        assertEquals(userFound.get().getPassword(), "");
-    }
-
-    @Test
-    void findUserByName_NotFound() {
-        UserStore store = getDefaultStore();
-        User userToFind = getDefaultUsers().get(0);
-
-        Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
-
-        assertFalse(userFound.isPresent());
-    }
-
-    @Test
-    void findUserByNameAndPassword() {
-        UserStore store = getDefaultStore();
-        User userToFind = getDefaultUsers().get(0);
-
-        Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
-
-        assertTrue(userFound.isPresent());
-        assertEquals(userToFind, userFound.get());
-        assertEquals(userFound.get().getPassword(), "");
-    }
-
-    @Test
-    void findUserByNameAndPassword_NotFound() {
-        UserStore store = getDefaultStore();
-        User userToFind = getDefaultUsers().get(0);
-
-        Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
-
-        assertFalse(userFound.isPresent());
-    }
-
-    @Test
-    void findUserByNameAndPassword_EmptyUser_NotFound() {
-        UserStore store = getDefaultStore();
-
-        Optional<User> userFound = store.findUser(null, "");
-
-        assertFalse(userFound.isPresent());
-    }
-
-    @Test
-    void overwriteUser() {
-        UserStore store = getDefaultStore();
-        User userToCreate = getDefaultUsers().get(1);
-
-        assertThrows(IllegalArgumentException.class,
-                () -> store.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail())
-        );
-    }
-
-    @Test
-    void updateUser() {
-        UserStore store = getDefaultStore();
-        User userToUpdate = getDefaultUsers().get(2);
-
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), userToUpdate.getEMail() + "@TESTING");
-
-        Optional<User> userFound = store.findUser(userToUpdate.getUsername());
-
-        assertTrue(userFound.isPresent());
-        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
     }
 
     @Test
@@ -138,6 +59,13 @@ class H2BasedUserStoreTest {
     }
 
     @Test
+    void createEmptyUser() {
+        UserStore store = getDefaultStore();
+
+        assertThrows(IllegalArgumentException.class, () -> store.createUser("", "", ""));
+    }
+
+    @Test
     void dropUser() {
         UserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
@@ -150,12 +78,56 @@ class H2BasedUserStoreTest {
     }
 
     @Test
-    void createEmptyUser() {
+    void findUserByName() {
+        UserStore store = getDefaultStore();
+        User userToFind = getDefaultUsers().get(0);
+
+        Optional<User> userFound = store.findUser(userToFind.getUsername());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userToFind, userFound.get());
+        assertEquals(userFound.get().getPassword(), "");
+    }
+
+    @Test
+    void findUserByNameAndPassword() {
+        UserStore store = getDefaultStore();
+        User userToFind = getDefaultUsers().get(0);
+
+        Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userToFind, userFound.get());
+        assertEquals(userFound.get().getPassword(), "");
+    }
+
+    @Test
+    void findUserByNameAndPassword_EmptyUser_NotFound() {
         UserStore store = getDefaultStore();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> store.createUser("", "", "")
-        );
+        Optional<User> userFound = store.findUser(null, "");
+
+        assertFalse(userFound.isPresent());
+    }
+
+    @Test
+    void findUserByNameAndPassword_NotFound() {
+        UserStore store = getDefaultStore();
+        User userToFind = getDefaultUsers().get(0);
+
+        Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
+
+        assertFalse(userFound.isPresent());
+    }
+
+    @Test
+    void findUserByName_NotFound() {
+        UserStore store = getDefaultStore();
+        User userToFind = getDefaultUsers().get(0);
+
+        Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
+
+        assertFalse(userFound.isPresent());
     }
 
     @Test
@@ -168,5 +140,28 @@ class H2BasedUserStoreTest {
         allUsersFromStore.forEach(u -> assertEquals(u.getPassword(), ""));
         Collections.sort(allUsersFromStore);
         assertEquals(allUsers, allUsersFromStore);
+    }
+
+    @Test
+    void overwriteUser() {
+        UserStore store = getDefaultStore();
+        User userToCreate = getDefaultUsers().get(1);
+
+        assertThrows(IllegalArgumentException.class,
+                     () -> store.createUser(userToCreate.getUsername(), userToCreate.getPassword(),
+                                            userToCreate.getEMail()));
+    }
+
+    @Test
+    void updateUser() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), userToUpdate.getEMail() + "@TESTING");
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
     }
 }

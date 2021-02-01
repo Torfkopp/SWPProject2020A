@@ -85,32 +85,31 @@ public class ChatMessageDTO implements ChatMessage {
      * Copy constructor
      *
      * @param chatMessage ChatMessage object to copy the values of
+     *
      * @return Copy of ChatMessage object
+     *
      * @since 2020-12-16
      */
     public static ChatMessage create(ChatMessage chatMessage) {
-        return new ChatMessageDTO(chatMessage.getID(), chatMessage.getAuthor(), chatMessage.getTimestamp(), chatMessage.getContent(), chatMessage.isEdited());
+        return new ChatMessageDTO(chatMessage.getID(), chatMessage.getAuthor(), chatMessage.getTimestamp(),
+                                  chatMessage.getContent(), chatMessage.isEdited());
     }
 
     /**
      * Converts a Instant (Timestamp) to a string
      *
      * @param timestamp The Instant to convert
+     *
      * @return String The created string
+     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.chat.ChatMessage
      * @since 2020-12-17
      */
     private static String timestampToString(Instant timestamp) {
-        return timestamp.atZone(ZoneOffset.UTC).getHour() +
-                ":" +
-                String.format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
-    }
-
-    @Override
-    public int getID() {
-        return this.id;
+        return timestamp.atZone(ZoneOffset.UTC).getHour() + ":" + String.format("%02d", timestamp.atZone(
+                ZoneOffset.UTC).getMinute());
     }
 
     @Override
@@ -129,6 +128,11 @@ public class ChatMessageDTO implements ChatMessage {
             this.content = newContent;
             this.edited = true;
         }
+    }
+
+    @Override
+    public int getID() {
+        return this.id;
     }
 
     @Override
@@ -151,13 +155,15 @@ public class ChatMessageDTO implements ChatMessage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChatMessage that = (ChatMessageDTO) o;
-        return id.equals(that.getID()) && author.equals(that.getAuthor()) && timestamp.equals(that.getTimestamp()) && content.equals(that.getContent());
+        return id.equals(that.getID()) && author.equals(that.getAuthor()) && timestamp.equals(
+                that.getTimestamp()) && content.equals(that.getContent());
     }
 
     /**
      * Converts a ChatMessage to a string
      *
      * @return String The created string
+     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.chat.ChatMessage
@@ -165,9 +171,8 @@ public class ChatMessageDTO implements ChatMessage {
      */
     @Override
     public String toString() {
-        String text = this.getContent() + " - " +
-                this.getAuthor().getUsername() + " - " +
-                timestampToString(this.getTimestamp());
+        String text = this.getContent() + " - " + this.getAuthor().getUsername() + " - "
+                      + timestampToString(this.getTimestamp());
         if (isEdited()) {
             text += " (ed)";
         }

@@ -53,7 +53,6 @@ public abstract class AbstractMessage implements Message {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractMessage that = (AbstractMessage) o;
-        return Objects.equals(messageContext, that.messageContext) &&
-                Objects.equals(session, that.session);
+        return Objects.equals(messageContext, that.messageContext) && Objects.equals(session, that.session);
     }
 }
