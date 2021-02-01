@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
@@ -9,6 +10,7 @@ import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
@@ -514,7 +516,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-1-15
      */
     public void onEndTurnButtonPressed(ActionEvent actionEvent) {
-        lobbyService.endTurn(loggedInUser, lobbyName);
+       lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
