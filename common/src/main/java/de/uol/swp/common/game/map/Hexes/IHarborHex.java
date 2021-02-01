@@ -1,4 +1,4 @@
-package de.uol.swp.server.game.map.Hexes;
+package de.uol.swp.common.game.map.Hexes;
 
 /**
  * Interface for a harbor hex
@@ -8,6 +8,13 @@ package de.uol.swp.server.game.map.Hexes;
  * @since 2021-01-16
  */
 public interface IHarborHex extends IWaterHex {
+
+    /**
+     * Gets the side to which the harbor faces
+     *
+     * @return Side
+     */
+    int getSide();
 
     /**
      * Gets the harbor's resource

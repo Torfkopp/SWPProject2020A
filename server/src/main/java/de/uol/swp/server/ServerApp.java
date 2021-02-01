@@ -20,11 +20,12 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * This class handles the startup of the server and the creation of default users
- * whilst the MainMemoryBasedUserStore is still in use.
+ * whilst the H2BasedUserStore is still in use.
  *
  * @author Marco Grawunder
- * @see de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore
- * @since 2017-03-17
+ * @author Marvin Drees
+ * @see de.uol.swp.server.usermanagement.store.H2BasedUserStore
+ * @since 2021-01-26
  */
 class ServerApp {
 

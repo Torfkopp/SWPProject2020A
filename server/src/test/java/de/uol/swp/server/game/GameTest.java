@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.game.Game;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;

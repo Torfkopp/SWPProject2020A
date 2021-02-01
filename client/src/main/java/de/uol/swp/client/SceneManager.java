@@ -12,6 +12,7 @@ import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
+import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
@@ -32,7 +33,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +52,7 @@ public class SceneManager {
 
     private final Stage primaryStage;
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
+    private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
     private Scene loginScene;
     private String lastTitle;
@@ -226,6 +230,22 @@ public class SceneManager {
     }
 
     /**
+     * Handles the CloseLobbiesViewEvent detected on the EventBus
+     * <p>
+     * If a CloseLobbiesEvent is detected on the EventBus, this method gets called.
+     * It calls a method to close all lobby screens.
+     *
+     * @param event The CloseLobbiesViewEvent detected on the EventBus
+     * @author Finn Haase
+     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
+     * @since 2021-01-28
+     */
+    @Subscribe
+    private void onCloseLobbiesViewEvent(CloseLobbiesViewEvent event) {
+        closeLobbies();
+    }
+
+    /**
      * Handles an incoming LobbyListMessage
      * <p>
      * If a LobbyListMessage is detected, the lobbyScenes map
@@ -262,7 +282,7 @@ public class SceneManager {
         lobbyStage.setTitle(lobbyName);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 630, 400);
+        Scene lobbyScene = new Scene(rootPane, 600, 600);
         lobbyScene.getStylesheets().add(styleSheet);
         lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene
@@ -272,10 +292,11 @@ public class SceneManager {
         //Specifies the owner Window (parent) for new window
         lobbyStage.initOwner(primaryStage);
         //Set position of second window, related to primary window
-        lobbyStage.setX(primaryStage.getX() + 200);
-        lobbyStage.setY(primaryStage.getY() + 100);
+        lobbyStage.setX(primaryStage.getX() + 100);
+        lobbyStage.setY(10);
         //Shows the window
         lobbyStage.show();
+        lobbyStages.add(lobbyStage);
     }
 
     /**
@@ -444,6 +465,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
+        System.out.println(lobbyStages.toString());
         showScene(loginScene, "Login");
     }
 
@@ -473,5 +495,19 @@ public class SceneManager {
     public void showChangePasswordScreen(User user) {
         ChangePasswordScene.setUserData(user);
         showScene(ChangePasswordScene, "Change Password");
+    }
+
+    /**
+     * Closes all Lobbies
+     *
+     * @author Finn Haase
+     * @author Aldin Dervisi
+     * @since 2021-01-28
+     */
+    public void closeLobbies() {
+        for (Stage lobbyStage : lobbyStages) {
+            lobbyStage.close();
+        }
+        lobbyStages.clear();
     }
 }

@@ -1,9 +1,9 @@
-package de.uol.swp.server.game;
+package de.uol.swp.common.game;
 
-import de.uol.swp.server.game.map.GameMapManagement;
-import de.uol.swp.server.game.map.Hexes.IGameHex;
-import de.uol.swp.server.game.map.Hexes.IResourceHex;
-import de.uol.swp.server.game.map.Hexes.ResourceHex;
+import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

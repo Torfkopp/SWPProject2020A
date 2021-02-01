@@ -3,14 +3,18 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.IGameRendering;
+import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
@@ -19,6 +23,7 @@ import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
+import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -26,11 +31,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -50,10 +56,10 @@ import java.util.Set;
  * @since 2020-11-21
  */
 @SuppressWarnings("UnstableApiUsage")
-public class LobbyPresenter extends AbstractPresenterWithChat {
+public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRendering {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-
+    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private ObservableList<Pair<String, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
@@ -70,11 +76,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Text text;
     @FXML
+    private Canvas gameMapCanvas;
+    @FXML
+    private VBox playField;
+    @FXML
     private ListView<Pair<String, String>> inventoryView;
 
     private Window window;
-    @FXML
-    private GridPane playField;
 
     /**
      * Constructor
@@ -318,6 +326,26 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles leaving all Lobbies when a user logged out
+     * <p>
+     * If a new RemoveFromLobbiesResponse is posted onto the EventBus the
+     * method leaveLobby in LobbyService is called for every Lobby the user
+     * is in.
+     *
+     * @param response the RemoveFromLobbiesResponse seen on the EventBus
+     * @author Finn Haase
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
+     * @since 2021-01-28
+     */
+    @Subscribe
+    private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response) {
+        for (Map.Entry<String, Lobby> entry : response.getLobbiesWithUser().entrySet()) {
+            lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+        }
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -425,8 +453,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Handles a StartSessionMessage found on the EventBus
      * <p>
-     * The lobby window gets a minimum width and height, and sets the play field
-     * to be visible.
+     * Sets the play field visible.
      *
      * @param startSessionMessage The StartSessionMessage found on the EventBus
      * @author Eric Vuong
@@ -437,10 +464,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
         if (startSessionMessage.getName().equals(this.lobbyName)) {
             Platform.runLater(() -> {
-                window.setY(window.getY() - 200);
-                ((Stage) window).setMinWidth(630);
-                ((Stage) window).setMinHeight(800);
                 playField.setVisible(true);
+                //This Line needs to be changed/ removed in the Future
+                drawGameMap(new GameMapManagement(), gameMapCanvas);
                 setTextText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
