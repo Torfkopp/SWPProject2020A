@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.IGameRendering;
@@ -12,6 +13,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -20,6 +22,7 @@ import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
@@ -58,6 +61,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private ObservableList<Pair<String, String>> lobbyMembers;
+    private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
 
@@ -75,6 +79,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private Canvas gameMapCanvas;
     @FXML
     private VBox playField;
+    @FXML
+    private ListView<Pair<String, String>> inventoryView;
 
     private Window window;
 
@@ -107,6 +113,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             protected void updateItem(Pair<String, String> item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? "" : item.getValue());
+            }
+        });
+        inventoryView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Pair<String, String> item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getValue() + " " + item.getKey()); // looks like: "1 Brick"
             }
         });
     }
@@ -457,6 +470,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 setTextText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
+                lobbyService.updateInventory(lobbyName, loggedInUser);
             });
         }
     }
@@ -477,6 +491,25 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         boolean isReady = readyCheckBox.isSelected();
         RequestMessage userReadyRequest = new UserReadyRequest(this.lobbyName, this.loggedInUser, isReady);
         eventBus.post(userReadyRequest);
+    }
+
+    @Subscribe
+    private void onUpdateInventoryResponse(UpdateInventoryResponse resp) {
+        if (resp.getLobbyName().equals(this.lobbyName)) {
+            if (resourceList == null) {
+                resourceList = FXCollections.observableArrayList();
+                inventoryView.setItems(resourceList);
+            }
+            resourceList.clear();
+            for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
+                Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
+                resourceList.add(resource);
+            }
+            for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
+                Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? "Has" : "Not");
+                resourceList.add(property);
+            }
+        }
     }
 
     /**
@@ -509,7 +542,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @since 2021-1-15
      */
     public void onEndTurnButtonPressed(ActionEvent actionEvent) {
-        lobbyService.endTurn(loggedInUser, lobbyName);
+       lobbyService.endTurn(loggedInUser, lobbyName);
+        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**

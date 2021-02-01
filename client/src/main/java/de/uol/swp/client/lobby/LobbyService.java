@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
@@ -115,5 +116,20 @@ public class LobbyService {
     public void removeFromLobbies(User user) {
         Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
         eventBus.post(removeFromLobbiesRequest);
+    }
+
+    /**
+     * Posts a request to update ones Inventory
+     *
+     * @param lobbyName name of the lobby the user wants to update his Inventory in
+     * @param user      User who wants to update his Inventory.
+     * @author Sven Ahrens
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
+     * @since 2021-1-25
+     */
+    public void updateInventory(String lobbyName, User user) {
+        Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
+        eventBus.post(updateInventoryRequest);
     }
 }

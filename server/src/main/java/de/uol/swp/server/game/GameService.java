@@ -5,14 +5,22 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
+import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Mapping EventBus calls to GameManagement calls
@@ -85,5 +93,56 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onCreateGameMessage(CreateGameMessage message) {
         gameManagement.createGame(message.getLobby(), message.getFirst());
+    }
+
+    /**
+     * Handles a UpdateInventoryRequest found on the EventBus
+     * <p>
+     * It searches the inventories in the current game for the one that belongs
+     * to the player sending the request. It then posts a UpdateInventoryResponse
+     * that contains all the user's items, saved in a resourceMap for
+     * counted items (bricks, grain, etc.) and a armyAndRoadMap which
+     * contains the boolean attributes longestRoad and largestArmy.
+     *
+     * @param msg The UpdateInventoryRequest found on the EventBus
+     * @author Sven Ahrens
+     * @author Finn Haase
+     * @since 2021-01-25
+     */
+    @Subscribe
+    private void onUpdateInventoryRequest(UpdateInventoryRequest msg) {
+        Game game = gameManagement.getGame(msg.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (int i = 0; i < inventories.length; i++) {
+            if (inventories[i].getPlayer().equals(msg.getUser())) {
+                inventory = inventories[i];
+                System.out.println(inventory.getPlayer());
+                break;
+            }
+        }
+        if (inventory != null) {
+            Map<String, Integer> resourceMap = new HashMap<>();
+            resourceMap.put("Brick", inventory.getBrick());
+            resourceMap.put("Grain", inventory.getGrain());
+            resourceMap.put("Lumber", inventory.getLumber());
+            resourceMap.put("Ore", inventory.getOre());
+            resourceMap.put("Wool", inventory.getWool());
+            resourceMap.put("Victory Point Cards", inventory.getVictoryPointCards());
+            resourceMap.put("Knight Cards", inventory.getKnightCards());
+            resourceMap.put("Road Building Cards", inventory.getRoadBuildingCards());
+            resourceMap.put("Year of Plenty Cards", inventory.getYearOfPlentyCards());
+            resourceMap.put("Monopoly Cards", inventory.getMonopolyCards());
+
+            Map<String, Boolean> armyAndRoadMap = new HashMap<>();
+            armyAndRoadMap.put("Largest Army", inventory.isLargestArmy());
+            armyAndRoadMap.put("Longest Road", inventory.isLongestRoad());
+
+            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(), Collections.unmodifiableMap(resourceMap), Collections.unmodifiableMap(armyAndRoadMap));
+            if (msg.getMessageContext().isPresent()) {
+                returnMessage.setMessageContext(msg.getMessageContext().get());
+            }
+            post(returnMessage);
+        }
     }
 }

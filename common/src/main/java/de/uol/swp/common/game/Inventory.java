@@ -11,6 +11,7 @@ import de.uol.swp.common.user.User;
  */
 public class Inventory {
 
+
     private final User player;
 
     private int totalResources = 0;
@@ -32,6 +33,10 @@ public class Inventory {
 
     public Inventory(User player) {
         this.player = player;
+    }
+
+    public User getPlayer() {
+        return player;
     }
 
     public int getTotalResources() {

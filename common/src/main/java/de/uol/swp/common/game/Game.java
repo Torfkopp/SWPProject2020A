@@ -14,6 +14,8 @@ import de.uol.swp.common.game.map.IGameMapManagement;
 public class Game {
 
     private final Lobby lobby;
+
+
     private final Inventory[] inventories;
     private final IGameMapManagement map;
     private final User[] players;
@@ -52,5 +54,9 @@ public class Game {
 
     public User[] getPlayers() {
         return players;
+    }
+
+    public Inventory[] getInventories() {
+        return inventories;
     }
 }
