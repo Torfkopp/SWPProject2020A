@@ -138,13 +138,13 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new EditChatMessage message for the ChatMessage ID " + msg.getId() + " and new content '"
-                      + msg.getContent() + '\'');
+            LOG.debug("Got a new EditChatMessage message for the ChatMessage ID " + msg
+                    .getId() + " and new content '" + msg.getContent() + '\'');
         }
         try {
             if (msg.isFromLobby()) {
-                ChatMessage chatMessage = chatManagement.updateChatMessage(msg.getId(), msg.getContent(),
-                                                                           msg.getOriginLobby());
+                ChatMessage chatMessage = chatManagement
+                        .updateChatMessage(msg.getId(), msg.getContent(), msg.getOriginLobby());
                 ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage, msg.getOriginLobby());
                 lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
             } else {
@@ -199,13 +199,13 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                    "Got new ChatMessage message from " + msg.getAuthor().getUsername() + " with content '" + msg.getContent() + '\'');
+            LOG.debug("Got new ChatMessage message from " + msg.getAuthor().getUsername() + " with content '" + msg
+                    .getContent() + '\'');
         }
         try {
             if (msg.isFromLobby()) {
-                ChatMessage chatMessage = chatManagement.createChatMessage(msg.getAuthor(), msg.getContent(),
-                                                                           msg.getOriginLobby());
+                ChatMessage chatMessage = chatManagement
+                        .createChatMessage(msg.getAuthor(), msg.getContent(), msg.getOriginLobby());
                 ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage, msg.getOriginLobby());
                 lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
             } else {

@@ -13,7 +13,11 @@ public interface IResourceHex extends ILandHex {
      * Enum for all five resource giving hex types
      */
     enum resource {
-        Hills, Forest, Mountains, Fields, Pasture
+        Hills,
+        Forest,
+        Mountains,
+        Fields,
+        Pasture
     }
 
     /**

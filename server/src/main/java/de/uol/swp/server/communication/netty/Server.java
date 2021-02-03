@@ -51,8 +51,8 @@ public class Server {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).localAddress(
-                    new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
+            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+             .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
 
                 @Override
                 protected void initChannel(SocketChannel ch) {

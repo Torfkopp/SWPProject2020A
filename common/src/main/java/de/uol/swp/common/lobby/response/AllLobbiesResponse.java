@@ -38,6 +38,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * Constructor
      *
      * @param lobbies Map of lobby's name and the lobby itself
+     *
      * @since 2020-12-12
      */
     public AllLobbiesResponse(Map<String, Lobby> lobbies) {
@@ -45,23 +46,25 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Gets the list of lobby names
-     *
-     * @return List of lobby names
-     * @since 2020-12-12
-     */
-    public List<String> getLobbyNames() {
-        return lobbyNames;
-    }
-
-    /**
      * Getter for the list of existing Lobby objects
      *
      * @return List of existing lobbyDTOs
+     *
      * @author Marvin Drees
      * @since 2020-12-16
      */
     public List<Lobby> getLobbies() {
         return lobbies;
+    }
+
+    /**
+     * Gets the list of lobby names
+     *
+     * @return List of lobby names
+     *
+     * @since 2020-12-12
+     */
+    public List<String> getLobbyNames() {
+        return lobbyNames;
     }
 }

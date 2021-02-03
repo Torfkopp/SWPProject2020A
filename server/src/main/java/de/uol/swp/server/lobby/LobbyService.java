@@ -46,7 +46,8 @@ public class LobbyService extends AbstractService {
      * @since 2019-10-08
      */
     @Inject
-    public LobbyService(LobbyManagement lobbyManagement, AuthenticationService authenticationService, EventBus eventBus) {
+    public LobbyService(LobbyManagement lobbyManagement, AuthenticationService authenticationService,
+                        EventBus eventBus) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;
         this.authenticationService = authenticationService;

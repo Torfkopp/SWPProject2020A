@@ -12,5 +12,4 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
  * @since 2020-12-12
  */
-public class RetrieveAllLobbiesRequest extends AbstractRequestMessage {
-}
+public class RetrieveAllLobbiesRequest extends AbstractRequestMessage {}

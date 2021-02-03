@@ -147,9 +147,8 @@ class H2BasedUserStoreTest {
         UserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
 
-        assertThrows(IllegalArgumentException.class,
-                     () -> store.createUser(userToCreate.getUsername(), userToCreate.getPassword(),
-                                            userToCreate.getEMail()));
+        assertThrows(IllegalArgumentException.class, () -> store
+                .createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail()));
     }
 
     @Test

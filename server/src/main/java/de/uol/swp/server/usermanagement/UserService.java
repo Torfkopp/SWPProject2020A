@@ -72,8 +72,8 @@ public class UserService extends AbstractService {
         }
         ResponseMessage returnMessage;
         try {
-            Optional<User> optionalUser = userManagement.getUserWithPassword(msg.getUser().getUsername(),
-                                                                             msg.getOldPassword());
+            Optional<User> optionalUser = userManagement
+                    .getUserWithPassword(msg.getUser().getUsername(), msg.getOldPassword());
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 userManagement.updateUser(msg.getUser());

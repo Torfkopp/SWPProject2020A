@@ -88,17 +88,17 @@ public class ClientConnection {
         group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port)).handler(
-                    new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) {
-                            // Add both Encoder and Decoder to send and receive serialisable objects
-                            ch.pipeline().addLast(new ObjectEncoder());
-                            ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                            // Add a ClientHandler
-                            ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
-                        }
-                    });
+            b.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port))
+             .handler(new ChannelInitializer<SocketChannel>() {
+                 @Override
+                 protected void initChannel(SocketChannel ch) {
+                     // Add both Encoder and Decoder to send and receive serialisable objects
+                     ch.pipeline().addLast(new ObjectEncoder());
+                     ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                     // Add a ClientHandler
+                     ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
+                 }
+             });
             ChannelFuture f = b.connect().sync();
             f.channel().closeFuture().sync();
         } finally {
