@@ -10,7 +10,10 @@ package de.uol.swp.common.game.map.Hexes;
 public interface IGameHex {
 
     enum type {
-        Water, Desert, Resource, Harbor
+        Water,
+        Desert,
+        Resource,
+        Harbor
     }
 
     type getType();

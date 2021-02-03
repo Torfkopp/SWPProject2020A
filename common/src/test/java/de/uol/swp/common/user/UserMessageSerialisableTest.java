@@ -33,14 +33,14 @@ class UserMessageSerialisableTest {
                                                                               UserLoggedInMessage.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new UserLoggedOutMessage("test"),
                                                                               UserLoggedOutMessage.class));
-        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new UsersListMessage(users),
-                                                                              UsersListMessage.class));
+        assertTrue(SerialisationTestHelper
+                           .checkSerialisableAndDeserialisable(new UsersListMessage(users), UsersListMessage.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new RegistrationExceptionMessage("Error"),
                                                                               RegistrationExceptionMessage.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new LoginSuccessfulResponse(defaultUser),
                                                                               LoginSuccessfulResponse.class));
-        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new LoginRequest("name", "pass"),
-                                                                              LoginRequest.class));
+        assertTrue(SerialisationTestHelper
+                           .checkSerialisableAndDeserialisable(new LoginRequest("name", "pass"), LoginRequest.class));
         assertTrue(
                 SerialisationTestHelper.checkSerialisableAndDeserialisable(new LogoutRequest(), LogoutRequest.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new RegisterUserRequest(defaultUser),

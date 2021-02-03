@@ -70,8 +70,8 @@ public class AuthenticationService extends AbstractService {
      * @since 2019-09-04
      */
     public Optional<Session> getSession(User user) {
-        Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream().filter(
-                e -> e.getValue().equals(user)).findFirst();
+        Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
+                                                               .filter(e -> e.getValue().equals(user)).findFirst();
         return entry.map(Map.Entry::getKey);
     }
 

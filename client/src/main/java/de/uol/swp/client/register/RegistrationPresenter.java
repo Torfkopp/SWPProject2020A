@@ -45,6 +45,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      *
      * @param eventBus    The EventBus set in ClientModule
      * @param userService The injected ClientUserService
+     *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2019-09-18
      */

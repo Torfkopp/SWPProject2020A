@@ -420,8 +420,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
         LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername().equals(
-                    message.getUser().getUsername()))
+            if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
+                                                                             .equals(message.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(message.getUser().getUsername(), message.getUser().getUsername()));
             setStartSessionButtonState();
         });
@@ -512,8 +512,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void setStartSessionButtonState() {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
-            this.startSession.setDisable(
-                    this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+            this.startSession
+                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
@@ -568,8 +568,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 if (readyUsers.contains(u)) {
                     username = "\u2713 " + username;
                 }
-                Pair<String, String> item = new Pair<>(u.getUsername(), u.getUsername().equals(
-                        this.owner.getUsername()) ? username + " \uD83D\uDC51" : username);  //Leerzeile vor Krone hinzugefügt
+                Pair<String, String> item = new Pair<>(u.getUsername(),
+                                                       u.getUsername().equals(this.owner.getUsername()) ?
+                                                       username + " \uD83D\uDC51" :
+                                                       username);  //Leerzeile vor Krone hinzugefügt
                 lobbyMembers.add(item);
             });
         });

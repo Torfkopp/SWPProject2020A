@@ -14,7 +14,12 @@ public interface IHarborHex extends IWaterHex {
      * and 'any' if every resource is tradeable
      */
     enum resource {
-        Brick, Lumber, Ore, Grain, Wool, Any
+        Brick,
+        Lumber,
+        Ore,
+        Grain,
+        Wool,
+        Any
     }
 
     /**

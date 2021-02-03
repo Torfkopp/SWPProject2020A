@@ -19,12 +19,12 @@ public class HarborHex extends AbstractHex implements IHarborHex {
     }
 
     @Override
-    public int getSide() { return side;}
-
-    @Override
     public resource getResource() {
         return resource;
     }
+
+    @Override
+    public int getSide() { return side;}
 
     @Override
     public type getType() {

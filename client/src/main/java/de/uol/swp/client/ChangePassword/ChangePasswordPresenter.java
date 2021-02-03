@@ -43,6 +43,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
      *
      * @param eventBus    The EventBus set in ClientModule
      * @param userService The injected ClientUserService
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.di.ClientModule

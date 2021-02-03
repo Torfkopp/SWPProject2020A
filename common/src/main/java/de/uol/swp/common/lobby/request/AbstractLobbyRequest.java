@@ -15,8 +15,8 @@ import java.util.Objects;
  */
 public class AbstractLobbyRequest extends AbstractRequestMessage {
 
-    String name;
-    User user;
+    private String name;
+    private User user;
 
     /**
      * Default constructor

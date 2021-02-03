@@ -142,8 +142,10 @@ public class GameService extends AbstractService {
             armyAndRoadMap.put("Longest Road", inventory.isLongestRoad());
 
             AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(),
-                                                                                Collections.unmodifiableMap(resourceMap),
-                                                                                Collections.unmodifiableMap(armyAndRoadMap));
+                                                                                Collections
+                                                                                        .unmodifiableMap(resourceMap),
+                                                                                Collections.unmodifiableMap(
+                                                                                        armyAndRoadMap));
             if (msg.getMessageContext().isPresent()) {
                 returnMessage.setMessageContext(msg.getMessageContext().get());
             }

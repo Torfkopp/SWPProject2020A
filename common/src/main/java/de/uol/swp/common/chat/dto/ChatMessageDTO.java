@@ -108,8 +108,8 @@ public class ChatMessageDTO implements ChatMessage {
      * @since 2020-12-17
      */
     private static String timestampToString(Instant timestamp) {
-        return timestamp.atZone(ZoneOffset.UTC).getHour() + ":" + String.format("%02d", timestamp.atZone(
-                ZoneOffset.UTC).getMinute());
+        return timestamp.atZone(ZoneOffset.UTC).getHour() + ":" + String
+                .format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
     }
 
     @Override
@@ -155,8 +155,8 @@ public class ChatMessageDTO implements ChatMessage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChatMessage that = (ChatMessageDTO) o;
-        return id.equals(that.getID()) && author.equals(that.getAuthor()) && timestamp.equals(
-                that.getTimestamp()) && content.equals(that.getContent());
+        return id.equals(that.getID()) && author.equals(that.getAuthor()) && timestamp
+                .equals(that.getTimestamp()) && content.equals(that.getContent());
     }
 
     /**
@@ -171,8 +171,8 @@ public class ChatMessageDTO implements ChatMessage {
      */
     @Override
     public String toString() {
-        String text = this.getContent() + " - " + this.getAuthor().getUsername() + " - "
-                      + timestampToString(this.getTimestamp());
+        String text = this.getContent() + " - " + this.getAuthor().getUsername() + " - " + timestampToString(
+                this.getTimestamp());
         if (isEdited()) {
             text += " (ed)";
         }
