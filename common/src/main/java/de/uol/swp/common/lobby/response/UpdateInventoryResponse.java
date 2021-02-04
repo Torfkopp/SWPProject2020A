@@ -1,6 +1,5 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
 
 import java.util.Map;
@@ -12,10 +11,9 @@ import java.util.Map;
  * @author Finn Haase
  * @since 2021-01-25
  */
-public class UpdateInventoryResponse extends AbstractResponseMessage {
+public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final User user;
-    private final String lobbyName;
     private final Map<String, Integer> resourceMap;
     private final Map<String, Boolean> armyAndRoadMap;
 
@@ -29,8 +27,8 @@ public class UpdateInventoryResponse extends AbstractResponseMessage {
      */
     public UpdateInventoryResponse(User user, String lobbyName, Map<String, Integer> resourceMap,
                                    Map<String, Boolean> armyAndRoadMap) {
+        super(lobbyName);
         this.user = user;
-        this.lobbyName = lobbyName;
         this.resourceMap = resourceMap;
         this.armyAndRoadMap = armyAndRoadMap;
     }
@@ -43,15 +41,6 @@ public class UpdateInventoryResponse extends AbstractResponseMessage {
      */
     public Map<String, Boolean> getArmyAndRoadMap() {
         return armyAndRoadMap;
-    }
-
-    /**
-     * Gets the name of the lobby in which the session is taking place
-     *
-     * @return Name of the Lobby
-     */
-    public String getLobbyName() {
-        return lobbyName;
     }
 
     /**

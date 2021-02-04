@@ -198,13 +198,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
-        LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
-        LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
-        LOG.debug("Update of ready users " + allLobbyMembersResponse.getReadyUsers());
-        this.owner = allLobbyMembersResponse.getOwner();
-        this.readyUsers = allLobbyMembersResponse.getReadyUsers();
-        updateUsersList(allLobbyMembersResponse.getUsers());
-        setStartSessionButtonState();
+        if (this.lobbyName.equals(allLobbyMembersResponse.getLobbyName())) {
+            LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
+            LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
+            LOG.debug("Update of ready users " + allLobbyMembersResponse.getReadyUsers());
+            this.owner = allLobbyMembersResponse.getOwner();
+            this.readyUsers = allLobbyMembersResponse.getReadyUsers();
+            updateUsersList(allLobbyMembersResponse.getUsers());
+            setStartSessionButtonState();
+        }
     }
 
     /**
@@ -361,12 +363,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * Handles a StartSessionMessage found on the EventBus
      * <p>
      * Sets the play field visible.
+     * The startSessionButton and every readyCheckbox are getting invisible for
+     * the lobby members.
      *
      * @param startSessionMessage The StartSessionMessage found on the EventBus
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
-     * @since 2021-01-21
+     * @since 2021-02-04
      */
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
@@ -379,6 +383,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
                 lobbyService.updateInventory(lobbyName, loggedInUser);
+                this.readyCheckBox.setVisible(false);
+                this.startSession.setVisible(false);
             });
         }
     }
