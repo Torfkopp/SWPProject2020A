@@ -36,12 +36,58 @@ public class Game {
         }
     }
 
+    /**
+     * Calculates the player's victory points
+     *
+     * @param player The User object
+     *
+     * @return int The amount of points
+     */
+    public int calcVicPoints(int player) {
+        int points = 0;
+        //Points made with settlements & cities
+        points += map.getPlayerPoints(player);
+        //Points made with victory point cards
+        points += inventories[player].getVictoryPoints();
+        //2 Points if player has the longest road
+        if (inventories[player].isLongestRoad()) points += 2;
+        //2 Points if player has the largest army
+        if (inventories[player].isLargestArmy()) points += 2;
+        return points;
+    }
+
     public Inventory[] getInventories() {
         return inventories;
     }
 
+    public Inventory getInventory(int player) {
+        return inventories[player - 1];
+    }
+
     public Lobby getLobby() {
         return lobby;
+    }
+
+    public IGameMapManagement getMap() {
+        return map;
+    }
+
+    /**
+     * Gets the player's number
+     *
+     * @param player The User object
+     *
+     * @return int The player's number
+     */
+    public int getPlayerNumber(User player) {
+        int number = 1;
+        for (int i = 0; i < 4; i++) {
+            if (players[i].equals(player)) {
+                number += i;
+                break;
+            }
+        }
+        return number;
     }
 
     public User[] getPlayers() {

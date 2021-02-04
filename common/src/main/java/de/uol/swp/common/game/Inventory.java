@@ -30,6 +30,8 @@ public class Inventory {
     private boolean longestRoad = false;
     private boolean largestArmy = false;
 
+    private int victoryPoints = 0;
+
     public Inventory(User player) {
         this.player = player;
     }
@@ -108,6 +110,14 @@ public class Inventory {
 
     public void setVictoryPointCards(int victoryPointCards) {
         this.victoryPointCards = victoryPointCards;
+    }
+
+    public int getVictoryPoints() {
+        return victoryPoints;
+    }
+
+    public void setVictoryPoints(int victoryPoints) {
+        this.victoryPoints = victoryPoints;
     }
 
     public int getWool() {

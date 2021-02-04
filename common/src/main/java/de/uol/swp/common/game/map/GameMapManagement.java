@@ -16,6 +16,10 @@ public class GameMapManagement implements IGameMapManagement {
     private final IEdge[] edges = new IEdge[73]; //72 edges
     private final IIntersection[] intersections = new IIntersection[55]; //54 intersections
 
+    //Array of the intersections possessed by a player
+    // (9 is the maximum amount of settlements/cities)
+    private final int[][] playerInters = new int[5][9]; //4 Players
+
     int robberPosition = 37;
 
     public GameMapManagement() {
@@ -242,6 +246,22 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public int getPlayerPoints(int player) {
+        if (getPlayerInters(player).length == 0) return 0;
+        int points = 0;
+        String state;
+        for (int i : getPlayerInters(player)) {
+            state = intersections[i].getState();
+            if (state.equals(player + "s")) {
+                points++;
+            } else if (state.equals(player + "c")) {
+                points += 2;
+            }
+        }
+        return points;
+    }
+
+    @Override
     public int getRobberPos() {
         return robberPosition;
     }
@@ -266,6 +286,12 @@ public class GameMapManagement implements IGameMapManagement {
     public boolean placeSettlement(int player, int position) {
         if (settlementPlaceable(player, position)) {
             intersections[position].setState(player + "s");
+            //Puts the place of the settlement into the playerInters array
+            for (int i : playerInters[player])
+                if (i == 0) {
+                    playerInters[player][i] = position;
+                    break;
+                }
             for (int iPos : intersections[player].getNeighbours()) {
                 intersections[iPos].setState("b");
             }
@@ -504,5 +530,14 @@ public class GameMapManagement implements IGameMapManagement {
         intersections[53] = new Intersection(new int[]{34, 35, 37}, new int[]{42, 52, 54}, "f");
         intersections[54] = new Intersection(new int[]{35, 36, 37}, new int[]{45, 49, 53}, "f");
         //----------------------------------------------------------------------------------------------------
+    }
+
+    /**
+     * Gets the positions of the player's settlements/cities
+     *
+     * @return An array of positions
+     */
+    private int[] getPlayerInters(int player) {
+        return playerInters[player];
     }
 }
