@@ -8,7 +8,8 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  * @author Maximilian Lindner
  * @since 2021-02-04
  */
-public class AbstractLobbyResponse extends AbstractResponseMessage {
+
+public abstract class AbstractLobbyResponse extends AbstractResponseMessage {
 
     private String lobbyName;
 
