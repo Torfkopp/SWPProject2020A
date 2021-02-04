@@ -43,8 +43,8 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @param users      Collection of all lobby members
      * @param owner      Owner of the lobby
      * @param readyUsers Set of all ready lobby members
+     * @param lobbyName  Name of the lobby
      *
-     * @param lobbyName Name of the lobby
      * @since 2021-02-04
      */
     public AllLobbyMembersResponse(Collection<User> users, User owner, Set<User> readyUsers, String lobbyName) {
