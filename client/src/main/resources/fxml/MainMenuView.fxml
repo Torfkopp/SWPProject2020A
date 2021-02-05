@@ -38,19 +38,19 @@
             </ListView>
             <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" prefHeight="25.0"/>
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
-                    text="%mainmenu.chat.buttons.sendmessage">
+                    text="%chat.buttons.sendmessage">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
-                    text="%mainmenu.chat.buttons.deletemessage">
+                    text="%chat.buttons.deletemessage">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
-                    text="%mainmenu.chat.buttons.editmessage">
+                    text="%chat.buttons.editmessage">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>

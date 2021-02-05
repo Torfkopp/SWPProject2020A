@@ -24,19 +24,19 @@
             </ListView>
             <TextField fx:id="messageField"/>
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed"
-                    text="%lobby.chat.buttons.sendmessage">
+                    text="%chat.buttons.sendmessage">
                 <VBox.margin>
                     <Insets top="5"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed"
-                    text="%lobby.chat.buttons.deletemessage">
+                    text="%chat.buttons.deletemessage">
                 <VBox.margin>
                     <Insets top="5"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed"
-                    text="%lobby.chat.buttons.editmessage">
+                    text="%chat.buttons.editmessage">
                 <VBox.margin>
                     <Insets top="5"/>
                 </VBox.margin>
