@@ -48,11 +48,11 @@ public class Game {
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += inventories[player].getVictoryPoints();
+        points += inventories[player - 1].getVictoryPointCards();
         //2 Points if player has the longest road
-        if (inventories[player].isLongestRoad()) points += 2;
+        if (inventories[player - 1].isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (inventories[player].isLargestArmy()) points += 2;
+        if (inventories[player - 1].isLargestArmy()) points += 2;
         return points;
     }
 

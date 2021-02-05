@@ -25,6 +25,7 @@ public class GameTest {
     @Test
     void calcVicPointsTest() {
         int player = game.getPlayerNumber(user);
+        assertEquals(game.getInventories().length, 1);
         assertEquals(player, 1);
         //Player has nothing
         assertEquals(game.calcVicPoints(player), 0);
@@ -43,7 +44,7 @@ public class GameTest {
         game.getInventory(player).setLargestArmy(true);
         //Player has a city, 3 point cards, longest road, and the largest army
         assertEquals(game.calcVicPoints(player), 9);
-        game.getMap().placeSettlement(player, 30);
+        game.getMap().placeSettlement(player, 50);
         //Player has a city, a settlement, 3 point cards, longest road, and the largest army
         assertEquals(game.calcVicPoints(player), 10);
     }
