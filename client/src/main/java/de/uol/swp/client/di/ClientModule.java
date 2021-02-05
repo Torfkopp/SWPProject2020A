@@ -10,6 +10,9 @@ import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import javafx.fxml.FXMLLoader;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Module that provides classes needed by the client.
  *
@@ -20,6 +23,16 @@ import javafx.fxml.FXMLLoader;
 public class ClientModule extends AbstractModule {
 
     final EventBus eventBus = new EventBus();
+    // ResourceBundle selection. Uncomment the one you want to use and comment the others
+    // TODO: should eventually be handled with a user setting or getting the client system locale
+    // standard en_GB resource bundle, enabled by default
+    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.UK);
+    // standard de_DE resource bundle
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.GERMANY);
+    // unicode-free en_GB resource bundle
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "nounicode"));
+    // unicode-free de_DE resource bundle
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("de", "DE", "nounicode"));
 
     @Override
     protected void configure() {
@@ -31,5 +44,6 @@ public class ClientModule extends AbstractModule {
         bind(EventBus.class).toInstance(eventBus);
         bind(ClientUserService.class).to(UserService.class);
         bind(IChatService.class).to(ChatService.class);
+        bind(ResourceBundle.class).toInstance(resourceBundle);
     }
 }

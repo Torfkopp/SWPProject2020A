@@ -4,6 +4,7 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.ClientUserService;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * The application class of the client
@@ -36,6 +38,8 @@ public class ClientApp extends Application implements ConnectionListener {
 
     private static final Logger LOG = LogManager.getLogger(ClientApp.class);
 
+    @Inject
+    private ResourceBundle resourceBundle;
     private String host;
     private int port;
 
@@ -180,7 +184,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onRegistrationExceptionMessage(RegistrationExceptionMessage message) {
-        sceneManager.showServerError("Registration error " + message);
+        sceneManager.showServerError(resourceBundle.getString("error.server.registration") + ' ' + message);
         LOG.error("Registration error " + message);
     }
 
@@ -218,7 +222,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message) {
-        sceneManager.showServerError("Change Password error: " + message);
+        sceneManager.showServerError(resourceBundle.getString("error.server.changepw") + ' ' + message);
         LOG.error("Change Password error: " + message);
     }
 
@@ -255,7 +259,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onUserDeletionExceptionMessage(UserDeletionExceptionMessage message) {
-        sceneManager.showServerError("Error when deleting the user: " + message);
+        sceneManager.showServerError(resourceBundle.getString("error.server.deleteuser") + ' ' + message);
         LOG.error("User Deletion error: " + message);
     }
 
