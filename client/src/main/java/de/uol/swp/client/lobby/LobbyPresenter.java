@@ -62,7 +62,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @FXML
     private Button endTurn;
     @FXML
-    private Text text;
+    private Text turnIndicator;
     @FXML
     private Canvas gameMapCanvas;
     @FXML
@@ -107,7 +107,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.getValue() + " " + item.getKey()); // looks like: "1 Brick"
+                setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
+                        .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
             }
         });
     }
@@ -296,7 +297,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage message) {
-        setTextText(message.getActivePlayer());
+        setTurnIndicatorText(message.getActivePlayer());
         //In here to test the endTurnButton
         onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
     }
@@ -375,7 +376,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future
                 drawGameMap(new GameMapManagement(), gameMapCanvas);
-                setTextText(startSessionMessage.getUser());
+                setTurnIndicatorText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
                 lobbyService.updateInventory(lobbyName, loggedInUser);
@@ -396,7 +397,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 resourceList.add(resource);
             }
             for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
-                Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? "Has" : "Not");
+                Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? resourceBundle
+                        .getString("game.property.has") : resourceBundle.getString("game.property.hasnot"));
                 resourceList.add(property);
             }
         }
@@ -530,8 +532,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @author Marvin Drees
      * @since 2021-01-23
      */
-    private void setTextText(User player) {
-        text.setText("It's " + player.getUsername() + "'s turn!");
+    private void setTurnIndicatorText(User player) {
+        turnIndicator.setText(
+                String.format(resourceBundle.getString("lobby.game.text.turnindicator"), player.getUsername()));
     }
 
     /**
@@ -566,11 +569,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             userLobbyList.forEach(u -> {
                 String username = u.getUsername();
                 if (readyUsers.contains(u)) {
-                    username = "\u2713 " + username;
+                    username = String.format(resourceBundle.getString("lobby.members.ready"), username);
                 }
                 Pair<String, String> item = new Pair<>(u.getUsername(),
                                                        u.getUsername().equals(this.owner.getUsername()) ?
-                                                       username + " \uD83D\uDC51" :
+                                                       String.format(resourceBundle.getString("lobby.members.owner"),
+                                                                     username) :
                                                        username);  //Leerzeile vor Krone hinzugefügt
                 lobbyMembers.add(item);
             });

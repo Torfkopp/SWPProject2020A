@@ -9,7 +9,7 @@
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="60.0"/>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="5.0" prefWidth="30.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="109.0"/>
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="150.0" minWidth="10.0" prefWidth="120.0"/>
             <ColumnConstraints maxWidth="369.0" minWidth="0.0" prefWidth="167.0"/>
             <ColumnConstraints maxWidth="369.0" minWidth="10.0" prefWidth="35.0"/>
             <ColumnConstraints maxWidth="312.0" minWidth="77.0" prefWidth="197.0"/>
@@ -23,11 +23,9 @@
         </rowConstraints>
         <ListView fx:id="usersView" prefHeight="200.0" prefWidth="200.0" GridPane.rowSpan="2147483647"/>
         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed"
-                text="CreateLobby"
-                GridPane.columnIndex="2"/>
+                text="%mainmenu.buttons.lobby.create" GridPane.columnIndex="2"/>
         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
-                text="JoinLobby"
-                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                text="%mainmenu.buttons.lobby.join" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
         <ListView fx:id="lobbyView" prefHeight="372.0" prefWidth="200.0" GridPane.columnIndex="3"
                   GridPane.rowSpan="2147483647"/>
 
@@ -40,19 +38,19 @@
             </ListView>
             <TextField fx:id="messageField" maxWidth="1.7976931348623157E308" prefHeight="25.0"/>
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
-                    text="Send message">
+                    text="%mainmenu.chat.buttons.sendmessage">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
-                    text="Delete message">
+                    text="%mainmenu.chat.buttons.deletemessage">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
-                    text="Edit message">
+                    text="%mainmenu.chat.buttons.editmessage">
                 <VBox.margin>
                     <Insets top="10.0"/>
                 </VBox.margin>
@@ -60,21 +58,23 @@
         </VBox>
 
         <MenuBar maxWidth="1.7976931348623157E308" prefHeight="25.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
-            <Menu mnemonicParsing="false" text="Settings">
+            <Menu mnemonicParsing="false" text="%mainmenu.settings">
                 <MenuItem mnemonicParsing="false">
                     <graphic>
                         <Button mnemonicParsing="false" onAction="#onChangePasswordButtonPressed"
-                                text="Change Password"/>
+                                text="%mainmenu.settings.buttons.changepw"/>
                     </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false">
                     <graphic>
-                        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="Delete my account"/>
+                        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed"
+                                text="%mainmenu.settings.buttons.deleteuser"/>
                     </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false">
                     <graphic>
-                        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="Logout"/>
+                        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed"
+                                text="%mainmenu.settings.buttons.logout"/>
                     </graphic>
                 </MenuItem>
             </Menu>
