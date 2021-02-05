@@ -117,45 +117,74 @@ public interface IGameRendering {
     private void drawHarbor(double currentX, double currentY, IHarborHex hex, double effectiveHeight,
                             GraphicsContext mapCtx) {
         mapCtx.setStroke(HARBOR_COLOUR);
+        mapCtx.setFill(HARBOR_COLOUR);
         mapCtx.setLineWidth((HEX_WIDTH_FACTOR * effectiveHeight) / 5.0);
+        double yDistance = (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 64.0);
+        double yExtend = (HEX_HEIGHT_FACTOR * effectiveHeight) * (5.0 / 32.0);
+        double xDistance = (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 32.0);
+        double xExtend = (HEX_WIDTH_FACTOR * effectiveHeight) * (5.0 / 16.0);
+        double[] xCords, yCords;
         switch (hex.getSide()) {
             case WEST:
-                mapCtx.strokeLine(currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (11.0 / 16.0),
-                                  currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (5.0 / 16.0));
+                xCords = new double[]{currentX + xDistance, currentX + xExtend / 2.0, currentX + xExtend / 2.0,
+                                      currentX + xDistance,};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0) + yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),};
                 break;
             case NORTHWEST:
-                mapCtx.strokeLine(currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (2.0 / 8.0),
-                                  currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 16.0));
+                xCords = new double[]{currentX + xDistance, currentX + xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0,};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + yExtend, currentY + yDistance,};
                 break;
             case NORTHEAST:
-                mapCtx.strokeLine(currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 16.0),
-                                  currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (2.0 / 8.0));
+                xCords = new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,};
+                yCords = new double[]{currentY + yDistance, currentY + yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),};
                 break;
             case EAST:
-                mapCtx.strokeLine(currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (5.0 / 16.0),
-                                  currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (11.0 / 16.0));
+                xCords = new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend / 2.0,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend / 2.0,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0) + yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),};
                 break;
             case SOUTHEAST:
-                mapCtx.strokeLine(currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (11.0 / 16.0),
-                                  currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (7.0 / 8.0));
+                xCords = new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0)};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yDistance,};
                 break;
             case SOUTHWEST:
-                mapCtx.strokeLine(currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (11.0 / 16.0));
+                xCords = new double[]{currentX + xDistance, currentX + xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0)};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yDistance,};
                 break;
+            default:
+                xCords = null;
+                yCords = null;
         }
+        mapCtx.fillPolygon(xCords, yCords, 4);
+
         String text = "";
         switch (hex.getResource()) {
             case BRICK:
