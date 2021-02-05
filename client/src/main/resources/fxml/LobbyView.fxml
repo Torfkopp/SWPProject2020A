@@ -90,6 +90,7 @@
                 <Insets top="50"></Insets>
             </VBox.margin>
             <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" text="Leave Lobby"></Button>
+            <Button onAction="#drawMap" text="Draw Map"></Button>
         </HBox>
     </VBox>
 </HBox>

@@ -12,12 +12,12 @@ public interface IResourceHex extends ILandHex {
     /**
      * Enum for all five resource giving hex types
      */
-    enum resource {
-        Hills,
-        Forest,
-        Mountains,
-        Fields,
-        Pasture
+    enum ResourceHexType {
+        HILLS,
+        FOREST,
+        MOUNTAINS,
+        FIELDS,
+        PASTURE
     }
 
     /**
@@ -25,7 +25,7 @@ public interface IResourceHex extends ILandHex {
      *
      * @return Resource
      */
-    resource getResource();
+    ResourceHexType getResource();
 
     /**
      * Gets the number of the hex's token

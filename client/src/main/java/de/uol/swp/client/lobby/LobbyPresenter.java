@@ -576,4 +576,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             });
         });
     }
+
+    @FXML
+    private void drawMap(){
+        drawGameMap(new GameMapManagement(), gameMapCanvas);
+    }
 }

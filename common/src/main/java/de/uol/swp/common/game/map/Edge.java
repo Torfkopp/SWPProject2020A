@@ -10,39 +10,43 @@ public class Edge implements IEdge {
 
     private final int[] neiInt;
     private final int[] neighbours;
-    private int state;
+    private Player owner;
 
     /**
      * Constructor
      *
      * @param neiInt     The two neighbouring intersections
      * @param neighbours The two to four neighbouring edges
-     * @param state      0 if undeveloped;
-     *                   1-4 for road's owner
      */
-    public Edge(int[] neiInt, int[] neighbours, int state) {
+    public Edge(int[] neiInt, int[] neighbours) {
         this.neiInt = neiInt;
         this.neighbours = neighbours;
-        this.state = state;
+        this.owner = null;
+    }
+
+    public Edge(int[] neiInt, int[] neighbours, Player owner) {
+        this.neiInt = neiInt;
+        this.neighbours = neighbours;
+        this.owner = owner;
     }
 
     @Override
-    public int[] getNeiInt() {
-        return neiInt;
-    }
-
-    @Override
-    public int[] getNeighbours() {
+    public int[] getNeighbouringEdges() {
         return neighbours;
     }
 
     @Override
-    public int getState() {
-        return state;
+    public int[] getNeighbouringIntersections() {
+        return neiInt;
     }
 
     @Override
-    public void setState(int state) {
-        this.state = state;
+    public Player getOwner() {
+        return owner;
+    }
+
+    @Override
+    public void setOwner(Player owner) {
+        this.owner = owner;
     }
 }

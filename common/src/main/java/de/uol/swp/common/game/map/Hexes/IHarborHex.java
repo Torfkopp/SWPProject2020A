@@ -13,13 +13,22 @@ public interface IHarborHex extends IWaterHex {
      * Enum for the five resources a harbor can trade
      * and 'any' if every resource is tradeable
      */
-    enum resource {
-        Brick,
-        Lumber,
-        Ore,
-        Grain,
-        Wool,
-        Any
+    enum HarborResource {
+        BRICK,
+        LUMBER,
+        ORE,
+        GRAIN,
+        WOOL,
+        ANY
+    }
+
+    enum HarborSide {
+        WEST,
+        NORTHWEST,
+        NORTHEAST,
+        EAST,
+        SOUTHEAST,
+        SOUTHWEST,
     }
 
     /**
@@ -27,12 +36,12 @@ public interface IHarborHex extends IWaterHex {
      *
      * @return Resource
      */
-    resource getResource();
+    HarborResource getResource();
 
     /**
      * Gets the side to which the harbor faces
      *
      * @return Side
      */
-    int getSide();
+    HarborSide getSide();
 }

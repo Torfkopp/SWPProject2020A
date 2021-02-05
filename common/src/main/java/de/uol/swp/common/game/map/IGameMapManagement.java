@@ -64,7 +64,7 @@ public interface IGameMapManagement {
      *
      * @return true if placement was successful; false if not
      */
-    boolean placeRoad(int player, int position);
+    boolean placeRoad(Player player, int position);
 
     /**
      * Places a settlement
@@ -75,7 +75,7 @@ public interface IGameMapManagement {
      *
      * @return true if placement was successful; false if not
      */
-    boolean placeSettlement(int player, int position);
+    boolean placeSettlement(Player player, int position);
 
     /**
      * Checks if a street is placeable
@@ -86,7 +86,7 @@ public interface IGameMapManagement {
      *
      * @return true if placement is possible; false if not
      */
-    boolean roadPlaceable(int player, int position);
+    boolean roadPlaceable(Player player, int position);
 
     /**
      * Checks if a settlement is placeable
@@ -97,7 +97,7 @@ public interface IGameMapManagement {
      *
      * @return true if placement is possible; false if not
      */
-    boolean settlementPlaceable(int player, int position);
+    boolean settlementPlaceable(Player player, int position);
 
     /**
      * Upgrades a settlement
@@ -108,5 +108,5 @@ public interface IGameMapManagement {
      *
      * @return true if placement was successful; false if not
      */
-    boolean upgradeSettlement(int player, int position);
+    boolean upgradeSettlement(Player player, int position);
 }
