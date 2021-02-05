@@ -5,64 +5,66 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="600.0" minWidth="600" minHeight="600"
-      xmlns="http://javafx.com/javafx/11.0.1"
-      fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+<HBox xmlns:fx="http://javafx.com/fxml/1" minHeight="600.0" minWidth="690.0" prefHeight="600.0" prefWidth="690.0"
+      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <VBox>
         <HBox.margin>
-            <Insets right="10" left="10" bottom="10"></Insets>
+            <Insets bottom="10" left="10" right="10"/>
         </HBox.margin>
         <VBox>
-            <ListView fx:id="membersView" prefHeight="100" minHeight="100">
+            <ListView fx:id="membersView" minHeight="100" prefHeight="100">
                 <VBox.margin>
-                    <Insets top="10"></Insets>
+                    <Insets top="10"/>
                 </VBox.margin>
             </ListView>
             <ListView fx:id="chatView">
                 <VBox.margin>
-                    <Insets top="10"></Insets>
+                    <Insets top="10"/>
                 </VBox.margin>
             </ListView>
-            <TextField fx:id="messageField"></TextField>
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" text="Send message">
+            <TextField fx:id="messageField"/>
+            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed"
+                    text="%chat.buttons.sendmessage">
                 <VBox.margin>
-                    <Insets top="5"></Insets>
+                    <Insets top="5"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" text="Delete message">
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed"
+                    text="%chat.buttons.deletemessage">
                 <VBox.margin>
-                    <Insets top="5"></Insets>
+                    <Insets top="5"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" text="Edit message">
+            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed"
+                    text="%chat.buttons.editmessage">
                 <VBox.margin>
-                    <Insets top="5"></Insets>
+                    <Insets top="5"/>
                 </VBox.margin>
             </Button>
         </VBox>
     </VBox>
     <VBox>
         <HBox.margin>
-            <Insets right="10" left="10"></Insets>
+            <Insets left="10" right="10"/>
         </HBox.margin>
         <VBox fx:id="playField">
             <VBox.margin>
-                <Insets top="10"></Insets>
+                <Insets top="10"/>
             </VBox.margin>
-            <Canvas fx:id="gameMapCanvas" width="380" height="380"></Canvas>
+            <Canvas fx:id="gameMapCanvas" height="380" width="380"/>
             <HBox>
                 <VBox.margin>
-                    <Insets top="10"></Insets>
+                    <Insets top="10"/>
                 </VBox.margin>
-                <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
-                        text="End Turn">
+                <Button fx:id="endTurn" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
                     <HBox.margin>
-                        <Insets right="10"></Insets>
+                        <Insets right="10"/>
                     </HBox.margin>
                 </Button>
-                <Text fx:id="text" text="Dies ist ein Text" wrappingWidth="75.0">
+                <Text fx:id="turnIndicator" wrappingWidth="75.0">
                     <HBox.margin>
-                        <Insets right="10"></Insets>
+                        <Insets right="10"/>
                     </HBox.margin>
                 </Text>
                 <ListView fx:id="inventoryView" layoutY="173.0" prefHeight="200.0" prefWidth="200.0"/>
@@ -70,26 +72,26 @@
         </VBox>
         <HBox>
             <VBox.margin>
-                <Insets top="20"></Insets>
+                <Insets top="20"/>
             </VBox.margin>
             <CheckBox fx:id="readyCheckBox" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked"
-                      text="Ready">
+                      text="%lobby.game.readycheckbox">
                 <HBox.margin>
-                    <Insets right="10"></Insets>
+                    <Insets right="10"/>
                 </HBox.margin>
             </CheckBox>
             <Button fx:id="startSession" disable="true" mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
-                    text="Start Session" visible="false">
+                    text="%lobby.game.buttons.startsession" visible="false">
                 <HBox.margin>
-                    <Insets right="10"></Insets>
+                    <Insets right="10"/>
                 </HBox.margin>
             </Button>
         </HBox>
         <HBox>
             <VBox.margin>
-                <Insets top="50"></Insets>
+                <Insets top="50"/>
             </VBox.margin>
-            <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" text="Leave Lobby"></Button>
+            <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" text="%lobby.buttons.leavelobby"/>
             <Button onAction="#drawMap" text="Draw Map"></Button>
         </HBox>
     </VBox>

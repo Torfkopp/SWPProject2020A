@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.ClientUserService;
 
+import java.util.ResourceBundle;
+
 /**
  * This class is the base for creating a new Presenter.
  * <p>
@@ -22,6 +24,9 @@ public abstract class AbstractPresenter {
 
     @Inject
     protected LobbyService lobbyService;
+
+    @Inject
+    protected ResourceBundle resourceBundle;
 
     protected EventBus eventBus;
 
