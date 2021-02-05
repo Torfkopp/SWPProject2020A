@@ -99,16 +99,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.getValue());
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue());
+                });
             }
         });
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
-                        .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
+                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                });
             }
         });
     }
@@ -387,20 +391,22 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse resp) {
         if (resp.getLobbyName().equals(this.lobbyName)) {
-            if (resourceList == null) {
-                resourceList = FXCollections.observableArrayList();
-                inventoryView.setItems(resourceList);
-            }
-            resourceList.clear();
-            for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
-                Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
-                resourceList.add(resource);
-            }
-            for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
-                Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? resourceBundle
-                        .getString("game.property.has") : resourceBundle.getString("game.property.hasnot"));
-                resourceList.add(property);
-            }
+            Platform.runLater(() -> {
+                if (resourceList == null) {
+                    resourceList = FXCollections.observableArrayList();
+                    inventoryView.setItems(resourceList);
+                }
+                resourceList.clear();
+                for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
+                    Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
+                    resourceList.add(resource);
+                }
+                for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
+                    Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? resourceBundle
+                            .getString("game.property.has") : resourceBundle.getString("game.property.hasnot"));
+                    resourceList.add(property);
+                }
+            });
         }
     }
 
