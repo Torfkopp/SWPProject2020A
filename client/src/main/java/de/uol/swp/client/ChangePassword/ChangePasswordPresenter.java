@@ -11,6 +11,8 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Manages the ChangePassword window
@@ -23,6 +25,7 @@ import javafx.scene.control.PasswordField;
 public class ChangePasswordPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangePasswordView.fxml";
+    private static final Logger LOG = LogManager.getLogger(ChangePasswordPresenter.class);
     private static final ChangePasswordCanceledEvent ChangePasswordCanceledEvent = new ChangePasswordCanceledEvent();
 
     @FXML
@@ -52,6 +55,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
     @Inject
     public ChangePasswordPresenter(EventBus eventBus, ClientUserService userService) {
         setEventBus(eventBus);
+        LOG.debug("ChangePasswordPresenter was started");
     }
 
     /**

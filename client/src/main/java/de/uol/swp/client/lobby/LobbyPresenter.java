@@ -82,6 +82,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     public LobbyPresenter() {
         super.init(LogManager.getLogger(LobbyPresenter.class));
+        LOG.debug("LobbyPresenter was started");
     }
 
     /**
@@ -110,11 +111,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 setText(empty || item == null ? "" : item.getValue() + " " + item.getKey()); // looks like: "1 Brick"
             }
         });
+        LOG.debug("LobbyPresenter was initialised");
     }
 
     @Override
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
+        LOG.debug("Received AskLatestChatMessageResponse");
         if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
@@ -123,6 +126,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @Override
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
+        LOG.debug("Received CreatedChatMessageMessage");
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onCreatedChatMessageMessage(msg);
         }
@@ -131,6 +135,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @Override
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
+        LOG.debug("Received DeletedChatMessageMessage");
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onDeletedChatMessageMessage(msg);
         }
@@ -139,6 +144,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @Override
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
+        LOG.debug("Received EditedChatMessageMessage");
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onEditedChatMessageMessage(msg);
         }
@@ -198,9 +204,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
-        LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
-        LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
-        LOG.debug("Update of ready users " + allLobbyMembersResponse.getReadyUsers());
+        LOG.debug("Received AllLobbyMembersResponse");
         this.owner = allLobbyMembersResponse.getOwner();
         this.readyUsers = allLobbyMembersResponse.getReadyUsers();
         updateUsersList(allLobbyMembersResponse.getUsers());
@@ -221,6 +225,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage message) {
+        LOG.debug("Received DiceCastMessage");
         setEndTurnButtonState(message.getUser());
     }
 
@@ -233,6 +238,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2021-1-15
      */
+    @FXML
     public void onEndTurnButtonPressed() {
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
@@ -271,6 +277,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent lobbyUpdateEvent) {
+        LOG.debug("Received LobbyUpdateEvent for lobby " + lobbyUpdateEvent.getLobbyName());
         if (super.lobbyName == null || loggedInUser == null) {
             super.lobbyName = lobbyUpdateEvent.getLobbyName();
             super.loggedInUser = lobbyUpdateEvent.getUser();
@@ -296,6 +303,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage message) {
+        if (message.getLobby() != this.lobbyName) return;
+        LOG.debug("Received NextPlayerMessage for Lobby " + message.getLobby());
         setTextText(message.getActivePlayer());
         //In here to test the endTurnButton
         onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
@@ -335,6 +344,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse response) {
+        LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : response.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
         }
@@ -371,6 +381,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
         if (startSessionMessage.getName().equals(this.lobbyName)) {
+            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
             Platform.runLater(() -> {
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future

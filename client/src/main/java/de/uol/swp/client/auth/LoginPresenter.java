@@ -33,6 +33,7 @@ public class LoginPresenter extends AbstractPresenter {
      * @since 2019-08-18
      */
     public LoginPresenter() {
+        LOG.debug("LoginPresenter was started");
     }
 
     /**
