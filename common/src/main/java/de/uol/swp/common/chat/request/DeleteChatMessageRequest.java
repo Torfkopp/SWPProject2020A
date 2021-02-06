@@ -59,9 +59,9 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
     }
 
     /**
-     * Gets requesting user.
+     * Gets the requestingUser attribute.
      *
-     * @return the requesting user
+     * @return The User who sent the DeleteChatMessageRequest
      *
      * @author Maximilian Lindner
      * @author Phillip-André Suhr
