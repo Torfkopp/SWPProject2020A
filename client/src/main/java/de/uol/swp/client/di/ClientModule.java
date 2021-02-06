@@ -36,7 +36,7 @@ public class ClientModule extends AbstractModule {
     // en_GB resource bundle for hearing impaired
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "hearingImpaired"));
     // standard de_NDS resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("de", "NDS"));
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("nds", "DE"));
     // standard degenerate resource bundle
     final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "UwU"));
     @Override
