@@ -40,7 +40,9 @@ public class ClientModule extends AbstractModule {
     // standard de_NDS resource bundle
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("nds", "DE"));
     // standard degenerate resource bundle
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "UwU"));
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "UwU"));
+    // standard blank resource bundle
+    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "blank"));
 
     @Override
     protected void configure() {
