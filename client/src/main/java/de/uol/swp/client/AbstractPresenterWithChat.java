@@ -115,8 +115,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     /**
      * Method called when the DeleteMessageButton is pressed
      * <p>
-     * This method is called when the DeleteMessageButton is pressed. It calls the chatService
-     * to delete the message currently selected in the chatView.
+     * This method is called when the DeleteMessageButton is pressed. It calls
+     * the chatService to delete the message currently selected in the
+     * chatView, but only when the ChatMessage author equals the logged in
+     * user.
      *
      * @see de.uol.swp.client.chat.ChatService
      */
@@ -124,12 +126,14 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onDeleteMessageButtonPressed() {
         ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
         int msgId = chatMsg.getID();
-        if (lobbyName != null) {
-            LOG.debug("Requesting to delete ChatMessage with ID " + msgId + " from lobby " + lobbyName);
-            chatService.deleteMessage(msgId, lobbyName);
-        } else {
-            LOG.debug("Requesting to delete ChatMessage with ID " + msgId + "from Global chat");
-            chatService.deleteMessage(msgId);
+        if (chatMsg.getAuthor().equals(this.loggedInUser)) {
+            if (lobbyName != null) {
+                LOG.debug("Requesting to delete ChatMessage with ID " + msgId + " from lobby " + lobbyName);
+                chatService.deleteMessage(msgId, this.loggedInUser, lobbyName);
+            } else {
+                LOG.debug("Requesting to delete ChatMessage with ID " + msgId + "from Global chat");
+                chatService.deleteMessage(msgId, this.loggedInUser);
+            }
         }
     }
 
@@ -163,9 +167,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     /**
      * Method called when the EditMessageButton is pressed.
      * <p>
-     * This method is called when the EditMessageButton is pressed. It calls the ChatService
-     * to edit the message currently selected in the chatView by replacing the current content
-     * with the content found in the messageField.
+     * This method is called when the EditMessageButton is pressed. It calls
+     * the ChatService to edit the message currently selected in the chatView
+     * by replacing the current content with the content found in the
+     * messageField, but only when the ChatMessage author equals the logged in
+     * user.
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
@@ -176,18 +182,20 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onEditMessageButtonPressed() {
         ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
         int msgId = chatMsg.getID();
-        if (lobbyName != null) {
-            LOG.debug(
-                    "Sending request to edit ChatMessage with ID " + msgId + " in lobby " + lobbyName + " to new content '" + messageField
-                            .getText() + '\'');
-            chatService.editMessage(msgId, messageField.getText(), lobbyName);
-        } else {
-            LOG.debug(
-                    "Sending request to edit ChatMessage with ID " + msgId + " in Global chat to new content: '" + messageField
-                            .getText() + '\'');
-            chatService.editMessage(msgId, messageField.getText());
+        if (chatMsg.getAuthor().equals(this.loggedInUser)) {
+            if (lobbyName != null) {
+                LOG.debug(
+                        "Sending request to edit ChatMessage with ID " + msgId + " in lobby " + lobbyName + " to new content '" + messageField
+                                .getText() + '\'');
+                chatService.editMessage(msgId, messageField.getText(), this.loggedInUser, lobbyName);
+            } else {
+                LOG.debug(
+                        "Sending request to edit ChatMessage with ID " + msgId + " in Global chat to new content: '" + messageField
+                                .getText() + '\'');
+                chatService.editMessage(msgId, messageField.getText(), this.loggedInUser);
+            }
+            messageField.clear();
         }
-        messageField.clear();
     }
 
     /**

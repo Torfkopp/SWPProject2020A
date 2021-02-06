@@ -1,5 +1,7 @@
 package de.uol.swp.common.chat.request;
 
+import de.uol.swp.common.user.User;
+
 /**
  * Request sent by the client when a ChatMessage should be deleted.
  *
@@ -11,6 +13,7 @@ package de.uol.swp.common.chat.request;
 public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
 
     private final int id;
+    private final User requestingUser;
 
     /**
      * Constructor
@@ -18,11 +21,13 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
      * This constructor is used for DeleteChatMessageRequests originating from
      * the global chat. It sets the inherited originLobby attribute to null.
      *
-     * @param id The ID of the ChatMessage that should be deleted
+     * @param id             The ID of the ChatMessage that should be deleted
+     * @param requestingUser The User who sent the DeleteChatMessageRequest
      */
-    public DeleteChatMessageRequest(int id) {
+    public DeleteChatMessageRequest(int id, User requestingUser) {
         super(null);
         this.id = id;
+        this.requestingUser = requestingUser;
     }
 
     /**
@@ -32,14 +37,16 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
      * a lobby chat. It sets the inherited originLobby attribute to the parameter
      * provided upon calling the constructor.
      *
-     * @param id          The ID of the ChatMessage that should be deleted
-     * @param originLobby The Lobby the DeleteChatMessageRequest originated from
+     * @param id             The ID of the ChatMessage that should be deleted
+     * @param requestingUser The User who sent the DeleteChatMessageRequest
+     * @param originLobby    The Lobby the DeleteChatMessageRequest originated from
      *
      * @since 2020-12-30
      */
-    public DeleteChatMessageRequest(int id, String originLobby) {
+    public DeleteChatMessageRequest(int id, User requestingUser, String originLobby) {
         super(originLobby);
         this.id = id;
+        this.requestingUser = requestingUser;
     }
 
     /**
@@ -49,5 +56,18 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
      */
     public int getId() {
         return id;
+    }
+
+    /**
+     * Gets requesting user.
+     *
+     * @return the requesting user
+     *
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    public User getRequestingUser() {
+        return requestingUser;
     }
 }
