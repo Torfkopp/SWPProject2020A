@@ -82,6 +82,16 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
+    public Optional<ChatMessage> findChatMessage(int id) {
+        return chatMessageStore.findMessage(id);
+    }
+
+    @Override
+    public Optional<ChatMessage> findChatMessage(int id, String originLobby) {
+        return chatMessageStore.findMessage(id, originLobby);
+    }
+
+    @Override
     public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
         return chatMessageStore.getLatestMessages(amount, originLobby);
     }
