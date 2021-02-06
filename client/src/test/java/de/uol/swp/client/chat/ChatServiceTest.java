@@ -279,6 +279,7 @@ class ChatServiceTest {
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
         assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 
@@ -310,6 +311,7 @@ class ChatServiceTest {
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
         assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 
@@ -341,6 +343,7 @@ class ChatServiceTest {
         assertTrue(chatMessageRequest.isFromLobby());
         assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
         assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 
