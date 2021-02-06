@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 /**
  * IGameRendering Interface
@@ -36,6 +37,7 @@ public interface IGameRendering {
     double ROBBER_LINE_WIDTH_FACTOR = ROAD_WIDTH_FACTOR / 2.0;
     double TOKEN_SIZE_FACTOR = HEX_HEIGHT_FACTOR / 3.0;
 
+    //Constants used for the colours
     Color TOKEN_COLOUR = Color.BEIGE;
     Color TEXT_COLOUR = Color.BLACK;
     Color BORDER_COLOUR = Color.BLACK;
@@ -54,6 +56,8 @@ public interface IGameRendering {
     Color PLAYER_2_COLOUR = Color.RED;
     Color PLAYER_3_COLOUR = Color.PURPLE;
     Color PLAYER_4_COLOUR = Color.WHITE;
+
+    ResourceBundleWrapper resourceBundleWrapper = new ResourceBundleWrapper();
 
     /**
      * drawCity method
@@ -83,8 +87,10 @@ public interface IGameRendering {
      *
      * @param gameMapManagement A GameMapManagement providing the game map to draw
      * @param canvas            A canvas to draw on
+     * @param resourceBundle    The ResourceBundle used for internationalisation
      */
-    default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas) {
+    default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas, ResourceBundle resourceBundle) {
+        resourceBundleWrapper.set(resourceBundle);
         double width = canvas.getWidth(), height = canvas.getHeight() - OFFSET_Y * 2;
         GraphicsContext mapCtx = canvas.getGraphicsContext2D();
 
@@ -188,27 +194,28 @@ public interface IGameRendering {
         String text = "";
         switch (hex.getResource()) {
             case BRICK:
-                text = "Brick";
+                text = resourceBundleWrapper.get().getString("game.resources.brick");
                 break;
             case LUMBER:
-                text = "Lumber";
+                text = resourceBundleWrapper.get().getString("game.resources.lumber");
                 break;
             case ORE:
-                text = "Ore";
+                text = resourceBundleWrapper.get().getString("game.resources.ore");
                 break;
             case GRAIN:
-                text = "Grain";
+                text = resourceBundleWrapper.get().getString("game.resources.grain");
                 break;
             case WOOL:
-                text = "Wool";
+                text = resourceBundleWrapper.get().getString("game.resources.wool");
                 break;
             case ANY:
-                text = "Any";
+                text = resourceBundleWrapper.get().getString("game.resources.any");
                 break;
         }
         mapCtx.setFill(TEXT_COLOUR);
         mapCtx.fillText(text, currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 8.0,
-                        currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) / 2.0);
+                        currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (4.0 / 8.0),
+                        (HEX_WIDTH_FACTOR * effectiveHeight) * (6.0 / 8.0));
     }
 
     /**
@@ -329,8 +336,10 @@ public interface IGameRendering {
         double yPos = currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) - (TOKEN_SIZE_FACTOR * effectiveHeight)) / 2.0;
         mapCtx.fillOval(xPos, yPos, (TOKEN_SIZE_FACTOR * effectiveHeight), (TOKEN_SIZE_FACTOR * effectiveHeight));
         mapCtx.setFill(TEXT_COLOUR);
-        mapCtx.fillText(String.valueOf(token), xPos + (TOKEN_SIZE_FACTOR * effectiveHeight) * (1.0 / 4.0),
-                        yPos + (TOKEN_SIZE_FACTOR * effectiveHeight) * (3.0 / 4.0));
+        mapCtx.fillText(resourceBundleWrapper.get().getString("game.token." + token),
+                        xPos + (TOKEN_SIZE_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                        yPos + (TOKEN_SIZE_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                        (TOKEN_SIZE_FACTOR * effectiveHeight) / 2.0);
     }
 
     /**
@@ -518,14 +527,14 @@ public interface IGameRendering {
      */
     private boolean setHexColour(IGameHex hex, GraphicsContext mapCtx) {
         switch (hex.getType()) {
-            case Water:
-            case Harbor:
+            case WATER:
+            case HARBOR:
                 mapCtx.setFill(WATER_COLOUR);
                 break;
-            case Desert:
+            case DESERT:
                 mapCtx.setFill(DESERT_COLOUR);
                 break;
-            case Resource:
+            case RESOURCE:
                 switch (((IResourceHex) hex).getResource()) {
                     case HILLS:
                         mapCtx.setFill(HILLS_COLOUR);
@@ -550,5 +559,28 @@ public interface IGameRendering {
                 return false;
         }
         return true;
+    }
+
+    /**
+     * ResourceBundleWrapper
+     * This class is a wrapper for the ResourceBundle to be able to access it like an attribute.
+     * Using a wrapper class it can be set after declaration even if it is "static final".
+     *
+     * @since 2021-02-05
+     */
+    class ResourceBundleWrapper {
+
+        private ResourceBundle resourceBundle = null;
+
+        public ResourceBundleWrapper() {
+        }
+
+        public ResourceBundle get() {
+            return resourceBundle;
+        }
+
+        public void set(ResourceBundle resourceBundle) {
+            this.resourceBundle = resourceBundle;
+        }
     }
 }

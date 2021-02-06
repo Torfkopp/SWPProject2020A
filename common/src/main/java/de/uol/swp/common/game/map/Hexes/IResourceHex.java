@@ -17,7 +17,7 @@ public interface IResourceHex extends ILandHex {
         FOREST,
         MOUNTAINS,
         FIELDS,
-        PASTURE
+        PASTURE,
     }
 
     /**

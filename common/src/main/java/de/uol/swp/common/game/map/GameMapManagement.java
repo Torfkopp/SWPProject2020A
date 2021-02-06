@@ -263,7 +263,7 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public boolean placeRoad(Player player, int position) {
         if (roadPlaceable(player, position)) {
-            edges[position].setOwner(player);
+            edges[position].buildRoad(player);
             return true;
         }
         return false;

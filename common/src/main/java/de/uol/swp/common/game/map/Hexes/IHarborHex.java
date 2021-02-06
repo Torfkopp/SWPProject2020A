@@ -19,9 +19,12 @@ public interface IHarborHex extends IWaterHex {
         ORE,
         GRAIN,
         WOOL,
-        ANY
+        ANY,
     }
 
+    /**
+     * Enum for the sides the harbor can face
+     */
     enum HarborSide {
         WEST,
         NORTHWEST,

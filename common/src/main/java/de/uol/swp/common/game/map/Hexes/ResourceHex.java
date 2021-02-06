@@ -35,7 +35,7 @@ public class ResourceHex extends AbstractHex implements IResourceHex {
     }
 
     @Override
-    public IGameHex.type getType() {
-        return IGameHex.type.Resource;
+    public HexType getType() {
+        return HexType.RESOURCE;
     }
 }

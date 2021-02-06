@@ -58,8 +58,7 @@ public interface IGameMapManagement {
     /**
      * Places a street
      *
-     * @param player   The number of the player
-     *                 wanting to build the street (1-4)
+     * @param player   The player wanting to build the street
      * @param position The position of the road
      *
      * @return true if placement was successful; false if not
@@ -69,8 +68,7 @@ public interface IGameMapManagement {
     /**
      * Places a settlement
      *
-     * @param player   The number of the player
-     *                 wanting to build the settlement (1-4)
+     * @param player   The player wanting to build the settlement (1-4)
      * @param position The position of the intersection
      *
      * @return true if placement was successful; false if not
@@ -80,8 +78,7 @@ public interface IGameMapManagement {
     /**
      * Checks if a street is placeable
      *
-     * @param player   The number of the player
-     *                 wanting to place the street (1-4)
+     * @param player   The player wanting to place the street
      * @param position The position of the road
      *
      * @return true if placement is possible; false if not
@@ -91,8 +88,7 @@ public interface IGameMapManagement {
     /**
      * Checks if a settlement is placeable
      *
-     * @param player   The number of the player
-     *                 wanting to place the settlement (1-4)
+     * @param player   The player wanting to place the settlement
      * @param position The position of the intersection
      *
      * @return true if placement is possible; false if not
@@ -102,8 +98,7 @@ public interface IGameMapManagement {
     /**
      * Upgrades a settlement
      *
-     * @param player   The number of the player
-     *                 wanting to upgrade the settlement (1-4)
+     * @param player   The player wanting to upgrade the settlement
      * @param position The position of the intersection
      *
      * @return true if placement was successful; false if not

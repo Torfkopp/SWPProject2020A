@@ -23,11 +23,11 @@ public class GameMapTest {
     void getHexTest() {
         // Tests getting a hex
         assertNotNull(map.getHex(2));
-        assertEquals(map.getHex(1).getType(), IGameHex.type.Harbor);
-        assertEquals(map.getHex(19).getType(), IGameHex.type.Resource);
+        assertEquals(map.getHex(1).getType(), IGameHex.HexType.HARBOR);
+        assertEquals(map.getHex(19).getType(), IGameHex.HexType.RESOURCE);
         // Tests getting the resource type of a hex
         ResourceHex rh = (ResourceHex) map.getHex(20);
-        assertEquals(rh.getType(), IGameHex.type.Resource);
+        assertEquals(rh.getType(), IGameHex.HexType.RESOURCE);
         assertEquals(rh.getResource(), IResourceHex.ResourceHexType.FOREST);
     }
 

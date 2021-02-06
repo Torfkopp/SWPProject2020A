@@ -26,9 +26,9 @@ public class ClientModule extends AbstractModule {
     // ResourceBundle selection. Uncomment the one you want to use and comment the others
     // TODO: should eventually be handled with a user setting or getting the client system locale
     // standard en_GB resource bundle, enabled by default
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.UK);
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.UK);
     // standard de_DE resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.GERMANY);
+    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.GERMANY);
     // unicode-free en_GB resource bundle
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "nounicode"));
     // unicode-free de_DE resource bundle

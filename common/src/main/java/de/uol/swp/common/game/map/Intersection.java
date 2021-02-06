@@ -14,8 +14,9 @@ public class Intersection implements IIntersection {
     private Player owner;
 
     /**
-     * Constructor
-     *  @param hexes      The surrounding hexes
+     * Constructor for an free intersection
+     *
+     * @param hexes      The surrounding hexes
      * @param neighbours The position of the neighbouring intersections
      */
     public Intersection(int[] hexes, int[] neighbours) {
@@ -24,6 +25,13 @@ public class Intersection implements IIntersection {
         this.state = IntersectionState.FREE;
     }
 
+    /**
+     * Constructor for an intersection with settlement on it
+     *
+     * @param hexes      The surrounding hexes
+     * @param neighbours The position of the neighbouring intersections
+     * @param owner      The owner of the settlement
+     */
     public Intersection(int[] hexes, int[] neighbours, Player owner) {
         this.hexes = hexes;
         this.neighbours = neighbours;

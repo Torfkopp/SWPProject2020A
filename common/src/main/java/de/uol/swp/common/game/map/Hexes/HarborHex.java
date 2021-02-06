@@ -13,6 +13,13 @@ public class HarborHex extends AbstractHex implements IHarborHex {
     private final HarborSide side;
     private final HarborResource resource;
 
+    /**
+     * Constructor
+     *
+     * @param belongingHex The hex the harbor belongs to
+     * @param side         The side the harbor faces
+     * @param resource     The resource that is tradeable at the harbor
+     */
     public HarborHex(int belongingHex, HarborSide side, HarborResource resource) {
         this.belongingHex = belongingHex;
         this.side = side;
@@ -28,7 +35,7 @@ public class HarborHex extends AbstractHex implements IHarborHex {
     public HarborSide getSide() { return side;}
 
     @Override
-    public type getType() {
-        return type.Harbor;
+    public HexType getType() {
+        return HexType.HARBOR;
     }
 }
