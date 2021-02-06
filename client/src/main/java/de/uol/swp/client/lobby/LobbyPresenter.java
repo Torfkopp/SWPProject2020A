@@ -362,9 +362,30 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         eventBus.post(startSessionRequest);
     }
 
-    @FXML
-    private void drawMap() {
-        drawGameMap(new GameMapManagement(), gameMapCanvas, resourceBundle);
+    /**
+     * Handles a StartSessionMessage found on the EventBus
+     * <p>
+     * Sets the play field visible.
+     *
+     * @param startSessionMessage The StartSessionMessage found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-21
+     */
+    @Subscribe
+    private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
+        if (startSessionMessage.getName().equals(this.lobbyName)) {
+            Platform.runLater(() -> {
+                playField.setVisible(true);
+                //This Line needs to be changed/ removed in the Future
+                drawGameMap(new GameMapManagement(), gameMapCanvas, resourceBundle);
+                setTurnIndicatorText(startSessionMessage.getUser());
+                //In here to test the endTurnButton.
+                eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
+                lobbyService.updateInventory(lobbyName, loggedInUser);
+            });
+        }
     }
 
     @Subscribe
@@ -564,31 +585,5 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 lobbyMembers.add(item);
             });
         });
-    }
-
-    /**
-     * Handles a StartSessionMessage found on the EventBus
-     * <p>
-     * Sets the play field visible.
-     *
-     * @param startSessionMessage The StartSessionMessage found on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Maximilian Lindner
-     * @since 2021-01-21
-     */
-    @Subscribe
-    private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
-        if (startSessionMessage.getName().equals(this.lobbyName)) {
-            Platform.runLater(() -> {
-                playField.setVisible(true);
-                //This Line needs to be changed/ removed in the Future
-                drawGameMap(new GameMapManagement(), gameMapCanvas, resourceBundle);
-                setTurnIndicatorText(startSessionMessage.getUser());
-                //In here to test the endTurnButton.
-                eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
-                lobbyService.updateInventory(lobbyName, loggedInUser);
-            });
-        }
     }
 }
