@@ -35,10 +35,13 @@ public class ClientModule extends AbstractModule {
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("de", "DE", "nounicode"));
     // en_GB resource bundle for hearing impaired
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "hearingImpaired"));
+    // en_GB resource bundle for blind
+    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "blind"));
     // standard de_NDS resource bundle
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("nds", "DE"));
     // standard degenerate resource bundle
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "UwU"));
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "UwU"));
+
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class).
