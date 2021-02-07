@@ -42,11 +42,11 @@ class ChatMessageSerialisableTest {
                                                                EditedChatMessageMessage.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new AskLatestChatMessageRequest(37),
                                                                               AskLatestChatMessageRequest.class));
-        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new DeleteChatMessageRequest(42),
-                                                                              DeleteChatMessageRequest.class));
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new EditChatMessageRequest(42, "I am content"),
-                                                               EditChatMessageRequest.class));
+                           .checkSerialisableAndDeserialisable(new DeleteChatMessageRequest(42, defaultUser),
+                                                               DeleteChatMessageRequest.class));
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(
+                new EditChatMessageRequest(42, "I am content", defaultUser), EditChatMessageRequest.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(
                 new NewChatMessageRequest(defaultUser, "I am content, too"), NewChatMessageRequest.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(
@@ -62,11 +62,11 @@ class ChatMessageSerialisableTest {
         assertTrue(SerialisationTestHelper
                            .checkSerialisableAndDeserialisable(new AskLatestChatMessageRequest(37, defaultLobby),
                                                                AskLatestChatMessageRequest.class));
-        assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new DeleteChatMessageRequest(42, defaultLobby),
-                                                               DeleteChatMessageRequest.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(
-                new EditChatMessageRequest(42, "I am content", defaultLobby), EditChatMessageRequest.class));
+                new DeleteChatMessageRequest(42, defaultUser, defaultLobby), DeleteChatMessageRequest.class));
+        assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(
+                new EditChatMessageRequest(42, "I am content", defaultUser, defaultLobby),
+                EditChatMessageRequest.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(
                 new NewChatMessageRequest(defaultUser, "I am content, too", defaultLobby),
                 NewChatMessageRequest.class));

@@ -42,6 +42,7 @@ class ChatServiceTest {
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am new, even more intelligent content";
     private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
+    private static final User secondUser = new UserDTO("test2", "test2", "test2@test.de");
     private static final String defaultLobby = "I am an intelligent lobby";
 
     final EventBus bus = new EventBus();
@@ -93,12 +94,45 @@ class ChatServiceTest {
     void deleteChatMessageInLobbyTest() throws InterruptedException {
         ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
         ChatMessage msg2 = chatManagement.createChatMessage(defaultUser, secondContent, defaultLobby);
-        final Message req = new DeleteChatMessageRequest(msg2.getID(), defaultLobby);
+        final Message req = new DeleteChatMessageRequest(msg2.getID(), defaultUser, defaultLobby);
         bus.post(req);
 
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(2, defaultLobby);
+        assertEquals(latestMessages.size(), 1);
+
+        ChatMessage latestMessage = latestMessages.get(0);
+        assertEquals(latestMessage.getID(), msg1.getID());
+        assertEquals(latestMessage.getContent(), defaultContent);
+    }
+
+    /**
+     * Tests if the ChatService properly handles the DeleteChatMessageRequest.
+     * <p>
+     * A new DeleteChatMessageRequest with a different User than the
+     * ChatMessage author is posted onto the EventBus and it is checked
+     * that the ChatMessage was not deleted in a specified lobby.
+     * <p>
+     * This test fails when the list of ChatMessages returned by the
+     * chatManagement is not of length 1, or when any of the attributes of the
+     * ChatMessage differ from the parameters provided on creation.
+     *
+     * @throws InterruptedException the interrupted exception
+     *
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    @Test
+    void deleteChatMessageInLobbyWrongUserTest() throws InterruptedException {
+        ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        final Message req = new DeleteChatMessageRequest(msg1.getID(), secondUser, defaultLobby);
+        bus.post(req);
+
+        lock.await(75, TimeUnit.MILLISECONDS);
+
+        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
         assertEquals(latestMessages.size(), 1);
 
         ChatMessage latestMessage = latestMessages.get(0);
@@ -121,12 +155,44 @@ class ChatServiceTest {
     void deleteChatMessageTest() throws InterruptedException {
         ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent);
         ChatMessage msg2 = chatManagement.createChatMessage(defaultUser, secondContent);
-        final Message req = new DeleteChatMessageRequest(msg2.getID());
+        final Message req = new DeleteChatMessageRequest(msg2.getID(), defaultUser);
         bus.post(req);
 
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(2);
+        assertEquals(latestMessages.size(), 1);
+
+        ChatMessage latestMessage = latestMessages.get(0);
+        assertEquals(latestMessage.getID(), msg1.getID());
+        assertEquals(latestMessage.getContent(), defaultContent);
+    }
+
+    /**
+     * Tests if the ChatService properly handles the DeleteChatMessageRequest.
+     * <p>
+     * A new DeleteChatMessageRequest with a different User than the
+     * ChatMessage author is posted onto the EventBus and it is checked
+     * that the ChatMessage was not deleted.
+     * <p>
+     * This test fails when the list of ChatMessages returned by the
+     * chatManagement is not of length 1, or when any of the attributes of the
+     * ChatMessage differ from the parameters provided on creation.
+     *
+     * @throws InterruptedException the interrupted exception
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    @Test
+    void deleteChatMessageWrongUserTest() throws InterruptedException {
+        ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent);
+        final Message req = new DeleteChatMessageRequest(msg1.getID(), secondUser);
+        bus.post(req);
+
+        lock.await(75, TimeUnit.MILLISECONDS);
+
+        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1);
         assertEquals(latestMessages.size(), 1);
 
         ChatMessage latestMessage = latestMessages.get(0);
@@ -149,7 +215,7 @@ class ChatServiceTest {
     @Test
     void editChatMessageInLobbyTest() throws InterruptedException {
         ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        final Message req = new EditChatMessageRequest(msg.getID(), secondContent, defaultLobby);
+        final Message req = new EditChatMessageRequest(msg.getID(), secondContent, defaultUser, defaultLobby);
         bus.post(req);
 
         lock.await(75, TimeUnit.MILLISECONDS);
@@ -163,10 +229,42 @@ class ChatServiceTest {
     }
 
     /**
+     * Tests if the ChatService properly handles the DeleteChatMessageRequest.
+     * <p>
+     * A new EditChatMessageRequest with a different User than the
+     * ChatMessage author is posted onto the EventBus and it is checked
+     * that the ChatMessage was not edited in a specified lobby.
+     * <p>
+     * This test fails when the list of ChatMessages returned by the
+     * chatManagement is not of length 1, or when any of the attributes of the
+     * ChatMessage differ from the parameters provided on creation.
+     *
+     * @throws InterruptedException the interrupted exception
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    @Test
+    void editChatMessageInLobbyWrongUserTest() throws InterruptedException {
+        ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        final Message req = new EditChatMessageRequest(msg1.getID(), secondContent, secondUser, defaultLobby);
+        bus.post(req);
+
+        lock.await(75, TimeUnit.MILLISECONDS);
+
+        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
+        assertEquals(latestMessages.size(), 1);
+
+        ChatMessage latestMessage = latestMessages.get(0);
+        assertEquals(latestMessage.getID(), msg1.getID());
+        assertEquals(latestMessage.getContent(), defaultContent);
+    }
+
+    /**
      * Tests if the ChatService properly handles the EditChatMessageRequest.
      * <p>
      * An EditChatMessageRequest is posted onto the EventBus. It is checked
-     * if the requested ChatMessage was edited
+     * if the requested ChatMessage was edited.
      * <p>
      * This test fails when the list of ChatMessages returned by the chatManagement is
      * empty or when the requested ChatMessage wasn't edited.
@@ -176,7 +274,7 @@ class ChatServiceTest {
     @Test
     void editChatMessageTest() throws InterruptedException {
         ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent);
-        final Message req = new EditChatMessageRequest(msg.getID(), secondContent);
+        final Message req = new EditChatMessageRequest(msg.getID(), secondContent, defaultUser);
         bus.post(req);
 
         lock.await(75, TimeUnit.MILLISECONDS);
@@ -187,6 +285,38 @@ class ChatServiceTest {
         ChatMessage latestMessage = latestMessages.get(0);
         assertEquals(latestMessage.getID(), msg.getID());
         assertEquals(latestMessage.getContent(), secondContent);
+    }
+
+    /**
+     * Tests if the ChatService properly handles the DeleteChatMessageRequest.
+     * <p>
+     * A new EditChatMessageRequest with a different User than the
+     * ChatMessage author is posted onto the EventBus and it is checked
+     * that the ChatMessage was not edited.
+     * <p>
+     * This test fails when the list of ChatMessages returned by the
+     * chatManagement is not of length 1, or when any of the attributes of the
+     * ChatMessage differ from the parameters provided on creation.
+     *
+     * @throws InterruptedException the interrupted exception
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    @Test
+    void editChatMessageWrongUserTest() throws InterruptedException {
+        ChatMessage msg1 = chatManagement.createChatMessage(defaultUser, defaultContent);
+        final Message req = new EditChatMessageRequest(msg1.getID(), secondContent, secondUser);
+        bus.post(req);
+
+        lock.await(75, TimeUnit.MILLISECONDS);
+
+        List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1);
+        assertEquals(latestMessages.size(), 1);
+
+        ChatMessage latestMessage = latestMessages.get(0);
+        assertEquals(latestMessage.getID(), msg1.getID());
+        assertEquals(latestMessage.getContent(), defaultContent);
     }
 
     /**
