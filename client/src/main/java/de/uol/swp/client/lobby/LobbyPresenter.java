@@ -379,7 +379,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             Platform.runLater(() -> {
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future
-                drawGameMap(new GameMapManagement(), gameMapCanvas);
+                drawGameMap(new GameMapManagement(), gameMapCanvas, resourceBundle);
                 setTurnIndicatorText(startSessionMessage.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));

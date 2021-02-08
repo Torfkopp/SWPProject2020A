@@ -9,12 +9,15 @@ package de.uol.swp.common.game.map.Hexes;
  */
 public class DesertHex extends AbstractHex implements ILandHex {
 
+    /**
+     * Constructor
+     */
     public DesertHex() {
         setRobberOnField(false);
     }
 
     @Override
-    public type getType() {
-        return type.Desert;
+    public HexType getType() {
+        return HexType.DESERT;
     }
 }
