@@ -28,7 +28,6 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -62,7 +61,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @FXML
     private Button endTurn;
     @FXML
-    private Text turnIndicator;
+    private Label turnIndicator;
     @FXML
     private Canvas gameMapCanvas;
     @FXML
@@ -236,9 +235,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * to end the current turn.
      *
      * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2021-1-15
+     * @since 2021-01-15
      */
-    public void onEndTurnButtonPressed() {
+    @FXML
+    private void onEndTurnButtonPressed() {
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -539,8 +539,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @since 2021-01-23
      */
     private void setTurnIndicatorText(User player) {
-        turnIndicator.setText(
-                String.format(resourceBundle.getString("lobby.game.text.turnindicator"), player.getUsername()));
+        Platform.runLater(() -> turnIndicator.setText(
+                String.format(resourceBundle.getString("lobby.game.text.turnindicator"), player.getUsername())));
     }
 
     /**

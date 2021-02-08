@@ -4,15 +4,14 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" minHeight="600.0" minWidth="690.0" prefHeight="600.0" prefWidth="690.0"
-      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+<HBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
+      fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <VBox>
         <HBox.margin>
             <Insets bottom="10" left="10" right="10"/>
         </HBox.margin>
         <VBox>
-            <ListView fx:id="membersView" minHeight="100" prefHeight="100">
+            <ListView fx:id="membersView" maxHeight="95.0" minHeight="95.0">
                 <VBox.margin>
                     <Insets top="10"/>
                 </VBox.margin>
@@ -23,25 +22,31 @@
                 </VBox.margin>
             </ListView>
             <TextField fx:id="messageField"/>
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed"
+            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
                     text="%chat.buttons.sendmessage">
                 <VBox.margin>
                     <Insets top="5"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed"
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
                     text="%chat.buttons.deletemessage">
                 <VBox.margin>
                     <Insets top="5"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed"
+            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
                     text="%chat.buttons.editmessage">
                 <VBox.margin>
                     <Insets top="5"/>
                 </VBox.margin>
             </Button>
         </VBox>
+        <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" prefWidth="150.0"
+                text="%lobby.buttons.leavelobby">
+            <VBox.margin>
+                <Insets top="35.0"/>
+            </VBox.margin>
+        </Button>
     </VBox>
     <VBox>
         <HBox.margin>
@@ -56,42 +61,35 @@
                 <VBox.margin>
                     <Insets top="10"/>
                 </VBox.margin>
-                <Button fx:id="endTurn" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
-                    <HBox.margin>
-                        <Insets right="10"/>
-                    </HBox.margin>
-                </Button>
-                <Text fx:id="turnIndicator" wrappingWidth="75.0">
-                    <HBox.margin>
-                        <Insets right="10"/>
-                    </HBox.margin>
-                </Text>
-                <ListView fx:id="inventoryView" layoutY="173.0" prefHeight="200.0" prefWidth="200.0"/>
+                <VBox prefHeight="259.0" prefWidth="210.0">
+                    <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
+                    <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false"
+                            onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
+                        <VBox.margin>
+                            <Insets right="5.0" top="5.0"/>
+                        </VBox.margin>
+                    </Button>
+                    <HBox>
+                        <VBox.margin>
+                            <Insets top="20"/>
+                        </VBox.margin>
+                        <CheckBox fx:id="readyCheckBox" minHeight="25.0" mnemonicParsing="false"
+                                  onAction="#onReadyCheckBoxClicked" text="%lobby.game.readycheckbox">
+                            <HBox.margin>
+                                <Insets right="10"/>
+                            </HBox.margin>
+                        </CheckBox>
+                        <Button fx:id="startSession" disable="true" maxWidth="Infinity"
+                                mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
+                                text="%lobby.game.buttons.startsession" visible="false" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets right="5.0"/>
+                            </HBox.margin>
+                        </Button>
+                    </HBox>
+                </VBox>
+                <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>
         </VBox>
-        <HBox>
-            <VBox.margin>
-                <Insets top="20"/>
-            </VBox.margin>
-            <CheckBox fx:id="readyCheckBox" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked"
-                      text="%lobby.game.readycheckbox">
-                <HBox.margin>
-                    <Insets right="10"/>
-                </HBox.margin>
-            </CheckBox>
-            <Button fx:id="startSession" disable="true" mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
-                    text="%lobby.game.buttons.startsession" visible="false">
-                <HBox.margin>
-                    <Insets right="10"/>
-                </HBox.margin>
-            </Button>
-        </HBox>
-        <HBox>
-            <VBox.margin>
-                <Insets top="50"/>
-            </VBox.margin>
-            <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" text="%lobby.buttons.leavelobby"/>
-        </HBox>
     </VBox>
 </HBox>
