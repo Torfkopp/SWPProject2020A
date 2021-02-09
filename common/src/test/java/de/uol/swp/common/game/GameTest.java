@@ -1,5 +1,6 @@
 package de.uol.swp.common.game;
 
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
@@ -24,15 +25,15 @@ public class GameTest {
 
     @Test
     void calcVicPointsTest() {
-        int player = game.getPlayerNumber(user);
+        Player player = Player.PLAYER_1;
         assertEquals(game.getInventories().length, 1);
-        assertEquals(player, 1);
+        assertEquals(player, Player.PLAYER_1);
         //Player has nothing
         assertEquals(game.calcVicPoints(player), 0);
-        game.getMap().placeSettlement(player, 5);
+        game.getMap().placeSettlement(player, 1);
         //Player has a settlement
         assertEquals(game.calcVicPoints(player), 1);
-        game.getMap().upgradeSettlement(player, 5);
+        game.getMap().upgradeSettlement(player, 1);
         //Player has a city
         assertEquals(game.calcVicPoints(player), 2);
         game.getInventory(player).setVictoryPointCards(3);

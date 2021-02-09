@@ -2,6 +2,7 @@ package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
@@ -43,16 +44,19 @@ public class Game {
      *
      * @return int The amount of points
      */
-    public int calcVicPoints(int player) {
+    public int calcVicPoints(Player player) {
         int points = 0;
+        //0 =^= 48 in Ascii; Array starts at 0.
+        //Player #1 has index 0 in the Inventory array, hence the -49.
+        int num = player.toString().charAt(7) - 49;
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += inventories[player - 1].getVictoryPointCards();
+        points += inventories[num].getVictoryPointCards();
         //2 Points if player has the longest road
-        if (inventories[player - 1].isLongestRoad()) points += 2;
+        if (inventories[num].isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (inventories[player - 1].isLargestArmy()) points += 2;
+        if (inventories[num].isLargestArmy()) points += 2;
         return points;
     }
 
@@ -60,8 +64,8 @@ public class Game {
         return inventories;
     }
 
-    public Inventory getInventory(int player) {
-        return inventories[player - 1];
+    public Inventory getInventory(Player player) {
+        return inventories[player.toString().charAt(7) - 49];
     }
 
     public Lobby getLobby() {
@@ -70,24 +74,6 @@ public class Game {
 
     public IGameMapManagement getMap() {
         return map;
-    }
-
-    /**
-     * Gets the player's number
-     *
-     * @param player The User object
-     *
-     * @return int The player's number
-     */
-    public int getPlayerNumber(User player) {
-        int number = 1;
-        for (int i = 0; i < 4; i++) {
-            if (players[i].equals(player)) {
-                number += i;
-                break;
-            }
-        }
-        return number;
     }
 
     public User[] getPlayers() {
