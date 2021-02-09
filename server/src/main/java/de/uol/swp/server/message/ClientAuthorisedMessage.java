@@ -26,7 +26,6 @@ public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
      * @since 2019-08-07
      */
     public ClientAuthorisedMessage(User user) {
-        super();
         this.user = user;
     }
 

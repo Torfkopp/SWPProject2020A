@@ -13,15 +13,6 @@ import de.uol.swp.common.user.User;
 public class LobbyLeaveUserRequest extends AbstractLobbyRequest {
 
     /**
-     * Default constructor
-     *
-     * @implNote This constructor is needed for serialisation
-     * @since 2019-10-08
-     */
-    public LobbyLeaveUserRequest() {
-    }
-
-    /**
      * Constructor
      *
      * @param lobbyName Name of the lobby

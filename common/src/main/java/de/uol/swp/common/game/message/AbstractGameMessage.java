@@ -21,14 +21,6 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
     private User user;
 
     /**
-     * Default constructor
-     * <p>
-     * This constructor is needed for serialisation
-     */
-    public AbstractGameMessage() {
-    }
-
-    /**
      * Constructor
      *
      * @param lobbyName The lobby name

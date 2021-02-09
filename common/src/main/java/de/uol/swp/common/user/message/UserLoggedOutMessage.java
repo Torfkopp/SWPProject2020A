@@ -16,17 +16,7 @@ import java.util.Objects;
 public class UserLoggedOutMessage extends AbstractServerMessage {
 
     private static final long serialVersionUID = -2071886836547126480L;
-    private String username;
-
-    /**
-     * Default constructor
-     *
-     * @implNote Do not use for valid logout, since no username gets set
-     * @implNote This constructor is needed for serialisation
-     * @since 2017-03-17
-     */
-    public UserLoggedOutMessage() {
-    }
+    private final String username;
 
     /**
      * Constructor

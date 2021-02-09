@@ -13,15 +13,7 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  */
 public abstract class AbstractLobbyResponse extends AbstractResponseMessage {
 
-    private String lobbyName;
-
-    /**
-     * Default Constructor
-     *
-     * @implNote This constructor is needed for serialisation
-     */
-    public AbstractLobbyResponse() {
-    }
+    private final String lobbyName;
 
     /**
      * Constructor
