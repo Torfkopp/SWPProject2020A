@@ -26,7 +26,7 @@ class UserDTOTest {
      */
     @Test
     void createUserWithEmptyName() {
-        assertThrows(AssertionError.class, () -> new UserDTO(null, "", ""));
+        assertThrows(IllegalArgumentException.class, () -> new UserDTO(null, "", ""));
     }
 
     /**
@@ -38,7 +38,7 @@ class UserDTOTest {
      */
     @Test
     void createUserWithEmptyPassword() {
-        assertThrows(AssertionError.class, () -> new UserDTO("", null, ""));
+        assertThrows(IllegalArgumentException.class, () -> new UserDTO("", null, ""));
     }
 
     /**

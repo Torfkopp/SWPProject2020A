@@ -28,8 +28,8 @@ public class UserDTO implements User {
      * @since 2019-08-13
      */
     public UserDTO(String username, String password, String eMail) {
-        assert Objects.nonNull(username);
-        assert Objects.nonNull(password);
+        if (!Objects.nonNull(username)) throw new IllegalArgumentException("Username must not be null");
+        if (!Objects.nonNull(password)) throw new IllegalArgumentException("Password must not be null");
         this.username = username;
         this.password = password;
         this.eMail = eMail;
