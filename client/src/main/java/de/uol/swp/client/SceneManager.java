@@ -46,6 +46,8 @@ public class SceneManager {
 
     static final Logger LOG = LogManager.getLogger(SceneManager.class);
     static final String styleSheet = "css/swp.css";
+    private static final int LOBBY_HEIGHT = 730;
+    private static final int LOBBY_WIDTH = 685;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
@@ -286,6 +288,10 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
+        lobbyStage.setHeight(LOBBY_HEIGHT);
+        lobbyStage.setMinHeight(LOBBY_HEIGHT);
+        lobbyStage.setWidth(LOBBY_WIDTH);
+        lobbyStage.setMinWidth(LOBBY_WIDTH);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);

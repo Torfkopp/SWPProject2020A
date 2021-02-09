@@ -25,10 +25,10 @@ public class ClientModule extends AbstractModule {
     final EventBus eventBus = new EventBus();
     // ResourceBundle selection. Uncomment the one you want to use and comment the others
     // TODO: should eventually be handled with a user setting or getting the client system locale
-    // standard improved en_GB resource bundle, enabled by default
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "improved"));
-    // standard en_GB resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.UK);
+    // standard en_GB resource bundle, enabled by default
+    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.UK);
+    // standard improved en_GB resource bundle
+    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "improved"));
     // standard de_DE resource bundle
     //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.GERMANY);
     // unicode-free en_GB resource bundle
