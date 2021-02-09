@@ -43,7 +43,7 @@ public class ClientModule extends AbstractModule {
             properties.load(file);
             file.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Couldn't find config file: " + filepath);
+            System.out.println("Couldn't find config file: " + filepath + "\n----But this is nothing to worry about");
         } catch (IOException e) {
             System.out.println("Error reading config file");
         }
@@ -62,7 +62,7 @@ public class ClientModule extends AbstractModule {
                 locale = new Locale(lang[0], lang[1], lang[2]);
                 break;
             default:
-                System.out.println("Invalid Argument in config option \"lang\"");
+                System.out.println("Invalid Argument in config option \"lang\"" + "\n----Using UK english");
                 locale = Locale.UK;
         }
 
