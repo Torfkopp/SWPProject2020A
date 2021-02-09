@@ -9,6 +9,16 @@ package de.uol.swp.common.game.map;
 public interface IIntersection {
 
     /**
+     * Enum for the states of the intersection
+     */
+    enum IntersectionState {
+        FREE,
+        BLOCKED,
+        SETTLEMENT,
+        CITY
+    }
+
+    /**
      * Gets the surrounding hexes
      *
      * @return Array of three hex positions
@@ -23,18 +33,31 @@ public interface IIntersection {
     int[] getNeighbours();
 
     /**
-     * Gets the intersection's status
+     * Gets the intersection's owner
      *
-     * @return "f" if free, "b" if blocked, or 1-4 for owner plus s (settlement) or c (city)
+     * @return The owner of the intersection
      */
-    String getState();
+    Player getOwner();
 
     /**
-     * Sets the intersection's status
+     * Gets the intersection's state
      *
-     * @param state "f" if free,
-     *              "b" if blocked, or
-     *              1-4 for owner plus s (settlement) or c (city)
+     * @return The state of the intersection
      */
-    void setState(String state);
+    IntersectionState getState();
+
+    /**
+     * Sets the intersection's state
+     *
+     * @param state The new state of the intersection
+     */
+    void setState(IntersectionState state);
+
+    /**
+     * Sets the intersection's state and owner
+     *
+     * @param state The new state of the intersection
+     * @param owner The new owner of the intersection
+     */
+    void setOwnerAndState(Player owner, IntersectionState state);
 }

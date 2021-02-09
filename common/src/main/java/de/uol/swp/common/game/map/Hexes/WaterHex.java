@@ -13,7 +13,7 @@ public class WaterHex extends AbstractHex implements IWaterHex {
     }
 
     @Override
-    public type getType() {
-        return type.Water;
+    public HexType getType() {
+        return HexType.WATER;
     }
 }

@@ -1,14 +1,15 @@
 package de.uol.swp.client;
 
-import de.uol.swp.common.game.map.Hexes.*;
-import de.uol.swp.common.game.map.IEdge;
-import de.uol.swp.common.game.map.IGameMapManagement;
-import de.uol.swp.common.game.map.IIntersection;
+import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 /**
  * IGameRendering Interface
@@ -26,33 +27,56 @@ import java.util.Arrays;
 public interface IGameRendering {
 
     //Constants used to calculate different values relative to the size of the canvas
-    double OFFSETY = 3.0;
-    double OFFSETX = 3.0;
-    double HEXHEIGHTFACTOR = 1.0 / 5.5;
-    double HEXWIDTHFACTOR = HEXHEIGHTFACTOR * (Math.sqrt(3) / 2);
-    double SETTLEMENTSIZEFACTOR = HEXHEIGHTFACTOR / 5.0;
-    double CITYSIZEFACTOR = SETTLEMENTSIZEFACTOR * 1.25;
-    double ROADWIDTHFACTOR = SETTLEMENTSIZEFACTOR / 4.0;
-    double ROBBERLINEWIDTHFACTOR = ROADWIDTHFACTOR;
+    double OFFSET_Y = 3.0;
+    double OFFSET_X = 3.0;
+    double HEX_HEIGHT_FACTOR = 1.0 / 5.5;
+    double HEX_WIDTH_FACTOR = HEX_HEIGHT_FACTOR * (Math.sqrt(3) / 2);
+    double SETTLEMENT_SIZE_FACTOR = HEX_HEIGHT_FACTOR / 4.0;
+    double CITY_SIZE_FACTOR = SETTLEMENT_SIZE_FACTOR * 1.25;
+    double ROAD_WIDTH_FACTOR = SETTLEMENT_SIZE_FACTOR / 2.0;
+    double ROBBER_LINE_WIDTH_FACTOR = ROAD_WIDTH_FACTOR / 2.0;
+    double TOKEN_SIZE_FACTOR = HEX_HEIGHT_FACTOR / 3.0;
+
+    //Constants used for the colours
+    Color TOKEN_COLOUR = Color.BEIGE;
+    Color TEXT_COLOUR = Color.BLACK;
+    Color BORDER_COLOUR = Color.BLACK;
+    Color ROBBER_COLOUR = Color.BLACK;
+
+    Color HARBOR_COLOUR = Color.SLATEGREY;
+    Color WATER_COLOUR = Color.CORNFLOWERBLUE;
+    Color DESERT_COLOUR = Color.WHITE;
+    Color HILLS_COLOUR = Color.DARKORANGE;
+    Color FOREST_COLOUR = Color.DARKGREEN;
+    Color MOUNTAINS_COLOUR = Color.DARKGREY;
+    Color FIELDS_COLOUR = Color.YELLOW;
+    Color PASTURE_COLOUR = Color.LIGHTGREEN;
+
+    Color PLAYER_1_COLOUR = Color.BLUE;
+    Color PLAYER_2_COLOUR = Color.RED;
+    Color PLAYER_3_COLOUR = Color.PURPLE;
+    Color PLAYER_4_COLOUR = Color.WHITE;
+
+    ResourceBundleWrapper resourceBundleWrapper = new ResourceBundleWrapper();
 
     /**
      * drawCity method
      * <p>
      * This method draws a city at the given coordinates.
      *
-     * @param state           Needed to access the color of player
+     * @param owner           Needed to access the color of player
      * @param currentX        The current x-coordinate
      * @param currentY        The current y-coordinate
      * @param effectiveHeight The effective height of the game map
      * @param mapCtx          A GraphicsContext needed to draw
      */
-    private void drawCity(String state, double currentX, double currentY, double effectiveHeight,
+    private void drawCity(Player owner, double currentX, double currentY, double effectiveHeight,
                           GraphicsContext mapCtx) {
-        mapCtx.setFill(getPlayerColour(state));
-        mapCtx.fillRoundRect(currentX - ((CITYSIZEFACTOR * effectiveHeight) / 2.0),
-                             currentY - ((CITYSIZEFACTOR * effectiveHeight) / 2.0), (CITYSIZEFACTOR * effectiveHeight),
-                             (CITYSIZEFACTOR * effectiveHeight), (CITYSIZEFACTOR * effectiveHeight) / 2.0,
-                             (CITYSIZEFACTOR * effectiveHeight) / 2.0);
+        mapCtx.setFill(getPlayerColour(owner));
+        mapCtx.fillRoundRect(currentX - ((CITY_SIZE_FACTOR * effectiveHeight) / 2.0),
+                             currentY - ((CITY_SIZE_FACTOR * effectiveHeight) / 2.0),
+                             (CITY_SIZE_FACTOR * effectiveHeight), (CITY_SIZE_FACTOR * effectiveHeight),
+                             (CITY_SIZE_FACTOR * effectiveHeight) / 2.0, (CITY_SIZE_FACTOR * effectiveHeight) / 2.0);
     }
 
     /**
@@ -63,14 +87,16 @@ public interface IGameRendering {
      *
      * @param gameMapManagement A GameMapManagement providing the game map to draw
      * @param canvas            A canvas to draw on
+     * @param resourceBundle    The ResourceBundle used for internationalisation
      */
-    default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas) {
-        double width = canvas.getWidth(), height = canvas.getHeight() - OFFSETY * 2;
+    default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas, ResourceBundle resourceBundle) {
+        resourceBundleWrapper.set(resourceBundle);
+        double width = canvas.getWidth(), height = canvas.getHeight() - OFFSET_Y * 2;
         GraphicsContext mapCtx = canvas.getGraphicsContext2D();
 
         //Sets an effectiveHeight depending on the height and width of the game map
-        double effectiveHeight = (HEXWIDTHFACTOR * height * 7 < width) ? height :
-                                 (width - OFFSETX * 2.0) / (7 * HEXHEIGHTFACTOR * (Math.sqrt(3) / 2));
+        double effectiveHeight = (HEX_WIDTH_FACTOR * height * 7 < width) ? height :
+                                 (width - OFFSET_X * 2.0) / (7 * HEX_HEIGHT_FACTOR * (Math.sqrt(3) / 2));
 
         //Get hexes, intersections, and edges in a usable format from the gameMapManagement
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
@@ -96,70 +122,100 @@ public interface IGameRendering {
      */
     private void drawHarbor(double currentX, double currentY, IHarborHex hex, double effectiveHeight,
                             GraphicsContext mapCtx) {
-        mapCtx.setStroke(Color.SLATEGREY);
-        mapCtx.setLineWidth((HEXWIDTHFACTOR * effectiveHeight) / 5.0);
+        mapCtx.setStroke(HARBOR_COLOUR);
+        mapCtx.setFill(HARBOR_COLOUR);
+        mapCtx.setLineWidth((HEX_WIDTH_FACTOR * effectiveHeight) / 5.0);
+        double yDistance = (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 64.0);
+        double yExtend = (HEX_HEIGHT_FACTOR * effectiveHeight) * (5.0 / 32.0);
+        double xDistance = (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 32.0);
+        double xExtend = (HEX_WIDTH_FACTOR * effectiveHeight) * (5.0 / 16.0);
+        double[] xCords, yCords;
         switch (hex.getSide()) {
-            case 0:
-                mapCtx.strokeLine(currentX + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0),
-                                  currentX + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0));
+            case WEST:
+                xCords = new double[]{currentX + xDistance, currentX + xExtend / 2.0, currentX + xExtend / 2.0,
+                                      currentX + xDistance,};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0) + yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),};
                 break;
-            case 1:
-                mapCtx.strokeLine(currentX + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0),
-                                  currentX + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0));
+            case NORTHWEST:
+                xCords = new double[]{currentX + xDistance, currentX + xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0,};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + yExtend, currentY + yDistance,};
                 break;
-            case 2:
-                mapCtx.strokeLine(currentX + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (1.0 / 16.0),
-                                  currentX + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (2.0 / 8.0));
+            case NORTHEAST:
+                xCords = new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,};
+                yCords = new double[]{currentY + yDistance, currentY + yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),};
                 break;
-            case 3:
-                mapCtx.strokeLine(currentX + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (5.0 / 16.0),
-                                  currentX + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
+            case EAST:
+                xCords = new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend / 2.0,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend / 2.0,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.0 / 4.0) + yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),};
                 break;
-            case 4:
-                mapCtx.strokeLine(currentX + (HEXWIDTHFACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0),
-                                  currentX + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0));
+            case SOUTHEAST:
+                xCords = new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xDistance,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) - xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0)};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yDistance,};
                 break;
-            case 5:
-                mapCtx.strokeLine(currentX + (HEXWIDTHFACTOR * effectiveHeight) * (4.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (7.0 / 8.0),
-                                  currentX + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 8.0),
-                                  currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (11.0 / 16.0));
+            case SOUTHWEST:
+                xCords = new double[]{currentX + xDistance, currentX + xExtend,
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0),
+                                      currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 2.0)};
+                yCords = new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yExtend,
+                                      currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) - yDistance,};
                 break;
+            default:
+                xCords = null;
+                yCords = null;
         }
+        mapCtx.fillPolygon(xCords, yCords, 4);
+
         String text = "";
         switch (hex.getResource()) {
-            case Brick:
-                text = "Brick";
+            case BRICK:
+                text = resourceBundleWrapper.get().getString("game.resources.brick");
                 break;
-            case Lumber:
-                text = "Lumber";
+            case LUMBER:
+                text = resourceBundleWrapper.get().getString("game.resources.lumber");
                 break;
-            case Ore:
-                text = "Ore";
+            case ORE:
+                text = resourceBundleWrapper.get().getString("game.resources.ore");
                 break;
-            case Grain:
-                text = "Grain";
+            case GRAIN:
+                text = resourceBundleWrapper.get().getString("game.resources.grain");
                 break;
-            case Wool:
-                text = "Wool";
+            case WOOL:
+                text = resourceBundleWrapper.get().getString("game.resources.wool");
                 break;
-            case Any:
-                text = "Any";
+            case ANY:
+                text = resourceBundleWrapper.get().getString("game.resources.any");
                 break;
         }
-        mapCtx.setFill(Color.BLACK);
-        mapCtx.fillText(text, currentX + (HEXWIDTHFACTOR * effectiveHeight) / 8.0,
-                        currentY + (HEXHEIGHTFACTOR * effectiveHeight) / 2.0);
+        mapCtx.setFill(TEXT_COLOUR);
+        mapCtx.fillText(text, currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 8.0,
+                        currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (4.0 / 8.0),
+                        (HEX_WIDTH_FACTOR * effectiveHeight) * (6.0 / 8.0));
     }
 
     /**
@@ -173,16 +229,17 @@ public interface IGameRendering {
      * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawHex(double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
-        double[] xCords = {currentX, currentX + (HEXWIDTHFACTOR * effectiveHeight) / 2,
-                           currentX + (HEXWIDTHFACTOR * effectiveHeight), currentX + (HEXWIDTHFACTOR * effectiveHeight),
-                           currentX + (HEXWIDTHFACTOR * effectiveHeight) / 2, currentX};
-        double[] yCords = {currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 4), currentY,
-                           currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 4),
-                           currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3,
-                           currentY + (HEXHEIGHTFACTOR * effectiveHeight),
-                           currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3};
+        double[] xCords = {currentX, currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 2,
+                           currentX + (HEX_WIDTH_FACTOR * effectiveHeight),
+                           currentX + (HEX_WIDTH_FACTOR * effectiveHeight),
+                           currentX + (HEX_WIDTH_FACTOR * effectiveHeight) / 2, currentX};
+        double[] yCords = {currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4), currentY,
+                           currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4),
+                           currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4) * 3,
+                           currentY + (HEX_HEIGHT_FACTOR * effectiveHeight),
+                           currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4) * 3};
         mapCtx.fillPolygon(xCords, yCords, 6);
-        mapCtx.setStroke(Color.BLACK);
+        mapCtx.setStroke(BORDER_COLOUR);
         mapCtx.setLineWidth(2);
         mapCtx.strokePolygon(xCords, yCords, 6);
     }
@@ -197,22 +254,22 @@ public interface IGameRendering {
      * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawHexTiles(IGameHex[][] hexes, double effectiveHeight, GraphicsContext mapCtx) {
-        double currentY = OFFSETY;
+        double currentY = OFFSET_Y;
         for (IGameHex[] hex : hexes) {
-            double currentX = OFFSETX;
+            double currentX = OFFSET_X;
             //Set the indentation for the current row of hex tiles
             if (hex.length % 2 == 0) { //Row with an even amount of hex tiles
-                currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
-                currentX += ((hexes[hexes.length / 2].length - 1 - hex.length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
+                currentX += (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0;
+                currentX += ((hexes[hexes.length / 2].length - 1 - hex.length) / 2.0) * (HEX_WIDTH_FACTOR * effectiveHeight);
             } else {//Row with an odd amount of hex tiles
-                currentX += ((hexes[hexes.length / 2].length - hex.length) / 2.0) * (HEXWIDTHFACTOR * effectiveHeight);
+                currentX += ((hexes[hexes.length / 2].length - hex.length) / 2.0) * (HEX_WIDTH_FACTOR * effectiveHeight);
             }
 
             for (IGameHex iGameHex : hex) {
                 renderHex(iGameHex, currentX, currentY, effectiveHeight, mapCtx);
-                currentX += (HEXWIDTHFACTOR * effectiveHeight);
+                currentX += (HEX_WIDTH_FACTOR * effectiveHeight);
             }
-            currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4) * 3;
+            currentY += ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4) * 3;
         }
     }
 
@@ -243,14 +300,14 @@ public interface IGameRendering {
      * @param mapCtx          A GraphicsContext needed to draw
      */
     private void drawRobber(double currentX, double currentY, double effectiveHeight, GraphicsContext mapCtx) {
-        mapCtx.setLineWidth((ROBBERLINEWIDTHFACTOR * effectiveHeight));
-        mapCtx.setStroke(Color.BLACK);
-        mapCtx.strokePolygon(new double[]{currentX + (HEXWIDTHFACTOR * effectiveHeight) * (1.0 / 4.0),
-                                          currentX + (HEXWIDTHFACTOR * effectiveHeight) * (3.0 / 4.0),
-                                          currentX + (HEXWIDTHFACTOR * effectiveHeight) * (2.0 / 4.0)},
-                             new double[]{currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (2.75 / 4.0),
-                                          currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (2.75 / 4.0),
-                                          currentY + (HEXHEIGHTFACTOR * effectiveHeight) * (1.125 / 4.0)}, 3);
+        mapCtx.setLineWidth((ROBBER_LINE_WIDTH_FACTOR * effectiveHeight));
+        mapCtx.setStroke(ROBBER_COLOUR);
+        mapCtx.strokePolygon(new double[]{currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                                          currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                                          currentX + (HEX_WIDTH_FACTOR * effectiveHeight) * (2.0 / 4.0)},
+                             new double[]{currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (2.75 / 4.0),
+                                          currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (2.75 / 4.0),
+                                          currentY + (HEX_HEIGHT_FACTOR * effectiveHeight) * (1.125 / 4.0)}, 3);
     }
 
     /**
@@ -258,22 +315,35 @@ public interface IGameRendering {
      * <p>
      * This method draws a settlement at the given coordinates.
      *
-     * @param state           Needed to access the color of player
+     * @param owner           Needed to access the color of player
      * @param currentX        The current x-coordinate
      * @param currentY        The current y-coordinate
      * @param effectiveHeight The effective height of the game map
      * @param mapCtx          A GraphicsContext needed to draw
      */
-    private void drawSettlement(String state, double currentX, double currentY, double effectiveHeight,
+    private void drawSettlement(Player owner, double currentX, double currentY, double effectiveHeight,
                                 GraphicsContext mapCtx) {
-        mapCtx.setFill(getPlayerColour(state));
-        mapCtx.fillOval(currentX - ((SETTLEMENTSIZEFACTOR * effectiveHeight) / 2.0),
-                        currentY - ((SETTLEMENTSIZEFACTOR * effectiveHeight) / 2.0),
-                        (SETTLEMENTSIZEFACTOR * effectiveHeight), (SETTLEMENTSIZEFACTOR * effectiveHeight));
+        mapCtx.setFill(getPlayerColour(owner));
+        mapCtx.fillOval(currentX - ((SETTLEMENT_SIZE_FACTOR * effectiveHeight) / 2.0),
+                        currentY - ((SETTLEMENT_SIZE_FACTOR * effectiveHeight) / 2.0),
+                        (SETTLEMENT_SIZE_FACTOR * effectiveHeight), (SETTLEMENT_SIZE_FACTOR * effectiveHeight));
+    }
+
+    private void drawToken(int token, double currentX, double currentY, double effectiveHeight,
+                           GraphicsContext mapCtx) {
+        mapCtx.setFill(TOKEN_COLOUR);
+        double xPos = currentX + ((HEX_WIDTH_FACTOR * effectiveHeight) - (TOKEN_SIZE_FACTOR * effectiveHeight)) / 2.0;
+        double yPos = currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) - (TOKEN_SIZE_FACTOR * effectiveHeight)) / 2.0;
+        mapCtx.fillOval(xPos, yPos, (TOKEN_SIZE_FACTOR * effectiveHeight), (TOKEN_SIZE_FACTOR * effectiveHeight));
+        mapCtx.setFill(TEXT_COLOUR);
+        mapCtx.fillText(resourceBundleWrapper.get().getString("game.token." + token),
+                        xPos + (TOKEN_SIZE_FACTOR * effectiveHeight) * (1.0 / 4.0),
+                        yPos + (TOKEN_SIZE_FACTOR * effectiveHeight) * (3.0 / 4.0),
+                        (TOKEN_SIZE_FACTOR * effectiveHeight) / 2.0);
     }
 
     /**
-     * getPlayerColour(String) method
+     * getPlayerColour method
      * <p>
      * This method gets the colour of the indicated player.
      *
@@ -281,30 +351,18 @@ public interface IGameRendering {
      *
      * @return The colour of the indicated player
      */
-    private Color getPlayerColour(String player) {
-        if (player.startsWith("1")) {
-            return Color.BLACK;
-        } else if (player.startsWith("2")) {
-            return Color.RED;
-        } else if (player.startsWith("3")) {
-            return Color.PINK;
-        } else if (player.startsWith("4")) {
-            return Color.WHITE;
+    private Color getPlayerColour(Player player) {
+        switch (player) {
+            case PLAYER_1:
+                return PLAYER_1_COLOUR;
+            case PLAYER_2:
+                return PLAYER_2_COLOUR;
+            case PLAYER_3:
+                return PLAYER_3_COLOUR;
+            case PLAYER_4:
+                return PLAYER_4_COLOUR;
         }
         return null;
-    }
-
-    /**
-     * getPlayerColour(int) method
-     * <p>
-     * This method gets the colour of the indicated player.
-     *
-     * @param player Indicates a player
-     *
-     * @return The colour of the indicated player
-     */
-    private Color getPlayerColour(int player) {
-        return getPlayerColour(String.valueOf(player));
     }
 
     /**
@@ -322,21 +380,21 @@ public interface IGameRendering {
     private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IEdge[][] edges,
                                   double effectiveHeight, GraphicsContext mapCtx) {
         //Sets currentY depending on topHalf
-        double currentY = ((topHalf) ? ((HEXHEIGHTFACTOR * effectiveHeight) * (3.0 / 4.0)) :
-                           ((effectiveHeight / 2) + ((HEXHEIGHTFACTOR * effectiveHeight) / 4))) + OFFSETY;
+        double currentY = ((topHalf) ? ((HEX_HEIGHT_FACTOR * effectiveHeight) * (3.0 / 4.0)) :
+                           ((effectiveHeight / 2) + ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4))) + OFFSET_Y;
         //Goes through all rows in the current half of the game map
         for (int y = ((topHalf) ? 0 : intersections.length / 2); y < ((topHalf) ? intersections.length / 2 :
                                                                       intersections.length); y++) {
-            double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * (HEXWIDTHFACTOR * effectiveHeight);
-            double currentX = OFFSETX + rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
-            if (topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
+            double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * (HEX_WIDTH_FACTOR * effectiveHeight);
+            double currentX = OFFSET_X + rowStartX + (HEX_WIDTH_FACTOR * effectiveHeight);
+            if (topHalf) currentX += (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0;
             goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], edges[y], effectiveHeight, mapCtx);
 
-            currentX = OFFSETX + rowStartX + (HEXWIDTHFACTOR * effectiveHeight);
-            if (!topHalf) currentX += (HEXWIDTHFACTOR * effectiveHeight) / 2.0;
-            currentY += ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0);
+            currentX = OFFSET_X + rowStartX + (HEX_WIDTH_FACTOR * effectiveHeight);
+            if (!topHalf) currentX += (HEX_WIDTH_FACTOR * effectiveHeight) / 2.0;
+            currentY += ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4.0);
             goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], edges[y], effectiveHeight, mapCtx);
-            currentY += (HEXHEIGHTFACTOR * effectiveHeight) / 2.0;
+            currentY += (HEX_HEIGHT_FACTOR * effectiveHeight) / 2.0;
         }
     }
 
@@ -363,7 +421,7 @@ public interface IGameRendering {
                 renderEdges(currentX, currentY, Arrays.copyOfRange(edges, xEdges, xEdges + 3), effectiveHeight, mapCtx);
             }
             renderIntersection(currentX, currentY, intersections[x], effectiveHeight, mapCtx);
-            currentX += (HEXWIDTHFACTOR * effectiveHeight);
+            currentX += (HEX_WIDTH_FACTOR * effectiveHeight);
         }
     }
 
@@ -380,26 +438,26 @@ public interface IGameRendering {
      */
     private void renderEdges(double currentX, double currentY, IEdge[] edges, double effectiveHeight,
                              GraphicsContext mapCtx) {
-        mapCtx.setLineWidth(ROADWIDTHFACTOR * effectiveHeight);
+        mapCtx.setLineWidth(ROAD_WIDTH_FACTOR * effectiveHeight);
 
         //Northwest road
-        if (edges[0] != null && edges[0].getState() != 0) {
-            mapCtx.setStroke(getPlayerColour(edges[0].getState()));
-            mapCtx.strokeLine(currentX, currentY, currentX - ((HEXWIDTHFACTOR * effectiveHeight) / 2.0),
-                              currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
+        if (edges[0] != null && edges[0].getOwner() != null) {
+            mapCtx.setStroke(getPlayerColour(edges[0].getOwner()));
+            mapCtx.strokeLine(currentX, currentY, currentX - ((HEX_WIDTH_FACTOR * effectiveHeight) / 2.0),
+                              currentY - ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4.0));
         }
 
         //Northeast road
-        if (edges[1] != null && edges[1].getState() != 0) {
-            mapCtx.setStroke(getPlayerColour(edges[1].getState()));
-            mapCtx.strokeLine(currentX, currentY, currentX, currentY + ((HEXHEIGHTFACTOR * effectiveHeight) / 2.0));
+        if (edges[1] != null && edges[1].getOwner() != null) {
+            mapCtx.setStroke(getPlayerColour(edges[1].getOwner()));
+            mapCtx.strokeLine(currentX, currentY, currentX, currentY + ((HEX_HEIGHT_FACTOR * effectiveHeight) / 2.0));
         }
 
         //South road
-        if (edges[2] != null && edges[2].getState() != 0) {
-            mapCtx.setStroke(getPlayerColour(edges[2].getState()));
-            mapCtx.strokeLine(currentX, currentY, currentX + ((HEXWIDTHFACTOR * effectiveHeight) / 2.0),
-                              currentY - ((HEXHEIGHTFACTOR * effectiveHeight) / 4.0));
+        if (edges[2] != null && edges[2].getOwner() != null) {
+            mapCtx.setStroke(getPlayerColour(edges[2].getOwner()));
+            mapCtx.strokeLine(currentX, currentY, currentX + ((HEX_WIDTH_FACTOR * effectiveHeight) / 2.0),
+                              currentY - ((HEX_HEIGHT_FACTOR * effectiveHeight) / 4.0));
         }
     }
 
@@ -416,11 +474,13 @@ public interface IGameRendering {
      */
     private void renderHex(IGameHex hex, double currentX, double currentY, double effectiveHeight,
                            GraphicsContext mapCtx) {
-        if (setHexColour(hex, mapCtx)) return;
+        if (!setHexColour(hex, mapCtx)) return;
 
         drawHex(currentX, currentY, effectiveHeight, mapCtx);
 
         if (hex.isRobberOnField()) drawRobber(currentX, currentY, effectiveHeight, mapCtx);
+        if (hex instanceof IResourceHex)
+            drawToken(((IResourceHex) hex).getToken(), currentX, currentY, effectiveHeight, mapCtx);
 
         if (hex instanceof IHarborHex) drawHarbor(currentX, currentY, (IHarborHex) hex, effectiveHeight, mapCtx);
     }
@@ -439,15 +499,19 @@ public interface IGameRendering {
      */
     private void renderIntersection(double currentX, double currentY, IIntersection intersection,
                                     double effectiveHeight, GraphicsContext mapCtx) {
-        String state = intersection.getState();
-        if (state.equals("f")) { //Free intersection
-            //Free intersections don't need to be marked, but it could easily be added here
-        } else if (state.equals("b")) { //Blocked intersection
-            //Blocked intersections don't need to be marked, but it could easily be added here
-        } else if (state.endsWith("s")) { //Intersection with settlement
-            drawSettlement(state, currentX, currentY, effectiveHeight, mapCtx);
-        } else if (state.endsWith("c")) { //Intersection with city
-            drawCity(state, currentX, currentY, effectiveHeight, mapCtx);
+        switch (intersection.getState()) {
+            case FREE:
+                //Free intersections don't need to be marked, but it could easily be added here
+                break;
+            case BLOCKED:
+                //Blocked intersections don't need to be marked, but it could easily be added here
+                break;
+            case SETTLEMENT:
+                drawSettlement(intersection.getOwner(), currentX, currentY, effectiveHeight, mapCtx);
+                break;
+            case CITY:
+                drawCity(intersection.getOwner(), currentX, currentY, effectiveHeight, mapCtx);
+                break;
         }
     }
 
@@ -462,24 +526,61 @@ public interface IGameRendering {
      * @return True if the colour couldn't be set, false otherwise
      */
     private boolean setHexColour(IGameHex hex, GraphicsContext mapCtx) {
-        if (hex instanceof IWaterHex) {
-            mapCtx.setFill(Color.CORNFLOWERBLUE);
-        } else if (hex instanceof DesertHex) {
-            mapCtx.setFill(Color.WHITE);
-        } else if (hex instanceof IResourceHex && ((IResourceHex) hex).getResource() == IResourceHex.resource.Hills) {
-            mapCtx.setFill(Color.DARKORANGE);
-        } else if (hex instanceof IResourceHex && ((IResourceHex) hex).getResource() == IResourceHex.resource.Forest) {
-            mapCtx.setFill(Color.DARKGREEN);
-        } else if (hex instanceof IResourceHex && ((IResourceHex) hex)
-                                                          .getResource() == IResourceHex.resource.Mountains) {
-            mapCtx.setFill(Color.DARKGREY);
-        } else if (hex instanceof IResourceHex && ((IResourceHex) hex).getResource() == IResourceHex.resource.Fields) {
-            mapCtx.setFill(Color.YELLOW);
-        } else if (hex instanceof IResourceHex && ((IResourceHex) hex).getResource() == IResourceHex.resource.Pasture) {
-            mapCtx.setFill(Color.LIGHTGREEN);
-        } else {
-            return true;
+        switch (hex.getType()) {
+            case WATER:
+            case HARBOR:
+                mapCtx.setFill(WATER_COLOUR);
+                break;
+            case DESERT:
+                mapCtx.setFill(DESERT_COLOUR);
+                break;
+            case RESOURCE:
+                switch (((IResourceHex) hex).getResource()) {
+                    case HILLS:
+                        mapCtx.setFill(HILLS_COLOUR);
+                        break;
+                    case FOREST:
+                        mapCtx.setFill(FOREST_COLOUR);
+                        break;
+                    case MOUNTAINS:
+                        mapCtx.setFill(MOUNTAINS_COLOUR);
+                        break;
+                    case FIELDS:
+                        mapCtx.setFill(FIELDS_COLOUR);
+                        break;
+                    case PASTURE:
+                        mapCtx.setFill(PASTURE_COLOUR);
+                        break;
+                    default:
+                        return false;
+                }
+                break;
+            default:
+                return false;
         }
-        return false;
+        return true;
+    }
+
+    /**
+     * ResourceBundleWrapper
+     * This class is a wrapper for the ResourceBundle to be able to access it like an attribute.
+     * Using a wrapper class it can be set after declaration even if it is "static final".
+     *
+     * @since 2021-02-05
+     */
+    class ResourceBundleWrapper {
+
+        private ResourceBundle resourceBundle = null;
+
+        public ResourceBundleWrapper() {
+        }
+
+        public ResourceBundle get() {
+            return resourceBundle;
+        }
+
+        public void set(ResourceBundle resourceBundle) {
+            this.resourceBundle = resourceBundle;
+        }
     }
 }

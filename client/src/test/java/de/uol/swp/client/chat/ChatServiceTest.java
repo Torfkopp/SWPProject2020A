@@ -176,7 +176,7 @@ class ChatServiceTest {
     @Test
     void deleteMessageTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId);
+        chatService.deleteMessage(defaultId, defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -186,6 +186,7 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getId(), defaultId);
     }
 
@@ -206,7 +207,7 @@ class ChatServiceTest {
     @Test
     void deleteMessageWithOriginLobbyIsNullTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId, null);
+        chatService.deleteMessage(defaultId, defaultUser, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -216,6 +217,7 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getId(), defaultId);
     }
 
@@ -236,7 +238,7 @@ class ChatServiceTest {
     @Test
     void deleteMessageWithOriginLobbyTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId, defaultLobby);
+        chatService.deleteMessage(defaultId, defaultUser, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -246,6 +248,7 @@ class ChatServiceTest {
 
         assertTrue(chatMessageRequest.isFromLobby());
         assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getId(), defaultId);
     }
 
@@ -265,7 +268,7 @@ class ChatServiceTest {
     @Test
     void editMessageTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent);
+        chatService.editMessage(defaultId, defaultContent, defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -276,6 +279,7 @@ class ChatServiceTest {
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
         assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 
@@ -296,7 +300,7 @@ class ChatServiceTest {
     @Test
     void editMessageWithOriginLobbyIsNullTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent);
+        chatService.editMessage(defaultId, defaultContent, defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -307,6 +311,7 @@ class ChatServiceTest {
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
         assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 
@@ -327,7 +332,7 @@ class ChatServiceTest {
     @Test
     void editMessageWithOriginLobbyTest() throws InterruptedException {
         IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent, defaultLobby);
+        chatService.editMessage(defaultId, defaultContent, defaultUser, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -338,6 +343,7 @@ class ChatServiceTest {
         assertTrue(chatMessageRequest.isFromLobby());
         assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
         assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
     }
 

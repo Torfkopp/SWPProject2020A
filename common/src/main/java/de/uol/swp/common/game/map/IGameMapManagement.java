@@ -58,55 +58,50 @@ public interface IGameMapManagement {
     /**
      * Places a street
      *
-     * @param player   The number of the player
-     *                 wanting to build the street (1-4)
+     * @param player   The player wanting to build the street
      * @param position The position of the road
      *
      * @return true if placement was successful; false if not
      */
-    boolean placeRoad(int player, int position);
+    boolean placeRoad(Player player, int position);
 
     /**
      * Places a settlement
      *
-     * @param player   The number of the player
-     *                 wanting to build the settlement (1-4)
+     * @param player   The player wanting to build the settlement (1-4)
      * @param position The position of the intersection
      *
      * @return true if placement was successful; false if not
      */
-    boolean placeSettlement(int player, int position);
+    boolean placeSettlement(Player player, int position);
 
     /**
      * Checks if a street is placeable
      *
-     * @param player   The number of the player
-     *                 wanting to place the street (1-4)
+     * @param player   The player wanting to place the street
      * @param position The position of the road
      *
      * @return true if placement is possible; false if not
      */
-    boolean roadPlaceable(int player, int position);
+    boolean roadPlaceable(Player player, int position);
 
     /**
      * Checks if a settlement is placeable
      *
-     * @param player   The number of the player
-     *                 wanting to place the settlement (1-4)
+     * @param player   The player wanting to place the settlement
      * @param position The position of the intersection
      *
      * @return true if placement is possible; false if not
      */
-    boolean settlementPlaceable(int player, int position);
+    boolean settlementPlaceable(Player player, int position);
 
     /**
      * Upgrades a settlement
      *
-     * @param player   The number of the player
-     *                 wanting to upgrade the settlement (1-4)
+     * @param player   The player wanting to upgrade the settlement
      * @param position The position of the intersection
      *
      * @return true if placement was successful; false if not
      */
-    boolean upgradeSettlement(int player, int position);
+    boolean upgradeSettlement(Player player, int position);
 }

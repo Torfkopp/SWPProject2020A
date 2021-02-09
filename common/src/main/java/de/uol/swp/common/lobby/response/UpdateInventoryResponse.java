@@ -9,6 +9,7 @@ import java.util.Map;
  *
  * @author Sven Ahrens
  * @author Finn Haase
+ * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
  * @since 2021-01-25
  */
 public class UpdateInventoryResponse extends AbstractLobbyResponse {

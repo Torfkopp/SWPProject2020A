@@ -4,7 +4,7 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <!-- warning %l needs much resources, remove in case of problems -->
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} %l  - %msg%n"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5p %.69l - %m%n"/>
         </Console>
     </Appenders>
     <Loggers>
