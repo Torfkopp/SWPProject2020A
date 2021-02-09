@@ -10,21 +10,33 @@ public class Intersection implements IIntersection {
 
     private final int[] hexes;
     private final int[] neighbours;
-    private String state;
+    private IntersectionState state;
+    private Player owner;
 
     /**
-     * Constructor
+     * Constructor for an free intersection
      *
      * @param hexes      The surrounding hexes
      * @param neighbours The position of the neighbouring intersections
-     * @param state      "f" if free,
-     *                   "b" if blocked, or
-     *                   1-4 for owner plus s (settlement) or c (city)
      */
-    public Intersection(int[] hexes, int[] neighbours, String state) {
+    public Intersection(int[] hexes, int[] neighbours) {
         this.hexes = hexes;
         this.neighbours = neighbours;
-        this.state = state;
+        this.state = IntersectionState.FREE;
+    }
+
+    /**
+     * Constructor for an intersection with settlement on it
+     *
+     * @param hexes      The surrounding hexes
+     * @param neighbours The position of the neighbouring intersections
+     * @param owner      The owner of the settlement
+     */
+    public Intersection(int[] hexes, int[] neighbours, Player owner) {
+        this.hexes = hexes;
+        this.neighbours = neighbours;
+        this.state = IntersectionState.SETTLEMENT;
+        this.owner = owner;
     }
 
     @Override
@@ -38,12 +50,23 @@ public class Intersection implements IIntersection {
     }
 
     @Override
-    public String getState() {
+    public Player getOwner() {
+        return owner;
+    }
+
+    @Override
+    public IntersectionState getState() {
         return state;
     }
 
     @Override
-    public void setState(String state) {
+    public void setState(IntersectionState state) {
+        this.state = state;
+    }
+
+    @Override
+    public void setOwnerAndState(Player owner, IntersectionState state) {
+        this.owner = owner;
         this.state = state;
     }
 }

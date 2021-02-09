@@ -126,20 +126,20 @@ public class GameService extends AbstractService {
         }
         if (inventory != null) {
             Map<String, Integer> resourceMap = new HashMap<>();
-            resourceMap.put("Brick", inventory.getBrick());
-            resourceMap.put("Grain", inventory.getGrain());
-            resourceMap.put("Lumber", inventory.getLumber());
-            resourceMap.put("Ore", inventory.getOre());
-            resourceMap.put("Wool", inventory.getWool());
-            resourceMap.put("Victory Point Cards", inventory.getVictoryPointCards());
-            resourceMap.put("Knight Cards", inventory.getKnightCards());
-            resourceMap.put("Road Building Cards", inventory.getRoadBuildingCards());
-            resourceMap.put("Year of Plenty Cards", inventory.getYearOfPlentyCards());
-            resourceMap.put("Monopoly Cards", inventory.getMonopolyCards());
+            resourceMap.put("brick", inventory.getBrick());
+            resourceMap.put("grain", inventory.getGrain());
+            resourceMap.put("lumber", inventory.getLumber());
+            resourceMap.put("ore", inventory.getOre());
+            resourceMap.put("wool", inventory.getWool());
+            resourceMap.put("cards.victorypoints", inventory.getVictoryPointCards());
+            resourceMap.put("cards.knights", inventory.getKnightCards());
+            resourceMap.put("cards.roadbuilding", inventory.getRoadBuildingCards());
+            resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
+            resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
 
             Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-            armyAndRoadMap.put("Largest Army", inventory.isLargestArmy());
-            armyAndRoadMap.put("Longest Road", inventory.isLongestRoad());
+            armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
+            armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
             AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(),
                                                                                 Collections

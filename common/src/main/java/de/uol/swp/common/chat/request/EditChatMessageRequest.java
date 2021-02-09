@@ -1,5 +1,7 @@
 package de.uol.swp.common.chat.request;
 
+import de.uol.swp.common.user.User;
+
 /**
  * Request sent by the client when a ChatMessage should be updated.
  *
@@ -12,6 +14,7 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
 
     private final int id;
     private final String content;
+    private final User requestingUser;
 
     /**
      * Constructor
@@ -19,13 +22,15 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      * This constructor is used for EditChatMessageRequests originating from
      * the global chat. It sets the inherited originLobby attribute to null.
      *
-     * @param id      The ID of the ChatMessage that should be updated
-     * @param content The content of the ChatMessage that should be updated
+     * @param id             The ID of the ChatMessage that should be updated
+     * @param content        The content of the ChatMessage that should be updated
+     * @param requestingUser The User who sent the EditChatMessageRequest
      */
-    public EditChatMessageRequest(int id, String content) {
+    public EditChatMessageRequest(int id, String content, User requestingUser) {
         super(null);
         this.id = id;
         this.content = content;
+        this.requestingUser = requestingUser;
     }
 
     /**
@@ -35,16 +40,18 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      * a lobby chat. It sets the inherited originLobby attribute to the parameter
      * provided upon calling the constructor.
      *
-     * @param id          The ID of the ChatMessage that should be edited
-     * @param content     The content of the ChatMessage that should be updated
-     * @param originLobby The Lobby the EditChatMessageRequest originated from
+     * @param id             The ID of the ChatMessage that should be edited
+     * @param content        The content of the ChatMessage that should be updated
+     * @param requestingUser The User who sent the EditChatMessageRequest
+     * @param originLobby    The Lobby the EditChatMessageRequest originated from
      *
      * @since 2020-12-30
      */
-    public EditChatMessageRequest(int id, String content, String originLobby) {
+    public EditChatMessageRequest(int id, String content, User requestingUser, String originLobby) {
         super(originLobby);
         this.id = id;
         this.content = content;
+        this.requestingUser = requestingUser;
     }
 
     /**
@@ -63,5 +70,18 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      */
     public int getId() {
         return id;
+    }
+
+    /**
+     * Gets the requestingUser attribute.
+     *
+     * @return The User who sent the EditChatMessageRequest
+     *
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    public User getRequestingUser() {
+        return requestingUser;
     }
 }

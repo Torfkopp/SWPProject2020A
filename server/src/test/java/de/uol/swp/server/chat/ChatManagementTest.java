@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -271,6 +272,58 @@ class ChatManagementTest {
 
         List<ChatMessage> list1 = chatMessageStore.getLatestMessages(1, defaultLobby);
         assertTrue(list1.isEmpty());
+    }
+
+    /**
+     * Test of the findChatMessage routine
+     * <p>
+     * Tests if a specified ChatMessage in a specified lobby will be found by
+     * the findChatMessage routine.
+     * <p>
+     * This test fails if the Optional returned by findChatMessage is empty,
+     * or if any of the attributes of the found ChatMessage differ from the
+     * parameters provided on creation.
+     *
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    @Test
+    void findChatMessageInLobbyTest() {
+        ChatMessage chatMessage = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+
+        Optional<ChatMessage> foundMessage = chatManagement.findChatMessage(chatMessage.getID(), defaultLobby);
+
+        assertTrue(foundMessage.isPresent());
+        assertEquals(foundMessage.get().getID(), chatMessage.getID());
+        assertEquals(foundMessage.get().getAuthor(), defaultUser);
+        assertEquals(foundMessage.get().getContent(), defaultContent);
+    }
+
+    /**
+     * Test of the findChatMessage routine
+     * <p>
+     * Tests if a specified ChatMessage will be found by the findChatMessage
+     * routine.
+     * <p>
+     * This test fails if the Optional returned by findChatMessage is empty,
+     * or if any of the attributes of the found ChatMessage differ from the
+     * parameters provided on creation.
+     *
+     * @author Maximilian Lindner
+     * @author Phillip-André Suhr
+     * @since 2021-02-06
+     */
+    @Test
+    void findChatMessageTest() {
+        ChatMessage chatMessage = chatMessageStore.createChatMessage(defaultUser, defaultContent);
+
+        Optional<ChatMessage> foundMessage = chatManagement.findChatMessage(chatMessage.getID());
+
+        assertTrue(foundMessage.isPresent());
+        assertEquals(foundMessage.get().getID(), chatMessage.getID());
+        assertEquals(foundMessage.get().getAuthor(), defaultUser);
+        assertEquals(foundMessage.get().getContent(), defaultContent);
     }
 
     /**

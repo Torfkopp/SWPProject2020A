@@ -187,13 +187,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onCreateLobbyButtonPressed() {
         //give the lobby a default name
-        String name = loggedInUser.getUsername() + "'s lobby";
+        String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"), loggedInUser.getUsername());
 
         //create Dialogue
         TextInputDialog dialog = new TextInputDialog(name);
-        dialog.setTitle("Lobby Name");
-        dialog.setHeaderText("Choose how to name your lobby");
-        dialog.setContentText("Please enter the lobby's name: ");
+        dialog.setTitle(resourceBundle.getString("lobby.dialog.title"));
+        dialog.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
+        dialog.setContentText(resourceBundle.getString("lobby.dialog.content"));
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialog.showAndWait();
@@ -219,9 +219,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getName()));
-            lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getName());
-            lobbyService.refreshLobbyPresenterFields(createLobbyResponse.getName(), loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getLobbyName()));
+            lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getLobbyName());
+            lobbyService.refreshLobbyPresenterFields(createLobbyResponse.getLobbyName(), loggedInUser);
         });
     }
 
@@ -264,7 +264,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         if (lobbyView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent("Please choose a valid Lobby"));
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
         } else {
             String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
             lobbyService.joinLobby(lobbyName, loggedInUser);
@@ -290,9 +290,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
-            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
-            lobbyService.refreshLobbyPresenterFields(joinLobbyResponse.getName(), loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getLobbyName()));
+            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getLobbyName());
+            lobbyService.refreshLobbyPresenterFields(joinLobbyResponse.getLobbyName(), loggedInUser);
         });
     }
 
