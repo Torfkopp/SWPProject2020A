@@ -3,6 +3,6 @@ bin/
 target/
 .idea
 *.iml
+*.uml
 config.properties
 serverconfig.properties
-*.uml
