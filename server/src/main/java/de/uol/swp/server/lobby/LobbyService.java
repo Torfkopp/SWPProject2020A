@@ -240,7 +240,7 @@ public class LobbyService extends AbstractService {
      * @param retrieveAllLobbyMembersRequest The RetrieveAllLobbyMembersRequest found on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
-     * @since 2020-02-04
+     * @since 2020-12-20
      */
     @Subscribe
     private void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest retrieveAllLobbyMembersRequest) {
@@ -248,8 +248,8 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             Set<User> lobbyMembers = lobby.get().getUsers();
-            Message response = new AllLobbyMembersResponse(lobbyMembers, lobby.get().getOwner(),
-                                                           lobby.get().getReadyUsers(), lobby.get().getName());
+            Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
+                                                           lobby.get().getReadyUsers());
             response.initWithMessage(retrieveAllLobbyMembersRequest);
             post(response);
         } else {

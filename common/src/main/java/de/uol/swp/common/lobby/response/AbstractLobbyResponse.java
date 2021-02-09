@@ -3,27 +3,20 @@ package de.uol.swp.common.lobby.response;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 /**
- * Base class of lobby responses. Basic handling of the lobby name.
+ * Base class for all Responses concerning one single lobby. This class abstracts away
+ * the lobbyName attribute.
  *
  * @author Maximilian Lindner
- * @since 2021-02-04
+ * @author Phillip-André Suhr
+ * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @since 2021-02-09
  */
-
 public abstract class AbstractLobbyResponse extends AbstractResponseMessage {
 
     private String lobbyName;
 
     /**
-     * Constructor
-     *
-     * @param lobbyName name of the lobby
-     */
-    public AbstractLobbyResponse(String lobbyName) {
-        this.lobbyName = lobbyName;
-    }
-
-    /**
-     * Default constructor
+     * Default Constructor
      *
      * @implNote This constructor is needed for serialisation
      */
@@ -31,9 +24,16 @@ public abstract class AbstractLobbyResponse extends AbstractResponseMessage {
     }
 
     /**
-     * Gets the lobby name variable
+     * Constructor
      *
-     * @return String containing the lobby's name
+     * @param lobbyName The name of the Lobby which this Response is directed to
+     */
+    public AbstractLobbyResponse(String lobbyName) {this.lobbyName = lobbyName;}
+
+    /**
+     * Gets the name of the lobby
+     *
+     * @return Name of the Lobby
      */
     public String getLobbyName() {
         return lobbyName;
