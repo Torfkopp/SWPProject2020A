@@ -1,6 +1,5 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 
@@ -12,9 +11,10 @@ import java.util.*;
  * This response includes all lobby members as well as the owner of the lobby.
  *
  * @author Alwin Bossert
+ * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
  * @since 2020-12-20
  */
-public class AllLobbyMembersResponse extends AbstractResponseMessage {
+public class AllLobbyMembersResponse extends AbstractLobbyResponse {
 
     private final List<User> users = new ArrayList<>();
     private final Set<User> readyUsers = new TreeSet<>();
@@ -40,13 +40,15 @@ public class AllLobbyMembersResponse extends AbstractResponseMessage {
      * The same is done for the Set of ready users in the lobby.
      * The same method is used to provide the User object for the lobby owner.
      *
+     * @param lobbyName  The name of the lobby
      * @param users      Collection of all lobby members
      * @param owner      Owner of the lobby
      * @param readyUsers Set of all ready lobby members
      *
      * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(Collection<User> users, User owner, Set<User> readyUsers) {
+    public AllLobbyMembersResponse(String lobbyName, Collection<User> users, User owner, Set<User> readyUsers) {
+        super(lobbyName);
         for (User user : users) {
             this.users.add(UserDTO.createWithoutPassword(user));
         }

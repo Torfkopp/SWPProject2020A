@@ -202,13 +202,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
-        LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
-        LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
-        LOG.debug("Update of ready users " + allLobbyMembersResponse.getReadyUsers());
-        this.owner = allLobbyMembersResponse.getOwner();
-        this.readyUsers = allLobbyMembersResponse.getReadyUsers();
-        updateUsersList(allLobbyMembersResponse.getUsers());
-        setStartSessionButtonState();
+        if (this.lobbyName.equals(allLobbyMembersResponse.getLobbyName())) {
+            LOG.debug("Update of lobby member list " + allLobbyMembersResponse.getUsers());
+            LOG.debug("Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
+            LOG.debug("Update of ready users " + allLobbyMembersResponse.getReadyUsers());
+            this.owner = allLobbyMembersResponse.getOwner();
+            this.readyUsers = allLobbyMembersResponse.getReadyUsers();
+            updateUsersList(allLobbyMembersResponse.getUsers());
+            setStartSessionButtonState();
+        }
     }
 
     /**

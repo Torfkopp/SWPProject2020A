@@ -219,9 +219,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getName()));
-            lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getName());
-            lobbyService.refreshLobbyPresenterFields(createLobbyResponse.getName(), loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getLobbyName()));
+            lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getLobbyName());
+            lobbyService.refreshLobbyPresenterFields(createLobbyResponse.getLobbyName(), loggedInUser);
         });
     }
 
@@ -290,9 +290,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
-            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
-            lobbyService.refreshLobbyPresenterFields(joinLobbyResponse.getName(), loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getLobbyName()));
+            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getLobbyName());
+            lobbyService.refreshLobbyPresenterFields(joinLobbyResponse.getLobbyName(), loggedInUser);
         });
     }
 
