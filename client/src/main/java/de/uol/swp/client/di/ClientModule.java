@@ -9,6 +9,8 @@ import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import javafx.fxml.FXMLLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Locale;
@@ -25,6 +27,7 @@ import java.util.ResourceBundle;
 public class ClientModule extends AbstractModule {
 
     final EventBus eventBus = new EventBus();
+    final Logger LOG = LogManager.getLogger(ClientModule.class);
 
     @Override
     protected void configure() {
@@ -38,15 +41,15 @@ public class ClientModule extends AbstractModule {
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
         final String filepath = "client" + File.separator + "target" + File.separator + "classes" + File.separator + "config.properties";
-        try {
-            FileInputStream file = new FileInputStream(filepath);
+        try (FileInputStream file = new FileInputStream(filepath)) {
             properties.load(file);
-            file.close();
         } catch (FileNotFoundException e) {
             System.out.println("Couldn't find config file: " + filepath + "\n----But this is nothing to worry about");
         } catch (IOException e) {
             System.out.println("Error reading config file");
         }
+
+        LOG.debug("Selected Language in config File: " + properties.getProperty("lang"));
 
         //Reading the language property into a locale
         String[] lang = properties.getProperty("lang").split("_");

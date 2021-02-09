@@ -7,6 +7,8 @@ import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.usermanagement.store.H2BasedUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Properties;
@@ -20,6 +22,7 @@ import java.util.Properties;
 @SuppressWarnings("UnstableApiUsage")
 public class ServerModule extends AbstractModule {
 
+    private final Logger LOG = LogManager.getLogger(ServerModule.class);
     private final EventBus bus = new EventBus();
     private final ChatMessageStore chatMessageStore = new MainMemoryBasedChatMessageStore();
 
@@ -34,17 +37,16 @@ public class ServerModule extends AbstractModule {
 
         //Reading properties-file
         final Properties serverProperties = new Properties(defaultProps);
-        final String filepath = "client" + File.separator + "target" + File.separator + "classes" + File.separator + "serverconfig.properties";
-        try {
-            FileInputStream file = new FileInputStream(filepath);
+        final String filepath = "server" + File.separator + "target" + File.separator + "classes" + File.separator + "serverconfig.properties";
+        try (FileInputStream file = new FileInputStream(filepath)) {
             serverProperties.load(file);
-            file.close();
         } catch (FileNotFoundException e) {
             System.out.println("Couldn't find config file: " + filepath + "\n----But this is nothing to worry about");
         } catch (IOException e) {
             System.out.println("Error reading config file");
         }
 
+        LOG.debug("Selected database backend: " + serverProperties.getProperty("db"));
         switch (serverProperties.getProperty("db")) {
             case "h2":
                 store = new H2BasedUserStore();
