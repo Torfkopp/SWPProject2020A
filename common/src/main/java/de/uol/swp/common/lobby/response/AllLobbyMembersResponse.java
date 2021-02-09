@@ -21,6 +21,16 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
     private User owner;
 
     /**
+     * Default Constructor
+     *
+     * @implNote This constructor is needed for serialisation
+     * @since 2020-12-21
+     */
+    public AllLobbyMembersResponse() {
+        // needed for serialisation
+    }
+
+    /**
      * Constructor
      * <p>
      * This constructor generates a new List of the lobby members from the given
