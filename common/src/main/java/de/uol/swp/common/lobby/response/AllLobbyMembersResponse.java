@@ -20,8 +20,6 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
     private final Set<User> readyUsers = new TreeSet<>();
     private User owner;
 
-
-
     /**
      * Constructor
      * <p>
