@@ -5,3 +5,4 @@ target/
 *.iml
 config.properties
 serverconfig.properties
+*.uml
