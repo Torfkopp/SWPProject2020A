@@ -4,6 +4,7 @@ import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.user.User;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An interface for all methods of the ChatManagement
@@ -68,6 +69,25 @@ public interface IChatManagement {
      * @since 2021-01-16
      */
     void dropLobbyHistory(String originLobby);
+
+    /**
+     * Find a message in the global Chat Store
+     *
+     * @param id The ID of the ChatMessage that should be found
+     *
+     * @return Empty Optional or Optional containing a ChatMessage object
+     */
+    Optional<ChatMessage> findChatMessage(int id);
+
+    /**
+     * Find a message in a Lobby Chat Store
+     *
+     * @param id          The ID of the ChatMessage that should be found
+     * @param originLobby The Lobby the ChatMessage belongs to
+     *
+     * @return Empty Optional or Optional containing a ChatMessage object
+     */
+    Optional<ChatMessage> findChatMessage(int id, String originLobby);
 
     /**
      * Returns a List with ChatMessage objects of size {@literal <amount>} or smaller

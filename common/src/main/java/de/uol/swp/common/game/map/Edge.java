@@ -8,41 +8,52 @@ package de.uol.swp.common.game.map;
  */
 public class Edge implements IEdge {
 
-    private final int[] neiInt;
-    private final int[] neighbours;
-    private int state;
+    private final int[] neighbouringIntersections;
+    private final int[] neighbouringEdges;
+    private Player owner;
 
     /**
-     * Constructor
+     * Constructor for a edge without a road on it
      *
-     * @param neiInt     The two neighbouring intersections
-     * @param neighbours The two to four neighbouring edges
-     * @param state      0 if undeveloped;
-     *                   1-4 for road's owner
+     * @param neighbouringIntersections The two neighbouring intersections
+     * @param neighbouringEdges         The two to four neighbouring edges
      */
-    public Edge(int[] neiInt, int[] neighbours, int state) {
-        this.neiInt = neiInt;
-        this.neighbours = neighbours;
-        this.state = state;
+    public Edge(int[] neighbouringIntersections, int[] neighbouringEdges) {
+        this.neighbouringIntersections = neighbouringIntersections;
+        this.neighbouringEdges = neighbouringEdges;
+        this.owner = null;
+    }
+
+    /**
+     * Constructor for a edge with a road on it
+     *
+     * @param neighbouringIntersections The two neighbouring intersections
+     * @param neighbouringEdges         The two to four neighbouring edges
+     * @param owner                     The owner of the road on the edge
+     */
+    public Edge(int[] neighbouringIntersections, int[] neighbouringEdges, Player owner) {
+        this.neighbouringIntersections = neighbouringIntersections;
+        this.neighbouringEdges = neighbouringEdges;
+        this.owner = owner;
     }
 
     @Override
-    public int[] getNeiInt() {
-        return neiInt;
+    public void buildRoad(Player owner) {
+        this.owner = owner;
     }
 
     @Override
-    public int[] getNeighbours() {
-        return neighbours;
+    public int[] getNeighbouringEdges() {
+        return neighbouringEdges;
     }
 
     @Override
-    public int getState() {
-        return state;
+    public Player getOwner() {
+        return owner;
     }
 
     @Override
-    public void setState(int state) {
-        this.state = state;
+    public int[] getNeighbouringIntersections() {
+        return neighbouringIntersections;
     }
 }

@@ -5,6 +5,8 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import javafx.fxml.FXMLLoader;
 
+import java.util.ResourceBundle;
+
 /**
  * Class that provides instances of the FXMLLoader
  *
@@ -19,6 +21,7 @@ public class FXMLLoaderProvider implements Provider<FXMLLoader> {
     @Override
     public FXMLLoader get() {
         FXMLLoader loader = new FXMLLoader();
+        loader.setResources(injector.getInstance(ResourceBundle.class));
         loader.setControllerFactory(injector::getInstance);
         return loader;
     }

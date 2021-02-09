@@ -46,7 +46,10 @@ public class SceneManager {
 
     static final Logger LOG = LogManager.getLogger(SceneManager.class);
     static final String styleSheet = "css/swp.css";
+    private static final int LOBBY_HEIGHT = 730;
+    private static final int LOBBY_WIDTH = 685;
 
+    private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
@@ -64,6 +67,7 @@ public class SceneManager {
         eventBus.register(this);
         this.primaryStage = primaryStage;
         this.injector = injected;
+        this.resourceBundle = this.injector.getInstance(ResourceBundle.class);
         initViews();
     }
 
@@ -284,9 +288,13 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
+        lobbyStage.setHeight(LOBBY_HEIGHT);
+        lobbyStage.setMinHeight(LOBBY_HEIGHT);
+        lobbyStage.setWidth(LOBBY_WIDTH);
+        lobbyStage.setMinWidth(LOBBY_WIDTH);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane, 600, 600);
+        Scene lobbyScene = new Scene(rootPane);
         lobbyScene.getStylesheets().add(styleSheet);
         lobbyScenes.put(lobbyName, lobbyScene);
         //Sets the stage to the newly created scene
@@ -403,7 +411,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showServerError(String e) {
-        showError("Server returned an error:\n", e);
+        showError(resourceBundle.getString("error.server") + '\n', e);
     }
 
     /**
@@ -414,7 +422,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showError(String e) {
-        showError("Error:\n", e);
+        showError(resourceBundle.getString("error.generic") + '\n', e);
     }
 
     /**
@@ -448,7 +456,7 @@ public class SceneManager {
      */
     public void showLoginErrorScreen() {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Error logging in to server");
+            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
             alert.showAndWait();
             showLoginScreen();
         });
@@ -463,7 +471,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showMainScreen(User currentUser) {
-        showScene(mainScene, "Welcome " + currentUser.getUsername());
+        showScene(mainScene,
+                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()));
     }
 
     /**
@@ -476,7 +485,7 @@ public class SceneManager {
      */
     public void showLoginScreen() {
         System.out.println(lobbyStages.toString());
-        showScene(loginScene, "Login");
+        showScene(loginScene, resourceBundle.getString("login.window.title"));
     }
 
     /**
@@ -488,7 +497,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, "Registration");
+        showScene(registrationScene, resourceBundle.getString("register.window.title"));
     }
 
     /**
@@ -504,7 +513,7 @@ public class SceneManager {
      */
     public void showChangePasswordScreen(User user) {
         ChangePasswordScene.setUserData(user);
-        showScene(ChangePasswordScene, "Change Password");
+        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"));
     }
 
     /**
