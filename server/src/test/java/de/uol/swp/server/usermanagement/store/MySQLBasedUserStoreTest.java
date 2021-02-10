@@ -1,10 +1,11 @@
-/*package de.uol.swp.server.usermanagement.store;
+package de.uol.swp.server.usermanagement.store;
 
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,12 @@ class MySQLBasedUserStoreTest {
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
+
+    // Set to true if you manually want to run these tests
+    // This is only needed to not run these time intensive tests in CI
+    static boolean isLocal() {
+        return false;
+    }
 
     static {
         users = new ArrayList<>();
@@ -49,6 +56,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void changePassword() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
@@ -62,6 +70,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void createEmptyUser() {
         UserStore store = getDefaultStore();
 
@@ -69,6 +78,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void dropUser() {
         UserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
@@ -81,6 +91,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void findUserByName() {
         UserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
@@ -93,6 +104,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void findUserByNameAndPassword() {
         UserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
@@ -105,6 +117,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void findUserByNameAndPassword_EmptyUser_NotFound() {
         UserStore store = getDefaultStore();
 
@@ -114,6 +127,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void findUserByNameAndPassword_NotFound() {
         UserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
@@ -124,6 +138,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void findUserByName_NotFound() {
         UserStore store = getDefaultStore();
         User userToFind = getDefaultUsers().get(0);
@@ -134,6 +149,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void getAllUsers() {
         UserStore store = getDefaultStore();
         List<User> allUsers = getDefaultUsers();
@@ -146,6 +162,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void overwriteUser() {
         UserStore store = getDefaultStore();
         User userToCreate = getDefaultUsers().get(1);
@@ -155,6 +172,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void updateUser() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
@@ -167,4 +185,3 @@ class MySQLBasedUserStoreTest {
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
     }
 }
-*/
