@@ -37,7 +37,7 @@ class ServerApp {
      * @since 2019-09-18
      */
     private static void createServices(Injector injector) {
-        ServerUserService userManagement = injector.getInstance(UserManagement.class);
+        IUserManagement userManagement = injector.getInstance(UserManagement.class);
 
         // TODO: Remove after registration is implemented
         for (int i = 0; i < 5; i++) {

@@ -1,3 +1,3 @@
 package de.uol.swp.server.usermanagement;
 
-abstract class AbstractUserManagement implements ServerUserService {}
+abstract class AbstractUserManagement implements IUserManagement {}
