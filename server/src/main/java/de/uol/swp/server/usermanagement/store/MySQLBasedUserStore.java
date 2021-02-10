@@ -23,10 +23,10 @@ import java.util.Optional;
  */
 public class MySQLBasedUserStore extends AbstractUserStore {
 
-    static final String JDBC_DRIVER = "org.mysql.jdbc.Driver";
-    static final String DB_URL = "134.106.11.89:50010";
+    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://134.106.11.89:50010/catan_user_schema";
     static final String USER = "catan";
-    static final String PASS = "definitlysecurepassword";
+    static final String PASS = "rNZcEqeiqMJpdr9M";
     Connection conn = null;
     PreparedStatement pstmt = null;
 
@@ -49,7 +49,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 conn.setAutoCommit(true);
 
-                String sql = "INSERT INTO USERDB (username, mail, pass) VALUES (?, ?, ?)";
+                String sql = "INSERT INTO userdb (username, mail, pass) VALUES (?, ?, ?)";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
@@ -86,7 +86,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT * FROM USERDB WHERE username = ?";
+            String sql = "SELECT * FROM userdb WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
@@ -133,7 +133,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT * FROM USERDB WHERE username = ?";
+            String sql = "SELECT * FROM userdb WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
@@ -180,7 +180,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "SELECT * FROM USERDB";
+            String sql = "SELECT * FROM userdb";
             pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
 
@@ -220,7 +220,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "DELETE FROM USERDB WHERE username = ?";
+            String sql = "DELETE FROM userdb WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.executeUpdate();
@@ -257,7 +257,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?";
+            String sql = "UPDATE userdb SET pass = ?, mail = ? WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, passwordHash);
             pstmt.setString(2, eMail);
