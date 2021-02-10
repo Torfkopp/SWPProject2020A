@@ -34,7 +34,7 @@ public class ServerModule extends AbstractModule {
         java.util.Properties defaultProps = new Properties();
 
         //Default language
-        defaultProps.setProperty("db", "mysql");
+        defaultProps.setProperty("db", "h2");
 
         //Reading properties-file
         final Properties serverProperties = new Properties(defaultProps);
