@@ -20,6 +20,7 @@ import java.util.Optional;
  * @implNote This store will never return the password of a user!
  * @see AbstractUserStore
  * @see UserStore
+ * @since 2021-02-10
  */
 public class MySQLBasedUserStore extends AbstractUserStore {
 
@@ -34,6 +35,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * This method registers the user with its specific and unique username,
      * password and e-mail and saves it in the database.
      *
+     * @author Marvin Drees
+     * @since 2021-02-10
      */
     @Override
     public User createUser(String username, String password, String eMail) {
@@ -78,6 +81,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * This method finds and returns the specific user
      * from the database without a password comparison.
      *
+     * @author Marvin Drees
+     * @since 2021-02-10
      */
     @Override
     public Optional<User> findUser(String username) {
@@ -123,6 +128,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * the provided username and password and returns a
      * UserDTO for the matching result.
      *
+     * @author Marvin Drees
+     * @since 2021-02-10
      */
     @Override
     public Optional<User> findUser(String username, String password) {
@@ -170,6 +177,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * the data from each row into a UserDTO which then
      * gets put into a list.
      *
+     * @author Marvin Drees
+     * @since 2021-02-10
      */
     @Override
     public List<User> getAllUsers() {
@@ -212,6 +221,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
     /**
      * This method removes the row matching the provided username.
      *
+     * @author Marvin Drees
+     * @since 2021-02-10
      */
     @Override
     public void removeUser(String username) {
@@ -243,6 +254,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * This method allows the user to change his unique username, password or e-mail.
      * The user will not be able to update his username or e-mail into already registered once.
      *
+     * @author Marvin Drees
+     * @since 2021-02-10
      */
     @Override
     public User updateUser(String username, String password, String eMail) {
