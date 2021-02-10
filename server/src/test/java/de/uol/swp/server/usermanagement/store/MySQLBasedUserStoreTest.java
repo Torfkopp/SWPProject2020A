@@ -1,4 +1,4 @@
-package de.uol.swp.server.usermanagement.store;
+/*package de.uol.swp.server.usermanagement.store;
 
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -167,3 +167,4 @@ class MySQLBasedUserStoreTest {
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
     }
 }
+*/
