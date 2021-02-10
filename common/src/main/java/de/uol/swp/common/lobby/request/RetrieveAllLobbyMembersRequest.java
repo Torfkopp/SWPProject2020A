@@ -15,10 +15,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  */
 public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
 
-    private String lobbyName;
-
-    public RetrieveAllLobbyMembersRequest() {
-    }
+    private final String lobbyName;
 
     public RetrieveAllLobbyMembersRequest(String lobbyName) {
         this.lobbyName = lobbyName;

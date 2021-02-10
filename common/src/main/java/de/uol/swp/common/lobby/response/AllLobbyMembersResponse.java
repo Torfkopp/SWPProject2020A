@@ -18,17 +18,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
 
     private final List<User> users = new ArrayList<>();
     private final Set<User> readyUsers = new TreeSet<>();
-    private User owner;
-
-    /**
-     * Default Constructor
-     *
-     * @implNote This constructor is needed for serialisation
-     * @since 2020-12-21
-     */
-    public AllLobbyMembersResponse() {
-        // needed for serialisation
-    }
+    private final User owner;
 
     /**
      * Constructor

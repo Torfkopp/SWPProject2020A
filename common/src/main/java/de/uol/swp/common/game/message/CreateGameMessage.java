@@ -12,15 +12,14 @@ import de.uol.swp.common.user.User;
 public class CreateGameMessage extends AbstractGameMessage {
 
     private final Lobby lobby;
-    private final User first;
 
     public CreateGameMessage(Lobby lobby, User first) {
+        super(lobby.getName(), first);
         this.lobby = lobby;
-        this.first = first;
     }
 
     public User getFirst() {
-        return first;
+        return super.getUser();
     }
 
     public Lobby getLobby() {

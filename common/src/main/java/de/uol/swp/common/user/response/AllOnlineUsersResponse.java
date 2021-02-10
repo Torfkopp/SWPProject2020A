@@ -26,16 +26,6 @@ public class AllOnlineUsersResponse extends AbstractResponseMessage {
     private final List<User> users = new ArrayList<>();
 
     /**
-     * Default constructor
-     *
-     * @implNote This constructor is needed for serialisation
-     * @since 2019-08-13
-     */
-    public AllOnlineUsersResponse() {
-        // needed for serialisation
-    }
-
-    /**
      * Constructor
      * <p>
      * This constructor generates a new list of logged in users from the given

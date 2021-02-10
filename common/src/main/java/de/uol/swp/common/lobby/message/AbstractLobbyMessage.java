@@ -13,19 +13,10 @@ import java.util.Objects;
  * @see de.uol.swp.common.message.AbstractServerMessage
  * @since 2019-10-08
  */
-public class AbstractLobbyMessage extends AbstractServerMessage {
+public abstract class AbstractLobbyMessage extends AbstractServerMessage {
 
-    String name;
-    User user;
-
-    /**
-     * Default constructor
-     *
-     * @implNote this constructor is needed for serialisation
-     * @since 2019-10-08
-     */
-    public AbstractLobbyMessage() {
-    }
+    private String name;
+    private User user;
 
     /**
      * Constructor

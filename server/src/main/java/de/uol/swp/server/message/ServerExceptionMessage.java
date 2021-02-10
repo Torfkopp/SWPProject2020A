@@ -22,7 +22,6 @@ public class ServerExceptionMessage extends AbstractServerInternalMessage {
      * @since 2019-08-07
      */
     public ServerExceptionMessage(Exception e) {
-        super();
         this.e = e;
     }
 

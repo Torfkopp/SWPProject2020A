@@ -32,9 +32,9 @@ public class ChatMessageDTO implements ChatMessage {
      * @param content   The content of the message
      */
     public ChatMessageDTO(int id, User author, Instant timestamp, String content) {
-        assert Objects.nonNull(author);
-        assert Objects.nonNull(timestamp);
-        assert !Strings.isNullOrEmpty(content);
+        if (!Objects.nonNull(author)) throw new IllegalArgumentException("Author must not be null");
+        if (Strings.isNullOrEmpty(content)) throw new IllegalArgumentException("Content must not be null or empty");
+        if (!Objects.nonNull(timestamp)) throw new IllegalArgumentException("Timestamp must not be null");
         this.id = id;
         this.author = author;
         this.timestamp = timestamp;
@@ -52,8 +52,8 @@ public class ChatMessageDTO implements ChatMessage {
      * @param content The content of the message
      */
     public ChatMessageDTO(int id, User author, String content) {
-        assert Objects.nonNull(author);
-        assert !Strings.isNullOrEmpty(content);
+        if (!Objects.nonNull(author)) throw new IllegalArgumentException("Author must not be null");
+        if (Strings.isNullOrEmpty(content)) throw new IllegalArgumentException("Content must not be null or empty");
         this.id = id;
         this.author = author;
         this.timestamp = Instant.now();
@@ -71,9 +71,9 @@ public class ChatMessageDTO implements ChatMessage {
      * @param edited    The edit status of the ChatMessage
      */
     public ChatMessageDTO(int id, User author, Instant timestamp, String content, boolean edited) {
-        assert Objects.nonNull(author);
-        assert Objects.nonNull(timestamp);
-        assert !Strings.isNullOrEmpty(content);
+        if (!Objects.nonNull(author)) throw new IllegalArgumentException("Author must not be null");
+        if (Strings.isNullOrEmpty(content)) throw new IllegalArgumentException("Content must not be null or empty");
+        if (!Objects.nonNull(timestamp)) throw new IllegalArgumentException("Timestamp must not be null");
         this.id = id;
         this.author = author;
         this.timestamp = timestamp;

@@ -305,7 +305,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onNextPlayerMessage(NextPlayerMessage message) {
         setTurnIndicatorText(message.getActivePlayer());
         //In here to test the endTurnButton
-        onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
+        onDiceCastMessage(new DiceCastMessage(message.getLobbyName(), message.getActivePlayer()));
     }
 
     /**
