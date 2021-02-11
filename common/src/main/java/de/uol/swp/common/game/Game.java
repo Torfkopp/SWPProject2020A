@@ -44,11 +44,14 @@ public class Game {
      *
      * @return int The amount of points
      */
-    public int calcVicPoints(Player player) {
+    public int calculateVictoryPoints(Player player) {
         int points = 0;
-        //0 =^= 48 in Ascii; Array starts at 0.
-        //Player #1 has index 0 in the Inventory array, hence the -49.
-        int num = player.toString().charAt(7) - 49;
+        int num = 1;
+        switch(player){
+            case PLAYER_2: num= 2;
+            case PLAYER_3: num= 3;
+            case PLAYER_4: num = 4;
+        }
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards

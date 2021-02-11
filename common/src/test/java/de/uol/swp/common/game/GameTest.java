@@ -29,25 +29,25 @@ public class GameTest {
         assertEquals(game.getInventories().length, 1);
         assertEquals(player, Player.PLAYER_1);
         //Player has nothing
-        assertEquals(game.calcVicPoints(player), 0);
+        assertEquals(game.calculateVictoryPoints(player), 0);
         game.getMap().placeSettlement(player, 1);
         //Player has a settlement
-        assertEquals(game.calcVicPoints(player), 1);
+        assertEquals(game.calculateVictoryPoints(player), 1);
         game.getMap().upgradeSettlement(player, 1);
         //Player has a city
-        assertEquals(game.calcVicPoints(player), 2);
+        assertEquals(game.calculateVictoryPoints(player), 2);
         game.getInventory(player).setVictoryPointCards(3);
         //Player has a city and 3 victory point cards
-        assertEquals(game.calcVicPoints(player), 5);
+        assertEquals(game.calculateVictoryPoints(player), 5);
         game.getInventory(player).setLongestRoad(true);
         //Player has a city, 3 victory point cards, and the longest road
-        assertEquals(game.calcVicPoints(player), 7);
+        assertEquals(game.calculateVictoryPoints(player), 7);
         game.getInventory(player).setLargestArmy(true);
         //Player has a city, 3 point cards, longest road, and the largest army
-        assertEquals(game.calcVicPoints(player), 9);
+        assertEquals(game.calculateVictoryPoints(player), 9);
         game.getMap().placeSettlement(player, 50);
         //Player has a city, a settlement, 3 point cards, longest road, and the largest army
-        assertEquals(game.calcVicPoints(player), 10);
+        assertEquals(game.calculateVictoryPoints(player), 10);
     }
 
     @Test
