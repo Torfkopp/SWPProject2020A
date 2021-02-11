@@ -15,15 +15,14 @@ import java.util.Objects;
 public class LoginRequest extends AbstractRequestMessage {
 
     private static final long serialVersionUID = 7793454958390539421L;
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     /**
      * Constructor
      *
      * @param username The user's username
      * @param password The user's password
-     *
      * @since 2017-03-17
      */
     public LoginRequest(String username, String password) {
@@ -53,43 +52,21 @@ public class LoginRequest extends AbstractRequestMessage {
      * Gets the password variable
      *
      * @return String containing the user's password
-     *
      * @since 2017-03-17
      */
     public String getPassword() {
         return password;
     }
 
-    /**
-     * Sets the password variable
-     *
-     * @param password String containing the new password
-     *
-     * @since 2017-03-17
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     /**
      * Gets the username variable
      *
      * @return String containing the user's username
-     *
      * @since 2017-03-17
      */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Sets the username variable
-     *
-     * @param username String containing the new username
-     *
-     * @since 2017-03-17
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
 }

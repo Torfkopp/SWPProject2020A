@@ -17,8 +17,8 @@ import de.uol.swp.common.user.User;
  */
 public abstract class AbstractGameMessage extends AbstractServerMessage {
 
-    private String lobbyName;
-    private User user;
+    private final String lobbyName;
+    private final User user;
 
     /**
      * Constructor
@@ -40,14 +40,6 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
         return lobbyName;
     }
 
-    /**
-     * Sets the lobbyName
-     *
-     * @param lobbyName Lobby's name
-     */
-    public void setLobbyName(String lobbyName) {
-        this.lobbyName = lobbyName;
-    }
 
     /**
      * Gets the user
@@ -58,12 +50,4 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
         return user;
     }
 
-    /**
-     * Sets the user
-     *
-     * @param user The user
-     */
-    public void setUser(User user) {
-        this.user = user;
-    }
 }
