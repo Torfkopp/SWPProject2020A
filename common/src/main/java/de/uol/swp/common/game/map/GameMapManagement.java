@@ -8,6 +8,8 @@ import static de.uol.swp.common.game.map.Hexes.IResourceHex.ResourceHexType.*;
 import static de.uol.swp.common.game.map.IIntersection.IntersectionState.*;
 import static de.uol.swp.common.game.map.Player.*;
 
+import java.util.*;
+
 /**
  * Management of the gameMap
  *
@@ -22,13 +24,15 @@ public class GameMapManagement implements IGameMapManagement {
     private final IEdge[] edges = new IEdge[73]; //72 edges
     private final IIntersection[] intersections = new IIntersection[55]; //54 intersections
 
+    //Map mapping the player and his settlements/cities
+    private final Map<Player, List<Integer>> playerInters = new HashMap<>();
+
     int robberPosition = 37;
 
     public GameMapManagement() {
         createBeginnerMap();
         createEdges();
         createIntersections();
-
         hexes[robberPosition].setRobberOnField(true);
     }
 
@@ -249,6 +253,22 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public int getPlayerPoints(Player player) {
+        if(!playerInters.containsKey(player)) return 0;
+        int points = 0;
+        IIntersection.IntersectionState state;
+        for (int i : playerInters.get(player)) {
+            state = intersections[i].getState();
+            if (state.equals(SETTLEMENT)) {
+                points++;
+            } else if (state.equals(CITY)) {
+                points += 2;
+            }
+        }
+        return points;
+    }
+
+    @Override
     public int getRobberPos() {
         return robberPosition;
     }
@@ -272,6 +292,8 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public boolean placeSettlement(Player player, int position) {
         if (settlementPlaceable(player, position)) {
+            if(!playerInters.containsKey(player)) playerInters.put(player, new ArrayList<>());
+            playerInters.get(player).add(position);
             intersections[position].setOwnerAndState(player, SETTLEMENT);
             for (int iPos : intersections[position].getNeighbours()) {
                 intersections[iPos].setState(BLOCKED);

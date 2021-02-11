@@ -2,6 +2,7 @@ package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
@@ -36,12 +37,46 @@ public class Game {
         }
     }
 
+    /**
+     * Calculates the player's victory points
+     *
+     * @param player The User object
+     *
+     * @return int The amount of points
+     */
+    public int calculateVictoryPoints(Player player) {
+        int points = 0;
+        int num = 0;
+        switch(player){
+            case PLAYER_2: num= 1;
+            case PLAYER_3: num= 2;
+            case PLAYER_4: num = 3;
+        }
+        //Points made with settlements & cities
+        points += map.getPlayerPoints(player);
+        //Points made with victory point cards
+        points += inventories[num].getVictoryPointCards();
+        //2 Points if player has the longest road
+        if (inventories[num].isLongestRoad()) points += 2;
+        //2 Points if player has the largest army
+        if (inventories[num].isLargestArmy()) points += 2;
+        return points;
+    }
+
     public Inventory[] getInventories() {
         return inventories;
     }
 
+    public Inventory getInventory(Player player) {
+        return inventories[player.toString().charAt(7) - 49];
+    }
+
     public Lobby getLobby() {
         return lobby;
+    }
+
+    public IGameMapManagement getMap() {
+        return map;
     }
 
     public User[] getPlayers() {

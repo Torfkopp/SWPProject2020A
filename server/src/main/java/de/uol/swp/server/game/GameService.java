@@ -117,9 +117,9 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(msg.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
-        for (int i = 0; i < inventories.length; i++) {
-            if (inventories[i].getPlayer().equals(msg.getUser())) {
-                inventory = inventories[i];
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(msg.getUser())) {
+                inventory = value;
                 System.out.println(inventory.getPlayer());
                 break;
             }
