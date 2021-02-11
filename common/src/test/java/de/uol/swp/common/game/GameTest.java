@@ -24,7 +24,7 @@ public class GameTest {
     static Game game = new Game(lobby, user);
 
     @Test
-    void calcVicPointsTest() {
+    void calculateVictoryPointsTest() {
         Player player = Player.PLAYER_1;
         assertEquals(game.getInventories().length, 1);
         assertEquals(player, Player.PLAYER_1);

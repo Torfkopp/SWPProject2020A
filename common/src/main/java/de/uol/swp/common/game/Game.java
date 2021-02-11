@@ -46,11 +46,11 @@ public class Game {
      */
     public int calculateVictoryPoints(Player player) {
         int points = 0;
-        int num = 1;
+        int num = 0;
         switch(player){
-            case PLAYER_2: num= 2;
-            case PLAYER_3: num= 3;
-            case PLAYER_4: num = 4;
+            case PLAYER_2: num= 1;
+            case PLAYER_3: num= 2;
+            case PLAYER_4: num = 3;
         }
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
