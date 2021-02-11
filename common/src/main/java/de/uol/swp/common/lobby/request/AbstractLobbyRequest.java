@@ -23,6 +23,7 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      *
      * @param name Name of the lobby
      * @param user User responsible for the creation of this message
+     *
      * @since 2019-10-08
      */
     public AbstractLobbyRequest(String name, User user) {
@@ -47,21 +48,21 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      * Gets the name variable
      *
      * @return String containing the lobby's name
+     *
      * @since 2019-10-08
      */
     public String getName() {
         return name;
     }
 
-
     /**
      * Gets the user variable
      *
      * @return User responsible for the creation of this message
+     *
      * @since 2019-10-08
      */
     public User getUser() {
         return user;
     }
-
 }

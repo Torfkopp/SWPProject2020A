@@ -40,7 +40,6 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
         return lobbyName;
     }
 
-
     /**
      * Gets the user
      *
@@ -49,5 +48,4 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
     public User getUser() {
         return user;
     }
-
 }

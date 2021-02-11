@@ -17,6 +17,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      *
      * @param name  Name of the lobby
      * @param owner User trying to create the lobby
+     *
      * @since 2019-10-08
      */
     public CreateLobbyRequest(String name, User owner) {
@@ -27,11 +28,10 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      * Gets the user variable
      *
      * @return User trying to create the lobby
+     *
      * @since 2019-10-08
      */
     public User getOwner() {
         return getUser();
     }
-
-
 }

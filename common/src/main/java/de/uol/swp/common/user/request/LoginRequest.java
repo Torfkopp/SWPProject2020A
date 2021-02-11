@@ -23,6 +23,7 @@ public class LoginRequest extends AbstractRequestMessage {
      *
      * @param username The user's username
      * @param password The user's password
+     *
      * @since 2017-03-17
      */
     public LoginRequest(String username, String password) {
@@ -52,21 +53,21 @@ public class LoginRequest extends AbstractRequestMessage {
      * Gets the password variable
      *
      * @return String containing the user's password
+     *
      * @since 2017-03-17
      */
     public String getPassword() {
         return password;
     }
 
-
     /**
      * Gets the username variable
      *
      * @return String containing the user's username
+     *
      * @since 2017-03-17
      */
     public String getUsername() {
         return username;
     }
-
 }
