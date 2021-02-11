@@ -36,7 +36,7 @@ class ServerApp {
      * @since 2019-09-18
      */
     private static void createServices(Injector injector) {
-        ServerUserService userManagement = injector.getInstance(UserManagement.class);
+        IUserManagement userManagement = injector.getInstance(UserManagement.class);
 
         // Create 5 test user for ease of development
         for (int i = 0; i < 5; i++) {

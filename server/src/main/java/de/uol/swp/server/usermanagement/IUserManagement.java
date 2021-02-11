@@ -11,7 +11,7 @@ import java.util.Optional;
  * @author Marco Grawunder
  * @since 2017-03-17
  */
-public interface ServerUserService {
+public interface IUserManagement {
 
     /**
      * Create a new permanent user

@@ -34,7 +34,7 @@ public class UserService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(UserService.class);
 
-    private final ServerUserService userManagement;
+    private final IUserManagement userManagement;
 
     /**
      * Constructor
