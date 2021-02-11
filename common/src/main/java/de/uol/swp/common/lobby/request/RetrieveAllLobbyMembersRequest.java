@@ -3,9 +3,9 @@ package de.uol.swp.common.lobby.request;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
- * Request for initialising the user list in the client
+ * Request for initialising the lobby member list in the client
  * <p>
- * This message is sent during the initialisation of the user list.
+ * This message is sent during the initialisation of the member list.
  * The server will respond with an AllLobbyMembersResponse.
  *
  * @author Alwin Bossert
@@ -17,10 +17,20 @@ public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
 
     private final String lobbyName;
 
+    /**
+     * Constructor
+     *
+     * @param lobbyName The name of the lobby for which to retrieve the list of members
+     */
     public RetrieveAllLobbyMembersRequest(String lobbyName) {
         this.lobbyName = lobbyName;
     }
 
+    /**
+     * Gets the lobby name.
+     *
+     * @return The lobby name
+     */
     public String getLobbyName() {
         return lobbyName;
     }

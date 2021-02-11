@@ -2,7 +2,6 @@ package de.uol.swp.server.communication;
 
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.request.LoginRequest;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -11,7 +10,7 @@ import java.util.UUID;
  * Class used to store connected clients and users in an identifiable way
  *
  * @author Marco Grawunder
- * @see de.uol.swp.server.usermanagement.AuthenticationService#onLoginRequest(LoginRequest)
+ * @see de.uol.swp.server.usermanagement.AuthenticationService
  * @see de.uol.swp.common.user.Session
  * @since 2017-03-17
  */

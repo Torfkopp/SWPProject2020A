@@ -18,15 +18,19 @@ public class UpdateUserPasswordRequest extends UpdateUserRequest {
     /**
      * Constructor
      *
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @since 2020-12-17
+     * @param user        The user whose password to update
+     * @param oldPassword the old password
      */
     public UpdateUserPasswordRequest(User user, String oldPassword) {
         super(user);
         this.oldPassword = oldPassword;
     }
 
+    /**
+     * Gets the user's old password
+     *
+     * @return The user's old password
+     */
     public String getOldPassword() {
         return oldPassword;
     }
