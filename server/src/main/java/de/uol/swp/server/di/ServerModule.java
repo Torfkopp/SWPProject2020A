@@ -6,6 +6,7 @@ import de.uol.swp.server.chat.store.ChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.usermanagement.store.H2BasedUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
+import de.uol.swp.server.usermanagement.store.MySQLBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,9 +55,9 @@ public class ServerModule extends AbstractModule {
             case "mainmemory":
                 store = new MainMemoryBasedUserStore();
                 break;
-            //case "mysql":
-            //    store = new MySQLBasedUserStore()
-            //    break;
+            case "mysql":
+                store = new MySQLBasedUserStore();
+                break;
             default:
                 System.err.println("Invalid value for 'db' in serverconfig.properties\n----Using h2");
                 store = new H2BasedUserStore();
