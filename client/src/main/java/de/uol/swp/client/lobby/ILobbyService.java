@@ -14,8 +14,8 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param name Name chosen for the new lobby
-     * @param user User wanting to create the new lobby
+     * @param name The name chosen for the new lobby
+     * @param user The user wanting to create the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
@@ -25,18 +25,18 @@ public interface ILobbyService {
     /**
      * Posts a request to end the turn onto the Event
      *
-     * @param user User who wants to end the turn
+     * @param user The user who wants to end the turn
      *
      * @see de.uol.swp.common.game.request.EndTurnRequest
-     * @since 2021-1-15
+     * @since 2021-01-15
      */
     void endTurn(User user, String lobbyName);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus
      *
-     * @param name Name of the lobby the user wants to join
-     * @param user User who wants to join the lobby
+     * @param name The name of the lobby the user wants to join
+     * @param user The user who wants to join the lobby
      *
      * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
@@ -70,7 +70,7 @@ public interface ILobbyService {
     /**
      * Posts a request to remove the user from all lobbies
      *
-     * @param user the logged in user
+     * @param user The logged in user
      *
      * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
      * @since 2021-01-28
@@ -99,13 +99,13 @@ public interface ILobbyService {
     /**
      * Posts a request to update ones Inventory
      *
-     * @param lobbyName name of the lobby the user wants to update his Inventory in
-     * @param user      User who wants to update his Inventory.
+     * @param lobbyName The name of the lobby the user wants to update his Inventory in
+     * @param user      The user who wants to update his Inventory.
      *
      * @author Sven Ahrens
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest
-     * @since 2021-1-25
+     * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
 }
