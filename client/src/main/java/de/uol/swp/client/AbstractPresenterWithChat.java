@@ -98,6 +98,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @param msg The CreatedChatMessageMessage object found on the EventBus
      *
+     * @implNote Some code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
      */
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
@@ -144,6 +146,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @param msg The DeletedChatMessageMessage found on the EventBus
      *
+     * @implNote Some code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.chat.message.DeletedChatMessageMessage
      */
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
@@ -205,6 +209,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @param msg The EditedChatMessageMessage found on the EventBus
      *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.chat.message.EditedChatMessageMessage
      */
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
@@ -291,6 +297,16 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         chatMessages = null;
     }
 
+    /**
+     * Helper method for updating the chatMessages list.
+     * This method places the provided List of ChatMessage objects into the
+     * chatMessages ObservableList.
+     *
+     * @param chatMessageList A List of ChatMessage objects to add to the chat
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     */
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
         Platform.runLater(() -> {
             if (chatMessages == null) prepareChatVars();

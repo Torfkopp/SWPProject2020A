@@ -11,6 +11,7 @@ import java.util.*;
  * This response includes all lobby members as well as the owner of the lobby.
  *
  * @author Alwin Bossert
+ * @see de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest
  * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
  * @since 2020-12-20
  */

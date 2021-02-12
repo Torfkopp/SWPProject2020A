@@ -5,6 +5,15 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.Map;
 
+/**
+ * Response sent by the server when a user wants to be removed from all lobbies
+ *
+ * @author Aldin Dervisi
+ * @author Finn Haase
+ * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
+ * @since 2020-01-28
+ */
 public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
 
     private final Map<String, Lobby> lobbiesWithUser;
@@ -13,10 +22,6 @@ public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
      * Constructor
      *
      * @param lobbiesWithUser The Map with the Lobbies
-     *
-     * @author Finn Haase
-     * @author Aldin Dervisi
-     * @since 2020-01-28
      **/
     public RemoveFromLobbiesResponse(Map<String, Lobby> lobbiesWithUser) {
         this.lobbiesWithUser = lobbiesWithUser;
@@ -26,8 +31,6 @@ public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
      * Gets the Map of the Lobbies
      *
      * @return Map getLobbiesWithUser
-     *
-     * @since 2020-01-28
      */
     public Map<String, Lobby> getLobbiesWithUser() {
         return lobbiesWithUser;

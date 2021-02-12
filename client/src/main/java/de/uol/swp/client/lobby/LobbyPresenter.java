@@ -184,18 +184,18 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     /**
      * Handles a new list of users
      * <p>
-     * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
-     * of the currently logged in members are put into the list of lobby members.
-     * The owner attribute is set and the set of ready Users is updated.
-     * Additionally, the state of the "Start Session" button is set
-     * appropriately.
+     * If a new AllOnlineUsersResponse object is posted onto the EventBus,
+     * and it is intended for the current Lobby, the names of the currently
+     * logged in members are put into the list of lobby members. The owner
+     * attribute is set and the set of ready Users is updated. Additionally,
+     * the state of the "Start Session" button is set appropriately.
      * <p>
      * Furthermore, if the LOG-Level is set to DEBUG, the messages "Update of user
      * list" with the names of all currently logged in users, "Owner of this
      * lobby: " with the name of the lobby's owner, and "Update of ready users "
      * are displayed in the log.
      *
-     * @param allLobbyMembersResponse AllLobbyMembersResponse object seen on the EventBus
+     * @param allLobbyMembersResponse The AllLobbyMembersResponse object seen on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2021-01-19
@@ -269,7 +269,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * Also makes sure that the lobby will be left gracefully should the window
      * be closed without using the Leave Lobby button.
      *
-     * @param lobbyUpdateEvent the lobby update event
+     * @param lobbyUpdateEvent The LobbyUpdateEvent found on the EventBus
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
@@ -333,7 +333,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * method leaveLobby in LobbyService is called for every Lobby the user
      * is in.
      *
-     * @param response the RemoveFromLobbiesResponse seen on the EventBus
+     * @param response The RemoveFromLobbiesResponse seen on the EventBus
      *
      * @author Finn Haase
      * @author Aldin Dervisi
@@ -390,6 +390,25 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         }
     }
 
+    /**
+     * Handles an UpdateInventoryResponse found on the EventBus
+     * <p>
+     * If the UpdateInventoryResponse is intended for the current Lobby, the
+     * resourceList linked to the inventoryView is cleared and updated with the
+     * items as listed in the maps contained in the UpdateInventoryResponse.
+     * The item names are localised with the ResourceBundle injected into the
+     * LobbyPresenter.
+     *
+     * @param resp The UpdateInventoryResponse found on the EventBus
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @author Phillip-André Suhr
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.lobby.response.UpdateInventoryResponse
+     * @since 2021-01-27
+     */
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse resp) {
         if (resp.getLobbyName().equals(this.lobbyName)) {

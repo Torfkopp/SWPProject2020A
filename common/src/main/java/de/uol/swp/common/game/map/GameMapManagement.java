@@ -2,13 +2,13 @@ package de.uol.swp.common.game.map;
 
 import de.uol.swp.common.game.map.Hexes.*;
 
+import java.util.*;
+
 import static de.uol.swp.common.game.map.Hexes.IHarborHex.HarborResource.*;
 import static de.uol.swp.common.game.map.Hexes.IHarborHex.HarborSide.*;
 import static de.uol.swp.common.game.map.Hexes.IResourceHex.ResourceHexType.*;
 import static de.uol.swp.common.game.map.IIntersection.IntersectionState.*;
 import static de.uol.swp.common.game.map.Player.*;
-
-import java.util.*;
 
 /**
  * Management of the gameMap
@@ -29,6 +29,9 @@ public class GameMapManagement implements IGameMapManagement {
 
     int robberPosition = 37;
 
+    /**
+     * Constructor
+     */
     public GameMapManagement() {
         createBeginnerMap();
         createEdges();
@@ -254,7 +257,7 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public int getPlayerPoints(Player player) {
-        if(!playerInters.containsKey(player)) return 0;
+        if (!playerInters.containsKey(player)) return 0;
         int points = 0;
         IIntersection.IntersectionState state;
         for (int i : playerInters.get(player)) {
@@ -292,7 +295,7 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public boolean placeSettlement(Player player, int position) {
         if (settlementPlaceable(player, position)) {
-            if(!playerInters.containsKey(player)) playerInters.put(player, new ArrayList<>());
+            if (!playerInters.containsKey(player)) playerInters.put(player, new ArrayList<>());
             playerInters.get(player).add(position);
             intersections[position].setOwnerAndState(player, SETTLEMENT);
             for (int iPos : intersections[position].getNeighbours()) {

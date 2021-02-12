@@ -7,7 +7,7 @@ package de.uol.swp.server.message;
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.message.AbstractServerInternalMessage
- * @see de.uol.swp.server.usermanagement.AuthenticationService#onLoginRequest
+ * @see de.uol.swp.server.usermanagement.AuthenticationService
  * @since 2019-08-07
  */
 public class ServerExceptionMessage extends AbstractServerInternalMessage {
