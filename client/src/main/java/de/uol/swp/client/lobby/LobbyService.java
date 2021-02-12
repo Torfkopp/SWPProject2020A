@@ -54,7 +54,7 @@ public class LobbyService {
      * @param user User who wants to end the turn
      *
      * @see de.uol.swp.common.game.request.EndTurnRequest
-     * @since 2021-1-15
+     * @since 2021-01-15
      */
     public void endTurn(User user, String lobbyName) {
         Message endTurnRequest = new EndTurnRequest(user, lobbyName);
@@ -64,8 +64,8 @@ public class LobbyService {
     /**
      * Posts a request to join a specified lobby onto the EventBus
      *
-     * @param name Name of the lobby the user wants to join
-     * @param user User who wants to join the lobby
+     * @param name The name of the lobby the user wants to join
+     * @param user The user who wants to join the lobby
      *
      * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
@@ -75,6 +75,15 @@ public class LobbyService {
         eventBus.post(joinUserRequest);
     }
 
+    /**
+     * Posts a request to leave a specified lobby onto the EventBus
+     *
+     * @param lobbyName The name of the lobby the User wants to leave
+     * @param user      The user who wants to leave the lobby
+     *
+     * @see de.uol.swp.common.lobby.request.LobbyLeaveUserRequest
+     * @since 2020-12-05
+     */
     public void leaveLobby(String lobbyName, User user) {
         Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
@@ -98,7 +107,7 @@ public class LobbyService {
     /**
      * Posts a request to remove the user from all lobbies
      *
-     * @param user the logged in user
+     * @param user The logged in user
      *
      * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
      * @since 2021-01-28
@@ -119,6 +128,15 @@ public class LobbyService {
         eventBus.post(retrieveAllLobbiesRequest);
     }
 
+    /**
+     * Posts a request to retrieve all members of a lobby
+     *
+     * @param lobbyName The name of the lobby whose member list to request
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest
+     * @since 2020-12-20
+     */
     public void retrieveAllLobbyMembers(String lobbyName) {
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
@@ -127,13 +145,13 @@ public class LobbyService {
     /**
      * Posts a request to update ones Inventory
      *
-     * @param lobbyName name of the lobby the user wants to update his Inventory in
-     * @param user      User who wants to update his Inventory.
+     * @param lobbyName The name of the lobby the user wants to update their Inventory in
+     * @param user      The user who wants to update their Inventory.
      *
      * @author Sven Ahrens
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest
-     * @since 2021-1-25
+     * @since 2021-01-25
      */
     public void updateInventory(String lobbyName, User user) {
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
