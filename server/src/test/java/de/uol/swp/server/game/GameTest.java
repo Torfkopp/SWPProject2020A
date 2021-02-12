@@ -23,7 +23,7 @@ class GameTest {
 
     @Test
     void gameManagementTest() {
-        GameManagement gm = new GameManagement();
+        IGameManagement gm = new GameManagement();
         User user = new UserDTO("", "", "");
         Lobby lobby = new LobbyDTO("testLobby", user);
         gm.createGame(lobby, user);

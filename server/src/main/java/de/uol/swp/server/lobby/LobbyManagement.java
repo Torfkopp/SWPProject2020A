@@ -16,22 +16,11 @@ import java.util.Optional;
  * @see de.uol.swp.common.lobby.dto.LobbyDTO
  * @since 2019-10-08
  */
-public class LobbyManagement {
+public class LobbyManagement implements ILobbyManagement {
 
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
-    /**
-     * Creates a new lobby and adds it to the list
-     *
-     * @param name  The name of the lobby to create
-     * @param owner The user who wants to create a lobby
-     *
-     * @throws java.lang.IllegalArgumentException Name already taken
-     * @implNote The primary key of the lobbies is the name, therefore the name has
-     * to be unique
-     * @see de.uol.swp.common.user.User
-     * @since 2019-10-08
-     */
+    @Override
     public void createLobby(String name, User owner) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name " + name + " already exists!");
@@ -39,14 +28,7 @@ public class LobbyManagement {
         lobbies.put(name, new LobbyDTO(name, owner));
     }
 
-    /**
-     * Deletes a lobby with a requested name
-     *
-     * @param name String containing the name of the lobby to delete
-     *
-     * @throws java.lang.IllegalArgumentException There is no lobby with the requested name
-     * @since 2019-10-08
-     */
+    @Override
     public void dropLobby(String name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name " + name + " not found!");
@@ -54,27 +36,12 @@ public class LobbyManagement {
         lobbies.remove(name);
     }
 
-    /**
-     * Gets the map
-     *
-     * @return Map with the lobby's name and its Lobby object
-     *
-     * @since 2020-12-12
-     */
+    @Override
     public Map<String, Lobby> getLobbies() {
         return lobbies;
     }
 
-    /**
-     * Searches for the lobby with the requested name
-     *
-     * @param name String containing the name of the lobby to search for
-     *
-     * @return Either an empty Optional or an Optional containing the lobby
-     *
-     * @see java.util.Optional
-     * @since 2019-10-08
-     */
+    @Override
     public Optional<Lobby> getLobby(String name) {
         Lobby lobby = lobbies.get(name);
         if (lobby != null) {

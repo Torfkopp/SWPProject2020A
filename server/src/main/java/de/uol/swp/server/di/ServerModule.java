@@ -4,6 +4,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import de.uol.swp.server.chat.store.ChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
+import de.uol.swp.server.game.GameManagement;
+import de.uol.swp.server.game.IGameManagement;
+import de.uol.swp.server.lobby.ILobbyManagement;
+import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.usermanagement.store.H2BasedUserStore;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.MySQLBasedUserStore;
@@ -67,5 +71,7 @@ public class ServerModule extends AbstractModule {
         bind(EventBus.class).toInstance(bus);
         bind(ChatMessageStore.class).toInstance(chatMessageStore);
         bind(Properties.class).toInstance(serverProperties);
+        bind(ILobbyManagement.class).to(LobbyManagement.class);
+        bind(IGameManagement.class).to(GameManagement.class);
     }
 }

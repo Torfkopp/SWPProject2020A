@@ -30,7 +30,7 @@ class LobbyServiceTest {
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(new MainMemoryBasedUserStore());
     final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
-    final LobbyManagement lobbyManagement = new LobbyManagement();
+    final ILobbyManagement lobbyManagement = new LobbyManagement();
     final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
 
     @Test
