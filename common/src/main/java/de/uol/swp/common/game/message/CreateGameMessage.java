@@ -25,7 +25,7 @@ public class CreateGameMessage extends AbstractGameMessage {
     }
 
     /**
-     * Gets the first player.
+     * Gets the first player
      *
      * @return The first player
      */

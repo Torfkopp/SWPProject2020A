@@ -269,7 +269,7 @@ public class Inventory {
     /**
      * Gets whether the player holds the unique "Largest Army" card
      *
-     * @return true, if the player has the "Largest Army" card, false, if not
+     * @return true if the player has the "Largest Army" card, false if not
      */
     public boolean isLargestArmy() {
         return largestArmy;
@@ -278,7 +278,7 @@ public class Inventory {
     /**
      * Sets whether the player holds the unique "Largest Army" card
      *
-     * @param largestArmy true, if the player has the Largest Army, false, if not
+     * @param largestArmy true if the player has the Largest Army, false if not
      */
     public void setLargestArmy(boolean largestArmy) {
         this.largestArmy = largestArmy;
@@ -287,7 +287,7 @@ public class Inventory {
     /**
      * Gets whether the player holds the unique "Longest Road" card
      *
-     * @return true, if the player has the "Longest Road" card, false, if not
+     * @return true if the player has the "Longest Road" card, false if not
      */
     public boolean isLongestRoad() {
         return longestRoad;
@@ -296,7 +296,7 @@ public class Inventory {
     /**
      * Sets whether the player holds the unique "Longest Road" card
      *
-     * @param longestRoad true, if the player has the Longest Road, false, if not
+     * @param longestRoad true if the player has the Longest Road, false if not
      */
     public void setLongestRoad(boolean longestRoad) {
         this.longestRoad = longestRoad;

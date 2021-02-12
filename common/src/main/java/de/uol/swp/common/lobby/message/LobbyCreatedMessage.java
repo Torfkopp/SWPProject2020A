@@ -3,7 +3,7 @@ package de.uol.swp.common.lobby.message;
 import de.uol.swp.common.user.User;
 
 /**
- * Message sent by the server when a new lobby was created.
+ * Message sent by the server when a new lobby was created
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.message.AbstractLobbyMessage

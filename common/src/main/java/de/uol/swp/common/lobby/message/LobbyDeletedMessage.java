@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
 /**
- * Message sent by the server when a lobby was deleted.
+ * Message sent by the server when a lobby was deleted
  *
  * @author Temmo Junkhoff
  * @see de.uol.swp.common.lobby.message.AbstractLobbyMessage

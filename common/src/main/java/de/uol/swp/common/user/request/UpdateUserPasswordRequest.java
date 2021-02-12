@@ -19,7 +19,7 @@ public class UpdateUserPasswordRequest extends UpdateUserRequest {
      * Constructor
      *
      * @param user        The user whose password to update
-     * @param oldPassword the old password
+     * @param oldPassword The user's old password
      */
     public UpdateUserPasswordRequest(User user, String oldPassword) {
         super(user);

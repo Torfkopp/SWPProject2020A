@@ -76,7 +76,7 @@ public class LobbyService {
     }
 
     /**
-     * Posts a request to leave a specified lobby on the EventBus
+     * Posts a request to leave a specified lobby onto the EventBus
      *
      * @param lobbyName The name of the lobby the User wants to leave
      * @param user      The user who wants to leave the lobby

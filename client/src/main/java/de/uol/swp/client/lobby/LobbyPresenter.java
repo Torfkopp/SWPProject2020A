@@ -393,7 +393,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     /**
      * Handles an UpdateInventoryResponse found on the EventBus
      * <p>
-     * If the UpdateInventoryResponse was intended for the current Lobby, the
+     * If the UpdateInventoryResponse is intended for the current Lobby, the
      * resourceList linked to the inventoryView is cleared and updated with the
      * items as listed in the maps contained in the UpdateInventoryResponse.
      * The item names are localised with the ResourceBundle injected into the

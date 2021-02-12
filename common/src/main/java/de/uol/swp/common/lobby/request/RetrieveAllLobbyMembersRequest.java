@@ -27,7 +27,7 @@ public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Gets the lobby name.
+     * Gets the lobby name
      *
      * @return The lobby name
      */

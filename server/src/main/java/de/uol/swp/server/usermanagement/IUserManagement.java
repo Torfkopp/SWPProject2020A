@@ -40,7 +40,7 @@ public interface IUserManagement {
     void dropUser(User user);
 
     /**
-     * Gets a user from the store with only their name.
+     * Gets a user from the store with only their name
      * <p>
      * Gets the user specified by the userName.
      *

@@ -3,8 +3,7 @@ package de.uol.swp.server.message;
 import de.uol.swp.common.message.Message;
 
 /**
- * This interface defines the methods any internal server messages have to
- * implement.
+ * This interface unifies all implementations of internal server messages
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.message.AbstractServerInternalMessage

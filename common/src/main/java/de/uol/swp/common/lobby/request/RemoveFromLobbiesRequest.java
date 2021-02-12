@@ -25,7 +25,7 @@ public class RemoveFromLobbiesRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Gets the user who wants to be removed from all lobbies.
+     * Gets the user who wants to be removed from all lobbies
      *
      * @return The user who wants to be removed from all lobbies
      */
