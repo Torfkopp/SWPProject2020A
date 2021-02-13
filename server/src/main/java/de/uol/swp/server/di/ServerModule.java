@@ -75,8 +75,8 @@ public class ServerModule extends AbstractModule {
         bind(AuthenticationService.class).in(Scopes.SINGLETON);
         bind(ChatService.class).in(Scopes.SINGLETON);
         /* TODO: uncomment after merge of SWP2020A-139
-        bind(IGameManagement.class).in(Scopes.SINGLETON);
-        bind(ILobbyManagement.class).in(Scopes.SINGLETON);
+        bind(IGameManagement.class).to(GameManagement.class).in(Scopes.SINGLETON);
+        bind(ILobbyManagement.class).to(LobbyManagement.class).in(Scopes.SINGLETON);
         */
         bind(GameService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);
