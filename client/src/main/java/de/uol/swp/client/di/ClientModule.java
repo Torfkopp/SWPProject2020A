@@ -86,6 +86,8 @@ public class ClientModule extends AbstractModule {
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
-        //bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
+        /* TODO: uncomment after merge of SWP2020A-139
+        bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
+        */
     }
 }

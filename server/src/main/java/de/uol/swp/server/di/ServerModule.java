@@ -74,6 +74,10 @@ public class ServerModule extends AbstractModule {
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(AuthenticationService.class).in(Scopes.SINGLETON);
         bind(ChatService.class).in(Scopes.SINGLETON);
+        /* TODO: uncomment after merge of SWP2020A-139
+        bind(IGameManagement.class).in(Scopes.SINGLETON);
+        bind(ILobbyManagement.class).in(Scopes.SINGLETON);
+        */
         bind(GameService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);
         bind(UserService.class).in(Scopes.SINGLETON);
