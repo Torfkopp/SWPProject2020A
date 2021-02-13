@@ -78,7 +78,7 @@ public class ClientModule extends AbstractModule {
                 build(SceneManagerFactory.class));
         install(new FactoryModuleBuilder().implement(ClientConnection.class, ClientConnection.class).
                 build(ClientConnectionFactory.class));
-        bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class).in(Scopes.SINGLETON);
+        bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class);
         bind(EventBus.class).toInstance(eventBus);
         bind(Properties.class).toInstance(properties);
         bind(ResourceBundle.class).toInstance(resourceBundle);
