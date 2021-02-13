@@ -12,17 +12,32 @@ import de.uol.swp.common.user.User;
 public class CreateGameMessage extends AbstractGameMessage {
 
     private final Lobby lobby;
-    private final User first;
 
+    /**
+     * Constructor
+     *
+     * @param lobby The lobby this game is taking place in
+     * @param first The first player
+     */
     public CreateGameMessage(Lobby lobby, User first) {
+        super(lobby.getName(), first);
         this.lobby = lobby;
-        this.first = first;
     }
 
+    /**
+     * Gets the first player
+     *
+     * @return The first player
+     */
     public User getFirst() {
-        return first;
+        return super.getUser();
     }
 
+    /**
+     * Gets the lobby the game is taking place in
+     *
+     * @return The Lobby the game is taking place in
+     */
     public Lobby getLobby() {
         return lobby;
     }

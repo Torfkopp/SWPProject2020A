@@ -14,7 +14,7 @@ public interface IGameMapManagement {
     /**
      * Gets the edges in a usable format for rendering them as a jagged array with some extra positions filled with null
      *
-     * @return a jagged array containing the hexes
+     * @return A jagged array containing the hexes
      */
     IEdge[][] getEdgesAsJaggedArrayWithNullFiller();
 
@@ -30,16 +30,24 @@ public interface IGameMapManagement {
     /**
      * Gets the hexes in a usable format for rendering them as a jagged array
      *
-     * @return a jagged array containing the hexes
+     * @return A jagged array containing the hexes
      */
     IGameHex[][] getHexesAsJaggedArray();
 
     /**
      * Gets the intersections in a usable format for rendering them as a jagged array
      *
-     * @return a jagged array containing the intersections
+     * @return A jagged array containing the intersections
      */
     IIntersection[][] getIntersectionsAsJaggedArray();
+
+    /**
+     * Gets the amount of points the player made with
+     * settlements and cities.
+     *
+     * @return int The amount of points the player has
+     */
+    int getPlayerPoints(Player player);
 
     /**
      * Gets the robber's position
@@ -61,7 +69,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to build the street
      * @param position The position of the road
      *
-     * @return true if placement was successful; false if not
+     * @return True if placement was successful; false if not
      */
     boolean placeRoad(Player player, int position);
 
@@ -71,7 +79,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to build the settlement (1-4)
      * @param position The position of the intersection
      *
-     * @return true if placement was successful; false if not
+     * @return True if placement was successful; false if not
      */
     boolean placeSettlement(Player player, int position);
 
@@ -81,7 +89,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to place the street
      * @param position The position of the road
      *
-     * @return true if placement is possible; false if not
+     * @return True if placement is possible; false if not
      */
     boolean roadPlaceable(Player player, int position);
 
@@ -91,7 +99,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to place the settlement
      * @param position The position of the intersection
      *
-     * @return true if placement is possible; false if not
+     * @return True if placement is possible; false if not
      */
     boolean settlementPlaceable(Player player, int position);
 
@@ -101,7 +109,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to upgrade the settlement
      * @param position The position of the intersection
      *
-     * @return true if placement was successful; false if not
+     * @return True if placement was successful; false if not
      */
     boolean upgradeSettlement(Player player, int position);
 }

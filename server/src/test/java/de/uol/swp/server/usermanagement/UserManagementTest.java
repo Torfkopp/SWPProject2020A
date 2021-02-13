@@ -27,7 +27,7 @@ class UserManagementTest {
         Collections.sort(users);
     }
 
-    ServerUserService getDefaultManagement() {
+    IUserManagement getDefaultManagement() {
         UserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
@@ -40,7 +40,7 @@ class UserManagementTest {
 
     @Test
     void createUser() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
 
         management.createUser(userNotInStore);
 
@@ -55,7 +55,7 @@ class UserManagementTest {
 
     @Test
     void createUserAlreadyExisting() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToCreate = users.get(0);
 
         assertThrows(UserManagementException.class, () -> management.createUser(userToCreate));
@@ -63,7 +63,7 @@ class UserManagementTest {
 
     @Test
     void dropUser() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         management.createUser(userNotInStore);
 
         management.dropUser(userNotInStore);
@@ -74,13 +74,13 @@ class UserManagementTest {
 
     @Test
     void dropUserNotExisting() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         assertThrows(UserManagementException.class, () -> management.dropUser(userNotInStore));
     }
 
     @Test
     void loginUser() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToLogIn = users.get(0);
 
         management.login(userToLogIn.getUsername(), userToLogIn.getPassword());
@@ -90,7 +90,7 @@ class UserManagementTest {
 
     @Test
     void loginUserEmptyPassword() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToLogIn = users.get(0);
 
         assertThrows(SecurityException.class, () -> management.login(userToLogIn.getUsername(), ""));
@@ -100,7 +100,7 @@ class UserManagementTest {
 
     @Test
     void loginUserWrongPassword() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToLogIn = users.get(0);
         User secondUser = users.get(1);
 
@@ -112,7 +112,7 @@ class UserManagementTest {
 
     @Test
     void logoutUser() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToLogin = users.get(0);
 
         management.login(userToLogin.getUsername(), userToLogin.getPassword());
@@ -126,7 +126,7 @@ class UserManagementTest {
 
     @Test
     void retrieveAllUsers() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
 
         List<User> allUsers = management.retrieveAllUsers();
 
@@ -140,13 +140,13 @@ class UserManagementTest {
 
     @Test
     void updateUnknownUser() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         assertThrows(UserManagementException.class, () -> management.updateUser(userNotInStore));
     }
 
     @Test
     void updateUserPassword_LoggedIn() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToUpdate = users.get(0);
         User updatedUser = new UserDTO(userToUpdate.getUsername(), "newPassword", null);
 
@@ -165,7 +165,7 @@ class UserManagementTest {
 
     @Test
     void updateUserPassword_NotLoggedIn() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToUpdate = users.get(0);
         User updatedUser = new UserDTO(userToUpdate.getUsername(), "newPassword", null);
 
@@ -178,7 +178,7 @@ class UserManagementTest {
 
     @Test
     void updateUser_Mail() {
-        ServerUserService management = getDefaultManagement();
+        IUserManagement management = getDefaultManagement();
         User userToUpdate = users.get(0);
         User updatedUser = new UserDTO(userToUpdate.getUsername(), "", "newMail@mail.com");
 

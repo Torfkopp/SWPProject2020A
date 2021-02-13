@@ -33,12 +33,6 @@ public class ChangePasswordPresenter extends AbstractPresenter {
     private PasswordField NewPasswordField2;
 
     /**
-     * Default Constructor
-     */
-    public ChangePasswordPresenter() {
-    }
-
-    /**
      * Constructor
      *
      * @param eventBus    The EventBus set in ClientModule

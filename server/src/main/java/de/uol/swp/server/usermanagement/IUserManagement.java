@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An interface for all methods of the server's UserService
+ * An interface for all methods of the server's UserManagement
  *
  * @author Marco Grawunder
  * @since 2017-03-17
  */
-public interface ServerUserService {
+public interface IUserManagement {
 
     /**
      * Create a new permanent user
@@ -39,8 +39,33 @@ public interface ServerUserService {
      */
     void dropUser(User user);
 
+    /**
+     * Gets a user from the store with only their name
+     * <p>
+     * Gets the user specified by the userName.
+     *
+     * @param userName The name of the user to get
+     *
+     * @return Optional containing the User object if found, empty otherwise
+     *
+     * @implNote The User object has to contain a unique identifier in order to
+     * get the correct user
+     */
     Optional<User> getUser(String userName);
 
+    /**
+     * Gets a user from the store using their name and password.
+     * <p>
+     * Gets the user specified by the userName and password.
+     *
+     * @param userName The name of the user to get
+     * @param password The password of the user to get
+     *
+     * @return Optional containing the User object if found, empty otherwise
+     *
+     * @implNote The User object has to contain a unique identifier in order to
+     * get the correct user
+     */
     Optional<User> getUserWithPassword(String userName, String password);
 
     /**
@@ -61,8 +86,6 @@ public interface ServerUserService {
      * @param password The password of the user
      *
      * @return A new user object
-     *
-     * @since 2017-03-17
      */
     User login(String username, String password);
 
@@ -71,7 +94,6 @@ public interface ServerUserService {
      *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
-     * @since 2017-03-17
      */
     void logout(User user);
 
@@ -79,8 +101,6 @@ public interface ServerUserService {
      * Retrieve the list of all currently logged in users
      *
      * @return A list of users
-     *
-     * @since 2017-03-17
      */
     List<User> retrieveAllUsers();
 

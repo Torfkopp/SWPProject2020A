@@ -15,16 +15,7 @@ import de.uol.swp.common.user.User;
  */
 public class ShowChangePasswordViewEvent {
 
-    private User user;
-
-    /**
-     * Default constructor
-     *
-     * @author Mario Fokken
-     * @since 2020-12-16
-     */
-    public ShowChangePasswordViewEvent() {
-    }
+    private final User user;
 
     /**
      * Constructor

@@ -25,16 +25,6 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     private final List<Lobby> lobbies = new ArrayList<>();
 
     /**
-     * Default Constructor
-     *
-     * @implNote This constructor is needed for serialisation
-     * @since 2020-12-12
-     */
-    public AllLobbiesResponse() {
-        // needed for serialisation
-    }
-
-    /**
      * Constructor
      *
      * @param lobbies Map of lobby's name and the lobby itself

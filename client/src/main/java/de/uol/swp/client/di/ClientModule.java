@@ -9,8 +9,12 @@ import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import javafx.fxml.FXMLLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.*;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 /**
@@ -23,31 +27,52 @@ import java.util.ResourceBundle;
 public class ClientModule extends AbstractModule {
 
     final EventBus eventBus = new EventBus();
-    // ResourceBundle selection. Uncomment the one you want to use and comment the others
-    // TODO: should eventually be handled with a user setting or getting the client system locale
-    // standard en_GB resource bundle, enabled by default
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.UK);
-    // standard improved en_GB resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "improved"));
-    // standard de_DE resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", Locale.GERMANY);
-    // unicode-free en_GB resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "nounicode"));
-    // unicode-free de_DE resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("de", "DE", "nounicode"));
-    // en_GB resource bundle for hearing impaired
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "hearingImpaired"));
-    // en_GB resource bundle for blind
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "blind"));
-    // standard de_NDS resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("nds", "DE"));
-    // standard degenerate resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "UwU"));
-    // standard blank resource bundle
-    //final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", new Locale("en", "GB", "blank"));
+    final Logger LOG = LogManager.getLogger(ClientModule.class);
 
     @Override
     protected void configure() {
+
+        //Default Properties
+        Properties defaultProps = new Properties();
+
+        //Default language
+        defaultProps.setProperty("lang", "en_GB");
+
+        //Reading properties-file
+        final Properties properties = new Properties(defaultProps);
+        final String filepath = "client" + File.separator + "target" + File.separator + "classes" + File.separator + "config.properties";
+        try (FileInputStream file = new FileInputStream(filepath)) {
+            properties.load(file);
+        } catch (FileNotFoundException e) {
+            System.out.println("Couldn't find config file: " + filepath + "\n----But this is nothing to worry about");
+        } catch (IOException e) {
+            System.out.println("Error reading config file");
+        }
+
+        LOG.debug("Selected Language in config File: " + properties.getProperty("lang"));
+
+        //Reading the language property into a locale
+        String[] lang = properties.getProperty("lang").split("_");
+        Locale locale;
+        switch (lang.length) {
+            case 1:
+                locale = new Locale(lang[0]);
+                break;
+            case 2:
+                locale = new Locale(lang[0], lang[1]);
+                break;
+            case 3:
+                locale = new Locale(lang[0], lang[1], lang[2]);
+                break;
+            default:
+                System.out.println("Invalid Argument in config option \"lang\"" + "\n----Using UK english");
+                locale = Locale.UK;
+        }
+
+        //Setting the language
+        final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
+
+        //DI stuff
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class).
                 build(SceneManagerFactory.class));
         install(new FactoryModuleBuilder().implement(ClientConnection.class, ClientConnection.class).
@@ -57,5 +82,6 @@ public class ClientModule extends AbstractModule {
         bind(ClientUserService.class).to(UserService.class);
         bind(IChatService.class).to(ChatService.class);
         bind(ResourceBundle.class).toInstance(resourceBundle);
+        bind(Properties.class).toInstance(properties);
     }
 }

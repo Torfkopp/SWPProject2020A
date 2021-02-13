@@ -16,7 +16,7 @@ import java.util.Objects;
 public class UsersListMessage extends AbstractServerMessage {
 
     private static final long serialVersionUID = -7968574381977330152L;
-    private final ArrayList<String> users;
+    private final List<String> users;
 
     /**
      * Constructor
@@ -49,7 +49,7 @@ public class UsersListMessage extends AbstractServerMessage {
      *
      * @since 2017-03-17
      */
-    public ArrayList<String> getUsers() {
+    public List<String> getUsers() {
         return users;
     }
 }

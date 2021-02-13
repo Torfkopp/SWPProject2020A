@@ -33,15 +33,16 @@ class ServerApp {
      * (for the time being) the test users
      *
      * @param injector The google guice injector used for dependency injection
-     *
      * @since 2019-09-18
      */
     private static void createServices(Injector injector) {
-        ServerUserService userManagement = injector.getInstance(UserManagement.class);
+        IUserManagement userManagement = injector.getInstance(UserManagement.class);
 
-        // TODO: Remove after registration is implemented
+        // Create 5 test user for ease of development
         for (int i = 0; i < 5; i++) {
-            userManagement.createUser(new UserDTO("test" + i, "test" + i, "test" + i + "@test.de"));
+            if (userManagement.getUser("test" + i).isEmpty()) {
+                userManagement.createUser(new UserDTO("test" + i, "test" + i, "test" + i + "@test.de"));
+            }
         }
 
         // Remark: As these services are not referenced by any other class
@@ -61,7 +62,6 @@ class ServerApp {
      *
      * @param args Any arguments given when starting the application, e.g. a port
      *             number
-     *
      * @since 2017-03-17
      */
     public static void main(String[] args) throws Exception {

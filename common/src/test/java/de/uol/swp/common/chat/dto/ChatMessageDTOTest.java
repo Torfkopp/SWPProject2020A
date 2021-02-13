@@ -85,7 +85,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyAuthor() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, null, defaultTimestamp, defaultContent));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, null, defaultTimestamp, defaultContent));
     }
 
     /**
@@ -97,7 +97,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, null));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, null));
     }
 
     /**
@@ -109,7 +109,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyStringContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, ""));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, ""));
     }
 
     /**
@@ -121,7 +121,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyTimestamp() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, null, defaultContent));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, null, defaultContent));
     }
 
     /**
@@ -170,7 +170,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithoutTimestampWithEmptyAuthor() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, null, defaultContent));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, null, defaultContent));
     }
 
     /**
@@ -182,7 +182,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithoutTimestampWithEmptyContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, null));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, null));
     }
 
     /**
@@ -194,7 +194,7 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithoutTimestampWithEmptyStringContent() {
-        assertThrows(AssertionError.class, () -> new ChatMessageDTO(defaultID, defaultUser, ""));
+        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, ""));
     }
 
     /**

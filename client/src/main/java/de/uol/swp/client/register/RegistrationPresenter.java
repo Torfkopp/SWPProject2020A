@@ -33,14 +33,6 @@ public class RegistrationPresenter extends AbstractPresenter {
     private PasswordField passwordField2;
 
     /**
-     * Default Constructor
-     *
-     * @since 2019-09-18
-     */
-    public RegistrationPresenter() {
-    }
-
-    /**
      * Constructor
      *
      * @param eventBus    The EventBus set in ClientModule

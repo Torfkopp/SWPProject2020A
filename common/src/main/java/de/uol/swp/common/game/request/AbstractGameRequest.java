@@ -15,7 +15,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2021-01-15
  */
-public class AbstractGameRequest extends AbstractRequestMessage {
+public abstract class AbstractGameRequest extends AbstractRequestMessage {
 
     private final String originLobby;
 

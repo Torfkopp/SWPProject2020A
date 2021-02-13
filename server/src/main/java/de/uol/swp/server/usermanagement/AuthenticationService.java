@@ -41,7 +41,7 @@ public class AuthenticationService extends AbstractService {
      */
     private final Map<Session, User> userSessions = new HashMap<>();
 
-    private final ServerUserService userManagement;
+    private final IUserManagement userManagement;
 
     /**
      * Constructor

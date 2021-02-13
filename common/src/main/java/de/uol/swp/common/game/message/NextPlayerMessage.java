@@ -9,17 +9,14 @@ import de.uol.swp.common.user.User;
  */
 public class NextPlayerMessage extends AbstractGameMessage {
 
-    private final String lobby;
-    private final User activePlayer;
-
     /**
      * Constructor
      *
-     * @param ActivePlayer The active player
+     * @param lobbyName    The lobby name
+     * @param activePlayer The active player
      */
-    public NextPlayerMessage(String lobby, User ActivePlayer) {
-        this.lobby = lobby;
-        this.activePlayer = ActivePlayer;
+    public NextPlayerMessage(String lobbyName, User activePlayer) {
+        super(lobbyName, activePlayer);
     }
 
     /**
@@ -28,15 +25,6 @@ public class NextPlayerMessage extends AbstractGameMessage {
      * @return User
      */
     public User getActivePlayer() {
-        return activePlayer;
-    }
-
-    /**
-     * Gets the lobby
-     *
-     * @return String The lobby's name
-     */
-    public String getLobby() {
-        return lobby;
+        return super.getUser();
     }
 }

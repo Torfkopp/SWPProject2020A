@@ -28,14 +28,6 @@ public class LoginPresenter extends AbstractPresenter {
     private TextField loginField;
 
     /**
-     * Default Constructor
-     *
-     * @since 2019-08-18
-     */
-    public LoginPresenter() {
-    }
-
-    /**
      * Method called when the login button is pressed
      * <p>
      * This Method is called when the login button is pressed. It takes the text
