@@ -2,12 +2,15 @@ package de.uol.swp.server.di;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
+import de.uol.swp.server.chat.ChatService;
 import de.uol.swp.server.chat.store.ChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
-import de.uol.swp.server.usermanagement.store.H2BasedUserStore;
-import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
-import de.uol.swp.server.usermanagement.store.MySQLBasedUserStore;
-import de.uol.swp.server.usermanagement.store.UserStore;
+import de.uol.swp.server.game.GameService;
+import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.usermanagement.AuthenticationService;
+import de.uol.swp.server.usermanagement.UserService;
+import de.uol.swp.server.usermanagement.store.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,9 +66,16 @@ public class ServerModule extends AbstractModule {
                 store = new H2BasedUserStore();
         }
 
-        bind(UserStore.class).toInstance(store);
-        bind(EventBus.class).toInstance(bus);
         bind(ChatMessageStore.class).toInstance(chatMessageStore);
+        bind(EventBus.class).toInstance(bus);
         bind(Properties.class).toInstance(serverProperties);
+        bind(UserStore.class).toInstance(store);
+
+        // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
+        bind(AuthenticationService.class).in(Scopes.SINGLETON);
+        bind(ChatService.class).in(Scopes.SINGLETON);
+        bind(GameService.class).in(Scopes.SINGLETON);
+        bind(LobbyService.class).in(Scopes.SINGLETON);
+        bind(UserService.class).in(Scopes.SINGLETON);
     }
 }

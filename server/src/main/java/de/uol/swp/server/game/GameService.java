@@ -3,7 +3,6 @@ package de.uol.swp.server.game;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
@@ -32,7 +31,6 @@ import java.util.Map;
  * @since 2021-01-15
  */
 @SuppressWarnings("UnstableApiUsage")
-@Singleton
 public class GameService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(GameService.class);

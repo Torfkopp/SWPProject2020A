@@ -3,7 +3,6 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
@@ -29,7 +28,6 @@ import java.util.Optional;
  * @since 2019-08-05
  */
 @SuppressWarnings("UnstableApiUsage")
-@Singleton
 public class UserService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(UserService.class);

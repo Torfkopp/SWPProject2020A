@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
-import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -35,14 +34,13 @@ public class RegistrationPresenter extends AbstractPresenter {
     /**
      * Constructor
      *
-     * @param eventBus    The EventBus set in ClientModule
-     * @param userService The injected ClientUserService
+     * @param eventBus The EventBus set in ClientModule
      *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2019-09-18
      */
     @Inject
-    public RegistrationPresenter(EventBus eventBus, ClientUserService userService) {
+    public RegistrationPresenter(EventBus eventBus) {
         setEventBus(eventBus);
     }
 
