@@ -8,6 +8,8 @@ import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class that manages lobbies
@@ -19,6 +21,7 @@ import de.uol.swp.common.user.User;
 public class LobbyService {
 
     private final EventBus eventBus;
+    private final Logger LOG = LogManager.getLogger(LobbyService.class);
 
     /**
      * Constructor
@@ -30,6 +33,7 @@ public class LobbyService {
      */
     @Inject
     public LobbyService(EventBus eventBus) {
+        LOG.debug("LobbyService started");
         this.eventBus = eventBus;
         this.eventBus.register(this);
     }
@@ -44,6 +48,7 @@ public class LobbyService {
      * @since 2019-11-20
      */
     public void createNewLobby(String name, User user) {
+        LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user);
         eventBus.post(createLobbyRequest);
     }
@@ -57,6 +62,7 @@ public class LobbyService {
      * @since 2021-1-15
      */
     public void endTurn(User user, String lobbyName) {
+        LOG.debug("Sending EndTurnRequest");
         Message endTurnRequest = new EndTurnRequest(user, lobbyName);
         eventBus.post(endTurnRequest);
     }
@@ -71,11 +77,13 @@ public class LobbyService {
      * @since 2019-11-20
      */
     public void joinLobby(String name, User user) {
+        LOG.debug("Sending LobbyJoinUserRequest");
         Message joinUserRequest = new LobbyJoinUserRequest(name, user);
         eventBus.post(joinUserRequest);
     }
 
     public void leaveLobby(String lobbyName, User user) {
+        LOG.debug("Sending LobbyLeaveUserRequest");
         Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
     }
@@ -104,6 +112,7 @@ public class LobbyService {
      * @since 2021-01-28
      */
     public void removeFromLobbies(User user) {
+        LOG.debug("Send RemoveFromLobbiesRequest");
         Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
         eventBus.post(removeFromLobbiesRequest);
     }
@@ -115,11 +124,13 @@ public class LobbyService {
      * @since 2020-12-12
      */
     public void retrieveAllLobbies() {
+        LOG.debug("Send RetrieveAllLobbiesRequest");
         Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
         eventBus.post(retrieveAllLobbiesRequest);
     }
 
     public void retrieveAllLobbyMembers(String lobbyName) {
+        LOG.debug("Send RetrieveAllLobbyMembersRequest for Lobby " + lobbyName);
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
@@ -136,6 +147,7 @@ public class LobbyService {
      * @since 2021-1-25
      */
     public void updateInventory(String lobbyName, User user) {
+        LOG.debug("Send UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
     }

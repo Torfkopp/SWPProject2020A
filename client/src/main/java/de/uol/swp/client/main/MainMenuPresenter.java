@@ -31,6 +31,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     public static final String fxml = "/fxml/MainMenuView.fxml";
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+    private final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
 
     private ObservableList<String> users;
     private ObservableList<String> lobbies;
@@ -69,6 +71,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-02
      */
     public MainMenuPresenter() {
+        LOG.debug("MainMenuPresenter started");
         super.init(LogManager.getLogger(MainMenuPresenter.class));
     }
 
@@ -134,6 +137,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
+        LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(allLobbiesResponse.getLobbyNames());
     }
 
@@ -153,7 +157,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllOnlineUsersResponse(AllOnlineUsersResponse allUsersResponse) {
-        LOG.debug("Update of user list " + allUsersResponse.getUsers());
+        LOG.debug("Received AllOnlineUsersResponse");
         updateUsersList(allUsersResponse.getUsers());
     }
 
@@ -218,6 +222,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
+        LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getName()));
             lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getName());
@@ -289,6 +294,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
+        LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getName()));
             lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getName());
@@ -315,12 +321,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
+        LOG.debug("Received LobbyCreatedMessage");
         lobbyService.retrieveAllLobbies();
         if (msg.getName() == null || msg.getName().isEmpty()) {
-            LOG.debug("Tried to add Lobby without name to LobbyList ");
+            LOG.debug("---- Tried to add Lobby without name to LobbyList ");
         } else {
             Platform.runLater(() -> lobbies.add(msg.getName()));
-            LOG.debug("Added Lobby to LobbyList " + msg.getName());
+            LOG.debug("---- Added Lobby to LobbyList " + msg.getName());
         }
     }
 
@@ -340,11 +347,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
+        LOG.debug("Received LobbyDeletedMessage");
         if (msg.getName() == null || msg.getName().isEmpty()) {
-            LOG.debug("Tried to delete Lobby without name from LobbyList ");
+            LOG.debug("---- Tried to delete Lobby without name from LobbyList ");
         } else {
             Platform.runLater(() -> lobbies.remove(msg.getName()));
-            LOG.debug("Removed Lobby from LobbyList " + msg.getName());
+            LOG.debug("---- Removed Lobby from LobbyList " + msg.getName());
         }
     }
 
@@ -366,6 +374,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
+        LOG.debug("Received LogSuccessfulResponse");
         this.loggedInUser = message.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
@@ -425,7 +434,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedInMessage(UserLoggedInMessage message) {
-        LOG.debug("New user " + message.getUsername() + " logged in");
+        LOG.debug("Received UserLoggedInMessage");
+        LOG.debug("---- New user " + message.getUsername() + " logged in");
         Platform.runLater(() -> {
             if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUsername()))
                 users.add(message.getUsername());
@@ -447,7 +457,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedOutMessage(UserLoggedOutMessage message) {
-        LOG.debug("User " + message.getUsername() + " logged out");
+        LOG.debug("Received UserLoggedOutMessage");
+        LOG.debug("---- User " + message.getUsername() + " logged out");
         Platform.runLater(() -> users.remove(message.getUsername()));
     }
 
@@ -467,7 +478,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-11-29
      */
     private void updateLobbyList(List<String> lobbyList) {
-        LOG.debug("Update Lobby List");
         Platform.runLater(() -> {
             if (lobbies == null) {
                 lobbies = FXCollections.observableArrayList();
@@ -494,7 +504,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2019-08-29
      */
     private void updateUsersList(List<User> userList) {
-        // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (users == null) {
                 users = FXCollections.observableArrayList();

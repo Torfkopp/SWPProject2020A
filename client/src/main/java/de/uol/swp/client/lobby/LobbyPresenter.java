@@ -82,7 +82,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     public LobbyPresenter() {
         super.init(LogManager.getLogger(LobbyPresenter.class));
-        LOG.debug("LobbyPresenter was started");
+        LOG.debug("LobbyPresenter started");
     }
 
     /**
@@ -111,7 +111,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 setText(empty || item == null ? "" : item.getValue() + " " + item.getKey()); // looks like: "1 Brick"
             }
         });
-        LOG.debug("LobbyPresenter was initialised");
+        LOG.debug("LobbyPresenter initialised");
     }
 
     @Override
@@ -303,7 +303,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage message) {
-        if (message.getLobby() != this.lobbyName) return;
+        if (message.getLobby().equals(message.getLobbyName())) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + message.getLobby());
         setTextText(message.getActivePlayer());
         //In here to test the endTurnButton
@@ -380,36 +380,35 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
-        if (startSessionMessage.getName().equals(this.lobbyName)) {
-            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-            Platform.runLater(() -> {
-                playField.setVisible(true);
-                //This Line needs to be changed/ removed in the Future
-                drawGameMap(new GameMapManagement(), gameMapCanvas);
-                setTextText(startSessionMessage.getUser());
-                //In here to test the endTurnButton.
-                eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
-                lobbyService.updateInventory(lobbyName, loggedInUser);
-            });
-        }
+        if (!startSessionMessage.getName().equals(this.lobbyName)) return;
+        LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
+        Platform.runLater(() -> {
+            playField.setVisible(true);
+            //This Line needs to be changed/ removed in the Future
+            drawGameMap(new GameMapManagement(), gameMapCanvas);
+            setTextText(startSessionMessage.getUser());
+            //In here to test the endTurnButton.
+            eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
+            lobbyService.updateInventory(lobbyName, loggedInUser);
+        });
     }
 
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse resp) {
-        if (resp.getLobbyName().equals(this.lobbyName)) {
-            if (resourceList == null) {
-                resourceList = FXCollections.observableArrayList();
-                inventoryView.setItems(resourceList);
-            }
-            resourceList.clear();
-            for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
-                Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
-                resourceList.add(resource);
-            }
-            for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
-                Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? "Has" : "Not");
-                resourceList.add(property);
-            }
+        if (!resp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received UpdateInventoryResponse for Lobby " + this.lobbyName);
+        if (resourceList == null) {
+            resourceList = FXCollections.observableArrayList();
+            inventoryView.setItems(resourceList);
+        }
+        resourceList.clear();
+        for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
+            Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
+            resourceList.add(resource);
+        }
+        for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
+            Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? "Has" : "Not");
+            resourceList.add(property);
         }
     }
 
@@ -429,7 +428,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage message) {
-        LOG.debug("New user " + message.getUser().getUsername() + " joined Lobby " + message.getName());
+        if (!message.getName().equals(this.lobbyName)) return;
+        LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
+        LOG.debug("---- User " + message.getUser().getUsername() + " joined");
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
                                                                              .equals(message.getUser().getUsername()))
@@ -461,11 +462,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage message) {
+        if (!message.getName().equals(this.lobbyName)) return;
+        LOG.debug("Received UserLeftLobbyMessage for Lobby " + this.lobbyName);
         if (message.getUser().getUsername().equals(owner.getUsername())) {
-            LOG.debug("Owner " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            LOG.debug("---- Owner " + message.getUser().getUsername() + " left");
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
-            LOG.debug("User " + message.getUser().getUsername() + " left Lobby " + message.getName());
+            LOG.debug("---- User " + message.getUser().getUsername() + " left");
         }
         Platform.runLater(() -> {
             lobbyMembers.remove(findMember(message.getUser().getUsername()));
@@ -489,9 +492,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onUserReadyMessage(UserReadyMessage userReadyMessage) {
-        if (userReadyMessage.getName().equals(this.lobbyName)) {
-            lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
-        }
+        if (!userReadyMessage.getName().equals(this.lobbyName)) return;
+        LOG.debug("Received UserReadyMessage for Lobby " + this.lobbyName);
+        lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
     }
 
     /**
@@ -566,7 +569,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @since 2021-01-05
      */
     private void updateUsersList(List<User> userLobbyList) {
-        // Attention: This must be done on the FX Thread!
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
                 lobbyMembers = FXCollections.observableArrayList();
@@ -581,8 +583,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 }
                 Pair<String, String> item = new Pair<>(u.getUsername(),
                                                        u.getUsername().equals(this.owner.getUsername()) ?
-                                                       username + " \uD83D\uDC51" :
-                                                       username);  //Leerzeile vor Krone hinzugefügt
+                                                       username + " \uD83D\uDC51" : username);
                 lobbyMembers.add(item);
             });
         });

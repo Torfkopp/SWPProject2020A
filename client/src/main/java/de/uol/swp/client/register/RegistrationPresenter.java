@@ -11,6 +11,8 @@ import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Manages the registration window
@@ -24,6 +26,7 @@ public class RegistrationPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RegistrationView.fxml";
     private static final RegistrationCanceledEvent registrationCanceledEvent = new RegistrationCanceledEvent();
+    private final Logger LOG = LogManager.getLogger(RegistrationPresenter.class);
 
     @FXML
     private TextField loginField;
@@ -51,6 +54,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @Inject
     public RegistrationPresenter(EventBus eventBus, ClientUserService userService) {
+        LOG.debug("RegistrationPresenter started");
         setEventBus(eventBus);
     }
 

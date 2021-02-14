@@ -55,7 +55,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
     @Inject
     public ChangePasswordPresenter(EventBus eventBus, ClientUserService userService) {
         setEventBus(eventBus);
-        LOG.debug("ChangePasswordPresenter was started");
+        LOG.debug("ChangePasswordPresenter started");
     }
 
     /**
