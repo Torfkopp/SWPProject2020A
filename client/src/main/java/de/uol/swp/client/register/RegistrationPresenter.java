@@ -46,7 +46,6 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @Inject
     public RegistrationPresenter(EventBus eventBus, ClientUserService userService) {
-        LOG.debug("RegistrationPresenter started");
         setEventBus(eventBus);
     }
 

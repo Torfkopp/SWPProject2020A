@@ -109,6 +109,7 @@ public class LobbyService {
      * @since 2020-12-30
      */
     public void refreshLobbyPresenterFields(String lobbyName, User user) {
+        LOG.debug("Sending LobbyUpdateEvent");
         eventBus.post(new LobbyUpdateEvent(lobbyName, user));
     }
 

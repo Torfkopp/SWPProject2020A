@@ -71,15 +71,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-02
      */
     public MainMenuPresenter() {
-        LOG.debug("MainMenuPresenter started");
         super.init(LogManager.getLogger(MainMenuPresenter.class));
     }
 
     @Override
     @Subscribe
-    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse msg) {
-        if (msg.getLobbyName() == null) {
-            super.onAskLatestChatMessageResponse(msg);
+    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
+        if (rsp.getLobbyName() == null) {
+            super.onAskLatestChatMessageResponse(rsp);
         }
     }
 
@@ -130,15 +129,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * list" with the names of all currently existing lobbies is displayed in the
      * log.
      *
-     * @param allLobbiesResponse The AllLobbiesResponse object seen on the EventBus
+     * @param rsp The AllLobbiesResponse object seen on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-11-29
      */
     @Subscribe
-    private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
+    private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
-        updateLobbyList(allLobbiesResponse.getLobbyNames());
+        updateLobbyList(rsp.getLobbyNames());
     }
 
     /**
@@ -150,15 +149,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * list" with the names of all currently logged in users is displayed in the
      * log.
      *
-     * @param allUsersResponse The AllOnlineUsersResponse object seen on the EventBus
+     * @param rsp The AllOnlineUsersResponse object seen on the EventBus
      *
      * @see de.uol.swp.common.user.response.AllOnlineUsersResponse
      * @since 2019-08-29
      */
     @Subscribe
-    private void onAllOnlineUsersResponse(AllOnlineUsersResponse allUsersResponse) {
+    private void onAllOnlineUsersResponse(AllOnlineUsersResponse rsp) {
         LOG.debug("Received AllOnlineUsersResponse");
-        updateUsersList(allUsersResponse.getUsers());
+        updateUsersList(rsp.getUsers());
     }
 
     /**
@@ -213,7 +212,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * all members of that new lobby enabling the lobby window to
      * display all members from the beginning.
      *
-     * @param createLobbyResponse The CreateLobbyResponse object found on the EventBus
+     * @param rsp The CreateLobbyResponse object found on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
@@ -221,12 +220,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-20
      */
     @Subscribe
-    private void onCreateLobbyResponse(CreateLobbyResponse createLobbyResponse) {
+    private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(createLobbyResponse.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(createLobbyResponse.getLobbyName());
-            lobbyService.refreshLobbyPresenterFields(createLobbyResponse.getLobbyName(), loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
+            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
 
@@ -285,7 +284,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * all members of that new lobby in order for the lobby window to be
      * able to display all members from the beginning.
      *
-     * @param joinLobbyResponse The JoinLobbyResponse object found on the EventBus
+     * @param rsp The JoinLobbyResponse object found on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
@@ -293,12 +292,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2020-12-20
      */
     @Subscribe
-    private void onJoinLobbyResponse(JoinLobbyResponse joinLobbyResponse) {
+    private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(joinLobbyResponse.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(joinLobbyResponse.getLobbyName());
-            lobbyService.refreshLobbyPresenterFields(joinLobbyResponse.getLobbyName(), loggedInUser);
+            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
+            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
 
@@ -367,15 +366,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * should the window be closed without using the Logout button. Closing
      * the window also clears the EventBus to avoid NullPointerExceptions.
      *
-     * @param message The LoginSuccessfulResponse object seen on the EventBus
+     * @param rsp The LoginSuccessfulResponse object seen on the EventBus
      *
      * @see de.uol.swp.common.user.response.LoginSuccessfulResponse
      * @since 2021-01-07
      */
     @Subscribe
-    private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LogSuccessfulResponse");
-        this.loggedInUser = message.getUser();
+        this.loggedInUser = rsp.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
@@ -389,8 +388,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 ((Stage) event.getSource()).close();
                 clearEventBus();
             });
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 
     /**
@@ -426,18 +424,18 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} logged in." is displayed in the log.
      *
-     * @param message The UserLoggedInMessage object seen on the EventBus
+     * @param msg The UserLoggedInMessage object seen on the EventBus
      *
      * @see de.uol.swp.common.user.message.UserLoggedInMessage
      * @since 2019-08-29
      */
     @Subscribe
-    private void onUserLoggedInMessage(UserLoggedInMessage message) {
+    private void onUserLoggedInMessage(UserLoggedInMessage msg) {
         LOG.debug("Received UserLoggedInMessage");
-        LOG.debug("---- New user " + message.getUsername() + " logged in");
+        LOG.debug("---- New user " + msg.getUsername() + " logged in");
         Platform.runLater(() -> {
-            if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(message.getUsername()))
-                users.add(message.getUsername());
+            if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(msg.getUsername()))
+                users.add(msg.getUsername());
         });
     }
 
@@ -449,16 +447,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Furthermore, if the LOG-Level is set to DEBUG, the message "User {@literal
      * <Username>} logged out." is displayed in the log.
      *
-     * @param message The UserLoggedOutMessage object seen on the EventBus
+     * @param msg The UserLoggedOutMessage object seen on the EventBus
      *
      * @see de.uol.swp.common.user.message.UserLoggedOutMessage
      * @since 2019-08-29
      */
     @Subscribe
-    private void onUserLoggedOutMessage(UserLoggedOutMessage message) {
+    private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
         LOG.debug("Received UserLoggedOutMessage");
-        LOG.debug("---- User " + message.getUsername() + " logged out");
-        Platform.runLater(() -> users.remove(message.getUsername()));
+        LOG.debug("---- User " + msg.getUsername() + " logged out");
+        Platform.runLater(() -> users.remove(msg.getUsername()));
     }
 
     /**

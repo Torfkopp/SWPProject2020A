@@ -63,9 +63,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @implNote Called automatically by JavaFX
      */
     @FXML
-    protected void initialize() {
-        prepareChatVars();
-    }
+    protected void initialize() { prepareChatVars(); }
 
     /**
      * Handles AskLatestChatMessageResponse
