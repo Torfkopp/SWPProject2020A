@@ -6,6 +6,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import de.uol.swp.client.*;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import javafx.fxml.FXMLLoader;
@@ -83,5 +85,6 @@ public class ClientModule extends AbstractModule {
         bind(IChatService.class).to(ChatService.class);
         bind(ResourceBundle.class).toInstance(resourceBundle);
         bind(Properties.class).toInstance(properties);
+        bind(ILobbyService.class).to(LobbyService.class);
     }
 }

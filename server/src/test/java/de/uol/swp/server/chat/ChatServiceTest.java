@@ -10,6 +10,7 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
+import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
@@ -49,7 +50,7 @@ class ChatServiceTest {
     final CountDownLatch lock = new CountDownLatch(1);
     private final UserStore userStore = new MainMemoryBasedUserStore();
     private final UserManagement userManagement = new UserManagement(userStore);
-    private final LobbyManagement lobbyManagement = new LobbyManagement();
+    private final ILobbyManagement lobbyManagement = new LobbyManagement();
     private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
     private final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
     private ChatManagement chatManagement;
