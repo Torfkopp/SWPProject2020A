@@ -51,6 +51,7 @@ public class ChatService extends AbstractService {
     @Inject
     public ChatService(EventBus bus, ChatManagement chatManagement, LobbyService lobbyService) {
         super(bus);
+        LOG.debug("ChatService started");
         this.chatManagement = chatManagement;
         this.lobbyService = lobbyService;
     }
@@ -72,7 +73,8 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onAskLatestChatMessageRequest(AskLatestChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new AskLatestMessage with " + msg.getAmount() + " messages");
+            if (msg.isFromLobby()) LOG.debug("Received AskLatestChatMessageRequest from Lobby " + msg.getOriginLobby());
+            else LOG.debug("Received AskLatestChatMessageRequest");
         }
         ResponseMessage returnMessage;
         if (msg.isFromLobby()) {
@@ -113,7 +115,8 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onDeleteChatMessageRequest(DeleteChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new DeleteChatMessage message for the ChatMessage ID " + msg.getId());
+            if (msg.isFromLobby()) LOG.debug("Received DeleteChatMessageRequest from Lobby " + msg.getOriginLobby());
+            else LOG.debug("Received DeleteChatMessageRequest");
         }
         try {
             Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(msg.getId(), msg.getOriginLobby());
@@ -157,8 +160,8 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new EditChatMessage message for the ChatMessage ID " + msg
-                    .getId() + " and new content '" + msg.getContent() + '\'');
+            if (msg.isFromLobby()) LOG.debug("Received EditChatMessageRequest from Lobby " + msg.getOriginLobby());
+            else LOG.debug("Received EditChatMessageRequest");
         }
         try {
             Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(msg.getId(), msg.getOriginLobby());
@@ -199,7 +202,8 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
-        LOG.debug("Lobby " + msg.getName() + " was deleted, removing its chat history...");
+        LOG.debug("Received LobbyDeletedMessage for Lobby " + msg.getName());
+        LOG.debug("---- Deleting Messages for the Lobby");
         chatManagement.dropLobbyHistory(msg.getName());
     }
 
@@ -220,8 +224,8 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new ChatMessage message from " + msg.getAuthor().getUsername() + " with content '" + msg
-                    .getContent() + '\'');
+            if (msg.isFromLobby()) LOG.debug("Received NewChatMessageRequest from Lobby " + msg.getOriginLobby());
+            else LOG.debug("Received NewChatMessageRequest");
         }
         try {
             if (msg.isFromLobby()) {

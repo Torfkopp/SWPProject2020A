@@ -52,6 +52,7 @@ public class GameService extends AbstractService {
     @Inject
     public GameService(EventBus bus, GameManagement gameManagement, LobbyService lobbyService) {
         super(bus);
+        LOG.debug("GameService started");
         this.gameManagement = gameManagement;
         this.lobbyService = lobbyService;
     }
@@ -68,6 +69,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onCreateGameMessage(CreateGameMessage message) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameMessage for Lobby " + message.getLobbyName());
         gameManagement.createGame(message.getLobby(), message.getFirst());
     }
 
@@ -86,7 +88,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onEndTurnRequest(EndTurnRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug(msg.getOriginLobby() + ": User " + msg.getUser().getUsername() + " wants to end his turn.");
+            LOG.debug("Received EndTurnRequest for Lobby " + msg.getOriginLobby());
+            LOG.debug("---- " + "User " + msg.getUser().getUsername() + " wants to end his turn.");
         }
         try {
             Game game = gameManagement.getGame(msg.getOriginLobby());
@@ -114,6 +117,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onUpdateInventoryRequest(UpdateInventoryRequest msg) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received UpdateInventoryRequest for Lobby " + msg.getOriginLobby());
         Game game = gameManagement.getGame(msg.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;

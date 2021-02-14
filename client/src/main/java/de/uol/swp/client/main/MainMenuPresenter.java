@@ -390,7 +390,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 clearEventBus();
             });
         } catch (Exception e) {
-            LOG.error(e);
         }
     }
 

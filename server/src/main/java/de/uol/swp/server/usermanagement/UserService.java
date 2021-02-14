@@ -48,6 +48,7 @@ public class UserService extends AbstractService {
     @Inject
     public UserService(EventBus eventBus, UserManagement userManagement) {
         super(eventBus);
+        if (LOG.isDebugEnabled()) LOG.debug("UserService started");
         this.userManagement = userManagement;
     }
 
@@ -68,7 +69,7 @@ public class UserService extends AbstractService {
     @Subscribe
     private void onChangePasswordRequest(UpdateUserPasswordRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new ChangePassword message with " + msg.getUser());
+            LOG.debug("Received ChangePasswordRequest for User " + msg.getUser().getUsername());
         }
         ResponseMessage returnMessage;
         try {
@@ -111,7 +112,7 @@ public class UserService extends AbstractService {
     @Subscribe
     private void onDeleteUserRequest(DeleteUserRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new deletion message with " + msg.getUser());
+            LOG.debug("Received DeleteUserRequest for User " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {
@@ -147,7 +148,7 @@ public class UserService extends AbstractService {
     @Subscribe
     private void onRegisterUserRequest(RegisterUserRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new registration message with " + msg.getUser());
+            LOG.debug("Received RegisterUserRequest for User " + msg.getUser());
         }
         ResponseMessage returnMessage;
         try {

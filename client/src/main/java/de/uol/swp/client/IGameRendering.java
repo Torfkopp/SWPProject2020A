@@ -7,6 +7,8 @@ import de.uol.swp.common.game.map.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.ResourceBundle;
@@ -58,6 +60,7 @@ public interface IGameRendering {
     Color PLAYER_4_COLOUR = Color.WHITE;
 
     ResourceBundleWrapper resourceBundleWrapper = new ResourceBundleWrapper();
+    Logger LOG = LogManager.getLogger(IGameRendering.class);
 
     /**
      * drawCity method
@@ -90,6 +93,7 @@ public interface IGameRendering {
      * @param resourceBundle    The ResourceBundle used for internationalisation
      */
     default void drawGameMap(IGameMapManagement gameMapManagement, Canvas canvas, ResourceBundle resourceBundle) {
+        LOG.debug("Drawing Game map");
         resourceBundleWrapper.set(resourceBundle);
         double width = canvas.getWidth(), height = canvas.getHeight() - OFFSET_Y * 2;
         GraphicsContext mapCtx = canvas.getGraphicsContext2D();

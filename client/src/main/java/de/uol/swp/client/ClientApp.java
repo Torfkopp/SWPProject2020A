@@ -149,23 +149,21 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles a successful login
+     * Handles a successful password changing process
      * <p>
-     * If an LoginSuccessfulResponse object is detected on the EventBus this
-     * method is called. It tells the SceneManager to show the main menu, and sets
-     * this clients user to the user found in the object. If the loglevel is set
-     * to DEBUG or higher, "User logged in successfully " and the username of the
-     * logged in user are written to the log.
+     * If an ChangePasswordSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
      *
-     * @param message The LoginSuccessfulResponse object detected on the EventBus
+     * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
      *
+     * @author Eric Vuong
+     * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
-     * @since 2017-03-17
+     * @since 2020-12-03
      */
     @Subscribe
-    private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
-        LOG.debug("User logged in successfully " + message.getUser().getUsername());
-        this.user = message.getUser();
+    private void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
+        LOG.info("Password change was successful.");
         sceneManager.showMainScreen(user);
     }
 
@@ -189,22 +187,24 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles a successful registration
+     * Handles a successful login
      * <p>
-     * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
-     * method is called. It tells the SceneManager to show the login window. If
-     * the loglevel is set to INFO or higher, "Registration Successful." is written
-     * to the log.
+     * If an LoginSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the main menu, and sets
+     * this clients user to the user found in the object. If the loglevel is set
+     * to DEBUG or higher, "User logged in successfully " and the username of the
+     * logged in user are written to the log.
      *
-     * @param message The RegistrationSuccessfulResponse object detected on the EventBus
+     * @param message The LoginSuccessfulResponse object detected on the EventBus
      *
      * @see de.uol.swp.client.SceneManager
-     * @since 2019-09-02
+     * @since 2017-03-17
      */
     @Subscribe
-    private void onRegistrationSuccessfulMessage(RegistrationSuccessfulResponse message) {
-        LOG.info("Registration successful.");
-        sceneManager.showLoginScreen();
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
+        LOG.debug("Received LoginSuccessfulResponse for User " + message.getUser().getUsername());
+        this.user = message.getUser();
+        sceneManager.showMainScreen(user);
     }
 
     /**
@@ -227,22 +227,22 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles a successful password changing process
+     * Handles a successful registration
      * <p>
-     * If an ChangePasswordSuccessfulResponse object is detected on the EventBus this
-     * method is called. It tells the SceneManager to show the MainScreen window.
+     * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
+     * method is called. It tells the SceneManager to show the login window. If
+     * the loglevel is set to INFO or higher, "Registration Successful." is written
+     * to the log.
      *
-     * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
+     * @param message The RegistrationSuccessfulResponse object detected on the EventBus
      *
-     * @author Eric Vuong
-     * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-03
+     * @since 2019-09-02
      */
     @Subscribe
-    private void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
-        LOG.info("Password change is successful.");
-        sceneManager.showMainScreen(user);
+    private void onRegistrationSuccessfulMessage(RegistrationSuccessfulResponse message) {
+        LOG.info("Registration was successful.");
+        sceneManager.showLoginScreen();
     }
 
     /**
@@ -277,7 +277,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onUserDeletionSuccessfulMessage(UserDeletionSuccessfulResponse message) {
-        LOG.info("Deletion of user successful.");
+        LOG.info("Deletion of user was successful.");
         sceneManager.showLoginScreen();
     }
 

@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -51,6 +52,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
+    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
     @FXML
     private ListView<Pair<String, String>> membersView;
@@ -312,8 +314,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage message) {
-        if (message.getLobby().equals(message.getLobbyName())) return;
-        LOG.debug("Received NextPlayerMessage for Lobby " + message.getLobby());
+        if (message.getLobbyName().equals(message.getLobbyName())) return;
+        LOG.debug("Received NextPlayerMessage for Lobby " + message.getLobbyName());
         setTurnIndicatorText(message.getActivePlayer());
         //In here to test the endTurnButton
         onDiceCastMessage(new DiceCastMessage(message.getLobbyName(), message.getActivePlayer()));

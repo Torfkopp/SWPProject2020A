@@ -38,56 +38,56 @@ public class ChatService implements IChatService {
 
     @Override
     public void askLatestMessages(int amount) {
-        LOG.debug("Send AskLatestMessagesRequest");
+        LOG.debug("Sending AskLatestMessagesRequest");
         Message request = new AskLatestChatMessageRequest(amount);
         bus.post(request);
     }
 
     @Override
     public void askLatestMessages(int amount, String originLobby) {
-        LOG.debug("Send AskLatestMessagesRequest for Lobby " + originLobby);
+        LOG.debug("Sending AskLatestMessagesRequest for Lobby " + originLobby);
         Message request = new AskLatestChatMessageRequest(amount, originLobby);
         bus.post(request);
     }
 
     @Override
     public void deleteMessage(int id, User requestingUser) {
-        LOG.debug("Send DeleteChatMessageRequest");
+        LOG.debug("Sending DeleteChatMessageRequest");
         Message request = new DeleteChatMessageRequest(id, requestingUser);
         bus.post(request);
     }
 
     @Override
     public void deleteMessage(int id, User requestingUser, String originLobby) {
-        LOG.debug("Send DeleteChatMessageRequest for Lobby " + originLobby);
+        LOG.debug("Sending DeleteChatMessageRequest for Lobby " + originLobby);
         Message request = new DeleteChatMessageRequest(id, requestingUser, originLobby);
         bus.post(request);
     }
 
     @Override
     public void editMessage(int id, String newContent, User requestingUser) {
-        LOG.debug("Send EditChatMessageRequest");
+        LOG.debug("Sending EditChatMessageRequest");
         Message request = new EditChatMessageRequest(id, newContent, requestingUser);
         bus.post(request);
     }
 
     @Override
     public void editMessage(int id, String newContent, User requestingUser, String originLobby) {
-        LOG.debug("Send EditChatMessageRequest for Lobby " + originLobby);
+        LOG.debug("Sending EditChatMessageRequest for Lobby " + originLobby);
         Message request = new EditChatMessageRequest(id, newContent, requestingUser, originLobby);
         bus.post(request);
     }
 
     @Override
     public void newMessage(User author, String msg) {
-        LOG.debug("Send NewChatMessageRequest");
+        LOG.debug("Sending NewChatMessageRequest");
         Message request = new NewChatMessageRequest(author, msg);
         bus.post(request);
     }
 
     @Override
     public void newMessage(User author, String msg, String originLobby) {
-        LOG.debug("Send NewChatMessageRequest for Lobby " + originLobby);
+        LOG.debug("Sending NewChatMessageRequest for Lobby " + originLobby);
         Message request = new NewChatMessageRequest(author, msg, originLobby);
         bus.post(request);
     }
