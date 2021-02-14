@@ -19,8 +19,6 @@ public class LobbyErrorEvent {
      * Constructor
      *
      * @param message Message containing the cause of the Error
-     *
-     * @since 2020-12-18
      */
     public LobbyErrorEvent(String message) {
         this.message = message;
@@ -30,8 +28,6 @@ public class LobbyErrorEvent {
      * Gets the error message
      *
      * @return A String containing the error message
-     *
-     * @since 2020-12-18
      */
     public String getMessage() {
         return message;

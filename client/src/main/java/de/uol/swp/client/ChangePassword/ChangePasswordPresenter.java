@@ -36,12 +36,6 @@ public class ChangePasswordPresenter extends AbstractPresenter {
     private PasswordField NewPasswordField2;
 
     /**
-     * Default Constructor
-     */
-    public ChangePasswordPresenter() {
-    }
-
-    /**
      * Constructor
      *
      * @param eventBus    The EventBus set in ClientModule
@@ -97,15 +91,15 @@ public class ChangePasswordPresenter extends AbstractPresenter {
         User user = (User) OldPasswordField1.getScene().getUserData();
 
         if (Strings.isNullOrEmpty(OldPasswordField1.getText())) {
-            eventBus.post(new ChangePasswordErrorEvent("Old Password cannot be empty"));
+            eventBus.post(new ChangePasswordErrorEvent(resourceBundle.getString("changepw.error.empty.oldpw")));
         } else if (Strings.isNullOrEmpty(NewPasswordField1.getText())) {
-            eventBus.post(new ChangePasswordErrorEvent("New Password cannot be empty"));
+            eventBus.post(new ChangePasswordErrorEvent(resourceBundle.getString("changepw.error.empty.newpw")));
         } else if (Strings.isNullOrEmpty(NewPasswordField2.getText())) {
-            eventBus.post(new ChangePasswordErrorEvent("Repeat new Password cannot be empty"));
+            eventBus.post(new ChangePasswordErrorEvent(resourceBundle.getString("changepw.error.empty.repeatpw")));
         } else if (!NewPasswordField1.getText().equals(NewPasswordField2.getText())) {
-            eventBus.post(new ChangePasswordErrorEvent("Your New Passwords are not equal"));
+            eventBus.post(new ChangePasswordErrorEvent(resourceBundle.getString("changepw.error.newnotequal")));
         } else {
-            userService.updateUserPassword(new UserDTO(user.getUsername(), NewPasswordField1.getText(), "empty"),
+            userService.updateUserPassword(new UserDTO(user.getUsername(), NewPasswordField1.getText(), ""),
                                            OldPasswordField1.getText());
         }
     }

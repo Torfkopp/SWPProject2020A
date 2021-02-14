@@ -14,7 +14,7 @@ import java.util.List;
  * @see de.uol.swp.common.message.ServerMessage
  * @since 2019-08-07
  */
-public class AbstractServerMessage extends AbstractMessage implements ServerMessage {
+public abstract class AbstractServerMessage extends AbstractMessage implements ServerMessage {
 
     private transient List<Session> receiver = new ArrayList<>();
 

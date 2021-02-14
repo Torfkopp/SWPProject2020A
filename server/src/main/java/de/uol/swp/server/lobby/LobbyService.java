@@ -248,7 +248,7 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             Set<User> lobbyMembers = lobby.get().getUsers();
-            Message response = new AllLobbyMembersResponse(lobbyMembers, lobby.get().getOwner(),
+            Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
                                                            lobby.get().getReadyUsers());
             response.initWithMessage(retrieveAllLobbyMembersRequest);
             post(response);

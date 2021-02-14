@@ -13,15 +13,6 @@ import de.uol.swp.common.user.User;
 public class UserJoinedLobbyMessage extends AbstractLobbyMessage {
 
     /**
-     * Default constructor
-     *
-     * @implNote This constructor is needed for serialisation
-     * @since 2019-10-08
-     */
-    public UserJoinedLobbyMessage() {
-    }
-
-    /**
      * Constructor
      *
      * @param lobbyName Name of the lobby

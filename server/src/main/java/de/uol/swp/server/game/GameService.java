@@ -117,29 +117,29 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(msg.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
-        for (int i = 0; i < inventories.length; i++) {
-            if (inventories[i].getPlayer().equals(msg.getUser())) {
-                inventory = inventories[i];
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(msg.getUser())) {
+                inventory = value;
                 System.out.println(inventory.getPlayer());
                 break;
             }
         }
         if (inventory != null) {
             Map<String, Integer> resourceMap = new HashMap<>();
-            resourceMap.put("Brick", inventory.getBrick());
-            resourceMap.put("Grain", inventory.getGrain());
-            resourceMap.put("Lumber", inventory.getLumber());
-            resourceMap.put("Ore", inventory.getOre());
-            resourceMap.put("Wool", inventory.getWool());
-            resourceMap.put("Victory Point Cards", inventory.getVictoryPointCards());
-            resourceMap.put("Knight Cards", inventory.getKnightCards());
-            resourceMap.put("Road Building Cards", inventory.getRoadBuildingCards());
-            resourceMap.put("Year of Plenty Cards", inventory.getYearOfPlentyCards());
-            resourceMap.put("Monopoly Cards", inventory.getMonopolyCards());
+            resourceMap.put("brick", inventory.getBrick());
+            resourceMap.put("grain", inventory.getGrain());
+            resourceMap.put("lumber", inventory.getLumber());
+            resourceMap.put("ore", inventory.getOre());
+            resourceMap.put("wool", inventory.getWool());
+            resourceMap.put("cards.victorypoints", inventory.getVictoryPointCards());
+            resourceMap.put("cards.knights", inventory.getKnightCards());
+            resourceMap.put("cards.roadbuilding", inventory.getRoadBuildingCards());
+            resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
+            resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
 
             Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-            armyAndRoadMap.put("Largest Army", inventory.isLargestArmy());
-            armyAndRoadMap.put("Longest Road", inventory.isLongestRoad());
+            armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
+            armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
             AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(),
                                                                                 Collections

@@ -9,31 +9,31 @@ package de.uol.swp.common.game.map;
 public interface IEdge {
 
     /**
-     * Gets the two surrounding intersections
+     * Builds a road on the edge and sets the road's owner
+     * <p>
      *
-     * @return Array of two positions
+     * @param owner The owner of the road
      */
-    int[] getNeiInt();
+    void buildRoad(Player owner);
 
     /**
      * Gets neighbouring edges
      *
      * @return Array of positions
      */
-    int[] getNeighbours();
+    int[] getNeighbouringEdges();
 
     /**
-     * Gets the edge's status
+     * Gets the two surrounding intersections
      *
-     * @return 0 if undeveloped or 1-4 for road owner
+     * @return Array of two positions
      */
-    int getState();
+    int[] getNeighbouringIntersections();
 
     /**
-     * Sets the edge's status
-     * <p>
+     * Gets the edge's owner or null if undeveloped
      *
-     * @param state 1-4 for road owner
+     * @return The owner of the road or null if undeveloped
      */
-    void setState(int state);
+    Player getOwner();
 }

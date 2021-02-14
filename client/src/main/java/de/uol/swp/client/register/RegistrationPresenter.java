@@ -36,14 +36,6 @@ public class RegistrationPresenter extends AbstractPresenter {
     private PasswordField passwordField2;
 
     /**
-     * Default Constructor
-     *
-     * @since 2019-09-18
-     */
-    public RegistrationPresenter() {
-    }
-
-    /**
      * Constructor
      *
      * @param eventBus    The EventBus set in ClientModule
@@ -91,13 +83,13 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     private void onRegisterButtonPressed() {
         if (Strings.isNullOrEmpty(loginField.getText())) {
-            eventBus.post(new RegistrationErrorEvent("Username cannot be empty"));
+            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
-            eventBus.post(new RegistrationErrorEvent("Passwords are not equal"));
+            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.notequalpw")));
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
-            eventBus.post(new RegistrationErrorEvent("Password cannot be empty"));
+            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
         } else {
-            userService.createUser(new UserDTO(loginField.getText(), passwordField1.getText(), "empty"));
+            userService.createUser(new UserDTO(loginField.getText(), passwordField1.getText(), ""));
         }
     }
 }

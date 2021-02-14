@@ -1,30 +1,21 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.message.AbstractResponseMessage;
-
-public class JoinLobbyResponse extends AbstractResponseMessage {
-
-    private final String name;
+/**
+ * Response sent by the server when a user wants to join a lobby
+ *
+ * @author Marvin Drees
+ * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
+ * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
+ * @since 2020-12-21
+ */
+public class JoinLobbyResponse extends AbstractLobbyResponse {
 
     /**
      * Constructor
      *
-     * @param name The name for the new lobby
-     *
-     * @since 2020-12-21
+     * @param lobbyName The name for the new lobby
      **/
-    public JoinLobbyResponse(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the name of the created lobby
-     *
-     * @return Name name of the created lobby
-     *
-     * @since 2020-12-21
-     */
-    public String getName() {
-        return name;
+    public JoinLobbyResponse(String lobbyName) {
+        super(lobbyName);
     }
 }

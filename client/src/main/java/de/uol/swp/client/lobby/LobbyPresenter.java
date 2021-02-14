@@ -28,7 +28,6 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -62,7 +61,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     @FXML
     private Button endTurn;
     @FXML
-    private Text text;
+    private Label turnIndicator;
     @FXML
     private Canvas gameMapCanvas;
     @FXML
@@ -100,15 +99,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.getValue());
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue());
+                });
             }
         });
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.getValue() + " " + item.getKey()); // looks like: "1 Brick"
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
+                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                });
             }
         });
         LOG.debug("LobbyPresenter initialised");
@@ -186,29 +190,34 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     /**
      * Handles a new list of users
      * <p>
-     * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
-     * of the currently logged in members are put into the list of lobby members.
-     * The owner attribute is set and the set of ready Users is updated.
-     * Additionally, the state of the "Start Session" button is set
-     * appropriately.
+     * If a new AllOnlineUsersResponse object is posted onto the EventBus,
+     * and it is intended for the current Lobby, the names of the currently
+     * logged in members are put into the list of lobby members. The owner
+     * attribute is set and the set of ready Users is updated. Additionally,
+     * the state of the "Start Session" button is set appropriately.
      * <p>
      * Furthermore, if the LOG-Level is set to DEBUG, the messages "Update of user
      * list" with the names of all currently logged in users, "Owner of this
      * lobby: " with the name of the lobby's owner, and "Update of ready users "
      * are displayed in the log.
      *
-     * @param allLobbyMembersResponse AllLobbyMembersResponse object seen on the EventBus
+     * @param allLobbyMembersResponse The AllLobbyMembersResponse object seen on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2021-01-19
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse allLobbyMembersResponse) {
-        LOG.debug("Received AllLobbyMembersResponse");
-        this.owner = allLobbyMembersResponse.getOwner();
-        this.readyUsers = allLobbyMembersResponse.getReadyUsers();
-        updateUsersList(allLobbyMembersResponse.getUsers());
-        setStartSessionButtonState();
+        if (this.lobbyName.equals(allLobbyMembersResponse.getLobbyName())) {
+            LOG.debug("Received AllLobbyMembersResponse");
+            LOG.debug("---- Update of lobby member list " + allLobbyMembersResponse.getUsers());
+            LOG.debug("---- Owner of this lobby: " + allLobbyMembersResponse.getOwner().getUsername());
+            LOG.debug("---- Update of ready users " + allLobbyMembersResponse.getReadyUsers());
+            this.owner = allLobbyMembersResponse.getOwner();
+            this.readyUsers = allLobbyMembersResponse.getReadyUsers();
+            updateUsersList(allLobbyMembersResponse.getUsers());
+            setStartSessionButtonState();
+        }
     }
 
     /**
@@ -236,10 +245,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * to end the current turn.
      *
      * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2021-1-15
+     * @since 2021-01-15
      */
     @FXML
-    public void onEndTurnButtonPressed() {
+    private void onEndTurnButtonPressed() {
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -268,7 +277,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * Also makes sure that the lobby will be left gracefully should the window
      * be closed without using the Leave Lobby button.
      *
-     * @param lobbyUpdateEvent the lobby update event
+     * @param lobbyUpdateEvent The LobbyUpdateEvent found on the EventBus
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
@@ -305,9 +314,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onNextPlayerMessage(NextPlayerMessage message) {
         if (message.getLobby().equals(message.getLobbyName())) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + message.getLobby());
-        setTextText(message.getActivePlayer());
+        setTurnIndicatorText(message.getActivePlayer());
         //In here to test the endTurnButton
-        onDiceCastMessage(new DiceCastMessage(message.getLobby(), message.getActivePlayer()));
+        onDiceCastMessage(new DiceCastMessage(message.getLobbyName(), message.getActivePlayer()));
     }
 
     /**
@@ -335,7 +344,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * method leaveLobby in LobbyService is called for every Lobby the user
      * is in.
      *
-     * @param response the RemoveFromLobbiesResponse seen on the EventBus
+     * @param response The RemoveFromLobbiesResponse seen on the EventBus
      *
      * @author Finn Haase
      * @author Aldin Dervisi
@@ -371,44 +380,72 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * Handles a StartSessionMessage found on the EventBus
      * <p>
      * Sets the play field visible.
+     * The startSessionButton and every readyCheckbox are getting invisible for
+     * the lobby members.
      *
      * @param startSessionMessage The StartSessionMessage found on the EventBus
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
-     * @since 2021-01-21
+     * @since 2021-02-04
      */
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage startSessionMessage) {
-        if (!startSessionMessage.getName().equals(this.lobbyName)) return;
-        LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-        Platform.runLater(() -> {
-            playField.setVisible(true);
-            //This Line needs to be changed/ removed in the Future
-            drawGameMap(new GameMapManagement(), gameMapCanvas);
-            setTextText(startSessionMessage.getUser());
-            //In here to test the endTurnButton.
-            eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
-            lobbyService.updateInventory(lobbyName, loggedInUser);
-        });
+        if (startSessionMessage.getName().equals(this.lobbyName)) {
+            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
+            Platform.runLater(() -> {
+                playField.setVisible(true);
+                //This Line needs to be changed/ removed in the Future
+                drawGameMap(new GameMapManagement(), gameMapCanvas, resourceBundle);
+                setTurnIndicatorText(startSessionMessage.getUser());
+                //In here to test the endTurnButton.
+                eventBus.post(new DiceCastMessage(startSessionMessage.getName(), startSessionMessage.getUser()));
+                lobbyService.updateInventory(lobbyName, loggedInUser);
+                this.readyCheckBox.setVisible(false);
+                this.startSession.setVisible(false);
+            });
+        }
     }
 
+    /**
+     * Handles an UpdateInventoryResponse found on the EventBus
+     * <p>
+     * If the UpdateInventoryResponse is intended for the current Lobby, the
+     * resourceList linked to the inventoryView is cleared and updated with the
+     * items as listed in the maps contained in the UpdateInventoryResponse.
+     * The item names are localised with the ResourceBundle injected into the
+     * LobbyPresenter.
+     *
+     * @param resp The UpdateInventoryResponse found on the EventBus
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @author Phillip-André Suhr
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.lobby.response.UpdateInventoryResponse
+     * @since 2021-01-27
+     */
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse resp) {
-        if (!resp.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received UpdateInventoryResponse for Lobby " + this.lobbyName);
-        if (resourceList == null) {
-            resourceList = FXCollections.observableArrayList();
-            inventoryView.setItems(resourceList);
-        }
-        resourceList.clear();
-        for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
-            Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
-            resourceList.add(resource);
-        }
-        for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
-            Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? "Has" : "Not");
-            resourceList.add(property);
+        if (resp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received UpdateInventoryResponse for Lobby " + this.lobbyName);
+            Platform.runLater(() -> {
+                if (resourceList == null) {
+                    resourceList = FXCollections.observableArrayList();
+                    inventoryView.setItems(resourceList);
+                }
+                resourceList.clear();
+                for (Map.Entry<String, Integer> entry : resp.getResourceMap().entrySet()) {
+                    Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
+                    resourceList.add(resource);
+                }
+                for (Map.Entry<String, Boolean> entry : resp.getArmyAndRoadMap().entrySet()) {
+                    Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? resourceBundle
+                            .getString("game.property.has") : resourceBundle.getString("game.property.hasnot"));
+                    resourceList.add(property);
+                }
+            });
         }
     }
 
@@ -544,8 +581,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @author Marvin Drees
      * @since 2021-01-23
      */
-    private void setTextText(User player) {
-        text.setText("It's " + player.getUsername() + "'s turn!");
+    private void setTurnIndicatorText(User player) {
+        Platform.runLater(() -> turnIndicator.setText(
+                String.format(resourceBundle.getString("lobby.game.text.turnindicator"), player.getUsername())));
     }
 
     /**
@@ -579,11 +617,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             userLobbyList.forEach(u -> {
                 String username = u.getUsername();
                 if (readyUsers.contains(u)) {
-                    username = "\u2713 " + username;
+                    username = String.format(resourceBundle.getString("lobby.members.ready"), username);
                 }
                 Pair<String, String> item = new Pair<>(u.getUsername(),
                                                        u.getUsername().equals(this.owner.getUsername()) ?
-                                                       username + " \uD83D\uDC51" : username);
+                                                       String.format(resourceBundle.getString("lobby.members.owner"),
+                                                                     username) :
+                                                       username);
                 lobbyMembers.add(item);
             });
         });

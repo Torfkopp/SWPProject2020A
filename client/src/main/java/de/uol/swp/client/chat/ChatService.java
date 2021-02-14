@@ -51,30 +51,30 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void deleteMessage(int id) {
+    public void deleteMessage(int id, User requestingUser) {
         LOG.debug("Send DeleteChatMessageRequest");
-        Message request = new DeleteChatMessageRequest(id);
+        Message request = new DeleteChatMessageRequest(id, requestingUser);
         bus.post(request);
     }
 
     @Override
-    public void deleteMessage(int id, String originLobby) {
+    public void deleteMessage(int id, User requestingUser, String originLobby) {
         LOG.debug("Send DeleteChatMessageRequest for Lobby " + originLobby);
-        Message request = new DeleteChatMessageRequest(id, originLobby);
+        Message request = new DeleteChatMessageRequest(id, requestingUser, originLobby);
         bus.post(request);
     }
 
     @Override
-    public void editMessage(int id, String newContent) {
+    public void editMessage(int id, String newContent, User requestingUser) {
         LOG.debug("Send EditChatMessageRequest");
-        Message request = new EditChatMessageRequest(id, newContent);
+        Message request = new EditChatMessageRequest(id, newContent, requestingUser);
         bus.post(request);
     }
 
     @Override
-    public void editMessage(int id, String newContent, String originLobby) {
+    public void editMessage(int id, String newContent, User requestingUser, String originLobby) {
         LOG.debug("Send EditChatMessageRequest for Lobby " + originLobby);
-        Message request = new EditChatMessageRequest(id, newContent, originLobby);
+        Message request = new EditChatMessageRequest(id, newContent, requestingUser, originLobby);
         bus.post(request);
     }
 

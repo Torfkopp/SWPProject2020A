@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Mapping EventBus calls to ChatManagement calls
@@ -90,9 +91,17 @@ public class ChatService extends AbstractService {
     /**
      * Handles a DeleteChatMessageRequest found on the EventBus
      * <p>
-     * If a DeleteChatMessageRequest is detected on the EventBus, this method is called.
-     * It then requests the ChatManagement to delete the message. If this succeeds, a
-     * DeleteChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
+     * If a DeleteChatMessageRequest is detected on the EventBus, this method
+     * is called.
+     * <p>
+     * First, it calls the ChatManagement to find the ChatMessage with the
+     * provided ID. If the returned Optional is empty or the User who sent the
+     * DeleteChatMessageRequest is not the author of the ChatMessage, the
+     * method returns immediately.
+     * <p>
+     * Otherwise, it requests the ChatManagement to delete the message. If this
+     * succeeds, a DeleteChatMessageMessage is posted onto the EventBus.
+     * Otherwise, nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
      *
@@ -107,6 +116,8 @@ public class ChatService extends AbstractService {
             LOG.debug("Got new DeleteChatMessage message for the ChatMessage ID " + msg.getId());
         }
         try {
+            Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(msg.getId(), msg.getOriginLobby());
+            if (storedMsg.isEmpty() || !storedMsg.get().getAuthor().equals(msg.getRequestingUser())) return;
             if (msg.isFromLobby()) {
                 chatManagement.dropChatMessage(msg.getId(), msg.getOriginLobby());
                 ServerMessage returnMessage = new DeletedChatMessageMessage(msg.getId(), msg.getOriginLobby());
@@ -124,9 +135,17 @@ public class ChatService extends AbstractService {
     /**
      * Handles an EditChatMessageRequest found on the EventBus
      * <p>
-     * If an EditChatMessageRequest is detected on the EventBus, this method is called.
-     * It then requests the ChatManagement to update the message. If this succeeds, a
-     * EditedChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
+     * If an EditChatMessageRequest is detected on the EventBus, this method is
+     * called.
+     * <p>
+     * First, it calls the ChatManagement to find the ChatMessage with the
+     * provided ID. If the returned Optional is empty or the User who sent the
+     * EditChatMessageRequest is not the author of the ChatMessage, the method
+     * returns immediately.
+     * <p>
+     * Otherwise, it requests the ChatManagement to update the message. If this
+     * succeeds, a EditedChatMessageMessage is posted onto the EventBus.
+     * Otherwise, nothing happens.
      *
      * @param msg The DeleteChatMessageRequest found on the EventBus
      *
@@ -142,6 +161,8 @@ public class ChatService extends AbstractService {
                     .getId() + " and new content '" + msg.getContent() + '\'');
         }
         try {
+            Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(msg.getId(), msg.getOriginLobby());
+            if (storedMsg.isEmpty() || !storedMsg.get().getAuthor().equals(msg.getRequestingUser())) return;
             if (msg.isFromLobby()) {
                 ChatMessage chatMessage = chatManagement
                         .updateChatMessage(msg.getId(), msg.getContent(), msg.getOriginLobby());
