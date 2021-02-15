@@ -15,8 +15,8 @@ import java.util.Objects;
  */
 public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
 
-    private String name;
-    private User user;
+    private final String name;
+    private final User user;
 
     /**
      * Constructor
@@ -56,17 +56,6 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
     }
 
     /**
-     * Sets the name variable
-     *
-     * @param name String containing the lobby's name
-     *
-     * @since 2019-10-08
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Gets the user variable
      *
      * @return User responsible for the creation of this message
@@ -75,16 +64,5 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      */
     public User getUser() {
         return user;
-    }
-
-    /**
-     * Sets the user variable
-     *
-     * @param user User responsible for the creation of this message
-     *
-     * @since 2019-10-08
-     */
-    public void setUser(User user) {
-        this.user = user;
     }
 }
