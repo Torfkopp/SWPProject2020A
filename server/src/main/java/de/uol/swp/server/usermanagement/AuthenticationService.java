@@ -114,7 +114,7 @@ public class AuthenticationService extends AbstractService {
     @Subscribe
     private void onLoginRequest(LoginRequest msg) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new auth message with " + msg.getUsername() + " " + msg.getPassword());
+            LOG.debug("Received LoginRequest for User " + msg.getUsername());
         }
         ServerInternalMessage returnMessage;
         try {
@@ -149,13 +149,14 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onLogoutRequest(LogoutRequest msg) {
+        LOG.debug("Received LogoutRequest");
         if (msg.getSession().isPresent()) {
             Session session = msg.getSession().get();
             User userToLogOut = userSessions.get(session);
             // Could be already logged out
             if (userToLogOut != null) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Logging out user " + userToLogOut.getUsername());
+                    LOG.debug("---- Logging out user " + userToLogOut.getUsername());
                 }
                 userManagement.logout(userToLogOut);
                 userSessions.remove(session);

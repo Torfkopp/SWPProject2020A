@@ -52,6 +52,7 @@ public class GameService extends AbstractService {
     @Inject
     public GameService(EventBus bus, IGameManagement gameManagement, LobbyService lobbyService) {
         super(bus);
+        LOG.debug("GameService started");
         this.gameManagement = gameManagement;
         this.lobbyService = lobbyService;
     }
@@ -62,13 +63,14 @@ public class GameService extends AbstractService {
      * If a CreateGameMessage is detected on the Eventbus, this method is called.
      * It then requests the GameManagement to create a game.
      *
-     * @param message The CreateGameMessage
+     * @param msg The CreateGameMessage
      *
      * @since 2021-01-24
      */
     @Subscribe
-    private void onCreateGameMessage(CreateGameMessage message) {
-        gameManagement.createGame(message.getLobby(), message.getFirst());
+    private void onCreateGameMessage(CreateGameMessage msg) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameMessage for Lobby " + msg.getLobbyName());
+        gameManagement.createGame(msg.getLobby(), msg.getFirst());
     }
 
     /**
@@ -77,21 +79,22 @@ public class GameService extends AbstractService {
      * If a EndTurnRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to change to current active player.
      *
-     * @param msg The EndTurnRequest found on the EventBus
+     * @param req The EndTurnRequest found on the EventBus
      *
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @see de.uol.swp.common.game.message.NextPlayerMessage
      * @since 2021-01-15
      */
     @Subscribe
-    private void onEndTurnRequest(EndTurnRequest msg) {
+    private void onEndTurnRequest(EndTurnRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug(msg.getOriginLobby() + ": User " + msg.getUser().getUsername() + " wants to end his turn.");
+            LOG.debug("Received EndTurnRequest for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to end his turn.");
         }
         try {
-            Game game = gameManagement.getGame(msg.getOriginLobby());
-            ServerMessage returnMessage = new NextPlayerMessage(msg.getOriginLobby(), game.nextPlayer());
-            lobbyService.sendToAllInLobby(msg.getOriginLobby(), returnMessage);
+            Game game = gameManagement.getGame(req.getOriginLobby());
+            ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), game.nextPlayer());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -106,19 +109,20 @@ public class GameService extends AbstractService {
      * counted items (bricks, grain, etc.) and a armyAndRoadMap which
      * contains the boolean attributes longestRoad and largestArmy.
      *
-     * @param msg The UpdateInventoryRequest found on the EventBus
+     * @param req The UpdateInventoryRequest found on the EventBus
      *
      * @author Sven Ahrens
      * @author Finn Haase
      * @since 2021-01-25
      */
     @Subscribe
-    private void onUpdateInventoryRequest(UpdateInventoryRequest msg) {
-        Game game = gameManagement.getGame(msg.getOriginLobby());
+    private void onUpdateInventoryRequest(UpdateInventoryRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received UpdateInventoryRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
         for (Inventory value : inventories) {
-            if (value.getPlayer().equals(msg.getUser())) {
+            if (value.getPlayer().equals(req.getUser())) {
                 inventory = value;
                 System.out.println(inventory.getPlayer());
                 break;
@@ -141,13 +145,13 @@ public class GameService extends AbstractService {
             armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
             armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
-            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(msg.getUser(), msg.getOriginLobby(),
+            AbstractResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                                 Collections
                                                                                         .unmodifiableMap(resourceMap),
                                                                                 Collections.unmodifiableMap(
                                                                                         armyAndRoadMap));
-            if (msg.getMessageContext().isPresent()) {
-                returnMessage.setMessageContext(msg.getMessageContext().get());
+            if (req.getMessageContext().isPresent()) {
+                returnMessage.setMessageContext(req.getMessageContext().get());
             }
             post(returnMessage);
         }

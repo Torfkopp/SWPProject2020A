@@ -8,6 +8,8 @@ import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class that manages lobbies
@@ -19,6 +21,7 @@ import de.uol.swp.common.user.User;
 public class LobbyService implements ILobbyService {
 
     private final EventBus eventBus;
+    private final Logger LOG = LogManager.getLogger(LobbyService.class);
 
     /**
      * Constructor
@@ -30,59 +33,69 @@ public class LobbyService implements ILobbyService {
      */
     @Inject
     public LobbyService(EventBus eventBus) {
+        LOG.debug("LobbyService started");
         this.eventBus = eventBus;
         this.eventBus.register(this);
     }
 
     @Override
     public void createNewLobby(String name, User user) {
+        LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user);
         eventBus.post(createLobbyRequest);
     }
 
     @Override
     public void endTurn(User user, String lobbyName) {
+        LOG.debug("Sending EndTurnRequest");
         Message endTurnRequest = new EndTurnRequest(user, lobbyName);
         eventBus.post(endTurnRequest);
     }
 
     @Override
     public void joinLobby(String name, User user) {
+        LOG.debug("Sending LobbyJoinUserRequest");
         Message joinUserRequest = new LobbyJoinUserRequest(name, user);
         eventBus.post(joinUserRequest);
     }
 
     @Override
     public void leaveLobby(String lobbyName, User user) {
+        LOG.debug("Sending LobbyLeaveUserRequest");
         Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
     }
 
     @Override
     public void refreshLobbyPresenterFields(String lobbyName, User user) {
+        LOG.debug("Sending LobbyUpdateEvent");
         eventBus.post(new LobbyUpdateEvent(lobbyName, user));
     }
 
     @Override
     public void removeFromLobbies(User user) {
+        LOG.debug("Sending RemoveFromLobbiesRequest");
         Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
         eventBus.post(removeFromLobbiesRequest);
     }
 
     @Override
     public void retrieveAllLobbies() {
+        LOG.debug("Sending RetrieveAllLobbiesRequest");
         Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
         eventBus.post(retrieveAllLobbiesRequest);
     }
 
     @Override
     public void retrieveAllLobbyMembers(String lobbyName) {
+        LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby " + lobbyName);
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
 
     @Override
     public void updateInventory(String lobbyName, User user) {
+        LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
     }

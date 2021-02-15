@@ -169,10 +169,9 @@ public class ClientConnection {
      */
     public void receivedMessage(Message in) {
         if (in instanceof ServerMessage || in instanceof ResponseMessage) {
-            LOG.debug("Received message. Post on event bus " + in);
             eventBus.post(in);
         } else {
-            LOG.warn("Can only process ServerMessage and ResponseMessage. Received: " + in);
+            LOG.warn("Can only process ServerMessage and ResponseMessage.");
         }
     }
 

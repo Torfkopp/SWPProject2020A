@@ -48,6 +48,7 @@ public class UserService extends AbstractService {
     @Inject
     public UserService(EventBus eventBus, UserManagement userManagement) {
         super(eventBus);
+        if (LOG.isDebugEnabled()) LOG.debug("UserService started");
         this.userManagement = userManagement;
     }
 
@@ -59,24 +60,24 @@ public class UserService extends AbstractService {
      * If this succeeds, a ChangePasswordSuccessfulResponse is posted onto the EventBus.
      * Otherwise, a ChangePasswordExceptionMessage gets posted there.
      *
-     * @param msg The ChangePasswordRequest found on the Eventbus
+     * @param req The ChangePasswordRequest found on the Eventbus
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangePasswordRequest(UpdateUserPasswordRequest msg) {
+    private void onChangePasswordRequest(UpdateUserPasswordRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new ChangePassword message with " + msg.getUser());
+            LOG.debug("Received ChangePasswordRequest for User " + req.getUser().getUsername());
         }
         ResponseMessage returnMessage;
         try {
             Optional<User> optionalUser = userManagement
-                    .getUserWithPassword(msg.getUser().getUsername(), msg.getOldPassword());
+                    .getUserWithPassword(req.getUser().getUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                userManagement.updateUser(msg.getUser());
+                userManagement.updateUser(req.getUser());
                 returnMessage = new ChangePasswordSuccessfulResponse();
             } else {
                 returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
@@ -84,10 +85,10 @@ public class UserService extends AbstractService {
         } catch (Exception e) {
             LOG.error(e);
             returnMessage = new ChangePasswordExceptionMessage(
-                    "Cannot change Password of " + msg.getUser() + " " + e.getMessage());
+                    "Cannot change Password of " + req.getUser() + " " + e.getMessage());
         }
-        if (msg.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(msg.getMessageContext().get());
+        if (req.getMessageContext().isPresent()) {
+            returnMessage.setMessageContext(req.getMessageContext().get());
             post(returnMessage);
         }
     }
@@ -100,7 +101,7 @@ public class UserService extends AbstractService {
      * a UserDeletionSuccessfulResponse is posted onto the EventBus.
      * Otherwise, a UserDeletionExceptionMessage gets posted there.
      *
-     * @param msg The DeleteUserRequest found on the EventBus
+     * @param req The DeleteUserRequest found on the EventBus
      *
      * @see de.uol.swp.server.usermanagement.UserManagement#dropUser(User)
      * @see de.uol.swp.common.user.request.DeleteUserRequest
@@ -109,21 +110,21 @@ public class UserService extends AbstractService {
      * @since 2020-11-02
      */
     @Subscribe
-    private void onDeleteUserRequest(DeleteUserRequest msg) {
+    private void onDeleteUserRequest(DeleteUserRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got new deletion message with " + msg.getUser());
+            LOG.debug("Received DeleteUserRequest for User " + req.getUser());
         }
         ResponseMessage returnMessage;
         try {
-            userManagement.dropUser(msg.getUser());
+            userManagement.dropUser(req.getUser());
             returnMessage = new UserDeletionSuccessfulResponse();
         } catch (Exception e) {
             LOG.error(e);
             returnMessage = new UserDeletionExceptionMessage(
-                    "Cannot delete user " + msg.getUser() + " " + e.getMessage());
+                    "Cannot delete user " + req.getUser() + " " + e.getMessage());
         }
-        if (msg.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(msg.getMessageContext().get());
+        if (req.getMessageContext().isPresent()) {
+            returnMessage.setMessageContext(req.getMessageContext().get());
         }
         post(returnMessage);
     }
@@ -136,7 +137,7 @@ public class UserService extends AbstractService {
      * a RegistrationSuccessfulResponse is posted onto the EventBus.
      * Otherwise, a RegistrationExceptionMessage gets posted there.
      *
-     * @param msg The RegisterUserRequest found on the EventBus
+     * @param req The RegisterUserRequest found on the EventBus
      *
      * @see de.uol.swp.server.usermanagement.UserManagement#createUser(User)
      * @see de.uol.swp.common.user.request.RegisterUserRequest
@@ -145,21 +146,21 @@ public class UserService extends AbstractService {
      * @since 2019-09-02
      */
     @Subscribe
-    private void onRegisterUserRequest(RegisterUserRequest msg) {
+    private void onRegisterUserRequest(RegisterUserRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Got a new registration message with " + msg.getUser());
+            LOG.debug("Received RegisterUserRequest for User " + req.getUser());
         }
         ResponseMessage returnMessage;
         try {
-            User newUser = userManagement.createUser(msg.getUser());
+            User newUser = userManagement.createUser(req.getUser());
             returnMessage = new RegistrationSuccessfulResponse();
         } catch (Exception e) {
             LOG.error(e);
             returnMessage = new RegistrationExceptionMessage(
-                    "Cannot create user " + msg.getUser() + " " + e.getMessage());
+                    "Cannot create user " + req.getUser() + " " + e.getMessage());
         }
-        if (msg.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(msg.getMessageContext().get());
+        if (req.getMessageContext().isPresent()) {
+            returnMessage.setMessageContext(req.getMessageContext().get());
         }
         post(returnMessage);
     }

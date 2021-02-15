@@ -32,6 +32,7 @@ public class UserService implements ClientUserService {
      */
     @Inject
     public UserService(EventBus bus) {
+        LOG.debug("UserService started");
         this.bus = bus;
         // Currently not needed, will only post on bus
         // bus.register(this);
@@ -44,6 +45,7 @@ public class UserService implements ClientUserService {
      */
     @Override
     public void createUser(User user) {
+        LOG.debug("Sending RegisterUserRequest");
         Message request = new RegisterUserRequest(user);
         bus.post(request);
     }
@@ -60,6 +62,7 @@ public class UserService implements ClientUserService {
      * @since 2020-11-02
      */
     public void dropUser(User user) {
+        LOG.debug("Sending DeleteUserRequest");
         Message request = new DeleteUserRequest(user);
         bus.post(request);
     }
@@ -74,6 +77,7 @@ public class UserService implements ClientUserService {
      */
     @Override
     public void login(String username, String password) {
+        LOG.debug("Sending LoginRequest");
         Message msg = new LoginRequest(username, password);
         bus.post(msg);
     }
@@ -85,6 +89,7 @@ public class UserService implements ClientUserService {
      */
     @Override
     public void logout(User username) {
+        LOG.debug("Sending LogoutRequest");
         Message msg = new LogoutRequest();
         bus.post(msg);
     }
@@ -94,6 +99,7 @@ public class UserService implements ClientUserService {
      */
     @Override
     public void retrieveAllUsers() {
+        LOG.debug("Sending RetrieveAllOnlineUsersRequest");
         Message cmd = new RetrieveAllOnlineUsersRequest();
         bus.post(cmd);
     }
@@ -107,6 +113,7 @@ public class UserService implements ClientUserService {
      */
     @Override
     public void updateUser(User user) {
+        LOG.debug("Sending UpdateUserRequest");
         Message request = new UpdateUserRequest(user);
         bus.post(request);
     }
@@ -127,6 +134,7 @@ public class UserService implements ClientUserService {
      */
     @Override
     public void updateUserPassword(User user, String oldPassword) {
+        LOG.debug("Sending UpdateUserPasswordRequest");
         Message request = new UpdateUserPasswordRequest(user, oldPassword);
         bus.post(request);
     }

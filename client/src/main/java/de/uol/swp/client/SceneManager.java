@@ -104,7 +104,7 @@ public class SceneManager {
         FXMLLoader loader = injector.getInstance(FXMLLoader.class);
         try {
             URL url = getClass().getResource(fxmlFile);
-            LOG.debug("Loading " + url);
+            LOG.debug("Loading FXML-File " + url);
             loader.setLocation(url);
             rootPane = loader.load();
         } catch (Exception e) {
@@ -264,7 +264,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
-        LOG.debug("Retrieval of lobby map");
+        LOG.debug("Received AllLobiesReponse");
         for (String name : allLobbiesResponse.getLobbyNames()) {
             lobbyScenes.put(name, null);
         }
