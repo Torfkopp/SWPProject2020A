@@ -2,6 +2,7 @@ package de.uol.swp.client.di;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import de.uol.swp.client.*;
 import de.uol.swp.client.chat.ChatService;
@@ -81,10 +82,12 @@ public class ClientModule extends AbstractModule {
                 build(ClientConnectionFactory.class));
         bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class);
         bind(EventBus.class).toInstance(eventBus);
-        bind(ClientUserService.class).to(UserService.class);
-        bind(IChatService.class).to(ChatService.class);
-        bind(ResourceBundle.class).toInstance(resourceBundle);
         bind(Properties.class).toInstance(properties);
-        bind(ILobbyService.class).to(LobbyService.class);
+        bind(ResourceBundle.class).toInstance(resourceBundle);
+
+        // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
+        bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
+        bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
+        bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
     }
 }

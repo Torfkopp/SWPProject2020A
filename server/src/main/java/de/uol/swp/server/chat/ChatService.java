@@ -3,7 +3,6 @@ package de.uol.swp.server.chat;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -31,7 +30,6 @@ import java.util.Optional;
  * @since 2020-12-16
  */
 @SuppressWarnings("UnstableApiUsage")
-@Singleton
 public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);

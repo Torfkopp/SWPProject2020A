@@ -3,7 +3,6 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
@@ -31,7 +30,6 @@ import java.util.*;
  * @since 2019-08-30
  */
 @SuppressWarnings("UnstableApiUsage")
-@Singleton
 public class AuthenticationService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(AuthenticationService.class);

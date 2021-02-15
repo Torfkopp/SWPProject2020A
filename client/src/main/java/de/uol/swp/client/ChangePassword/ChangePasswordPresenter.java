@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
 import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
-import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
@@ -35,8 +34,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
     /**
      * Constructor
      *
-     * @param eventBus    The EventBus set in ClientModule
-     * @param userService The injected ClientUserService
+     * @param eventBus The EventBus set in ClientModule
      *
      * @author Eric Vuong
      * @author Steven Luong
@@ -44,7 +42,7 @@ public class ChangePasswordPresenter extends AbstractPresenter {
      * @since 2020-11-25
      */
     @Inject
-    public ChangePasswordPresenter(EventBus eventBus, ClientUserService userService) {
+    public ChangePasswordPresenter(EventBus eventBus) {
         setEventBus(eventBus);
     }
 

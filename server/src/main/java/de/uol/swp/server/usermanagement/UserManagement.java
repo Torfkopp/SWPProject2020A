@@ -1,10 +1,10 @@
 package de.uol.swp.server.usermanagement;
 
 import com.google.common.base.Strings;
+import com.google.inject.Inject;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.usermanagement.store.UserStore;
 
-import javax.inject.Inject;
 import java.util.*;
 
 /**
