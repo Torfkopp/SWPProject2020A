@@ -7,6 +7,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import de.uol.swp.client.*;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import javafx.fxml.FXMLLoader;
@@ -86,8 +88,6 @@ public class ClientModule extends AbstractModule {
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
-        /* TODO: uncomment after merge of SWP2020A-139
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
-        */
     }
 }

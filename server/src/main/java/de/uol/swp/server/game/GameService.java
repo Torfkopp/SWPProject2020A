@@ -35,7 +35,7 @@ public class GameService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(GameService.class);
 
-    private final GameManagement gameManagement;
+    private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
 
     /**
@@ -48,7 +48,7 @@ public class GameService extends AbstractService {
      * @since 2021-01-15
      */
     @Inject
-    public GameService(EventBus bus, GameManagement gameManagement, LobbyService lobbyService) {
+    public GameService(EventBus bus, IGameManagement gameManagement, LobbyService lobbyService) {
         super(bus);
         this.gameManagement = gameManagement;
         this.lobbyService = lobbyService;

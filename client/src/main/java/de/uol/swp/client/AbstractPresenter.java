@@ -2,7 +2,7 @@ package de.uol.swp.client;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.user.ClientUserService;
 
 import java.util.ResourceBundle;
@@ -23,7 +23,7 @@ public abstract class AbstractPresenter {
     protected ClientUserService userService;
 
     @Inject
-    protected LobbyService lobbyService;
+    protected ILobbyService lobbyService;
 
     @Inject
     protected ResourceBundle resourceBundle;

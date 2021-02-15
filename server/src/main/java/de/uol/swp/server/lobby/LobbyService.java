@@ -29,7 +29,7 @@ import java.util.*;
 public class LobbyService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
-    private final LobbyManagement lobbyManagement;
+    private final ILobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
     private final List<Lobby> lobbyList = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class LobbyService extends AbstractService {
      * @since 2019-10-08
      */
     @Inject
-    public LobbyService(LobbyManagement lobbyManagement, AuthenticationService authenticationService,
+    public LobbyService(ILobbyManagement lobbyManagement, AuthenticationService authenticationService,
                         EventBus eventBus) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;

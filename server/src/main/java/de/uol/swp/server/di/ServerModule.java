@@ -6,6 +6,10 @@ import com.google.inject.Scopes;
 import de.uol.swp.server.chat.ChatService;
 import de.uol.swp.server.chat.store.ChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
+import de.uol.swp.server.game.GameManagement;
+import de.uol.swp.server.game.IGameManagement;
+import de.uol.swp.server.lobby.ILobbyManagement;
+import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.game.GameService;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.usermanagement.AuthenticationService;
@@ -74,10 +78,8 @@ public class ServerModule extends AbstractModule {
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(AuthenticationService.class).in(Scopes.SINGLETON);
         bind(ChatService.class).in(Scopes.SINGLETON);
-        /* TODO: uncomment after merge of SWP2020A-139
         bind(IGameManagement.class).to(GameManagement.class).in(Scopes.SINGLETON);
         bind(ILobbyManagement.class).to(LobbyManagement.class).in(Scopes.SINGLETON);
-        */
         bind(GameService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);
         bind(UserService.class).in(Scopes.SINGLETON);
