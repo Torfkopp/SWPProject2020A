@@ -2,7 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.IGameRendering;
+import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -44,7 +44,7 @@ import java.util.*;
  * @since 2020-11-21
  */
 @SuppressWarnings("UnstableApiUsage")
-public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRendering {
+public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
@@ -70,6 +70,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private VBox playField;
     @FXML
     private ListView<Pair<String, String>> inventoryView;
+
+    private GameRendering gameRendering;
 
     private Window window;
 
@@ -116,6 +118,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 });
             }
         });
+
+        gameRendering = new GameRendering(gameMapCanvas, resourceBundle);
         LOG.debug("LobbyPresenter initialised");
     }
 
@@ -397,7 +401,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             Platform.runLater(() -> {
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future
-                drawGameMap(new GameMapManagement(), gameMapCanvas, resourceBundle);
+                gameRendering.drawGameMap(new GameMapManagement());
                 setTurnIndicatorText(msg.getUser());
                 //In here to test the endTurnButton.
                 eventBus.post(new DiceCastMessage(msg.getName(), msg.getUser()));
@@ -565,7 +569,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession
-                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+                    .setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
