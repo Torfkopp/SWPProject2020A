@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.chat.ChatService;
+import de.uol.swp.server.chat.CommandService;
 import de.uol.swp.server.communication.ServerHandler;
 import de.uol.swp.server.communication.netty.NettyServerHandler;
 import de.uol.swp.server.communication.netty.Server;
@@ -82,6 +83,7 @@ class ServerApp {
         Injector injector = Guice.createInjector(new ServerModule());
         createServices(injector);
         ServerHandler serverHandler = injector.getInstance(ServerHandler.class);
+        CommandService commandService = injector.getInstance(CommandService.class);
         ChannelHandler channelHandler = new NettyServerHandler(serverHandler);
         Server server = new Server(channelHandler);
         server.start(port);
