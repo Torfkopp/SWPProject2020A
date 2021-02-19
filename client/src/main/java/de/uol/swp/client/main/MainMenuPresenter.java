@@ -25,9 +25,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Manages the main menu
@@ -194,6 +193,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //create Dialogue
         TextInputDialog dialog = new TextInputDialog(name);
+        UnaryOperator<TextFormatter.Change> lobbyNameLimiter = change -> {
+            if (change.getText().contains("\"")) {
+                change.setText(change.getText().replace("\"", "")); // " are not allowed in lobby names
+                return change;
+            }
+            return change;
+        };
+        dialog.getEditor().setTextFormatter(new TextFormatter<>(lobbyNameLimiter));
         dialog.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialog.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
         dialog.setContentText(resourceBundle.getString("lobby.dialog.content"));
