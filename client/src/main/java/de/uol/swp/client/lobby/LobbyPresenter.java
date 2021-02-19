@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.IGameRendering;
+import de.uol.swp.client.Trade.Event.ShowTradeWithBankViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -421,6 +422,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onTradeWithBankButtonPressed() {
         this.tradeWithBankButton.setDisable(true);
         this.endTurn.setDisable(true);
+        eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser.getUsername()));
     }
 
     /**
