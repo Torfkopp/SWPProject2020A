@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 /**
  * Manages the Trading with the bank window
  *
@@ -37,14 +38,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * Method called when the BuyBankButton is pressed.
      * The Method posts a BuyBankRequest including logged in user
      * the EventBus.
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @since 2021-02-19
      */
     @FXML
-    public void onBuyEntwicklungskarteButtonPressed() {
-
+    private void onBuyEntwicklungskarteButtonPressed() {
     }
 
     /**
@@ -53,14 +49,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * Method called when the CancelButton is pressed.
      * The Method posts a CancelBankTradeRequest including logged in user
      * the EventBus.
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @since 2021-02-19
      */
     @FXML
-    public void onCancelButtonPressed() {
-
+    private void onCancelButtonPressed() {
     }
 
     /**
@@ -69,14 +60,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * Method called when the TradeBankButton is pressed.
      * The Method posts a TradeBankRequest including logged in user
      * the EventBus.
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @since 2021-02-19
      */
     @FXML
-    public void onTradeRessourceWithBankButtonPressed() {
-
+    private void onTradeRessourceWithBankButtonPressed() {
     }
 }
 

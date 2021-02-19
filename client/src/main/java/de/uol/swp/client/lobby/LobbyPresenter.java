@@ -14,7 +14,10 @@ import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.message.StartSessionMessage;
+import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
@@ -35,7 +38,10 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages the lobby's menu
@@ -422,7 +428,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onTradeWithBankButtonPressed() {
         this.tradeWithBankButton.setDisable(true);
         this.endTurn.setDisable(true);
-        eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser.getUsername()));
+        eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser));
     }
 
     /**

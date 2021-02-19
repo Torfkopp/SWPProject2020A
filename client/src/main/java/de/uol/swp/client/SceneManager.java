@@ -558,7 +558,10 @@ public class SceneManager {
         showError(resourceBundle.getString("error.server") + '\n', e);
     }
 
+    /**
+     * todo doku
+     */
     public void showTradeWithBankScreen() {
-        showScene(tradeWithBankScene, resourceBundle.getString("lobby.dialog.title"));
+        showScene(tradeWithBankScene, "Trading Window");
     }
 }
