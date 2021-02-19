@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="196.0" prefWidth="407.0"
+            xmlns="http://javafx.com/javafx/11.0.1"
+            fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
+
+
+</AnchorPane>

@@ -20,6 +20,8 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.trade.ShowTradeWithUserViewEvent;
+import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -48,6 +50,8 @@ public class SceneManager {
     static final String styleSheet = "css/swp.css";
     private static final int LOBBY_HEIGHT = 730;
     private static final int LOBBY_WIDTH = 685;
+    private static final int TRADING_HEIGHT = 600;
+    private static final int TRADING_WIDTH = 600;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
@@ -61,7 +65,7 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
-
+    private Scene tradeWithBankScene;
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
         eventBus.register(this);
@@ -83,6 +87,7 @@ public class SceneManager {
         initMainView();
         initRegistrationView();
         initChangePasswordView();
+        initTradeWithUserView();
     }
 
     /**
@@ -184,7 +189,13 @@ public class SceneManager {
             ChangePasswordScene.getStylesheets().add(styleSheet);
         }
     }
-
+    private void initTradeWithUserView() {
+        if (tradeWithBankScene == null) {
+            Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
+            tradeWithBankScene = new Scene(rootPane, 600, 600);
+            tradeWithBankScene.getStylesheets().add(styleSheet);
+        }
+        }
     /**
      * Handles the ShowRegistrationViewEvent detected on the EventBus
      * <p>
@@ -269,7 +280,28 @@ public class SceneManager {
             lobbyScenes.put(name, null);
         }
     }
-
+    @Subscribe
+    private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
+        //gets the lobby's name
+        User user = event.getUser();
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Trade of "+ user.getUsername());
+        lobbyStage.setHeight(TRADING_HEIGHT);
+        lobbyStage.setMinHeight(TRADING_HEIGHT);
+        lobbyStage.setWidth(TRADING_WIDTH);
+        lobbyStage.setMinWidth(TRADING_WIDTH);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane);
+        lobbyScene.getStylesheets().add(styleSheet);
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Shows the window
+        lobbyStage.show();
+    }
     /**
      * Handles the ShowLobbyViewEvent detected on the EventBus
      * <p>
