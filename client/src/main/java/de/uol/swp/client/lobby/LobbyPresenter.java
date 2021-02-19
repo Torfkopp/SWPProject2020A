@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.IGameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.trade.ShowTradeWithUserViewEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -627,8 +628,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     }
 
     public void onTradeWithUserButtonPressed(ActionEvent actionEvent) {
-        System.out.println("hi");
-        this.tradeWithUserButton.setDisable(true);
-        eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser));
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (membersView.getSelectionModel().isEmpty()) {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby"))); // todo neues Errorevent erstellen
+        } else if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+        } else {
+            this.tradeWithUserButton.setDisable(true);
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, selectedUser.getKey(), this.lobbyName));
+            LOG.debug("Posted ShowTradeWithUserViewEvent");
+        }
     }
 }

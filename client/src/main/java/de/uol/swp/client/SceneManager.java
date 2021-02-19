@@ -21,6 +21,7 @@ import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import de.uol.swp.client.trade.ShowTradeWithUserViewEvent;
+import de.uol.swp.client.trade.TradeWithUserCancelEvent;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
@@ -55,6 +56,7 @@ public class SceneManager {
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
+    private final Map<String, Stage> tradingStage = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
@@ -283,6 +285,8 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
         //gets the lobby's name
+        String lobbyName = event.getLobbyName();
+        System.out.println(lobbyName + "in Event ist das die Lobby");
         User user = event.getUser();
         //New window (Stage)
         Stage lobbyStage = new Stage();
@@ -295,6 +299,8 @@ public class SceneManager {
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);
         lobbyScene.getStylesheets().add(styleSheet);
+        lobbyStage.setScene(lobbyScene);
+        tradingStage.put(lobbyName, lobbyStage);
         //Specifies the modality for new window
         lobbyStage.initModality(Modality.NONE);
         //Specifies the owner Window (parent) for new window
@@ -420,6 +426,17 @@ public class SceneManager {
         showError(event.getMessage());
     }
 
+    @Subscribe
+    private void onTradeWithUserCancelEvent(TradeWithUserCancelEvent event){
+        LOG.debug("Received TradeWithUserCancelEvent");
+        String lobby = event.getLobbyName();
+        System.out.println(event.getLobbyName()+ " ist der lobbyname");
+        if(tradingStage.containsKey(lobby)){
+            tradingStage.get(lobby).close();
+            tradingStage.remove(lobby);
+        }
+        else{ System.out.println("Stage nicht gefunden");}
+    }
     /**
      * Shows an error message inside an error alert
      *
