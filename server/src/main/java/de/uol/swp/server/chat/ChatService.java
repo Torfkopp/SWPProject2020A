@@ -223,7 +223,7 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
         if (req.getContent().startsWith("/")) {
-            post(new NewChatCommandMessage(req.getAuthor(), req.getContent()));
+            post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1)));
             return;
         }
         if (LOG.isDebugEnabled()) {
