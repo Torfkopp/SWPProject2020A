@@ -79,14 +79,16 @@
                                 <Insets right="10"/>
                             </HBox.margin>
                         </CheckBox>
-                        <Button fx:id="startSession" disable="true" maxWidth="Infinity"
-                                mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
-                                text="%lobby.game.buttons.startsession" visible="false" HBox.hgrow="ALWAYS">
+                        <Button fx:id="startSession" disable="true" maxWidth="Infinity" mnemonicParsing="false"
+                                onAction="#onStartSessionButtonPressed" text="%lobby.game.buttons.startsession"
+                                visible="false" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets right="5.0"/>
                             </HBox.margin>
                         </Button>
                     </HBox>
+                    <Button fx:id="tradeWithBankButton" mnemonicParsing="false" onAction="#onTradeWithBankButtonPressed"
+                            text="Trade with Bank"/>
                 </VBox>
                 <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>

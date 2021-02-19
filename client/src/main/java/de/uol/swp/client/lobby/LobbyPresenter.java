@@ -48,12 +48,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
     private ObservableList<Pair<String, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
-    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
-
     @FXML
     private ListView<Pair<String, String>> membersView;
     @FXML
@@ -70,7 +69,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private VBox playField;
     @FXML
     private ListView<Pair<String, String>> inventoryView;
-
+    @FXML
+    private Button tradeWithBankButton;
     private Window window;
 
     /**
@@ -409,6 +409,21 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     }
 
     /**
+     * Handles a click on the TradeWithBank Button
+     * <p>
+     * Method called when the TradeWithBankButton is pressed.
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-01-20
+     */
+    @FXML
+    private void onTradeWithBankButtonPressed() {
+        this.tradeWithBankButton.setDisable(true);
+        this.endTurn.setDisable(true);
+    }
+
+    /**
      * Handles an UpdateInventoryResponse found on the EventBus
      * <p>
      * If the UpdateInventoryResponse is intended for the current Lobby, the
@@ -623,8 +638,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 Pair<String, String> item = new Pair<>(u.getUsername(),
                                                        u.getUsername().equals(this.owner.getUsername()) ?
                                                        String.format(resourceBundle.getString("lobby.members.owner"),
-                                                                     username) :
-                                                       username);
+                                                                     username) : username);
                 lobbyMembers.add(item);
             });
         });
