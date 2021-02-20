@@ -15,10 +15,11 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 
 /**
- * IGameRendering Interface
+ * GameRendering Class
  * <p>
- * Interface that can be used to draw a game map on a canvas.
- * This provides one default method drawGameMap that can be called to draw a given game map on a given canvas.
+ * Class that can be used to draw a game map on a canvas.
+ * This provides one public method drawGameMap that can be called
+ * to draw a given game map on a canvas given to the constructor on instantiation.
  *
  * @author Timo Gerken
  * @author Temmo Junkhoff
@@ -29,6 +30,10 @@ import java.util.ResourceBundle;
  */
 public class GameRendering {
 
+    public static final Color PLAYER_1_COLOUR = Color.BLUE;
+    public static final Color PLAYER_2_COLOUR = Color.RED;
+    public static final Color PLAYER_3_COLOUR = Color.PURPLE;
+    public static final Color PLAYER_4_COLOUR = Color.WHITE;
     //Constants used for the colours
     private static final Color TOKEN_COLOUR = Color.BEIGE;
     private static final Color TEXT_COLOUR = Color.BLACK;
@@ -42,11 +47,6 @@ public class GameRendering {
     private static final Color MOUNTAINS_COLOUR = Color.DARKGREY;
     private static final Color FIELDS_COLOUR = Color.YELLOW;
     private static final Color PASTURE_COLOUR = Color.LIGHTGREEN;
-    private static final Color PLAYER_1_COLOUR = Color.BLUE;
-    private static final Color PLAYER_2_COLOUR = Color.RED;
-    private static final Color PLAYER_3_COLOUR = Color.PURPLE;
-    private static final Color PLAYER_4_COLOUR = Color.WHITE;
-
     @Inject
     private static ResourceBundle resourceBundle;
 
@@ -57,6 +57,11 @@ public class GameRendering {
 
     Logger LOG = LogManager.getLogger(GameRendering.class);
 
+    /**
+     * Constructor
+     *
+     * @param canvas The canvas that should be drawn on
+     */
     public GameRendering(Canvas canvas) {
         double WIDTH_FACTOR = (Math.sqrt(3) / 2);
         double HEX_HEIGHT_FACTOR = 1.0 / 5.5;
@@ -294,6 +299,14 @@ public class GameRendering {
                         settlementSize);
     }
 
+    /**
+     * drawToken method
+     * This method draws the token of a hex at the given coordinates.
+     *
+     * @param token    The value of the token that should be drawn
+     * @param currentX The current x-coordinate
+     * @param currentY The current y-coordinate
+     */
     private void drawToken(int token, double currentX, double currentY) {
         gfxCtx.setFill(TOKEN_COLOUR);
         double xPos = currentX + (hexWidth - tokenSize) / 2.0;
