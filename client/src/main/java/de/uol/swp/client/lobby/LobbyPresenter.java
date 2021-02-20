@@ -119,7 +119,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
 
-        gameRendering = new GameRendering(gameMapCanvas, resourceBundle);
+        gameRendering = new GameRendering(gameMapCanvas);
         LOG.debug("LobbyPresenter initialised");
     }
 

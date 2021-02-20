@@ -1,5 +1,6 @@
 package de.uol.swp.client;
 
+import com.google.inject.Inject;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
@@ -45,17 +46,18 @@ public class GameRendering {
     private static final Color PLAYER_2_COLOUR = Color.RED;
     private static final Color PLAYER_3_COLOUR = Color.PURPLE;
     private static final Color PLAYER_4_COLOUR = Color.WHITE;
+
+    @Inject
+    private static ResourceBundle resourceBundle;
+
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth;
     private final GraphicsContext gfxCtx;
 
-    private final ResourceBundle resourceBundle;
-
     Logger LOG = LogManager.getLogger(GameRendering.class);
 
-    public GameRendering(Canvas canvas, ResourceBundle resourceBundle) {
-        this.resourceBundle = resourceBundle;
+    public GameRendering(Canvas canvas) {
         double WIDTH_FACTOR = (Math.sqrt(3) / 2);
         double HEX_HEIGHT_FACTOR = 1.0 / 5.5;
         double HEX_WIDTH_FACTOR = HEX_HEIGHT_FACTOR * WIDTH_FACTOR;
