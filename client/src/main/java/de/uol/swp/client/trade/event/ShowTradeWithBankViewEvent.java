@@ -1,4 +1,4 @@
-package de.uol.swp.client.Trade.Event;
+package de.uol.swp.client.trade.event;
 
 import de.uol.swp.common.user.User;
 
@@ -16,22 +16,29 @@ import de.uol.swp.common.user.User;
 public class ShowTradeWithBankViewEvent {
 
     private final User user;
+    private final String lobbyName;
 
     /**
      * Constructor
      *
-     * @param user User that wants to trade with the bank
+     * @param user      User that wants to trade with the bank
+     * @param lobbyName
      */
-    public ShowTradeWithBankViewEvent(User user) {
+    public ShowTradeWithBankViewEvent(User user, String lobbyName) {
         this.user = user;
+        this.lobbyName = lobbyName;
     }
 
     /**
-     * Gets the User object
+     * Gets the User who wants to trade with the Bank
      *
      * @return User object of the event
      */
     public User getUser() {
         return user;
+    }
+
+    public String getLobbyName() {
+        return lobbyName;
     }
 }
