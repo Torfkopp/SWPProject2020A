@@ -100,6 +100,20 @@ public class GameService extends AbstractService {
         }
     }
 
+    /**
+     * Handles a TradeWithBankRequest found on the EventBus
+     * <p>
+     * It searches the inventories in the current game for the one that belongs
+     * to the player sending the request. It then posts a InventoryForTradeResponse
+     * that contains all the user's resources, saved in a resourceMap for
+     * counted items (bricks, grain, etc.) .
+     *
+     * @param request The TradeWithBankRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @since 2021-02-21
+     */
     @Subscribe
     private void onTradeWithBankRequest(TradeWithBankRequest request) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + request.getName());

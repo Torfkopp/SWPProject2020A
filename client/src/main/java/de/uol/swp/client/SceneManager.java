@@ -418,7 +418,8 @@ public class SceneManager {
      * Handles the ShowTradeWithBankViewEvent detected on the EventBus
      * <p>
      * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
-     * called. It opens the trading with the bank window in a new window.
+     * called. It opens the trading with the bank window in a new window and a
+     * TradeUpdateEvent is sent onto teh eventBus.
      *
      * @param event The ShowTradeWithBankViewEvent detected on the EventBus
      *

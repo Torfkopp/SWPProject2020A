@@ -21,8 +21,8 @@ public class TradeUpdateEvent extends LobbyUpdateEvent {
     /**
      * Constructor
      *
-     * @param lobbyName The name of the Lobby to update
-     * @param user      The name of the User who caused this Event (Creator or Joining User)
+     * @param lobbyName The name of the Lobby of the trade
+     * @param user      The name of the User who wants to trade
      */
     public TradeUpdateEvent(String lobbyName, User user) {
         super(lobbyName, user);

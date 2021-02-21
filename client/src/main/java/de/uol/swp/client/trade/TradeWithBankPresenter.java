@@ -49,16 +49,34 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @FXML
     private Button tradeRessourceWithBankButton;
 
+    /**
+     * Constructor
+     * <p>
+     * Sets the eventBus
+     *
+     * @param eventBus
+     */
     @Inject
     public TradeWithBankPresenter(EventBus eventBus) {
         setEventBus(eventBus);
     }
 
+    /**
+     * Helper function
+     * Posts a TradeWithBankCancelEvent with its lobbyName and
+     * a TradeLobbyButtonUpdateEvent with the loggedInUser
+     * and the lobbyName on the eventBus.
+     */
     private void closeWindow() {
         eventBus.post(new TradeWithBankCancelEvent(lobbyName));
         eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
     }
 
+    /**
+     * Initialises the Presenter by setting up the ownRessourceView.
+     *
+     * @implNote Called automatically by JavaFX
+     */
     @FXML
     public void initialize() {
         ownRessourceView.setCellFactory(lv -> new ListCell<>() {
@@ -87,16 +105,24 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     /**
      * Handles a click on the Cancel Button
      * <p>
-     * Method called when the CancelButton is pressed.
-     * The Method posts a CancelBankTradeRequest including logged in user
-     * the EventBus and a TradeLobbyButtonUpdateEvent including the
-     * logged in user and the lobbyname.
+     * Method called when the CancelButton is pressed and uses
+     * the helperFunction closeWindow to close the window
+     * properly.
      */
     @FXML
     private void onCancelButtonPressed() {
         closeWindow();
     }
 
+    /**
+     * Handles a InventoryForTradeResponse found on the eventBus
+     * <p>
+     * If the InventoryForTradeResponse is directed to this lobby,
+     * the TradeWithBankPresenter gets the inventory of the player
+     * as a Map. Calls a function to fill the inventory.
+     *
+     * @param response InventoryForTradeResponse having the inventory
+     */
     @Subscribe
     private void onInventoryForTradeResponse(InventoryForTradeResponse response) {
         if (response.getLobbyName().equals(this.lobbyName)) {
@@ -122,7 +148,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * <p>
      * If the lobbyname and the logged in user of the TradeWithBankPresenter are
      * null, they get the parameters of the event. This Event is sent when a new
-     * TradeWithBankPresenter is created.
+     * TradeWithBankPresenter is created. If a window is closed using the
+     * X(top-right-Button), the closeWindow method is called.
      *
      * @param event TradeUpdateEvent found on the event bus
      */
@@ -138,8 +165,13 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }
 
+    /**
+     * Helper Function
+     * <p>
+     * If there is no resourceList it gets created and cleared. Then it gets
+     * updated with the items as listed in the ressourceMap.
+     */
     private void setTradingLists() {
-        System.out.println(resourceMap.get("ore"));
         if (resourceList == null) {
             resourceList = FXCollections.observableArrayList();
             ownRessourceView.setItems(resourceList);

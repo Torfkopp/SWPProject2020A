@@ -432,7 +432,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     /**
      * Handles a click on the TradeWithBank Button
      * <p>
-     * Method called when the TradeWithBankButton is pressed.
+     * Method called when the TradeWithBankButton is pressed. It posts a
+     * ShowTradeWithViewEvent and a TradeWithBankRequest onto the event bus.
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner

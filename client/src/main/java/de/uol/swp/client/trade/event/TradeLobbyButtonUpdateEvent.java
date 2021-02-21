@@ -3,7 +3,8 @@ package de.uol.swp.client.trade.event;
 import de.uol.swp.common.user.User;
 
 /**
- * Event used to trigger the updating of the Trade with Bank Button in the according lobby
+ * Event used to trigger the updating of the Trade with Bank Button status
+ * in the according lobby
  * <p>
  * In order to change the status of the button in the right lobby, post an
  * instance of it onto the EventBus the LobbyPresenter is subscribed to.

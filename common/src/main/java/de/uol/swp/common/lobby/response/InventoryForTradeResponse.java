@@ -7,10 +7,10 @@ import java.util.Map;
 /**
  * This Response has up-to-date info about what the inventory of a specified player contains
  *
- * @author Sven Ahrens
- * @author Finn Haase
+ * @author Maximilian Lindner
+ * @author Alwin Bossert
  * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
- * @since 2021-01-25
+ * @since 2021-02-21
  */
 public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
@@ -42,9 +42,9 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
     }
 
     /**
-     * Gets the user whose inventory is being updated
+     * Gets the user who wants to get his inventory
      *
-     * @return The User whose inventory is being updated
+     * @return The User who wants to get his inventory
      */
     public User getUser() {
         return user;
