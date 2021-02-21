@@ -4,18 +4,20 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.client.trade.event.TradeWithBankCancelEvent;
+import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
 import de.uol.swp.common.lobby.response.InventoryForTradeResponse;
+import de.uol.swp.common.lobby.response.TradeWithBankAcceptedResponse;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -57,7 +59,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * <p>
      * Sets the eventBus
      *
-     * @param eventBus
+     * @param eventBus EventBus
      */
     @Inject
     public TradeWithBankPresenter(EventBus eventBus) {
@@ -71,8 +73,11 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * and the lobbyName on the eventBus.
      */
     private void closeWindow() {
-        eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-        eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
+        Platform.runLater(() -> {
+            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
+            eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
+        });
+        System.out.println("Hi");
     }
 
     /**
@@ -91,8 +96,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
                 });
             }
         });
-        bankResourceView.setCellFactory(lv -> new ListCell<>(){
-            protected void updateItem(Pair<String, Integer> item, boolean empty){
+        bankResourceView.setCellFactory(lv -> new ListCell<>() {
+            protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
@@ -148,11 +153,37 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * Handles a click on the Trade Button
      * <p>
      * Method called when the TradeBankButton is pressed.
-     * The Method posts a TradeBankRequest including logged in user
-     * the EventBus.
+     * This method checks both lists for the selected item.
+     * If there is a selected item in both lists, it posts a UpdateInventoryAfterTradeWithBankRequest
+     * onto the EventBus.
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
+        Pair<String, Integer> bankResource;
+        Pair<String, Integer> giveResource;
+        ownResourceView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        if (ownResourceView.getSelectionModel().isEmpty()) {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            return;
+        } else {
+            giveResource = ownResourceView.getSelectionModel().getSelectedItem();
+        }
+        bankResourceView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        if (bankResourceView.getSelectionModel().isEmpty()) {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            return;
+        } else {
+            bankResource = bankResourceView.getSelectionModel().getSelectedItem();
+        }
+        if (bankResource != null && giveResource != null) {
+            String userGetsResource = bankResource.getKey();
+            String userLosesResource = giveResource.getKey();
+            if (userGetsResource.equals(userLosesResource)) return;
+            LOG.debug("Sending a UpdateInventoryAfterTradeWithBankRequest for Lobby " + this.lobbyName);
+            Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(
+                    loggedInUser, lobbyName, userGetsResource, userLosesResource);
+            eventBus.post(updateInventoryAfterTradeWithBankRequest);
+        }
     }
 
     /**
@@ -177,6 +208,14 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }
 
+    @Subscribe
+    private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse response) {
+        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
+        if (lobbyName.equals(response.getLobbyName())) { //kein Inhalt
+        }
+        closeWindow();
+    }
+
     /**
      * Helper Function
      * <p>
@@ -190,18 +229,18 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         }
         resourceList.clear();
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            //if (entry.getValue() < 4) continue;
-            Pair<String, Integer> resource = new Pair<>(entry.getKey(), entry.getValue() + 4);
+            if (entry.getValue() < 4) continue;
+            Pair<String, Integer> resource = new Pair<>(entry.getKey(), entry.getValue());
             resourceList.add(resource);
         }
         System.out.println("Du hast" + resourceMap.get("ore"));
-        if(bankResourceList == null){
+        if (bankResourceList == null) {
             bankResourceList = FXCollections.observableArrayList();
             bankResourceView.setItems(bankResourceList);
         }
         bankResourceList.clear();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()){
-            Pair<String, Integer> resource = new Pair<>(entry.getKey(), entry.getValue() + 5);
+        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
+            Pair<String, Integer> resource = new Pair<>(entry.getKey(), 1);
             bankResourceList.add(resource);
         }
         System.out.println("Die Bank hat" + resourceMap.get("ore"));

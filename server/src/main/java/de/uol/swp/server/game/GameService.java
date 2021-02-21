@@ -8,13 +8,9 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
-import de.uol.swp.common.game.request.EndTurnRequest;
-import de.uol.swp.common.game.request.UpdateBankInventoryRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.lobby.request.TradeWithBankRequest;
-import de.uol.swp.common.lobby.response.InventoryForTradeResponse;
-import de.uol.swp.common.lobby.response.UpdateBankInventoryResponse;
-import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
+import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
@@ -148,46 +144,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a UpdateBankInventoryRequest found on the EventBus
-     * <p>
-     * It posts a UpdateBankInventoryResponse
-     * that contains all the bank's items, saved in a resourceMap for
-     * counted items (bricks, grain, etc.).
-     *
-     * @param req The UpdateInventoryRequest found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @since 2021-02-21
-     */
-    @Subscribe
-    private void onUpdateBankInventoryRequest(UpdateBankInventoryRequest req){
-        if (LOG.isDebugEnabled()) LOG.debug("Received UpdateBankInventoryRequest for Lobby " + req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        BankInventory bankInventory = null;
-        if (bankInventory != null) {
-            Map<String, Integer> resourceMap = new HashMap<>();
-            resourceMap.put("brick", bankInventory.getBrick());
-            resourceMap.put("grain", bankInventory.getGrain());
-            resourceMap.put("lumber", bankInventory.getLumber());
-            resourceMap.put("ore", bankInventory.getOre());
-            resourceMap.put("wool", bankInventory.getWool());
-            resourceMap.put("cards.knights", bankInventory.getKnightCards());
-            resourceMap.put("cards.roadbuilding", bankInventory.getRoadBuildingCards());
-            resourceMap.put("cards.yearofplenty", bankInventory.getYearOfPlentyCards());
-            resourceMap.put("cards.monopoly", bankInventory.getMonopolyCards());
-
-            AbstractResponseMessage returnMessage = new UpdateBankInventoryResponse(req.getOriginLobby(),
-                    Collections
-                            .unmodifiableMap(resourceMap));
-            if (req.getMessageContext().isPresent()) {
-                returnMessage.setMessageContext(req.getMessageContext().get());
-            }
-            post(returnMessage);
-        }
-    }
-
-    /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -232,14 +188,63 @@ public class GameService extends AbstractService {
             armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
             AbstractResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                    Collections
-                            .unmodifiableMap(resourceMap),
-                    Collections.unmodifiableMap(
-                            armyAndRoadMap));
+                                                                                Collections
+                                                                                        .unmodifiableMap(resourceMap),
+                                                                                Collections.unmodifiableMap(
+                                                                                        armyAndRoadMap));
             if (req.getMessageContext().isPresent()) {
                 returnMessage.setMessageContext(req.getMessageContext().get());
             }
             post(returnMessage);
+        }
+    }
+
+    /**
+     * Handles a UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     * <p>
+     * If a UpdateInventoryAfterTradeWithBankRequest is found on the EventBus this method updates the inventory
+     * of the player who traded with the bank. The resource he wants to trade gets -4
+     * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
+     *
+     * @param request The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-02-21
+     */
+    @Subscribe
+    private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest request) {
+        if (LOG.isDebugEnabled())
+            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + request.getOriginLobby());
+        Game game = gameManagement.getGame(request.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(request.getUser())) {
+                if (value.getPlayer().equals(request.getUser())) {
+                    inventory = value;
+                    break;
+                }
+            }
+        }
+        if (inventory != null) {
+            if (request.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
+            if (request.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
+            if (request.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
+            if (request.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
+            if (request.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
+            if (request.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
+            if (request.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
+            if (request.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
+            if (request.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
+            if (request.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
+            System.out.println(inventory.getOre() + "" + inventory.getGrain() + "" + inventory.getWool() + "" + inventory
+                    .getLumber() + "" + inventory.getBrick());
+            AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(request.getUser(),
+                                                                                      request.getOriginLobby());
+            if (request.getMessageContext().isPresent()) returnMessage.setMessageContext(request.getMessageContext().get());
+            post(returnMessage);
+            LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + request.getOriginLobby());
         }
     }
 }
