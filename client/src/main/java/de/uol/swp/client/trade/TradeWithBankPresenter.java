@@ -40,14 +40,17 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private User loggedInUser;
     private Map<String, Integer> resourceMap;
     private ObservableList<Pair<String, Integer>> resourceList;
+    private ObservableList<Pair<String, Integer>> bankResourceList;
     @FXML
-    private ListView<Pair<String, Integer>> ownRessourceView;
+    private ListView<Pair<String, Integer>> ownResourceView;
+    @FXML
+    private ListView<Pair<String, Integer>> bankResourceView;
     @FXML
     private Button buyEntwicklungskarteButton;
     @FXML
     private Button cancelButton;
     @FXML
-    private Button tradeRessourceWithBankButton;
+    private Button tradeResourceWithBankButton;
 
     /**
      * Constructor
@@ -73,18 +76,27 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Initialises the Presenter by setting up the ownRessourceView.
+     * Initialises the Presenter by setting up the ownResourceView.
      *
      * @implNote Called automatically by JavaFX
      */
     @FXML
     public void initialize() {
-        ownRessourceView.setCellFactory(lv -> new ListCell<>() {
+        ownResourceView.setCellFactory(lv -> new ListCell<>() {
             protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
                             .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                });
+            }
+        });
+        bankResourceView.setCellFactory(lv -> new ListCell<>(){
+            protected void updateItem(Pair<String, Integer> item, boolean empty){
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
+                            .getString("game.resources." + item.getKey()));
                 });
             }
         });
@@ -140,7 +152,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * the EventBus.
      */
     @FXML
-    private void onTradeRessourceWithBankButtonPressed() {
+    private void onTradeResourceWithBankButtonPressed() {
     }
 
     /**
@@ -161,7 +173,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         }
         LOG.debug("Received TradeUpdateEvent for Lobby " + this.lobbyName);
 
-        Window window = ownRessourceView.getScene().getWindow();
+        Window window = ownResourceView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }
 
@@ -169,12 +181,12 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * Helper Function
      * <p>
      * If there is no resourceList it gets created and cleared. Then it gets
-     * updated with the items as listed in the ressourceMap.
+     * updated with the items as listed in the resourceMap.
      */
     private void setTradingLists() {
         if (resourceList == null) {
             resourceList = FXCollections.observableArrayList();
-            ownRessourceView.setItems(resourceList);
+            ownResourceView.setItems(resourceList);
         }
         resourceList.clear();
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
@@ -183,6 +195,16 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             resourceList.add(resource);
         }
         System.out.println("Du hast" + resourceMap.get("ore"));
+        if(bankResourceList == null){
+            bankResourceList = FXCollections.observableArrayList();
+            bankResourceView.setItems(bankResourceList);
+        }
+        bankResourceList.clear();
+        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()){
+            Pair<String, Integer> resource = new Pair<>(entry.getKey(), entry.getValue() + 5);
+            bankResourceList.add(resource);
+        }
+        System.out.println("Die Bank hat" + resourceMap.get("ore"));
     }
 }
 

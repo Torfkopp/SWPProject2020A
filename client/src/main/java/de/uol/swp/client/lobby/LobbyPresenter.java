@@ -240,6 +240,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
     private void onDiceCastMessage(DiceCastMessage msg) {
         LOG.debug("Received DiceCastMessage");
         setEndTurnButtonState(msg.getUser());
+        setTradeWithBankButtonState(msg.getUser());
     }
 
     /**
@@ -407,6 +408,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);
+                this.tradeWithBankButton.setVisible(true);
             });
         }
     }
@@ -611,6 +613,21 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Helper function that sets the Visible and Disable states of the "Start
+     * Session" button.
+     * <p>
+     * The button is only ever visible to the lobby owner, and is only enabled
+     * if there are 3 or more lobby members, and all members are marked as ready.
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-20
+     */
+    private void setTradeWithBankButtonState(User player) {
+        this.tradeWithBankButton.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**

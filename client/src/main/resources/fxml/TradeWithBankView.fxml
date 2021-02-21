@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+<?import javafx.scene.layout.*?>
 
-    <Button fx:id="buyEntwicklungskarteButton" layoutX="452.0" layoutY="285.0" mnemonicParsing="false"
-            onAction="#onBuyEntwicklungskarteButtonPressed" text="Buy Card"/>
-    <Button fx:id="cancelButton" layoutX="452.0" layoutY="341.0" mnemonicParsing="false"
-            onAction="#onCancelButtonPressed" text="Cancel"/>
-    <Button fx:id="tradeRessourceWithBankButton" layoutX="255.0" layoutY="316.0" mnemonicParsing="false"
-            onAction="#onTradeRessourceWithBankButtonPressed" text="Buy"/>
-    <ListView fx:id="ownRessourceView" layoutX="32.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0"/>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+
+    <Button fx:id="buyEntwicklungskarteButton" layoutX="452.0" layoutY="285.0" mnemonicParsing="false" onAction="#onBuyEntwicklungskarteButtonPressed" text="Buy Card" />
+    <Button fx:id="cancelButton" layoutX="452.0" layoutY="341.0" mnemonicParsing="false" onAction="#onCancelButtonPressed" text="Cancel" />
+    <Button fx:id="tradeResourceWithBankButton" layoutX="255.0" layoutY="316.0" mnemonicParsing="false" onAction="#onTradeResourceWithBankButtonPressed" text="Buy" />
+    <ListView fx:id="ownResourceView" layoutX="32.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0" />
+    <ListView fx:id="bankResourceView" layoutX="368.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0" />
 </AnchorPane>

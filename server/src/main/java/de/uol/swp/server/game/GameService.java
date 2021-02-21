@@ -3,14 +3,17 @@ package de.uol.swp.server.game;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.game.BankInventory;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.UpdateBankInventoryRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.lobby.response.InventoryForTradeResponse;
+import de.uol.swp.common.lobby.response.UpdateBankInventoryResponse;
 import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
@@ -145,6 +148,46 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a UpdateBankInventoryRequest found on the EventBus
+     * <p>
+     * It posts a UpdateBankInventoryResponse
+     * that contains all the bank's items, saved in a resourceMap for
+     * counted items (bricks, grain, etc.).
+     *
+     * @param req The UpdateInventoryRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-02-21
+     */
+    @Subscribe
+    private void onUpdateBankInventoryRequest(UpdateBankInventoryRequest req){
+        if (LOG.isDebugEnabled()) LOG.debug("Received UpdateBankInventoryRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        BankInventory bankInventory = null;
+        if (bankInventory != null) {
+            Map<String, Integer> resourceMap = new HashMap<>();
+            resourceMap.put("brick", bankInventory.getBrick());
+            resourceMap.put("grain", bankInventory.getGrain());
+            resourceMap.put("lumber", bankInventory.getLumber());
+            resourceMap.put("ore", bankInventory.getOre());
+            resourceMap.put("wool", bankInventory.getWool());
+            resourceMap.put("cards.knights", bankInventory.getKnightCards());
+            resourceMap.put("cards.roadbuilding", bankInventory.getRoadBuildingCards());
+            resourceMap.put("cards.yearofplenty", bankInventory.getYearOfPlentyCards());
+            resourceMap.put("cards.monopoly", bankInventory.getMonopolyCards());
+
+            AbstractResponseMessage returnMessage = new UpdateBankInventoryResponse(req.getOriginLobby(),
+                    Collections
+                            .unmodifiableMap(resourceMap));
+            if (req.getMessageContext().isPresent()) {
+                returnMessage.setMessageContext(req.getMessageContext().get());
+            }
+            post(returnMessage);
+        }
+    }
+
+    /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -189,10 +232,10 @@ public class GameService extends AbstractService {
             armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
             AbstractResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                                Collections
-                                                                                        .unmodifiableMap(resourceMap),
-                                                                                Collections.unmodifiableMap(
-                                                                                        armyAndRoadMap));
+                    Collections
+                            .unmodifiableMap(resourceMap),
+                    Collections.unmodifiableMap(
+                            armyAndRoadMap));
             if (req.getMessageContext().isPresent()) {
                 returnMessage.setMessageContext(req.getMessageContext().get());
             }
