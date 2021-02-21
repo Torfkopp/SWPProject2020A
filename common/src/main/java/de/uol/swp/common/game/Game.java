@@ -6,6 +6,8 @@ import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
+import java.util.List;
+
 /**
  * Class for a game
  *
@@ -19,6 +21,7 @@ public class Game {
     private final IGameMapManagement map;
     private final User[] players;
     private int activePlayer;
+    private List bankInventory;
 
     /**
      * Constructor
@@ -41,6 +44,8 @@ public class Game {
         for (User u : players) {
             inventories[i++] = new Inventory(u);
         }
+        BankInventory bankInvent = new BankInventory();
+        bankInventory = bankInvent.getResourceCards();
     }
 
     /**
@@ -54,9 +59,12 @@ public class Game {
         int points = 0;
         int num = 0;
         switch (player) {
-            case PLAYER_2: num= 1;
-            case PLAYER_3: num= 2;
-            case PLAYER_4: num = 3;
+            case PLAYER_2:
+                num = 1;
+            case PLAYER_3:
+                num = 2;
+            case PLAYER_4:
+                num = 3;
         }
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
@@ -67,6 +75,14 @@ public class Game {
         //2 Points if player has the largest army
         if (inventories[num].isLargestArmy()) points += 2;
         return points;
+    }
+    /**
+     * Gets the List of the items of the bank.
+     *
+     * @return The List of the bank inventory
+     */
+    public List getBankInventory() {
+        return bankInventory;
     }
 
     /**

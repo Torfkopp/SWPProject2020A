@@ -1,5 +1,16 @@
 package de.uol.swp.common.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The banks inventory
+ *
+ * @author Alwin Bossert
+ * @author Maximilian Lindner
+ * @implNote brick, grain, lumber, ore and wool are not used jet
+ * @since 2021-02-21
+ */
 public class BankInventory {
 
     private int brick = 100;
@@ -8,16 +19,22 @@ public class BankInventory {
     private int ore = 100;
     private int wool = 100;
 
-    private int knightCards = 100;
-    private int roadBuildingCards = 100;
-    private int yearOfPlentyCards = 100;
-    private int monopolyCards = 100;
+    private int knightCards = 14;
+    private int roadBuildingCards = 2;
+    private int yearOfPlentyCards = 2;
+    private int monopolyCards = 2;
+
+    private int victoryPointCards = 5;
+    private List resourceCards;
+
+    public BankInventory() {}
 
     /**
      * Gets the amount of Bricks a bank has in the inventory
      *
      * @return The amount of Bricks
      */
+
     public int getBrick() {
         return brick;
     }
@@ -121,6 +138,31 @@ public class BankInventory {
         this.ore = ore;
     }
 
+    public List getResourceCards() {
+        int size = 0;
+        resourceCards = new ArrayList();
+        for (int i = size; i < knightCards; i++) {
+            resourceCards.add(i, "knightCard");
+        }
+        size = resourceCards.size();
+        for (int i = size; i < (roadBuildingCards + size); i++) {
+            resourceCards.add(i, "roadBuildingCard");
+        }
+        size = resourceCards.size();
+        for (int i = size; i < (yearOfPlentyCards + size); i++) {
+            resourceCards.add(i, "yearOfPlentyCard");
+        }
+        size = resourceCards.size();
+        for (int i = size; i < (monopolyCards + size); i++) {
+            resourceCards.add(i, "monopolyCard");
+        }
+        size = resourceCards.size();
+        for (int i = size; i < (victoryPointCards + size); i++) {
+            resourceCards.add(i, "victoryPointCard");
+        }
+        return resourceCards;
+    }
+
     /**
      * Gets the amount of Road Building Cards a bank has in the inventory
      *
@@ -137,6 +179,15 @@ public class BankInventory {
      */
     public void setRoadBuildingCards(int roadBuildingCards) {
         this.roadBuildingCards = roadBuildingCards;
+    }
+
+    /**
+     * Gets the amount of victory point cards the bank has in its inventory
+     *
+     * @return The amount of victory point cards
+     */
+    public int getVictoryPointCards() {
+        return victoryPointCards;
     }
 
     /**
@@ -173,5 +224,14 @@ public class BankInventory {
      */
     public void setYearOfPlentyCards(int yearOfPlentyCards) {
         this.yearOfPlentyCards = yearOfPlentyCards;
+    }
+
+    /**
+     * Sets the amount of VictoryPointCards of the bankInventory
+     *
+     * @param victoryPointsCards The amount of Victory Point Cards
+     */
+    public void setVictoryPointsCards(int victoryPointsCards) {
+        this.victoryPointCards = victoryPointsCards;
     }
 }
