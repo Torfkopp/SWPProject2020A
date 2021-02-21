@@ -14,6 +14,7 @@ package de.uol.swp.client.trade.event;
  * @since 2021-02-20
  */
 public class TradeWithBankCancelEvent {
+
     private final String lobbyName;
 
     /**

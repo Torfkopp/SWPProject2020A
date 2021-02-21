@@ -30,20 +30,20 @@ public class TradeLobbyButtonUpdateEvent {
     }
 
     /**
-     * Gets the User who wants to update the button status
-     *
-     * @return User object of the event
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
      * Gets the name of the lobby where the button should be enabled
      *
      * @return LobbyName object of the event
      */
     public String getLobbyName() {
         return lobbyName;
+    }
+
+    /**
+     * Gets the User who wants to update the button status
+     *
+     * @return User object of the event
+     */
+    public User getUser() {
+        return user;
     }
 }

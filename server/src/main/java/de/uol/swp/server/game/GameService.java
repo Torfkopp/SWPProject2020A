@@ -9,6 +9,8 @@ import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.lobby.request.TradeWithBankRequest;
+import de.uol.swp.common.lobby.response.InventoryForTradeResponse;
 import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
@@ -98,6 +100,36 @@ public class GameService extends AbstractService {
         }
     }
 
+    @Subscribe
+    private void onTradeWithBankRequest(TradeWithBankRequest request) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + request.getName());
+        Game game = gameManagement.getGame(request.getName());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(request.getUser())) {
+                inventory = value;
+                break;
+            }
+        }
+        if (inventory != null) {
+            Map<String, Integer> resourceMap = new HashMap<>();
+            resourceMap.put("brick", inventory.getBrick());
+            resourceMap.put("grain", inventory.getGrain());
+            resourceMap.put("lumber", inventory.getLumber());
+            resourceMap.put("ore", inventory.getOre());
+            resourceMap.put("wool", inventory.getWool());
+
+            AbstractResponseMessage returnMessage = new InventoryForTradeResponse(request.getUser(), request.getName(),
+                                                                                  Collections.unmodifiableMap(
+                                                                                          resourceMap));
+            if (request.getMessageContext().isPresent()) {
+                returnMessage.setMessageContext(request.getMessageContext().get());
+            }
+            post(returnMessage);
+        }
+    }
+
     /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
@@ -122,7 +154,6 @@ public class GameService extends AbstractService {
         for (Inventory value : inventories) {
             if (value.getPlayer().equals(req.getUser())) {
                 inventory = value;
-                System.out.println(inventory.getPlayer());
                 break;
             }
         }

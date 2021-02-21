@@ -17,6 +17,7 @@ import de.uol.swp.common.user.User;
  * @since 2021-02-20
  */
 public class TradeUpdateEvent extends LobbyUpdateEvent {
+
     /**
      * Constructor
      *

@@ -29,6 +29,10 @@ public class ShowTradeWithBankViewEvent {
         this.lobbyName = lobbyName;
     }
 
+    public String getLobbyName() {
+        return lobbyName;
+    }
+
     /**
      * Gets the User who wants to trade with the Bank
      *
@@ -36,9 +40,5 @@ public class ShowTradeWithBankViewEvent {
      */
     public User getUser() {
         return user;
-    }
-
-    public String getLobbyName() {
-        return lobbyName;
     }
 }
