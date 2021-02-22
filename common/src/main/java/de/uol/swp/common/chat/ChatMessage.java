@@ -2,7 +2,6 @@ package de.uol.swp.common.chat;
 
 import de.uol.swp.common.user.User;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -15,7 +14,7 @@ import java.time.Instant;
  * @see de.uol.swp.common.chat.dto.ChatMessageDTO
  * @since 2020-12-16
  */
-public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
+public interface ChatMessage extends Comparable<ChatMessage>, ChatOrSystemMessage {
 
     /**
      * Gets the ChatMessage's author
