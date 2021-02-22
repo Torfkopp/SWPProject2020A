@@ -317,7 +317,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (msg.getLobbyName().equals(this.lobbyName)) return;
+        //TODO Rework this
+        //if (msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         //In here to test the endTurnButton
