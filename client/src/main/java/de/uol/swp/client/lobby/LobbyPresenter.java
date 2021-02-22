@@ -240,8 +240,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
-        LOG.debug("Received DiceCastMessage");
+        LOG.debug("Received DiceCastMessage; the dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
+        gameRendering.drawDices(msg.getDice1(), msg.getDice2());
     }
 
     /**
@@ -321,8 +322,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
-        //In here to test the endTurnButton
-        onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
+        setRollDiceButtonState(msg.getActivePlayer());
     }
 
     /**
@@ -421,8 +421,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 //This Line needs to be changed/ removed in the Future
                 gameRendering.drawGameMap(new GameMapManagement());
                 setTurnIndicatorText(msg.getUser());
-                //In here to test the endTurnButton.
-                eventBus.post(new DiceCastMessage(msg.getName(), msg.getUser()));
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);

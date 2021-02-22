@@ -99,6 +99,15 @@ public class GameRendering {
     }
 
     /**
+     * drawDices method
+     * <p>
+     * This method draws two dices
+     */
+    public void drawDices(int dice1, int dice2) {
+        //TODO make a functioning method to draw two dices
+    }
+
+    /**
      * drawGameMap Method
      * <p>
      * This method draws the game map represented in the given GameMapManagement on the given canvas
