@@ -3,10 +3,13 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -15,6 +18,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
@@ -41,10 +46,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected String lobbyName;
     protected User loggedInUser;
-    protected ObservableList<ChatMessage> chatMessages;
+    protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     @FXML
-    protected ListView<ChatMessage> chatView;
+    protected ListView<ChatOrSystemMessage> chatView;
     @FXML
     protected TextField messageField;
 
@@ -121,7 +126,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onDeleteMessageButtonPressed() {
-        ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
+        ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
+        ChatMessage chatMsg;
+        if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
+        else return;
         int msgId = chatMsg.getID();
         if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
         if (lobbyName != null) {
@@ -151,9 +159,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         }
         Platform.runLater(() -> {
             for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i).getID() == msg.getId()) {
-                    chatMessages.remove(i);
-                    break;
+                if (chatMessages.get(i) instanceof ChatMessage) {
+                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
+                    if (chatMessage.getID() == msg.getId()) {
+                        chatMessages.remove(i);
+                        break;
+                    }
                 }
             }
         });
@@ -175,7 +186,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onEditMessageButtonPressed() {
-        ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
+        ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
+        ChatMessage chatMsg;
+        if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
+        else return;
         int msgId = chatMsg.getID();
         if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
         if (lobbyName != null) {
@@ -207,8 +221,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         }
         Platform.runLater(() -> {
             for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i).getID() == msg.getMsg().getID()) {
-                    chatMessages.set(i, msg.getMsg());
+                if (chatMessages.get(i) instanceof ChatMessage) {
+                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
+                    if (chatMessage.getID() == msg.getMsg().getID()) {
+                        chatMessages.set(i, msg.getMsg());
+                    }
                 }
             }
         });
@@ -234,6 +251,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         }
     }
 
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
+        } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) LOG.debug("Received SystemMessageResponse");
+        Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+    }
+
     /**
      * Prepares the variables used for the chat storage and management
      * <p>
@@ -250,8 +274,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
         chatView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(ChatMessage item, boolean empty) {
+            protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
+                if (item instanceof SystemMessage)
+                    setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
+                else setFont(Font.getDefault());
                 setText(empty || item == null ? "" : item.toString());
             }
         });

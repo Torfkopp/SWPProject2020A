@@ -11,6 +11,7 @@ import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
+import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
@@ -20,6 +21,7 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -232,6 +234,28 @@ public class SceneManager {
     @Subscribe
     private void onShowLoginViewEvent(ShowLoginViewEvent event) {
         showLoginScreen();
+    }
+
+    @Subscribe
+    private void onOpenDevMenuResponse(OpenDevMenuResponse rsp) {
+        Platform.runLater(() -> {
+            Stage devMenuStage = new Stage();
+            devMenuStage.setTitle("Developer Access Board (D.A.B.)");
+            //devMenuStage.setHeight(LOBBY_HEIGHT); TODO dimensions
+            //devMenuStage.setMinHeight(LOBBY_HEIGHT);
+            //devMenuStage.setWidth(LOBBY_WIDTH);
+            //devMenuStage.setMinWidth(LOBBY_WIDTH);
+            Parent rootPane = initPresenter(DevMenuPresenter.fxml);
+            Scene devMenuScene = new Scene(rootPane);
+            devMenuScene.getStylesheets().add(styleSheet);
+            //lobbyScenes.put(lobbyName, devMenuScene); TODO need to save scene?
+            devMenuStage.setScene(devMenuScene);
+            devMenuStage.initOwner(primaryStage);
+            devMenuStage.setX(primaryStage.getX() + 100);
+            devMenuStage.setY(10);
+            devMenuStage.show();
+            //lobbyStages.add(devMenuStage); TODO need to save stage?
+        });
     }
 
     /**

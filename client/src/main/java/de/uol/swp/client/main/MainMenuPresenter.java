@@ -11,6 +11,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
@@ -76,33 +77,31 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Override
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName() == null) {
-            super.onAskLatestChatMessageResponse(rsp);
-        }
+        if (rsp.getLobbyName() == null) super.onAskLatestChatMessageResponse(rsp);
     }
 
     @Override
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) {
-            super.onCreatedChatMessageMessage(msg);
-        }
+        if (!msg.isLobbyChatMessage()) super.onCreatedChatMessageMessage(msg);
     }
 
     @Override
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) {
-            super.onDeletedChatMessageMessage(msg);
-        }
+        if (!msg.isLobbyChatMessage()) super.onDeletedChatMessageMessage(msg);
     }
 
     @Override
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) {
-            super.onEditedChatMessageMessage(msg);
-        }
+        if (!msg.isLobbyChatMessage()) super.onEditedChatMessageMessage(msg);
+    }
+
+    @Override
+    @Subscribe
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        if (!rsp.isLobbyChatMessage()) super.onSystemMessageResponse(rsp);
     }
 
     /**

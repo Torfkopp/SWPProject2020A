@@ -9,6 +9,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
@@ -156,6 +157,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received EditedChatMessageMessage");
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onEditedChatMessageMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        LOG.debug("Received SystemMessageResponse");
+        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(super.lobbyName)) {
+            super.onSystemMessageResponse(rsp);
         }
     }
 
