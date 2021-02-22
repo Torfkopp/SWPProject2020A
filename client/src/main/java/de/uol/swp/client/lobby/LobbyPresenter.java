@@ -48,18 +48,19 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
     private ObservableList<Pair<String, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
-    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
-
     @FXML
     private ListView<Pair<String, String>> membersView;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
     private Button startSession;
+    @FXML
+    private Button rollDice;
     @FXML
     private Button endTurn;
     @FXML
@@ -365,6 +366,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the rollDice Button is pressed
+     * <p>
+     * If the rollDice Button is pressed, this method requests the LobbyService
+     * to roll the dices.
+     *
+     * @author Mario Fokken
+     * @author Sven Ahrens
+     * @see LobbyService
+     * @since 2021-02-22
+     */
+    @FXML
+    public void onRollDiceButtonPressed() {
+        lobbyService.rollDice(lobbyName, loggedInUser);
+        this.rollDice.setDisable(true);
+    }
+
+    /**
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
@@ -408,6 +426,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);
+                setRollDiceButtonState(msg.getUser());
             });
         }
     }
@@ -555,6 +574,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Helper function that sets the disable state of the rollDiceButton
+     *
+     * @author Sven Ahrens
+     * @author Mario Fokken
+     * @since 2021-02-22
+     */
+    private void setRollDiceButtonState(User player) {
+        this.rollDice.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
      * Helper function that sets the Visible and Disable states of the "Start
      * Session" button.
      * <p>
@@ -627,8 +657,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 Pair<String, String> item = new Pair<>(u.getUsername(),
                                                        u.getUsername().equals(this.owner.getUsername()) ?
                                                        String.format(resourceBundle.getString("lobby.members.owner"),
-                                                                     username) :
-                                                       username);
+                                                                     username) : username);
                 lobbyMembers.add(item);
             });
         });
