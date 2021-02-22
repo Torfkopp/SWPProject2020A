@@ -30,15 +30,6 @@ public class ShowTradeWithBankViewEvent {
     }
 
     /**
-     * Gets the User who wants to trade with the Bank
-     *
-     * @return User who wants to trade with the bank
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
      * Gets the lobby name of the lobby where the player want to
      * trade with the bank
      *
@@ -46,5 +37,14 @@ public class ShowTradeWithBankViewEvent {
      */
     public String getLobbyName() {
         return lobbyName;
+    }
+
+    /**
+     * Gets the User who wants to trade with the Bank
+     *
+     * @return User who wants to trade with the bank
+     */
+    public User getUser() {
+        return user;
     }
 }

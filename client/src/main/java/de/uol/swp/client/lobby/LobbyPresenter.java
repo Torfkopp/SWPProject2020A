@@ -328,10 +328,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setTurnIndicatorText(msg.getActivePlayer());
             //In here to test the endTurnButton
             onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
-            if (loggedInUser.equals(msg.getActivePlayer())) {
-                endTurn.setDisable(false);
-                System.out.println("Button wird wieder aktiviert");
-            }
+            if (loggedInUser.equals(msg.getActivePlayer())) endTurn.setDisable(false);
         }
     }
 
@@ -456,6 +453,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
+     * @since 2021-02-22
      */
     @Subscribe
     public void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
@@ -473,7 +471,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
-     * @since 2021-01-20
+     * @since 2021-02-20
      */
     @FXML
     private void onTradeWithBankButtonPressed() {

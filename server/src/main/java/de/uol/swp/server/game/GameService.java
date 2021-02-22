@@ -63,35 +63,31 @@ public class GameService extends AbstractService {
      * user has enough resources, he gets the new card(happens in helper method).
      * Afterwards a new BuyDevelopmentCardResponse is posted onto the event bus.
      *
-     * @param request The request found on the event bus
+     * @param req The request found on the event bus
      *
      * @author Maximilian Lindner
      * @author Alwin Bossert
      * @since 2021-02-22
      */
     @Subscribe
-    private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest request) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received BuyDevelopmentCardRequest for Lobby " + request.getOriginLobby());
-        Game game = gameManagement.getGame(request.getOriginLobby());
+    private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received BuyDevelopmentCardRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
         List<String> bankInventory = game.getBankInventory();
         if (bankInventory != null && bankInventory.size() > 0) {
-            Random zufall = new Random(); // neues Random Objekt, namens zufall
-            int zufallsZahl = zufall.nextInt(bankInventory.size());
-            String developmentCard = bankInventory.get(zufallsZahl);
-            if (updatePlayersInventoryWithDevelopmentCard(developmentCard, request.getUser(),
-                                                          request.getOriginLobby())) {
-                bankInventory.remove(zufallsZahl);
-                if (LOG.isDebugEnabled())
-                    LOG.debug("Sending a BuyDevelopmentCard for Lobby " + request.getOriginLobby());
-                AbstractResponseMessage returnMessage = new BuyDevelopmentCardResponse(request.getUser(),
-                                                                                       request.getOriginLobby(),
+            Random random = new Random(); // new Random object, named random
+            int randInt = random.nextInt(bankInventory.size());
+            String developmentCard = bankInventory.get(randInt);
+            if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
+                bankInventory.remove(randInt);
+                if (LOG.isDebugEnabled()) LOG.debug("Sending a BuyDevelopmentCard for Lobby " + req.getOriginLobby());
+                AbstractResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(),
+                                                                                       req.getOriginLobby(),
                                                                                        developmentCard);
-                if (request.getMessageContext().isPresent()) {
-                    returnMessage.setMessageContext(request.getMessageContext().get());
-                }
+                returnMessage.initWithMessage(req);
                 post(returnMessage);
-            } else LOG.debug("In the lobby " + request.getOriginLobby() + " the User " + request.getUser()
-                                                                                                .getUsername() + "couldnt buy a development Card");
+            } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
+                                                                                        .getUsername() + "couldnt buy a development Card");
         }
     }
 
@@ -146,20 +142,20 @@ public class GameService extends AbstractService {
      * that contains all the user's resources, saved in a resourceMap for
      * counted items (bricks, grain, etc.) .
      *
-     * @param request The TradeWithBankRequest found on the EventBus
+     * @param req The TradeWithBankRequest found on the EventBus
      *
      * @author Maximilian Lindner
      * @author Alwin Bossert
      * @since 2021-02-21
      */
     @Subscribe
-    private void onTradeWithBankRequest(TradeWithBankRequest request) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + request.getName());
-        Game game = gameManagement.getGame(request.getName());
+    private void onTradeWithBankRequest(TradeWithBankRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
+        Game game = gameManagement.getGame(req.getName());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
         for (Inventory value : inventories) {
-            if (value.getPlayer().equals(request.getUser())) {
+            if (value.getPlayer().equals(req.getUser())) {
                 inventory = value;
                 break;
             }
@@ -172,12 +168,10 @@ public class GameService extends AbstractService {
             resourceMap.put("ore", inventory.getOre());
             resourceMap.put("wool", inventory.getWool());
 
-            AbstractResponseMessage returnMessage = new InventoryForTradeResponse(request.getUser(), request.getName(),
+            AbstractResponseMessage returnMessage = new InventoryForTradeResponse(req.getUser(), req.getName(),
                                                                                   Collections.unmodifiableMap(
                                                                                           resourceMap));
-            if (request.getMessageContext().isPresent()) {
-                returnMessage.setMessageContext(request.getMessageContext().get());
-            }
+            returnMessage.initWithMessage(req);
             post(returnMessage);
         }
     }
@@ -189,44 +183,43 @@ public class GameService extends AbstractService {
      * of the player who traded with the bank. The resource he wants to trade gets -4
      * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
      *
-     * @param request The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     * @param req The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
      * @since 2021-02-21
      */
     @Subscribe
-    private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest request) {
+    private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest req) {
         if (LOG.isDebugEnabled())
-            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + request.getOriginLobby());
-        Game game = gameManagement.getGame(request.getOriginLobby());
+            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
         for (Inventory value : inventories) {
-            if (value.getPlayer().equals(request.getUser())) {
-                if (value.getPlayer().equals(request.getUser())) {
+            if (value.getPlayer().equals(req.getUser())) {
+                if (value.getPlayer().equals(req.getUser())) {
                     inventory = value;
                     break;
                 }
             }
         }
         if (inventory != null) {
-            if (request.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
-            if (request.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
-            if (request.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
-            if (request.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
-            if (request.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
-            if (request.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
-            if (request.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
-            if (request.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
-            if (request.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
-            if (request.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
-            AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(request.getUser(),
-                                                                                      request.getOriginLobby());
-            if (request.getMessageContext().isPresent())
-                returnMessage.setMessageContext(request.getMessageContext().get());
+            if (req.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
+            if (req.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
+            if (req.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
+            if (req.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
+            if (req.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
+            if (req.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
+            if (req.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
+            if (req.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
+            if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
+            if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
+            AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(),
+                                                                                      req.getOriginLobby());
+            returnMessage.initWithMessage(req);
             post(returnMessage);
-            LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + request.getOriginLobby());
+            LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
         }
     }
 
@@ -279,9 +272,7 @@ public class GameService extends AbstractService {
                                                                                         .unmodifiableMap(resourceMap),
                                                                                 Collections.unmodifiableMap(
                                                                                         armyAndRoadMap));
-            if (req.getMessageContext().isPresent()) {
-                returnMessage.setMessageContext(req.getMessageContext().get());
-            }
+            returnMessage.initWithMessage(req);
             post(returnMessage);
         }
     }

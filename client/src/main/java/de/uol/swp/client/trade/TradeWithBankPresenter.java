@@ -17,7 +17,6 @@ import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Window;
@@ -72,7 +71,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper function called if a not successfull trade happened.
+     * Helper function called if an unsuccessful trade happened.
+     * <p>
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeLobbyButtonUpdateEvent with the
      * loggedInUser and the lobbyName on the eventBus to update the
@@ -86,7 +86,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper function called if a successfull trade happened.
+     * Helper function called if a successful trade happened.
+     * <p>
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and TradeLobbyButtonUpdateEvent with the
      * loggedInUser and the lobbyName on the eventBus to update the
@@ -129,7 +130,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                            .getString("game.resources." + item.getKey()));
                 });
             }
         });
@@ -144,7 +145,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * the EventBus.
      */
     @FXML
-    public void onBuyDevelopmentCardButtonPressed(ActionEvent actionEvent) {
+    public void onBuyDevelopmentCardButtonPressed() {
         if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
             Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(loggedInUser, lobbyName);
             eventBus.post(buyDevelopmentCardRequest);
@@ -158,16 +159,16 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * to get the new Inventory after the trade shown in the
      * LobbyView.
      *
-     * @param response The BuyDevelopmentCardResponse found on the eventBus
+     * @param rsp The BuyDevelopmentCardResponse found on the eventBus
      *
      * @implNote the User has to check what card he got by looking at his inventory or check the log
      */
     @Subscribe
-    private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse response) {
+    private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
-        if (lobbyName.equals(response.getLobbyName())) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
             closeWindowAfterSuccessfulTrade();
-            LOG.debug("The user got a " + response.getDevelopmentCard());
+            LOG.debug("The user got a " + rsp.getDevelopmentCard());
             LOG.debug("Sending UpdateInventoryRequest");
             Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
             eventBus.post(updateInventoryRequest);
@@ -195,13 +196,13 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * as a Map. Calls a function to fill the inventory.
      * If the user has enough resources, the buy
      *
-     * @param response InventoryForTradeResponse having the inventory
+     * @param rsp InventoryForTradeResponse having the inventory
      */
     @Subscribe
-    private void onInventoryForTradeResponse(InventoryForTradeResponse response) {
-        if (response.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received InventorForTradeResponse for Lobby " + this.lobbyName);
-            resourceMap = response.getResourceMap();
+    private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
+        if (rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received InventoryForTradeResponse for Lobby " + this.lobbyName);
+            resourceMap = rsp.getResourceMap();
             setTradingLists();
         }
         if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
@@ -223,14 +224,14 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         Pair<String, Integer> giveResource;
         ownResourceToTradeWithView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent("You have to choose one of your resources in the top left list"));
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("game.error.trade.noplayerresource")));
             return;
         } else {
             giveResource = ownResourceToTradeWithView.getSelectionModel().getSelectedItem();
         }
         bankResourceView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (bankResourceView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent("You have to choose one of the resources the bank offers you"));
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("game.error.trade.nobankresource")));
             return;
         } else {
             bankResource = bankResourceView.getSelectionModel().getSelectedItem();
@@ -275,12 +276,12 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * to get the new Inventory after the trade shown in the
      * LobbyView.
      *
-     * @param response TradeWithBankButtonAcceptedResponse found on the event bus
+     * @param rsp TradeWithBankButtonAcceptedResponse found on the event bus
      */
     @Subscribe
-    private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse response) {
+    private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
-        if (lobbyName.equals(response.getLobbyName())) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
             closeWindowAfterSuccessfulTrade();
             LOG.debug("Sending UpdateInventoryRequest");
             Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
