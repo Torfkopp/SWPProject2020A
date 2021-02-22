@@ -297,6 +297,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * updated with the items as listed in the resourceMap.
      */
     private void setTradingLists() {
+        int tradingRatio = 4; //can be expanded by harbours
         if (resourceList == null) {
             resourceList = FXCollections.observableArrayList();
             ownInventoryList = FXCollections.observableArrayList();
@@ -308,8 +309,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
             ownInventoryList.add(ownResource);
-            if (entry.getValue() < 4) continue;
-            Pair<String, Integer> resource = new Pair<>(entry.getKey(), 4);
+            if (entry.getValue() < tradingRatio) continue;
+            Pair<String, Integer> resource = new Pair<>(entry.getKey(), tradingRatio);
             resourceList.add(resource);
         }
         if (resourceList.size() == 0) {
