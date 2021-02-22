@@ -52,7 +52,7 @@ public class SceneManager {
     static final String styleSheet = "css/swp.css";
     private static final int LOBBY_HEIGHT = 730;
     private static final int LOBBY_WIDTH = 685;
-    private static final int TRADING_HEIGHT = 600;
+    private static final int TRADING_HEIGHT = 420;
     private static final int TRADING_WIDTH = 600;
 
     private final ResourceBundle resourceBundle;
@@ -466,7 +466,7 @@ public class SceneManager {
      * @since 2021-02-20
      */
     @Subscribe
-    private void onTradeWithUserCancelEvent(TradeWithBankCancelEvent event) {
+    private void onTradeWithBankCancelEvent(TradeWithBankCancelEvent event) {
         LOG.debug("Received TradeWithUserCancelEvent");
         String lobby = event.getLobbyName();
         if (tradingStage.containsKey(lobby)) {

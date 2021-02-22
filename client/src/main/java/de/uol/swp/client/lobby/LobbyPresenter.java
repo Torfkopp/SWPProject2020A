@@ -5,6 +5,7 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent;
 import de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -322,11 +323,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (msg.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
-        setTurnIndicatorText(msg.getActivePlayer());
-        //In here to test the endTurnButton
-        onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
+        if (msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+            setTurnIndicatorText(msg.getActivePlayer());
+            //In here to test the endTurnButton
+            onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
+            if (loggedInUser.equals(msg.getActivePlayer())) {
+                endTurn.setDisable(false);
+                System.out.println("Button wird wieder aktiviert");
+            }
+        }
     }
 
     /**
@@ -366,6 +372,27 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+        }
+    }
+
+    /**
+     * Handles an ResetTradeWithBankButtonEvent found on the EventBus
+     * <p>
+     * If the ResetTradeWithBankButtonEvent is intended for the current Lobby
+     * the trade With Bank button is enabled again and the end turn button
+     * as well.
+     *
+     * @param event The TradeLobbyButtonUpdateEvent found on the event bus
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-02-22
+     */
+    @Subscribe
+    public void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
+        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
+            tradeWithBankButton.setDisable(false);
+            endTurn.setDisable(false);
         }
     }
 
@@ -422,7 +449,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Handles an TradeLobbyButtonUpdateEvent found on the EventBus
      * <p>
      * If the TradeLobbyButtonUpdateEvent is intended for the current Lobby
-     * the trade With Bank button is enabled again.
+     * the trade With Bank button is disabled. The end turn button gets
+     * enabled again.
      *
      * @param event The TradeLobbyButtonUpdateEvent found on the event bus
      *
@@ -431,8 +459,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     public void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
-        if (super.lobbyName.equals(event.getLobbyName())) {
-            tradeWithBankButton.setDisable(false);
+        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
+            tradeWithBankButton.setDisable(true);
+            endTurn.setDisable(false);
         }
     }
 

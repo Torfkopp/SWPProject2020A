@@ -5,12 +5,14 @@
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
             xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
 
-    <Button fx:id="buyDevelopmentButton" layoutX="452.0" layoutY="285.0" mnemonicParsing="false"
-            onAction="#onBuyDevelopmentCardButtonPressed" text="Buy Card" disable="true"/>
-    <Button fx:id="cancelButton" layoutX="452.0" layoutY="341.0" mnemonicParsing="false"
+    <Button fx:id="buyDevelopmentButton" disable="true" layoutX="400" layoutY="250.0" prefHeight="50"
+            mnemonicParsing="false"
+            onAction="#onBuyDevelopmentCardButtonPressed" text="1 Ore, 1 Wool, 1 Grain &#10;for 1 Development Card"/>
+    <Button fx:id="cancelButton" layoutX="400.0" layoutY="320.0" mnemonicParsing="false"
             onAction="#onCancelButtonPressed" text="Cancel"/>
     <Button fx:id="tradeResourceWithBankButton" layoutX="268.0" layoutY="123.0" mnemonicParsing="false"
             onAction="#onTradeResourceWithBankButtonPressed" text="Trade for"/>
-    <ListView fx:id="ownResourceView" layoutX="32.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0"/>
-    <ListView fx:id="bankResourceView" layoutX="368.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0"/>
+    <ListView fx:id="ownResourceToTradeWithView" layoutX="32.0" layoutY="35.0" prefHeight="140.0" prefWidth="200.0"/>
+    <ListView fx:id="bankResourceView" layoutX="368.0" layoutY="35.0" prefHeight="140.0" prefWidth="200.0"/>
+    <ListView fx:id="ownInventoryView" layoutX="32.0" layoutY="200" prefHeight="140.0" prefWidth="200.0"/>
 </AnchorPane>

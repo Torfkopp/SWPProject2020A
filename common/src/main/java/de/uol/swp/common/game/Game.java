@@ -45,7 +45,7 @@ public class Game {
             inventories[i++] = new Inventory(u);
         }
         BankInventory bankInvent = new BankInventory();
-        bankInventory = bankInvent.getResourceCards();
+        bankInventory = bankInvent.getDevelopmentCards();
     }
 
     /**

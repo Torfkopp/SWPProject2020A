@@ -23,9 +23,8 @@ public class BankInventory {
     private int roadBuildingCards = 2;
     private int yearOfPlentyCards = 2;
     private int monopolyCards = 2;
-
     private int victoryPointCards = 5;
-    private List<String> resourceCards;
+    private List<String> developmentCards;
 
     public BankInventory() {}
 
@@ -46,6 +45,31 @@ public class BankInventory {
      */
     public void setBrick(int brick) {
         this.brick = brick;
+    }
+
+    /**
+     * Sets all cards into a list and returns this list
+     *
+     * @return List a List having all the cards
+     */
+    public List<String> getDevelopmentCards() {
+        developmentCards = new ArrayList<>();
+        for (int i = 0; i < knightCards; i++) {
+            developmentCards.add("knightCard");
+        }
+        for (int i = 0; i < roadBuildingCards; i++) {
+            developmentCards.add("roadBuildingCard");
+        }
+        for (int i = 0; i < yearOfPlentyCards; i++) {
+            developmentCards.add("yearOfPlentyCard");
+        }
+        for (int i = 0; i < monopolyCards; i++) {
+            developmentCards.add("monopolyCard");
+        }
+        for (int i = 0; i < victoryPointCards; i++) {
+            developmentCards.add("victoryPointCard");
+        }
+        return developmentCards;
     }
 
     /**
@@ -136,31 +160,6 @@ public class BankInventory {
      */
     public void setOre(int ore) {
         this.ore = ore;
-    }
-
-    /**
-     * Sets all cards into a list and returns this list
-     *
-     * @return List a List having all the cards
-     */
-    public List<String> getResourceCards() {
-        resourceCards = new ArrayList<>();
-        for (int i = 0; i < knightCards; i++) {
-            resourceCards.add("knightCard");
-        }
-        for (int i = 0; i < roadBuildingCards; i++) {
-            resourceCards.add("roadBuildingCard");
-        }
-        for (int i = 0; i < yearOfPlentyCards; i++) {
-            resourceCards.add("yearOfPlentyCard");
-        }
-        for (int i = 0; i < monopolyCards; i++) {
-            resourceCards.add("monopolyCard");
-        }
-        for (int i = 0; i < victoryPointCards; i++) {
-            resourceCards.add("victoryPointCard");
-        }
-        return resourceCards;
     }
 
     /**
