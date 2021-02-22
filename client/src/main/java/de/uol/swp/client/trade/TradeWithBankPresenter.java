@@ -223,14 +223,14 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         Pair<String, Integer> giveResource;
         ownResourceToTradeWithView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            eventBus.post(new LobbyErrorEvent("You have to choose one of your resources in the top left list"));
             return;
         } else {
             giveResource = ownResourceToTradeWithView.getSelectionModel().getSelectedItem();
         }
         bankResourceView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (bankResourceView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            eventBus.post(new LobbyErrorEvent("You have to choose one of the resources the bank offers you"));
             return;
         } else {
             bankResource = bankResourceView.getSelectionModel().getSelectedItem();
@@ -326,4 +326,3 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         }
     }
 }
-

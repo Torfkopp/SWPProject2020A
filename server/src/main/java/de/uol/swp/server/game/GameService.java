@@ -221,9 +221,6 @@ public class GameService extends AbstractService {
             if (request.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
             if (request.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
             if (request.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
-            System.out.println(
-                    inventory.getOre() + "" + inventory.getGrain() + "" + inventory.getWool() + "" + inventory
-                            .getLumber() + "" + inventory.getBrick());
             AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(request.getUser(),
                                                                                       request.getOriginLobby());
             if (request.getMessageContext().isPresent())
