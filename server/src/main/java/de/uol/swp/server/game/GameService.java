@@ -7,23 +7,18 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
-import de.uol.swp.common.game.request.EndTurnRequest;
-import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.request.*;
+import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.request.TradeWithBankRequest;
-import de.uol.swp.common.lobby.response.InventoryForTradeResponse;
-import de.uol.swp.common.lobby.response.TradeWithBankAcceptedResponse;
-import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Mapping EventBus calls to GameManagement calls
@@ -57,6 +52,47 @@ public class GameService extends AbstractService {
         LOG.debug("GameService started");
         this.gameManagement = gameManagement;
         this.lobbyService = lobbyService;
+    }
+
+    /**
+     * Handles a BuyDevelopmentCard found on the event bus
+     * <p>
+     * If a BuyDevelopmentCard is found on the event bus, this method checks
+     * if there are development cards to sell available in the bankInventory.
+     * If there is at least one card, a random card gets chosen and if the
+     * user has enough resources, he gets the new card(happens in helper method).
+     * Afterwards a new BuyDevelopmentCardResponse is posted onto the event bus.
+     *
+     * @param request The request found on the event bus
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @since 2021-02-22
+     */
+    @Subscribe
+    private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest request) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received BuyDevelopmentCardRequest for Lobby " + request.getOriginLobby());
+        Game game = gameManagement.getGame(request.getOriginLobby());
+        List<String> bankInventory = game.getBankInventory();
+        if (bankInventory != null && bankInventory.size() > 0) {
+            Random zufall = new Random(); // neues Random Objekt, namens zufall
+            int zufallsZahl = zufall.nextInt(bankInventory.size());
+            String developmentCard = bankInventory.get(zufallsZahl);
+            if (updatePlayersInventoryWithDevelopmentCard(developmentCard, request.getUser(),
+                                                          request.getOriginLobby())) {
+                bankInventory.remove(zufallsZahl);
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Sending a BuyDevelopmentCard for Lobby " + request.getOriginLobby());
+                AbstractResponseMessage returnMessage = new BuyDevelopmentCardResponse(request.getUser(),
+                                                                                       request.getOriginLobby(),
+                                                                                       developmentCard);
+                if (request.getMessageContext().isPresent()) {
+                    returnMessage.setMessageContext(request.getMessageContext().get());
+                }
+                post(returnMessage);
+            } else LOG.debug("In the lobby " + request.getOriginLobby() + " the User " + request.getUser()
+                                                                                                .getUsername() + "couldnt buy a development Card");
+        }
     }
 
     /**
@@ -147,6 +183,57 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     * <p>
+     * If a UpdateInventoryAfterTradeWithBankRequest is found on the EventBus this method updates the inventory
+     * of the player who traded with the bank. The resource he wants to trade gets -4
+     * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
+     *
+     * @param request The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-02-21
+     */
+    @Subscribe
+    private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest request) {
+        if (LOG.isDebugEnabled())
+            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + request.getOriginLobby());
+        Game game = gameManagement.getGame(request.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(request.getUser())) {
+                if (value.getPlayer().equals(request.getUser())) {
+                    inventory = value;
+                    break;
+                }
+            }
+        }
+        if (inventory != null) {
+            if (request.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
+            if (request.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
+            if (request.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
+            if (request.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
+            if (request.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
+            if (request.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
+            if (request.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
+            if (request.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
+            if (request.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
+            if (request.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
+            System.out.println(
+                    inventory.getOre() + "" + inventory.getGrain() + "" + inventory.getWool() + "" + inventory
+                            .getLumber() + "" + inventory.getBrick());
+            AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(request.getUser(),
+                                                                                      request.getOriginLobby());
+            if (request.getMessageContext().isPresent())
+                returnMessage.setMessageContext(request.getMessageContext().get());
+            post(returnMessage);
+            LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + request.getOriginLobby());
+        }
+    }
+
+    /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -203,51 +290,54 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     * Helper method
      * <p>
-     * If a UpdateInventoryAfterTradeWithBankRequest is found on the EventBus this method updates the inventory
-     * of the player who traded with the bank. The resource he wants to trade gets -4
-     * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
+     * Adds the radom chosen development card and deletes the resources
+     * he had to pay from his inventory.
      *
-     * @param request The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
+     * @param developmentCard Name of the random chosen development Card
+     * @param user            User who wants to buy the development Card
+     * @param lobbyName       Name of the lobby where the trade is happening
      *
-     * @author Alwin Bossert
+     * @return a boolean if the trade worked out
+     *
      * @author Maximilian Lindner
-     * @since 2021-02-21
+     * @author Alwin Bossert
+     * @since 2021-02-22
      */
-    @Subscribe
-    private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest request) {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + request.getOriginLobby());
-        Game game = gameManagement.getGame(request.getOriginLobby());
+    private boolean updatePlayersInventoryWithDevelopmentCard(String developmentCard, User user, String lobbyName) {
+        Game game = gameManagement.getGame(lobbyName);
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
         for (Inventory value : inventories) {
-            if (value.getPlayer().equals(request.getUser())) {
-                if (value.getPlayer().equals(request.getUser())) {
-                    inventory = value;
-                    break;
-                }
+            if (value.getPlayer().equals(user)) {
+                inventory = value;
+                break;
             }
         }
         if (inventory != null) {
-            if (request.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
-            if (request.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
-            if (request.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
-            if (request.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
-            if (request.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
-            if (request.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
-            if (request.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
-            if (request.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
-            if (request.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
-            if (request.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
-            System.out.println(inventory.getOre() + "" + inventory.getGrain() + "" + inventory.getWool() + "" + inventory
-                    .getLumber() + "" + inventory.getBrick());
-            AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(request.getUser(),
-                                                                                      request.getOriginLobby());
-            if (request.getMessageContext().isPresent()) returnMessage.setMessageContext(request.getMessageContext().get());
-            post(returnMessage);
-            LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + request.getOriginLobby());
-        }
+            if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {
+
+                inventory.setOre(inventory.getOre() - 1);
+                inventory.setGrain(inventory.getGrain() - 1);
+                inventory.setWool(inventory.getWool() - 1);
+                if (developmentCard.equals("knightCard")) {
+                    inventory.setKnightCards(inventory.getKnightCards() + 1);
+                }
+                if (developmentCard.equals("roadBuildingCard")) {
+                    inventory.setRoadBuildingCards(inventory.getRoadBuildingCards() + 1);
+                }
+                if (developmentCard.equals("yearOfPlentyCard")) {
+                    inventory.setYearOfPlentyCards(inventory.getYearOfPlentyCards() + 1);
+                }
+                if (developmentCard.equals("monopolyCard")) {
+                    inventory.setMonopolyCards(inventory.getMonopolyCards() + 1);
+                }
+                if (developmentCard.equals("victoryPointCard")) {
+                    inventory.setVictoryPointCards(inventory.getVictoryPointCards() + 1);
+                }
+            }
+            return true;
+        } else return false;
     }
 }

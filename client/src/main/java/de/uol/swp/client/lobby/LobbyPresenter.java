@@ -14,6 +14,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.response.UpdateInventoryResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
@@ -21,7 +22,6 @@ import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
-import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -467,7 +467,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * @author Phillip-André Suhr
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.lobby.response.UpdateInventoryResponse
+     * @see de.uol.swp.common.game.response.UpdateInventoryResponse
      * @since 2021-01-27
      */
     @Subscribe

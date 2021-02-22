@@ -21,7 +21,7 @@ public class Game {
     private final IGameMapManagement map;
     private final User[] players;
     private int activePlayer;
-    private List bankInventory;
+    private List<String> bankInventory;
 
     /**
      * Constructor
@@ -76,12 +76,13 @@ public class Game {
         if (inventories[num].isLargestArmy()) points += 2;
         return points;
     }
+
     /**
      * Gets the List of the items of the bank.
      *
      * @return The List of the bank inventory
      */
-    public List getBankInventory() {
+    public List<String> getBankInventory() {
         return bankInventory;
     }
 

@@ -25,7 +25,7 @@ public class BankInventory {
     private int monopolyCards = 2;
 
     private int victoryPointCards = 5;
-    private List resourceCards;
+    private List<String> resourceCards;
 
     public BankInventory() {}
 
@@ -138,27 +138,27 @@ public class BankInventory {
         this.ore = ore;
     }
 
-    public List getResourceCards() {
-        int size = 0;
-        resourceCards = new ArrayList();
-        for (int i = size; i < knightCards; i++) {
-            resourceCards.add(i, "knightCard");
+    /**
+     * Sets all cards into a list and returns this list
+     *
+     * @return List a List having all the cards
+     */
+    public List<String> getResourceCards() {
+        resourceCards = new ArrayList<>();
+        for (int i = 0; i < knightCards; i++) {
+            resourceCards.add("knightCard");
         }
-        size = resourceCards.size();
-        for (int i = size; i < (roadBuildingCards + size); i++) {
-            resourceCards.add(i, "roadBuildingCard");
+        for (int i = 0; i < roadBuildingCards; i++) {
+            resourceCards.add("roadBuildingCard");
         }
-        size = resourceCards.size();
-        for (int i = size; i < (yearOfPlentyCards + size); i++) {
-            resourceCards.add(i, "yearOfPlentyCard");
+        for (int i = 0; i < yearOfPlentyCards; i++) {
+            resourceCards.add("yearOfPlentyCard");
         }
-        size = resourceCards.size();
-        for (int i = size; i < (monopolyCards + size); i++) {
-            resourceCards.add(i, "monopolyCard");
+        for (int i = 0; i < monopolyCards; i++) {
+            resourceCards.add("monopolyCard");
         }
-        size = resourceCards.size();
-        for (int i = size; i < (victoryPointCards + size); i++) {
-            resourceCards.add(i, "victoryPointCard");
+        for (int i = 0; i < victoryPointCards; i++) {
+            resourceCards.add("victoryPointCard");
         }
         return resourceCards;
     }

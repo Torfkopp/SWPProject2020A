@@ -472,8 +472,6 @@ public class SceneManager {
         if (tradingStage.containsKey(lobby)) {
             tradingStage.get(lobby).close();
             tradingStage.remove(lobby);
-        } else {
-            System.out.println("Stage nicht gefunden");
         }
     }
 

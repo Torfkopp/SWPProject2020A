@@ -8,14 +8,18 @@ import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.client.trade.event.TradeWithBankCancelEvent;
+import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
 import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
-import de.uol.swp.common.lobby.response.InventoryForTradeResponse;
-import de.uol.swp.common.lobby.response.TradeWithBankAcceptedResponse;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
+import de.uol.swp.common.game.response.InventoryForTradeResponse;
+import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Window;
@@ -48,7 +52,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @FXML
     private ListView<Pair<String, Integer>> bankResourceView;
     @FXML
-    private Button buyEntwicklungskarteButton;
+    private Button buyDevelopmentButton;
     @FXML
     private Button cancelButton;
     @FXML
@@ -77,7 +81,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             eventBus.post(new TradeWithBankCancelEvent(lobbyName));
             eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
         });
-        System.out.println("Hi");
     }
 
     /**
@@ -116,7 +119,33 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * the EventBus.
      */
     @FXML
-    private void onBuyEntwicklungskarteButtonPressed() {
+    public void onBuyDevelopmentCardButtonPressed(ActionEvent actionEvent) {
+        if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
+            Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(loggedInUser, lobbyName);
+            eventBus.post(buyDevelopmentCardRequest);
+        }
+    }
+
+    /**
+     * If a BuyDevelopmentCardResponse is found on the event bus,
+     * this method calls the close method, which closes the trading
+     * window and posts a updateInventoryRequest onto the event bus
+     * to get the new Inventory after the trade shown in the
+     * LobbyView.
+     *
+     * @param response The BuyDevelopmentCardResponse found on the eventBus
+     */
+    @Subscribe
+    private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse response) {
+        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
+        if (lobbyName.equals(response.getLobbyName())) {
+            closeWindow();
+            LOG.debug("Sending UpdateInventoryRequest");
+            Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
+            eventBus.post(updateInventoryRequest);
+            tradeResourceWithBankButton.setDisable(true);
+        }
+        //todo show which card the user got
     }
 
     /**
@@ -137,6 +166,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * If the InventoryForTradeResponse is directed to this lobby,
      * the TradeWithBankPresenter gets the inventory of the player
      * as a Map. Calls a function to fill the inventory.
+     * If the user has enough resources, the buy
      *
      * @param response InventoryForTradeResponse having the inventory
      */
@@ -146,6 +176,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             LOG.debug("Received InventorForTradeResponse for Lobby " + this.lobbyName);
             resourceMap = response.getResourceMap();
             setTradingLists();
+        }
+        if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
+            buyDevelopmentButton.setDisable(false);
         }
     }
 
@@ -208,12 +241,25 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }
 
+    /**
+     * If a TradeWithBankAcceptedResponse is found on the event bus,
+     * this method calls the close method, which closes the trading
+     * window and posts a updateInventoryRequest onto the event bus
+     * to get the new Inventory after the trade shown in the
+     * LobbyView.
+     *
+     * @param response TradeWithBankButtonAcceptedResponse found on the event bus
+     */
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse response) {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
-        if (lobbyName.equals(response.getLobbyName())) { //kein Inhalt
+        if (lobbyName.equals(response.getLobbyName())) {
+            closeWindow();
+            LOG.debug("Sending UpdateInventoryRequest");
+            Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
+            eventBus.post(updateInventoryRequest);
+            tradeResourceWithBankButton.setDisable(true);
         }
-        closeWindow();
     }
 
     /**
@@ -233,7 +279,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             Pair<String, Integer> resource = new Pair<>(entry.getKey(), entry.getValue());
             resourceList.add(resource);
         }
-        System.out.println("Du hast" + resourceMap.get("ore"));
         if (bankResourceList == null) {
             bankResourceList = FXCollections.observableArrayList();
             bankResourceView.setItems(bankResourceList);
@@ -243,7 +288,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             Pair<String, Integer> resource = new Pair<>(entry.getKey(), 1);
             bankResourceList.add(resource);
         }
-        System.out.println("Die Bank hat" + resourceMap.get("ore"));
     }
 }
 

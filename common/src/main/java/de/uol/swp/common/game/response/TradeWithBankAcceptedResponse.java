@@ -1,5 +1,6 @@
-package de.uol.swp.common.lobby.response;
+package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.User;
 
 /**
