@@ -23,10 +23,21 @@ public interface UserStore {
      * @param eMail    E-mail address of the new user
      *
      * @return The user without password information
-     *
-     * @since 2019-08-13
      */
     User createUser(String username, String password, String eMail);
+
+    /**
+     * Find a user only by ID
+     *
+     * @param id ID of the user to find
+     *
+     * @return The user without password information if found
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    Optional<User> findUser(int id);
 
     /**
      * Find a user only by name
@@ -34,8 +45,6 @@ public interface UserStore {
      * @param username Username of the user to find
      *
      * @return The user without password information if found
-     *
-     * @since 2019-08-13
      */
     Optional<User> findUser(String username);
 
@@ -46,8 +55,6 @@ public interface UserStore {
      * @param password Password of the user to find
      *
      * @return The user without password information if found
-     *
-     * @since 2019-08-13
      */
     Optional<User> findUser(String username, String password);
 
@@ -55,13 +62,22 @@ public interface UserStore {
      * Retrieves the list of all users.
      *
      * @return A list of all users without password information
-     *
-     * @since 2019-08-13
      */
     List<User> getAllUsers();
 
     /**
-     * Remove a user from the store
+     * Remove a user form the store with their ID
+     *
+     * @param id The ID of the user to remove
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    void removeUser(int id);
+
+    /**
+     * Remove a user from the store with their username
      *
      * @param username The username of the user to remove
      *
@@ -70,15 +86,30 @@ public interface UserStore {
     void removeUser(String username);
 
     /**
-     * Update a user. Updates only given fields. Username cannot be changed
+     * Update a user. Updates only given fields. ID cannot be changed
+     *
+     * @param id       ID of the user to be modified
+     * @param username New username
+     * @param password New password
+     * @param eMail    New email address
+     *
+     * @return The user without password information
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    User updateUser(int id, String username, String password, String eMail);
+
+    /**
+     * Update a user. Updates only given fields.
+     * Username cannot be changed with this method
      *
      * @param username Username of the user to be modified
      * @param password New password
      * @param eMail    New email address
      *
      * @return The user without password information
-     *
-     * @since 2019-08-13
      */
     User updateUser(String username, String password, String eMail);
 }

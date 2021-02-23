@@ -40,6 +40,21 @@ public interface IUserManagement {
     void dropUser(User user);
 
     /**
+     * Gets a user from the store with only their ID
+     * <p>
+     * Gets the user specified by the ID.
+     *
+     * @param id The ID of the user to get
+     *
+     * @return Optional containing the User object if found, empty otherwise
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    Optional<User> getUser(int id);
+
+    /**
      * Gets a user from the store with only their name
      * <p>
      * Gets the user specified by the userName.

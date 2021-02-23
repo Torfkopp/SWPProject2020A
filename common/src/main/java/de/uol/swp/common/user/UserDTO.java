@@ -14,6 +14,7 @@ import java.util.Objects;
  */
 public class UserDTO implements User {
 
+    private final int id;
     private final String username;
     private final String password;
     private final String eMail;
@@ -21,15 +22,15 @@ public class UserDTO implements User {
     /**
      * Constructor
      *
+     * @param id       The user's ID
      * @param username The user's username
      * @param password The user's password
      * @param eMail    The user's e-mail address
-     *
-     * @since 2019-08-13
      */
-    public UserDTO(String username, String password, String eMail) {
+    public UserDTO(int id, String username, String password, String eMail) {
         if (!Objects.nonNull(username)) throw new IllegalArgumentException("Username must not be null");
         if (!Objects.nonNull(password)) throw new IllegalArgumentException("Password must not be null");
+        this.id = id;
         this.username = username;
         this.password = password;
         this.eMail = eMail;
@@ -41,11 +42,9 @@ public class UserDTO implements User {
      * @param user User object to copy the values of
      *
      * @return User copy of the User object
-     *
-     * @since 2019-08-13
      */
     public static User create(User user) {
-        return new UserDTO(user.getUsername(), user.getPassword(), user.getEMail());
+        return new UserDTO(user.getID(), user.getUsername(), user.getPassword(), user.getEMail());
     }
 
     /**
@@ -57,16 +56,19 @@ public class UserDTO implements User {
      * @param user User object to copy the values of
      *
      * @return UserDTO Copy of User object with the password variable left empty
-     *
-     * @since 2019-08-13
      */
     public static User createWithoutPassword(User user) {
-        return new UserDTO(user.getUsername(), "", user.getEMail());
+        return new UserDTO(user.getID(), user.getUsername(), "", user.getEMail());
     }
 
     @Override
     public String getEMail() {
         return eMail;
+    }
+
+    @Override
+    public int getID() {
+        return id;
     }
 
     @Override
@@ -81,12 +83,13 @@ public class UserDTO implements User {
 
     @Override
     public User getWithoutPassword() {
-        return new UserDTO(username, "", eMail);
+        return new UserDTO(id, username, "", eMail);
     }
 
     @Override
     public int compareTo(User o) {
-        return username.compareTo(o.getUsername());
+        Integer id_obj = id; // compareTo is only defined on the wrapper class, so we make one here
+        return id_obj.compareTo(o.getID());
     }
 
     @Override
@@ -99,6 +102,6 @@ public class UserDTO implements User {
         if (!(obj instanceof UserDTO)) {
             return false;
         }
-        return Objects.equals(this.username, ((UserDTO) obj).username);
+        return this.id == ((UserDTO) obj).getID();
     }
 }

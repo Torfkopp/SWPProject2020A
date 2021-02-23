@@ -48,14 +48,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-    private ObservableList<Pair<String, String>> lobbyMembers;
+    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
+    private ObservableList<Pair<Integer, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
-    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
-
     @FXML
-    private ListView<Pair<String, String>> membersView;
+    private ListView<Pair<Integer, String>> membersView;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -101,7 +100,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         super.initialize();
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
+            protected void updateItem(Pair<Integer, String> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
@@ -177,17 +176,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Helper function to find the Pair for a given key
      *
-     * @param name the key of the pair that should be returned
+     * @param id The key of the pair that should be returned
      *
-     * @return the pair matched by the name
+     * @return The pair matched by the ID
      *
      * @author Temmo Junkhoff
      * @author Timo Gerken
      * @since 2021-01-19
      */
-    private Pair<String, String> findMember(String name) {
-        for (Pair<String, String> lobbyMember : lobbyMembers) {
-            if (lobbyMember.getKey().equals(name)) return lobbyMember;
+    private Pair<Integer, String> findMember(int id) {
+        for (Pair<Integer, String> lobbyMember : lobbyMembers) {
+            if (lobbyMember.getKey() == (id)) return lobbyMember;
         }
         return null;
     }
@@ -474,9 +473,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
         LOG.debug("---- User " + msg.getUser().getUsername() + " joined");
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
-                                                                             .equals(msg.getUser().getUsername()))
-                lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
+            if (lobbyMembers != null && loggedInUser != null && loggedInUser.getID() != msg.getUser().getID())
+                lobbyMembers.add(new Pair<>(msg.getUser().getID(), msg.getUser().getUsername()));
             setStartSessionButtonState();
         });
     }
@@ -506,14 +504,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby " + this.lobbyName);
-        if (msg.getUser().getUsername().equals(owner.getUsername())) {
+        if (msg.getUser().getID() == owner.getID()) {
             LOG.debug("---- Owner " + msg.getUser().getUsername() + " left");
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
             LOG.debug("---- User " + msg.getUser().getUsername() + " left");
         }
         Platform.runLater(() -> {
-            lobbyMembers.remove(findMember(msg.getUser().getUsername()));
+            lobbyMembers.remove(findMember(msg.getUser().getID()));
             readyUsers.remove(msg.getUser());
             setStartSessionButtonState();
         });
@@ -624,11 +622,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 if (readyUsers.contains(u)) {
                     username = String.format(resourceBundle.getString("lobby.members.ready"), username);
                 }
-                Pair<String, String> item = new Pair<>(u.getUsername(),
-                                                       u.getUsername().equals(this.owner.getUsername()) ?
-                                                       String.format(resourceBundle.getString("lobby.members.owner"),
-                                                                     username) :
-                                                       username);
+                Pair<Integer, String> item = new Pair<>(u.getID(), u.getUsername().equals(this.owner.getUsername()) ?
+                                                                   String.format(resourceBundle.getString(
+                                                                           "lobby.members.owner"), username) :
+                                                                   username);
                 lobbyMembers.add(item);
             });
         });

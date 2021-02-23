@@ -72,6 +72,8 @@ public class RegistrationPresenter extends AbstractPresenter {
      * If everything is filled in correctly, the user service is requested to create
      * a new user.
      *
+     * @implNote The ID of the User to create is set to -1.
+     * This will NOT be its final ID and must not be used for identification in any way
      * @see de.uol.swp.client.register.event.RegistrationErrorEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
@@ -86,7 +88,7 @@ public class RegistrationPresenter extends AbstractPresenter {
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
         } else {
-            userService.createUser(new UserDTO(loginField.getText(), passwordField1.getText(), ""));
+            userService.createUser(new UserDTO(-1, loginField.getText(), passwordField1.getText(), ""));
         }
     }
 }

@@ -36,10 +36,6 @@ public class H2BasedUserStore extends AbstractUserStore {
     /**
      * This method registers the user with its specific and unique username,
      * password and e-mail and saves it in the H2 Database.
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
      */
     @Override
     public User createUser(String username, String password, String eMail) {
@@ -76,7 +72,9 @@ public class H2BasedUserStore extends AbstractUserStore {
                     se.printStackTrace();
                 }
             }
-            return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
+            Optional<User> usr = findUser(username);
+            if (usr.isPresent()) return usr.get().getWithoutPassword();
+            else throw new RuntimeException("Something went wrong when creating the user");
         } else {
             throw new IllegalArgumentException("Username must not be taken already");
         }
@@ -84,11 +82,58 @@ public class H2BasedUserStore extends AbstractUserStore {
 
     /**
      * This method finds and returns the specific user
-     * from the database without the password.
+     * identified by the providied ID from the database
+     * without the password.
      *
      * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    @Override
+    public Optional<User> findUser(int id) {
+        createTable();
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "SELECT * FROM USERDB WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int userId = rs.getInt("id");
+                String user = rs.getString("username");
+                String mail = rs.getString("mail");
+                String pass = rs.getString("pass");
+
+                if (userId == id) {
+                    User usr = new UserDTO(userId, user, pass, mail);
+                    return Optional.of(usr.getWithoutPassword());
+                }
+            }
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * This method finds and returns the specific user
+     * from the database without the password.
      */
     @Override
     public Optional<User> findUser(String username) {
@@ -105,12 +150,13 @@ public class H2BasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                int userId = rs.getInt("id");
                 String user = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
                 if (user.equals(username)) {
-                    User usr = new UserDTO(user, pass, mail);
+                    User usr = new UserDTO(userId, user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
             }
@@ -135,10 +181,6 @@ public class H2BasedUserStore extends AbstractUserStore {
      * This method searches for a user that matches both
      * the provided username and password and returns a
      * UserDTO for the matching result.
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
      */
     @Override
     public Optional<User> findUser(String username, String password) {
@@ -157,12 +199,13 @@ public class H2BasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                int userId = rs.getInt("id");
                 String user = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
                 if (user.equals(username) && pass.equals(passwordHash)) {
-                    User usr = new UserDTO(user, pass, mail);
+                    User usr = new UserDTO(userId, user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
             }
@@ -187,10 +230,6 @@ public class H2BasedUserStore extends AbstractUserStore {
      * This method dumps the whole database and puts
      * the data from each row into a UserDTO which then
      * gets put into a list.
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
      */
     @Override
     public List<User> getAllUsers() {
@@ -208,11 +247,12 @@ public class H2BasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                int userId = rs.getInt("id");
                 String username = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
-                User usr = new UserDTO(username, pass, mail);
+                User usr = new UserDTO(userId, username, pass, mail);
                 retUsers.add(usr.getWithoutPassword());
             }
             rs.close();
@@ -233,11 +273,42 @@ public class H2BasedUserStore extends AbstractUserStore {
     }
 
     /**
-     * This method removes the row matching the provided username.
+     * This method removes the row matching the provided ID.
      *
      * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    @Override
+    public void removeUser(int id) {
+        createTable();
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "DELETE FROM USERDB WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * This method removes the row matching the provided username.
      */
     @Override
     public void removeUser(String username) {
@@ -268,12 +339,63 @@ public class H2BasedUserStore extends AbstractUserStore {
     }
 
     /**
-     * This method allows the user to change his unique username, password or e-mail.
-     * The user will not be able to update his username or e-mail into already registered once.
+     * This method allows the user to change their unique username, password
+     * or e-mail.
+     * <p>
+     * The user will not be able to update his username or e-mail into already
+     * registered ones.
+     */
+    @Override
+    public User updateUser(int id, String username, String password, String eMail) {
+        if (Strings.isNullOrEmpty(username)) {
+            throw new IllegalArgumentException("Username must not be null");
+        }
+
+        createTable();
+
+        String passwordHash = hash(password);
+
+        Optional<User> usr = findUser(username);
+        if (usr.isPresent() && usr.get().getID() != id) throw new IllegalArgumentException("Username is already taken");
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.setString(2, passwordHash);
+            pstmt.setString(3, eMail);
+            pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        Optional<User> usr2 = findUser(username);
+        if (usr2.isPresent()) return usr2.get().getWithoutPassword();
+        else throw new RuntimeException("Something went wrong when updating the user");
+    }
+
+    /**
+     * This method allows the user to change their password or e-mail.
+     * The user will not be able to update their username through this method.
      *
      * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
+     * @author Phillip-André Suhr
+     * @implNote This method will not change the username. Use {@code updateUser(int id, String username, String password, String eMail)} for that instead.
+     * @since 2021-02-23
      */
     @Override
     public User updateUser(String username, String password, String eMail) {
@@ -290,7 +412,7 @@ public class H2BasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?";
+            String sql = "UPDATE USERDB pass = ?, mail = ? WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, passwordHash);
             pstmt.setString(2, eMail);
@@ -309,7 +431,9 @@ public class H2BasedUserStore extends AbstractUserStore {
                 se.printStackTrace();
             }
         }
-        return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
+        Optional<User> user = findUser(username);
+        if (user.isPresent()) return user.get().getWithoutPassword();
+        else throw new RuntimeException("Something went wrong when updating the user");
     }
 
     /**
@@ -318,10 +442,6 @@ public class H2BasedUserStore extends AbstractUserStore {
      * IMPORTANT: This method is only needed for H2 as this database
      * gets generated dynamically on ServerApp start. Other databases
      * might not need it!
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-01-20
      */
     private void createTable() {
         try {

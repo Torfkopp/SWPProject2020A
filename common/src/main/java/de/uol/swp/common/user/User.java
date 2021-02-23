@@ -27,6 +27,17 @@ public interface User extends Serializable, Comparable<User> {
     String getEMail();
 
     /**
+     * Gets the ID variable
+     *
+     * @return ID of the user
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    int getID();
+
+    /**
      * Gets the password variable
      *
      * @return Password of the user as a string
