@@ -240,7 +240,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
-        LOG.debug("Received DiceCastMessage; the dices show: " + msg.getDice1() + " and " + msg.getDice2());
+        LOG.debug("Received DiceCastMessage");
+        LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
         gameRendering.drawDices(msg.getDice1(), msg.getDice2());
     }
