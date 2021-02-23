@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.canvas.*?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <HBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <VBox>
         <HBox.margin>
@@ -58,25 +57,30 @@
                     <Insets top="10" />
                 </VBox.margin>
                 <VBox prefHeight="259.0" prefWidth="210.0">
-                    <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0" />
-               <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed" text="Roll Dice" />
-                    <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false" onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
+                    <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
+                    <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
+                            text="%lobby.game.buttons.rolldice"/>
+                    <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false"
+                            onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
                         <VBox.margin>
-                            <Insets right="5.0" top="5.0" />
+                            <Insets right="5.0" top="5.0"/>
                         </VBox.margin>
                     </Button>
                     <HBox>
                         <VBox.margin>
-                            <Insets top="20" />
+                            <Insets top="20"/>
                         </VBox.margin>
-                        <CheckBox fx:id="readyCheckBox" minHeight="25.0" mnemonicParsing="false" onAction="#onReadyCheckBoxClicked" text="%lobby.game.readycheckbox">
+                        <CheckBox fx:id="readyCheckBox" minHeight="25.0" mnemonicParsing="false"
+                                  onAction="#onReadyCheckBoxClicked" text="%lobby.game.readycheckbox">
                             <HBox.margin>
-                                <Insets right="10" />
+                                <Insets right="10"/>
                             </HBox.margin>
                         </CheckBox>
-                        <Button fx:id="startSession" disable="true" maxWidth="Infinity" mnemonicParsing="false" onAction="#onStartSessionButtonPressed" text="%lobby.game.buttons.startsession" visible="false" HBox.hgrow="ALWAYS">
+                        <Button fx:id="startSession" disable="true" maxWidth="Infinity" mnemonicParsing="false"
+                                onAction="#onStartSessionButtonPressed" text="%lobby.game.buttons.startsession"
+                                visible="false" HBox.hgrow="ALWAYS">
                             <HBox.margin>
-                                <Insets right="5.0" />
+                                <Insets right="5.0"/>
                             </HBox.margin>
                         </Button>
                     </HBox>
