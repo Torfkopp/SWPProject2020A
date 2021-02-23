@@ -21,7 +21,7 @@ public class Game {
     private final IGameMapManagement map;
     private final User[] players;
     private int activePlayer;
-    private List<String> bankInventory;
+    private final List<String> bankInventory;
 
     /**
      * Constructor
