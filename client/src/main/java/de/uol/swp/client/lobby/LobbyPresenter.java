@@ -256,6 +256,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onEndTurnButtonPressed() {
+        this.endTurn.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -319,8 +320,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        //TODO Rework this
-        //if (msg.getLobbyName().equals(this.lobbyName)) return;
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
