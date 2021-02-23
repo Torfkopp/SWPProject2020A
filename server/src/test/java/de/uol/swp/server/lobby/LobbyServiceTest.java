@@ -18,11 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnstableApiUsage")
 class LobbyServiceTest {
 
-    static final User user1 = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-    static final User user2 = new UserDTO("Danny", "DeVito", "danny@devito.com");
-    static final User user3 = new UserDTO("Angy", "Merte", "Angy@Merte.com");
-    static final User user4 = new UserDTO("User", "NummerVier", "User@NummerVier.com");
-    static final User user5 = new UserDTO("Bruder", "WasGeht", "Bruder@WasGeht.com");
+    static final User user1 = new UserDTO(1, "Chuck", "Norris", "chuck@norris.com");
+    static final User user2 = new UserDTO(2, "Danny", "DeVito", "danny@devito.com");
+    static final User user3 = new UserDTO(3, "Angy", "Merte", "Angy@Merte.com");
+    static final User user4 = new UserDTO(4, "User", "NummerVier", "User@NummerVier.com");
+    static final User user5 = new UserDTO(5, "Bruder", "WasGeht", "Bruder@WasGeht.com");
 
     static final Lobby lobbyToTest = new LobbyDTO("Testlobby", user1);
     static final Lobby lobbyWithSameName = new LobbyDTO("Testlobby", user2);

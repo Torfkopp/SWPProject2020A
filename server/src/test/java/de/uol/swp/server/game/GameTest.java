@@ -24,7 +24,7 @@ class GameTest {
     @Test
     void gameManagementTest() {
         IGameManagement gm = new GameManagement();
-        User user = new UserDTO("", "", "");
+        User user = new UserDTO(99, "", "", "");
         Lobby lobby = new LobbyDTO("testLobby", user);
         gm.createGame(lobby, user);
         assertNotNull(gm.getGame("testLobby"));
@@ -38,9 +38,9 @@ class GameTest {
     @Test
     void gameTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0]);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);

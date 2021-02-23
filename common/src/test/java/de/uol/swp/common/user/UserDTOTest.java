@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class UserDTOTest {
 
-    private static final User defaultUser = new UserDTO("marco", "marco", "marco@grawunder.de");
-    private static final User secondsUser = new UserDTO("marco2", "marco", "marco@grawunder.de");
+    private static final User defaultUser = new UserDTO(1, "marco", "marco", "marco@grawunder.de");
+    private static final User secondsUser = new UserDTO(2, "marco2", "marco", "marco@grawunder.de");
 
     /**
      * This test checks if the username can be null.
@@ -26,7 +26,7 @@ class UserDTOTest {
      */
     @Test
     void createUserWithEmptyName() {
-        assertThrows(IllegalArgumentException.class, () -> new UserDTO(null, "", ""));
+        assertThrows(IllegalArgumentException.class, () -> new UserDTO(100, null, "", ""));
     }
 
     /**
@@ -38,7 +38,7 @@ class UserDTOTest {
      */
     @Test
     void createUserWithEmptyPassword() {
-        assertThrows(IllegalArgumentException.class, () -> new UserDTO("", null, ""));
+        assertThrows(IllegalArgumentException.class, () -> new UserDTO(100, "", null, ""));
     }
 
     /**

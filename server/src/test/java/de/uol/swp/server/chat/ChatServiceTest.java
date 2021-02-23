@@ -42,8 +42,8 @@ class ChatServiceTest {
 
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am new, even more intelligent content";
-    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
-    private static final User secondUser = new UserDTO("test2", "test2", "test2@test.de");
+    private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
+    private static final User secondUser = new UserDTO(2, "test2", "test2", "test2@test.de");
     private static final String defaultLobby = "I am an intelligent lobby";
 
     final EventBus bus = new EventBus();

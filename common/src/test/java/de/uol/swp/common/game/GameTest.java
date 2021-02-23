@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class GameTest {
 
-    static final User user = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-    static final User user2 = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-    static final User user3 = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+    static final User user = new UserDTO(42, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+    static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+    static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final Lobby lobby = new LobbyDTO("Read the Manga", user);
     static Game game = new Game(lobby, user);
 
@@ -57,14 +57,14 @@ public class GameTest {
         game = new Game(lobby, user);
         User[] players = game.getPlayers();
         //Tests if the players are in correct order
-        //Alphabetical order (dunno why)
-        assertEquals(players[0], user2);
-        assertEquals(players[1], user);
+        //Ordered by ID
+        assertEquals(players[0], user);
+        assertEquals(players[1], user2);
         assertEquals(players[2], user3);
         assertEquals(game.getLobby(), lobby);
         //Since Jolyne made the lobby, she goes first
-        assertEquals(game.nextPlayer(), user3);
         assertEquals(game.nextPlayer(), user2);
+        assertEquals(game.nextPlayer(), user3);
         assertEquals(game.nextPlayer(), user);
     }
 }

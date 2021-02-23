@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("UnstableApiUsage")
 class LobbyServiceTest {
 
-    final User defaultUser = new UserDTO("chuck", "test", "chuck@norris.com");
+    final User defaultUser = new UserDTO(1, "chuck", "test", "chuck@norris.com");
 
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
