@@ -640,7 +640,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession
-                    .setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
+                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
