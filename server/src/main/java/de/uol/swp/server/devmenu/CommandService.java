@@ -1,4 +1,4 @@
-package de.uol.swp.server.chat;
+package de.uol.swp.server.devmenu;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -6,6 +6,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
+import de.uol.swp.common.devmenu.CommandParser;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
@@ -14,7 +15,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.chat.message.NewChatCommandMessage;
+import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,9 @@ import java.util.*;
 public class CommandService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(CommandService.class);
+    private static final List<String> allowedNames = new ArrayList<>(
+            Arrays.asList("event", "message", "request", "response"));
+    private static final List<String> excludedNames = new ArrayList<>(Arrays.asList("abstract", "store", "context"));
     private static Set<ClassPath.ClassInfo> allClasses;
     private final IUserManagement userManagement; //use to find users by name
     private final ILobbyManagement lobbyManagement;
@@ -42,13 +46,13 @@ public class CommandService extends AbstractService {
         LOG.debug("CommandService started");
     }
 
-    private void command_DevMenu(List<String> args, NewChatMessageRequest originalMessage) {
+    private void command_DevMenu(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         OpenDevMenuResponse msg = new OpenDevMenuResponse();
         msg.initWithMessage(originalMessage);
         post(msg);
     }
 
-    private void command_Help(List<String> args, NewChatMessageRequest originalMessage) {
+    private void command_Help(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         String str = new StringBuilder().append("The following Commands are available:\n")
                                         .append("-------------------------------------\n")
                                         .append("\"/help\": Shows this Help screen\n")
@@ -57,23 +61,26 @@ public class CommandService extends AbstractService {
         sendSystemMessageResponse(originalMessage, str);
     }
 
-    private void command_Invalid(List<String> args, NewChatMessageRequest originalMessage) {
+    private void command_Invalid(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         String content = new StringBuilder().append("You typed an invalid command\n")
                                             .append("----------------------------\n")
                                             .append("Type \"/help\" for a list of valid commands").toString();
         sendSystemMessageResponse(originalMessage, content);
     }
 
-    private void command_Post(List<String> args, Message originalMessage) {
+    private void command_Post(List<CommandParser.ASTToken> args, Message originalMessage) {
         for (ClassPath.ClassInfo cInfo : allClasses) {
-            if (cInfo.getSimpleName().equals(args.get(0))) {
+            if (cInfo.getSimpleName().equals(args.get(0).getString())) {
                 try {
                     Class<?> cls = Class.forName(cInfo.getName());
                     Constructor<?>[] constructors = cls.getConstructors();
                     for (Constructor<?> constr : constructors) {
                         // 0: command name, 1: Class name, 2+: Class constructor args
                         if (constr.getParameterCount() == args.size() - 1) {
-                            Message msg = parseArguments(args, constr);
+                            Message msg = parseArguments(args, constr, (originalMessage.getSession().isPresent() ?
+                                                                        Optional.of(originalMessage.getSession().get()
+                                                                                                   .getUser()) :
+                                                                        Optional.empty()));
                             msg.initWithMessage(originalMessage);
                             post(msg);
                             break;
@@ -89,30 +96,16 @@ public class CommandService extends AbstractService {
     public void getAllClasses() {
         ClassLoader cl = getClass().getClassLoader();
         try {
-            allClasses = ClassPath.from(cl).getTopLevelClassesRecursive("de.uol.swp");
+            Set<ClassPath.ClassInfo> clsSet = ClassPath.from(cl).getTopLevelClassesRecursive("de.uol.swp");
+            Set<ClassPath.ClassInfo> noExcludedClsSet = new HashSet<>();
+            allClasses = new HashSet<>();
+            clsSet.stream()
+                  .filter(clsin -> excludedNames.stream().noneMatch(clsin.getSimpleName().toLowerCase()::contains))
+                  .forEach(noExcludedClsSet::add);
+            noExcludedClsSet.stream().filter(clsin -> allowedNames.stream().anyMatch(
+                    clsin.getSimpleName().toLowerCase()::contains)).forEach(allClasses::add);
         } catch (IOException e) {
             // TODO: error handling
-        }
-    }
-
-    private void lexCommand(NewChatCommandMessage msg, List<String> command) {
-        String commandString = msg.getCommand();
-        int start = 0;
-        String subString;
-        boolean inQuotes = false;
-        for (int i = 0; i <= commandString.length(); i++) {
-            subString = commandString.substring(start, i);
-            if ((subString.endsWith(" ") || i == commandString.length()) && !inQuotes) {
-                if (subString.strip().length() == 0) continue;
-                command.add(subString.strip());
-                start = i;
-            } else if (subString.endsWith("\"")) {
-                if (inQuotes) {
-                    command.add(subString.replace("\"", "").strip());
-                    start = i;
-                }
-                inQuotes = !inQuotes;
-            }
         }
     }
 
@@ -122,8 +115,6 @@ public class CommandService extends AbstractService {
         SortedMap<String, List<Map<String, Class<?>>>> classesMap = new TreeMap<>();
         for (ClassPath.ClassInfo cinfo : allClasses) {
             String clsn = cinfo.getSimpleName();
-            if (!clsn.toLowerCase().contains("message") && !clsn.toLowerCase().contains("request") && !clsn
-                    .toLowerCase().contains("response")) continue;
             List<Map<String, Class<?>>> constructorArgList = new ArrayList<>();
             try {
                 Class<?> cls = Class.forName(cinfo.getName());
@@ -146,64 +137,70 @@ public class CommandService extends AbstractService {
     @Subscribe
     private void onDevMenuCommandRequest(DevMenuCommandRequest msg) {
         LOG.debug("Received DevMenuCommandRequest");
-        msg.getArgs().add(0, msg.getClassname());
+        msg.getArgs().add(0, new CommandParser.ASTToken(CommandParser.ASTToken.Type.UNTYPED, msg.getClassname()));
         command_Post(msg.getArgs(), msg);
     }
 
     @Subscribe
     private void onNewChatCommandMessage(NewChatCommandMessage msg) {
         LOG.debug("Received NewChatCommandMessage");
-        List<String> cmd = new LinkedList<>();
-        lexCommand(msg, cmd);
-        List<String> args = cmd.size() > 0 ? new LinkedList<>(cmd.subList(1, cmd.size())) : new LinkedList<>();
+        List<CommandParser.ASTToken> commandAST = CommandParser.parse(CommandParser.lex(msg.getCommand()));
+        List<CommandParser.ASTToken> argsAST =
+                commandAST.size() > 0 ? new LinkedList<>(commandAST.subList(1, commandAST.size())) : new LinkedList<>();
 
-        switch (cmd.get(0)) {
+        if (!commandAST.get(0).hasCollection()) switch (commandAST.get(0).getString().trim()) {
             case "post":
-                command_Post(args, msg.getOriginalMessage());
+                command_Post(argsAST, msg.getOriginalMessage());
                 break;
             case "devmenu":
-                command_DevMenu(args, msg.getOriginalMessage());
+                command_DevMenu(argsAST, msg.getOriginalMessage());
                 break;
             case "help":
-                command_Help(args, msg.getOriginalMessage());
+                command_Help(argsAST, msg.getOriginalMessage());
                 break;
             default:
-                command_Invalid(args, msg.getOriginalMessage());
+                command_Invalid(argsAST, msg.getOriginalMessage());
                 // TODO: more cases (aka commands)
                 // Some shortcuts for common Messages/ Requests
         }
-        /* Examples:
-        fixme: /post UpdateInventoryRequest . Lobby2
-        works: /post UpdateInventoryRequest test2 "test lobby"
-         */
     }
 
-    private Message parseArguments(List<String> args, Constructor<?> constr) throws ReflectiveOperationException {
+    private Message parseArguments(List<CommandParser.ASTToken> args, Constructor<?> constr,
+                                   Optional<User> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
             switch (parameters[i].getName()) {
                 case "de.uol.swp.common.user.User":
-                    if (args.get(i + 1).equals(".") || args.get(i + 1).equals("me")) {
-                        // TODO: aktuellen User durchreichen
+                    if (args.get(i + 1).getString().equals(".") || args.get(i + 1).getString().equals("me")) {
+                        if (currentUser.isPresent()) argList.add(currentUser.get());
                     } else {
-                        Optional<User> foundUser = userManagement.getUser(args.get(i + 1));
-                        if (foundUser.isPresent()) argList.add(foundUser.get());
+                        if (args.get(i + 1).hasCollection()) System.err.println("Bad syntax");
+                        else {
+                            Optional<User> foundUser = userManagement.getUser(args.get(i + 1).getString());
+                            if (foundUser.isPresent()) argList.add(foundUser.get());
+                        }
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
-                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(args.get(i + 1));
-                    if (foundLobby.isPresent()) argList.add(foundLobby.get());
+                    if (args.get(i + 1).hasCollection()) System.err.println("Bad syntax");
+                    else {
+                        Optional<Lobby> foundLobby = lobbyManagement.getLobby(args.get(i + 1).getString());
+                        if (foundLobby.isPresent()) argList.add(foundLobby.get());
+                    }
                     break;
                 case "boolean":
-                    argList.add(Boolean.parseBoolean(args.get(i + 1)));
+                    if (args.get(i + 1).hasCollection()) System.err.println("Bad syntax");
+                    else argList.add(Boolean.parseBoolean(args.get(i + 1).getString()));
                     break;
                 case "int":
-                    argList.add(Integer.parseInt(args.get(i + 1)));
+                    if (args.get(i + 1).hasCollection()) System.err.println("Bad syntax");
+                    else argList.add(Integer.parseInt(args.get(i + 1).getString()));
                     break;
-                case "java.lang.String":
+                case "java.util.List":
                 default:
-                    argList.add(args.get(i + 1));
+                    if (args.get(i + 1).hasCollection()) System.err.println("Bad syntax");
+                    else argList.add(args.get(i + 1).getString());
                     break;
             }
         }
