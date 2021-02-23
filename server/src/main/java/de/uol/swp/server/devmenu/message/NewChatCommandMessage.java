@@ -1,4 +1,4 @@
-package de.uol.swp.server.chat.message;
+package de.uol.swp.server.devmenu.message;
 
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.user.User;

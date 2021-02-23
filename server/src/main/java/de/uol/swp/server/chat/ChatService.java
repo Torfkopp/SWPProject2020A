@@ -14,7 +14,7 @@ import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.chat.message.NewChatCommandMessage;
+import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

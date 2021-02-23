@@ -6,16 +6,16 @@ import java.time.Instant;
 
 public class SystemMessageDTO implements SystemMessage {
 
-    private Instant timestamp;
-    private String content;
+    private final Instant timestamp;
+    private final String content;
 
     public SystemMessageDTO(String content, Instant timestamp) {
-        this.timestamp = timestamp;
         this.content = content;
+        this.timestamp = timestamp;
     }
 
     public SystemMessageDTO(String content) {
-        new SystemMessageDTO(content, Instant.now());
+        this(content, Instant.now());
     }
 
     @Override
