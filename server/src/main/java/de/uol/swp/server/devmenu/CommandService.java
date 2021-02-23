@@ -46,6 +46,16 @@ public class CommandService extends AbstractService {
         LOG.debug("CommandService started");
     }
 
+    //TODO: Remove method
+    String astToString(List<CommandParser.ASTToken> tokens) {
+        String text = "";
+        for (CommandParser.ASTToken token : tokens) {
+            if (token.hasCollection()) text += "[ " + astToString(token.getAstTokens()) + " ]";
+            else text += "(" + token.getString() + ") ";
+        }
+        return text;
+    }
+
     private void command_DevMenu(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         OpenDevMenuResponse msg = new OpenDevMenuResponse();
         msg.initWithMessage(originalMessage);
@@ -157,6 +167,9 @@ public class CommandService extends AbstractService {
                 break;
             case "help":
                 command_Help(argsAST, msg.getOriginalMessage());
+                break;
+            case "showast": //TODO: Remove
+                sendSystemMessageResponse(msg.getOriginalMessage(), astToString(argsAST));
                 break;
             default:
                 command_Invalid(argsAST, msg.getOriginalMessage());

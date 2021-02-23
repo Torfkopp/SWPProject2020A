@@ -6,6 +6,13 @@ import java.util.List;
 
 public class CommandParser implements Serializable {
 
+    private static boolean endIn(String string, String[] endStrings) {
+        for (String endString : endStrings) {
+            if (string.endsWith(endString)) return true;
+        }
+        return false;
+    }
+
     public static List<Token> lex(String commandString) {
         List<Token> tokens = new LinkedList<>();
         int start = 0;
@@ -14,7 +21,7 @@ public class CommandParser implements Serializable {
         boolean inList = false;
         for (int i = 0; i <= commandString.length(); i++) {
             subString = commandString.substring(start, i);
-            if ((subString.endsWith(" ") || i == commandString.length()) && !inQuotes) {
+            if ((endIn(subString, new String[]{"\"", "]", "}"}) || i == commandString.length()) && !inQuotes) {
                 if (subString.strip().length() == 0) continue;
                 tokens.add(new Token(Token.Type.ANY, subString.strip()));
                 start = i;
@@ -24,7 +31,8 @@ public class CommandParser implements Serializable {
                     start = i;
                 }
                 inQuotes = !inQuotes;
-            } else if (subString.endsWith("[") && !inQuotes) {
+            }
+            if (subString.endsWith("[") && !inQuotes) {
                 tokens.add(new Token(Token.Type.LIST_START, "["));
                 start = i;
             } else if (subString.endsWith("]") && !inQuotes) {
