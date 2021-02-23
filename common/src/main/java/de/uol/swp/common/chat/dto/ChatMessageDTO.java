@@ -108,8 +108,8 @@ public class ChatMessageDTO implements ChatMessage {
      * @since 2020-12-17
      */
     private static String timestampToString(Instant timestamp) {
-        return timestamp.atZone(ZoneOffset.UTC).getHour() + ":" + String
-                .format("%02d", timestamp.atZone(ZoneOffset.UTC).getMinute());
+        return String.format("%02d", timestamp.atZone(ZoneOffset.systemDefault()).getHour()) + ":" + String
+                .format("%02d", timestamp.atZone(ZoneOffset.systemDefault()).getMinute());
     }
 
     @Override
