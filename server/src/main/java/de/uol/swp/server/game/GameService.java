@@ -180,7 +180,7 @@ public class GameService extends AbstractService {
      * Handles a UpdateInventoryAfterTradeWithBankRequest found on the EventBus
      * <p>
      * If a UpdateInventoryAfterTradeWithBankRequest is found on the EventBus this method updates the inventory
-     * of the player who traded with the bank. The resource he wants to trade gets -4
+     * of the player who traded with the bank. If the User has enough resources, the resource he wants to trade gets -4
      * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
      *
      * @param req The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
@@ -205,21 +205,31 @@ public class GameService extends AbstractService {
             }
         }
         if (inventory != null) {
-            if (req.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
-            if (req.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
-            if (req.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
-            if (req.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
-            if (req.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
-            if (req.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
-            if (req.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
-            if (req.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
-            if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
-            if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
-            AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(),
-                                                                                      req.getOriginLobby());
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
+            if (((req.getGiveResource().equals("ore")) && (inventory.getOre() >= 4)) || ((req.getGiveResource()
+                                                                                             .equals("brick")) && (inventory
+                                                                                                                           .getBrick() >= 4)) || ((req.getGiveResource()
+                                                                                                                                                      .equals("grain")) && (inventory
+                                                                                                                                                                                    .getGrain() >= 4)) || ((req.getGiveResource()
+                                                                                                                                                                                                               .equals("lumber")) && (inventory
+                                                                                                                                                                                                                                              .getLumber() >= 4)) || ((req.getGiveResource()
+                                                                                                                                                                                                                                                                          .equals("wool")) && (inventory
+                                                                                                                                                                                                                                                                                                       .getWool() >= 4))) {
+                if (req.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
+                if (req.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
+                if (req.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
+                if (req.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
+                if (req.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
+                if (req.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
+                if (req.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
+                if (req.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
+                if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
+                if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
+                AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(),
+                                                                                          req.getOriginLobby());
+                returnMessage.initWithMessage(req);
+                post(returnMessage);
+                LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
+            }
         }
     }
 
@@ -280,7 +290,7 @@ public class GameService extends AbstractService {
     /**
      * Helper method
      * <p>
-     * Adds the radom chosen development card and deletes the resources
+     * Adds the random chosen development card and deletes the resources
      * he had to pay from his inventory.
      *
      * @param developmentCard Name of the random chosen development Card
