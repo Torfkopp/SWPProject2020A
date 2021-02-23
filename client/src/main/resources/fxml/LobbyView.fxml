@@ -4,57 +4,62 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+<HBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
+      fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <VBox>
         <HBox.margin>
-            <Insets bottom="10" left="10" right="10" />
+            <Insets bottom="10" left="10" right="10"/>
         </HBox.margin>
         <VBox>
             <ListView fx:id="membersView" maxHeight="95.0" minHeight="95.0">
                 <VBox.margin>
-                    <Insets top="10" />
+                    <Insets top="10"/>
                 </VBox.margin>
             </ListView>
             <ListView fx:id="chatView">
                 <VBox.margin>
-                    <Insets top="10" />
+                    <Insets top="10"/>
                 </VBox.margin>
             </ListView>
-            <TextField fx:id="messageField" />
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.sendmessage">
+            <TextField fx:id="messageField"/>
+            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
+                    text="%chat.buttons.sendmessage">
                 <VBox.margin>
-                    <Insets top="5" />
+                    <Insets top="5"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.deletemessage">
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
+                    text="%chat.buttons.deletemessage">
                 <VBox.margin>
-                    <Insets top="5" />
+                    <Insets top="5"/>
                 </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage">
+            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
+                    text="%chat.buttons.editmessage">
                 <VBox.margin>
-                    <Insets top="5" />
+                    <Insets top="5"/>
                 </VBox.margin>
             </Button>
         </VBox>
-        <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" prefWidth="150.0" text="%lobby.buttons.leavelobby">
+        <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" prefWidth="150.0"
+                text="%lobby.buttons.leavelobby">
             <VBox.margin>
-                <Insets top="35.0" />
+                <Insets top="35.0"/>
             </VBox.margin>
         </Button>
     </VBox>
     <VBox>
         <HBox.margin>
-            <Insets left="10" right="10" />
+            <Insets left="10" right="10"/>
         </HBox.margin>
         <VBox fx:id="playField">
             <VBox.margin>
-                <Insets top="10" />
+                <Insets top="10"/>
             </VBox.margin>
-            <Canvas fx:id="gameMapCanvas" height="380" width="380" />
+            <Canvas fx:id="gameMapCanvas" height="380" width="380"/>
             <HBox>
                 <VBox.margin>
-                    <Insets top="10" />
+                    <Insets top="10"/>
                 </VBox.margin>
                 <VBox prefHeight="259.0" prefWidth="210.0">
                     <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
@@ -85,7 +90,7 @@
                         </Button>
                     </HBox>
                 </VBox>
-                <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0" />
+                <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>
         </VBox>
     </VBox>
