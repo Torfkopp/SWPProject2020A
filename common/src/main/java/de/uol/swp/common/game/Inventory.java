@@ -14,12 +14,12 @@ public class Inventory {
     private final User player;
 
     private int totalResources = 0;
-
-    private int brick = 0;
-    private int grain = 0;
-    private int lumber = 0;
-    private int ore = 0;
-    private int wool = 0;
+    //todo wieder auf 0 setzen.. ist nur zum testen auf 4
+    private int brick = 4;
+    private int grain = 4;
+    private int lumber = 4;
+    private int ore = 4;
+    private int wool = 4;
 
     private int victoryPointCards = 0;
     private int knightCards = 0;
@@ -156,6 +156,16 @@ public class Inventory {
      */
     public User getPlayer() {
         return player;
+    }
+
+    /**
+     * Gets the amount of ResourceCards the user has in his inventory
+     *
+     * @return The amount of Road Building Cards
+     */
+    public int getResourceAmount() {
+        int resourceAmount = getBrick() + getWool() + getLumber() + getGrain() + getOre();
+        return resourceAmount;
     }
 
     /**

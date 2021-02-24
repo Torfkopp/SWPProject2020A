@@ -9,6 +9,8 @@ import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
+import de.uol.swp.common.lobby.request.TradeWithUserRequest;
 import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
@@ -95,6 +97,60 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);
+        }
+    }
+
+    /**
+     * Handles a TradeWithUserRequest found on the EventBus
+     * <p>
+     * It searches the inventories in the current game for the one that belongs
+     * to the player sending the request and gets the amount of resource cards
+     * the trading user has in the inventory. It then posts a InventoryForTradeWithUserResponse
+     * that contains all the user's resources, saved in a resourceMap for
+     * counted items (bricks, grain, etc.) .
+     *
+     * @param req The TradeWithBankRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.InventoryForTradeWithUserResponse
+     * @since 2021-02-23
+     */
+    @Subscribe
+    private void onTradeWithUserRequest(TradeWithUserRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
+        Game game = gameManagement.getGame(req.getName());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(req.getUser())) {
+                inventory = value;
+                break;
+            }
+        }
+        Inventory traderInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getTradingUser())) {
+                traderInventory = value;
+                break;
+            }
+        }
+        int traderInventorySize = traderInventory.getResourceAmount();
+        if (inventory != null) {
+            Map<String, Integer> resourceMap = new HashMap<>();
+            resourceMap.put("brick", inventory.getBrick());
+            resourceMap.put("grain", inventory.getGrain());
+            resourceMap.put("lumber", inventory.getLumber());
+            resourceMap.put("ore", inventory.getOre());
+            resourceMap.put("wool", inventory.getWool());
+            System.out.println(req.getName());
+            AbstractResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
+                                                                                          Collections.unmodifiableMap(
+                                                                                                  resourceMap),
+                                                                                          traderInventorySize);
+            LOG.debug("Sent a InventoryForTradeWithUserResponse for Lobby " + req.getName());
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
         }
     }
 
