@@ -412,7 +412,7 @@ public class H2BasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
-            String sql = "UPDATE USERDB pass = ?, mail = ? WHERE username = ?";
+            String sql = "UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, passwordHash);
             pstmt.setString(2, eMail);

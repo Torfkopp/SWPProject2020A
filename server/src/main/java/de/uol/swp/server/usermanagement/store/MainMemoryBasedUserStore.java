@@ -22,9 +22,9 @@ import java.util.*;
  */
 public class MainMemoryBasedUserStore extends AbstractUserStore implements UserStore {
 
-    private int id_counter;
     private final Map<String, User> usersByName = new HashMap<>();
     private final Map<Integer, User> usersById = new HashMap<>();
+    private int id_counter;
 
     @Override
     public User createUser(String username, String password, String eMail) {
@@ -112,12 +112,6 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     public User updateUser(String username, String password, String eMail) {
         Optional<User> user = findUser(username);
         if (user.isEmpty()) throw new IllegalArgumentException("No user with this name found");
-        else {
-            removeUser(user.get().getUsername());
-            User usr = createUser(username, password, eMail);
-            usersByName.put(username, usr);
-            usersById.put(usr.getID(), usr);
-            return usr;
-        }
+        else return createUser(username, password, eMail);
     }
 }

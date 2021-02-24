@@ -33,9 +33,12 @@ class MainMemoryBasedUserStoreTest {
     }
 
     @Test
-    void changePassword() {
+    void changePasswordWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
 
         store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS",
                          userToUpdate.getEMail());
@@ -43,6 +46,28 @@ class MainMemoryBasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS");
 
         assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
+        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail());
+    }
+
+    @Test
+    void changePasswordWithNoIdParameterUpdate() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS", userToUpdate.getEMail());
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS");
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail());
     }
 
@@ -54,7 +79,19 @@ class MainMemoryBasedUserStoreTest {
     }
 
     @Test
-    void dropUser() {
+    void dropUserById() {
+        UserStore store = getDefaultStore();
+        User userToRemove = getDefaultUsers().get(3);
+
+        store.removeUser(userToRemove.getID());
+
+        Optional<User> userFound = store.findUser(userToRemove.getID());
+
+        assertFalse(userFound.isPresent());
+    }
+
+    @Test
+    void dropUserByUsername() {
         UserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
@@ -149,9 +186,13 @@ class MainMemoryBasedUserStoreTest {
     }
 
     @Test
-    void updateUser() {
+    void updateEmailWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
+
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
 
         store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword(),
                          userToUpdate.getEMail() + "@TESTING");
@@ -159,6 +200,29 @@ class MainMemoryBasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
         assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
+        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
+    }
+
+    @Test
+    void updateEmailWithNoIdParameterUpdate() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), userToUpdate.getEMail() + "@TESTING");
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
     }
 }
