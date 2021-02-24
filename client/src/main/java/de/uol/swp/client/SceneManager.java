@@ -20,10 +20,9 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
-import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
-import de.uol.swp.client.trade.event.TradeWithUserCancelEvent;
-import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
+import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -58,6 +57,7 @@ public class SceneManager {
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStage = new HashMap<>();
+    private final Map<String, Stage> tradingResponseStage = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
@@ -453,6 +453,37 @@ public class SceneManager {
         lobbyStage.show();
         eventBus.post(new TradeWithUserUpdateEvent(lobbyName, user));
         LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
+    }
+
+    @Subscribe
+    private void onShowTradeWithUserAcceptViewEvent(ShowTradeWithUserAcceptViewEvent event) {
+        //todo Fenster nur bei responding user anzeigen
+        //gets the lobby's name
+        String lobbyName = event.getLobbyName();
+        User user = event.getUser();
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Trade of " + user.getUsername());
+        lobbyStage.setHeight(TRADING_HEIGHT);
+        lobbyStage.setMinHeight(TRADING_HEIGHT);
+        lobbyStage.setWidth(TRADING_WIDTH);
+        lobbyStage.setMinWidth(TRADING_WIDTH);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyStage.setScene(lobbyScene);
+        tradingResponseStage.put(lobbyName, lobbyStage);
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Shows the window
+        lobbyStage.show();
+        eventBus.post(new TradeWithUserResponseUpdateEvent(event.getTradingUser(), lobbyName, user));
+        LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+
+
     }
     /**
      * Handles the TradeWithUserCancelEvent detected on the EventBus

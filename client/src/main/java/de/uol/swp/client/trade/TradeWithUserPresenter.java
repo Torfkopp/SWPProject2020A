@@ -4,9 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.trade.event.ResetTradeWithUserButtonEvent;
-import de.uol.swp.client.trade.event.TradeWithUserCancelEvent;
-import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
+import de.uol.swp.client.trade.event.*;
+import de.uol.swp.common.game.request.OfferingTradeWithUserRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -20,6 +19,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,8 +45,10 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     private String lobbyName;
     private User loggedInUser;
+    private String tradingUserName;
     private int traderInventorySize;
-    private int ownInventorySize;
+    private Map<String, Double> selectedOwnResourceMap;
+    private Map<String, Double> selectedPartnersResourceMap;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
     private Map<String, Integer> resourceMap;
     @FXML
@@ -66,6 +68,24 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @Inject
     public TradeWithUserPresenter(EventBus eventBus) {
         setEventBus(eventBus);
+    }
+
+    private boolean checkNoSelectedResources() {
+        double selectedOwnResourceMapCounter = 0;
+        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("brick");
+        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("ore");
+        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("wool");
+        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("lumber");
+        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("grain");
+
+        double selectedPartnersResourceMapCounter = 0;
+        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("brick");
+        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("ore");
+        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("lumber");
+        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("wool");
+        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("grain");
+        if (selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0) return true;
+        return false;
     }
 
     /**
@@ -133,15 +153,15 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             resourceMap = rsp.getResourceMap();
             setTradingLists();
             traderInventorySize = rsp.getTradingUsersInventorySize();
-            ownInventorySize = 0;
+            int ownInventorySize = 0;
             ownInventorySize += resourceMap.get("wool");
             ownInventorySize += resourceMap.get("brick");
             ownInventorySize += resourceMap.get("ore");
             ownInventorySize += resourceMap.get("lumber");
+            ownInventorySize += resourceMap.get("grain");
             if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
                 setSliders();
             } else {
-                ownInventorySize += resourceMap.get("grain");
                 offerTradeButton.setDisable(true);
                 tradingHBox.setVisible(false);
                 noResourcesLabel.setVisible(true);
@@ -154,7 +174,20 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      */
     @FXML
     private void onOfferTradeButtonPressed() {
+        System.out.println("Es sind bricks ausgewählt" + ownBrickSlider.getValue());
+        setResourceMaps();
 
+        if (checkNoSelectedResources()) {
+            LOG.debug("Failed sending the offer");
+            return;
+        }
+
+        eventBus.post(new ShowTradeWithUserAcceptViewEvent(this.loggedInUser, this.tradingUserName, this.lobbyName));
+        LOG.debug("Sending ShowTradeWithUserAcceptViewEvent");
+        //todo request kommt nicht an
+        eventBus.post(new OfferingTradeWithUserRequest(this.loggedInUser, this.tradingUserName, this.lobbyName,
+                                                       selectedOwnResourceMap, selectedPartnersResourceMap));
+        LOG.debug("Sending OfferingTradeWithUserRequest");
     }
 
     /**
@@ -178,9 +211,27 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         window.setOnCloseRequest(windowEvent -> closeWindowAfterNotSuccessfulTrade());
     }
 
+    @FXML
+    private void setResourceMaps() {
+        selectedOwnResourceMap = new HashMap<String, Double>();
+        selectedOwnResourceMap.put("brick", (ownBrickSlider.getValue()));
+        selectedOwnResourceMap.put("ore", (ownOreSlider.getValue()));
+        selectedOwnResourceMap.put("lumber", (ownLumberSlider.getValue()));
+        selectedOwnResourceMap.put("grain", (ownGrainSlider.getValue()));
+        selectedOwnResourceMap.put("wool", (ownWoolSlider.getValue()));
+
+        selectedPartnersResourceMap = new HashMap<String, Double>();
+        selectedPartnersResourceMap.put("brick", (tradingPartnerBrickSlider.getValue()));
+        selectedPartnersResourceMap.put("ore", (tradingPartnerOreSlider.getValue()));
+        selectedPartnersResourceMap.put("wool", (tradingPartnerWoolSlider.getValue()));
+        selectedPartnersResourceMap.put("lumber", (tradingPartnerLumberSlider.getValue()));
+        selectedPartnersResourceMap.put("grain", (tradingPartnerGrainSlider.getValue()));
+    }
+
     /**
      * Helper Function to handle the slider attributes
      */
+    @FXML
     private void setSliders() {
         System.out.println("Sliders werden gesetzt");
         tradingPartnerBrickSlider.setMax(traderInventorySize);
@@ -188,6 +239,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         tradingPartnerLumberSlider.setMax(traderInventorySize);
         tradingPartnerWoolSlider.setMax(traderInventorySize);
         tradingPartnerGrainSlider.setMax(traderInventorySize);
+
         ownGrainSlider.setMax(resourceMap.get("grain"));
         ownOreSlider.setMax(resourceMap.get("ore"));
         ownLumberSlider.setMax(resourceMap.get("lumber"));

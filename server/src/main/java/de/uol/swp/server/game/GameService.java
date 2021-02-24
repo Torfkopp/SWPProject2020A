@@ -7,7 +7,9 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.message.TradeWithUserOfferMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.OfferingTradeWithUserRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.lobby.request.TradeWithUserRequest;
@@ -57,6 +59,10 @@ public class GameService extends AbstractService {
         this.lobbyService = lobbyService;
     }
 
+    private boolean checkOwnInventory(Map<String, Integer> offeringInventory, Map<String, Double> OfferingResourceMap) {
+        return true;
+    }
+
     /**
      * Handles a CreateGameMessage found on the EventBus
      * <p>
@@ -100,6 +106,32 @@ public class GameService extends AbstractService {
         }
     }
 
+    @Subscribe
+    private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
+        System.out.println("OfferingTradeWithUserRequest ist angekommen");
+        if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getLobbyName());
+        Game game = gameManagement.getGame(req.getLobbyName());
+        Inventory[] inventories = game.getInventories();
+        Inventory respondingInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getRespondingUser())) {
+                respondingInventory = value;
+            }
+        }
+        Map<String, Integer> resourceMap = new HashMap<>();
+        if (respondingInventory != null) {
+            resourceMap.put("brick", respondingInventory.getBrick());
+            resourceMap.put("grain", respondingInventory.getGrain());
+            resourceMap.put("lumber", respondingInventory.getLumber());
+            resourceMap.put("ore", respondingInventory.getOre());
+            resourceMap.put("wool", respondingInventory.getWool());
+        }
+        LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getLobbyName());
+        ServerMessage returnMessage = new TradeWithUserOfferMessage(req.getOfferingUser(), req.getRespondingUser(),
+                                                                    req.getLobbyName(), resourceMap);
+        post(returnMessage);
+    }
+
     /**
      * Handles a TradeWithUserRequest found on the EventBus
      * <p>
@@ -118,7 +150,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
         Game game = gameManagement.getGame(req.getName());
         Inventory[] inventories = game.getInventories();
         Inventory inventory = null;
@@ -147,7 +179,8 @@ public class GameService extends AbstractService {
             AbstractResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
                                                                                           Collections.unmodifiableMap(
                                                                                                   resourceMap),
-                                                                                          traderInventorySize);
+                                                                                          traderInventorySize,
+                                                                                          req.getTradingUser());
             LOG.debug("Sent a InventoryForTradeWithUserResponse for Lobby " + req.getName());
             returnMessage.initWithMessage(req);
             post(returnMessage);
