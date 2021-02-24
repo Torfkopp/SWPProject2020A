@@ -323,13 +323,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
-            setTurnIndicatorText(msg.getActivePlayer());
-            //In here to test the endTurnButton
-            onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
-            if (loggedInUser.equals(msg.getActivePlayer())) endTurn.setDisable(false);
-        }
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+        setTurnIndicatorText(msg.getActivePlayer());
+        //In here to test the endTurnButton
+        onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
+        if (loggedInUser.equals(msg.getActivePlayer())) endTurn.setDisable(false);
     }
 
     /**
@@ -383,6 +382,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
+     * @see de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent
      * @since 2021-02-22
      */
     @Subscribe
@@ -453,6 +453,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
+     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
      * @since 2021-02-22
      */
     @Subscribe
@@ -471,6 +472,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
+     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
+     * @see de.uol.swp.common.lobby.request.TradeWithBankRequest
      * @since 2021-02-20
      */
     @FXML
@@ -648,15 +651,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Helper function that sets the Visible and Disable states of the "Start
-     * Session" button.
+     * Helper function that sets the Visible and Disable states of the "Trade
+     * With Bank" button.
      * <p>
-     * The button is only ever visible to the lobby owner, and is only enabled
-     * if there are 3 or more lobby members, and all members are marked as ready.
+     * The button is only visible if the logged in user is the player.
      *
-     * @author Eric Vuong
+     * @author Alwin Bossert
      * @author Maximilian Lindner
-     * @since 2021-01-20
+     * @since 2021-02-21
      */
     private void setTradeWithBankButtonState(User player) {
         this.tradeWithBankButton.setDisable(!super.loggedInUser.equals(player));

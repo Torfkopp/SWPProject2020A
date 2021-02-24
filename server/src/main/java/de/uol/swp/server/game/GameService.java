@@ -67,6 +67,8 @@ public class GameService extends AbstractService {
      *
      * @author Maximilian Lindner
      * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
+     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
      * @since 2021-02-22
      */
     @Subscribe
@@ -99,6 +101,7 @@ public class GameService extends AbstractService {
      *
      * @param msg The CreateGameMessage
      *
+     * @see de.uol.swp.common.game.message.CreateGameMessage
      * @since 2021-01-24
      */
     @Subscribe
@@ -146,6 +149,8 @@ public class GameService extends AbstractService {
      *
      * @author Maximilian Lindner
      * @author Alwin Bossert
+     * @see de.uol.swp.common.lobby.request.TradeWithBankRequest
+     * @see de.uol.swp.common.game.response.InventoryForTradeResponse
      * @since 2021-02-21
      */
     @Subscribe
@@ -187,6 +192,8 @@ public class GameService extends AbstractService {
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest
+     * @see de.uol.swp.common.game.response.TradeWithBankAcceptedResponse
      * @since 2021-02-21
      */
     @Subscribe
@@ -204,33 +211,30 @@ public class GameService extends AbstractService {
                 }
             }
         }
-        if (inventory != null) {
-            if (((req.getGiveResource().equals("ore")) && (inventory.getOre() >= 4)) || ((req.getGiveResource()
-                                                                                             .equals("brick")) && (inventory
-                                                                                                                           .getBrick() >= 4)) || ((req.getGiveResource()
-                                                                                                                                                      .equals("grain")) && (inventory
-                                                                                                                                                                                    .getGrain() >= 4)) || ((req.getGiveResource()
-                                                                                                                                                                                                               .equals("lumber")) && (inventory
-                                                                                                                                                                                                                                              .getLumber() >= 4)) || ((req.getGiveResource()
-                                                                                                                                                                                                                                                                          .equals("wool")) && (inventory
-                                                                                                                                                                                                                                                                                                       .getWool() >= 4))) {
-                if (req.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
-                if (req.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
-                if (req.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
-                if (req.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
-                if (req.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
-                if (req.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
-                if (req.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
-                if (req.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
-                if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
-                if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
-                AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(),
-                                                                                          req.getOriginLobby());
-                returnMessage.initWithMessage(req);
-                post(returnMessage);
-                LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
-            }
-        }
+        if (inventory == null) return;
+
+        if (req.getGiveResource().equals("ore") && (inventory.getOre() < 4)) return;
+        if (req.getGiveResource().equals("brick") && (inventory.getBrick() < 4)) return;
+        if (req.getGiveResource().equals("grain") && (inventory.getGrain() < 4)) return;
+        if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < 4)) return;
+        if (req.getGiveResource().equals("wool") && (inventory.getWool() < 4)) return;
+
+        if (req.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
+        if (req.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
+        if (req.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
+        if (req.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
+        if (req.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
+
+        if (req.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
+        if (req.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
+        if (req.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
+        if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
+        if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
+
+        AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+        LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
     }
 
     /**
@@ -246,6 +250,8 @@ public class GameService extends AbstractService {
      *
      * @author Sven Ahrens
      * @author Finn Haase
+     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
+     * @see de.uol.swp.common.game.response.UpdateInventoryResponse
      * @since 2021-01-25
      */
     @Subscribe
@@ -313,29 +319,28 @@ public class GameService extends AbstractService {
                 break;
             }
         }
-        if (inventory != null) {
-            if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {
+        if (inventory == null) return false;
+        if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {
 
-                inventory.setOre(inventory.getOre() - 1);
-                inventory.setGrain(inventory.getGrain() - 1);
-                inventory.setWool(inventory.getWool() - 1);
-                if (developmentCard.equals("knightCard")) {
-                    inventory.setKnightCards(inventory.getKnightCards() + 1);
-                }
-                if (developmentCard.equals("roadBuildingCard")) {
-                    inventory.setRoadBuildingCards(inventory.getRoadBuildingCards() + 1);
-                }
-                if (developmentCard.equals("yearOfPlentyCard")) {
-                    inventory.setYearOfPlentyCards(inventory.getYearOfPlentyCards() + 1);
-                }
-                if (developmentCard.equals("monopolyCard")) {
-                    inventory.setMonopolyCards(inventory.getMonopolyCards() + 1);
-                }
-                if (developmentCard.equals("victoryPointCard")) {
-                    inventory.setVictoryPointCards(inventory.getVictoryPointCards() + 1);
-                }
+            inventory.setOre(inventory.getOre() - 1);
+            inventory.setGrain(inventory.getGrain() - 1);
+            inventory.setWool(inventory.getWool() - 1);
+            if (developmentCard.equals("knightCard")) {
+                inventory.setKnightCards(inventory.getKnightCards() + 1);
             }
-            return true;
-        } else return false;
+            if (developmentCard.equals("roadBuildingCard")) {
+                inventory.setRoadBuildingCards(inventory.getRoadBuildingCards() + 1);
+            }
+            if (developmentCard.equals("yearOfPlentyCard")) {
+                inventory.setYearOfPlentyCards(inventory.getYearOfPlentyCards() + 1);
+            }
+            if (developmentCard.equals("monopolyCard")) {
+                inventory.setMonopolyCards(inventory.getMonopolyCards() + 1);
+            }
+            if (developmentCard.equals("victoryPointCard")) {
+                inventory.setVictoryPointCards(inventory.getVictoryPointCards() + 1);
+            }
+        }
+        return true;
     }
 }

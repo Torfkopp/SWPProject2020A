@@ -76,7 +76,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeLobbyButtonUpdateEvent with the
      * loggedInUser and the lobbyName on the eventBus to update the
-     * button statuses in the lobby..
+     * button statuses in the lobby.
      */
     private void closeWindowAfterNotSuccessfulTrade() {
         Platform.runLater(() -> {
@@ -92,6 +92,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * trading window and TradeLobbyButtonUpdateEvent with the
      * loggedInUser and the lobbyName on the eventBus to update the
      * button statuses in the lobby.
+     *
+     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
+     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
      */
     private void closeWindowAfterSuccessfulTrade() {
         Platform.runLater(() -> {
@@ -101,7 +104,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Initialises the Presenter by setting up the ownResourceView.
+     * Initialises the Presenter by setting up the ownResourceView, the bankResourceView
+     * and the ownInventoryView.
      *
      * @implNote Called automatically by JavaFX
      */
@@ -142,7 +146,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * <p>
      * Method called when the BuyBankButton is pressed.
      * The Method posts a BuyBankRequest including logged in user
-     * the EventBus.
+     * onto the EventBus.
+     *
+     * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
      */
     @FXML
     public void onBuyDevelopmentCardButtonPressed() {
@@ -155,25 +161,27 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     /**
      * If a BuyDevelopmentCardResponse is found on the event bus,
      * this method calls the close method, which closes the trading
-     * window and posts a updateInventoryRequest onto the event bus
+     * window and posts a updateInventoryRequest onto the EventBus
      * to get the new Inventory after the trade shown in the
      * LobbyView.
      *
      * @param rsp The BuyDevelopmentCardResponse found on the eventBus
      *
      * @implNote the User has to check what card he got by looking at his inventory or check the log
+     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
+     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
      */
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
-        if (lobbyName.equals(rsp.getLobbyName())) {
-            closeWindowAfterSuccessfulTrade();
-            LOG.debug("The user got a " + rsp.getDevelopmentCard());
-            LOG.debug("Sending UpdateInventoryRequest");
-            Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
-            eventBus.post(updateInventoryRequest);
-            tradeResourceWithBankButton.setDisable(true);
-        }
+        //todo Show the User what card they got?
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        closeWindowAfterSuccessfulTrade();
+        LOG.debug("The user got a " + rsp.getDevelopmentCard());
+        LOG.debug("Sending UpdateInventoryRequest");
+        Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
+        eventBus.post(updateInventoryRequest);
+        tradeResourceWithBankButton.setDisable(true);
     }
 
     /**
@@ -194,9 +202,12 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * If the InventoryForTradeResponse is directed to this lobby,
      * the TradeWithBankPresenter gets the inventory of the player
      * as a Map. Calls a function to fill the inventory.
-     * If the user has enough resources, the buy
+     * If the user has enough resources, the buy the buyDevelopmentButton
+     * gets enabled.
      *
      * @param rsp InventoryForTradeResponse having the inventory
+     *
+     * @see de.uol.swp.common.game.response.InventoryForTradeResponse
      */
     @Subscribe
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
@@ -217,6 +228,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * This method checks both lists for the selected item.
      * If there is a selected item in both lists, it posts a UpdateInventoryAfterTradeWithBankRequest
      * onto the EventBus.
+     *
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @see de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
@@ -256,6 +270,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * X(top-right-Button), the closeWindow method is called.
      *
      * @param event TradeUpdateEvent found on the event bus
+     *
+     * @see de.uol.swp.client.trade.event.TradeUpdateEvent
      */
     @Subscribe
     private void onTradeUpdateEvent(TradeUpdateEvent event) {
@@ -281,14 +297,13 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
-        if (lobbyName.equals(rsp.getLobbyName())) {
-            closeWindowAfterSuccessfulTrade();
-            LOG.debug("Sending UpdateInventoryRequest");
-            Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
-            eventBus.post(updateInventoryRequest);
-            tradeResourceWithBankButton.setVisible(false);
-            tradeResourceWithBankButton.setDisable(true);
-        }
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        closeWindowAfterSuccessfulTrade();
+        LOG.debug("Sending UpdateInventoryRequest");
+        Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
+        eventBus.post(updateInventoryRequest);
+        tradeResourceWithBankButton.setVisible(false);
+        tradeResourceWithBankButton.setDisable(true);
     }
 
     /**
@@ -296,6 +311,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * <p>
      * If there is no resourceList it gets created and cleared. Then it gets
      * updated with the items as listed in the resourceMap.
+     * The same happens for the ownInventoryList and the bankResourceList.
      */
     private void setTradingLists() {
         int tradingRatio = 4; //can be expanded by harbours
@@ -308,11 +324,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         resourceList.clear();
         ownInventoryList.clear();
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
-            ownInventoryList.add(ownResource);
+            ownInventoryList.add(new Pair<>(entry.getKey(), entry.getValue()));
             if (entry.getValue() < tradingRatio) continue;
-            Pair<String, Integer> resource = new Pair<>(entry.getKey(), tradingRatio);
-            resourceList.add(resource);
+            resourceList.add(new Pair<>(entry.getKey(), tradingRatio));
         }
         if (resourceList.size() == 0) {
             tradeResourceWithBankButton.setDisable(true);
@@ -323,8 +337,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         }
         bankResourceList.clear();
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            Pair<String, Integer> resource = new Pair<>(entry.getKey(), 1);
-            bankResourceList.add(resource);
+            bankResourceList.add(new Pair<>(entry.getKey(), 1));
         }
     }
 }

@@ -9,6 +9,7 @@ import de.uol.swp.common.user.User;
  *
  * @author Alwin Bossert
  * @author Maximilian Lindner
+ * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
  * @since 2021-02-21
  */
 public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {

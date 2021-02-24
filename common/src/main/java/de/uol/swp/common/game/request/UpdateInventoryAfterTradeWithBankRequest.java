@@ -8,6 +8,7 @@ import de.uol.swp.common.user.User;
  *
  * @author Alwin Bossert
  * @author Maximilian Lindner
+ * @see de.uol.swp.common.game.request.UpdateInventoryRequest
  * @since 2021-02-21
  */
 public class UpdateInventoryAfterTradeWithBankRequest extends UpdateInventoryRequest {

@@ -33,7 +33,7 @@ public class ResetTradeWithBankButtonEvent {
     /**
      * Gets the name of the lobby where the button should be enabled
      *
-     * @return LobbyName The name of the lobby where the button should be enabled
+     * @return The name of the lobby where the button should be enabled
      */
     public String getLobbyName() {
         return lobbyName;
@@ -42,7 +42,7 @@ public class ResetTradeWithBankButtonEvent {
     /**
      * Gets the User who wants to update the button status
      *
-     * @return User The User who wants to update the button status
+     * @return The User who wants to update the button status
      */
     public User getUser() {
         return user;

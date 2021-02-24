@@ -20,8 +20,8 @@ public class Game {
     private final Inventory[] inventories;
     private final IGameMapManagement map;
     private final User[] players;
-    private int activePlayer;
     private final List<String> bankInventory;
+    private int activePlayer;
 
     /**
      * Constructor
@@ -81,6 +81,8 @@ public class Game {
      * Gets the List of the items of the bank.
      *
      * @return The List of the bank inventory
+     *
+     * @since 2021-02-21
      */
     public List<String> getBankInventory() {
         return bankInventory;

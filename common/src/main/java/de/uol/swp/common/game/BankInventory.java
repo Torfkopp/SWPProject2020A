@@ -26,6 +26,9 @@ public class BankInventory {
     private int victoryPointCards = 5;
     private List<String> developmentCards;
 
+    /**
+     * Constructor
+     */
     public BankInventory() {}
 
     /**
@@ -33,7 +36,6 @@ public class BankInventory {
      *
      * @return The amount of Bricks
      */
-
     public int getBrick() {
         return brick;
     }

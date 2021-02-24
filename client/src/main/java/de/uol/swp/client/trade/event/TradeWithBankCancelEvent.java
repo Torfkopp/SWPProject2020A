@@ -29,7 +29,7 @@ public class TradeWithBankCancelEvent {
     /**
      * Gets the name of the lobby where the trading window should be closed
      *
-     * @return LobbyName object of the event
+     * @return name of the lobby
      */
     public String getLobbyName() {
         return lobbyName;
