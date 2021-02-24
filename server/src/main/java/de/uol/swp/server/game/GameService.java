@@ -8,9 +8,7 @@ import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.message.TradeWithUserOfferMessage;
-import de.uol.swp.common.game.request.EndTurnRequest;
-import de.uol.swp.common.game.request.OfferingTradeWithUserRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.lobby.request.TradeWithUserRequest;
 import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
@@ -59,8 +57,85 @@ public class GameService extends AbstractService {
         this.lobbyService = lobbyService;
     }
 
-    private boolean checkOwnInventory(Map<String, Integer> offeringInventory, Map<String, Double> OfferingResourceMap) {
-        return true;
+    /**
+     * Helper function
+     * <p>
+     * Checks if there are enough resources in the needed Inventory.
+     * It compares the needed inventory with the actual inventory.
+     *
+     * @param inventoryMap       Saved inventory in game
+     * @param neededInventoryMap Trading inventory
+     *
+     * @return if there are enough resources in the neededInventoryMap
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @since 2021-02-24
+     */
+    private boolean checkEnoughResourcesInInventory(Map<String, Integer> inventoryMap,
+                                                    Map<String, Integer> neededInventoryMap) {
+        if (inventoryMap.get("grain") <= neededInventoryMap.get("grain")) return false;
+        else if (inventoryMap.get("ore") <= neededInventoryMap.get("ore")) return false;
+        else if (inventoryMap.get("wool") <= neededInventoryMap.get("wool")) return false;
+        else if (inventoryMap.get("brick") <= neededInventoryMap.get("brick")) return false;
+        else if (inventoryMap.get("lumber") <= neededInventoryMap.get("grain")) return false;
+        else return true;
+    }
+
+    /**
+     * Handles a AcceptUserTradeRequest found on the EventBus
+     * <p>
+     * If there is a AcceptUserTradeRequest on the EventBus, this method
+     * checks if there are enough resources available in the inventorys
+     * to make a trade between the 2 users.
+     * //todo doku
+     *
+     * @param req AcceptUserTradeRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.AcceptUserTradeRequest
+     * @since 2021-02-24
+     */
+    @Subscribe
+    private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
+        System.out.println("Du tauscht mit dem Spieler namens" + req.getOfferingUser());
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory offeringInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getOfferingUser())) {
+                offeringInventory = value;
+                break;
+            }
+        }
+        Inventory respondingInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getRespondingUser())) {
+                respondingInventory = value;
+                break;
+            }
+        }
+        Map<String, Integer> offeringInventoryMap = new HashMap<>();
+        offeringInventoryMap.put("brick", offeringInventory.getBrick());
+        offeringInventoryMap.put("ore", offeringInventory.getOre());
+        offeringInventoryMap.put("lumber", offeringInventory.getLumber());
+        offeringInventoryMap.put("wool", offeringInventory.getWool());
+        offeringInventoryMap.put("grain", offeringInventory.getGrain());
+        Map<String, Integer> responseInventoryMap = new HashMap<>();
+        responseInventoryMap.put("brick", respondingInventory.getBrick());
+        responseInventoryMap.put("ore", respondingInventory.getOre());
+        responseInventoryMap.put("lumber", respondingInventory.getLumber());
+        responseInventoryMap.put("wool", respondingInventory.getWool());
+        responseInventoryMap.put("grain", respondingInventory.getGrain());
+        if (checkEnoughResourcesInInventory(offeringInventoryMap,
+                                            req.getOfferingResourceMap()) && checkEnoughResourcesInInventory(
+                responseInventoryMap, req.getRespondingResourceMap())) {
+            System.out.println("Hast genug Resourcen");
+            //todo resourcen Tausch
+            //todo response
+        } else System.out.println("Hast nicht genug Resourcen");
     }
 
     /**
@@ -106,11 +181,27 @@ public class GameService extends AbstractService {
         }
     }
 
+    /**
+     * Handles a OfferingTradeWithUserRequest found on the EventBus
+     * <p>
+     * If there is a OfferingTradeWithUserRequest found on the EventBus,
+     * a TradeWithUserOfferMessage is posted onto the EventBus containing
+     * both users, the lobby, the resourceMap of the respondingUser
+     * and the two maps containing information of the trade.
+     *
+     * @param req OfferingTradeWithUserRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
+     * @see de.uol.swp.common.game.message.TradeWithUserOfferMessage
+     * @since 2021-02-24
+     */
     @Subscribe
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
-        System.out.println("OfferingTradeWithUserRequest ist angekommen");
-        if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getLobbyName());
-        Game game = gameManagement.getGame(req.getLobbyName());
+        if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
+        System.out.println(req.getRespondingUser());
+        Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory respondingInventory = null;
         for (Inventory value : inventories) {
@@ -119,16 +210,17 @@ public class GameService extends AbstractService {
             }
         }
         Map<String, Integer> resourceMap = new HashMap<>();
-        if (respondingInventory != null) {
-            resourceMap.put("brick", respondingInventory.getBrick());
-            resourceMap.put("grain", respondingInventory.getGrain());
-            resourceMap.put("lumber", respondingInventory.getLumber());
-            resourceMap.put("ore", respondingInventory.getOre());
-            resourceMap.put("wool", respondingInventory.getWool());
-        }
-        LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getLobbyName());
+        resourceMap.put("brick", respondingInventory.getBrick());
+        resourceMap.put("grain", respondingInventory.getGrain());
+        resourceMap.put("lumber", respondingInventory.getLumber());
+        resourceMap.put("ore", respondingInventory.getOre());
+        resourceMap.put("wool", respondingInventory.getWool());
+
+        LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
         ServerMessage returnMessage = new TradeWithUserOfferMessage(req.getOfferingUser(), req.getRespondingUser(),
-                                                                    req.getLobbyName(), resourceMap);
+                                                                    req.getOriginLobby(), resourceMap,
+                                                                    req.getOfferingResourceMap(),
+                                                                    req.getRespondingResourceMap());
         post(returnMessage);
     }
 
@@ -175,7 +267,6 @@ public class GameService extends AbstractService {
             resourceMap.put("lumber", inventory.getLumber());
             resourceMap.put("ore", inventory.getOre());
             resourceMap.put("wool", inventory.getWool());
-            System.out.println(req.getName());
             AbstractResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
                                                                                           Collections.unmodifiableMap(
                                                                                                   resourceMap),
@@ -211,7 +302,6 @@ public class GameService extends AbstractService {
         for (Inventory value : inventories) {
             if (value.getPlayer().equals(req.getUser())) {
                 inventory = value;
-                System.out.println(inventory.getPlayer());
                 break;
             }
         }

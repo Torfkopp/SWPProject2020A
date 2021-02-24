@@ -68,8 +68,14 @@
             </VBox>
         </VBox>
     </HBox>
-    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="28.0" layoutY="37.0" prefHeight="257.0" visible="false"
-           fx:id="noResourcesLabel" prefWidth="552.0" text="Your own inventory and the other users inventory are empty">
+    <Label fx:id="noResourcesLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="28.0" layoutY="37.0"
+           prefHeight="257.0" prefWidth="552.0" text="Your own inventory and the other users inventory are empty"
+           visible="false">
+        <font>
+            <Font size="18.0"/>
+        </font>
+    </Label>
+    <Label fx:id="waitForResponse" disable="true" layoutX="290.0" layoutY="387.0">
         <font>
             <Font size="18.0"/>
         </font>

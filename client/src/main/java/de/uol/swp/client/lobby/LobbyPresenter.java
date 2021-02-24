@@ -235,7 +235,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
      * this method is called.
-     * It enables the endTurnButton.
+     * It enables the endTurnButton and the Trade with User Button.
      *
      * @param msg The DiceCastMessage object seen on the EventBus
      *
@@ -246,6 +246,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onDiceCastMessage(DiceCastMessage msg) {
         LOG.debug("Received DiceCastMessage");
         setEndTurnButtonState(msg.getUser());
+        setTradeWithUserButtonState(msg.getUser());
     }
 
     /**
@@ -322,11 +323,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (msg.getLobbyName().equals(this.lobbyName)) return;
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         //In here to test the endTurnButton
         onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
+        if (loggedInUser.equals(msg.getActivePlayer())) endTurn.setDisable(false);
     }
 
     /**
@@ -463,6 +465,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.tradeWithUserButton.setDisable(true);
             eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName));
             LOG.debug("Posted ShowTradeWithUserViewEvent");
+            System.out.println(selectedUser.getKey() + " ist der User mit dem du tauschst");
             eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
         }
@@ -630,6 +633,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Helper function that sets the Visible and Disable states of the "Trade
+     * With User" button.
+     * <p>
+     * The button is only visible if the logged in user is the player.
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-02-21
+     */
+    private void setTradeWithUserButtonState(User player) {
+        this.tradeWithUserButton.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**

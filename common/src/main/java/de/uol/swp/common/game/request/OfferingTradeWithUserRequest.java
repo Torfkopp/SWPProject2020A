@@ -4,29 +4,24 @@ import de.uol.swp.common.user.User;
 
 import java.util.Map;
 
-public class OfferingTradeWithUserRequest {
+public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
     private final User offeringUser;
     private final String respondingUser;
-    private final String lobbyName;
-    private final Map<String, Double> offeringResourceMap;
-    private final Map<String, Double> respondingResourceMap;
+    private final Map<String, Integer> offeringResourceMap;
+    private final Map<String, Integer> respondingResourceMap;
 
     public OfferingTradeWithUserRequest(User offeringUser, String respondingUser, String lobbyName,
-                                        Map<String, Double> offeringResourceMap,
-                                        Map<String, Double> respondingResourceMap) {
+                                        Map<String, Integer> offeringResourceMap,
+                                        Map<String, Integer> respondingResourceMap) {
+        super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
-        this.lobbyName = lobbyName;
         this.offeringResourceMap = offeringResourceMap;
         this.respondingResourceMap = respondingResourceMap;
     }
 
-    public String getLobbyName() {
-        return lobbyName;
-    }
-
-    public Map<String, Double> getOfferingResourceMap() {
+    public Map<String, Integer> getOfferingResourceMap() {
         return offeringResourceMap;
     }
 
@@ -34,7 +29,7 @@ public class OfferingTradeWithUserRequest {
         return offeringUser;
     }
 
-    public Map<String, Double> getRespondingResourceMap() {
+    public Map<String, Integer> getRespondingResourceMap() {
         return respondingResourceMap;
     }
 

@@ -53,7 +53,8 @@ public class SceneManager {
     private static final int LOBBY_WIDTH = 685;
     private static final int TRADING_HEIGHT = 600;
     private static final int TRADING_WIDTH = 600;
-
+    private static final int RESPONSE_TRADING_WIDTH = 390;
+    private static final int RESPONSE_TRADING_HEIGHT = 280;
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStage = new HashMap<>();
@@ -274,6 +275,16 @@ public class SceneManager {
         closeLobbies();
     }
 
+    @Subscribe
+    private void onCloseTradeWithUserResponseEvent(CloseTradeWithUserResponseEvent event) {
+        LOG.debug("Received CloseTradeWithUserResponseEvent");
+        String lobby = event.getLobbyName();
+        if (tradingResponseStage.containsKey(lobby)) {
+            tradingResponseStage.get(lobby).close();
+            tradingResponseStage.remove(lobby);
+        }
+    }
+
     /**
      * Handles the LobbyErrorEvent detected on the EventBus
      * <p>
@@ -413,13 +424,57 @@ public class SceneManager {
     }
 
     /**
+     * Handles the ShowTradeWithUserAcceptViewEvent detected on the EventBus
+     * <p>
+     * If a ShowTradeWithUserAcceptViewEvent is detected on the EventBus, this method gets
+     * called. It opens the response window of a trade between 2 users in a new window and a
+     * TradeWithUserResponseUpdateEvent is sent onto the EventBus.
+     *
+     * @param event The ShowTradeWithUserAcceptViewEvent detected on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserAcceptViewEvent
+     * @since 2021-02-23
+     */
+    @Subscribe
+    private void onShowTradeWithUserAcceptViewEvent(ShowTradeWithUserAcceptViewEvent event) {
+        //todo Fenster nur bei responding user anzeigen
+        //gets the lobby's name
+        String lobbyName = event.getLobbyName();
+        User user = event.getUser();
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Trade of " + user.getUsername());
+        lobbyStage.setHeight(RESPONSE_TRADING_HEIGHT);
+        lobbyStage.setMinHeight(RESPONSE_TRADING_HEIGHT);
+        lobbyStage.setWidth(RESPONSE_TRADING_WIDTH);
+        lobbyStage.setMinWidth(RESPONSE_TRADING_WIDTH);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyStage.setScene(lobbyScene);
+        tradingResponseStage.put(lobbyName, lobbyStage);
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Shows the window
+        lobbyStage.show();
+        eventBus.post(new TradeWithUserResponseUpdateEvent(event.getTradingUser(), lobbyName, user));
+        LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+    }
+
+    /**
      * Handles the ShowTradeWithUserViewEvent detected on the EventBus
      * <p>
      * If a ShowTradeWithUserViewEvent is detected on the EventBus, this method gets
-     * called. It opens the trading with the bank window in a new window and a
-     * TradeWithUserUpdateEvent is sent onto teh eventBus.
+     * called. It opens the trading with another user window in a new window and a
+     * TradeWithUserUpdateEvent is sent onto the EventBus.
      *
-     * @param event The ShowTradeWithBankViewEvent detected on the EventBus
+     * @param event The TradeWithUserUpdateEvent detected on the EventBus
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -455,41 +510,12 @@ public class SceneManager {
         LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
     }
 
-    @Subscribe
-    private void onShowTradeWithUserAcceptViewEvent(ShowTradeWithUserAcceptViewEvent event) {
-        //todo Fenster nur bei responding user anzeigen
-        //gets the lobby's name
-        String lobbyName = event.getLobbyName();
-        User user = event.getUser();
-        //New window (Stage)
-        Stage lobbyStage = new Stage();
-        lobbyStage.setTitle("Trade of " + user.getUsername());
-        lobbyStage.setHeight(TRADING_HEIGHT);
-        lobbyStage.setMinHeight(TRADING_HEIGHT);
-        lobbyStage.setWidth(TRADING_WIDTH);
-        lobbyStage.setMinWidth(TRADING_WIDTH);
-        //Initialises a new lobbyScene
-        Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane);
-        lobbyScene.getStylesheets().add(styleSheet);
-        lobbyStage.setScene(lobbyScene);
-        tradingResponseStage.put(lobbyName, lobbyStage);
-        //Specifies the modality for new window
-        lobbyStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        lobbyStage.initOwner(primaryStage);
-        //Shows the window
-        lobbyStage.show();
-        eventBus.post(new TradeWithUserResponseUpdateEvent(event.getTradingUser(), lobbyName, user));
-        LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
-
-
-    }
     /**
      * Handles the TradeWithUserCancelEvent detected on the EventBus
      * <p>
      * If a TradeWithUserCancelEvent is detected on the EventBus, this method gets
      * called. If there is a trading stage in the according lobby, it gets closed.
+     * If there is a tradingResponseStage it gets closed as well.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -503,6 +529,10 @@ public class SceneManager {
         if (tradingStage.containsKey(lobby)) {
             tradingStage.get(lobby).close();
             tradingStage.remove(lobby);
+        }
+        if (tradingResponseStage.containsKey(lobby)) {
+            tradingResponseStage.get(lobby).close();
+            tradingResponseStage.remove(lobby);
         }
     }
 

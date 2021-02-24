@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="230.0" prefWidth="387.0"
             xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithUserAcceptPresenter">
-    <children>
-        <Label layoutX="105.0" layoutY="44.0" text="User x offers y for z" fx:id="tradeResponseLabel"/>
-        <Button fx:id="acceptTradeButton" layoutX="67.0" layoutY="122.0" mnemonicParsing="false" text="Accept" onAction="#onAcceptTradeButtonPressed"/>
-        <Button fx:id="rejectTradeButton" layoutX="259.0" layoutY="122.0" mnemonicParsing="false" text="Reject" onAction="#onRejectTradeButtonPressed"/>
-    </children>
+    <Label fx:id="tradeResponseLabel" layoutX="29.0" layoutY="44.0" maxWidth="300" prefHeight="42.0" prefWidth="415.0"
+           wrapText="true"/>
+    <Button fx:id="acceptTradeButton" layoutX="274.0" layoutY="128.0" mnemonicParsing="false"
+            onAction="#onAcceptTradeButtonPressed" text="Accept"/>
+    <Button fx:id="rejectTradeButton" layoutX="276.0" layoutY="181.0" mnemonicParsing="false"
+            onAction="#onRejectTradeButtonPressed" text="Reject"/>
+    <ListView fx:id="ownInventoryView" layoutX="29.0" layoutY="92.0" prefHeight="121.0" prefWidth="200.0"/>
 </AnchorPane>

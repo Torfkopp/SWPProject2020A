@@ -7,6 +7,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.game.request.OfferingTradeWithUserRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
+import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -36,6 +37,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     public static final String fxml = "/fxml/TradeWithUserView.fxml";
     private final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
     @FXML
+    private Label waitForResponse;
+    @FXML
     private Label noResourcesLabel;
     @FXML
     private HBox tradingHBox;
@@ -47,8 +50,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private User loggedInUser;
     private String tradingUserName;
     private int traderInventorySize;
-    private Map<String, Double> selectedOwnResourceMap;
-    private Map<String, Double> selectedPartnersResourceMap;
+    private Map<String, Integer> selectedOwnResourceMap;
+    private Map<String, Integer> selectedPartnersResourceMap;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
     private Map<String, Integer> resourceMap;
     @FXML
@@ -70,22 +73,28 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         setEventBus(eventBus);
     }
 
+    /**
+     * Helper Function
+     * <p>
+     * Checks if there is no selected resource at all
+     *
+     * @return if any resource is selected
+     */
     private boolean checkNoSelectedResources() {
-        double selectedOwnResourceMapCounter = 0;
+        int selectedOwnResourceMapCounter = 0;
         selectedOwnResourceMapCounter += selectedOwnResourceMap.get("brick");
         selectedOwnResourceMapCounter += selectedOwnResourceMap.get("ore");
         selectedOwnResourceMapCounter += selectedOwnResourceMap.get("wool");
         selectedOwnResourceMapCounter += selectedOwnResourceMap.get("lumber");
         selectedOwnResourceMapCounter += selectedOwnResourceMap.get("grain");
 
-        double selectedPartnersResourceMapCounter = 0;
+        int selectedPartnersResourceMapCounter = 0;
         selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("brick");
         selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("ore");
         selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("lumber");
         selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("wool");
         selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("grain");
-        if (selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0) return true;
-        return false;
+        return selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0;
     }
 
     /**
@@ -93,6 +102,9 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * <p>
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window.
+     *
+     * @see de.uol.swp.client.trade.event.TradeWithUserCancelEvent
+     * @see de.uol.swp.client.trade.event.ResetTradeWithUserButtonEvent
      */
     private void closeWindowAfterNotSuccessfulTrade() {
         Platform.runLater(() -> {
@@ -145,10 +157,13 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * hiding the inventories and the button and showing the label instead.
      *
      * @param rsp InventoryForTradeResponse having the inventory
+     *
+     * @see de.uol.swp.common.game.response.InventoryForTradeWithUserResponse
      */
     @Subscribe
     private void onInventoryForTradeResponse(InventoryForTradeWithUserResponse rsp) {
         if (rsp.getLobbyName().equals(this.lobbyName)) {
+            tradingUserName = rsp.getTradingUserName();
             LOG.debug("Received InventoryForTradeResponse for Lobby " + rsp.getLobbyName());
             resourceMap = rsp.getResourceMap();
             setTradingLists();
@@ -171,10 +186,21 @@ public class TradeWithUserPresenter extends AbstractPresenter {
 
     /**
      * Handles a Click on the OfferTrade button
+     * <p>
+     * If the button is clicked, this method calls the setResourcMaps method.
+     * If there is no resource selected at all, nothing happens.
+     * Otherwise a ShowTradeWithUserAcceptViewEvent to show the Trade with
+     * User View is posted onto the EventBus and a OfferingTradeWithUserRequest
+     * is posted onto the EventBus to get the needed information from
+     * the server.
+     * The offerTradeButton gets disabled and the user gets the message gut wait
+     * for the other user.
+     *
+     * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserAcceptViewEvent
      */
     @FXML
     private void onOfferTradeButtonPressed() {
-        System.out.println("Es sind bricks ausgewählt" + ownBrickSlider.getValue());
         setResourceMaps();
 
         if (checkNoSelectedResources()) {
@@ -184,10 +210,35 @@ public class TradeWithUserPresenter extends AbstractPresenter {
 
         eventBus.post(new ShowTradeWithUserAcceptViewEvent(this.loggedInUser, this.tradingUserName, this.lobbyName));
         LOG.debug("Sending ShowTradeWithUserAcceptViewEvent");
-        //todo request kommt nicht an
-        eventBus.post(new OfferingTradeWithUserRequest(this.loggedInUser, this.tradingUserName, this.lobbyName,
-                                                       selectedOwnResourceMap, selectedPartnersResourceMap));
+
+        offerTradeButton.setDisable(true);
+        waitForResponse.setVisible(true);
+        waitForResponse.setText("Wait for " + tradingUserName + "...");
+
+        Message offeringTradeWithUserRequest = new OfferingTradeWithUserRequest(this.loggedInUser, tradingUserName,
+                                                                                this.lobbyName, selectedOwnResourceMap,
+                                                                                selectedPartnersResourceMap);
+        eventBus.post(offeringTradeWithUserRequest);
         LOG.debug("Sending OfferingTradeWithUserRequest");
+    }
+
+    /**
+     * Handles a ResetOfferTradeButtonEvent found on the EventBus
+     * <p>
+     * If a ResetOfferTradeButtonEvent is on the EventBus, the offer trade button
+     * is re-enabled and the trading user get a hint that the other user
+     * rejected the offer.
+     *
+     * @param event ResetOfferTradeButtonEvent found on the EventBus
+     *
+     * @see de.uol.swp.client.trade.event.ResetOfferTradeButtonEvent
+     */
+    @Subscribe
+    private void onResetOfferTradeButtonEvent(ResetOfferTradeButtonEvent event) {
+        if (lobbyName.equals(event.getLobbyName())) {
+            offerTradeButton.setDisable(false);
+            waitForResponse.setText(tradingUserName + "has rejected the offer!");
+        }
     }
 
     /**
@@ -199,6 +250,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * X(top-right-Button), the closeWindowAfterNotSuccessfulTrade method is called.
      *
      * @param event TradeUpdateEvent found on the event bus
+     *
+     * @see de.uol.swp.client.trade.event.TradeWithUserUpdateEvent
      */
     @Subscribe
     private void onTradeWithUserUpdateEvent(TradeWithUserUpdateEvent event) {
@@ -211,21 +264,27 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         window.setOnCloseRequest(windowEvent -> closeWindowAfterNotSuccessfulTrade());
     }
 
+    /**
+     * Helper function
+     * <p>
+     * Sets the content of resource maps according to the selected resources
+     * with the sliders.
+     */
     @FXML
     private void setResourceMaps() {
-        selectedOwnResourceMap = new HashMap<String, Double>();
-        selectedOwnResourceMap.put("brick", (ownBrickSlider.getValue()));
-        selectedOwnResourceMap.put("ore", (ownOreSlider.getValue()));
-        selectedOwnResourceMap.put("lumber", (ownLumberSlider.getValue()));
-        selectedOwnResourceMap.put("grain", (ownGrainSlider.getValue()));
-        selectedOwnResourceMap.put("wool", (ownWoolSlider.getValue()));
+        selectedOwnResourceMap = new HashMap<>();
+        selectedOwnResourceMap.put("brick", ((int) (ownBrickSlider.getValue())));
+        selectedOwnResourceMap.put("ore", ((int) (ownOreSlider.getValue())));
+        selectedOwnResourceMap.put("lumber", ((int) (ownLumberSlider.getValue())));
+        selectedOwnResourceMap.put("grain", ((int) (ownGrainSlider.getValue())));
+        selectedOwnResourceMap.put("wool", ((int) (ownWoolSlider.getValue())));
 
-        selectedPartnersResourceMap = new HashMap<String, Double>();
-        selectedPartnersResourceMap.put("brick", (tradingPartnerBrickSlider.getValue()));
-        selectedPartnersResourceMap.put("ore", (tradingPartnerOreSlider.getValue()));
-        selectedPartnersResourceMap.put("wool", (tradingPartnerWoolSlider.getValue()));
-        selectedPartnersResourceMap.put("lumber", (tradingPartnerLumberSlider.getValue()));
-        selectedPartnersResourceMap.put("grain", (tradingPartnerGrainSlider.getValue()));
+        selectedPartnersResourceMap = new HashMap<>();
+        selectedPartnersResourceMap.put("brick", ((int) (tradingPartnerBrickSlider.getValue())));
+        selectedPartnersResourceMap.put("ore", ((int) (tradingPartnerOreSlider.getValue())));
+        selectedPartnersResourceMap.put("wool", ((int) (tradingPartnerWoolSlider.getValue())));
+        selectedPartnersResourceMap.put("lumber", ((int) (tradingPartnerLumberSlider.getValue())));
+        selectedPartnersResourceMap.put("grain", ((int) (tradingPartnerGrainSlider.getValue())));
     }
 
     /**
@@ -233,7 +292,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      */
     @FXML
     private void setSliders() {
-        System.out.println("Sliders werden gesetzt");
         tradingPartnerBrickSlider.setMax(traderInventorySize);
         tradingPartnerOreSlider.setMax(traderInventorySize);
         tradingPartnerLumberSlider.setMax(traderInventorySize);

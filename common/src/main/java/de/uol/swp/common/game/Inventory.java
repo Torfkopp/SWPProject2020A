@@ -16,7 +16,7 @@ public class Inventory {
     private int totalResources = 0;
     //todo wieder auf 0 setzen.. ist nur zum testen auf 4
     private int brick = 2;
-    private int grain =2;
+    private int grain = 2;
     private int lumber = 2;
     private int ore = 2;
     private int wool = 2;
@@ -162,10 +162,13 @@ public class Inventory {
      * Gets the amount of ResourceCards the user has in his inventory
      *
      * @return The amount of Road Building Cards
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @since 2021-02-24
      */
     public int getResourceAmount() {
-        int resourceAmount = getBrick() + getWool() + getLumber() + getGrain() + getOre();
-        return resourceAmount;
+        return getBrick() + getWool() + getLumber() + getGrain() + getOre();
     }
 
     /**
