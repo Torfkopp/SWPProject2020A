@@ -18,7 +18,7 @@ class H2BasedUserStoreTest {
     static {
         users = new ArrayList<>();
         for (int i = 0; i < NO_USERS; i++) {
-            users.add(new UserDTO("Us3rName" + i, "123GoodPassword" + i, "Username" + i + "@username.de"));
+            users.add(new UserDTO(i, "Us3rName" + i, "123GoodPassword" + i, "Username" + i + "@username.de"));
         }
         Collections.sort(users);
     }
@@ -49,8 +49,12 @@ class H2BasedUserStoreTest {
     void changePassword() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
 
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS", userToUpdate.getEMail());
+        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS",
+                         userToUpdate.getEMail());
 
         Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS");
 
@@ -85,7 +89,10 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userToFind, userFound.get());
+        // Cannot compare against the object or ID because it is unknown at creation of the UserDTO list at the start
+        // which ID the users will have as that is solely handled by the store
+        assertEquals(userToFind.getUsername(), userFound.get().getUsername());
+        assertEquals(userToFind.getEMail(), userFound.get().getEMail());
         assertEquals(userFound.get().getPassword(), "");
     }
 
@@ -97,7 +104,10 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userToFind, userFound.get());
+        // Cannot compare against the object or ID because it is unknown at creation of the UserDTO list at the start
+        // which ID the users will have as that is solely handled by the store
+        assertEquals(userToFind.getUsername(), userFound.get().getUsername());
+        assertEquals(userToFind.getEMail(), userFound.get().getEMail());
         assertEquals(userFound.get().getPassword(), "");
     }
 
@@ -139,7 +149,14 @@ class H2BasedUserStoreTest {
 
         allUsersFromStore.forEach(u -> assertEquals(u.getPassword(), ""));
         Collections.sort(allUsersFromStore);
-        assertEquals(allUsers, allUsersFromStore);
+
+        // Cannot compare against the object or ID because it is unknown at creation of the UserDTO list at the start
+        // which ID the users will have as that is solely handled by the store
+        // here, we iterate over each list and compare usernames and emails
+        for (int i = 0; i < allUsers.size() && i < allUsersFromStore.size(); i++) {
+            assertEquals(allUsers.get(i).getUsername(), allUsersFromStore.get(i).getUsername());
+            assertEquals(allUsers.get(i).getEMail(), allUsersFromStore.get(i).getEMail());
+        }
     }
 
     @Test
@@ -156,7 +173,12 @@ class H2BasedUserStoreTest {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
 
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), userToUpdate.getEMail() + "@TESTING");
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+
+        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword(),
+                         userToUpdate.getEMail() + "@TESTING");
 
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
