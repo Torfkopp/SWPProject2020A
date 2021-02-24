@@ -372,7 +372,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
-        LOG.debug("Received LogSuccessfulResponse");
+        LOG.debug("Received LoginSuccessfulResponse");
         this.loggedInUser = rsp.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();

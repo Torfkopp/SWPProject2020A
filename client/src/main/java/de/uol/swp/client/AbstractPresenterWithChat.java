@@ -94,12 +94,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Handles new incoming ChatMessage
      * <p>
      * If a CreatedChatMessageMessage is posted to the EventBus, this method
-     * puts the incoming ChatMessage's content into the chatMessageMap with the
-     * ChatMessage's ID as the key.
-     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
-     * the incoming ChatMessage's content is displayed in the log.
+     * places the incoming ChatMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * CreatedChatMessageMessage" or "Received CreatedChatMessageMessage for
+     * Lobby {@code <lobbyName>}" is displayed in the log.
      *
-     * @param msg The CreatedChatMessageMessage object found on the EventBus
+     * @param msg The CreatedChatMessageMessage found on the EventBus
      *
      * @implNote Some code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
@@ -143,7 +143,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Handles incoming notification that a ChatMessage was deleted
      * <p>
      * If a DeletedChatMessageMessage is posted to the EventBus, this method
-     * removes the ChatMessage with the corresponding ID from the chatMessageMap.
+     * removes the ChatMessage with the corresponding ID from the chatMessages
+     * list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * DeletedChatMessageMessage" or "Received DeletedChatMessageMessage for
+     * Lobby {@code <lobbyName>}" is displayed in the log.
      *
      * @param msg The DeletedChatMessageMessage found on the EventBus
      *
@@ -178,6 +182,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * by replacing the current content with the content found in the
      * messageField, but only when the ChatMessage author equals the logged in
      * user.
+     * Should the selected ChatMessage be a SystemMessage, the method silently
+     * returns with no further action.
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
@@ -204,8 +210,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Handles incoming notification that a ChatMessage was edited
      * <p>
      * If an EditedChatMessageMessage is posted to the EventBus, this method
-     * replaces the content in the chatMessageMap that is stored under the
-     * edited ChatMessage's ID.
+     * replaces the ChatMessage with the corresponding ID in the chatMessages
+     * list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * EditedChatMessageMessage" or "Received EditedChatMessageMessage for
+     * Lobby {@code <lobbyName>}" is displayed in the log.
      *
      * @param msg The EditedChatMessageMessage found on the EventBus
      *
@@ -234,9 +243,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     /**
      * Method called when the SendMessageButton is pressed
      * <p>
-     * This Method is called when the SendMessageButton is pressed. It calls the chatService
-     * to create a new message with the contents of the messageField as its content and
-     * the currently logged in user as author. It also clears the messageField.
+     * This Method is called when the SendMessageButton is pressed. It calls
+     * the chatService to create a new message with the contents of the
+     * messageField as its content and the currently logged in user as author.
+     * It also clears the messageField.
      *
      * @see de.uol.swp.client.chat.ChatService
      */
@@ -251,6 +261,19 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         }
     }
 
+    /**
+     * Handles new incoming SystemMessage
+     * <p>
+     * If a SystemMessageResponse is posted onto the EventBus, this method
+     * places the incoming SystemMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * SystemMessageResponse" or "Received SystemMessageResponse for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param rsp The SystemMessageResponse found on the EventBus
+     *
+     * @since 2021-02-22
+     */
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
         if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
@@ -286,11 +309,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Nulls the chatMessageMap and chatMessages variables
+     * Nulls the chatMessages variable
      * <p>
-     * This method is called on pressing the logout or the delete account button, and
-     * ensures that the chatMessageMap and chatMessages are reset to null, to avoid
-     * multiple instances of the chat being displayed in the chatView.
+     * This method is called on pressing the logout or the delete account
+     * button, and ensures that the chatMessages list is reset to null, to
+     * avoid multiple instances of the chat being displayed in the chatView.
      *
      * @author Finn Haase
      * @author Phillip-André Suhr

@@ -50,6 +50,8 @@ public class SceneManager {
     static final String styleSheet = "css/swp.css";
     private static final int LOBBY_HEIGHT = 730;
     private static final int LOBBY_WIDTH = 685;
+    private static final int DEVMENU_HEIGHT = 450;
+    private static final int DEVMENU_WIDTH = 630;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
@@ -236,25 +238,38 @@ public class SceneManager {
         showLoginScreen();
     }
 
+    /**
+     * Handles the OpenDevMenuResponse detected on the EventBus
+     * <p>
+     * If an OpenDevMenuResponse is detected on the EventBus, this method gets
+     * called. It opens the Developer Menu in a new window.
+     *
+     * @param rsp The OpenDevMenuResponse detected on the EventBus
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.common.devmenu.response.OpenDevMenuResponse
+     * @since 2021-02-22
+     */
     @Subscribe
     private void onOpenDevMenuResponse(OpenDevMenuResponse rsp) {
         Platform.runLater(() -> {
             Stage devMenuStage = new Stage();
-            devMenuStage.setTitle("Developer Access Board (D.A.B.)");
-            //devMenuStage.setHeight(LOBBY_HEIGHT); TODO dimensions
-            //devMenuStage.setMinHeight(LOBBY_HEIGHT);
-            //devMenuStage.setWidth(LOBBY_WIDTH);
-            //devMenuStage.setMinWidth(LOBBY_WIDTH);
+            devMenuStage.setTitle("Developer Access Board (D.A.B.)"); // TODO name
+            devMenuStage.setHeight(DEVMENU_HEIGHT);
+            devMenuStage.setMinHeight(DEVMENU_HEIGHT);
+            devMenuStage.setWidth(DEVMENU_WIDTH);
+            devMenuStage.setMinWidth(DEVMENU_WIDTH);
             Parent rootPane = initPresenter(DevMenuPresenter.fxml);
             Scene devMenuScene = new Scene(rootPane);
             devMenuScene.getStylesheets().add(styleSheet);
-            //lobbyScenes.put(lobbyName, devMenuScene); TODO need to save scene?
+            //X.put(lobbyName, devMenuScene); // TODO need to save scene?
             devMenuStage.setScene(devMenuScene);
             devMenuStage.initOwner(primaryStage);
             devMenuStage.setX(primaryStage.getX() + 100);
-            devMenuStage.setY(10);
+            devMenuStage.setY(primaryStage.getY());
             devMenuStage.show();
-            //lobbyStages.add(devMenuStage); TODO need to save stage?
+            //X.add(devMenuStage); // TODO need to save stage?
         });
     }
 

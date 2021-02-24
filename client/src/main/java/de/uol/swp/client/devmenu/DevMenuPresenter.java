@@ -52,9 +52,9 @@ public class DevMenuPresenter extends AbstractPresenter {
     /**
      * Initialises the DevMenu.
      * <p>
-     * First, a {@code DevMenuClassesRequest} is posted onto the EventBus.
-     * Then, a Listener is added to the classFilterTextField which will
-     * filter for the text entered by the user.
+     * First, a DevMenuClassesRequest is posted onto the EventBus.
+     * Then, a Listener is added to the classFilterTextField which will filter
+     * for the text entered by the user.
      * The constructorList gets a CellFactory which handles the showing
      * of constructor args.
      *
@@ -75,6 +75,7 @@ public class DevMenuPresenter extends AbstractPresenter {
             });
         });
         classListView.setItems(new SortedList<>(filteredClassNameList));
+
         if (constructorObservableList == null) constructorObservableList = FXCollections.observableArrayList();
         constructorList.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -96,11 +97,11 @@ public class DevMenuPresenter extends AbstractPresenter {
     /**
      * Handles a DevMenuClassesResponse found on the EventBus
      * <p>
-     * If a new DevMenuClassesResponse is found on the EventBus, this
-     * method adds a Listener to the classListView which will handle
-     * updating the constructor argument ListView (on the right).
-     * After that, {@code updateClassList} is called to display the
-     * classes contained in the DevMenuClassesResponse.
+     * If a new DevMenuClassesResponse is found on the EventBus, this method
+     * adds a Listener to the classListView which will handle updating the
+     * constructor argument ListView (on the right).
+     * After that, {@code updateClassList} is called to display the classes
+     * contained in the DevMenuClassesResponse.
      *
      * @param rsp The DevMenuClassesResponse found on the EventBus
      *
@@ -121,9 +122,17 @@ public class DevMenuPresenter extends AbstractPresenter {
      * Method called when the Send Button is pressed.
      * <p>
      * This method is called when the Send Button is pressed.
-     * TODO: explain the magix Temmo is doing
+     * It gathers the constructor parameter types and then lets the
+     * CommandParser lex and parse the argument values to be able to recognize
+     * Lists, Sets, Collections, Maps, and other data types as entered by the
+     * user into the dynamically generated TextFields.
+     * Finally, it posts a DevMenuCommandRequest with the currently selected
+     * class and the parsed argument list onto the EventBus.
+     * TODO: can still be better I think
      *
      * @see de.uol.swp.common.devmenu.CommandParser
+     * @see de.uol.swp.common.devmenu.CommandParser.ASTToken
+     * @see de.uol.swp.common.devmenu.request.DevMenuCommandRequest
      */
     @FXML
     private void onSendButtonPressed() {
@@ -157,8 +166,8 @@ public class DevMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper method to dynamically generate Labels and TextField
-     * for parameter input.
+     * Helper method to dynamically generate Labels and TextField for parameter
+     * input.
      *
      * @param args The Map of constructor arguments
      */

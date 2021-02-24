@@ -34,6 +34,7 @@ class ServerApp {
      * (for the time being) the test users
      *
      * @param injector The google guice injector used for dependency injection
+     *
      * @since 2019-09-18
      */
     private static void createServices(Injector injector) {
@@ -52,6 +53,7 @@ class ServerApp {
         injector.getInstance(AuthenticationService.class);
         injector.getInstance(LobbyService.class);
         injector.getInstance(ChatService.class);
+        injector.getInstance(CommandService.class);
         injector.getInstance(GameService.class);
     }
 
@@ -63,6 +65,7 @@ class ServerApp {
      *
      * @param args Any arguments given when starting the application, e.g. a port
      *             number
+     *
      * @since 2017-03-17
      */
     public static void main(String[] args) throws Exception {
@@ -83,7 +86,6 @@ class ServerApp {
         Injector injector = Guice.createInjector(new ServerModule());
         createServices(injector);
         ServerHandler serverHandler = injector.getInstance(ServerHandler.class);
-        CommandService commandService = injector.getInstance(CommandService.class);
         ChannelHandler channelHandler = new NettyServerHandler(serverHandler);
         Server server = new Server(channelHandler);
         server.start(port);

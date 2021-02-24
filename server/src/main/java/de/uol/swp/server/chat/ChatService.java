@@ -222,7 +222,7 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
-        if (req.getContent().startsWith("/")) {
+        if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
             return;
         }

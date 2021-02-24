@@ -26,6 +26,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
+/**
+ * Handles commands sent in by a client through the chat
+ *
+ * @author Temmo Junkhoff
+ * @author Phillip-André Suhr
+ * @see de.uol.swp.server.AbstractService
+ * @since 2021-02-22
+ */
 @SuppressWarnings("UnstableApiUsage")
 public class CommandService extends AbstractService {
 
@@ -37,6 +45,13 @@ public class CommandService extends AbstractService {
     private final IUserManagement userManagement; //use to find users by name
     private final ILobbyManagement lobbyManagement;
 
+    /**
+     * Constructor
+     *
+     * @param eventBus        The EventBus (injected)
+     * @param lobbyManagement The LobbyManagement (injected)
+     * @param userManagement  The UserManagement (injected)
+     */
     @Inject
     public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement) {
         super(eventBus);
@@ -47,6 +62,7 @@ public class CommandService extends AbstractService {
     }
 
     //TODO: Remove method
+    //TODO 2: undocumented because of impending removal
     String astToString(List<CommandParser.ASTToken> tokens) {
         String text = "";
         for (CommandParser.ASTToken token : tokens) {
@@ -56,12 +72,24 @@ public class CommandService extends AbstractService {
         return text;
     }
 
+    /**
+     * Handles the /devmenu command
+     *
+     * @param args            List of CommandParser.ASTToken to be used as args //TODO: remove?
+     * @param originalMessage The NewChatMessageRequest used to use the command
+     */
     private void command_DevMenu(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         OpenDevMenuResponse msg = new OpenDevMenuResponse();
         msg.initWithMessage(originalMessage);
         post(msg);
     }
 
+    /**
+     * Handles the /help command
+     *
+     * @param args            List of CommandParser.ASTToken to be used as args //TODO: remove?
+     * @param originalMessage The NewChatMessageRequest used to use the command
+     */
     private void command_Help(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         String str = new StringBuilder().append("The following Commands are available:\n")
                                         .append("-------------------------------------\n")
@@ -71,6 +99,12 @@ public class CommandService extends AbstractService {
         sendSystemMessageResponse(originalMessage, str);
     }
 
+    /**
+     * Handles misspelled or nonexistent commands by sending an error message
+     *
+     * @param args            List of CommandParser.ASTToken to be used as args //TODO: remove?
+     * @param originalMessage The NewChatMessageRequest used to use the command
+     */
     private void command_Invalid(List<CommandParser.ASTToken> args, NewChatMessageRequest originalMessage) {
         String content = new StringBuilder().append("You typed an invalid command\n")
                                             .append("----------------------------\n")
@@ -78,6 +112,16 @@ public class CommandService extends AbstractService {
         sendSystemMessageResponse(originalMessage, content);
     }
 
+    /**
+     * Handles the /post command
+     * <p>
+     * Finds the requested class in the List of allowed classes, figures out
+     * which constructor was requested, and, after parsing the arguments, posts
+     * the instance of the class to the EventBus.
+     *
+     * @param args            List of CommandParser.ASTToken to be used as args
+     * @param originalMessage the original message
+     */
     private void command_Post(List<CommandParser.ASTToken> args, Message originalMessage) {
         for (ClassPath.ClassInfo cInfo : allClasses) {
             if (cInfo.getSimpleName().equals(args.get(0).getString())) {
@@ -103,7 +147,13 @@ public class CommandService extends AbstractService {
         }
     }
 
+    /**
+     * Helper method that filters through all classes in the project modules
+     * and returns a list that contains only classes the Developer Menu is
+     * allowed to request an instantiation and posting of.
+     */
     public void getAllClasses() {
+        //TODO: filter for "extends Message" and "not interface"
         ClassLoader cl = getClass().getClassLoader();
         try {
             Set<ClassPath.ClassInfo> clsSet = ClassPath.from(cl).getTopLevelClassesRecursive("de.uol.swp");
@@ -119,6 +169,14 @@ public class CommandService extends AbstractService {
         }
     }
 
+    /**
+     * Handles a DevMenuClassesRequest found on the EventBus
+     * <p>
+     * Will create a Map of class names to a List of their constructors, each
+     * as a Map of their parameter names to the parameter's type.
+     *
+     * @param req The DevMenuClassesRequest found on the EventBus
+     */
     @Subscribe
     private void onDevMenuClassesRequest(DevMenuClassesRequest req) {
         //classes<classname, constructors<arguments<argumentname, argumenttype>>>
@@ -131,7 +189,7 @@ public class CommandService extends AbstractService {
                 for (Constructor<?> cons : cls.getConstructors()) {
                     Map<String, Class<?>> constructorArgs = new LinkedHashMap<>();
                     for (Parameter cls2 : cons.getParameters()) {
-                        constructorArgs.put(cls2.getName(), cls2.getType()); // name, java.lang.String
+                        constructorArgs.put(cls2.getName(), cls2.getType()); // e.g.: lobbyName, java.lang.String
                     }
                     constructorArgList.add(constructorArgs);
                 }
@@ -144,13 +202,39 @@ public class CommandService extends AbstractService {
         post(response);
     }
 
+    /**
+     * Handles a DevMenuCommandRequest found on the Eventbus
+     * <p>
+     * Prepends the requested class name to the List of arguments in the
+     * request and then calls {@code command_Post(List<ASTToken>, Message)}
+     * with that prepended list.
+     *
+     * @param req The DevMenuCommandRequest found on the EventBus
+     */
     @Subscribe
-    private void onDevMenuCommandRequest(DevMenuCommandRequest msg) {
+    private void onDevMenuCommandRequest(DevMenuCommandRequest req) {
         LOG.debug("Received DevMenuCommandRequest");
-        msg.getArgs().add(0, new CommandParser.ASTToken(CommandParser.ASTToken.Type.UNTYPED, msg.getClassname()));
-        command_Post(msg.getArgs(), msg);
+        req.getArgs().add(0, new CommandParser.ASTToken(CommandParser.ASTToken.Type.UNTYPED, req.getClassname()));
+        command_Post(req.getArgs(), req);
     }
 
+    /**
+     * Handles a NewChatCommandMessage found on the EventBus
+     * <p>
+     * This means a command was typed into the chat box and the ChatService
+     * recognised the command prefix. This method decides which method to call
+     * based on the command String contained in the message.
+     * <p>
+     * This method uses the CommandParser to parse the String in the message,
+     * and then calls the method corresponding to the String in the first
+     * position.
+     *
+     * @param msg The NewChatCommandMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.devmenu.CommandParser
+     * @see de.uol.swp.common.devmenu.CommandParser#parse(java.util.List)
+     * @see de.uol.swp.common.devmenu.CommandParser#lex(String)
+     */
     @Subscribe
     private void onNewChatCommandMessage(NewChatCommandMessage msg) {
         LOG.debug("Received NewChatCommandMessage");
@@ -175,9 +259,34 @@ public class CommandService extends AbstractService {
                 command_Invalid(argsAST, msg.getOriginalMessage());
                 // TODO: more cases (aka commands)
                 // Some shortcuts for common Messages/ Requests
+                /* Ideas for shortcuts:
+                 * 1) create a lobby with 4 members on the spot
+                 * 2) ???
+                 * 3) Profit.
+                 */
         }
     }
 
+    /**
+     * Helper method used to parse the arguments provided to {@code command_Post()}
+     * <p>
+     * This method matches the parameter names provided as their canonical
+     * long names (like {@code java.lang.String}) and tries to convert the
+     * given argument to that specific type.
+     * <p>
+     * In the end returns an instance of the class whose constructor was
+     * provided
+     *
+     * @param args        List of CommandParser.ASTToken to be used as args
+     * @param constr      The specific Constructor to be used in instantiation
+     * @param currentUser The User who invoked the command (to replace '.' or 'me')
+     *
+     * @return The instance of a Message subclass as returned by the provided
+     * constructor
+     *
+     * @throws ReflectiveOperationException Thrown when something goes awry
+     *                                      during the reflection process
+     */
     private Message parseArguments(List<CommandParser.ASTToken> args, Constructor<?> constr,
                                    Optional<User> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
@@ -220,6 +329,13 @@ public class CommandService extends AbstractService {
         return (Message) constr.newInstance(argList.toArray());
     }
 
+    /**
+     * Helper method used to post a SystemMessageResponse onto the EventBus
+     *
+     * @param originalMessage The NewChatMessageRequest that provoked a
+     *                        SystemMessage
+     * @param content         The content of the SystemMessage
+     */
     private void sendSystemMessageResponse(NewChatMessageRequest originalMessage, String content) {
         final SystemMessageResponse response = new SystemMessageResponse(originalMessage.getOriginLobby(), content);
         response.initWithMessage(originalMessage);

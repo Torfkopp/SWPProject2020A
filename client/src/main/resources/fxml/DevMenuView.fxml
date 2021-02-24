@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.devmenu.DevMenuPresenter">
-    <ListView fx:id="classListView" layoutX="14.0" layoutY="14.0" prefHeight="175.0" prefWidth="200.0"/>
-    <ListView fx:id="constructorList" layoutX="224.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
+            fx:controller="de.uol.swp.client.devmenu.DevMenuPresenter">
+    <ListView fx:id="classListView" layoutX="10.0" layoutY="10.0" minHeight="200.0" minWidth="200.0" prefHeight="200.0"
+              prefWidth="200.0"/>
+    <ListView fx:id="constructorList" layoutX="220.0" layoutY="10.0" minHeight="225.0" minWidth="200.0"
+              prefHeight="225.0" prefWidth="200.0">
         <placeholder>
-            <Label text="%devmenu.lists.constructors.placeholder"/>
+            <Label text="%devmenu.lists.constructors.placeholder" textAlignment="CENTER" wrapText="true">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
         </placeholder>
     </ListView>
-    <HBox fx:id="parameterBox" layoutX="14.0" layoutY="221.0" prefHeight="100.0" prefWidth="410.0">
+    <HBox fx:id="parameterBox" layoutX="10.0" layoutY="245.0" prefHeight="145.0" prefWidth="410.0">
         <spacing>5</spacing>
     </HBox>
-    <TextField fx:id="classFilterTextField" layoutX="14.0" layoutY="188.0" prefHeight="25.0" prefWidth="200.0"/>
-    <VBox alignment="TOP_CENTER" layoutX="424.0" layoutY="14.0" prefHeight="200.0" prefWidth="183.0">
+    <TextField fx:id="classFilterTextField" layoutX="10.0" layoutY="210.0" prefHeight="25.0" prefWidth="200.0"/>
+    <VBox alignment="TOP_CENTER" layoutX="430.0" layoutY="10.0" maxHeight="225.0" prefHeight="225.0" prefWidth="190.0">
         <Button mnemonicParsing="false" onAction="#onSendButtonPressed" text="%devmenu.buttons.send"
-                VBox.vgrow="ALWAYS"/>
-        <Label maxHeight="Infinity" maxWidth="Infinity" text="%devmenu.labels.legend"
-               VBox.vgrow="ALWAYS">
+                VBox.vgrow="ALWAYS">
             <VBox.margin>
-                <Insets top="10.0"/>
+                <Insets right="10.0"/>
             </VBox.margin>
+        </Button>
+        <Label alignment="TOP_LEFT" maxHeight="Infinity" maxWidth="Infinity" text="%devmenu.labels.legend"
+               wrapText="true" VBox.vgrow="ALWAYS">
+            <VBox.margin>
+                <Insets right="10.0" top="20.0"/>
+            </VBox.margin>
+            <padding>
+                <Insets left="5.0" right="5.0"/>
+            </padding>
         </Label>
     </VBox>
 </AnchorPane>
