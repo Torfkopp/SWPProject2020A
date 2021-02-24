@@ -6,7 +6,8 @@ import de.uol.swp.client.IGameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.client.trade.ShowTradeWithUserViewEvent;
+import de.uol.swp.client.trade.event.ResetTradeWithUserButtonEvent;
+import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
@@ -15,11 +16,9 @@ import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.StartSessionMessage;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
-import de.uol.swp.common.lobby.message.UserReadyMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
+import de.uol.swp.common.lobby.request.TradeWithUserRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
@@ -29,7 +28,6 @@ import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -40,10 +38,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages the lobby's menu
@@ -183,7 +178,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * Helper function to find the Pair for a given key
      *
      * @param name the key of the pair that should be returned
+     *
      * @return the pair matched by the name
+     *
      * @author Temmo Junkhoff
      * @author Timo Gerken
      * @since 2021-01-19
@@ -210,6 +207,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * are displayed in the log.
      *
      * @param rsp The AllLobbyMembersResponse object seen on the EventBus
+     *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2021-01-19
      */
@@ -235,6 +233,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * It enables the endTurnButton.
      *
      * @param msg The DiceCastMessage object seen on the EventBus
+     *
      * @see de.uol.swp.common.game.message.DiceCastMessage
      * @since 2021-01-15
      */
@@ -284,6 +283,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * be closed without using the Leave Lobby button.
      *
      * @param event The LobbyUpdateEvent found on the EventBus
+     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
@@ -350,6 +350,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * is in.
      *
      * @param rsp The RemoveFromLobbiesResponse seen on the EventBus
+     *
      * @author Finn Haase
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
@@ -361,6 +362,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
         }
+    }
+
+    /**
+     * Handles a ResetTradeWithUserButtonEvent found on the event bus
+     * <p>
+     * If a new ResetTradeWithUserButtonEvent is posted onto the EventBus the
+     * tradeWithUserButton is enabled again.
+     *
+     * @param event The ResetTradeWithUserButtonEvent seen on the EventBus
+     *
+     * @author Finn Haase
+     * @author Maximilian Lindner
+     * @since 2021-02-23
+     */
+    @Subscribe
+    private void onResetTradeWithUserButtonEvent(ResetTradeWithUserButtonEvent event) {
+        this.tradeWithUserButton.setDisable(false);
     }
 
     /**
@@ -388,6 +406,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * the lobby members.
      *
      * @param msg The StartSessionMessage found on the EventBus
+     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-02-04
@@ -406,7 +425,41 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);
+                this.tradeWithUserButton.setVisible(true);
             });
+        }
+    }
+
+    /**
+     * Handles a Click on the TradeWithUserButtons
+     * <p>
+     * If another player of the lobby-member-list is selected and the button gets pressed,
+     * this button gets disabled, a new ShowTradeWithUserViewEvent is posted onto the
+     * EventBus to show the trading window and a TradeWithUserRequest is posted
+     * onto the EventBus to get the necessary inventory information.
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
+     * @see de.uol.swp.common.lobby.request.TradeWithUserRequest
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @since 2021-02-23
+     */
+    @FXML
+    private void onTradeWithUserButtonPressed() {
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (membersView.getSelectionModel().isEmpty()) {
+            eventBus.post(new LobbyErrorEvent(
+                    resourceBundle.getString("lobby.error.invalidlobby"))); // todo neues Errorevent erstellen
+        } else if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+        } else {
+            this.tradeWithUserButton.setDisable(true);
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName));
+            LOG.debug("Posted ShowTradeWithUserViewEvent");
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
+            LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
         }
     }
 
@@ -420,6 +473,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * LobbyPresenter.
      *
      * @param rsp The UpdateInventoryResponse found on the EventBus
+     *
      * @author Finn Haase
      * @author Sven Ahrens
      * @author Phillip-André Suhr
@@ -461,6 +515,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * <Username>} joined Lobby." is displayed in the log.
      *
      * @param msg the UserJoinedLobbyMessage object seen on the EventBus
+     *
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2020-11-22
      */
@@ -471,7 +526,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         LOG.debug("---- User " + msg.getUser().getUsername() + " joined");
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
-                    .equals(msg.getUser().getUsername()))
+                                                                             .equals(msg.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
             setStartSessionButtonState();
         });
@@ -493,6 +548,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * in the log, depending on whether the owner or a normal user left.
      *
      * @param msg The UserLeftLobbyMessage object seen on the EventBus
+     *
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2021-01-20
@@ -522,6 +578,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      * such.
      *
      * @param msg The UserReadyMessage found on the EventBus
+     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-01-19
@@ -563,7 +620,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession
-                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+                    .setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
@@ -599,6 +656,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
      *
      * @param userLobbyList A list of User objects including all currently logged in
      *                      users
+     *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.User
@@ -618,26 +676,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat implements IGameRe
                     username = String.format(resourceBundle.getString("lobby.members.ready"), username);
                 }
                 Pair<String, String> item = new Pair<>(u.getUsername(),
-                        u.getUsername().equals(this.owner.getUsername()) ?
-                                String.format(resourceBundle.getString("lobby.members.owner"),
-                                        username) :
-                                username);
+                                                       u.getUsername().equals(this.owner.getUsername()) ?
+                                                       String.format(resourceBundle.getString("lobby.members.owner"),
+                                                                     username) : username);
                 lobbyMembers.add(item);
             });
         });
-    }
-
-    public void onTradeWithUserButtonPressed(ActionEvent actionEvent) {
-        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if (membersView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby"))); // todo neues Errorevent erstellen
-        } else if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
-        } else {
-            this.tradeWithUserButton.setDisable(true);
-            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, selectedUser.getKey(), this.lobbyName));
-            LOG.debug("Posted ShowTradeWithUserViewEvent");
-        }
     }
 }
