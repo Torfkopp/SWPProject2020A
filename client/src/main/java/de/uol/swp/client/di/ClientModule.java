@@ -90,5 +90,6 @@ public class ClientModule extends AbstractModule {
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
+        requestStaticInjection(ClientApp.class);
     }
 }
