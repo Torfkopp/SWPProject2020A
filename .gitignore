@@ -6,3 +6,6 @@ target/
 *.uml
 config.properties
 serverconfig.properties
+# LaTeX folders we don't need
+documentation/auxil
+documentation/out
