@@ -24,6 +24,7 @@ import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -74,6 +75,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private GameRendering gameRendering;
 
     private Window window;
+    private Object ShowDevelopmentCardViewEvent;
 
     /**
      * Constructor
@@ -632,5 +634,83 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 lobbyMembers.add(item);
             });
         });
+    }
+
+    /**
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    @FXML
+    private void onPlayDevelopmentCardButtonPressed(ActionEvent event) {
+        //eventBus.post(showDevelopmentCardMessage);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Development Cards");
+        alert.setHeaderText("Which Development Card you want to play?");
+        alert.setContentText("Choose your option.");
+
+        ButtonType bKnight = new ButtonType("Knight");
+        ButtonType bMonopoly = new ButtonType("Monopoly");
+        ButtonType bRoadBuilding = new ButtonType("Road Building");
+        ButtonType bYearOfPlenty = new ButtonType("Year of Plenty");
+        ButtonType bCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(bKnight, bMonopoly, bRoadBuilding, bYearOfPlenty, bCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        List<Resources> choices = new ArrayList<>();
+        choices.add(Resources.ORE);
+        choices.add(Resources.GRAIN);
+        choices.add(Resources.BRICK);
+        choices.add(Resources.LUMBER);
+        choices.add(Resources.WOOL);
+
+        if (result.get() == bKnight) {
+            lobbyService.playKnightCard(lobbyName, loggedInUser);
+
+        } else if (result.get() == bMonopoly) {
+
+            ChoiceDialog<Resources> dialogue = new ChoiceDialog<>(Resources.BRICK, choices);
+            dialogue.setTitle("Resource Cards");
+            dialogue.setHeaderText("Which specific type of resource card you want to claim?");
+            dialogue.setContentText("Choose your option.");
+            Optional<Resources> rst = dialogue.showAndWait();
+            if (rst.isPresent()) {
+                lobbyService.playMonopolyCard(lobbyName, loggedInUser, rst.get());
+            }
+        } else if (result.get() == bRoadBuilding) {
+            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
+        } else if (result.get() == bYearOfPlenty) {
+            //TODO FIX IT
+            Dialog<Pair<Choice, Choice>> dialogue = new Dialog<>();
+            dialogue.setTitle("Resource Cards");
+            dialogue.setHeaderText("Which two resource cards you want to draw from the Bank?");
+
+            ButtonType ok = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
+            dialogue.getDialogPane().getButtonTypes().addAll(ok, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20,150,10,10));
+
+            ChoiceBox<Resources> c1 = new ChoiceBox();
+            c1.setItems((ObservableList) choices);
+            ChoiceBox<Resources> c2 = new ChoiceBox();
+            c2.setItems((ObservableList) choices);
+
+            grid.add(c1,0,0);
+            grid.add(c2,0,1);
+
+            Optional<Pair<Choice,Choice>> rst = dialogue.showAndWait();
+            if(rst.isPresent()){
+                lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, c1.getValue(), c2.getValue());
+            }
+        } else {
+
+        }
     }
 }

@@ -42,12 +42,21 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Bricks a player has in their inventory
+     * Gets the player who this inventory belongs to
      *
-     * @return The amount of Bricks
+     * @return The player who this inventory belongs to
      */
-    public int getBrick() {
-        return brick;
+    public User getPlayer() {
+        return player;
+    }
+
+    /**
+     * Gets the total amount of resources a player has in their inventory
+     *
+     * @return The total amount of resources
+     */
+    public int getTotalResources() {
+        return totalResources;
     }
 
     /**
@@ -60,12 +69,21 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Grain a player has in their inventory
+     * Increases the amount of Bricks by the amount
      *
-     * @return The amount of Grain
+     * @param i The increase
      */
-    public int getGrain() {
-        return grain;
+    public void increaseBrick(int i) {
+        brick += i;
+    }
+
+    /**
+     * Gets the amount of Bricks a player has in their inventory
+     *
+     * @return The amount of Bricks
+     */
+    public int getBrick() {
+        return brick;
     }
 
     /**
@@ -78,12 +96,21 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Knight Cards a player has in their inventory
+     * Increases the amount of Grain by one*
      *
-     * @return The amount of Knight Cards
+     * @param i The increase
      */
-    public int getKnightCards() {
-        return knightCards;
+    public void increaseGrain(int i) {
+        grain += i;
+    }
+
+    /**
+     * Gets the amount of Grain a player has in their inventory
+     *
+     * @return The amount of Grain
+     */
+    public int getGrain() {
+        return grain;
     }
 
     /**
@@ -93,6 +120,15 @@ public class Inventory {
      */
     public void setKnightCards(int knightCards) {
         this.knightCards = knightCards;
+    }
+
+    /**
+     * Increases the amount of Lumber by one
+     *
+     * @param i The increase
+     */
+    public void increaseLumber(int i) {
+        lumber += i;
     }
 
     /**
@@ -114,12 +150,21 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Monopoly Cards a player has in their inventory
+     * Increases the amount of Ore by one
      *
-     * @return The amount of Monopoly Cards
+     * @param i The increase
      */
-    public int getMonopolyCards() {
-        return monopolyCards;
+    public void increaseOre(int i) {
+        ore += i;
+    }
+
+    /**
+     * Gets the amount of Ore a player has in their inventory
+     *
+     * @return The amount of Ore
+     */
+    public int getOre() {
+        return ore;
     }
 
     /**
@@ -132,12 +177,21 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Ore a player has in their inventory
+     * Increases the amount of Wool by one
      *
-     * @return The amount of Ore
+     * @param i The increase
      */
-    public int getOre() {
-        return ore;
+    public void increaseWool(int i) {
+        wool += i;
+    }
+
+    /**
+     * Gets the amount of Wool a player has in their inventory
+     *
+     * @return The amount of Wool
+     */
+    public int getWool() {
+        return wool;
     }
 
     /**
@@ -159,12 +213,21 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Road Building Cards a player has in their inventory
+     * Gets the amount of Victory Point Cards a player has in their inventory
      *
-     * @return The amount of Road Building Cards
+     * @return The amount of Victory Point Cards
      */
-    public int getRoadBuildingCards() {
-        return roadBuildingCards;
+    public int getVictoryPointCards() {
+        return victoryPointCards;
+    }
+
+    /**
+     * Sets the amount of Victory Point Cards in the player's inventory
+     *
+     * @param victoryPointCards The amount of Victory Point Cards to place in the inventory
+     */
+    public void setVictoryPointCards(int victoryPointCards) {
+        this.victoryPointCards = victoryPointCards;
     }
 
     /**
@@ -195,12 +258,19 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Victory Point Cards a player has in their inventory
-     *
-     * @return The amount of Victory Point Cards
+     * Increases the amount of RoadBuildingCards by one
      */
-    public int getVictoryPointCards() {
-        return victoryPointCards;
+    public void increaseRoadBuildingCards() {
+        roadBuildingCards++;
+    }
+
+    /**
+     * Gets the amount of Road Building Cards a player has in their inventory
+     *
+     * @return The amount of Road Building Cards
+     */
+    public int getRoadBuildingCards() {
+        return roadBuildingCards;
     }
 
     /**
@@ -231,21 +301,10 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of Wool a player has in their inventory
-     *
-     * @return The amount of Wool
+     * Increases the amount of YearOfPlentyCards by one
      */
-    public int getWool() {
-        return wool;
-    }
-
-    /**
-     * Sets the amount of Wool in the player's inventory
-     *
-     * @param wool The amount of Wool to place in the inventory
-     */
-    public void setWool(int wool) {
-        this.wool = wool;
+    public void increaseYearOfPlentyCards() {
+        yearOfPlentyCards++;
     }
 
     /**
@@ -258,12 +317,66 @@ public class Inventory {
     }
 
     /**
+     * Sets the amount of Wool in the player's inventory
+     *
+     * @param wool The amount of Wool to place in the inventory
+     */
+    public void setWool(int wool) {
+        this.wool = wool;
+    }
+
+    /**
+     * Increases the amount of MonopolyCards by one
+     */
+    public void increaseMonopolyCards() {
+        monopolyCards++;
+    }
+
+    /**
+     * Gets the amount of Monopoly Cards a player has in their inventory
+     *
+     * @return The amount of Monopoly Cards
+     */
+    public int getMonopolyCards() {
+        return monopolyCards;
+    }
+
+    /**
      * Sets the amount of Year of Plenty Cards in the player's inventory
      *
      * @param yearOfPlentyCards The amount of Year of Plenty Cards to place in the inventory
      */
     public void setYearOfPlentyCards(int yearOfPlentyCards) {
         this.yearOfPlentyCards = yearOfPlentyCards;
+    }
+
+    //
+    // OTHERS
+    //
+
+    /**
+     * Increases the amount of Knights by one
+     */
+    public void increaseKnights() {
+        knights++;
+    }
+
+    /**
+     * Gets the amount of knights
+     *
+     * @return The amount of knights
+     */
+    public int getKnights() {
+        return knights;
+    }
+
+    /**
+     * Set the amount of knights
+     *
+     * @param knights The amount of knights a player has
+     */
+    public void setKnights(int knights) {
+        this.knights = knights;
     }
 
     /**

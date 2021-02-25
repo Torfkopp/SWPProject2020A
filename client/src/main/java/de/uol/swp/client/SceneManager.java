@@ -388,6 +388,7 @@ public class SceneManager {
         showError(event.getMessage());
     }
 
+
     /**
      * Shows an error message inside an error alert
      *
