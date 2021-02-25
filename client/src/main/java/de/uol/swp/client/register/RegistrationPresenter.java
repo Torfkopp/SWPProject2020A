@@ -13,6 +13,9 @@ import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Manages the registration window
  *
@@ -30,6 +33,8 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     private TextField loginField;
     @FXML
+    private TextField emailField;
+    @FXML
     private PasswordField passwordField1;
     @FXML
     private PasswordField passwordField2;
@@ -38,7 +43,6 @@ public class RegistrationPresenter extends AbstractPresenter {
      * Constructor
      *
      * @param eventBus The EventBus set in ClientModule
-     *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2019-09-18
      */
@@ -68,25 +72,51 @@ public class RegistrationPresenter extends AbstractPresenter {
      * <p>
      * This Method is called when the RegisterButton is pressed. It posts an instance
      * of the RegistrationErrorEvent onto the EventBus the SceneManager is subscribed
-     * to if one of the fields is empty or the password fields are not equal.
+     * to if one of the fields is empty, the password fields are not equal or the
+     * eMail field is malformed.
      * If everything is filled in correctly, the user service is requested to create
      * a new user.
      *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
      * @see de.uol.swp.client.register.event.RegistrationErrorEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
-     * @since 2019-09-02
+     * @since 2021-02-25
      */
     @FXML
     private void onRegisterButtonPressed() {
         if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
+        } else if (!checkMailFormat(emailField.getText())) {
+            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.notequalpw")));
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
         } else {
-            userService.createUser(new UserDTO(loginField.getText(), passwordField1.getText(), ""));
+            userService.createUser(new UserDTO(loginField.getText(), passwordField1.getText(), emailField.getText()));
         }
+    }
+
+    /**
+     * Method called to compare the eMail string with valid regex
+     * <p>
+     * This helper method is called to compare whether a provided
+     * string complies to RFC5322 and some other restrictions like
+     * to adjacent dots. If it matches, the boolean true is returned.
+     *
+     * @param eMail the mail string provided during registration
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-02-25
+     */
+    private boolean checkMailFormat(String eMail) {
+        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(eMail);
+
+        return matcher.matches();
     }
 }
