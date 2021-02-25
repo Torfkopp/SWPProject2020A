@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.sun.source.tree.PackageTree;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
@@ -10,6 +11,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.Lobby;
@@ -26,8 +28,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -35,7 +42,10 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.crypto.spec.OAEPParameterSpec;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Manages the lobby's menu
@@ -180,9 +190,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function to find the Pair for a given key
      *
      * @param name the key of the pair that should be returned
-     *
      * @return the pair matched by the name
-     *
      * @author Temmo Junkhoff
      * @author Timo Gerken
      * @since 2021-01-19
@@ -209,7 +217,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * are displayed in the log.
      *
      * @param rsp The AllLobbyMembersResponse object seen on the EventBus
-     *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2021-01-19
      */
@@ -235,7 +242,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * It enables the endTurnButton.
      *
      * @param msg The DiceCastMessage object seen on the EventBus
-     *
      * @see de.uol.swp.common.game.message.DiceCastMessage
      * @since 2021-01-15
      */
@@ -285,7 +291,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * be closed without using the Leave Lobby button.
      *
      * @param event The LobbyUpdateEvent found on the EventBus
-     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
@@ -352,7 +357,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * is in.
      *
      * @param rsp The RemoveFromLobbiesResponse seen on the EventBus
-     *
      * @author Finn Haase
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
@@ -391,7 +395,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * the lobby members.
      *
      * @param msg The StartSessionMessage found on the EventBus
-     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-02-04
@@ -424,7 +427,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * LobbyPresenter.
      *
      * @param rsp The UpdateInventoryResponse found on the EventBus
-     *
      * @author Finn Haase
      * @author Sven Ahrens
      * @author Phillip-André Suhr
@@ -466,7 +468,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <Username>} joined Lobby." is displayed in the log.
      *
      * @param msg the UserJoinedLobbyMessage object seen on the EventBus
-     *
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2020-11-22
      */
@@ -477,7 +478,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- User " + msg.getUser().getUsername() + " joined");
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
-                                                                             .equals(msg.getUser().getUsername()))
+                    .equals(msg.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
             setStartSessionButtonState();
         });
@@ -499,7 +500,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * in the log, depending on whether the owner or a normal user left.
      *
      * @param msg The UserLeftLobbyMessage object seen on the EventBus
-     *
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2021-01-20
@@ -529,7 +529,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * such.
      *
      * @param msg The UserReadyMessage found on the EventBus
-     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-01-19
@@ -607,7 +606,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @param userLobbyList A list of User objects including all currently logged in
      *                      users
-     *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.User
@@ -627,10 +625,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     username = String.format(resourceBundle.getString("lobby.members.ready"), username);
                 }
                 Pair<String, String> item = new Pair<>(u.getUsername(),
-                                                       u.getUsername().equals(this.owner.getUsername()) ?
-                                                       String.format(resourceBundle.getString("lobby.members.owner"),
-                                                                     username) :
-                                                       username);
+                        u.getUsername().equals(this.owner.getUsername()) ?
+                                String.format(resourceBundle.getString("lobby.members.owner"),
+                                        username) :
+                                username);
                 lobbyMembers.add(item);
             });
         });

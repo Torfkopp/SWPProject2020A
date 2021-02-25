@@ -3,6 +3,11 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.message.KnightCardPlayedMessage;
+import de.uol.swp.common.game.message.MonopolyCardPlayedMessage;
+import de.uol.swp.common.game.message.RoadBuildingCardPlayedMessage;
+import de.uol.swp.common.game.message.YearOfPlentyCardPlayedMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
@@ -10,6 +15,8 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
 
 /**
  * Class that manages lobbies
@@ -98,5 +105,33 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
+    }
+
+    @Override
+    public void playKnightCard(String lobbyName, User user){
+        LOG.debug("Sending KnightCardPlayedMessage");
+        Message knightCardPlayedMessage = new KnightCardPlayedMessage(lobbyName, user);
+        eventBus.post(knightCardPlayedMessage);
+    }
+
+    @Override
+    public void playMonopolyCard(String lobbyName, User user, Resources resource){
+        LOG.debug("Sending MonopolyCardPlayedMessage");
+        Message monopolyCardPlayedMessage = new MonopolyCardPlayedMessage(lobbyName, user, resource);
+        eventBus.post(monopolyCardPlayedMessage);
+    }
+
+    @Override
+    public void playRoadBuildingCard(String lobbyName, User user){
+        LOG.debug("Sending RoadBuildingCardPlayedMessage");
+        Message roadBuildingPlayedMessage = new RoadBuildingCardPlayedMessage(lobbyName, user);
+        eventBus.post(roadBuildingPlayedMessage);
+    }
+
+    @Override
+    public void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2){
+        LOG.debug("Sending YearOfPlentyCardPlayedMessage");
+        Message yearOfPlentyCardPlayedMessage = new YearOfPlentyCardPlayedMessage(lobbyName, user, resource1, resource2);
+        eventBus.post(yearOfPlentyCardPlayedMessage);
     }
 }

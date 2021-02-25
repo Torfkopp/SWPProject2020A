@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.User;
 
 /**
