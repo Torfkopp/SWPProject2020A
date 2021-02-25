@@ -151,11 +151,11 @@ public class GameRendering {
     }
 
     /**
-     * drawDices method
+     * drawDice method
      * <p>
-     * This method draws two dices
+     * This method draw two dices
      */
-    public void drawDices(int dice1, int dice2) {
+    public void drawDice(int dice1, int dice2) {
         gfxCtx.clearRect(OFFSET_X, OFFSET_Y, 2 * diceSize + diceSize / 8.0 + 2 * diceLineWidth,
                          diceSize + 2 * diceLineWidth);
         double startX = OFFSET_X;
