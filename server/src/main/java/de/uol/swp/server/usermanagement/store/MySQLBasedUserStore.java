@@ -79,6 +79,14 @@ public class MySQLBasedUserStore extends AbstractUserStore {
         }
     }
 
+    /**
+     * This method finds and returns the user specified by the provided ID
+     * without a password comparison
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
     @Override
     public Optional<User> findUser(int id) {
         try {
@@ -263,6 +271,13 @@ public class MySQLBasedUserStore extends AbstractUserStore {
         return retUsers;
     }
 
+    /**
+     * This method removes the row matching the provided ID.
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
     @Override
     public void removeUser(int id) {
         try {
