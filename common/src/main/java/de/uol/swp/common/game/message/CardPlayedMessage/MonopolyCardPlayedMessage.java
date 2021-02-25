@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.message;
+package de.uol.swp.common.game.message.CardPlayedMessage;
 
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.User;
@@ -11,7 +11,7 @@ public class MonopolyCardPlayedMessage extends CardPlayedMessage {
 
     Resources resource;
 
-    public MonopolyCardPlayedMessage(String lobbyName, User user, Resources resource){
+    public MonopolyCardPlayedMessage(String lobbyName, User user, Resources resource) {
         super(lobbyName, user);
         this.resource = resource;
     }

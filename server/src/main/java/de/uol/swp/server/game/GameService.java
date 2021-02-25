@@ -5,7 +5,9 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.message.CardPlayedMessage.*;
+import de.uol.swp.common.game.message.CreateGameMessage;
+import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
@@ -43,6 +45,7 @@ public class GameService extends AbstractService {
      * @param bus            The EventBus used throughout the entire server (injected)
      * @param gameManagement The ChatManagement to use (injected)
      * @param lobbyService   The LobbyService to use (injected)
+     *
      * @since 2021-01-15
      */
     @Inject
@@ -60,6 +63,7 @@ public class GameService extends AbstractService {
      * It then requests the GameManagement to create a game.
      *
      * @param msg The CreateGameMessage found on the EventBus
+     *
      * @see de.uol.swp.common.game.message.CreateGameMessage
      * @since 2021-01-24
      */
@@ -76,6 +80,7 @@ public class GameService extends AbstractService {
      * It then requests the GameManagement to change to current active player.
      *
      * @param req The EndTurnRequest found on the EventBus
+     *
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @see de.uol.swp.common.game.message.NextPlayerMessage
      * @since 2021-01-15
@@ -96,13 +101,36 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a KnightCardPlayedMessage found on the EventBus
+     * <p>
+     * If a KnightCardPlayedMessage is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param msg The KnightCardPlayedMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.KnightCardPlayedMessage
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onKnightCardPlayedMessage(KnightCardPlayedMessage msg) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received KnightCardPlayedMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("---- " + msg.getUser().getUsername() + "wants to improve the army");
+        }
+        Game game = gameManagement.getGame(msg.getLobbyName());
+        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
+        inv.setKnights(inv.getKnights() + 1);
+    }
+
+    /**
      * Handles a MonopolyCardPlayedMessage found on the EventBus
      * <p>
      * If a MonopolyCardPlayedMessage is detected on the EventBus, this method is called.
      * It then requests the GameManagement to handle the card.
      *
      * @param msg The MonopolyCardPlayedMessage found on the EventBus
-     * @see de.uol.swp.common.game.message.MonopolyCardPlayedMessage
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.MonopolyCardPlayedMessage
      * @since 2021-02-25
      */
     @Subscribe
@@ -142,7 +170,8 @@ public class GameService extends AbstractService {
      * It then requests the GameManagement to handle the card.
      *
      * @param msg The RoadBuildingCardPlayedMessage found on the EventBus
-     * @see de.uol.swp.common.game.message.RoadBuildingCardPlayedMessage
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.RoadBuildingCardPlayedMessage
      * @since 2021-02-25
      */
     @Subscribe
@@ -155,73 +184,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a YearOfPlentyCardPlayedMessage found on the EventBus
-     * <p>
-     * If a YearOfPlentyCardPlayedMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param msg The YearOfPlentyCardPlayedMessage found on the EventBus
-     * @see de.uol.swp.common.game.message.YearOfPlentyCardPlayedMessage
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onYearOfPlentyCardPlayedMessage(YearOfPlentyCardPlayedMessage msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants " + msg.getResource1() + " and " + msg.getResource2());
-        }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
-
-        switch (msg.getResource1()) {
-            case ORE:
-                inv.increaseOre(1);
-            case WOOL:
-                inv.increaseWool(1);
-            case BRICK:
-                inv.increaseBrick(1);
-            case GRAIN:
-                inv.increaseGrain(1);
-            case LUMBER:
-                inv.increaseLumber(1);
-        }
-
-        switch (msg.getResource2()) {
-            case ORE:
-                inv.increaseOre(1);
-            case WOOL:
-                inv.increaseWool(1);
-            case BRICK:
-                inv.increaseBrick(1);
-            case GRAIN:
-                inv.increaseGrain(1);
-            case LUMBER:
-                inv.increaseLumber(1);
-        }
-    }
-
-    /**
-     * Handles a KnightCardPlayedMessage found on the EventBus
-     * <p>
-     * If a KnightCardPlayedMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param msg The KnightCardPlayedMessage found on the EventBus
-     * @see de.uol.swp.common.game.message.KnightCardPlayedMessage
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onKnightCardPlayedMessage(KnightCardPlayedMessage msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received KnightCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to improve the army");
-        }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
-        inv.setKnights(inv.getKnights() + 1);
-    }
-
-    /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -231,6 +193,7 @@ public class GameService extends AbstractService {
      * contains the boolean attributes longestRoad and largestArmy.
      *
      * @param req The UpdateInventoryRequest found on the EventBus
+     *
      * @author Sven Ahrens
      * @author Finn Haase
      * @since 2021-01-25
@@ -266,14 +229,62 @@ public class GameService extends AbstractService {
             armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
             AbstractResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                    Collections
-                            .unmodifiableMap(resourceMap),
-                    Collections.unmodifiableMap(
-                            armyAndRoadMap));
+                                                                                Collections
+                                                                                        .unmodifiableMap(resourceMap),
+                                                                                Collections.unmodifiableMap(
+                                                                                        armyAndRoadMap));
             if (req.getMessageContext().isPresent()) {
                 returnMessage.setMessageContext(req.getMessageContext().get());
             }
             post(returnMessage);
+        }
+    }
+
+    /**
+     * Handles a YearOfPlentyCardPlayedMessage found on the EventBus
+     * <p>
+     * If a YearOfPlentyCardPlayedMessage is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param msg The YearOfPlentyCardPlayedMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.YearOfPlentyCardPlayedMessage
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onYearOfPlentyCardPlayedMessage(YearOfPlentyCardPlayedMessage msg) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("---- " + msg.getUser().getUsername() + "wants " + msg.getResource1() + " and " + msg
+                    .getResource2());
+        }
+        Game game = gameManagement.getGame(msg.getLobbyName());
+        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
+
+        switch (msg.getResource1()) {
+            case ORE:
+                inv.increaseOre(1);
+            case WOOL:
+                inv.increaseWool(1);
+            case BRICK:
+                inv.increaseBrick(1);
+            case GRAIN:
+                inv.increaseGrain(1);
+            case LUMBER:
+                inv.increaseLumber(1);
+        }
+
+        switch (msg.getResource2()) {
+            case ORE:
+                inv.increaseOre(1);
+            case WOOL:
+                inv.increaseWool(1);
+            case BRICK:
+                inv.increaseBrick(1);
+            case GRAIN:
+                inv.increaseGrain(1);
+            case LUMBER:
+                inv.increaseLumber(1);
         }
     }
 }

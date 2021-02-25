@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.message;
+package de.uol.swp.common.game.message.CardPlayedMessage;
 
 import de.uol.swp.common.user.User;
 
@@ -8,7 +8,7 @@ import de.uol.swp.common.user.User;
  */
 public class RoadBuildingCardPlayedMessage extends CardPlayedMessage {
 
-    public RoadBuildingCardPlayedMessage(String lobbyName, User user){
+    public RoadBuildingCardPlayedMessage(String lobbyName, User user) {
         super(lobbyName, user);
     }
 }

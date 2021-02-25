@@ -1,7 +1,6 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
-import com.sun.source.tree.PackageTree;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
@@ -31,9 +30,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -42,10 +38,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.crypto.spec.OAEPParameterSpec;
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * Manages the lobby's menu
@@ -59,12 +52,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
     private ObservableList<Pair<String, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
-    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
-
     @FXML
     private ListView<Pair<String, String>> membersView;
     @FXML
@@ -73,6 +65,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private Button startSession;
     @FXML
     private Button endTurn;
+    @FXML
+    private Button playCard;
     @FXML
     private Label turnIndicator;
     @FXML
@@ -190,7 +184,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function to find the Pair for a given key
      *
      * @param name the key of the pair that should be returned
+     *
      * @return the pair matched by the name
+     *
      * @author Temmo Junkhoff
      * @author Timo Gerken
      * @since 2021-01-19
@@ -217,6 +213,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * are displayed in the log.
      *
      * @param rsp The AllLobbyMembersResponse object seen on the EventBus
+     *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2021-01-19
      */
@@ -242,6 +239,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * It enables the endTurnButton.
      *
      * @param msg The DiceCastMessage object seen on the EventBus
+     *
      * @see de.uol.swp.common.game.message.DiceCastMessage
      * @since 2021-01-15
      */
@@ -291,6 +289,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * be closed without using the Leave Lobby button.
      *
      * @param event The LobbyUpdateEvent found on the EventBus
+     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
@@ -329,6 +328,92 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         setTurnIndicatorText(msg.getActivePlayer());
         //In here to test the endTurnButton
         onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
+        setPlayCardButtonState(msg.getActivePlayer());
+    }
+
+    /**
+     * Handles a click on the PlayCardButton
+     * <p>
+     * Method called when the PlayCardButton is pushed
+     * It opens a dialogue to allow the player to choose
+     * which card is to be played.
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    @FXML
+    private void onPlayCardButtonPressed(ActionEvent event) {
+        //eventBus.post(showDevelopmentCardMessage);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Development Cards");
+        alert.setHeaderText("Which Development Card you want to play?");
+        alert.setContentText("Choose your option.");
+
+        ButtonType bKnight = new ButtonType("Knight");
+        ButtonType bMonopoly = new ButtonType("Monopoly");
+        ButtonType bRoadBuilding = new ButtonType("Road Building");
+        ButtonType bYearOfPlenty = new ButtonType("Year of Plenty");
+        ButtonType bCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(bKnight, bMonopoly, bRoadBuilding, bYearOfPlenty, bCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        List<Resources> choices = new ArrayList<>();
+        choices.add(Resources.ORE);
+        choices.add(Resources.GRAIN);
+        choices.add(Resources.BRICK);
+        choices.add(Resources.LUMBER);
+        choices.add(Resources.WOOL);
+
+        if (result.get() == bKnight) {
+            lobbyService.playKnightCard(lobbyName, loggedInUser);
+        } else if (result.get() == bMonopoly) {
+
+            ChoiceDialog<Resources> dialogue = new ChoiceDialog<>(Resources.BRICK, choices);
+            dialogue.setTitle("Resource Cards");
+            dialogue.setHeaderText("Which specific type of resource card you want to claim?");
+            dialogue.setContentText("Choose your option.");
+            Optional<Resources> rst = dialogue.showAndWait();
+            rst.ifPresent(resources -> lobbyService.playMonopolyCard(lobbyName, loggedInUser, resources));
+        } else if (result.get() == bRoadBuilding) {
+            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
+        } else if (result.get() == bYearOfPlenty) {
+            Dialog<Resources> dialogue = new Dialog<>();
+            dialogue.setTitle("Resource Cards");
+            dialogue.setHeaderText("Which two resource cards you want to draw from the Bank?");
+
+            ButtonType confirm = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType("ney", ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            ChoiceBox c1 = new ChoiceBox();
+            ChoiceBox c2 = new ChoiceBox();
+            for (Resources r : choices) {
+                c1.getItems().add(r);
+                c2.getItems().add(r);
+            }
+            c1.setValue(Resources.BRICK);
+            c2.setValue(Resources.BRICK);
+
+            grid.add(new Label("Resource 1:"), 0, 0);
+            grid.add(c1, 1, 0);
+            grid.add(new Label("Resource 2:"), 0, 1);
+            grid.add(c2, 1, 1);
+
+            dialogue.getDialogPane().setContent(grid);
+            dialogue.showAndWait();
+
+            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, (Resources) c1.getValue(),
+                                              (Resources) c2.getValue());
+        }
     }
 
     /**
@@ -357,6 +442,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * is in.
      *
      * @param rsp The RemoveFromLobbiesResponse seen on the EventBus
+     *
      * @author Finn Haase
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
@@ -395,6 +481,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * the lobby members.
      *
      * @param msg The StartSessionMessage found on the EventBus
+     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-02-04
@@ -413,6 +500,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);
+                this.playCard.setVisible(true);
+                setPlayCardButtonState(msg.getUser());
             });
         }
     }
@@ -427,6 +516,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * LobbyPresenter.
      *
      * @param rsp The UpdateInventoryResponse found on the EventBus
+     *
      * @author Finn Haase
      * @author Sven Ahrens
      * @author Phillip-André Suhr
@@ -468,6 +558,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <Username>} joined Lobby." is displayed in the log.
      *
      * @param msg the UserJoinedLobbyMessage object seen on the EventBus
+     *
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2020-11-22
      */
@@ -478,7 +569,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- User " + msg.getUser().getUsername() + " joined");
         Platform.runLater(() -> {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
-                    .equals(msg.getUser().getUsername()))
+                                                                             .equals(msg.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
             setStartSessionButtonState();
         });
@@ -500,6 +591,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * in the log, depending on whether the owner or a normal user left.
      *
      * @param msg The UserLeftLobbyMessage object seen on the EventBus
+     *
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2021-01-20
@@ -529,6 +621,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * such.
      *
      * @param msg The UserReadyMessage found on the EventBus
+     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @since 2021-01-19
@@ -553,6 +646,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setEndTurnButtonState(User player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the disable state of the PlayCardButton
+     * The button is only enabled to the active player
+     *
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    private void setPlayCardButtonState(User player) {
+        this.playCard.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**
@@ -606,6 +710,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @param userLobbyList A list of User objects including all currently logged in
      *                      users
+     *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.User
@@ -625,90 +730,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     username = String.format(resourceBundle.getString("lobby.members.ready"), username);
                 }
                 Pair<String, String> item = new Pair<>(u.getUsername(),
-                        u.getUsername().equals(this.owner.getUsername()) ?
-                                String.format(resourceBundle.getString("lobby.members.owner"),
-                                        username) :
-                                username);
+                                                       u.getUsername().equals(this.owner.getUsername()) ?
+                                                       String.format(resourceBundle.getString("lobby.members.owner"),
+                                                                     username) : username);
                 lobbyMembers.add(item);
             });
         });
-    }
-
-    /**
-     *
-     * @author Eric Vuong
-     * @author Mario Fokken
-     * @since 2021-02-25
-     */
-    @FXML
-    private void onPlayDevelopmentCardButtonPressed(ActionEvent event) {
-        //eventBus.post(showDevelopmentCardMessage);
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Development Cards");
-        alert.setHeaderText("Which Development Card you want to play?");
-        alert.setContentText("Choose your option.");
-
-        ButtonType bKnight = new ButtonType("Knight");
-        ButtonType bMonopoly = new ButtonType("Monopoly");
-        ButtonType bRoadBuilding = new ButtonType("Road Building");
-        ButtonType bYearOfPlenty = new ButtonType("Year of Plenty");
-        ButtonType bCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(bKnight, bMonopoly, bRoadBuilding, bYearOfPlenty, bCancel);
-
-        Optional<ButtonType> result = alert.showAndWait();
-
-        List<Resources> choices = new ArrayList<>();
-        choices.add(Resources.ORE);
-        choices.add(Resources.GRAIN);
-        choices.add(Resources.BRICK);
-        choices.add(Resources.LUMBER);
-        choices.add(Resources.WOOL);
-
-        if (result.get() == bKnight) {
-            lobbyService.playKnightCard(lobbyName, loggedInUser);
-
-        } else if (result.get() == bMonopoly) {
-
-            ChoiceDialog<Resources> dialogue = new ChoiceDialog<>(Resources.BRICK, choices);
-            dialogue.setTitle("Resource Cards");
-            dialogue.setHeaderText("Which specific type of resource card you want to claim?");
-            dialogue.setContentText("Choose your option.");
-            Optional<Resources> rst = dialogue.showAndWait();
-            if (rst.isPresent()) {
-                lobbyService.playMonopolyCard(lobbyName, loggedInUser, rst.get());
-            }
-        } else if (result.get() == bRoadBuilding) {
-            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
-        } else if (result.get() == bYearOfPlenty) {
-            //TODO FIX IT
-            Dialog<Pair<Choice, Choice>> dialogue = new Dialog<>();
-            dialogue.setTitle("Resource Cards");
-            dialogue.setHeaderText("Which two resource cards you want to draw from the Bank?");
-
-            ButtonType ok = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
-            dialogue.getDialogPane().getButtonTypes().addAll(ok, ButtonType.CANCEL);
-
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(20,150,10,10));
-
-            ChoiceBox<Resources> c1 = new ChoiceBox();
-            c1.setItems((ObservableList) choices);
-            ChoiceBox<Resources> c2 = new ChoiceBox();
-            c2.setItems((ObservableList) choices);
-
-            grid.add(c1,0,0);
-            grid.add(c2,0,1);
-
-            Optional<Pair<Choice,Choice>> rst = dialogue.showAndWait();
-            if(rst.isPresent()){
-                lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, c1.getValue(), c2.getValue());
-            }
-        } else {
-
-        }
     }
 }

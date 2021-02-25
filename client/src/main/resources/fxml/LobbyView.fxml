@@ -87,8 +87,8 @@
                             </HBox.margin>
                         </Button>
                     </HBox>
-                    <Button fx:id="playDevelopmentCard" mnemonicParsing="false"
-                            onAction="#onPlayDevelopmentCardButtonPressed" text="PlayDevelopmentCard"/>
+                    <Button fx:id="playCard" mnemonicParsing="false" visible="false" disable="true"
+                            onAction="#onPlayCardButtonPressed" text="Play Card"/>
                 </VBox>
                 <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>

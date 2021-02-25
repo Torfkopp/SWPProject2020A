@@ -1,5 +1,6 @@
-package de.uol.swp.common.game.message;
+package de.uol.swp.common.game.message.CardPlayedMessage;
 
+import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.user.User;
 
 /**
