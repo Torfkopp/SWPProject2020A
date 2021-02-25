@@ -43,12 +43,35 @@ public class RegistrationPresenter extends AbstractPresenter {
      * Constructor
      *
      * @param eventBus The EventBus set in ClientModule
+     *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2019-09-18
      */
     @Inject
     public RegistrationPresenter(EventBus eventBus) {
         setEventBus(eventBus);
+    }
+
+    /**
+     * Method called to compare the eMail string with valid regex
+     * <p>
+     * This helper method is called to compare whether a provided
+     * string complies to RFC5322 and some other restrictions like
+     * to adjacent dots. If it matches, the boolean true is returned.
+     *
+     * @param eMail the mail string provided during registration
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-02-25
+     */
+    private boolean checkMailFormat(String eMail) {
+        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(eMail);
+
+        return matcher.matches();
     }
 
     /**
@@ -97,28 +120,8 @@ public class RegistrationPresenter extends AbstractPresenter {
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
         } else {
-            userService.createUser(new UserDTO(-1, loginField.getText(), passwordField1.getText(), emailField.getText()));
+            userService
+                    .createUser(new UserDTO(-1, loginField.getText(), passwordField1.getText(), emailField.getText()));
         }
-    }
-
-    /**
-     * Method called to compare the eMail string with valid regex
-     * <p>
-     * This helper method is called to compare whether a provided
-     * string complies to RFC5322 and some other restrictions like
-     * to adjacent dots. If it matches, the boolean true is returned.
-     *
-     * @param eMail the mail string provided during registration
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-02-25
-     */
-    private boolean checkMailFormat(String eMail) {
-        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(eMail);
-
-        return matcher.matches();
     }
 }
