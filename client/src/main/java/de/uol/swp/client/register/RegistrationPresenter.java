@@ -72,7 +72,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      * <p>
      * This Method is called when the RegisterButton is pressed. It posts an instance
      * of the RegistrationErrorEvent onto the EventBus the SceneManager is subscribed
-     * to if one of the fields is empty, the password fields are not equal or the
+     * to if one of the fields is empty, the password fields are not equal, or the
      * eMail field is malformed.
      * If everything is filled in correctly, the user service is requested to create
      * a new user.
