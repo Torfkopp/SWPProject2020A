@@ -219,7 +219,7 @@ public class GameService extends AbstractService {
             resourceMap.put("ore", inventory.getOre());
             resourceMap.put("wool", inventory.getWool());
             resourceMap.put("cards.victorypoints", inventory.getVictoryPointCards());
-            resourceMap.put("cards.knights", inventory.getKnightCards());
+            resourceMap.put("cards.knight", inventory.getKnightCards());
             resourceMap.put("cards.roadbuilding", inventory.getRoadBuildingCards());
             resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
             resourceMap.put("cards.monopoly", inventory.getMonopolyCards());

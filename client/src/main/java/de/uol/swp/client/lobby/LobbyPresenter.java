@@ -347,15 +347,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         //eventBus.post(showDevelopmentCardMessage);
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Development Cards");
-        alert.setHeaderText("Which Development Card you want to play?");
-        alert.setContentText("Choose your option.");
+        alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
+        alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
+        alert.setContentText(resourceBundle.getString("%game.playcards.alert.content"));
 
-        ButtonType bKnight = new ButtonType("Knight");
-        ButtonType bMonopoly = new ButtonType("Monopoly");
-        ButtonType bRoadBuilding = new ButtonType("Road Building");
-        ButtonType bYearOfPlenty = new ButtonType("Year of Plenty");
-        ButtonType bCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType bKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
+        ButtonType bMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
+        ButtonType bRoadBuilding = new ButtonType(resourceBundle.getString("game.resources.cards.roadbuilding"));
+        ButtonType bYearOfPlenty = new ButtonType(resourceBundle.getString("game.resources.cards.yearofplenty"));
+        ButtonType bCancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                            ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(bKnight, bMonopoly, bRoadBuilding, bYearOfPlenty, bCancel);
 
@@ -371,22 +372,22 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (result.get() == bKnight) {
             lobbyService.playKnightCard(lobbyName, loggedInUser);
         } else if (result.get() == bMonopoly) {
-
             ChoiceDialog<Resources> dialogue = new ChoiceDialog<>(Resources.BRICK, choices);
-            dialogue.setTitle("Resource Cards");
-            dialogue.setHeaderText("Which specific type of resource card you want to claim?");
-            dialogue.setContentText("Choose your option.");
+            dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
+            dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
+            dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
             Optional<Resources> rst = dialogue.showAndWait();
             rst.ifPresent(resources -> lobbyService.playMonopolyCard(lobbyName, loggedInUser, resources));
         } else if (result.get() == bRoadBuilding) {
             lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
         } else if (result.get() == bYearOfPlenty) {
             Dialog<Resources> dialogue = new Dialog<>();
-            dialogue.setTitle("Resource Cards");
-            dialogue.setHeaderText("Which two resource cards you want to draw from the Bank?");
-
-            ButtonType confirm = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType("ney", ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
+            dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.confirm"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
             dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
 
             GridPane grid = new GridPane();
@@ -403,9 +404,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             c1.setValue(Resources.BRICK);
             c2.setValue(Resources.BRICK);
 
-            grid.add(new Label("Resource 1:"), 0, 0);
+            grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
             grid.add(c1, 1, 0);
-            grid.add(new Label("Resource 2:"), 0, 1);
+            grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label2")), 0, 1);
             grid.add(c2, 1, 1);
 
             dialogue.getDialogPane().setContent(grid);
