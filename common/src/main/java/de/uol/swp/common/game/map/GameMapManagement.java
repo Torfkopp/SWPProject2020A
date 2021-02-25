@@ -1,5 +1,8 @@
 package de.uol.swp.common.game.map;
 
+import com.google.common.graph.ElementOrder;
+import com.google.common.graph.ImmutableNetwork;
+import com.google.common.graph.NetworkBuilder;
 import de.uol.swp.common.game.map.Hexes.*;
 
 import java.util.*;
@@ -37,6 +40,38 @@ public class GameMapManagement implements IGameMapManagement {
         createEdges();
         createIntersections();
         hexes[robberPosition].setRobberOnField(true);
+        var fancyNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(true)
+                                                .nodeOrder(ElementOrder.insertion()).expectedNodeCount(37)
+                                                .expectedEdgeCount(72).<IGameHex, IEdge>immutable();
+
+        IGameHex[][] map;
+        map = new IGameHex[7][];
+        map[0] = new IGameHex[4];
+        map[1] = new IGameHex[5];
+        map[2] = new IGameHex[6];
+        map[3] = new IGameHex[7];
+        map[4] = new IGameHex[6];
+        map[5] = new IGameHex[5];
+        map[6] = new IGameHex[4];
+
+        //[0][1] -> [0][2], [1][1], [1][2]
+
+        //[2][4] -> [2][3], [2][5], [1][3], [1][4], [3][4], [3][5]
+
+        //WaterHex[] waterHexes = new WaterHex[38];
+        for (int i = 1; i < hexes.length; i++) {
+            //waterHexes[i] = new WaterHex();
+            fancyNetworkBuilder.addNode(hexes[i]);
+        }
+
+        //IEdge[] edges = new IEdge[72];
+        for (int i = 1; i < edges.length; i++) {
+            //edges[i] = new Edge(new int[0], new int[0]);
+            fancyNetworkBuilder.addEdge(hexes[i / 2 + 1], hexes[((i / 2 + 2) % 37) + 1], edges[i]);
+        }
+        ImmutableNetwork<IGameHex, IEdge> fancyNetwork = fancyNetworkBuilder.build();
+
+        System.err.println(fancyNetwork.adjacentNodes(hexes[37]));
     }
 
     @Override
