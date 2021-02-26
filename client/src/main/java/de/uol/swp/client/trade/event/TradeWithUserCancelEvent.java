@@ -16,6 +16,7 @@ package de.uol.swp.client.trade.event;
 public class TradeWithUserCancelEvent {
 
     private final String lobbyName;
+
     /**
      * Constructor
      *
@@ -24,6 +25,7 @@ public class TradeWithUserCancelEvent {
     public TradeWithUserCancelEvent(String lobbyName) {
         this.lobbyName = lobbyName;
     }
+
     /**
      * Gets the name of the lobby where the trading window should be closed
      *

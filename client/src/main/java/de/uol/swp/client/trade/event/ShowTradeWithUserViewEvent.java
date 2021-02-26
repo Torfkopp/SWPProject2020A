@@ -15,23 +15,26 @@ import de.uol.swp.common.user.User;
  */
 public class ShowTradeWithUserViewEvent {
 
-    private final User user;
+    private final User offeringUser;
     private final String lobbyName;
+    private final String respondingUserName;
 
     /**
      * Constructor
      *
-     * @param user      User that wants to trade with another user
-     * @param lobbyName Lobby name of the lobby where the player wants to trade
+     * @param offeringUser       User that wants to trade with another user
+     * @param lobbyName          Lobby name of the lobby where the player wants to trade
+     * @param respondingUserName Name of the user who the offer will be made to
      */
-    public ShowTradeWithUserViewEvent(User user, String lobbyName) {
-        this.user = user;
+    public ShowTradeWithUserViewEvent(User offeringUser, String lobbyName, String respondingUserName) {
+        this.offeringUser = offeringUser;
         this.lobbyName = lobbyName;
+        this.respondingUserName = respondingUserName;
     }
 
     /**
      * Gets the lobby name of the lobby where the player want to
-     * trade with the bank
+     * trade with the user
      *
      * @return Lobby name of the lobby where the player wants to trade
      */
@@ -40,11 +43,20 @@ public class ShowTradeWithUserViewEvent {
     }
 
     /**
-     * Gets the User who wants to trade with the Bank
+     * Gets the User who wants to trade with another User
      *
-     * @return User who wants to trade with the bank
+     * @return User who wants to trade with another User
      */
-    public User getUser() {
-        return user;
+    public User getOfferingUser() {
+        return offeringUser;
+    }
+
+    /**
+     * Gets the name of the responding user.
+     *
+     * @return Name of the responding user
+     */
+    public String getRespondingUserName() {
+        return respondingUserName;
     }
 }
