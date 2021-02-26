@@ -4,10 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.client.trade.event.ResetTradeWithUserButtonEvent;
-import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
+import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
@@ -15,6 +13,8 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
+import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
@@ -438,6 +438,22 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles a TradeOfUsersAcceptedResponse found on the EventBus
+     * Updates the Inventories of the trading User.
+     *
+     * @param rsp The TradeOfUsersAcceptedResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
+        lobbyService.updateInventory(this.lobbyName, this.loggedInUser);
+    }
+
+    /**
      * Handles a Click on the TradeWithUserButtons
      * <p>
      * If another player of the lobby-member-list is selected and the button gets pressed,
@@ -457,17 +473,36 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(
-                    resourceBundle.getString("lobby.error.invalidlobby"))); // todo neues Errorevent erstellen
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
         } else if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             this.tradeWithUserButton.setDisable(true);
-            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName));
-            LOG.debug("Posted ShowTradeWithUserViewEvent");
-            System.out.println(selectedUser.getKey() + " ist der User mit dem du tauschst");
-            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
+            LOG.debug("Sending ShowTradeWithUserViewEvent");
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, selectedUser.getKey()));
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
+        }
+    }
+
+    /**
+     * Handles the TradeWithUserOfferResponse found on the EventBus
+     * If a user gets a trading offer a new ShowTradeWithUserRespondViewEvent is posted onto
+     * the  EventBus to show the AcceptView.
+     *
+     * @param rsp The TradeWithUserOfferResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
+        if (rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Sending ShowTradeWithUserAcceptViewEvent");
+            eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
+                                                                this.loggedInUser.getUsername(), this.lobbyName, rsp));
         }
     }
 
@@ -641,7 +676,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
-     * @author Alwin Bossert
+     * @author Finn Haase
      * @author Maximilian Lindner
      * @since 2021-02-21
      */

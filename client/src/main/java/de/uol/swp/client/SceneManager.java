@@ -57,8 +57,8 @@ public class SceneManager {
     private static final int RESPONSE_TRADING_HEIGHT = 280;
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
-    private final Map<String, Stage> tradingStage = new HashMap<>();
-    private final Map<String, Stage> tradingResponseStage = new HashMap<>();
+    private final Map<String, Stage> tradingStages = new HashMap<>();
+    private final Map<String, Stage> tradingResponseStages = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
@@ -69,7 +69,7 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
@@ -279,9 +279,9 @@ public class SceneManager {
     private void onCloseTradeWithUserResponseEvent(CloseTradeWithUserResponseEvent event) {
         LOG.debug("Received CloseTradeWithUserResponseEvent");
         String lobby = event.getLobbyName();
-        if (tradingResponseStage.containsKey(lobby)) {
-            tradingResponseStage.get(lobby).close();
-            tradingResponseStage.remove(lobby);
+        if (tradingResponseStages.containsKey(lobby)) {
+            tradingResponseStages.get(lobby).close();
+            tradingResponseStages.remove(lobby);
         }
     }
 
@@ -435,36 +435,31 @@ public class SceneManager {
      * @author Maximilian Lindner
      * @author Finn Haase
      * @see de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent
-     * @see de.uol.swp.client.trade.event.ShowTradeWithUserAcceptViewEvent
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserRespondViewEvent
      * @since 2021-02-23
      */
     @Subscribe
-    private void onShowTradeWithUserAcceptViewEvent(ShowTradeWithUserAcceptViewEvent event) {
-        //todo Fenster nur bei responding user anzeigen
-        //gets the lobby's name
+    private void onShowTradeWithUserRespondViewEvent(ShowTradeWithUserRespondViewEvent event) {
         String lobbyName = event.getLobbyName();
-        User user = event.getUser();
-        //New window (Stage)
-        Stage lobbyStage = new Stage();
-        lobbyStage.setTitle("Trade of " + user.getUsername());
-        lobbyStage.setHeight(RESPONSE_TRADING_HEIGHT);
-        lobbyStage.setMinHeight(RESPONSE_TRADING_HEIGHT);
-        lobbyStage.setWidth(RESPONSE_TRADING_WIDTH);
-        lobbyStage.setMinWidth(RESPONSE_TRADING_WIDTH);
-        //Initialises a new lobbyScene
-        Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane);
-        lobbyScene.getStylesheets().add(styleSheet);
-        lobbyStage.setScene(lobbyScene);
-        tradingResponseStage.put(lobbyName, lobbyStage);
-        //Specifies the modality for new window
-        lobbyStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        lobbyStage.initOwner(primaryStage);
-        //Shows the window
-        lobbyStage.show();
-        eventBus.post(new TradeWithUserResponseUpdateEvent(event.getTradingUser(), lobbyName, user));
-        LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+        Platform.runLater(() -> {
+            Stage tradingResponseStage = new Stage();
+            tradingResponseStage.setTitle(String.format(resourceBundle.getString("game.trade.window.receiving.title"),
+                                                        event.getOfferingUser()));
+            tradingResponseStage.setHeight(RESPONSE_TRADING_HEIGHT);
+            tradingResponseStage.setMinHeight(RESPONSE_TRADING_HEIGHT);
+            tradingResponseStage.setWidth(RESPONSE_TRADING_WIDTH);
+            tradingResponseStage.setMinWidth(RESPONSE_TRADING_WIDTH);
+            Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
+            Scene tradeScene = new Scene(rootPane);
+            tradeScene.getStylesheets().add(styleSheet);
+            tradingResponseStage.setScene(tradeScene);
+            tradingResponseStages.put(lobbyName, tradingResponseStage);
+            tradingResponseStage.initModality(Modality.NONE);
+            tradingResponseStage.initOwner(primaryStage);
+            tradingResponseStage.show();
+            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+            eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
+        });
     }
 
     /**
@@ -484,30 +479,43 @@ public class SceneManager {
      */
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
-        //gets the lobby's name
         String lobbyName = event.getLobbyName();
-        User user = event.getUser();
-        //New window (Stage)
-        Stage lobbyStage = new Stage();
-        lobbyStage.setTitle("Trade of " + user.getUsername());
-        lobbyStage.setHeight(TRADING_HEIGHT);
-        lobbyStage.setMinHeight(TRADING_HEIGHT);
-        lobbyStage.setWidth(TRADING_WIDTH);
-        lobbyStage.setMinWidth(TRADING_WIDTH);
-        //Initialises a new lobbyScene
+        User offeringUser = event.getOfferingUser();
+        Stage tradingStage = new Stage();
+        tradingStage.setTitle(String.format(resourceBundle.getString("game.trade.window.offering.title"),
+                                            event.getRespondingUserName()));
+        tradingStage.setHeight(TRADING_HEIGHT);
+        tradingStage.setMinHeight(TRADING_HEIGHT);
+        tradingStage.setWidth(TRADING_WIDTH);
+        tradingStage.setMinWidth(TRADING_WIDTH);
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane);
-        lobbyScene.getStylesheets().add(styleSheet);
-        lobbyStage.setScene(lobbyScene);
-        tradingStage.put(lobbyName, lobbyStage);
-        //Specifies the modality for new window
-        lobbyStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        lobbyStage.initOwner(primaryStage);
-        //Shows the window
-        lobbyStage.show();
-        eventBus.post(new TradeWithUserUpdateEvent(lobbyName, user));
+        Scene tradeScene = new Scene(rootPane);
+        tradeScene.getStylesheets().add(styleSheet);
+        tradingStage.setScene(tradeScene);
+        tradingStages.put(lobbyName, tradingStage);
+        tradingStage.initModality(Modality.NONE);
+        tradingStage.initOwner(primaryStage);
+        tradingStage.show();
+        eventBus.post(new TradeWithUserUpdateEvent(lobbyName, offeringUser));
         LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
+    }
+
+    /**
+     * Handles the TradeErrorEvent detected on the EventBus
+     * <p>
+     * If a TradeErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in an error alert.
+     *
+     * @param event The LobbyErrorEvent detected on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.TradeErrorEvent
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeErrorEvent(TradeErrorEvent event) {
+        showError(event.getMessage());
     }
 
     /**
@@ -526,13 +534,13 @@ public class SceneManager {
     private void onTradeWithUserCancelEvent(TradeWithUserCancelEvent event) {
         LOG.debug("Received TradeWithUserCancelEvent");
         String lobby = event.getLobbyName();
-        if (tradingStage.containsKey(lobby)) {
-            tradingStage.get(lobby).close();
-            tradingStage.remove(lobby);
+        if (tradingStages.containsKey(lobby)) {
+            tradingStages.get(lobby).close();
+            tradingStages.remove(lobby);
         }
-        if (tradingResponseStage.containsKey(lobby)) {
-            tradingResponseStage.get(lobby).close();
-            tradingResponseStage.remove(lobby);
+        if (tradingResponseStages.containsKey(lobby)) {
+            tradingResponseStages.get(lobby).close();
+            tradingResponseStages.remove(lobby);
         }
     }
 

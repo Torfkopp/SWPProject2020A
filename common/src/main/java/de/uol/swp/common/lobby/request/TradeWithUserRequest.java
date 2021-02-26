@@ -13,7 +13,7 @@ import de.uol.swp.common.user.User;
  */
 public class TradeWithUserRequest extends AbstractLobbyRequest {
 
-    private final String tradingUser;
+    private final String respondingUser;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      */
     public TradeWithUserRequest(String name, User user, String tradingPartner) {
         super(name, user);
-        this.tradingUser = tradingPartner;
+        this.respondingUser = tradingPartner;
     }
 
     /**
@@ -32,7 +32,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      *
      * @return The username of the trading partner
      */
-    public String getTradingUser() {
-        return tradingUser;
+    public String getRespondingUser() {
+        return respondingUser;
     }
 }
