@@ -391,7 +391,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
             dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
             Optional<String> rst = dialogue.showAndWait();
-
+            //TODO Buttons sind auf Deutsch; Cancel Button Cancelt nicht
             Resources resource = Resources.BRICK;
             if (rst.isPresent()) {
                 if (rst.get().equals(ore)) resource = Resources.ORE;
@@ -413,7 +413,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
             dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
-
+            //TODO Cancel button cancelt nicht
             GridPane grid = new GridPane();
             grid.setHgap(10);
             grid.setVgap(10);
