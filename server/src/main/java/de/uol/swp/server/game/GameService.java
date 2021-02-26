@@ -162,6 +162,7 @@ public class GameService extends AbstractService {
         if (inv.getKnightCards() == 0) {
             PlayCardFailureResponse returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                                 PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
             LOG.debug("---- Not enough Knight cards");
@@ -195,6 +196,7 @@ public class GameService extends AbstractService {
         if (invMono.getMonopolyCards() == 0) {
             AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                                 PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
             LOG.debug("---- Not enough Monopoly cards");
@@ -252,6 +254,7 @@ public class GameService extends AbstractService {
         if (inv.getRoadBuildingCards() == 0) {
             AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                                 PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
             LOG.debug("---- Not enough RoadBuilding cards");
@@ -287,6 +290,7 @@ public class GameService extends AbstractService {
         if (inv.getYearOfPlentyCards() == 0) {
             AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
                                                                                 PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
             LOG.debug("---- Not enough YearOfPlenty cards");

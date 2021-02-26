@@ -470,7 +470,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             alert.setContentText("");
             alert.showAndWait();
         }
-        //TODO Wird nicht aufgerufen
+        //TODO Alert schreiben
     }
 
     /**
