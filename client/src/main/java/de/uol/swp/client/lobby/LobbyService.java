@@ -4,8 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.message.CardPlayedMessage.*;
 import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
@@ -104,29 +104,29 @@ public class LobbyService implements ILobbyService {
 
     @Override
     public void playKnightCard(String lobbyName, User user) {
-        LOG.debug("Sending KnightCardPlayedMessage");
-        Message msg = new KnightCardPlayedMessage(lobbyName, user);
+        LOG.debug("Sending PlayKnightCardRequest");
+        Message msg = new PlayKnightCardRequest(lobbyName, user);
         eventBus.post(msg);
     }
 
     @Override
     public void playMonopolyCard(String lobbyName, User user, Resources resource) {
-        LOG.debug("Sending MonopolyCardPlayedMessage");
-        Message msg = new MonopolyCardPlayedMessage(lobbyName, user, resource);
+        LOG.debug("Sending PlayMonopolyCardRequest");
+        Message msg = new PlayMonopolyCardRequest(lobbyName, user, resource);
         eventBus.post(msg);
     }
 
     @Override
     public void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2) {
-        LOG.debug("Sending YearOfPlentyCardPlayedMessage");
-        Message msg = new YearOfPlentyCardPlayedMessage(lobbyName, user, resource1, resource2);
+        LOG.debug("Sending PlayYearOfPlentyCardRequest");
+        Message msg = new PlayYearOfPlentyCardRequest(lobbyName, user, resource1, resource2);
         eventBus.post(msg);
     }
 
     @Override
     public void playRoadBuildingCard(String lobbyName, User user) {
-        LOG.debug("Sending RoadBuildingCardPlayedMessage");
-        Message msg = new RoadBuildingCardPlayedMessage(lobbyName, user);
+        LOG.debug("Sending PlayRoadBuildingCardRequest");
+        Message msg = new PlayRoadBuildingCardRequest(lobbyName, user);
         eventBus.post(msg);
     }
 }

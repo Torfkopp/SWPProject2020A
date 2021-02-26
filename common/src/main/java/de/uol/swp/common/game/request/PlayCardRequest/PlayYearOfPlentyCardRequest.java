@@ -1,19 +1,19 @@
-package de.uol.swp.common.game.message.CardPlayedMessage;
+package de.uol.swp.common.game.request.PlayCardRequest;
 
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.User;
 
 /**
- * This message gets sent when the player
+ * This request gets sent when the player
  * wants to play a YearOfPlentyCard
  */
-public class YearOfPlentyCardPlayedMessage extends CardPlayedMessage {
+public class PlayYearOfPlentyCardRequest extends PlayCardRequest {
 
     Resources resource1;
     Resources resource2;
 
-    public YearOfPlentyCardPlayedMessage(String lobbyName, User user, Resources resource1, Resources resource2) {
-        super(lobbyName, user);
+    public PlayYearOfPlentyCardRequest(String originLobby, User user, Resources resource1, Resources resource2) {
+        super(originLobby, user);
         this.resource1 = resource1;
         this.resource2 = resource2;
     }

@@ -3,7 +3,12 @@ package de.uol.swp.server.game;
 import com.google.common.eventbus.EventBus;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
 import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
@@ -329,5 +334,65 @@ public class GameServiceTest {
         assertEquals(gameInventory1[0].getOre(), 0);
         assertEquals(gameInventory1[0].getGrain(), 0);
         assertEquals(gameInventory1[0].getLumber(), 0);
+    }
+
+    @Test
+    void onPlayKnightCardRequestTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0]);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        gameManagement.createGame(lobby, user[0]);
+        Game game = gameManagement.getGame(lobby.getName());
+        game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
+        bus.post(new PlayKnightCardRequest(lobby.getName(), user[0]));
+        assertEquals(game.getInventory(Player.PLAYER_1).getKnights(), 1);
+    }
+
+    @Test
+    void onPlayMonopolyCardRequestTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0]);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        gameManagement.createGame(lobby, user[0]);
+        Game game = gameManagement.getGame(lobby.getName());
+        Inventory[] inventories = game.getInventories();
+        inventories[1].increaseBrick(1);
+        inventories[2].increaseBrick(2);
+        inventories[0].increaseMonopolyCards(1);
+        bus.post(new PlayMonopolyCardRequest(lobby.getName(), user[0], Resources.BRICK));
+        assertEquals(inventories[0].getBrick(), 2);
+        assertEquals(inventories[1].getBrick(), 0);
+        assertEquals(inventories[2].getBrick(), 1);
+    }
+
+    @Test
+    void onPlayYearOfPlentyCardRequestTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0]);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        gameManagement.createGame(lobby, user[0]);
+        Game game = gameManagement.getGame(lobby.getName());
+        assertEquals(game.getInventory(Player.PLAYER_1).getBrick(), 0);
+        game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
+        bus.post(new PlayYearOfPlentyCardRequest(lobby.getName(), user[0], Resources.BRICK, Resources.GRAIN));
+        assertEquals(game.getInventory(Player.PLAYER_1).getBrick(), 1);
+        assertEquals(game.getInventory(Player.PLAYER_1).getGrain(), 1);
+    }
+
+    @Test
+    void onRoadBuildingCardRequestTest() {
+        //Methode noch nicht fertig
     }
 }

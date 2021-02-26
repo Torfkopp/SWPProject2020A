@@ -5,10 +5,10 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.message.CardPlayedMessage.*;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
+import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.message.AbstractResponseMessage;
@@ -139,86 +139,197 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a KnightCardPlayedMessage found on the EventBus
+     * Handles a PlayKnightCardRequest found on the EventBus
      * <p>
-     * If a KnightCardPlayedMessage is detected on the EventBus, this method is called.
+     * If a PlayKnightCardRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to handle the card.
      *
-     * @param msg The KnightCardPlayedMessage found on the EventBus
+     * @param req The PlayKnightCardRequest found on the EventBus
      *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.KnightCardPlayedMessage
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest
      * @since 2021-02-25
      */
     @Subscribe
-    private void onKnightCardPlayedMessage(KnightCardPlayedMessage msg) {
+    private void onPlayKnightCardRequest(PlayKnightCardRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Received KnightCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to improve the army");
+            LOG.debug("Received KnightCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + "wants to improve the army");
         }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (inv.getKnightCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough Knight cards");
+            return;
+        }
         inv.setKnights(inv.getKnights() + 1);
+
+        inv.increaseRoadBuildingCards(-1);
     }
 
     /**
-     * Handles a MonopolyCardPlayedMessage found on the EventBus
+     * Handles a PlayMonopolyCardRequest found on the EventBus
      * <p>
-     * If a MonopolyCardPlayedMessage is detected on the EventBus, this method is called.
+     * If a PlayMonopolyCardRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to handle the card.
      *
-     * @param msg The MonopolyCardPlayedMessage found on the EventBus
+     * @param req The PlayMonopolyCardRequest found on the EventBus
      *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.MonopolyCardPlayedMessage
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest
      * @since 2021-02-25
      */
     @Subscribe
-    private void onMonopolyCardPlayedMessage(MonopolyCardPlayedMessage msg) {
+    private void onPlayMonopolyCardRequest(PlayMonopolyCardRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to monopolise " + msg.getResource());
+            LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + "wants to monopolise " + req.getResource());
         }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory invMono = game.getInventory(game.getPlayer(msg.getUser()));
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory invMono = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (invMono.getMonopolyCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough RoadBuilding cards");
+            return;
+        }
         Inventory[] inventories = game.getInventories();
         int i = inventories.length;
         //Player gets one resource too much which gets reduced in the next step
-        switch (msg.getResource()) {
+        switch (req.getResource()) {
             case ORE:
                 invMono.increaseOre(i);
-                for (Inventory inv : inventories) inv.increaseOre(-1);
+                for (Inventory inv : inventories) if (inv.getOre() > 0) inv.increaseOre(-1);
+                break;
             case WOOL:
                 invMono.increaseWool(i);
-                for (Inventory inv : inventories) inv.increaseWool(-1);
+                for (Inventory inv : inventories) if (inv.getWool() > 0) inv.increaseWool(-1);
+                break;
             case BRICK:
                 invMono.increaseBrick(i);
-                for (Inventory inv : inventories) inv.increaseBrick(-1);
+                for (Inventory inv : inventories) if (inv.getBrick() > 0) inv.increaseBrick(-1);
+                break;
             case GRAIN:
                 invMono.increaseGrain(i);
-                for (Inventory inv : inventories) inv.increaseGrain(-1);
+                for (Inventory inv : inventories) if (inv.getGrain() > 0) inv.increaseGrain(-1);
+                break;
             case LUMBER:
                 invMono.increaseLumber(i);
-                for (Inventory inv : inventories) inv.increaseLumber(-1);
+                for (Inventory inv : inventories) if (inv.getLumber() > 0) inv.increaseLumber(-1);
+                break;
         }
+        invMono.increaseMonopolyCards(-1);
     }
 
     /**
-     * Handles a RoadBuildingCardPlayedMessage found on the EventBus
+     * Handles a PlayRoadBuildingCardRequest found on the EventBus
      * <p>
-     * If a RoadBuildingCardPlayedMessage is detected on the EventBus, this method is called.
+     * If a PlayRoadBuildingCardRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to handle the card.
      *
-     * @param msg The RoadBuildingCardPlayedMessage found on the EventBus
+     * @param req The PlayRoadBuildingCardRequest found on the EventBus
      *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.RoadBuildingCardPlayedMessage
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardRequest
      * @since 2021-02-25
      */
     @Subscribe
-    private void onRoadBuildingCardPlayedMessage(RoadBuildingCardPlayedMessage msg) {
+    private void onPlayRoadBuildingCardRequest(PlayRoadBuildingCardRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to build a road");
+            LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + "wants to build a road");
+        }
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (inv.getRoadBuildingCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough cards");
+            return;
         }
         //TODO: Implementierung
+
+        inv.increaseRoadBuildingCards(-1);
+    }
+
+    /**
+     * Handles a PlayYearOfPlentyCardRequest found on the EventBus
+     * <p>
+     * If a PlayYearOfPlentyCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayYearOfPlentyCardRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayYearOfPlentyCardRequest(PlayYearOfPlentyCardRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + " wants " + req.getResource1() + " and " + req
+                    .getResource2());
+        }
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (inv.getYearOfPlentyCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough YearOfPlenty cards");
+            return;
+        }
+
+        switch (req.getResource1()) {
+            case ORE:
+                inv.increaseOre(1);
+                break;
+            case WOOL:
+                inv.increaseWool(1);
+                break;
+            case BRICK:
+                inv.increaseBrick(1);
+                break;
+            case GRAIN:
+                inv.increaseGrain(1);
+                break;
+            case LUMBER:
+                inv.increaseLumber(1);
+                break;
+        }
+
+        switch (req.getResource2()) {
+            case ORE:
+                inv.increaseOre(1);
+                break;
+            case WOOL:
+                inv.increaseWool(1);
+                break;
+            case BRICK:
+                inv.increaseBrick(1);
+                break;
+            case GRAIN:
+                inv.increaseGrain(1);
+                break;
+            case LUMBER:
+                inv.increaseLumber(1);
+                break;
+        }
+        inv.increaseYearOfPlentyCards(-1);
     }
 
     /**
@@ -374,54 +485,6 @@ public class GameService extends AbstractService {
                                                                                         armyAndRoadMap));
             returnMessage.initWithMessage(req);
             post(returnMessage);
-        }
-    }
-
-    /**
-     * Handles a YearOfPlentyCardPlayedMessage found on the EventBus
-     * <p>
-     * If a YearOfPlentyCardPlayedMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param msg The YearOfPlentyCardPlayedMessage found on the EventBus
-     *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.YearOfPlentyCardPlayedMessage
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onYearOfPlentyCardPlayedMessage(YearOfPlentyCardPlayedMessage msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants " + msg.getResource1() + " and " + msg
-                    .getResource2());
-        }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
-
-        switch (msg.getResource1()) {
-            case ORE:
-                inv.increaseOre(1);
-            case WOOL:
-                inv.increaseWool(1);
-            case BRICK:
-                inv.increaseBrick(1);
-            case GRAIN:
-                inv.increaseGrain(1);
-            case LUMBER:
-                inv.increaseLumber(1);
-        }
-
-        switch (msg.getResource2()) {
-            case ORE:
-                inv.increaseOre(1);
-            case WOOL:
-                inv.increaseWool(1);
-            case BRICK:
-                inv.increaseBrick(1);
-            case GRAIN:
-                inv.increaseGrain(1);
-            case LUMBER:
-                inv.increaseLumber(1);
         }
     }
 

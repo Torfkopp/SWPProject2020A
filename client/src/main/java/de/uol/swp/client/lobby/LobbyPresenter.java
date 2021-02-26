@@ -16,6 +16,7 @@ import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.response.PlayCardFailureResponse;
 import de.uol.swp.common.game.response.UpdateInventoryResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -368,26 +369,44 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
         Optional<ButtonType> result = alert.showAndWait();
 
-        List<Resources> choices = new ArrayList<>();
-        choices.add(Resources.ORE);
-        choices.add(Resources.GRAIN);
-        choices.add(Resources.BRICK);
-        choices.add(Resources.LUMBER);
-        choices.add(Resources.WOOL);
+        String ore = resourceBundle.getString("game.resources.ore");
+        String grain = resourceBundle.getString("game.resources.grain");
+        String brick = resourceBundle.getString("game.resources.brick");
+        String lumber = resourceBundle.getString("game.resources.lumber");
+        String wool = resourceBundle.getString("game.resources.wool");
+
+        List<String> choices = new ArrayList<>();
+        choices.add(ore);
+        choices.add(grain);
+        choices.add(brick);
+        choices.add(lumber);
+        choices.add(wool);
 
         if (result.get() == bKnight) {
+            //Play a Knight Card
             lobbyService.playKnightCard(lobbyName, loggedInUser);
         } else if (result.get() == bMonopoly) {
-            ChoiceDialog<Resources> dialogue = new ChoiceDialog<>(Resources.BRICK, choices);
+            //Play a Monopoly Card
+            ChoiceDialog<String> dialogue = new ChoiceDialog<>(brick, choices);
             dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
             dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
             dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
-            Optional<Resources> rst = dialogue.showAndWait();
-            rst.ifPresent(resources -> lobbyService.playMonopolyCard(lobbyName, loggedInUser, resources));
+            Optional<String> rst = dialogue.showAndWait();
+
+            Resources resource = Resources.BRICK;
+            if (rst.isPresent()) {
+                if (rst.get().equals(ore)) resource = Resources.ORE;
+                else if (rst.get().equals(grain)) resource = Resources.GRAIN;
+                else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
+                else if (rst.get().equals(wool)) resource = Resources.WOOL;
+            }
+            lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
         } else if (result.get() == bRoadBuilding) {
+            //Play a Road Building Card
             lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
         } else if (result.get() == bYearOfPlenty) {
-            Dialog<Resources> dialogue = new Dialog<>();
+            //Play a Year Of Plenty Card
+            Dialog<String> dialogue = new Dialog<>();
             dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
             dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
@@ -403,12 +422,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
             ChoiceBox c1 = new ChoiceBox();
             ChoiceBox c2 = new ChoiceBox();
-            for (Resources r : choices) {
-                c1.getItems().add(r);
-                c2.getItems().add(r);
+            for (String s : choices) {
+                c1.getItems().add(s);
+                c2.getItems().add(s);
             }
-            c1.setValue(Resources.BRICK);
-            c2.setValue(Resources.BRICK);
+            c1.setValue(brick);
+            c2.setValue(brick);
 
             grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
             grid.add(c1, 1, 0);
@@ -418,8 +437,37 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             dialogue.getDialogPane().setContent(grid);
             dialogue.showAndWait();
 
-            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, (Resources) c1.getValue(),
-                                              (Resources) c2.getValue());
+            Resources resource1 = Resources.BRICK;
+            Resources resource2 = Resources.BRICK;
+
+            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
+            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
+            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
+            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+
+            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
+            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
+            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
+            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+
+            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+        }
+    }
+
+    /**
+     * Handles a PlayCardFailureResponse found on the EventBus
+     *
+     * @param response The PlayCardFailureResponse found on the EventBus
+     */
+    @Subscribe
+    private void onPlayCardFailureResponse(PlayCardFailureResponse response) {
+        //TODO Error machen, wenn PlayCardFailureResponse kommt
+        if (loggedInUser.equals(response.getUser())) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("");
+            alert.setHeaderText("");
+            alert.setContentText("");
+            alert.showAndWait();
         }
     }
 
