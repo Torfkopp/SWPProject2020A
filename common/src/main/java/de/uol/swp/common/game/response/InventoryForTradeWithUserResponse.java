@@ -24,7 +24,8 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
     /**
      * Constructor
-     * @param user                     The user wanting to update the inventory
+     *
+     * @param user                      The user wanting to update the inventory
      * @param lobbyName                 The lobby for which the update is supposed to happen in
      * @param resourceMap               The Map containing the name of a resource as key and the amount as value
      * @param tradingUsersInventorySize Amount of resource cards the other user has
@@ -50,6 +51,10 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
         return resourceMap;
     }
 
+    public String getTradingUserName() {
+        return tradingUserName;
+    }
+
     /**
      * Gets the amount of resource cards the other user has.
      *
@@ -66,9 +71,5 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      */
     public User getUser() {
         return user;
-    }
-
-    public String getTradingUserName() {
-        return tradingUserName;
     }
 }
