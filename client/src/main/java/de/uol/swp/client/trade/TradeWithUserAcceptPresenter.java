@@ -191,12 +191,12 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             int amount = entry.getValue();
             if (amount > 0) {
                 offer = true;
-                offerText.append(entry.getKey()).append(" ")
+                offerText.append(entry.getValue()).append(" ")
                          .append(resourceBundle.getString("game.resources." + entry.getKey())).append(", ");
             }
         }
-        if (offerText.substring(offerText.length() - 3, offerText.length() - 1).equals(", "))
-            offerText.delete(offerText.length() - 3, offerText.length() - 1);
+        if (offerText.substring(offerText.length() - 2, offerText.length()).equals(", "))
+            offerText.delete(offerText.length() - 2, offerText.length());
         if (!offer) offerText.append(resourceBundle.getString("game.trade.offer.nothing"));
         boolean demand = false;
         offerText.append("\n").append(resourceBundle.getString("game.trade.offer.demand")).append("\n");
@@ -205,12 +205,12 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             int amount = entry.getValue();
             if (amount > 0) {
                 demand = true;
-                offerText.append(entry.getKey()).append(" ")
+                offerText.append(entry.getValue()).append(" ")
                          .append(resourceBundle.getString("game.resources." + entry.getKey())).append(", ");
             }
         }
-        if (offerText.substring(offerText.length() - 3, offerText.length() - 1).equals(", "))
-            offerText.delete(offerText.length() - 3, offerText.length() - 1);
+        if (offerText.substring(offerText.length() - 2, offerText.length()).equals(", "))
+            offerText.delete(offerText.length() - 2, offerText.length());
         if (!demand) offerText.append(resourceBundle.getString("game.trade.offer.nothing"));
         Platform.runLater(() -> tradeResponseLabel.setText(offerText.append(".").toString()));
     }

@@ -2,16 +2,10 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="230.0" prefWidth="387.0"
-            xmlns="http://javafx.com/javafx/11.0.1"
-            fx:controller="de.uol.swp.client.trade.TradeWithUserAcceptPresenter">
-    <Label fx:id="tradeResponseLabel" layoutX="29.0" layoutY="44.0" maxWidth="300" prefHeight="42.0" prefWidth="415.0"
-           wrapText="true"/>
-    <Button fx:id="acceptTradeButton" layoutX="274.0" layoutY="128.0" mnemonicParsing="false"
-            onAction="#onAcceptTradeButtonPressed" text="%game.trade.offer.buttons.accept"/>
-    <Button layoutX="276.0" layoutY="181.0" mnemonicParsing="false" onAction="#onRejectTradeButtonPressed"
-            text="%game.trade.offer.buttons.reject"/>
-    <ListView fx:id="ownInventoryView" layoutX="29.0" layoutY="92.0" prefHeight="121.0" prefWidth="200.0"/>
-    <Label fx:id="tradeNotPossibleLabel" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="207.0"
-           disable="true"/>
+<AnchorPane prefHeight="300" prefWidth="387.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.trade.TradeWithUserAcceptPresenter">
+    <Label fx:id="tradeResponseLabel" layoutX="29.0" layoutY="14.0" maxWidth="328.0" prefHeight="108.0" prefWidth="328.0" wrapText="true" />
+    <Button fx:id="acceptTradeButton" layoutX="277.0" layoutY="173.0" mnemonicParsing="false" onAction="#onAcceptTradeButtonPressed" text="%game.trade.offer.buttons.accept" />
+    <Button layoutX="277.0" layoutY="235.0" mnemonicParsing="false" onAction="#onRejectTradeButtonPressed" text="%game.trade.offer.buttons.reject" />
+    <ListView fx:id="ownInventoryView" layoutX="29.0" layoutY="143.0" prefHeight="124.0" prefWidth="200.0" />
+    <Label fx:id="tradeNotPossibleLabel" disable="true" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="207.0" />
 </AnchorPane>

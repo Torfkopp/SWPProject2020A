@@ -18,10 +18,7 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.game.response.UpdateInventoryResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.request.StartSessionRequest;
-import de.uol.swp.common.lobby.request.TradeWithBankRequest;
-import de.uol.swp.common.lobby.request.TradeWithUserRequest;
-import de.uol.swp.common.lobby.request.UserReadyRequest;
+import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
@@ -390,6 +387,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onResetTradeWithUserButtonEvent(ResetTradeWithUserButtonEvent event) {
         this.tradeWithUserButton.setDisable(false);
+        tradeWithBankButton.setDisable(false);
     }
 
     /**
@@ -411,6 +409,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
             tradeWithBankButton.setDisable(false);
             endTurn.setDisable(false);
+            tradeWithUserButton.setDisable(false);
         }
     }
 
@@ -509,6 +508,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, selectedUser.getKey()));
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
             eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
+            tradeWithBankButton.setDisable(true);
         }
     }
 
@@ -571,6 +571,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onTradeWithBankButtonPressed() {
         this.tradeWithBankButton.setDisable(true);
         this.endTurn.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
         eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
         LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
         eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));

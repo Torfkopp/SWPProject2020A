@@ -28,12 +28,12 @@
                         showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0">
-                <Label text="game.resources.wool"/>
+                <Label text="%game.resources.wool"/>
                 <Slider fx:id="ownWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
                         showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0">
-                <Label text="game.resources.lumber"/>
+                <Label text="%game.resources.lumber"/>
                 <Slider fx:id="ownLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
                         showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
@@ -57,12 +57,12 @@
                         minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0">
-                <Label text="game.resources.wool"/>
+                <Label text="%game.resources.wool"/>
                 <Slider fx:id="tradingPartnerWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
                         minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0">
-                <Label text="game.resources.lumber"/>
+                <Label text="%game.resources.lumber"/>
                 <Slider fx:id="tradingPartnerLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
                         minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
