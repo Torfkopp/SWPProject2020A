@@ -247,6 +247,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void updateEmailWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
@@ -267,6 +268,7 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
+    @EnabledIf("isLocal")
     void updateEmailWithNoIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);

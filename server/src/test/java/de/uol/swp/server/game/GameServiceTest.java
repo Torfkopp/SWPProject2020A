@@ -46,26 +46,62 @@ public class GameServiceTest {
     private GameService gameService;
 
     /**
-     * Helper method run before each test case
+     * Tests if the gameManagement handles a BuyDevelopmentCardRequest properly when the
+     * bankInventory is empty
      * <p>
-     * This method instantiates a new GameManagement and a new GameService so that
-     * one test's Game objects don't interfere with another test's
+     * A BuyDevelopmentCardRequest is posted onto the event bus and the user
+     * wants to buy a DevelopmentCard.
+     * <p>
+     * This test fails if the users gets a development card even if the banks inventory is empty
      */
-    @BeforeEach
-    void setUp() {
-        gameManagement = new GameManagement();
-        gameService = new GameService(bus, gameManagement, lobbyService);
-    }
+    @Test
+    void BuyDevelopmentCardWhenBankInventoryIsEmptyTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
+        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        gameManagement.createGame(lobby, user[0]);
+        Game game = gameManagement.getGame("testlobby");
+        Inventory[] gameInventory = game.getInventories();
+        gameInventory[0].setWool(5);
+        gameInventory[0].setBrick(5);
+        gameInventory[0].setGrain(5);
+        gameInventory[0].setOre(5);
+        gameInventory[0].setLumber(5);
+        assertEquals(gameInventory[0].getWool(), 5);
+        assertEquals(gameInventory[0].getBrick(), 5);
+        assertEquals(gameInventory[0].getOre(), 5);
+        assertEquals(gameInventory[0].getGrain(), 5);
+        assertEquals(gameInventory[0].getLumber(), 5);
 
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method resets the gameService and gameManagement variables to null
-     */
-    @AfterEach
-    void tearDown() {
-        gameService = null;
-        gameManagement = null;
+        assertEquals(gameInventory[0].getKnightCards(), 0);
+        assertEquals(gameInventory[0].getRoadBuildingCards(), 0);
+        assertEquals(gameInventory[0].getMonopolyCards(), 0);
+        assertEquals(gameInventory[0].getYearOfPlentyCards(), 0);
+        assertEquals(gameInventory[0].getVictoryPointCards(), 0);
+
+        List<String> bankInventory = game.getBankInventory();
+        //deletes the bank inventory
+        for (int i = 0; i < bankInventory.size(); ) {
+            bankInventory.remove(0);
+        }
+        assertEquals(bankInventory.size(), 0);
+
+        Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
+        bus.post(buyDevelopmentCardRequest);
+        Game game1 = gameManagement.getGame("testlobby");
+        Inventory[] gameInventory1 = game1.getInventories();
+        List<String> bankInv = game1.getBankInventory();
+        assertEquals(bankInv, bankInventory);
+        assertEquals(bankInv.size(), 0);
+        assertEquals(gameInventory1[0].getKnightCards(), 0);
+        assertEquals(gameInventory1[0].getRoadBuildingCards(), 0);
+        assertEquals(gameInventory1[0].getMonopolyCards(), 0);
+        assertEquals(gameInventory1[0].getYearOfPlentyCards(), 0);
+        assertEquals(gameInventory1[0].getVictoryPointCards(), 0);
     }
 
     /**
@@ -80,9 +116,9 @@ public class GameServiceTest {
     @Test
     void buyDevelopmentCardTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0]);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -155,121 +191,6 @@ public class GameServiceTest {
         assertTrue(
                 ((usersKnightCards == newKnightCards - 1) || (usersMonopolyCards == newMonopolyCards - 1) || (usersVictoryPointCards == newVictoryPointCards - 1) || (usersYearOfPlentyCards == newYearOfPlentyCards - 1) || (usersRoadBuildingCards == newRoadBuildingCards - 1)));
     }
-    /**
-     * Tests if the gameManagement handles a BuyDevelopmentCardRequest properly when the
-     * bankInventory is empty
-     * <p>
-     * A BuyDevelopmentCardRequest is posted onto the event bus and the user
-     * wants to buy a DevelopmentCard.
-     * <p>
-     * This test fails if the users gets a development card even if the banks inventory is empty
-     */
-    @Test
-    void BuyDevelopmentCardWhenBankInventoryIsEmptyTest() {
-        User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
-        lobby.joinUser(user[1]);
-        lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
-        Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
-        gameInventory[0].setWool(5);
-        gameInventory[0].setBrick(5);
-        gameInventory[0].setGrain(5);
-        gameInventory[0].setOre(5);
-        gameInventory[0].setLumber(5);
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
-
-        assertEquals(gameInventory[0].getKnightCards(), 0);
-        assertEquals(gameInventory[0].getRoadBuildingCards(), 0);
-        assertEquals(gameInventory[0].getMonopolyCards(), 0);
-        assertEquals(gameInventory[0].getYearOfPlentyCards(), 0);
-        assertEquals(gameInventory[0].getVictoryPointCards(), 0);
-
-        List<String> bankInventory = game.getBankInventory();
-        //deletes the bank inventory
-        for (int i = 0; i < bankInventory.size(); ) {
-            bankInventory.remove(0);
-        }
-        assertEquals(bankInventory.size(), 0);
-
-        Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
-        bus.post(buyDevelopmentCardRequest);
-        Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
-        List<String> bankInv = game1.getBankInventory();
-        assertEquals(bankInv, bankInventory);
-        assertEquals(bankInv.size(), 0);
-        assertEquals(gameInventory1[0].getKnightCards(), 0);
-        assertEquals(gameInventory1[0].getRoadBuildingCards(), 0);
-        assertEquals(gameInventory1[0].getMonopolyCards(), 0);
-        assertEquals(gameInventory1[0].getYearOfPlentyCards(), 0);
-        assertEquals(gameInventory1[0].getVictoryPointCards(), 0);
-    }
-
-    /**
-     * Tests if the gameManagement handles a UpdateInventoryAfterTradeWithBankRequest properly
-     * <p>
-     * A UpdateInventoryAfterTradeWithBankRequest is posted onto the event bus and the user
-     * wants trade a resource with the bank.
-     * <p>
-     * This test fails if the users inventory is not updated properly or the User is able to
-     * trade even if he has not enough resources.
-     */
-    @Test
-    void tradeResourceWithBankTest() {
-        User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
-        lobby.joinUser(user[1]);
-        lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
-        Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
-        gameInventory[0].setWool(5);
-        gameInventory[0].setBrick(5);
-        gameInventory[0].setGrain(5);
-        gameInventory[0].setOre(5);
-        gameInventory[0].setLumber(5);
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
-
-        Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(user[0],
-                                                                                                        "testlobby",
-                                                                                                        "wool",
-                                                                                                        "brick");
-        bus.post(updateInventoryAfterTradeWithBankRequest);
-        Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
-        assertEquals(gameInventory1[0].getLumber(), 5);
-        assertEquals(gameInventory1[0].getWool(), 6);
-        assertEquals(gameInventory1[0].getBrick(), 1);
-        assertEquals(gameInventory1[0].getGrain(), 5);
-        assertEquals(gameInventory1[0].getLumber(), 5);
-
-        bus.post(updateInventoryAfterTradeWithBankRequest);
-        Game game2 = gameManagement.getGame("testlobby");
-        //inventory doesnt change because user had not enough resources
-        Inventory[] gameInventory2 = game2.getInventories();
-        assertEquals(gameInventory1[0], gameInventory2[0]);
-        assertEquals(gameInventory2[0].getLumber(), 5);
-        assertEquals(gameInventory2[0].getWool(), 6);
-        assertEquals(gameInventory2[0].getBrick(), 1);
-        assertEquals(gameInventory2[0].getGrain(), 5);
-        assertEquals(gameInventory2[0].getLumber(), 5);
-    }
 
     /**
      * Tests if the gameManagement handles a BuyDevelopmentCardRequest properly when the
@@ -283,9 +204,9 @@ public class GameServiceTest {
     @Test
     void buyDevelopmentCardWithNotEnoughResourcesTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0]);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -329,5 +250,85 @@ public class GameServiceTest {
         assertEquals(gameInventory1[0].getOre(), 0);
         assertEquals(gameInventory1[0].getGrain(), 0);
         assertEquals(gameInventory1[0].getLumber(), 0);
+    }
+
+    /**
+     * Helper method run before each test case
+     * <p>
+     * This method instantiates a new GameManagement and a new GameService so that
+     * one test's Game objects don't interfere with another test's
+     */
+    @BeforeEach
+    void setUp() {
+        gameManagement = new GameManagement();
+        gameService = new GameService(bus, gameManagement, lobbyService);
+    }
+
+    /**
+     * Helper method run after each test case
+     * <p>
+     * This method resets the gameService and gameManagement variables to null
+     */
+    @AfterEach
+    void tearDown() {
+        gameService = null;
+        gameManagement = null;
+    }
+
+    /**
+     * Tests if the gameManagement handles a UpdateInventoryAfterTradeWithBankRequest properly
+     * <p>
+     * A UpdateInventoryAfterTradeWithBankRequest is posted onto the event bus and the user
+     * wants trade a resource with the bank.
+     * <p>
+     * This test fails if the users inventory is not updated properly or the User is able to
+     * trade even if he has not enough resources.
+     */
+    @Test
+    void tradeResourceWithBankTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
+        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        gameManagement.createGame(lobby, user[0]);
+        Game game = gameManagement.getGame("testlobby");
+        Inventory[] gameInventory = game.getInventories();
+        gameInventory[0].setWool(5);
+        gameInventory[0].setBrick(5);
+        gameInventory[0].setGrain(5);
+        gameInventory[0].setOre(5);
+        gameInventory[0].setLumber(5);
+        assertEquals(gameInventory[0].getWool(), 5);
+        assertEquals(gameInventory[0].getBrick(), 5);
+        assertEquals(gameInventory[0].getOre(), 5);
+        assertEquals(gameInventory[0].getGrain(), 5);
+        assertEquals(gameInventory[0].getLumber(), 5);
+
+        Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(user[0],
+                                                                                                        "testlobby",
+                                                                                                        "wool",
+                                                                                                        "brick");
+        bus.post(updateInventoryAfterTradeWithBankRequest);
+        Game game1 = gameManagement.getGame("testlobby");
+        Inventory[] gameInventory1 = game1.getInventories();
+        assertEquals(gameInventory1[0].getLumber(), 5);
+        assertEquals(gameInventory1[0].getWool(), 6);
+        assertEquals(gameInventory1[0].getBrick(), 1);
+        assertEquals(gameInventory1[0].getGrain(), 5);
+        assertEquals(gameInventory1[0].getLumber(), 5);
+
+        bus.post(updateInventoryAfterTradeWithBankRequest);
+        Game game2 = gameManagement.getGame("testlobby");
+        //inventory doesnt change because user had not enough resources
+        Inventory[] gameInventory2 = game2.getInventories();
+        assertEquals(gameInventory1[0], gameInventory2[0]);
+        assertEquals(gameInventory2[0].getLumber(), 5);
+        assertEquals(gameInventory2[0].getWool(), 6);
+        assertEquals(gameInventory2[0].getBrick(), 1);
+        assertEquals(gameInventory2[0].getGrain(), 5);
+        assertEquals(gameInventory2[0].getLumber(), 5);
     }
 }
