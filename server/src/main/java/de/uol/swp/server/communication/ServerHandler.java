@@ -9,9 +9,7 @@ import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
-import de.uol.swp.server.message.ClientAuthorisedMessage;
-import de.uol.swp.server.message.ClientDisconnectedMessage;
-import de.uol.swp.server.message.ServerExceptionMessage;
+import de.uol.swp.server.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -175,6 +173,28 @@ public class ServerHandler implements ServerHandlerDelegate {
         } else {
             LOG.warn("No context for " + msg);
         }
+    }
+
+    /**
+     * Handles a FetchUserContextInternalRequest found on the EventBus
+     * <p>
+     * If a FetchUserContextInternalRequest is detected on the EventBus
+     * this method gets the MessageContext of the user provided by the
+     * FetchUserContextInternalRequest and sends the Message contained in the
+     * FetchUserContextInternalRequest to the specified client.
+     *
+     * @param req FetchUserContextInternalRequest found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onFetchUserContextInternalRequest(FetchUserContextInternalRequest req) {
+        Optional<MessageContext> ctx = getCtx(req.getUserSession());
+        ctx.ifPresent(messageContext -> sendToClient(messageContext, req.getReturnMessage()));
     }
 
     /**
