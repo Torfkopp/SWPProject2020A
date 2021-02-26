@@ -153,22 +153,21 @@ public class GameService extends AbstractService {
     private void onPlayKnightCardRequest(PlayKnightCardRequest req) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Received KnightCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + "wants to improve the army");
+            LOG.debug("---- " + req.getUser().getUsername() + " wants to improve the army");
         }
 
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
 
         if (inv.getKnightCards() == 0) {
-            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+            PlayCardFailureResponse returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
             LOG.debug("---- Not enough Knight cards");
             return;
         }
         inv.setKnights(inv.getKnights() + 1);
-
         inv.increaseRoadBuildingCards(-1);
     }
 
@@ -187,7 +186,7 @@ public class GameService extends AbstractService {
     private void onPlayMonopolyCardRequest(PlayMonopolyCardRequest req) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + "wants to monopolise " + req.getResource());
+            LOG.debug("---- " + req.getUser().getUsername() + " wants to monopolise " + req.getResource());
         }
 
         Game game = gameManagement.getGame(req.getOriginLobby());
@@ -195,10 +194,10 @@ public class GameService extends AbstractService {
 
         if (invMono.getMonopolyCards() == 0) {
             AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
-            LOG.debug("---- Not enough RoadBuilding cards");
+            LOG.debug("---- Not enough Monopoly cards");
             return;
         }
         Inventory[] inventories = game.getInventories();
@@ -244,7 +243,7 @@ public class GameService extends AbstractService {
     private void onPlayRoadBuildingCardRequest(PlayRoadBuildingCardRequest req) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + "wants to build a road");
+            LOG.debug("---- " + req.getUser().getUsername() + " wants to build a road");
         }
 
         Game game = gameManagement.getGame(req.getOriginLobby());
@@ -252,10 +251,10 @@ public class GameService extends AbstractService {
 
         if (inv.getRoadBuildingCards() == 0) {
             AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
-            LOG.debug("---- Not enough cards");
+            LOG.debug("---- Not enough RoadBuilding cards");
             return;
         }
         //TODO: Implementierung
@@ -287,7 +286,7 @@ public class GameService extends AbstractService {
 
         if (inv.getYearOfPlentyCards() == 0) {
             AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                                PlayCardFailureResponse.Reasons.NO_CARD);
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
             LOG.debug("---- Not enough YearOfPlenty cards");

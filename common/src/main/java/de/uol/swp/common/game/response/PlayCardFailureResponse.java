@@ -16,7 +16,7 @@ public class PlayCardFailureResponse extends AbstractLobbyResponse {
     Reasons reason;
 
     public enum Reasons {
-        NO_CARD,
+        NO_CARDS,
         TOO_MANY_RESOURCES
     }
 

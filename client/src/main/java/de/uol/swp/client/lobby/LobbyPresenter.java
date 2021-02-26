@@ -86,7 +86,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Button tradeWithBankButton;
     private Window window;
-    private Object ShowDevelopmentCardViewEvent;
 
     /**
      * Constructor
@@ -457,18 +456,21 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Handles a PlayCardFailureResponse found on the EventBus
      *
-     * @param response The PlayCardFailureResponse found on the EventBus
+     * @param rsp The PlayCardFailureResponse found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.PlayCardFailureResponse
      */
     @Subscribe
-    private void onPlayCardFailureResponse(PlayCardFailureResponse response) {
-        //TODO Error machen, wenn PlayCardFailureResponse kommt
-        if (loggedInUser.equals(response.getUser())) {
+    private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
+        LOG.debug("Received PlayCardFailureResponse");
+        if (loggedInUser.equals(rsp.getUser())) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("");
             alert.setHeaderText("");
             alert.setContentText("");
             alert.showAndWait();
         }
+        //TODO Wird nicht aufgerufen
     }
 
     /**
