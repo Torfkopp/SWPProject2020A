@@ -7,7 +7,9 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.game.request.OfferingTradeWithUserRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
-import de.uol.swp.common.message.Message;
+import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
+import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
+import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -35,7 +37,8 @@ import java.util.Map;
 public class TradeWithUserPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithUserView.fxml";
-    private final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+
     @FXML
     private Label waitForResponse;
     @FXML
@@ -57,8 +60,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @FXML
     private ListView<Pair<String, Integer>> ownInventoryView;
     @FXML
-    private Button cancelTradeButton;
-    @FXML
     private Button offerTradeButton;
 
     /**
@@ -66,7 +67,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * <p>
      * Sets the eventBus
      *
-     * @param eventBus EventBus
+     * @param eventBus The EventBus
      */
     @Inject
     public TradeWithUserPresenter(EventBus eventBus) {
@@ -80,21 +81,19 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      *
      * @return if any resource is selected
      */
-    private boolean checkNoSelectedResources() {
+    private boolean checkResources() {
         int selectedOwnResourceMapCounter = 0;
-        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("brick");
-        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("ore");
-        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("wool");
-        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("lumber");
-        selectedOwnResourceMapCounter += selectedOwnResourceMap.get("grain");
-
         int selectedPartnersResourceMapCounter = 0;
-        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("brick");
-        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("ore");
-        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("lumber");
-        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("wool");
-        selectedPartnersResourceMapCounter += selectedPartnersResourceMap.get("grain");
-        return selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0;
+        for (Map.Entry<String, Integer> entry : selectedOwnResourceMap.entrySet()) {
+            selectedOwnResourceMapCounter += entry.getValue();
+        }
+        for (Map.Entry<String, Integer> entry : selectedPartnersResourceMap.entrySet()) {
+            selectedPartnersResourceMapCounter += entry.getValue();
+        }
+        if (selectedPartnersResourceMapCounter > traderInventorySize) {
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.demandtoohigh")));
+        }
+        return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0) && (selectedPartnersResourceMapCounter > traderInventorySize));
     }
 
     /**
@@ -106,7 +105,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.trade.event.TradeWithUserCancelEvent
      * @see de.uol.swp.client.trade.event.ResetTradeWithUserButtonEvent
      */
-    private void closeWindowAfterNotSuccessfulTrade() {
+    private void closeWindow() {
         Platform.runLater(() -> {
             eventBus.post(new TradeWithUserCancelEvent(lobbyName));
             eventBus.post(new ResetTradeWithUserButtonEvent(loggedInUser, lobbyName));
@@ -120,7 +119,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      */
     @FXML
     public void initialize() {
-
         ownInventoryView.setCellFactory(lv -> new ListCell<>() {
             protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
@@ -142,7 +140,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelTradeButtonPressed() {
-        closeWindowAfterNotSuccessfulTrade();
+        closeWindow();
     }
 
     /**
@@ -161,26 +159,22 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.game.response.InventoryForTradeWithUserResponse
      */
     @Subscribe
-    private void onInventoryForTradeResponse(InventoryForTradeWithUserResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName)) {
-            tradingUserName = rsp.getTradingUserName();
-            LOG.debug("Received InventoryForTradeResponse for Lobby " + rsp.getLobbyName());
-            resourceMap = rsp.getResourceMap();
-            setTradingLists();
-            traderInventorySize = rsp.getTradingUsersInventorySize();
-            int ownInventorySize = 0;
-            ownInventorySize += resourceMap.get("wool");
-            ownInventorySize += resourceMap.get("brick");
-            ownInventorySize += resourceMap.get("ore");
-            ownInventorySize += resourceMap.get("lumber");
-            ownInventorySize += resourceMap.get("grain");
-            if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
-                setSliders();
-            } else {
-                offerTradeButton.setDisable(true);
-                tradingHBox.setVisible(false);
-                noResourcesLabel.setVisible(true);
-            }
+    private void onInventoryForTradeWithUserResponse(InventoryForTradeWithUserResponse rsp) {
+        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received InventoryForTradeResponse for Lobby " + rsp.getLobbyName());
+        tradingUserName = rsp.getTradingUserName();
+        resourceMap = rsp.getResourceMap();
+        setTradingLists();
+        traderInventorySize = rsp.getTradingUsersInventorySize();
+        int ownInventorySize = 0;
+        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
+            ownInventorySize += entry.getValue();
+        }
+        if (!(traderInventorySize == 0 && ownInventorySize == 0)) setSliders();
+        else {
+            offerTradeButton.setDisable(true);
+            tradingHBox.setVisible(false);
+            noResourcesLabel.setVisible(true);
         }
     }
 
@@ -197,48 +191,60 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * for the other user.
      *
      * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
-     * @see de.uol.swp.client.trade.event.ShowTradeWithUserAcceptViewEvent
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserRespondViewEvent
      */
     @FXML
     private void onOfferTradeButtonPressed() {
         setResourceMaps();
-
-        if (checkNoSelectedResources()) {
+        if (checkResources()) {
             LOG.debug("Failed sending the offer");
             return;
         }
-
-        eventBus.post(new ShowTradeWithUserAcceptViewEvent(this.loggedInUser, this.tradingUserName, this.lobbyName));
-        LOG.debug("Sending ShowTradeWithUserAcceptViewEvent");
-
         offerTradeButton.setDisable(true);
         waitForResponse.setVisible(true);
-        waitForResponse.setText("Wait for " + tradingUserName + "...");
-
-        Message offeringTradeWithUserRequest = new OfferingTradeWithUserRequest(this.loggedInUser, tradingUserName,
-                                                                                this.lobbyName, selectedOwnResourceMap,
-                                                                                selectedPartnersResourceMap);
-        eventBus.post(offeringTradeWithUserRequest);
+        waitForResponse.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), tradingUserName));
+        RequestMessage request = new OfferingTradeWithUserRequest(this.loggedInUser, tradingUserName, this.lobbyName,
+                                                                  selectedOwnResourceMap, selectedPartnersResourceMap);
         LOG.debug("Sending OfferingTradeWithUserRequest");
+        eventBus.post(request);
     }
 
     /**
-     * Handles a ResetOfferTradeButtonEvent found on the EventBus
+     * Handles a ResetOfferTradeButtonResponse found on the EventBus
      * <p>
-     * If a ResetOfferTradeButtonEvent is on the EventBus, the offer trade button
+     * If a ResetOfferTradeButtonResponse is on the EventBus, the offer trade button
      * is re-enabled and the trading user get a hint that the other user
      * rejected the offer.
      *
-     * @param event ResetOfferTradeButtonEvent found on the EventBus
+     * @param event ResetOfferTradeButtonResponse found on the EventBus
      *
-     * @see de.uol.swp.client.trade.event.ResetOfferTradeButtonEvent
+     * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
      */
     @Subscribe
-    private void onResetOfferTradeButtonEvent(ResetOfferTradeButtonEvent event) {
+    private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
         if (lobbyName.equals(event.getLobbyName())) {
-            offerTradeButton.setDisable(false);
-            waitForResponse.setText(tradingUserName + "has rejected the offer!");
+            LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
+            Platform.runLater(() -> {
+                offerTradeButton.setDisable(false);
+                waitForResponse.setText(
+                        String.format(resourceBundle.getString("game.trade.status.rejected"), tradingUserName));
+            });
         }
+    }
+
+    /**
+     * Handles a TradeOfUsersAcceptedResponse found on the EventBus
+     * If the trade is accepted this will close the trading window.
+     *
+     * @param rsp Response found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
+     */
+    @Subscribe
+    private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
+        if (rsp.getLobbyName().equals(this.lobbyName))
+            LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
+            closeWindow();
     }
 
     /**
@@ -261,7 +267,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             loggedInUser = event.getUser();
         }
         Window window = ownInventoryView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> closeWindowAfterNotSuccessfulTrade());
+        window.setOnCloseRequest(windowEvent -> closeWindow());
     }
 
     /**
