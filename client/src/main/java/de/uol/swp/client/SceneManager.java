@@ -66,6 +66,7 @@ public class SceneManager {
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
+    private final EventBus eventBus;
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
@@ -73,8 +74,14 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
-    private final EventBus eventBus;
 
+    /**
+     * Constructor
+     *
+     * @param eventBus     The EventBus
+     * @param injected     The Guice injector module
+     * @param primaryStage The primary Stage
+     */
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
         eventBus.register(this);
@@ -278,7 +285,20 @@ public class SceneManager {
     private void onCloseLobbiesViewEvent(CloseLobbiesViewEvent event) {
         closeLobbies();
     }
-//todo doku
+
+    /**
+     * Handles a CloseTradeWithUserResponseEvent found on the EventBus
+     * <p>
+     * If a CloseTradeWithUserResponseEvent is detected on the EventBus, this method gets called.
+     * Its closes the tradingRespondStage according to the lobbyName.
+     *
+     * @param event CloseTradeWithUserResponseEvent found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.CloseTradeWithUserResponseEvent
+     * @since 2021-02-25
+     */
     @Subscribe
     private void onCloseTradeWithUserResponseEvent(CloseTradeWithUserResponseEvent event) {
         LOG.debug("Received CloseTradeWithUserResponseEvent");
@@ -428,6 +448,46 @@ public class SceneManager {
     }
 
     /**
+     * Handles the ShowTradeWithBankViewEvent detected on the EventBus
+     * <p>
+     * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
+     * called. It opens the trading with the bank window in a new window and a
+     * TradeUpdateEvent is sent onto teh eventBus.
+     *
+     * @param event The ShowTradeWithBankViewEvent detected on the EventBus
+     *
+     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
+     * @since 2021-02-20
+     */
+    @Subscribe
+    private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
+        //gets the lobby's name
+        User user = event.getUser();
+        String lobbyName = event.getLobbyName();
+        //New window (Stage)
+        Stage bankStage = new Stage();
+        bankStage.setTitle("Trade of " + user.getUsername());
+        bankStage.setHeight(BANK_TRADING_HEIGHT);
+        bankStage.setMinHeight(BANK_TRADING_HEIGHT);
+        bankStage.setWidth(BANK_TRADING_WIDTH);
+        bankStage.setMinWidth(BANK_TRADING_WIDTH);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
+        Scene bankScene = new Scene(rootPane);
+        bankScene.getStylesheets().add(styleSheet);
+        bankStage.setScene(bankScene);
+        tradingStages.put(lobbyName, bankStage);
+        //Specifies the modality for new window
+        bankStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        bankStage.initOwner(primaryStage);
+        //Shows the window
+        bankStage.show();
+        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
+        eventBus.post(new TradeUpdateEvent(lobbyName, user));
+    }
+
+    /**
      * Handles the ShowTradeWithUserAcceptViewEvent detected on the EventBus
      * <p>
      * If a ShowTradeWithUserAcceptViewEvent is detected on the EventBus, this method gets
@@ -467,45 +527,6 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ShowTradeWithBankViewEvent detected on the EventBus
-     * <p>
-     * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
-     * called. It opens the trading with the bank window in a new window and a
-     * TradeUpdateEvent is sent onto teh eventBus.
-     *
-     * @param event The ShowTradeWithBankViewEvent detected on the EventBus
-     *
-     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
-     * @since 2021-02-20
-     */
-    @Subscribe
-    private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
-        //gets the lobby's name
-        User user = event.getUser();
-        String lobbyName = event.getLobbyName();
-        //New window (Stage)
-        Stage bankStage = new Stage();
-        bankStage.setTitle("Trade of " + user.getUsername());
-        bankStage.setHeight(BANK_TRADING_HEIGHT);
-        bankStage.setMinHeight(BANK_TRADING_HEIGHT);
-        bankStage.setWidth(BANK_TRADING_WIDTH);
-        bankStage.setMinWidth(BANK_TRADING_WIDTH);
-        //Initialises a new lobbyScene
-        Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
-        Scene bankScene = new Scene(rootPane);
-        bankScene.getStylesheets().add(styleSheet);
-        bankStage.setScene(bankScene);
-        tradingStages.put(lobbyName, bankStage);
-        //Specifies the modality for new window
-        bankStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        bankStage.initOwner(primaryStage);
-        //Shows the window
-        bankStage.show();
-        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
-        eventBus.post(new TradeUpdateEvent(lobbyName, user));
-    }
-    /**
      * Handles the ShowTradeWithUserViewEvent detected on the EventBus
      * <p>
      * If a ShowTradeWithUserViewEvent is detected on the EventBus, this method gets
@@ -544,6 +565,24 @@ public class SceneManager {
     }
 
     /**
+     * Handles the TradeErrorEvent detected on the EventBus
+     * <p>
+     * If a TradeErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in an error alert.
+     *
+     * @param event The LobbyErrorEvent detected on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.TradeErrorEvent
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeErrorEvent(TradeErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
      * Handles the TradeWithBankCancelEvent detected on the EventBus
      * <p>
      * If a TradeWithBankCancelEvent is detected on the EventBus, this method gets
@@ -562,24 +601,6 @@ public class SceneManager {
             tradingStages.get(lobby).close();
             tradingStages.remove(lobby);
         }
-    }
-
-    /**
-     * Handles the TradeErrorEvent detected on the EventBus
-     * <p>
-     * If a TradeErrorEvent is detected on the EventBus, this method gets
-     * called. It shows the error message of the event in an error alert.
-     *
-     * @param event The LobbyErrorEvent detected on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.client.trade.event.TradeErrorEvent
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onTradeErrorEvent(TradeErrorEvent event) {
-        showError(event.getMessage());
     }
 
     /**
