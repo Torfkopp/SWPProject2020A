@@ -91,7 +91,7 @@
                             onAction="#onTradeWithBankButtonPressed"
                             text="%lobby.game.buttons.banktrade" visible="false"/>
                     <Button fx:id="playCard" mnemonicParsing="false" visible="false" disable="true"
-                            onAction="#onPlayCardButtonPressed" text="Play Card"/>
+                            onAction="#onPlayCardButtonPressed" text="%game.playcards.button"/>
                 </VBox>
                 <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>

@@ -139,6 +139,89 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a KnightCardPlayedMessage found on the EventBus
+     * <p>
+     * If a KnightCardPlayedMessage is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param msg The KnightCardPlayedMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.KnightCardPlayedMessage
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onKnightCardPlayedMessage(KnightCardPlayedMessage msg) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received KnightCardPlayedMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("---- " + msg.getUser().getUsername() + "wants to improve the army");
+        }
+        Game game = gameManagement.getGame(msg.getLobbyName());
+        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
+        inv.setKnights(inv.getKnights() + 1);
+    }
+
+    /**
+     * Handles a MonopolyCardPlayedMessage found on the EventBus
+     * <p>
+     * If a MonopolyCardPlayedMessage is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param msg The MonopolyCardPlayedMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.MonopolyCardPlayedMessage
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onMonopolyCardPlayedMessage(MonopolyCardPlayedMessage msg) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("---- " + msg.getUser().getUsername() + "wants to monopolise " + msg.getResource());
+        }
+        Game game = gameManagement.getGame(msg.getLobbyName());
+        Inventory invMono = game.getInventory(game.getPlayer(msg.getUser()));
+        Inventory[] inventories = game.getInventories();
+        int i = inventories.length;
+        //Player gets one resource too much which gets reduced in the next step
+        switch (msg.getResource()) {
+            case ORE:
+                invMono.increaseOre(i);
+                for (Inventory inv : inventories) inv.increaseOre(-1);
+            case WOOL:
+                invMono.increaseWool(i);
+                for (Inventory inv : inventories) inv.increaseWool(-1);
+            case BRICK:
+                invMono.increaseBrick(i);
+                for (Inventory inv : inventories) inv.increaseBrick(-1);
+            case GRAIN:
+                invMono.increaseGrain(i);
+                for (Inventory inv : inventories) inv.increaseGrain(-1);
+            case LUMBER:
+                invMono.increaseLumber(i);
+                for (Inventory inv : inventories) inv.increaseLumber(-1);
+        }
+    }
+
+    /**
+     * Handles a RoadBuildingCardPlayedMessage found on the EventBus
+     * <p>
+     * If a RoadBuildingCardPlayedMessage is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param msg The RoadBuildingCardPlayedMessage found on the EventBus
+     *
+     * @see de.uol.swp.common.game.message.CardPlayedMessage.RoadBuildingCardPlayedMessage
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onRoadBuildingCardPlayedMessage(RoadBuildingCardPlayedMessage msg) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("---- " + msg.getUser().getUsername() + "wants to build a road");
+        }
+        //TODO: Implementierung
+    }
+
+    /**
      * Handles a TradeWithBankRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -239,89 +322,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a KnightCardPlayedMessage found on the EventBus
-     * <p>
-     * If a KnightCardPlayedMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param msg The KnightCardPlayedMessage found on the EventBus
-     *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.KnightCardPlayedMessage
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onKnightCardPlayedMessage(KnightCardPlayedMessage msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received KnightCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to improve the army");
-        }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory inv = game.getInventory(game.getPlayer(msg.getUser()));
-        inv.setKnights(inv.getKnights() + 1);
-    }
-
-    /**
-     * Handles a MonopolyCardPlayedMessage found on the EventBus
-     * <p>
-     * If a MonopolyCardPlayedMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param msg The MonopolyCardPlayedMessage found on the EventBus
-     *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.MonopolyCardPlayedMessage
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onMonopolyCardPlayedMessage(MonopolyCardPlayedMessage msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to monopolise " + msg.getResource());
-        }
-        Game game = gameManagement.getGame(msg.getLobbyName());
-        Inventory invMono = game.getInventory(game.getPlayer(msg.getUser()));
-        Inventory[] inventories = game.getInventories();
-        int i = inventories.length;
-        //Player gets one resource too much which gets reduced in the next step
-        switch (msg.getResource()) {
-            case ORE:
-                invMono.increaseOre(i);
-                for (Inventory inv : inventories) inv.increaseOre(-1);
-            case WOOL:
-                invMono.increaseWool(i);
-                for (Inventory inv : inventories) inv.increaseWool(-1);
-            case BRICK:
-                invMono.increaseBrick(i);
-                for (Inventory inv : inventories) inv.increaseBrick(-1);
-            case GRAIN:
-                invMono.increaseGrain(i);
-                for (Inventory inv : inventories) inv.increaseGrain(-1);
-            case LUMBER:
-                invMono.increaseLumber(i);
-                for (Inventory inv : inventories) inv.increaseLumber(-1);
-        }
-    }
-
-    /**
-     * Handles a RoadBuildingCardPlayedMessage found on the EventBus
-     * <p>
-     * If a RoadBuildingCardPlayedMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param msg The RoadBuildingCardPlayedMessage found on the EventBus
-     *
-     * @see de.uol.swp.common.game.message.CardPlayedMessage.RoadBuildingCardPlayedMessage
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onRoadBuildingCardPlayedMessage(RoadBuildingCardPlayedMessage msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + msg.getLobbyName());
-            LOG.debug("---- " + msg.getUser().getUsername() + "wants to build a road");
-        }
-        //TODO: Implementierung
-    }
-
-    /**
      * Handles a UpdateInventoryRequest found on the EventBus
      * <p>
      * It searches the inventories in the current game for the one that belongs
@@ -378,35 +378,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Helper method
-     * <p>
-     * Adds the random chosen development card and deletes the resources
-     * he had to pay from his inventory.
-     *
-     * @param developmentCard Name of the random chosen development Card
-     * @param user            User who wants to buy the development Card
-     * @param lobbyName       Name of the lobby where the trade is happening
-     *
-     * @return a boolean if the trade worked out
-     *
-     * @author Maximilian Lindner
-     * @author Alwin Bossert
-     * @since 2021-02-22
-     */
-    private boolean updatePlayersInventoryWithDevelopmentCard(String developmentCard, User user, String lobbyName) {
-        Game game = gameManagement.getGame(lobbyName);
-        Inventory[] inventories = game.getInventories();
-        Inventory inventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().equals(user)) {
-                inventory = value;
-                break;
-            }
-        }
-        if (inventory == null) return false;
-        if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {
-
-    /**
      * Handles a YearOfPlentyCardPlayedMessage found on the EventBus
      * <p>
      * If a YearOfPlentyCardPlayedMessage is detected on the EventBus, this method is called.
@@ -453,7 +424,35 @@ public class GameService extends AbstractService {
                 inv.increaseLumber(1);
         }
     }
-}
+
+    /**
+     * Helper method
+     * <p>
+     * Adds the random chosen development card and deletes the resources
+     * he had to pay from his inventory.
+     *
+     * @param developmentCard Name of the random chosen development Card
+     * @param user            User who wants to buy the development Card
+     * @param lobbyName       Name of the lobby where the trade is happening
+     *
+     * @return a boolean if the trade worked out
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @since 2021-02-22
+     */
+    private boolean updatePlayersInventoryWithDevelopmentCard(String developmentCard, User user, String lobbyName) {
+        Game game = gameManagement.getGame(lobbyName);
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(user)) {
+                inventory = value;
+                break;
+            }
+        }
+        if (inventory == null) return false;
+        if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {
 
             inventory.setOre(inventory.getOre() - 1);
             inventory.setGrain(inventory.getGrain() - 1);

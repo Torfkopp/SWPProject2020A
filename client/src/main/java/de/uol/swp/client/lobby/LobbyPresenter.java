@@ -352,12 +352,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onPlayCardButtonPressed(ActionEvent event) {
-        //eventBus.post(showDevelopmentCardMessage);
-
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
         alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
-        alert.setContentText(resourceBundle.getString("%game.playcards.alert.content"));
+        alert.setContentText(resourceBundle.getString("game.playcards.alert.content"));
 
         ButtonType bKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
         ButtonType bMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
@@ -394,7 +392,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType(resourceBundle.getString("button.confirm"),
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
             dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
 
@@ -750,7 +748,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession
-                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+                    .setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
