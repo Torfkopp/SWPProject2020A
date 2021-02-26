@@ -66,6 +66,17 @@ public interface UserStore {
     List<User> getAllUsers();
 
     /**
+     * Gets the ID that will be assigned to the NEXT newly created user
+     *
+     * @return The next user ID, -1 if an error occurred when looking it up
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-26
+     */
+    int getNextUserID();
+
+    /**
      * Remove a user form the store with their ID
      *
      * @param id The ID of the user to remove

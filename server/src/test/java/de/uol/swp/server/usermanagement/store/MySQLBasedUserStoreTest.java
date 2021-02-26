@@ -7,75 +7,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
-import java.sql.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MySQLBasedUserStoreTest {
 
-    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://134.106.11.89:50010/catan_user_schema";
-    static final String USER = "catan";
-    static final String PASS = "rNZcEqeiqMJpdr9M";
     private static final int NO_USERS = 10;
-    private static final List<User> users;
+    private static List<User> users;
+    private static int nextID;
 
-    // Set to true if you manually want to run these tests
-    // This is only needed to not run these time intensive tests in CI
-    static boolean isLocal() {
-        return false;
-    }
-
-    private static final int LATEST_ID = getLatestID();
-    private static final int TEST_USER_START_ID = LATEST_ID + NO_USERS;
-
-    static {
-        users = new ArrayList<>();
-        for (int i = LATEST_ID; i < TEST_USER_START_ID; i++) {
+    { // do not make static (will cause tests to fail)
+        UserStore store = new MySQLBasedUserStore();
+        MySQLBasedUserStoreTest.nextID = store.getNextUserID();
+        MySQLBasedUserStoreTest.users = new ArrayList<>();
+        for (int i = nextID; i < NO_USERS + nextID; i++) {
             users.add(new UserDTO(i, "Us3rName" + i, "123GoodPassword" + i, "Username" + i + "@username.de"));
         }
         Collections.sort(users);
     }
 
-    /**
-     * Helper method to find out what ID the next created user will have
-     * <p>
-     * Used to make comparisons possible. Asks the database about the current
-     * value of the AUTO_INCREMENT variable used for user ID assignment in the
-     * MySQL database table userdb.
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-24
-     */
-    private static int getLatestID() {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        int currentAutoIncrementValue = -1;
-        try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            conn.setAutoCommit(true);
-            pstmt = conn.prepareStatement(
-                    "SELECT `AUTO_INCREMENT` " + "FROM INFORMATION_SCHEMA.TABLES " + "WHERE TABLE_SCHEMA = 'catan_user_schema' " + "AND TABLE_NAME = 'userdb'");
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) currentAutoIncrementValue = rs.getInt(1);
-            rs.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
-        }
-        return currentAutoIncrementValue;
+    // Set to true if you manually want to run these tests
+    // This is only needed to not run these time intensive tests in CI
+    static boolean isLocal() {
+        return false;
     }
 
     UserStore getDefaultStore() {
@@ -102,20 +57,45 @@ class MySQLBasedUserStoreTest {
 
     @Test
     @EnabledIf("isLocal")
-    void changePassword() {
+    void changePasswordWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
-        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        Optional<User> usr = store.findUser(userToUpdate.getID());
         assertTrue(usr.isPresent());
         userToUpdate = usr.get();
 
-        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS",
-                         userToUpdate.getEMail());
+        String newPass = userToUpdate.getPassword() + "_NEWPASS";
+        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), newPass, userToUpdate.getEMail());
 
-        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS");
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), newPass);
 
         assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail());
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void changePasswordWithNoIdParameterUpdate() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getID());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+        String newPass = userToUpdate.getPassword() + "_NEWPASS";
+
+        store.updateUser(userToUpdate.getUsername(), newPass, userToUpdate.getEMail());
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), newPass);
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userToUpdate.getUsername(), userFound.get().getUsername());
+        assertEquals(userToUpdate.getEMail(), userFound.get().getEMail());
+        assertEquals(userFound.get().getPassword(), "");
     }
 
     @Test
@@ -128,7 +108,22 @@ class MySQLBasedUserStoreTest {
 
     @Test
     @EnabledIf("isLocal")
-    void dropUser() {
+    void dropUserById() {
+        UserStore store = getDefaultStore();
+        User userToRemove = getDefaultUsers().get(3);
+        Optional<User> userFound = store.findUser(userToRemove.getID());
+        assertTrue(userFound.isPresent());
+
+        store.removeUser(userToRemove.getID());
+
+        userFound = store.findUser(userToRemove.getID());
+
+        assertTrue(userFound.isEmpty());
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void dropUserByUsername() {
         UserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
@@ -136,7 +131,22 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser(userToRemove.getUsername());
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void findUserById() {
+        UserStore store = getDefaultStore();
+        User userToFind = getDefaultUsers().get(2);
+
+        Optional<User> userFound = store.findUser(userToFind.getID());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToFind);
+        assertEquals(userFound.get().getID(), userToFind.getID());
+        assertEquals(userFound.get().getUsername(), userToFind.getUsername());
+        assertEquals(userFound.get().getEMail(), userToFind.getEMail());
     }
 
     @Test
@@ -148,8 +158,8 @@ class MySQLBasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername());
 
         assertTrue(userFound.isPresent());
-        // Cannot compare against the object or ID because it is unknown at creation of the UserDTO list at the start
-        // which ID the users will have as that is solely handled by the store
+        assertEquals(userFound.get(), userToFind);
+        assertEquals(userFound.get().getID(), userToFind.getID());
         assertEquals(userToFind.getUsername(), userFound.get().getUsername());
         assertEquals(userToFind.getEMail(), userFound.get().getEMail());
         assertEquals(userFound.get().getPassword(), "");
@@ -164,8 +174,8 @@ class MySQLBasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
 
         assertTrue(userFound.isPresent());
-        // Cannot compare against the object or ID because it is unknown at creation of the UserDTO list at the start
-        // which ID the users will have as that is solely handled by the store
+        assertEquals(userFound.get(), userToFind);
+        assertEquals(userFound.get().getID(), userToFind.getID());
         assertEquals(userToFind.getUsername(), userFound.get().getUsername());
         assertEquals(userToFind.getEMail(), userFound.get().getEMail());
         assertEquals(userFound.get().getPassword(), "");
@@ -178,7 +188,7 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser(null, "");
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
     }
 
     @Test
@@ -189,7 +199,7 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
     }
 
     @Test
@@ -200,7 +210,7 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
     }
 
     @Test
@@ -209,15 +219,18 @@ class MySQLBasedUserStoreTest {
         UserStore store = getDefaultStore();
         List<User> allUsers = getDefaultUsers();
 
-        List<User> storedUsers = store.getAllUsers();
-        storedUsers.forEach(u -> assertEquals(u.getPassword(), ""));
+        List<User> allUsersFromStore = store.getAllUsers();
+        allUsersFromStore.forEach(u -> assertEquals(u.getPassword(), ""));
         // We can only reliably check the created test users.
-        List<User> allTestUsers = new ArrayList<>(storedUsers.subList(storedUsers.size() - 10, storedUsers.size()));
+        List<User> allTestUsers = new ArrayList<>(
+                allUsersFromStore.subList(allUsersFromStore.size() - 10, allUsersFromStore.size()));
 
-        // Cannot compare against the object or ID because it is unknown at creation of the UserDTO list at the start
-        // which ID the users will have as that is solely handled by the store
-        // here, we iterate over each list and compare usernames and emails
+        allTestUsers.forEach(u -> assertEquals(u.getPassword(), ""));
+        Collections.sort(allTestUsers);
+
+        assertEquals(allUsers, allTestUsers);
         for (int i = 0; i < allUsers.size() && i < allTestUsers.size(); i++) {
+            assertEquals(allUsers.get(i).getID(), allTestUsers.get(i).getID());
             assertEquals(allUsers.get(i).getUsername(), allTestUsers.get(i).getUsername());
             assertEquals(allUsers.get(i).getEMail(), allTestUsers.get(i).getEMail());
         }
@@ -234,20 +247,42 @@ class MySQLBasedUserStoreTest {
     }
 
     @Test
-    @EnabledIf("isLocal")
-    void updateUser() {
+    void updateEmailWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
         Optional<User> usr = store.findUser(userToUpdate.getUsername());
         assertTrue(usr.isPresent());
         userToUpdate = usr.get();
+        String newEMail = userToUpdate.getEMail() + "@TESTING";
 
-        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword(),
-                         userToUpdate.getEMail() + "@TESTING");
+        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword(), newEMail);
 
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
+        assertEquals(userFound.get().getEMail(), newEMail);
+    }
+
+    @Test
+    void updateEmailWithNoIdParameterUpdate() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+        String newEMail = userToUpdate.getEMail() + "@TESTING";
+
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), newEMail);
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
+        assertEquals(userFound.get().getEMail(), newEMail);
     }
 }

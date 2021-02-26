@@ -75,6 +75,11 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     }
 
     @Override
+    public int getNextUserID() {
+        return id_counter;
+    }
+
+    @Override
     public void removeUser(int id) {
         Optional<User> user = findUser(id);
         if (user.isPresent()) {

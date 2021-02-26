@@ -32,6 +32,7 @@ public class H2BasedUserStore extends AbstractUserStore {
     static final String PASS = "123456";
     Connection conn = null;
     PreparedStatement pstmt = null;
+    private int nextID;
 
     /**
      * This method registers the user with its specific and unique username,
@@ -270,6 +271,52 @@ public class H2BasedUserStore extends AbstractUserStore {
             }
         }
         return retUsers;
+    }
+
+    /**
+     * This method gets the value that will be assigned to the NEXT created user
+     * by looking up the Sequence responsible for the auto_increment id column,
+     * fetching its current value, and adding 1 to it.
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-26
+     */
+    @Override
+    public int getNextUserID() {
+        createTable();
+
+        String sequenceName = "";
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "SELECT SEQUENCE_NAME FROM USERDB.INFORMATION_SCHEMA.SEQUENCES LIMIT 1";
+            pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) sequenceName = rs.getString(1);
+            rs.close();
+            pstmt.close();
+            sql = "SELECT CURRENT_VALUE FROM USERDB.INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_NAME = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, sequenceName);
+            rs = pstmt.executeQuery();
+            while (rs.next()) nextID = rs.getInt(1) + 1;
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException ignored) {
+            }
+        }
+        return nextID;
     }
 
     /**

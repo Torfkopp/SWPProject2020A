@@ -30,6 +30,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
     static final String PASS = "rNZcEqeiqMJpdr9M";
     Connection conn = null;
     PreparedStatement pstmt = null;
+    private int nextID;
 
     /**
      * This method registers the user with its specific and unique username,
@@ -269,6 +270,42 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             }
         }
         return retUsers;
+    }
+
+    /**
+     * This method gets the value that will be assigned to the NEXT created user
+     * by looking up the current value of the AUTO_INCREMENT field in the MySQL
+     * database.
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-26
+     */
+    @Override
+    public int getNextUserID() {
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(
+                    "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'catan_user_schema' AND TABLE_NAME = 'userdb'");
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) nextID = rs.getInt(1);
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        return nextID;
     }
 
     /**
