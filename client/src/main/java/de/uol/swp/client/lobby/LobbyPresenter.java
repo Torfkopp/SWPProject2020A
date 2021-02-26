@@ -23,7 +23,6 @@ import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
-import de.uol.swp.common.lobby.response.UpdateInventoryResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
