@@ -5,21 +5,28 @@
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="196.0" prefWidth="407.0"
             xmlns="http://javafx.com/javafx/11.0.1"
             fx:controller="de.uol.swp.client.register.RegistrationPresenter">
+
     <Label layoutX="43.0" layoutY="17.0" text="%register.labels.login"/>
     <TextField id="loginField" fx:id="loginField" layoutX="142.0" layoutY="12.0" promptText="%register.prompts.login">
         <tooltip>
             <Tooltip text="%register.tooltips.login"/>
         </tooltip>
     </TextField>
-    <PasswordField id="passwordField" fx:id="passwordField1" layoutX="142.0" layoutY="48.0"
+
+    <Label layoutX="43.0" layoutY="53.0" text="%register.labels.email"/>
+    <TextField id="emailField" fx:id="emailField" layoutX="142.0" layoutY="48.0" promptText="%register.prompts.email"/>
+
+    <Label layoutX="43.0" layoutY="89.0" text="%register.labels.pw"/>
+    <PasswordField id="passwordField" fx:id="passwordField1" layoutX="142.0" layoutY="84.0"
                    promptText="%register.prompts.pw.enter"/>
-    <PasswordField id="passwordField" fx:id="passwordField2" layoutX="142.0" layoutY="85.0"
+
+    <Label layoutX="43.0" layoutY="125.0" text="%register.labels.pw"/>
+    <PasswordField id="passwordField" fx:id="passwordField2" layoutX="142.0" layoutY="120.0"
                    promptText="%register.prompts.pw.repeat"/>
-    <Button id="registerButton" defaultButton="true" layoutX="112.0" layoutY="133.0" mnemonicParsing="false"
+
+    <Button id="registerButton" defaultButton="true" layoutX="112.0" layoutY="169.0" mnemonicParsing="false"
             onAction="#onRegisterButtonPressed" text="%register.buttons.register"/>
-    <Button id="cancelButton" layoutX="203.0" layoutY="133.0"
+    <Button id="cancelButton" layoutX="203.0" layoutY="169.0"
             mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%register.buttons.cancel"/>
 
-    <Label layoutX="44.0" layoutY="53.0" text="%register.labels.pw"/>
-    <Label layoutX="44.0" layoutY="90.0" text="%register.labels.pw"/>
 </AnchorPane>

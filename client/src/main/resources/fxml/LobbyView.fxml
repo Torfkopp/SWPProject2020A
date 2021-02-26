@@ -89,6 +89,9 @@
                     </HBox>
                     <Button fx:id="tradeWithUserButton" mnemonicParsing="false" onAction="#onTradeWithUserButtonPressed"
                             text="%lobby.game.buttons.playertrade" visible="false"/>
+                    <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
+                            onAction="#onTradeWithBankButtonPressed"
+                            text="%lobby.game.buttons.banktrade" visible="false"/>
                 </VBox>
                 <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>

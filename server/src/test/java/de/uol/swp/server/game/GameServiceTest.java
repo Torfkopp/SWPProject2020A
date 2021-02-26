@@ -4,6 +4,8 @@ import com.google.common.eventbus.EventBus;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
+import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
+import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.message.Message;
@@ -23,16 +25,17 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * This is a test class to handle the requests sent by the client regarding the game
+ * This is a test of the class used to handle the requests sent by the client regarding the game
  *
  * @author Maximilian Lindner
- * @author Finn Haase
- * @since 2021-02-25
+ * @author Alwin Bossert
+ * @since 2021-02-23
  */
 @SuppressWarnings("UnstableApiUsage")
 public class GameServiceTest {
