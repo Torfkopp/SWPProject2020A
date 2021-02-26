@@ -5,6 +5,9 @@ import de.uol.swp.common.user.User;
 
 /**
  * Abstract class for all PlayCard requests
+ *
+ * @author Mario Fokken
+ * @since 2021-02-26
  */
 abstract class PlayCardRequest extends AbstractGameRequest {
 

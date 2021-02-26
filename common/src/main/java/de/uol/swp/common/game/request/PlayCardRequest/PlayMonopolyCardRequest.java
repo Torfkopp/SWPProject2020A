@@ -6,6 +6,9 @@ import de.uol.swp.common.user.User;
 /**
  * This request gets sent when the player
  * wants to play a MonopolyCard
+ *
+ * @author Mario Fokken
+ * @since 2021-02-26
  */
 public class PlayMonopolyCardRequest extends PlayCardRequest {
 
