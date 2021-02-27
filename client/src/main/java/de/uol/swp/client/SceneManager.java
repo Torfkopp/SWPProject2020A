@@ -77,7 +77,7 @@ public class SceneManager {
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
     private Scene tradeWithBankScene;
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
@@ -420,8 +420,6 @@ public class SceneManager {
     private void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
         showRegistrationScreen();
     }
-
-
 
     /**
      * Handles the ShowTradeWithBankViewEvent detected on the EventBus
