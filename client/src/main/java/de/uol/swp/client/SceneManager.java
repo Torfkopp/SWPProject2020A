@@ -69,6 +69,7 @@ public class SceneManager {
     private final Map<String, Stage> tradingStage = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
+    private final EventBus eventBus;
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
@@ -77,7 +78,6 @@ public class SceneManager {
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
     private Scene tradeWithBankScene;
-    private final EventBus eventBus;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
