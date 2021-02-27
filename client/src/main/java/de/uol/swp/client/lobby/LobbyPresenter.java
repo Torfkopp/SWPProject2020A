@@ -265,6 +265,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onEndTurnButtonPressed() {
         this.endTurn.setDisable(true);
+        this.rollDice.setDisable(true);
+        this.tradeWithBankButton.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -331,9 +333,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
-        //In here to test the endTurnButton
-        onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
-        if (loggedInUser.equals(msg.getActivePlayer())) endTurn.setDisable(false);
         setRollDiceButtonState(msg.getActivePlayer());
     }
 
