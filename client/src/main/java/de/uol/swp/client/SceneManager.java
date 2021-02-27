@@ -20,6 +20,10 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.trade.TradeWithBankPresenter;
+import de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent;
+import de.uol.swp.client.trade.event.TradeUpdateEvent;
+import de.uol.swp.client.trade.event.TradeWithBankCancelEvent;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -48,6 +52,8 @@ public class SceneManager {
     static final String styleSheet = "css/swp.css";
     private static final int LOBBY_HEIGHT = 730;
     private static final int LOBBY_WIDTH = 685;
+    private static final int TRADING_HEIGHT = 420;
+    private static final int TRADING_WIDTH = 600;
     private static final int LOGIN_HEIGHT = 220;
     private static final int LOGIN_WIDTH = 400;
     private static final int REGISTRATION_HEIGHT = 250;
@@ -60,6 +66,7 @@ public class SceneManager {
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
+    private final Map<String, Stage> tradingStage = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
     private Scene loginScene;
@@ -69,10 +76,13 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
+    private Scene tradeWithBankScene;
+    private EventBus eventBus;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
         eventBus.register(this);
+        this.eventBus = eventBus;
         this.primaryStage = primaryStage;
         this.injector = injected;
         this.resourceBundle = this.injector.getInstance(ResourceBundle.class);
@@ -220,7 +230,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
-        LOG.debug("Received AllLobiesReponse");
+        LOG.debug("Received AllLobbiesReponse");
         for (String name : allLobbiesResponse.getLobbyNames()) {
             lobbyScenes.put(name, null);
         }
@@ -409,6 +419,69 @@ public class SceneManager {
     @Subscribe
     private void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
         showRegistrationScreen();
+    }
+
+
+
+    /**
+     * Handles the ShowTradeWithBankViewEvent detected on the EventBus
+     * <p>
+     * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
+     * called. It opens the trading with the bank window in a new window and a
+     * TradeUpdateEvent is sent onto teh eventBus.
+     *
+     * @param event The ShowTradeWithBankViewEvent detected on the EventBus
+     *
+     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
+     * @since 2021-02-20
+     */
+    @Subscribe
+    private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
+        //gets the lobby's name
+        User user = event.getUser();
+        String lobbyName = event.getLobbyName();
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Trade of " + user.getUsername());
+        lobbyStage.setHeight(TRADING_HEIGHT);
+        lobbyStage.setMinHeight(TRADING_HEIGHT);
+        lobbyStage.setWidth(TRADING_WIDTH);
+        lobbyStage.setMinWidth(TRADING_WIDTH);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyStage.setScene(lobbyScene);
+        tradingStage.put(lobbyName, lobbyStage);
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Shows the window
+        lobbyStage.show();
+        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
+        eventBus.post(new TradeUpdateEvent(lobbyName, user));
+    }
+
+    /**
+     * Handles the TradeWithBankCancelEvent detected on the EventBus
+     * <p>
+     * If a TradeWithBankCancelEvent is detected on the EventBus, this method gets
+     * called. If there is a trading stage in the according lobby, it gets closed.
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
+     * @since 2021-02-20
+     */
+    @Subscribe
+    private void onTradeWithBankCancelEvent(TradeWithBankCancelEvent event) {
+        LOG.debug("Received TradeWithUserCancelEvent");
+        String lobby = event.getLobbyName();
+        if (tradingStage.containsKey(lobby)) {
+            tradingStage.get(lobby).close();
+            tradingStage.remove(lobby);
+        }
     }
 
     /**
