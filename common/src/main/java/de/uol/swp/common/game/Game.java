@@ -6,6 +6,8 @@ import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
+import java.util.List;
+
 /**
  * Class for a game
  *
@@ -18,6 +20,7 @@ public class Game {
     private final Inventory[] inventories;
     private final IGameMapManagement map;
     private final User[] players;
+    private final List<String> bankInventory;
     private int activePlayer;
 
     /**
@@ -41,6 +44,8 @@ public class Game {
         for (User u : players) {
             inventories[i++] = new Inventory(u);
         }
+        BankInventory bankInvent = new BankInventory();
+        bankInventory = bankInvent.getDevelopmentCards();
     }
 
     /**
@@ -70,6 +75,17 @@ public class Game {
         //2 Points if player has the largest army
         if (inventories[num].isLargestArmy()) points += 2;
         return points;
+    }
+
+    /**
+     * Gets the List of the items of the bank.
+     *
+     * @return The List of the bank inventory
+     *
+     * @since 2021-02-21
+     */
+    public List<String> getBankInventory() {
+        return bankInventory;
     }
 
     /**
