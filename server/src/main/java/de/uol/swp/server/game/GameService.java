@@ -6,9 +6,11 @@ import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
+import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.message.AbstractResponseMessage;
@@ -115,7 +117,7 @@ public class GameService extends AbstractService {
      * Handles a EndTurnRequest found on the EventBus
      * <p>
      * If a EndTurnRequest is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to change to current active player.
+     * It then sends a NextPlayerMessage to all members in the lobby.
      *
      * @param req The EndTurnRequest found on the EventBus
      *
@@ -132,6 +134,32 @@ public class GameService extends AbstractService {
         try {
             Game game = gameManagement.getGame(req.getOriginLobby());
             ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), game.nextPlayer());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+        } catch (Exception e) {
+            LOG.error(e);
+        }
+    }
+
+    /**
+     * Handles a RollDiceRequest found on the EventBus
+     * If a RollDiceRequest is detected on the EventBus, this method is called.
+     * It then sends a DiceCastMessage to all members in the lobby.
+     *
+     * @param req The RollDiceRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.RollDiceRequest
+     * @see de.uol.swp.common.game.message.DiceCastMessage
+     * @since 2021-02-22
+     */
+    @Subscribe
+    private void onRollDiceRequest(RollDiceRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
+        }
+        try {
+            Game game = gameManagement.getGame(req.getOriginLobby());
+            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), game.rollDice());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);

@@ -63,6 +63,8 @@
                 </VBox.margin>
                 <VBox prefHeight="259.0" prefWidth="210.0">
                     <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
+                    <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
+                            text="%lobby.game.buttons.rolldice"/>
                     <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false"
                             onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
                         <VBox.margin>

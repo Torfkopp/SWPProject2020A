@@ -69,6 +69,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Button startSession;
     @FXML
+    private Button rollDice;
+    @FXML
     private Button endTurn;
     @FXML
     private Button playCard;
@@ -252,8 +254,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
         LOG.debug("Received DiceCastMessage");
+        LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
+        gameRendering.drawDice(msg.getDice1(), msg.getDice2());
     }
 
     /**
@@ -267,6 +271,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onEndTurnButtonPressed() {
+        this.endTurn.setDisable(true);
+        this.rollDice.setDisable(true);
+        this.tradeWithBankButton.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -333,9 +340,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
-        //In here to test the endTurnButton
-        onDiceCastMessage(new DiceCastMessage(msg.getLobbyName(), msg.getActivePlayer()));
-        if (loggedInUser.equals(msg.getActivePlayer())) endTurn.setDisable(false);
+        setRollDiceButtonState(msg.getActivePlayer());
         setPlayCardButtonState(msg.getActivePlayer());
     }
 
@@ -489,7 +494,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 alert.showAndWait();
             });
         }
-        //TODO Alert schreiben
     }
 
     /**
@@ -555,6 +559,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the rollDice Button is pressed
+     * <p>
+     * If the rollDice Button is pressed, this method requests the LobbyService
+     * to roll the dices.
+     *
+     * @author Mario Fokken
+     * @author Sven Ahrens
+     * @see LobbyService
+     * @since 2021-02-22
+     */
+    @FXML
+    public void onRollDiceButtonPressed() {
+        lobbyService.rollDice(lobbyName, loggedInUser);
+        this.rollDice.setDisable(true);
+    }
+
+    /**
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
@@ -593,12 +614,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 //This Line needs to be changed/ removed in the Future
                 gameRendering.drawGameMap(new GameMapManagement());
                 setTurnIndicatorText(msg.getUser());
-                //In here to test the endTurnButton.
-                eventBus.post(new DiceCastMessage(msg.getName(), msg.getUser()));
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);
                 this.tradeWithBankButton.setVisible(true);
+                setRollDiceButtonState(msg.getUser());
                 this.playCard.setVisible(true);
                 setPlayCardButtonState(msg.getUser());
             });
@@ -789,6 +809,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setEndTurnButtonState(User player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the disable state of the rollDiceButton
+     *
+     * @author Sven Ahrens
+     * @author Mario Fokken
+     * @since 2021-02-22
+     */
+    private void setRollDiceButtonState(User player) {
+        this.rollDice.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**

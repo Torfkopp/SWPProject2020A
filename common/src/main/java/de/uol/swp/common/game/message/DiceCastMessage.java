@@ -11,13 +11,26 @@ import de.uol.swp.common.user.User;
  */
 public class DiceCastMessage extends AbstractGameMessage {
 
+    int dice1;
+    int dice2;
+
     /**
      * Constructor
      *
      * @param lobbyName Name of the lobby
      * @param user      Active user
      */
-    public DiceCastMessage(String lobbyName, User user) {
+    public DiceCastMessage(String lobbyName, User user, int[] dices) {
         super(lobbyName, user);
+        dice1 = dices[0];
+        dice2 = dices[1];
+    }
+
+    public int getDice1() {
+        return dice1;
+    }
+
+    public int getDice2() {
+        return dice2;
     }
 }

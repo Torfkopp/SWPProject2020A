@@ -6,6 +6,7 @@ import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
@@ -93,6 +94,13 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby " + lobbyName);
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
+    }
+
+    @Override
+    public void rollDice(String lobbyName, User user) {
+        LOG.debug("Sending RollDiceRequest for Lobby " + lobbyName);
+        Message rollDiceRequest = new RollDiceRequest(user, lobbyName);
+        eventBus.post(rollDiceRequest);
     }
 
     @Override

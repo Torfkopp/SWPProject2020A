@@ -163,4 +163,16 @@ public class Game {
         activePlayer = (activePlayer + 1) % players.length;
         return players[activePlayer];
     }
+
+    /**
+     * Rolls two dices
+     *
+     * @return Array of two integers
+     */
+    public int[] rollDice() {
+        int dice1 = (int) (Math.random() * 6 + 1);
+        int dice2 = (int) (Math.random() * 6 + 1);
+
+        return (new int[]{dice1, dice2});
+    }
 }
