@@ -54,6 +54,14 @@ public class SceneManager {
     private static final int LOBBY_WIDTH = 685;
     private static final int TRADING_HEIGHT = 420;
     private static final int TRADING_WIDTH = 600;
+    private static final int LOGIN_HEIGHT = 220;
+    private static final int LOGIN_WIDTH = 400;
+    private static final int REGISTRATION_HEIGHT = 250;
+    private static final int REGISTRATION_WIDTH = 410;
+    private static final int MAINMENU_HEIGHT = 550;
+    private static final int MAINMENU_WIDTH = 820;
+    private static final int CHANGEPW_HEIGHT = 230;
+    private static final int CHANGEPW_WIDTH = 395;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
@@ -61,6 +69,7 @@ public class SceneManager {
     private final Map<String, Stage> tradingStage = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
+    private final EventBus eventBus;
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
@@ -69,7 +78,6 @@ public class SceneManager {
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
     private Scene tradeWithBankScene;
-    private EventBus eventBus;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
@@ -220,10 +228,9 @@ public class SceneManager {
      * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-12-12
      */
-
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
-        LOG.debug("Received AllLobiesReponse");
+        LOG.debug("Received AllLobbiesReponse");
         for (String name : allLobbiesResponse.getLobbyNames()) {
             lobbyScenes.put(name, null);
         }
@@ -241,7 +248,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
-        showScene(lastScene, lastTitle);
+        showScene(lastScene, lastTitle, MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
     /**
@@ -305,7 +312,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
-        showScene(lastScene, lastTitle);
+        showScene(lastScene, lastTitle, LOGIN_WIDTH, LOGIN_HEIGHT);
     }
 
     /**
@@ -488,7 +495,8 @@ public class SceneManager {
      */
     public void showChangePasswordScreen(User user) {
         ChangePasswordScene.setUserData(user);
-        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"));
+        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"), CHANGEPW_WIDTH,
+                  CHANGEPW_HEIGHT);
     }
 
 
@@ -543,7 +551,7 @@ public class SceneManager {
      */
     public void showLoginScreen() {
         System.out.println(lobbyStages.toString());
-        showScene(loginScene, resourceBundle.getString("login.window.title"));
+        showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
     }
 
     /**
@@ -556,7 +564,8 @@ public class SceneManager {
      */
     public void showMainScreen(User currentUser) {
         showScene(mainScene,
-                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()));
+                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
+                  MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
     /**
@@ -568,7 +577,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"));
+        showScene(registrationScene, resourceBundle.getString("register.window.title"), REGISTRATION_WIDTH,
+                  REGISTRATION_HEIGHT);
     }
 
     /**
@@ -577,18 +587,24 @@ public class SceneManager {
      * The current scene and title are saved in the lastScene and lastTitle variables
      * before the new scene and title are set and shown.
      *
-     * @param scene New scene to show
-     * @param title New window title
+     * @param scene     New scene to show
+     * @param title     New window title
+     * @param minWidth  Minimum Width of the scene
+     * @param minHeight Minimum Height of the scene
      *
      * @since 2019-09-03
      */
-    private void showScene(final Scene scene, final String title) {
+    private void showScene(final Scene scene, final String title, int minWidth, int minHeight) {
         this.lastScene = currentScene;
         this.lastTitle = primaryStage.getTitle();
         this.currentScene = scene;
         Platform.runLater(() -> {
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
+            primaryStage.setMinWidth(minWidth);
+            primaryStage.setMinHeight(minHeight);
+            primaryStage.setWidth(minWidth);
+            primaryStage.setHeight(minHeight);
             primaryStage.show();
         });
     }

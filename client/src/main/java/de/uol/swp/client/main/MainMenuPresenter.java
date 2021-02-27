@@ -320,6 +320,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
+        if (this.loggedInUser == null) return;
         LOG.debug("Received LobbyCreatedMessage");
         lobbyService.retrieveAllLobbies();
         if (msg.getName() == null || msg.getName().isEmpty()) {
@@ -346,6 +347,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
+        if (this.loggedInUser == null) return;
         LOG.debug("Received LobbyDeletedMessage");
         if (msg.getName() == null || msg.getName().isEmpty()) {
             LOG.debug("---- Tried to delete Lobby without name from LobbyList ");
@@ -431,6 +433,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
+        if (this.loggedInUser == null) return;
         LOG.debug("Received UserLoggedInMessage");
         LOG.debug("---- New user " + msg.getUsername() + " logged in");
         Platform.runLater(() -> {
@@ -454,6 +457,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
+        if (this.loggedInUser == null) return;
         LOG.debug("Received UserLoggedOutMessage");
         LOG.debug("---- User " + msg.getUsername() + " logged out");
         Platform.runLater(() -> users.remove(msg.getUsername()));
