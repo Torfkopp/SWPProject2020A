@@ -14,12 +14,12 @@ public class Inventory {
     private final User player;
 
     private int totalResources = 0;
-
-    private int brick = 0;
-    private int grain = 0;
-    private int lumber = 0;
-    private int ore = 0;
-    private int wool = 0;
+    //todo Die Attribute sind nur zum testen auf 4 gesetzt und müssen vor dem Merge UNBEDINGT raus
+    private int brick = 4;
+    private int grain = 4;
+    private int lumber = 4;
+    private int ore = 4;
+    private int wool = 4;
 
     private int victoryPointCards = 0;
     private int knightCards = 0;

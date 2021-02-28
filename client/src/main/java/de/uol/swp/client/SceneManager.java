@@ -22,6 +22,10 @@ import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
+import de.uol.swp.client.trade.TradeWithBankPresenter;
+import de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent;
+import de.uol.swp.client.trade.event.TradeUpdateEvent;
+import de.uol.swp.client.trade.event.TradeWithBankCancelEvent;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -52,12 +56,24 @@ public class SceneManager {
     private static final int LOBBY_WIDTH = 685;
     private static final int DEVMENU_HEIGHT = 450;
     private static final int DEVMENU_WIDTH = 630;
+    private static final int TRADING_HEIGHT = 420;
+    private static final int TRADING_WIDTH = 600;
+    private static final int LOGIN_HEIGHT = 220;
+    private static final int LOGIN_WIDTH = 400;
+    private static final int REGISTRATION_HEIGHT = 250;
+    private static final int REGISTRATION_WIDTH = 410;
+    private static final int MAINMENU_HEIGHT = 550;
+    private static final int MAINMENU_WIDTH = 820;
+    private static final int CHANGEPW_HEIGHT = 230;
+    private static final int CHANGEPW_WIDTH = 395;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
+    private final Map<String, Stage> tradingStage = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
+    private final EventBus eventBus;
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
@@ -65,10 +81,12 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
+    private Scene tradeWithBankScene;
 
     @Inject
     public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
         eventBus.register(this);
+        this.eventBus = eventBus;
         this.primaryStage = primaryStage;
         this.injector = injected;
         this.resourceBundle = this.injector.getInstance(ResourceBundle.class);
@@ -76,17 +94,71 @@ public class SceneManager {
     }
 
     /**
-     * Subroutine to initialise all views
-     * <p>
-     * This is a subroutine of the constructor to initialise all views
+     * Closes all Lobbies
      *
+     * @author Finn Haase
+     * @author Aldin Dervisi
+     * @since 2021-01-28
+     */
+    public void closeLobbies() {
+        for (Stage lobbyStage : lobbyStages) {
+            lobbyStage.close();
+        }
+        lobbyStages.clear();
+    }
+
+    /**
+     * Initialises the Change Password view
+     * <p>
+     * If the ChangePasswordScene is null, it gets set to a new scene containing the
+     * pane showing the Change Password view as specified by the ChangePasswordView
+     * FXML file.
+     *
+     * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.ChangePasswordPresenter
+     * @since 2020-12-19
+     */
+    private void initChangePasswordView() {
+        if (ChangePasswordScene == null) {
+            Parent rootPane = initPresenter(ChangePasswordPresenter.fxml);
+            ChangePasswordScene = new Scene(rootPane, 400, 200);
+            ChangePasswordScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
+     * Initialises the login view
+     * <p>
+     * If the loginScene is null, it gets set to a new scene containing the
+     * pane showing the login view as specified by the LoginView FXML file.
+     *
+     * @see de.uol.swp.client.auth.LoginPresenter
      * @since 2019-09-03
      */
-    private void initViews() {
-        initLoginView();
-        initMainView();
-        initRegistrationView();
-        initChangePasswordView();
+    private void initLoginView() {
+        if (loginScene == null) {
+            Parent rootPane = initPresenter(LoginPresenter.fxml);
+            loginScene = new Scene(rootPane, 400, 200);
+            loginScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
+     * Initialises the main menu view
+     * <p>
+     * If the mainScene is null, it gets set to a new scene containing the
+     * pane showing the main menu view as specified by the MainMenuView
+     * FXML file.
+     *
+     * @see de.uol.swp.client.main.MainMenuPresenter
+     * @since 2019-09-03
+     */
+    private void initMainView() {
+        if (mainScene == null) {
+            Parent rootPane = initPresenter(MainMenuPresenter.fxml);
+            mainScene = new Scene(rootPane, 800, 600);
+            mainScene.getStylesheets().add(styleSheet);
+        }
     }
 
     /**
@@ -118,41 +190,6 @@ public class SceneManager {
     }
 
     /**
-     * Initialises the main menu view
-     * <p>
-     * If the mainScene is null, it gets set to a new scene containing the
-     * pane showing the main menu view as specified by the MainMenuView
-     * FXML file.
-     *
-     * @see de.uol.swp.client.main.MainMenuPresenter
-     * @since 2019-09-03
-     */
-    private void initMainView() {
-        if (mainScene == null) {
-            Parent rootPane = initPresenter(MainMenuPresenter.fxml);
-            mainScene = new Scene(rootPane, 800, 600);
-            mainScene.getStylesheets().add(styleSheet);
-        }
-    }
-
-    /**
-     * Initialises the login view
-     * <p>
-     * If the loginScene is null, it gets set to a new scene containing the
-     * pane showing the login view as specified by the LoginView FXML file.
-     *
-     * @see de.uol.swp.client.auth.LoginPresenter
-     * @since 2019-09-03
-     */
-    private void initLoginView() {
-        if (loginScene == null) {
-            Parent rootPane = initPresenter(LoginPresenter.fxml);
-            loginScene = new Scene(rootPane, 400, 200);
-            loginScene.getStylesheets().add(styleSheet);
-        }
-    }
-
-    /**
      * Initialises the registration view
      * <p>
      * If the registrationScene is null, it gets set to a new scene containing the
@@ -171,71 +208,66 @@ public class SceneManager {
     }
 
     /**
-     * Initialises the Change Password view
+     * Subroutine to initialise all views
      * <p>
-     * If the ChangePasswordScene is null, it gets set to a new scene containing the
-     * pane showing the Change Password view as specified by the ChangePasswordView
-     * FXML file.
+     * This is a subroutine of the constructor to initialise all views
      *
-     * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.ChangePasswordPresenter
-     * @since 2020-12-19
+     * @since 2019-09-03
      */
-    private void initChangePasswordView() {
-        if (ChangePasswordScene == null) {
-            Parent rootPane = initPresenter(ChangePasswordPresenter.fxml);
-            ChangePasswordScene = new Scene(rootPane, 400, 200);
-            ChangePasswordScene.getStylesheets().add(styleSheet);
+    private void initViews() {
+        initLoginView();
+        initMainView();
+        initRegistrationView();
+        initChangePasswordView();
+    }
+
+    /**
+     * Handles an incoming LobbyListMessage
+     * <p>
+     * If a LobbyListMessage is detected, the lobbyScenes map
+     * is updated to know the same lobbies as the server
+     *
+     * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
+     *
+     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
+     * @since 2020-12-12
+     */
+    @Subscribe
+    private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
+        LOG.debug("Received AllLobbiesReponse");
+        for (String name : allLobbiesResponse.getLobbyNames()) {
+            lobbyScenes.put(name, null);
         }
     }
 
     /**
-     * Handles the ShowRegistrationViewEvent detected on the EventBus
+     * Handles the ChangePasswordCanceledEvent detected on the EventBus
      * <p>
-     * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
-     * called. It calls a method to switch the current screen to the registration
-     * screen.
-     *
-     * @param event The ShowRegistrationViewEvent detected on the EventBus
-     *
-     * @see de.uol.swp.client.register.event.ShowRegistrationViewEvent
-     * @since 2019-09-03
-     */
-    @Subscribe
-    private void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
-        showRegistrationScreen();
-    }
-
-    /**
-     * Handles the ShowChangePasswordViewEvent detected on the EventBus
-     * <p>
-     * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
-     * called. It calls a method to switch the current screen to the Change Password
-     * screen.
+     * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the screen shown before Change Password screen.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent
      * @since 2020-12-19
      */
     @Subscribe
-    private void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
-        showChangePasswordScreen(event.getUser());
+    private void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
+        showScene(lastScene, lastTitle, MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
     /**
-     * Handles the ShowLoginViewEvent detected on the EventBus
+     * Handles the ChangePasswordErrorEvent detected on the EventBus
      * <p>
-     * If a ShowLoginViewEvent is detected on the EventBus, this method gets
-     * called. It calls a method to switch the current screen to the login screen.
+     * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in a error alert.
      *
-     * @param event The ShowLoginViewEvent detected on the EventBus
-     *
-     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
-     * @since 2019-09-03
+     * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent
+     * @since 2020-12-19
      */
     @Subscribe
-    private void onShowLoginViewEvent(ShowLoginViewEvent event) {
-        showLoginScreen();
+    private void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
+        showError(event.getMessage());
     }
 
     /**
@@ -291,22 +323,67 @@ public class SceneManager {
     }
 
     /**
-     * Handles an incoming LobbyListMessage
+     * Handles the LobbyErrorEvent detected on the EventBus
      * <p>
-     * If a LobbyListMessage is detected, the lobbyScenes map
-     * is updated to know the same lobbies as the server
+     * If a LobbyErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in a error alert.
      *
-     * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
+     * @param event The LobbyErrorEvent detected on the EventBus
      *
-     * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
-     * @since 2020-12-12
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @since 2020-12-18
      */
     @Subscribe
-    private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
-        LOG.debug("Received AllLobiesReponse");
-        for (String name : allLobbiesResponse.getLobbyNames()) {
-            lobbyScenes.put(name, null);
-        }
+    private void onLobbyErrorEvent(LobbyErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
+     * Handles the RegistrationCanceledEvent detected on the EventBus
+     * <p>
+     * If a RegistrationCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the screen shown before registration.
+     *
+     * @param event The RegistrationCanceledEvent detected on the EventBus
+     *
+     * @see de.uol.swp.client.register.event.RegistrationCanceledEvent
+     * @since 2019-09-03
+     */
+    @Subscribe
+    private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
+        showScene(lastScene, lastTitle, LOGIN_WIDTH, LOGIN_HEIGHT);
+    }
+
+    /**
+     * Handles the RegistrationErrorEvent detected on the EventBus
+     * <p>
+     * If a RegistrationErrorEvent is detected on the EventBus, this method gets
+     * called. It shows the error message of the event in a error alert.
+     *
+     * @param event The RegistrationErrorEvent detected on the EventBus
+     *
+     * @see de.uol.swp.client.register.event.RegistrationErrorEvent
+     * @since 2019-09-03
+     */
+    @Subscribe
+    private void onRegistrationErrorEvent(RegistrationErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
+     * Handles the ShowChangePasswordViewEvent detected on the EventBus
+     * <p>
+     * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the Change Password
+     * screen.
+     *
+     * @author Eric Vuong
+     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @since 2020-12-19
+     */
+    @Subscribe
+    private void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
+        showChangePasswordScreen(event.getUser());
     }
 
     /**
@@ -351,80 +428,114 @@ public class SceneManager {
     }
 
     /**
-     * Handles the LobbyErrorEvent detected on the EventBus
+     * Handles the ShowLoginViewEvent detected on the EventBus
      * <p>
-     * If a LobbyErrorEvent is detected on the EventBus, this method gets
-     * called. It shows the error message of the event in a error alert.
+     * If a ShowLoginViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the login screen.
      *
-     * @param event The LobbyErrorEvent detected on the EventBus
-     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
-     * @since 2020-12-18
-     */
-    @Subscribe
-    private void onLobbyErrorEvent(LobbyErrorEvent event) {
-        showError(event.getMessage());
-    }
-
-    /**
-     * Handles the RegistrationCanceledEvent detected on the EventBus
-     * <p>
-     * If a RegistrationCanceledEvent is detected on the EventBus, this method gets
-     * called. It calls a method to show the screen shown before registration.
+     * @param event The ShowLoginViewEvent detected on the EventBus
      *
-     * @param event The RegistrationCanceledEvent detected on the EventBus
-     *
-     * @see de.uol.swp.client.register.event.RegistrationCanceledEvent
+     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @since 2019-09-03
      */
     @Subscribe
-    private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
-        showScene(lastScene, lastTitle);
+    private void onShowLoginViewEvent(ShowLoginViewEvent event) {
+        showLoginScreen();
     }
 
     /**
-     * Handles the ChangePasswordCanceledEvent detected on the EventBus
+     * Handles the ShowRegistrationViewEvent detected on the EventBus
      * <p>
-     * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
-     * called. It calls a method to show the screen shown before Change Password screen.
+     * If a ShowRegistrationViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the registration
+     * screen.
      *
-     * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent
-     * @since 2020-12-19
-     */
-    @Subscribe
-    private void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
-        showScene(lastScene, lastTitle);
-    }
-
-    /**
-     * Handles the RegistrationErrorEvent detected on the EventBus
-     * <p>
-     * If a RegistrationErrorEvent is detected on the EventBus, this method gets
-     * called. It shows the error message of the event in a error alert.
+     * @param event The ShowRegistrationViewEvent detected on the EventBus
      *
-     * @param event The RegistrationErrorEvent detected on the EventBus
-     *
-     * @see de.uol.swp.client.register.event.RegistrationErrorEvent
+     * @see de.uol.swp.client.register.event.ShowRegistrationViewEvent
      * @since 2019-09-03
      */
     @Subscribe
-    private void onRegistrationErrorEvent(RegistrationErrorEvent event) {
-        showError(event.getMessage());
+    private void onShowRegistrationViewEvent(ShowRegistrationViewEvent event) {
+        showRegistrationScreen();
     }
 
     /**
-     * Handles the ChangePasswordErrorEvent detected on the EventBus
+     * Handles the ShowTradeWithBankViewEvent detected on the EventBus
      * <p>
-     * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
-     * called. It shows the error message of the event in a error alert.
+     * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
+     * called. It opens the trading with the bank window in a new window and a
+     * TradeUpdateEvent is sent onto teh eventBus.
      *
-     * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent
-     * @since 2020-12-19
+     * @param event The ShowTradeWithBankViewEvent detected on the EventBus
+     *
+     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
+     * @since 2021-02-20
      */
     @Subscribe
-    private void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
-        showError(event.getMessage());
+    private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
+        //gets the lobby's name
+        User user = event.getUser();
+        String lobbyName = event.getLobbyName();
+        //New window (Stage)
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle("Trade of " + user.getUsername());
+        lobbyStage.setHeight(TRADING_HEIGHT);
+        lobbyStage.setMinHeight(TRADING_HEIGHT);
+        lobbyStage.setWidth(TRADING_WIDTH);
+        lobbyStage.setMinWidth(TRADING_WIDTH);
+        //Initialises a new lobbyScene
+        Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
+        Scene lobbyScene = new Scene(rootPane);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyStage.setScene(lobbyScene);
+        tradingStage.put(lobbyName, lobbyStage);
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Shows the window
+        lobbyStage.show();
+        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
+        eventBus.post(new TradeUpdateEvent(lobbyName, user));
+    }
+
+    /**
+     * Handles the TradeWithBankCancelEvent detected on the EventBus
+     * <p>
+     * If a TradeWithBankCancelEvent is detected on the EventBus, this method gets
+     * called. If there is a trading stage in the according lobby, it gets closed.
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
+     * @since 2021-02-20
+     */
+    @Subscribe
+    private void onTradeWithBankCancelEvent(TradeWithBankCancelEvent event) {
+        LOG.debug("Received TradeWithUserCancelEvent");
+        String lobby = event.getLobbyName();
+        if (tradingStage.containsKey(lobby)) {
+            tradingStage.get(lobby).close();
+            tradingStage.remove(lobby);
+        }
+    }
+
+    /**
+     * Shows the change password screen
+     * <p>
+     * Sets the scene's UserData to the current user.
+     * Switches the current Scene to the ChangePasswordScene
+     * and sets the window's title to "Change Password"
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2020-12-19
+     */
+    public void showChangePasswordScreen(User user) {
+        ChangePasswordScene.setUserData(user);
+        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"), CHANGEPW_WIDTH,
+                  CHANGEPW_HEIGHT);
     }
 
     /**
@@ -443,17 +554,6 @@ public class SceneManager {
     }
 
     /**
-     * Shows a server error message inside an error alert
-     *
-     * @param e The error message
-     *
-     * @since 2019-09-03
-     */
-    public void showServerError(String e) {
-        showError(resourceBundle.getString("error.server") + '\n', e);
-    }
-
-    /**
      * Shows an error message inside an error alert
      *
      * @param e The error message
@@ -462,28 +562,6 @@ public class SceneManager {
      */
     public void showError(String e) {
         showError(resourceBundle.getString("error.generic") + '\n', e);
-    }
-
-    /**
-     * Switches the current scene and title to the given ones
-     * <p>
-     * The current scene and title are saved in the lastScene and lastTitle variables
-     * before the new scene and title are set and shown.
-     *
-     * @param scene New scene to show
-     * @param title New window title
-     *
-     * @since 2019-09-03
-     */
-    private void showScene(final Scene scene, final String title) {
-        this.lastScene = currentScene;
-        this.lastTitle = primaryStage.getTitle();
-        this.currentScene = scene;
-        Platform.runLater(() -> {
-            primaryStage.setTitle(title);
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        });
     }
 
     /**
@@ -502,19 +580,6 @@ public class SceneManager {
     }
 
     /**
-     * Shows the main menu
-     * <p>
-     * Switches the current scene to the mainScene and sets the window's title
-     * to "Welcome " and the current user's username
-     *
-     * @since 2019-09-03
-     */
-    public void showMainScreen(User currentUser) {
-        showScene(mainScene,
-                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()));
-    }
-
-    /**
      * Shows the login screen
      * <p>
      * Switches the current Scene to the loginScene
@@ -524,7 +589,21 @@ public class SceneManager {
      */
     public void showLoginScreen() {
         System.out.println(lobbyStages.toString());
-        showScene(loginScene, resourceBundle.getString("login.window.title"));
+        showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
+    }
+
+    /**
+     * Shows the main menu
+     * <p>
+     * Switches the current scene to the mainScene and sets the window's title
+     * to "Welcome " and the current user's username
+     *
+     * @since 2019-09-03
+     */
+    public void showMainScreen(User currentUser) {
+        showScene(mainScene,
+                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
+                  MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
     /**
@@ -536,36 +615,46 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"));
+        showScene(registrationScene, resourceBundle.getString("register.window.title"), REGISTRATION_WIDTH,
+                  REGISTRATION_HEIGHT);
     }
 
     /**
-     * Shows the change password screen
+     * Switches the current scene and title to the given ones
      * <p>
-     * Sets the scene's UserData to the current user.
-     * Switches the current Scene to the ChangePasswordScene
-     * and sets the window's title to "Change Password"
+     * The current scene and title are saved in the lastScene and lastTitle variables
+     * before the new scene and title are set and shown.
      *
-     * @author Eric Vuong
-     * @author Mario Fokken
-     * @since 2020-12-19
+     * @param scene     New scene to show
+     * @param title     New window title
+     * @param minWidth  Minimum Width of the scene
+     * @param minHeight Minimum Height of the scene
+     *
+     * @since 2019-09-03
      */
-    public void showChangePasswordScreen(User user) {
-        ChangePasswordScene.setUserData(user);
-        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"));
+    private void showScene(final Scene scene, final String title, int minWidth, int minHeight) {
+        this.lastScene = currentScene;
+        this.lastTitle = primaryStage.getTitle();
+        this.currentScene = scene;
+        Platform.runLater(() -> {
+            primaryStage.setTitle(title);
+            primaryStage.setScene(scene);
+            primaryStage.setMinWidth(minWidth);
+            primaryStage.setMinHeight(minHeight);
+            primaryStage.setWidth(minWidth);
+            primaryStage.setHeight(minHeight);
+            primaryStage.show();
+        });
     }
 
     /**
-     * Closes all Lobbies
+     * Shows a server error message inside an error alert
      *
-     * @author Finn Haase
-     * @author Aldin Dervisi
-     * @since 2021-01-28
+     * @param e The error message
+     *
+     * @since 2019-09-03
      */
-    public void closeLobbies() {
-        for (Stage lobbyStage : lobbyStages) {
-            lobbyStage.close();
-        }
-        lobbyStages.clear();
+    public void showServerError(String e) {
+        showError(resourceBundle.getString("error.server") + '\n', e);
     }
 }
