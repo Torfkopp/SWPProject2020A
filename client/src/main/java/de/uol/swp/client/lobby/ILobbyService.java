@@ -97,6 +97,14 @@ public interface ILobbyService {
     void retrieveAllLobbyMembers(String lobbyName);
 
     /**
+     * Posts a request to roll the dices
+     *
+     * @see de.uol.swp.common.game.request.RollDiceRequest
+     * @since 2021-02-22
+     */
+    void rollDice(String lobbyName, User user);
+
+    /**
      * Posts a request to update ones Inventory
      *
      * @param lobbyName The name of the lobby the user wants to update his Inventory in
