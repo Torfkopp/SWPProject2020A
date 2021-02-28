@@ -9,7 +9,6 @@ import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
-import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.lobby.request.TradeWithUserRequest;
@@ -242,7 +241,7 @@ public class GameService extends AbstractService {
             if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
                 bankInventory.remove(randInt);
                 if (LOG.isDebugEnabled()) LOG.debug("Sending a BuyDevelopmentCard for Lobby " + req.getOriginLobby());
-                AbstractResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(),
+                ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(),
                                                                                        req.getOriginLobby(),
                                                                                        developmentCard);
                 returnMessage.initWithMessage(req);
@@ -295,6 +294,22 @@ public class GameService extends AbstractService {
             LOG.error(e);
         }
     }
+    @Subscribe
+    private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req){
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory respondingInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getRespondingUser())) {
+                respondingInventory = value;
+            }
+        }
+        if (respondingInventory == null) return;
+        ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessage));
+    }
 
     /**
      * Handles a RollDiceRequest found on the EventBus
@@ -343,7 +358,6 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
-        System.out.println(req.getRespondingUser());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory respondingInventory = null;

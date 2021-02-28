@@ -24,6 +24,7 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -71,6 +72,7 @@ public class SceneManager {
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
     private final Map<String, Stage> tradingResponseStages = new HashMap<>();
+    private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final Injector injector;
     private final EventBus eventBus;
@@ -525,6 +527,9 @@ public class SceneManager {
             tradeScene.getStylesheets().add(styleSheet);
             tradingResponseStage.setScene(tradeScene);
             tradingResponseStages.put(lobbyName, tradingResponseStage);
+            System.out.println("Scene gesetzt");
+            System.out.println(tradingResponseStages.get(lobbyName));
+            System.out.println(tradingResponseStages.size());
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
@@ -602,7 +607,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onTradeWithBankCancelEvent(TradeWithBankCancelEvent event) {
-        LOG.debug("Received TradeWithUserCancelEvent");
+        LOG.debug("Received TradeWithBankCancelEvent");
         String lobby = event.getLobbyName();
         if (tradingStages.containsKey(lobby)) {
             tradingStages.get(lobby).close();
@@ -615,7 +620,6 @@ public class SceneManager {
      * <p>
      * If a TradeWithUserCancelEvent is detected on the EventBus, this method gets
      * called. If there is a trading stage in the according lobby, it gets closed.
-     * If there is a tradingResponseStage it gets closed as well.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -630,9 +634,28 @@ public class SceneManager {
             tradingStages.get(lobby).close();
             tradingStages.remove(lobby);
         }
+    }
+
+    /**
+     * Handles the TradeWithUserCancelResponse detected on the EventBus
+     * <p>
+     * If a TradeWithUserCancelResponse is detected on the EventBus, this method gets
+     * called. If there is a responding trading stage in the according lobby, it gets closed.
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeWithUserCancelResponse
+     * @since 2021-02-28
+     */
+    @Subscribe
+    private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
+        LOG.debug("Received a TradeWithUserCancelResponse");
+        String lobby = rsp.getLobbyName();
         if (tradingResponseStages.containsKey(lobby)) {
-            tradingResponseStages.get(lobby).close();
-            tradingResponseStages.remove(lobby);
+            Platform.runLater(() -> {
+                tradingResponseStages.get(lobby).close();
+                tradingResponseStages.remove(lobby);
+            });
         }
     }
 

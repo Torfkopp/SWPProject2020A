@@ -64,7 +64,7 @@
                 <VBox prefHeight="259.0" prefWidth="210.0" spacing="5.0">
                     <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
                     <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
-                            text="%lobby.game.buttons.rolldice"/>
+                            text="%lobby.game.buttons.rolldice" visible="false"/>
                     <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false"
                             onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
                         <VBox.margin>
@@ -89,7 +89,8 @@
                             </HBox.margin>
                         </Button>
                     </HBox>
-                    <Button fx:id="tradeWithUserButton" mnemonicParsing="false" onAction="#onTradeWithUserButtonPressed"
+                    <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false"
+                            onAction="#onTradeWithUserButtonPressed"
                             text="%lobby.game.buttons.playertrade" visible="false"/>
                     <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
                             onAction="#onTradeWithBankButtonPressed" text="%lobby.game.buttons.banktrade"
