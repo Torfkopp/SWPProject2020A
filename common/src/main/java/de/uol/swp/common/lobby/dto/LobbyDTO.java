@@ -31,6 +31,7 @@ public class LobbyDTO implements Lobby {
      *
      * @param name    The requested name the lobby
      * @param creator The user who created the lobby and therefore its owner
+     * @param inGame  Whether the lobby is currently in a game
      *
      * @since 2019-10-08
      */

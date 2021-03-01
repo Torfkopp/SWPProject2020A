@@ -52,7 +52,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     public static final String fxml = "/fxml/MainMenuView.fxml";
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-    private final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
 
     private ObservableList<String> users;
     private ObservableList<Pair<String, String>> lobbies;
@@ -277,7 +277,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
             lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
@@ -349,7 +348,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
             lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
@@ -525,8 +523,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             lobbies.clear();
             lobbyList.forEach(l -> {
                 String s = l.getName() + " (" + l.getUsers().size() + "/4)";
-                if (l.getUsers().size() == 4) s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
+                else if (l.getUsers().size() == 4)
+                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
             });
         });
