@@ -5,9 +5,7 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
-import de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent;
-import de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent;
+import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
@@ -15,11 +13,12 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
-import de.uol.swp.common.game.response.UpdateInventoryResponse;
+import de.uol.swp.common.game.request.TradeWithBankRequest;
+import de.uol.swp.common.game.request.TradeWithUserRequest;
+import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
-import de.uol.swp.common.lobby.request.TradeWithBankRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
@@ -68,6 +67,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Button endTurn;
     @FXML
+    private Button tradeWithUserButton;
+    @FXML
+    private Button tradeWithBankButton;
+    @FXML
     private Label turnIndicator;
     @FXML
     private Canvas gameMapCanvas;
@@ -77,9 +80,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private ListView<Pair<String, String>> inventoryView;
 
     private GameRendering gameRendering;
-
-    @FXML
-    private Button tradeWithBankButton;
     private Window window;
 
     /**
@@ -233,11 +233,31 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * If a BuyDevelopmentCardResponse is found on the EventBus,
+     * this method calls 2 methods to reset the trade with bank button
+     * and the trade with user button for the users in the response.
+     *
+     * @param rsp BuyDevelopmentCardResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
+     * @since 2021-02-28
+     */
+    @Subscribe
+    private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        setTradeWithUserButtonState(rsp.getUser());
+        setTradeWithBankButtonState(rsp.getUser());
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
      * this method is called.
-     * It enables the endTurnButton.
+     * It enables the endTurnButton, the Trade with User Button and
+     * the trade with Bank Button.
      *
      * @param msg The DiceCastMessage object seen on the EventBus
      *
@@ -250,6 +270,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
+        setTradeWithUserButtonState(msg.getUser());
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
     }
 
@@ -267,6 +288,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.endTurn.setDisable(true);
         this.rollDice.setDisable(true);
         this.tradeWithBankButton.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -393,9 +415,28 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     public void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
-            tradeWithBankButton.setDisable(false);
-            endTurn.setDisable(false);
+            setTradeWithBankButtonState(event.getUser());
+            setEndTurnButtonState(event.getUser());
+            setTradeWithUserButtonState(event.getUser());
         }
+    }
+
+    /**
+     * Handles a ResetTradeWithUserButtonEvent found on the event bus
+     * <p>
+     * If a new ResetTradeWithUserButtonEvent is posted onto the EventBus the
+     * tradeWithUserButton is enabled again.
+     *
+     * @param event The ResetTradeWithUserButtonEvent seen on the EventBus
+     *
+     * @author Finn Haase
+     * @author Maximilian Lindner
+     * @since 2021-02-23
+     */
+    @Subscribe
+    private void onResetTradeWithUserButtonEvent(ResetTradeWithUserButtonEvent event) {
+        setTradeWithBankButtonState(event.getUser());
+        setTradeWithUserButtonState(event.getUser());
     }
 
     /**
@@ -457,6 +498,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
                 this.startSession.setVisible(false);
+                this.rollDice.setVisible(true);
+                this.tradeWithUserButton.setVisible(true);
                 this.tradeWithBankButton.setVisible(true);
                 setRollDiceButtonState(msg.getUser());
             });
@@ -480,9 +523,43 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     public void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
-            tradeWithBankButton.setDisable(true);
             endTurn.setDisable(false);
         }
+    }
+
+    /**
+     * Handles a TradeOfUsersAcceptedResponse found on the EventBus
+     * Updates the Inventories of the trading User.
+     *
+     * @param rsp The TradeOfUsersAcceptedResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
+        lobbyService.updateInventory(this.lobbyName, this.loggedInUser);
+    }
+
+    /**
+     * If a TradeWithBankAcceptedResponse is found on the EventBus,
+     * this method calls 2 methods to reset the trade with bank button
+     * and the trade with user button for the users in the response.
+     *
+     * @param rsp TradeWithBankButtonAcceptedResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeWithBankAcceptedResponse
+     * @since 2021-02-28
+     */
+    @Subscribe
+    private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        setTradeWithUserButtonState(rsp.getUser());
+        setTradeWithBankButtonState(rsp.getUser());
     }
 
     /**
@@ -494,17 +571,73 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Alwin Bossert
      * @author Maximilian Lindner
      * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
-     * @see de.uol.swp.common.lobby.request.TradeWithBankRequest
+     * @see de.uol.swp.common.game.request.TradeWithBankRequest
      * @since 2021-02-20
      */
     @FXML
     private void onTradeWithBankButtonPressed() {
         this.tradeWithBankButton.setDisable(true);
         this.endTurn.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
         eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
         LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
         eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));
         LOG.debug("Sending a TradeWithBankRequest for Lobby " + this.lobbyName);
+    }
+
+    /**
+     * Handles a Click on the TradeWithUserButton
+     * <p>
+     * If another player of the lobby-member-list is selected and the button gets pressed,
+     * this button gets disabled, a new ShowTradeWithUserViewEvent is posted onto the
+     * EventBus to show the trading window and a TradeWithUserRequest is posted
+     * onto the EventBus to get the necessary inventory information.
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @since 2021-02-23
+     */
+    @FXML
+    private void onTradeWithUserButtonPressed() {
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (membersView.getSelectionModel().isEmpty()) {
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
+        } else if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) {
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
+        } else {
+            tradeWithUserButton.setDisable(true);
+            tradeWithBankButton.setDisable(true);
+            endTurn.setDisable(true);
+            LOG.debug("Sending ShowTradeWithUserViewEvent");
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, selectedUser.getKey()));
+            LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
+        }
+    }
+
+    /**
+     * Handles the TradeWithUserOfferResponse found on the EventBus
+     * If a user gets a trading offer a new ShowTradeWithUserRespondViewEvent is posted onto
+     * the  EventBus to show the AcceptView.
+     *
+     * @param rsp The TradeWithUserOfferResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
+        if (rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
+            eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
+                                                                this.loggedInUser.getUsername(), this.lobbyName, rsp));
+        }
     }
 
     /**
@@ -694,6 +827,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setTradeWithBankButtonState(User player) {
         this.tradeWithBankButton.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the Visible and Disable states of the "Trade
+     * With User" button.
+     * <p>
+     * The button is only visible if the logged in user is the player.
+     *
+     * @author Finn Haase
+     * @author Maximilian Lindner
+     * @since 2021-02-21
+     */
+    private void setTradeWithUserButtonState(User player) {
+        this.tradeWithUserButton.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**

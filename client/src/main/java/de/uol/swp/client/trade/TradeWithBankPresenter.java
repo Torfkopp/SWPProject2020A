@@ -286,13 +286,13 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * If a TradeWithBankAcceptedResponse is found on the event bus,
+     * If a TradeWithBankAcceptedResponse is found on the EventBus,
      * this method calls the close method, which closes the trading
-     * window and posts a updateInventoryRequest onto the event bus
+     * window and posts a updateInventoryRequest onto the EventBus
      * to get the new Inventory after the trade shown in the
      * LobbyView.
      *
-     * @param rsp TradeWithBankButtonAcceptedResponse found on the event bus
+     * @param rsp TradeWithBankButtonAcceptedResponse found on the EventBus
      */
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
@@ -302,8 +302,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
         eventBus.post(updateInventoryRequest);
-        tradeResourceWithBankButton.setVisible(false);
-        tradeResourceWithBankButton.setDisable(true);
     }
 
     /**
