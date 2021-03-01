@@ -38,10 +38,8 @@ import java.util.*;
 public class CommandService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(CommandService.class);
-    private static final List<String> allowedNames = new ArrayList<>(
-            Arrays.asList("event", "message", "request", "response"));
     private static final List<String> excludedNames = new ArrayList<>(Arrays.asList("abstract", "store", "context"));
-    private static Set<ClassPath.ClassInfo> allClasses;
+    private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement; //use to find users by name
     private final ILobbyManagement lobbyManagement;
 
@@ -123,10 +121,9 @@ public class CommandService extends AbstractService {
      * @param originalMessage the original message
      */
     private void command_Post(List<CommandParser.ASTToken> args, Message originalMessage) {
-        for (ClassPath.ClassInfo cInfo : allClasses) {
-            if (cInfo.getSimpleName().equals(args.get(0).getString())) {
+        for (Class<?> cls : allClasses) {
+            if (cls.getSimpleName().equals(args.get(0).getString())) {
                 try {
-                    Class<?> cls = Class.forName(cInfo.getName());
                     Constructor<?>[] constructors = cls.getConstructors();
                     for (Constructor<?> constr : constructors) {
                         // 0: command name, 1: Class name, 2+: Class constructor args
@@ -153,18 +150,16 @@ public class CommandService extends AbstractService {
      * allowed to request an instantiation and posting of.
      */
     public void getAllClasses() {
-        //TODO: filter for "extends Message" and "not interface"
+        allClasses = new HashSet<>();
+        Set<Class<?>> clsSet = new HashSet<>();
         ClassLoader cl = getClass().getClassLoader();
         try {
-            Set<ClassPath.ClassInfo> clsSet = ClassPath.from(cl).getTopLevelClassesRecursive("de.uol.swp");
-            Set<ClassPath.ClassInfo> noExcludedClsSet = new HashSet<>();
-            allClasses = new HashSet<>();
-            clsSet.stream()
-                  .filter(clsin -> excludedNames.stream().noneMatch(clsin.getSimpleName().toLowerCase()::contains))
-                  .forEach(noExcludedClsSet::add);
-            noExcludedClsSet.stream().filter(clsin -> allowedNames.stream().anyMatch(
-                    clsin.getSimpleName().toLowerCase()::contains)).forEach(allClasses::add);
-        } catch (IOException e) {
+            Set<ClassPath.ClassInfo> clsinSet = ClassPath.from(cl).getTopLevelClassesRecursive("de.uol.swp");
+            for (ClassPath.ClassInfo clsin : clsinSet) clsSet.add(Class.forName(clsin.getName()));
+            clsSet.stream().filter(cls -> !cls.isInterface())
+                  .filter(cls -> excludedNames.stream().noneMatch(cls.getSimpleName().toLowerCase()::contains))
+                  .filter(Message.class::isAssignableFrom).forEach(allClasses::add);
+        } catch (IOException | ClassNotFoundException e) {
             // TODO: error handling
         }
     }
@@ -181,19 +176,15 @@ public class CommandService extends AbstractService {
     private void onDevMenuClassesRequest(DevMenuClassesRequest req) {
         //classes<classname, constructors<arguments<argumentname, argumenttype>>>
         SortedMap<String, List<Map<String, Class<?>>>> classesMap = new TreeMap<>();
-        for (ClassPath.ClassInfo cinfo : allClasses) {
-            String clsn = cinfo.getSimpleName();
+        for (Class<?> cls : allClasses) {
+            String clsn = cls.getSimpleName();
             List<Map<String, Class<?>>> constructorArgList = new ArrayList<>();
-            try {
-                Class<?> cls = Class.forName(cinfo.getName());
-                for (Constructor<?> cons : cls.getConstructors()) {
-                    Map<String, Class<?>> constructorArgs = new LinkedHashMap<>();
-                    for (Parameter cls2 : cons.getParameters()) {
-                        constructorArgs.put(cls2.getName(), cls2.getType()); // e.g.: lobbyName, java.lang.String
-                    }
-                    constructorArgList.add(constructorArgs);
+            for (Constructor<?> constructor : cls.getConstructors()) {
+                Map<String, Class<?>> constructorArgs = new LinkedHashMap<>();
+                for (Parameter parameter : constructor.getParameters()) {
+                    constructorArgs.put(parameter.getName(), parameter.getType()); // e.g.: lobbyName, java.lang.String
                 }
-            } catch (ClassNotFoundException ignored) {
+                constructorArgList.add(constructorArgs);
             }
             classesMap.put(clsn, constructorArgList);
         }
@@ -284,15 +275,15 @@ public class CommandService extends AbstractService {
      * @return The instance of a Message subclass as returned by the provided
      * constructor
      *
-     * @throws ReflectiveOperationException Thrown when something goes awry
-     *                                      during the reflection process
+     * @throws java.lang.ReflectiveOperationException Thrown when something goes awry
+     *                                                during the reflection process
      */
     private Message parseArguments(List<CommandParser.ASTToken> args, Constructor<?> constr,
                                    Optional<User> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
-            switch (parameters[i].getName()) {
+            switch (parameters[i].getName()) { //TODO: handle int[] (e.g. DiceCastMessage)
                 case "de.uol.swp.common.user.User":
                     if (args.get(i + 1).getString().equals(".") || args.get(i + 1).getString().equals("me")) {
                         if (currentUser.isPresent()) argList.add(currentUser.get());
