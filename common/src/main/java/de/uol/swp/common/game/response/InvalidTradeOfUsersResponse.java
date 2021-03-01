@@ -5,7 +5,7 @@ import de.uol.swp.common.user.User;
 
 /**
  * This method is called if a trade between two users
- * is invalid.
+ * is invalid, e.g. too many resources were demanded.
  *
  * @author Maximilian Lindner
  * @author Finn Haase

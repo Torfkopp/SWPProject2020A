@@ -1,11 +1,11 @@
 package de.uol.swp.client.trade.event;
 
 /**
- * Event used to trigger close the trading response window
+ * Event used to trigger the closure of the trading response window
  * of a trade between 2 users.
  * <p>
  * In order to close the Trading window when the cancel button got pressed, post an
- * instance of it onto the EventBus the SceneManager is subscribed to. The SceneManager
+ * instance of this onto the EventBus the SceneManager is subscribed to. The SceneManager
  * will need the Lobby Name to close the trading window
  *
  * @author Maximilian Lindner

@@ -1,5 +1,6 @@
-package de.uol.swp.common.lobby.request;
+package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
 import de.uol.swp.common.user.User;
 
 /**

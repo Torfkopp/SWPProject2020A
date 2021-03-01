@@ -14,12 +14,12 @@ public class Inventory {
     private final User player;
 
     private int totalResources = 0;
-    //todo wieder auf 0 setzen.. ist nur zum testen auf 4
-    private int brick = 2;
-    private int grain = 2;
-    private int lumber = 2;
-    private int ore = 2;
-    private int wool = 2;
+
+    private int brick = 0;
+    private int grain = 0;
+    private int lumber = 0;
+    private int ore = 0;
+    private int wool = 0;
 
     private int victoryPointCards = 0;
     private int knightCards = 0;

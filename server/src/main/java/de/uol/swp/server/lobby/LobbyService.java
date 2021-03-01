@@ -95,7 +95,8 @@ public class LobbyService extends AbstractService {
      * If a GetUserSessionEvent is found on the EventBus this
      * method gets the Session of the User contained in the GetUserSessionEvent.
      * Then it posts a FetchUserContextInternalRequest with the session of the
-     * User and the ResponseMessage of the GetUserSessionEvent.
+     * User and .the ResponseMessage contained in the GetUserSessionEvent,
+     * which will be handled by the ServerHandler.
      *
      * @param event GetUserSessionEvent found on the EventBus
      *
@@ -303,7 +304,7 @@ public class LobbyService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug("Received StartSessionRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isPresent()) {
-            if (lobby.get().getUsers().size() >= 1 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
+            if (lobby.get().getUsers().size() >= 3 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
                 LOG.debug("---- All Members are ready, proceeding with sending of StartSessionMessage...");
                 ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), req.getUser());
                 post(new CreateGameMessage(lobby.get(), req.getUser()));

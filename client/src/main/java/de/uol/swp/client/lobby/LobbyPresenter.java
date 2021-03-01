@@ -13,10 +13,13 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.request.TradeWithBankRequest;
+import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.request.*;
+import de.uol.swp.common.lobby.request.StartSessionRequest;
+import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
@@ -64,6 +67,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Button endTurn;
     @FXML
+    private Button tradeWithUserButton;
+    @FXML
+    private Button tradeWithBankButton;
+    @FXML
     private Label turnIndicator;
     @FXML
     private Canvas gameMapCanvas;
@@ -71,13 +78,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private VBox playField;
     @FXML
     private ListView<Pair<String, String>> inventoryView;
-    @FXML
-    private Button tradeWithUserButton;
 
     private GameRendering gameRendering;
-
-    @FXML
-    private Button tradeWithBankButton;
     private Window window;
 
     /**
@@ -254,7 +256,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
      * this method is called.
-     * It enables the endTurnButton and the Trade with User Button.
+     * It enables the endTurnButton, the Trade with User Button and
+     * the trade with Bank Button.
      *
      * @param msg The DiceCastMessage object seen on the EventBus
      *
@@ -568,7 +571,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Alwin Bossert
      * @author Maximilian Lindner
      * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
-     * @see de.uol.swp.common.lobby.request.TradeWithBankRequest
+     * @see de.uol.swp.common.game.request.TradeWithBankRequest
      * @since 2021-02-20
      */
     @FXML
@@ -583,7 +586,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Handles a Click on the TradeWithUserButtons
+     * Handles a Click on the TradeWithUserButton
      * <p>
      * If another player of the lobby-member-list is selected and the button gets pressed,
      * this button gets disabled, a new ShowTradeWithUserViewEvent is posted onto the
@@ -593,7 +596,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Maximilian Lindner
      * @author Finn Haase
      * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
-     * @see de.uol.swp.common.lobby.request.TradeWithUserRequest
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
      * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
      * @since 2021-02-23
      */
@@ -631,7 +634,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Sending ShowTradeWithUserAcceptViewEvent");
+            LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
             eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
                                                                 this.loggedInUser.getUsername(), this.lobbyName, rsp));
         }

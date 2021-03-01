@@ -3,7 +3,7 @@ package de.uol.swp.common.game.request;
 import java.util.Map;
 
 /**
- * Request sent to the server when the responding user wants to accept the trade.
+ * Request sent to the server when the responding user wants to accept the trade offer.
  *
  * @author Maximilian Lindner
  * @author Finn Haase
@@ -18,13 +18,13 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
     private final Map<String, Integer> offeringResourceMap;
 
     /**
-     * Constructor.
+     * Constructor
      *
-     * @param respondingUser        the responding user
-     * @param offeringUser          the offering user
-     * @param lobbyName             the lobby name
-     * @param respondingResourceMap the responding resource map
-     * @param offeringResourceMap   the offering resource map
+     * @param respondingUser        The responding user
+     * @param offeringUser          The offering user
+     * @param lobbyName             The lobby name
+     * @param respondingResourceMap The demanded resources
+     * @param offeringResourceMap   The offered resources
      */
     public AcceptUserTradeRequest(String respondingUser, String offeringUser, String lobbyName,
                                   Map<String, Integer> respondingResourceMap,
@@ -39,7 +39,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
     /**
      * Gets offering user´s resource map.
      *
-     * @return Map the offering resource map
+     * @return Map of the offered resources
      */
     public Map<String, Integer> getOfferingResourceMap() {
         return offeringResourceMap;
@@ -48,7 +48,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
     /**
      * Gets name of the offering user.
      *
-     * @return String Name of the offering user
+     * @return Name of the offering user
      */
     public String getOfferingUser() {
         return offeringUser;
@@ -57,7 +57,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
     /**
      * Gets responding user´s resource map.
      *
-     * @return Map the responding resource map
+     * @return Map of the demanded resources
      */
     public Map<String, Integer> getRespondingResourceMap() {
         return respondingResourceMap;
@@ -66,7 +66,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
     /**
      * Gets the name of the responding user.
      *
-     * @return the name of the responding user
+     * @return Name of the responding user
      */
     public String getRespondingUser() {
         return respondingUser;

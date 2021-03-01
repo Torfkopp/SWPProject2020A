@@ -1,7 +1,7 @@
 package de.uol.swp.client.trade.event;
 
 /**
- * Event used to trigger close the trading window with the bank
+ * Event used to trigger the closure of the trading window with the bank
  * when the cancel button got pressed
  * <p>
  * In order to close the Trading window when the cancel button got pressed, post an

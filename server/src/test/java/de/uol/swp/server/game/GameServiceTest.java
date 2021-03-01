@@ -50,6 +50,29 @@ public class GameServiceTest {
     private GameService gameService;
 
     /**
+     * Helper method run before each test case
+     * <p>
+     * This method instantiates a new GameManagement and a new GameService so that
+     * one test's Game objects don't interfere with another test's
+     */
+    @BeforeEach
+    void setUp() {
+        gameManagement = new GameManagement();
+        gameService = new GameService(bus, gameManagement, lobbyService);
+    }
+
+    /**
+     * Helper method run after each test case
+     * <p>
+     * This method resets the gameService and gameManagement variables to null
+     */
+    @AfterEach
+    void tearDown() {
+        gameService = null;
+        gameManagement = null;
+    }
+
+    /**
      * Tests if the gameManagement handles a BuyDevelopmentCardRequest properly when the
      * bankInventory is empty
      * <p>
@@ -268,29 +291,6 @@ public class GameServiceTest {
 
         assertTrue(userManagement.isLoggedIn(userToLogin));
         userManagement.dropUser(userToLogin);
-    }
-
-    /**
-     * Helper method run before each test case
-     * <p>
-     * This method instantiates a new GameManagement and a new GameService so that
-     * one test's Game objects don't interfere with another test's
-     */
-    @BeforeEach
-    void setUp() {
-        gameManagement = new GameManagement();
-        gameService = new GameService(bus, gameManagement, lobbyService);
-    }
-
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method resets the gameService and gameManagement variables to null
-     */
-    @AfterEach
-    void tearDown() {
-        gameService = null;
-        gameManagement = null;
     }
 
     /**

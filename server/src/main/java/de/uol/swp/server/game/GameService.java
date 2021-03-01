@@ -10,9 +10,6 @@ import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.*;
-import de.uol.swp.common.lobby.request.TradeWithBankRequest;
-import de.uol.swp.common.lobby.request.TradeWithUserRequest;
-import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -66,7 +63,7 @@ public class GameService extends AbstractService {
      * @param inventoryMap       Saved inventory in game
      * @param neededInventoryMap Trading inventory
      *
-     * @return if there are enough resources in the neededInventoryMap
+     * @return true if there are enough resources in the neededInventoryMap, false if not
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -103,9 +100,9 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a AcceptUserTradeRequest found on the EventBus
+     * Handles an AcceptUserTradeRequest found on the EventBus
      * <p>
-     * If there is a AcceptUserTradeRequest on the EventBus, this method
+     * If an AcceptUserTradeRequest is found on the EventBus, this method
      * checks if there are enough resources available in the inventories
      * to make a trade between the 2 users.
      * If there are enough resources this method creates a
@@ -206,7 +203,7 @@ public class GameService extends AbstractService {
         } else {
             ResponseMessage returnMessage = new InvalidTradeOfUsersResponse(req.getOriginLobby(),
                                                                             offeringInventory.getPlayer());
-            LOG.debug("Sent a InvalidTradeOfUsersResponse for Lobby " + req.getOriginLobby());
+            LOG.debug("Sending an InvalidTradeOfUsersResponse for Lobby " + req.getOriginLobby());
             returnMessage.initWithMessage(req);
             post(returnMessage);
         }
@@ -241,9 +238,8 @@ public class GameService extends AbstractService {
             if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
                 bankInventory.remove(randInt);
                 if (LOG.isDebugEnabled()) LOG.debug("Sending a BuyDevelopmentCard for Lobby " + req.getOriginLobby());
-                ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(),
-                                                                                       req.getOriginLobby(),
-                                                                                       developmentCard);
+                ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(), req.getOriginLobby(),
+                                                                               developmentCard);
                 returnMessage.initWithMessage(req);
                 post(returnMessage);
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
@@ -294,9 +290,28 @@ public class GameService extends AbstractService {
             LOG.error(e);
         }
     }
+
+    /**
+     * Handles an OfferingTradeWithUserRequest found on the EventBus
+     * <p>
+     * If an OfferingTradeWithUserRequest is found on the EventBus,
+     * a new GetUserSessionEvent is posted onto the EventBus containing
+     * the respondingUser and a new TradeWithUserOfferResponse which in turn
+     * contains both users, the lobby, the resourceMap of the respondingUser
+     * and the two maps containing information of the trade.
+     *
+     * @param req The OfferingTradeWithUserRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
+     * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
+     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @since 2021-02-24
+     */
     @Subscribe
-    private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req){
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
+    private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory respondingInventory = null;
@@ -306,9 +321,49 @@ public class GameService extends AbstractService {
             }
         }
         if (respondingInventory == null) return;
-        ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
-        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessage));
+        Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
+
+        LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
+                                                                       respondingInventory.getPlayer(), resourceMap,
+                                                                       req.getOfferingResourceMap(),
+                                                                       req.getRespondingResourceMap(),
+                                                                       req.getOriginLobby());
+        post(new GetUserSessionEvent(respondingInventory.getPlayer(), offerResponse));
+    }
+
+    /**
+     * Handles a ResetOfferTradeButtonRequest found on the EventBus
+     * <p>
+     * If a ResetOfferTradeButtonRequest is found on the EventBus,
+     * a new GetUserSessionEvent is posted onto the EventBus containing
+     * the user and a new ResetOfferTradeButtonResponse which contains
+     * the lobby name.
+     *
+     * @param req The ResetOfferTradeButtonRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.ResetOfferTradeButtonRequest
+     * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
+     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory offeringInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getOfferingUserName())) {
+                offeringInventory = value;
+                break;
+            }
+        }
+        if (offeringInventory == null) return;
+        ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
+        post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
     }
 
     /**
@@ -338,26 +393,62 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a OfferingTradeWithUserRequest found on the EventBus
+     * Handles a TradeWithBankRequest found on the EventBus
      * <p>
-     * If there is a OfferingTradeWithUserRequest found on the EventBus,
-     * a new GetUserSessionEvent is posted onto the EventBus containing
-     * the respondingUser and a new TradeWithUserOfferResponse wich contains
-     * both users, the lobby, the resourceMap of the respondingUser
-     * and the two maps containing information of the trade.
+     * It searches the inventories in the current game for the one that belongs
+     * to the player sending the request. It then posts an InventoryForTradeResponse
+     * that contains all the user's resources, saved in a resourceMap for
+     * counted items (bricks, grain, etc.).
      *
-     * @param req The OfferingTradeWithUserRequest found on the EventBus
+     * @param req The TradeWithBankRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.TradeWithBankRequest
+     * @see de.uol.swp.common.game.response.InventoryForTradeResponse
+     * @since 2021-02-21
+     */
+    @Subscribe
+    private void onTradeWithBankRequest(TradeWithBankRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
+        Game game = gameManagement.getGame(req.getName());
+        Inventory[] inventories = game.getInventories();
+        Inventory inventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().equals(req.getUser())) {
+                inventory = value;
+                break;
+            }
+        }
+        if (inventory == null) return;
+        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
+
+        ResponseMessage returnMessage = new InventoryForTradeResponse(req.getUser(), req.getName(),
+                                                                      Collections.unmodifiableMap(resourceMap));
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+    }
+
+    /**
+     * Handles a TradeWithUserCancelRequest found on the EventBus
+     * <p>
+     * If a TradeWithUserCancelRequest is detected on the EventBus, this
+     * method creates a TradeWithUserCancelResponse to close the responding
+     * trade window of the responding user of the request.
+     * Therefore a GetUserSessionEvent is needed.
+     *
+     * @param req TradeWithUserCancelRequest found on the EventBus
      *
      * @author Maximilian Lindner
      * @author Finn Haase
-     * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
-     * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
+     * @see de.uol.swp.common.game.request.TradeWithUserCancelRequest
+     * @see de.uol.swp.common.game.response.TradeWithUserCancelResponse
      * @see de.uol.swp.server.game.GetUserSessionEvent
-     * @since 2021-02-24
+     * @since 2021-02-28
      */
     @Subscribe
-    private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
+    private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory[] inventories = game.getInventories();
         Inventory respondingInventory = null;
@@ -367,44 +458,9 @@ public class GameService extends AbstractService {
             }
         }
         if (respondingInventory == null) return;
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
-
-        LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), req.getOriginLobby(),
-                                                                       resourceMap, req.getOfferingResourceMap(),
-                                                                       req.getRespondingResourceMap(),
-                                                                       respondingInventory.getPlayer());
-        post(new GetUserSessionEvent(respondingInventory.getPlayer(), offerResponse));
-    }
-
-    /**
-     * Handles a ResetOfferTradeButtonRequest found on the EventBus
-     * If a ResetOfferTradeButtonRequest is found on the EventBus,
-     * a new GetUserSessionEvent is posted onto the EventBus containing
-     * the user and a new ResetOfferTradeButtonResponse wich contains
-     * the lobby name.
-     *
-     * @param req The ResetOfferTradeButtonRequest found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        Inventory[] inventories = game.getInventories();
-        Inventory offeringInventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().getUsername().equals(req.getOfferingUserName())) {
-                offeringInventory = value;
-                break;
-            }
-        }
-        if (offeringInventory == null) return;
-        ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
-        post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
+        ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessage));
     }
 
     /**
@@ -421,7 +477,7 @@ public class GameService extends AbstractService {
      * @author Maximilian Lindner
      * @author Finn Haase
      * @see de.uol.swp.common.game.response.InventoryForTradeWithUserResponse
-     * @see de.uol.swp.common.lobby.request.TradeWithUserRequest
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
      * @since 2021-02-23
      */
     @Subscribe
@@ -451,50 +507,6 @@ public class GameService extends AbstractService {
         LOG.debug("Sent a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);
-    }
-
-    /**
-     * Handles a TradeWithBankRequest found on the EventBus
-     * <p>
-     * It searches the inventories in the current game for the one that belongs
-     * to the player sending the request. It then posts a InventoryForTradeResponse
-     * that contains all the user's resources, saved in a resourceMap for
-     * counted items (bricks, grain, etc.) .
-     *
-     * @param req The TradeWithBankRequest found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.lobby.request.TradeWithBankRequest
-     * @see de.uol.swp.common.game.response.InventoryForTradeResponse
-     * @since 2021-02-21
-     */
-    @Subscribe
-    private void onTradeWithBankRequest(TradeWithBankRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
-        Game game = gameManagement.getGame(req.getName());
-        Inventory[] inventories = game.getInventories();
-        Inventory inventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().equals(req.getUser())) {
-                inventory = value;
-                break;
-            }
-        }
-        if (inventory != null) {
-            Map<String, Integer> resourceMap = new HashMap<>();
-            resourceMap.put("brick", inventory.getBrick());
-            resourceMap.put("grain", inventory.getGrain());
-            resourceMap.put("lumber", inventory.getLumber());
-            resourceMap.put("ore", inventory.getOre());
-            resourceMap.put("wool", inventory.getWool());
-
-            AbstractResponseMessage returnMessage = new InventoryForTradeResponse(req.getUser(), req.getName(),
-                                                                                  Collections.unmodifiableMap(
-                                                                                          resourceMap));
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-        }
     }
 
     /**
@@ -547,7 +559,7 @@ public class GameService extends AbstractService {
         if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
         if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
 
-        AbstractResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
+        ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
@@ -594,10 +606,9 @@ public class GameService extends AbstractService {
         armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
         armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
 
-        AbstractResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                            Collections.unmodifiableMap(resourceMap),
-                                                                            Collections
-                                                                                    .unmodifiableMap(armyAndRoadMap));
+        ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
+                                                                    Collections.unmodifiableMap(resourceMap),
+                                                                    Collections.unmodifiableMap(armyAndRoadMap));
         returnMessage.initWithMessage(req);
         post(returnMessage);
     }

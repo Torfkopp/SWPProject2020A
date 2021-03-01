@@ -6,8 +6,8 @@ import de.uol.swp.common.user.User;
 import java.util.Map;
 
 /**
- * This Response has up-to-date info about the inventory's resources of the
- * player who opened the trade window and the amount of resource cards the other
+ * This Response has up-to-date info about the resources in the inventory
+ * of the player who opened the trade window and the amount of resource cards the other
  * user has.
  *
  * @author Maximilian Lindner

@@ -69,8 +69,7 @@
         </VBox>
     </HBox>
     <Label fx:id="noResourcesLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="28.0" layoutY="37.0"
-           prefHeight="257.0" prefWidth="552.0" text="%game.trade.error.noresources"
-           visible="false">
+           prefHeight="257.0" prefWidth="552.0" text="%game.trade.error.noresources" visible="false">
         <font>
             <Font size="18.0"/>
         </font>

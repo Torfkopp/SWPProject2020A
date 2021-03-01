@@ -26,16 +26,16 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
     /**
      * Constructor
      *
-     * @param offeringUser          the offering User
-     * @param lobbyName             the name of the lobby
-     * @param resourceMap           the inventory of the responding user
-     * @param offeringResourceMap   the offered resources
-     * @param respondingResourceMap the demanded resources
-     * @param respondingUser        the responding User
+     * @param offeringUser          The offering User
+     * @param respondingUser        The responding User
+     * @param resourceMap           The inventory of the responding user
+     * @param offeringResourceMap   The offered resources
+     * @param respondingResourceMap The demanded resources
+     * @param lobbyName             The name of the lobby
      */
-    public TradeWithUserOfferResponse(User offeringUser, String lobbyName, Map<String, Integer> resourceMap,
+    public TradeWithUserOfferResponse(User offeringUser, User respondingUser, Map<String, Integer> resourceMap,
                                       Map<String, Integer> offeringResourceMap,
-                                      Map<String, Integer> respondingResourceMap, User respondingUser) {
+                                      Map<String, Integer> respondingResourceMap, String lobbyName) {
         super(lobbyName);
         this.resourceMap = resourceMap;
         this.offeringResourceMap = offeringResourceMap;

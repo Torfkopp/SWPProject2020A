@@ -26,6 +26,8 @@ import java.util.Map;
 /**
  * Manages the trading accept menu
  *
+ * @author Maximilian Lindner
+ * @author Finn Haase
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2021-02-25
  */
@@ -43,11 +45,11 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @FXML
     private ListView<Pair<String, Integer>> ownInventoryView;
 
-    private Map<String, Integer> resourceMap;
+    private String lobbyName;
     private String offeringUserName;
     private String respondingUserName;
-    private String lobbyName;
     private Map<String, Integer> offeringResourceMap;
+    private Map<String, Integer> resourceMap;
     private Map<String, Integer> respondingResourceMap;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
 
@@ -152,7 +154,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      * Handles a TradeWithUserResponseUpdateEvent found on the EventBus
      * <p>
      * If a TradeWithUserResponseUpdateEvent is found on the EventBus
-     * and its direct to this lobby, this TradeWithUserAcceptPresenter
+     * and it is directed to this lobby, this TradeWithUserAcceptPresenter
      * gets multiple Parameters and calls the setOfferLabel method to
      * set the offer label according to the offer and the setTradingList
      * to set the inventory according to the responding user´s inventory.

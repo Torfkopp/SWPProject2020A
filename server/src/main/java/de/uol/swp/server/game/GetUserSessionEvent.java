@@ -7,7 +7,8 @@ import de.uol.swp.server.message.AbstractServerInternalMessage;
 /**
  * This Event is sent to the LobbyService to get
  * the Session of the targetUser and stores a
- * ResponseMessage.
+ * ResponseMessage which is to be sent to the targetUser
+ * via the ServerHandler.
  *
  * @author Maximilian Lindner
  * @author Finn Haase

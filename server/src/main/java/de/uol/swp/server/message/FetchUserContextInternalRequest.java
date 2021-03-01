@@ -22,8 +22,8 @@ public class FetchUserContextInternalRequest extends AbstractServerInternalMessa
     /**
      * Constructor.
      *
-     * @param userSession   the user session
-     * @param returnMessage the stored ResponseMessage
+     * @param userSession   The user session of the target user
+     * @param returnMessage The stored ResponseMessage
      */
     public FetchUserContextInternalRequest(Session userSession, ResponseMessage returnMessage) {
         this.userSession = userSession;

@@ -299,7 +299,7 @@ public class SceneManager {
      * Handles a CloseTradeWithUserResponseEvent found on the EventBus
      * <p>
      * If a CloseTradeWithUserResponseEvent is detected on the EventBus, this method gets called.
-     * Its closes the tradingRespondStage according to the lobbyName.
+     * Its closes the tradingResponseStage according to the lobbyName.
      *
      * @param event CloseTradeWithUserResponseEvent found on the EventBus
      *
@@ -475,7 +475,7 @@ public class SceneManager {
         String lobbyName = event.getLobbyName();
         //New window (Stage)
         Stage bankStage = new Stage();
-        bankStage.setTitle("Trade of " + user.getUsername());
+        bankStage.setTitle(resourceBundle.getString("game.trade.window.bank.title"));
         bankStage.setHeight(BANK_TRADING_HEIGHT);
         bankStage.setMinHeight(BANK_TRADING_HEIGHT);
         bankStage.setWidth(BANK_TRADING_WIDTH);
@@ -497,13 +497,13 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ShowTradeWithUserAcceptViewEvent detected on the EventBus
+     * Handles the ShowTradeWithUserRespondViewEvent detected on the EventBus
      * <p>
-     * If a ShowTradeWithUserAcceptViewEvent is detected on the EventBus, this method gets
+     * If a ShowTradeWithUserRespondViewEvent is detected on the EventBus, this method gets
      * called. It opens the response window of a trade between 2 users in a new window and a
      * TradeWithUserResponseUpdateEvent is sent onto the EventBus.
      *
-     * @param event The ShowTradeWithUserAcceptViewEvent detected on the EventBus
+     * @param event The ShowTradeWithUserRespondViewEvent detected on the EventBus
      *
      * @author Maximilian Lindner
      * @author Finn Haase

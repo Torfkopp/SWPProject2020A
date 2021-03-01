@@ -179,8 +179,8 @@ public class ServerHandler implements ServerHandlerDelegate {
      * Handles a FetchUserContextInternalRequest found on the EventBus
      * <p>
      * If a FetchUserContextInternalRequest is detected on the EventBus
-     * this method gets the MessageContext of the user provided by the
-     * FetchUserContextInternalRequest and sends the Message contained in the
+     * this method gets the MessageContext associated with the provided
+     * Session object and sends the Message contained in the
      * FetchUserContextInternalRequest to the specified client.
      *
      * @param req FetchUserContextInternalRequest found on the EventBus

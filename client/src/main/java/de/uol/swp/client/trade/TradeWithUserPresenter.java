@@ -78,7 +78,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     /**
      * Helper Function
      * <p>
-     * Checks if there is no selected resource at all
+     * Checks if there is no selected resource at all or if too
+     * many resources were demanded by the offering player.
      *
      * @return if any resource is selected
      */
@@ -111,8 +112,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private void closeWindow() {
         Platform.runLater(() -> {
             eventBus.post(new TradeWithUserCancelEvent(lobbyName));
-            eventBus.post(new TradeWithUserCancelRequest(lobbyName,
-                                                         respondingUser));
+            eventBus.post(new TradeWithUserCancelRequest(lobbyName, respondingUser));
             eventBus.post(new ResetTradeWithUserButtonEvent(loggedInUser, lobbyName));
         });
     }
@@ -140,7 +140,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * Handles a click on the Cancel Button
      * <p>
      * Method called when the CancelButton is pressed and uses
-     * the helperFunction closeWindowAfterNotSuccessfulTrade to close the window
+     * the helperFunction closeWindow to close the window
      * properly.
      */
     @FXML
@@ -186,17 +186,15 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     /**
      * Handles a Click on the OfferTrade button
      * <p>
-     * If the button is clicked, this method calls the setResourcMaps method.
+     * If the button is clicked, this method calls the setResourceMap method.
      * If there is no resource selected at all, nothing happens.
-     * Otherwise a ShowTradeWithUserAcceptViewEvent to show the Trade with
-     * User View is posted onto the EventBus and a OfferingTradeWithUserRequest
-     * is posted onto the EventBus to get the needed information from
+     * Otherwise, an OfferingTradeWithUserRequest is posted
+     * onto the EventBus to get the needed information from
      * the server.
-     * The offerTradeButton gets disabled and the user gets the message gut wait
+     * The offerTradeButton gets disabled and the user gets the message to wait
      * for the other user.
      *
      * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
-     * @see de.uol.swp.client.trade.event.ShowTradeWithUserRespondViewEvent
      */
     @FXML
     private void onOfferTradeButtonPressed() {
@@ -217,8 +215,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     /**
      * Handles a ResetOfferTradeButtonResponse found on the EventBus
      * <p>
-     * If a ResetOfferTradeButtonResponse is on the EventBus, the offer trade button
-     * is re-enabled and the trading user get a hint that the other user
+     * If a ResetOfferTradeButtonResponse is found on the EventBus, the offer trade button
+     * is re-enabled and the trading user gets a hint that the other user
      * rejected the offer.
      *
      * @param event ResetOfferTradeButtonResponse found on the EventBus
@@ -227,14 +225,13 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
-        if (lobbyName.equals(event.getLobbyName())) {
-            LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
-            Platform.runLater(() -> {
-                offerTradeButton.setDisable(false);
-                waitForResponse.setText(
-                        String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
-            });
-        }
+        if (!lobbyName.equals(event.getLobbyName())) return;
+        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
+        Platform.runLater(() -> {
+            offerTradeButton.setDisable(false);
+            waitForResponse
+                    .setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
+        });
     }
 
     /**
@@ -247,9 +244,9 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName))
-            LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
-            closeWindow();
+        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
+        closeWindow();
     }
 
     /**
@@ -258,7 +255,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * If the lobbyname or the logged in user of the TradeWithUserPresenter are
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithUserPresenter is created. If a window is closed using e.g.
-     * X(top-right-Button), the closeWindowAfterNotSuccessfulTrade method is called.
+     * X(top-right-Button), the closeWindow method is called.
      *
      * @param event TradeUpdateEvent found on the event bus
      *
@@ -279,7 +276,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * Helper function
      * <p>
      * Sets the content of resource maps according to the selected resources
-     * with the sliders.
+     * and the amount of resources as selected with the sliders.
      */
     @FXML
     private void setResourceMaps() {
@@ -319,7 +316,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     /**
      * Helper Function
      * <p>
-     * If there is no resourceList it gets created and cleared. Then it gets
+     * If there is no resourceList one gets created and cleared. Then it gets
      * updated with the items as listed in the resourceMap.
      */
     private void setTradingLists() {
