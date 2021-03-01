@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the Game object
@@ -117,5 +118,15 @@ public class GameTest {
         assertEquals(game.nextPlayer(), user2);
         assertEquals(game.nextPlayer(), user3);
         assertEquals(game.nextPlayer(), user);
+    }
+
+    @Test
+    void rollDiceTest() {
+        int[] dices;
+        for (int i = 0; i < 69; i++) {
+            dices = game.rollDice();
+            assertTrue(1 <= dices[0] && dices[0] <= 6);
+            assertTrue(1 <= dices[1] && dices[1] <= 6);
+        }
     }
 }
