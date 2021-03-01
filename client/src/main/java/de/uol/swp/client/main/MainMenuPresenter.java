@@ -224,7 +224,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
             lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
@@ -296,7 +295,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
             lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
@@ -390,7 +388,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 ((Stage) event.getSource()).close();
                 clearEventBus();
             });
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     /**
