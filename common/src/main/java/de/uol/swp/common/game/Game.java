@@ -77,6 +77,10 @@ public class Game {
         return points;
     }
 
+    public User getActivePlayer() {
+        return players[activePlayer]; //TODO: docs, maybe remove if not needed
+    }
+
     /**
      * Gets the List of the items of the bank.
      *

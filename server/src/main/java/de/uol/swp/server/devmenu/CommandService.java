@@ -11,11 +11,20 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
+import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
+import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
+import de.uol.swp.common.lobby.request.UserReadyRequest;
+import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
+import de.uol.swp.server.game.IGameManagement;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +34,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Handles commands sent in by a client through the chat
@@ -42,6 +53,8 @@ public class CommandService extends AbstractService {
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement; //use to find users by name
     private final ILobbyManagement lobbyManagement;
+    private final IGameManagement gameManagement;
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     /**
      * Constructor
@@ -51,10 +64,12 @@ public class CommandService extends AbstractService {
      * @param userManagement  The UserManagement (injected)
      */
     @Inject
-    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement) {
+    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement,
+                          IGameManagement gameManagement) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;
         this.userManagement = userManagement;
+        this.gameManagement = gameManagement;
         getAllClasses();
         LOG.debug("CommandService started");
     }
@@ -110,6 +125,16 @@ public class CommandService extends AbstractService {
         sendSystemMessageResponse(originalMessage, content);
     }
 
+    private void command_NextPlayerIfTemp(List<CommandParser.ASTToken> argsAST, NewChatMessageRequest originalMessage) {
+        String lobbyName = "Quick Lobby";
+        Game game = gameManagement.getGame(lobbyName);
+        if (game == null) return;
+        User activePlayer = game.getActivePlayer();
+        if (activePlayer.getUsername().equals("temp1") || activePlayer.getUsername().equals("temp2")) {
+            post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
+        }
+    }
+
     /**
      * Handles the /post command
      * <p>
@@ -139,6 +164,74 @@ public class CommandService extends AbstractService {
                     }
                 } catch (ReflectiveOperationException ignored) {
                 }
+                break;
+            }
+        }
+    }
+
+    private void command_QuickLobby(List<CommandParser.ASTToken> argsAST, NewChatMessageRequest originalMessage) {
+        //TODO: docs, simplify if possible
+        if (originalMessage.getSession().isEmpty()) return;
+        String lobbyName = "Quick Lobby";
+        User invoker = originalMessage.getSession().get().getUser();
+        lobbyManagement.createLobby(lobbyName, invoker);
+        ResponseMessage rsp = new CreateLobbyResponse(lobbyName);
+        rsp.initWithMessage(originalMessage);
+        post(rsp);
+
+        User temp1, temp2;
+        try {
+            Optional<User> found = userManagement.getUser("temp1");
+            if (found.isEmpty()) throw new RuntimeException("User not found");
+            temp1 = found.get();
+        } catch (Exception e) {
+            temp1 = userManagement.createUser(new UserDTO("temp1", "temp1", "")); //UserDTO(-1, "temp1", "temp1", ""));
+        }
+
+        try {
+            Optional<User> found = userManagement.getUser("temp2");
+            if (found.isEmpty()) throw new RuntimeException("User not found");
+            temp2 = found.get();
+        } catch (Exception e) {
+            temp2 = userManagement.createUser(new UserDTO("temp2", "temp2", "")); //UserDTO(-1, "temp2", "temp2", ""));
+        }
+
+        try {
+            // wait for the client to be ready to receive the ensuing notifications without NullPointerExceptions
+            latch.await(250, TimeUnit.MILLISECONDS);
+            post(new LobbyJoinUserRequest(lobbyName, temp1));
+            post(new LobbyJoinUserRequest(lobbyName, temp2));
+            post(new UserReadyRequest(lobbyName, temp1, true));
+            post(new UserReadyRequest(lobbyName, temp2, true));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void command_RemoveTemp(List<CommandParser.ASTToken> argsAST, NewChatMessageRequest originalMessage) {
+        //TODO: docs, simplify if possible
+        String lobbyName = "Quick Lobby";
+        Optional<Lobby> found = lobbyManagement.getLobby(lobbyName);
+        if (found.isEmpty()) return;
+        for (User user : found.get().getUsers()) {
+            if (user.getUsername().equals("temp1") || user.getUsername().equals("temp2")) {
+                post(new UserReadyRequest(lobbyName, user, false));
+                post(new LobbyLeaveUserRequest(lobbyName, user));
+                userManagement.dropUser(user);
+            }
+        }
+    }
+
+    private void command_SkipBots(List<CommandParser.ASTToken> argsAST, NewChatMessageRequest originalMessage) {
+        //TODO: docs, simplify if possible
+        String lobbyName = "Quick Lobby";
+        Game game = gameManagement.getGame(lobbyName);
+        if (game == null) return;
+        User[] players = game.getPlayers();
+        for (User ignored : players) {
+            User activePlayer = game.getActivePlayer();
+            if (activePlayer.getUsername().equals("temp1") || activePlayer.getUsername().equals("temp2")) {
+                post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
                 break;
             }
         }
@@ -245,6 +338,18 @@ public class CommandService extends AbstractService {
                 break;
             case "showast": //TODO: Remove
                 sendSystemMessageResponse(msg.getOriginalMessage(), astToString(argsAST));
+                break;
+            case "quicklobby":
+                command_QuickLobby(argsAST, msg.getOriginalMessage());
+                break;
+            case "skip":
+                command_NextPlayerIfTemp(argsAST, msg.getOriginalMessage());
+                break;
+            case "skipall":
+                command_SkipBots(argsAST, msg.getOriginalMessage());
+                break;
+            case "removetemp":
+                command_RemoveTemp(argsAST, msg.getOriginalMessage());
                 break;
             default:
                 command_Invalid(argsAST, msg.getOriginalMessage());
