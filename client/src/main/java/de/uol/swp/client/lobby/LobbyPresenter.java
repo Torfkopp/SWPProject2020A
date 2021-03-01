@@ -257,6 +257,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
+        setPlayCardButtonState(msg.getUser());
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
     }
 
@@ -273,6 +274,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onEndTurnButtonPressed() {
         this.endTurn.setDisable(true);
         this.rollDice.setDisable(true);
+        this.playCard.setDisable(true);
         this.tradeWithBankButton.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
@@ -341,7 +343,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
-        setPlayCardButtonState(msg.getActivePlayer());
     }
 
     /**
@@ -427,7 +428,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
             dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
-            //TODO Cancel button cancelt nicht
             //Make a grid to put the ChoiceBoxes and labels on
             GridPane grid = new GridPane();
             grid.setHgap(10);
@@ -620,7 +620,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 this.tradeWithBankButton.setVisible(true);
                 setRollDiceButtonState(msg.getUser());
                 this.playCard.setVisible(true);
-                setPlayCardButtonState(msg.getUser());
             });
         }
     }
