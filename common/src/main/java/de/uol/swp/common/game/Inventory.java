@@ -177,6 +177,19 @@ public class Inventory {
     }
 
     /**
+     * Gets the amount of ResourceCards the user has in his inventory
+     *
+     * @return The amount of Road Building Cards
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @since 2021-02-24
+     */
+    public int getResourceAmount() {
+        return getBrick() + getWool() + getLumber() + getGrain() + getOre();
+    }
+
+    /**
      * Gets the amount of Road Building Cards a player has in their inventory
      *
      * @return The amount of Road Building Cards
