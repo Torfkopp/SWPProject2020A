@@ -84,9 +84,9 @@ public class GameServiceTest {
     @Test
     void BuyDevelopmentCardWhenBankInventoryIsEmptyTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0]);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -361,9 +361,9 @@ public class GameServiceTest {
     @Test
     void tradeResourcesTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
@@ -432,9 +432,9 @@ public class GameServiceTest {
     @Test
     void tradeWithNotEnoughResources() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
