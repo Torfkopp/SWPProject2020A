@@ -57,7 +57,7 @@ public class GameServiceTest {
      */
     @BeforeEach
     void setUp() {
-        gameManagement = new GameManagement();
+        gameManagement = new GameManagement(lobbyManagement);
         gameService = new GameService(bus, gameManagement, lobbyService);
     }
 
@@ -87,7 +87,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -146,7 +146,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -234,7 +234,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -308,7 +308,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -368,7 +368,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -439,7 +439,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO("testlobby", user[0]);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);

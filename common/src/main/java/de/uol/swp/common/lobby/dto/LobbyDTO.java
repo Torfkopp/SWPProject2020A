@@ -23,6 +23,7 @@ public class LobbyDTO implements Lobby {
     private final String name;
     private final Set<User> users = new TreeSet<>();
     private final Set<User> readyUsers = new TreeSet<>();
+    private boolean inGame;
     private User owner;
 
     /**
@@ -30,13 +31,15 @@ public class LobbyDTO implements Lobby {
      *
      * @param name    The requested name the lobby
      * @param creator The user who created the lobby and therefore its owner
+     * @param inGame  Whether the lobby is currently in a game
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, User creator) {
+    public LobbyDTO(String name, User creator, boolean inGame) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
+        this.inGame = inGame;
     }
 
     /**
@@ -49,7 +52,7 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner());
+        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame());
     }
 
     @Override
@@ -70,6 +73,16 @@ public class LobbyDTO implements Lobby {
     @Override
     public Set<User> getUsers() {
         return Collections.unmodifiableSet(users);
+    }
+
+    @Override
+    public boolean isInGame() {
+        return inGame;
+    }
+
+    @Override
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 
     @Override
