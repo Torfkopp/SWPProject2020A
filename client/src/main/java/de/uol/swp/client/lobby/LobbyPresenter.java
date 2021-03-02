@@ -18,9 +18,11 @@ import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
@@ -51,7 +53,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
+
     private ObservableList<Pair<String, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
@@ -60,6 +63,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private ListView<Pair<String, String>> membersView;
     @FXML
     private CheckBox readyCheckBox;
+    @FXML
+    private Button kickUserButton;
     @FXML
     private Button startSession;
     @FXML
@@ -95,7 +100,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Initialises the Presenter by setting up the membersView.
+     * Initialises the Presenter by setting up the membersView, the
+     * inventory view, the kickUserButton and the tradeWithUserButton.
      *
      * @implNote Called automatically by JavaFX
      * @author Temmo Junkhoff
@@ -113,6 +119,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
                 });
+            }
+        });
+        membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            String name = newValue.getKey();
+            boolean isSelf = name.equals(this.loggedInUser.getUsername());
+            kickUserButton.setDisable(isSelf);
+            tradeWithUserButton.setDisable(isSelf);
+            if (isSelf) {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+            } else {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
+                tradeWithUserButton
+                        .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
             }
         });
         inventoryView.setCellFactory(lv -> new ListCell<>() {
@@ -170,11 +190,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
+     * @param kicked Whether the user was kicked (true) or is leaving
+     *               voluntarily (false)
+     *
      * @author Temmo Junkhoff
      * @since 2021-01-06
      */
-    private void closeWindow() {
-        if (lobbyName != null || loggedInUser != null) {
+    private void closeWindow(boolean kicked) {
+        if (lobbyName != null || loggedInUser != null || !kicked) {
             lobbyService.leaveLobby(lobbyName, loggedInUser);
         }
         ((Stage) window).close();
@@ -229,6 +252,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.readyUsers = rsp.getReadyUsers();
             updateUsersList(rsp.getUsers());
             setStartSessionButtonState();
+            setKickUserButtonState();
         }
     }
 
@@ -294,6 +318,46 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the KickUserButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests to kick
+     * the selected User of the members view.
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @since 2021-03-02
+     */
+    @FXML
+    private void onKickUserButtonPressed() {
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) return;
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getKey()));
+    }
+
+    /**
+     * Handles a KickUserResponse found on the EventBus
+     * <p>
+     * If a KickUserResponse is detected on the EventBus and its
+     * directed to this lobby and this player, the according lobby
+     * window is closed.
+     *
+     * @param rsp The KickUserResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserResponse(KickUserResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName()) && this.loggedInUser.equals(rsp.getToBeKickedUser())) {
+            Platform.runLater(() -> closeWindow(true));
+        }
+    }
+
+    /**
      * Handles a click on the LeaveLobby button
      * <p>
      * Method called when the leaveLobby button is pressed.
@@ -304,7 +368,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onLeaveLobbyButtonPressed() {
-        closeWindow();
+        closeWindow(false);
     }
 
     /**
@@ -338,7 +402,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (this.readyUsers == null) {
             this.readyUsers = new HashSet<>();
         }
-        this.window.setOnCloseRequest(windowEvent -> closeWindow());
+        this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
+        kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+        tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
     }
 
@@ -414,7 +480,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-22
      */
     @Subscribe
-    public void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
+    private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
             setTradeWithBankButtonState(event.getUser());
             setEndTurnButtonState(event.getUser());
@@ -452,7 +518,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-22
      */
     @FXML
-    public void onRollDiceButtonPressed() {
+    private void onRollDiceButtonPressed() {
         lobbyService.rollDice(lobbyName, loggedInUser);
         this.rollDice.setDisable(true);
     }
@@ -489,22 +555,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage msg) {
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-            Platform.runLater(() -> {
-                playField.setVisible(true);
-                //This Line needs to be changed/ removed in the Future
-                gameRendering.drawGameMap(new GameMapManagement());
-                setTurnIndicatorText(msg.getUser());
-                lobbyService.updateInventory(lobbyName, loggedInUser);
-                this.readyCheckBox.setVisible(false);
-                this.startSession.setVisible(false);
-                this.rollDice.setVisible(true);
-                this.tradeWithUserButton.setVisible(true);
-                this.tradeWithBankButton.setVisible(true);
-                setRollDiceButtonState(msg.getUser());
-            });
-        }
+        if (!msg.getName().equals(this.lobbyName)) return;
+        LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
+        Platform.runLater(() -> {
+            playField.setVisible(true);
+            //This Line needs to be changed/ removed in the Future
+            gameRendering.drawGameMap(new GameMapManagement());
+            setTurnIndicatorText(msg.getUser());
+            lobbyService.updateInventory(lobbyName, loggedInUser);
+            this.readyCheckBox.setVisible(false);
+            this.startSession.setVisible(false);
+            this.rollDice.setVisible(true);
+            this.tradeWithUserButton.setVisible(true);
+            this.tradeWithUserButton.setDisable(true);
+            this.tradeWithBankButton.setVisible(true);
+            setRollDiceButtonState(msg.getUser());
+            this.kickUserButton.setVisible(false);
+        });
     }
 
     /**
@@ -522,7 +589,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-22
      */
     @Subscribe
-    public void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
+    private void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
             endTurn.setDisable(false);
         }
@@ -781,6 +848,24 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setEndTurnButtonState(User player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the disable and visible state of the kickUserButton.
+     * <p>
+     * The button is only enabled the lobby owner when a game
+     * has not started yet and if the logged in user is the
+     * owner
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @since 2021-03-03
+     */
+    private void setKickUserButtonState() {
+        Platform.runLater(() -> {
+            this.kickUserButton.setVisible(this.loggedInUser.equals(this.owner));
+            this.kickUserButton.setDisable(this.loggedInUser.equals(this.owner));
+        });
     }
 
     /**
