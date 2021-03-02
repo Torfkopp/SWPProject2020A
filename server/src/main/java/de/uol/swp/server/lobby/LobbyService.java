@@ -134,13 +134,21 @@ public class LobbyService extends AbstractService {
         if (lobby.isPresent()) {
             if (lobby.get().getUsers().size() < 4) {
                 if (!lobby.get().getUsers().contains(req.getUser())) {
-                    lobby.get().joinUser(req.getUser());
-                    Message responseMessage = new JoinLobbyResponse(req.getName());
-                    if (req.getMessageContext().isPresent()) {
-                        responseMessage.setMessageContext(req.getMessageContext().get());
+                    if (!lobby.get().isInGame()) {
+                        lobby.get().joinUser(req.getUser());
+                        Message responseMessage = new JoinLobbyResponse(req.getName());
+                        if (req.getMessageContext().isPresent()) {
+                            responseMessage.setMessageContext(req.getMessageContext().get());
+                        }
+                        post(responseMessage);
+                        sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
+                        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+                    } else {
+                        ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
+                        exceptionMessage.initWithMessage(req);
+                        post(exceptionMessage);
+                        LOG.debug(exceptionMessage.getException());
                     }
-                    post(responseMessage);
-                    sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
                 } else {
                     ExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
                     if (req.getMessageContext().isPresent()) {
@@ -190,6 +198,7 @@ public class LobbyService extends AbstractService {
             try {
                 lobby.get().leaveUser(req.getUser());
                 sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getUser()));
+                post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
             } catch (IllegalArgumentException exception) {
                 lobbyManagement.dropLobby(lobby.get().getName());
                 sendToAll(new LobbyDeletedMessage(req.getName()));
@@ -236,6 +245,7 @@ public class LobbyService extends AbstractService {
         }
         Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
         post(response);
+        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
 
     /**

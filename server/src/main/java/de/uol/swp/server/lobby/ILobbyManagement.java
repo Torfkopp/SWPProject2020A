@@ -59,4 +59,17 @@ public interface ILobbyManagement {
      * @since 2019-10-08
      */
     Optional<Lobby> getLobby(String name);
+
+    /**
+     * Sets the inGame attribute of a lobby according to the boolean provided
+     *
+     * @param lobbyName The name of the lobby
+     * @param inGame    Whether the lobby is currently in a game or not
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    void setInGame(String lobbyName, boolean inGame);
 }

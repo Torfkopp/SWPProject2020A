@@ -349,6 +349,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.readyUsers = new HashSet<>();
         }
         this.window.setOnCloseRequest(windowEvent -> closeWindow());
+        lobbyService.retrieveAllLobbyMembers(this.lobbyName);
     }
 
     /**

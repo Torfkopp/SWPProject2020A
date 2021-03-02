@@ -242,9 +242,9 @@ public class SceneManager {
      */
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
-        LOG.debug("Received AllLobbiesReponse");
+        LOG.debug("Received AllLobbiesResponse");
         for (String name : allLobbiesResponse.getLobbyNames()) {
-            lobbyScenes.put(name, null);
+            if (!lobbyScenes.containsKey(name)) lobbyScenes.put(name, null); //do not overwrite existing lobbyScene
         }
     }
 

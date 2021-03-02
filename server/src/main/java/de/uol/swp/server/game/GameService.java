@@ -12,6 +12,7 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.message.AbstractResponseMessage;
+import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -291,6 +292,26 @@ public class GameService extends AbstractService {
         } catch (Exception e) {
             LOG.error(e);
         }
+    }
+
+    /**
+     * Handles a LobbyDeletedMessage found on the EventBus
+     * <p>
+     * If a LobbyDeletedMessage is found on the EventBus this method drops the
+     * game associated with the Lobby, if one existed.
+     *
+     * @param msg The LobbyDeletedMessage found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André-Suhr
+     * @since 2021-03-01
+     */
+    @Subscribe
+    private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
+        Game game = gameManagement.getGame(msg.getName());
+        if (game == null) return;
+        gameManagement.dropGame(msg.getName());
     }
 
     /**
