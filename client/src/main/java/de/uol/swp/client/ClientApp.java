@@ -209,7 +209,8 @@ public class ClientApp extends Application implements ConnectionListener {
 
     @Subscribe
     private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse message) {
-        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getUser().getUsername());
+        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getLoggedInSession().get().getUser().getUsername());
+        sceneManager.showLogOldSessionOutScreen(message.getLoggedInSession().get());
     }
     
     /**

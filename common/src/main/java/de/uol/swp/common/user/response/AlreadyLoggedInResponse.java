@@ -1,9 +1,9 @@
 package de.uol.swp.common.user.response;
 
 import de.uol.swp.common.message.AbstractResponseMessage;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.Session;
 
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A message containing a session (typically for a new logged in user)
@@ -13,42 +13,24 @@ import java.util.Objects;
  * @author Marvin Drees
  * @author Eric Vuong
  * @see de.uol.swp.common.user.request.LoginRequest
- * @see User
+ * @see Session
  * @see AbstractResponseMessage
  * @since 2021-03-02
  */
 public class AlreadyLoggedInResponse extends AbstractResponseMessage {
 
-    private final User user;
+    private final Session oldSession;
 
     /**
      * Constructor
      *
-     * @param user The successfully logged in user
+     * @param oldSession The already logged in session
      */
-    public AlreadyLoggedInResponse(User user) {
-        this.user = user;
+    public AlreadyLoggedInResponse(Session oldSession) {
+        this.oldSession = oldSession;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(user);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AlreadyLoggedInResponse that = (AlreadyLoggedInResponse) o;
-        return Objects.equals(user, that.user);
-    }
-
-    /**
-     * Gets the user variable
-     *
-     * @return User object of the successfully logged in user
-     */
-    public User getUser() {
-        return user;
+    public Optional<Session> getLoggedInSession() {
+        return Optional.of(oldSession);
     }
 }

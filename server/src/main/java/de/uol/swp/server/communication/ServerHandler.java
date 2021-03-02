@@ -164,7 +164,7 @@ public class ServerHandler implements ServerHandlerDelegate {
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent() && msg.getSession().isPresent()) {
             if (msg.getOldSession() != null) {
-                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
+                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getOldSession()));
             } else {
                 putSession(ctx.get(), msg.getSession().get());
                 sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
