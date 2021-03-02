@@ -207,6 +207,11 @@ public class ClientApp extends Application implements ConnectionListener {
         sceneManager.showMainScreen(user);
     }
 
+    @Subscribe
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse message) {
+        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getUser().getUsername());
+    }
+    
     /**
      * Handles an unsuccessful password changing process
      * <p>

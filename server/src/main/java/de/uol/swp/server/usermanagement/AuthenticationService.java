@@ -46,7 +46,6 @@ public class AuthenticationService extends AbstractService {
      *
      * @param bus            The EventBus used throughout the entire server
      * @param userManagement Object of the UserManagement to use
-     *
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-30
      */
@@ -60,16 +59,14 @@ public class AuthenticationService extends AbstractService {
      * Searches the session for a given user
      *
      * @param user User whose session is to be searched
-     *
      * @return Either an empty Optional or an Optional containing the session
-     *
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.user.User
      * @since 2019-09-04
      */
     public Optional<Session> getSession(User user) {
         Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
-                                                               .filter(e -> e.getValue().equals(user)).findFirst();
+                .filter(e -> e.getValue().equals(user)).findFirst();
         return entry.map(Map.Entry::getKey);
     }
 
@@ -77,9 +74,7 @@ public class AuthenticationService extends AbstractService {
      * Searches the sessions for a set of given users
      *
      * @param users Set of users whose sessions are to be searched
-     *
      * @return List containing the sessions that where found
-     *
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
@@ -103,7 +98,6 @@ public class AuthenticationService extends AbstractService {
      * Otherwise, a ServerExceptionMessage gets posted there.
      *
      * @param msg The LoginRequest
-     *
      * @see de.uol.swp.common.user.request.LoginRequest
      * @see de.uol.swp.server.message.ClientAuthorisedMessage
      * @see de.uol.swp.server.message.ServerExceptionMessage
@@ -117,7 +111,11 @@ public class AuthenticationService extends AbstractService {
         ServerInternalMessage returnMessage;
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
-            returnMessage = new ClientAuthorisedMessage(newUser);
+            if (userSessions.containsValue(newUser)) {
+                returnMessage = new ClientAuthorisedMessage(newUser, getSession(newUser).get());
+            } else {
+                returnMessage = new ClientAuthorisedMessage(newUser, null);
+            }
             Session newSession = UUIDSession.create(newUser);
             userSessions.put(newSession, newUser);
             returnMessage.setSession(newSession);
@@ -140,7 +138,6 @@ public class AuthenticationService extends AbstractService {
      * and a UserLoggedOutMessage is posted onto the EventBus.
      *
      * @param msg The LogoutRequest
-     *
      * @see de.uol.swp.common.user.request.LogoutRequest
      * @see de.uol.swp.common.user.message.UserLoggedOutMessage
      * @since 2019-08-30
@@ -172,7 +169,6 @@ public class AuthenticationService extends AbstractService {
      * every logged in user on the EvenBus.
      *
      * @param msg RetrieveAllOnlineUsersRequest found on the EventBus
-     *
      * @see de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest
      * @see de.uol.swp.common.user.response.AllOnlineUsersResponse
      * @since 2019-08-30
