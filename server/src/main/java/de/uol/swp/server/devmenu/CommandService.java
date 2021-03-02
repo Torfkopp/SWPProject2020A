@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -49,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 public class CommandService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(CommandService.class);
-    private static final List<String> excludedNames = new ArrayList<>(Arrays.asList("abstract", "store", "context"));
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement; //use to find users by name
     private final ILobbyManagement lobbyManagement;
@@ -75,15 +75,14 @@ public class CommandService extends AbstractService {
     }
 
     //TODO: Remove method
-    //TODO 2: undocumented because of impending removal
-    String astToString(List<CommandParser.ASTToken> tokens) {
-        String text = "";
-        for (CommandParser.ASTToken token : tokens) {
-            if (token.hasCollection()) text += "[ " + astToString(token.getAstTokens()) + " ]";
-            else text += "(" + token.getString() + ") ";
-        }
-        return text;
-    }
+    //String astToString(List<CommandParser.ASTToken> tokens) {
+    //    String text = "";
+    //    for (CommandParser.ASTToken token : tokens) {
+    //        if (token.hasCollection()) text += "[ " + astToString(token.getAstTokens()) + " ]";
+    //        else text += "(" + token.getString() + ") ";
+    //    }
+    //    return text;
+    //}
 
     /**
      * Handles the /devmenu command
@@ -249,9 +248,10 @@ public class CommandService extends AbstractService {
         try {
             Set<ClassPath.ClassInfo> clsinSet = ClassPath.from(cl).getTopLevelClassesRecursive("de.uol.swp");
             for (ClassPath.ClassInfo clsin : clsinSet) clsSet.add(Class.forName(clsin.getName()));
-            clsSet.stream().filter(cls -> !cls.isInterface())
-                  .filter(cls -> excludedNames.stream().noneMatch(cls.getSimpleName().toLowerCase()::contains))
-                  .filter(Message.class::isAssignableFrom).forEach(allClasses::add);
+            clsSet.stream().filter(cls -> !cls.isInterface()) // No interfaces
+                  .filter(cls -> !Modifier.isAbstract(cls.getModifiers())) // No Abstract classes
+                  .filter(Message.class::isAssignableFrom) // Only things that implement the Message interface
+                  .forEach(allClasses::add);
         } catch (IOException | ClassNotFoundException e) {
             // TODO: error handling
         }
@@ -270,7 +270,6 @@ public class CommandService extends AbstractService {
         //classes<classname, constructors<arguments<argumentname, argumenttype>>>
         SortedMap<String, List<Map<String, Class<?>>>> classesMap = new TreeMap<>();
         for (Class<?> cls : allClasses) {
-            String clsn = cls.getSimpleName();
             List<Map<String, Class<?>>> constructorArgList = new ArrayList<>();
             for (Constructor<?> constructor : cls.getConstructors()) {
                 Map<String, Class<?>> constructorArgs = new LinkedHashMap<>();
@@ -279,9 +278,9 @@ public class CommandService extends AbstractService {
                 }
                 constructorArgList.add(constructorArgs);
             }
-            classesMap.put(clsn, constructorArgList);
+            classesMap.put(cls.getSimpleName(), constructorArgList);
         }
-        final DevMenuClassesResponse response = new DevMenuClassesResponse(classesMap);
+        ResponseMessage response = new DevMenuClassesResponse(classesMap);
         response.initWithMessage(req);
         post(response);
     }
@@ -336,9 +335,9 @@ public class CommandService extends AbstractService {
             case "help":
                 command_Help(argsAST, msg.getOriginalMessage());
                 break;
-            case "showast": //TODO: Remove
-                sendSystemMessageResponse(msg.getOriginalMessage(), astToString(argsAST));
-                break;
+            //case "showast": //TODO: Remove
+            //    sendSystemMessageResponse(msg.getOriginalMessage(), astToString(argsAST));
+            //    break;
             case "quicklobby":
                 command_QuickLobby(argsAST, msg.getOriginalMessage());
                 break;
@@ -355,6 +354,8 @@ public class CommandService extends AbstractService {
                 command_Invalid(argsAST, msg.getOriginalMessage());
                 // TODO: more cases (aka commands)
                 // Some shortcuts for common Messages/ Requests
+                // /give test1 brick 1 || /give test1 brick -1 ? or /remove test1 brick 1 ?
+                // /forceendturn test1 ?
                 /* Ideas for shortcuts:
                  * 1) create a lobby with 4 members on the spot
                  * 2) ???
@@ -433,7 +434,7 @@ public class CommandService extends AbstractService {
      * @param content         The content of the SystemMessage
      */
     private void sendSystemMessageResponse(NewChatMessageRequest originalMessage, String content) {
-        final SystemMessageResponse response = new SystemMessageResponse(originalMessage.getOriginLobby(), content);
+        ResponseMessage response = new SystemMessageResponse(originalMessage.getOriginLobby(), content);
         response.initWithMessage(originalMessage);
         post(response);
     }
