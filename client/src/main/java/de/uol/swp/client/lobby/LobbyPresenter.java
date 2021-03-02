@@ -17,8 +17,6 @@ import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
-import de.uol.swp.common.game.response.PlayCardFailureResponse;
-import de.uol.swp.common.game.response.UpdateInventoryResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
@@ -507,16 +505,33 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
-        LOG.debug("Received PlayCardFailureResponse");
-        if (loggedInUser.equals(rsp.getUser())) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
-                alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
-                if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
-                    alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
-                alert.showAndWait();
-            });
+        if (lobbyName.equals(rsp.getLobbyName())) {
+            LOG.debug("Received PlayCardFailureResponse");
+            if (loggedInUser.equals(rsp.getUser())) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
+                    alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
+                    if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
+                        alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+                    alert.showAndWait();
+                });
+            }
+        }
+    }
+
+    /**
+     * Handles a PlayCardSuccessResponse found on the EventBus
+     *
+     * @param rsp The PlayCardSuccessResponse found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.PlayCardSuccessResponse
+     */
+    @Subscribe
+    private void onPlayCardSuccessResponse(PlayCardSuccessResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
+            LOG.debug("Received PlayCardSuccessResponse");
+            playCard.setDisable(true);
         }
     }
 
@@ -946,17 +961,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Helper function that sets the disable state of the rollDiceButton
-     *
-     * @author Sven Ahrens
-     * @author Mario Fokken
-     * @since 2021-02-22
-     */
-    private void setRollDiceButtonState(User player) {
-        this.rollDice.setDisable(!super.loggedInUser.equals(player));
-    }
-
-    /**
      * Helper function that sets the disable state of the PlayCardButton
      * The button is only enabled to the active player
      *
@@ -965,6 +969,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setPlayCardButtonState(User player) {
         this.playCard.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the disable state of the rollDiceButton
+     *
+     * @author Sven Ahrens
+     * @author Mario Fokken
+     * @since 2021-02-22
+     */
+    private void setRollDiceButtonState(User player) {
+        this.rollDice.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**
