@@ -532,7 +532,7 @@ public class GameServiceTest {
         user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0]);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -548,7 +548,7 @@ public class GameServiceTest {
         user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0]);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -569,7 +569,7 @@ public class GameServiceTest {
         user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0]);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
