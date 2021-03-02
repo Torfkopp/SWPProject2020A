@@ -11,10 +11,15 @@ import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
+import de.uol.swp.common.lobby.request.KickUserRequest;
+import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -118,7 +123,7 @@ public class GameService extends AbstractService {
      * @see de.uol.swp.common.game.request.AcceptUserTradeRequest
      * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
      * @see de.uol.swp.common.game.response.InvalidTradeOfUsersResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-24
      */
     @Subscribe
@@ -293,6 +298,33 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a KickUserRequest found on the EventBus
+     * <p>
+     * If a KickUserRequest is detected on the EventBus this method
+     * checks if a game has already started in this lobby.
+     * If not, a KickUserEvent is posted onto the EventBus.
+     * Otherwise a LobbyExceptionMessage ist posted onto the EventBus.
+     *
+     * @param req KickUserRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.server.game.event.KickUserEvent
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserRequest(KickUserRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received KickUserRequest for Lobby " + req.getName());
+        if (gameManagement.getGames().containsKey(req.getName())) {
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Can not kick while a game is ongoing");
+            exceptionMessage.initWithMessage(req);
+            post(exceptionMessage);
+            LOG.debug(exceptionMessage.getException());
+        } else post(new KickUserEvent(req));
+    }
+
+    /**
      * Handles a LobbyDeletedMessage found on the EventBus
      * <p>
      * If a LobbyDeletedMessage is found on the EventBus this method drops the
@@ -327,7 +359,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
      * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-24
      */
     @Subscribe
@@ -367,7 +399,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.ResetOfferTradeButtonRequest
      * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-25
      */
     @Subscribe
@@ -464,7 +496,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.TradeWithUserCancelRequest
      * @see de.uol.swp.common.game.response.TradeWithUserCancelResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-28
      */
     @Subscribe
