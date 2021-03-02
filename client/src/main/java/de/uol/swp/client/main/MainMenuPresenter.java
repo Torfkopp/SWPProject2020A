@@ -11,6 +11,9 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.message.CreateGameMessage;
+import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.message.AllLobbiesMessage;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
@@ -26,11 +29,10 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,13 +53,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     public static final String fxml = "/fxml/MainMenuView.fxml";
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-    private final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
 
     private ObservableList<String> users;
-    private ObservableList<String> lobbies;
+    private ObservableList<Pair<String, String>> lobbies;
 
     @FXML
-    private ListView<String> lobbyView;
+    private ListView<Pair<String, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
 
@@ -73,6 +75,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     public MainMenuPresenter() {
         super.init(LogManager.getLogger(MainMenuPresenter.class));
+    }
+
+    @Override
+    @FXML
+    public void initialize() {
+        super.initialize();
+        lobbyView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Pair<String, String> item, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue());
+                });
+            }
+        });
     }
 
     @Override
@@ -120,13 +137,31 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles an AllLobbiesMessage found on the EventBus
+     * <p>
+     * If a new AllLobbiesMessage object is posted to the EventBus, this method
+     * calls the {@code updateLobbyList()} method to update the list of lobbies
+     * displayed in the Main Menu.
+     *
+     * @param msg The AllLobbiesMessage found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    @Subscribe
+    private void onAllLobbiesMessage(AllLobbiesMessage msg) {
+        if (this.loggedInUser == null) return;
+        LOG.debug("Received AllLobbiesMessage");
+        updateLobbyList(msg.getLobbies());
+    }
+
+    /**
      * Handles a new list of lobbies
      * <p>
      * If a new AllLobbiesResponse object is posted to the EventBus, the names
      * of all currently existing lobbies are put into the lobby list in the main menu.
-     * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of lobby
-     * list" with the names of all currently existing lobbies is displayed in the
-     * log.
      *
      * @param rsp The AllLobbiesResponse object seen on the EventBus
      *
@@ -136,7 +171,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
-        updateLobbyList(rsp.getLobbyNames());
+        updateLobbyList(rsp.getLobbies());
     }
 
     /**
@@ -144,9 +179,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new AllOnlineUsersResponse object is posted onto the EventBus, the names
      * of all currently logged in users are put onto the UserList in the main menu.
-     * Furthermore, if the LOG-Level is set to DEBUG, the message "Update of user
-     * list" with the names of all currently logged in users is displayed in the
-     * log.
      *
      * @param rsp The AllOnlineUsersResponse object seen on the EventBus
      *
@@ -173,6 +205,27 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onChangePasswordButtonPressed() {
         eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
+    }
+
+    /**
+     * Handles a CreateGameMessage found on the EventBus
+     * <p>
+     * If a CreateGameMessage is found on the EventBus, this method calls on the
+     * LobbyService to get an updated list of all lobbies, so the "in Game" and "full"
+     * statuses are displayed correctly.
+     *
+     * @param msg The CreateGameMessage found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    @Subscribe
+    private void onCreateGameMessage(CreateGameMessage msg) {
+        if (this.loggedInUser == null) return;
+        LOG.debug("Received CreateGameMessage");
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
@@ -223,7 +276,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
             lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
@@ -269,7 +321,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (lobbyView.getSelectionModel().isEmpty()) {
             eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
         } else {
-            String lobbyName = lobbyView.getSelectionModel().getSelectedItem();
+            String lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
             lobbyService.joinLobby(lobbyName, loggedInUser);
         }
     }
@@ -295,7 +347,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.retrieveAllLobbyMembers(rsp.getLobbyName());
             lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
         });
     }
@@ -307,8 +358,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * of the newly created lobby is put onto the LobbyList in the main menu.
      * It also calls the LobbyService to retrieve all lobbies from the server
      * so the SceneManager can properly keep track of the lobby scenes.
-     * Furthermore, if the LOG-Level is set to DEBUG, the message "Added new lobby to lobby
-     * list" with the name of the newly added lobby is displayed in the log.
      *
      * @param msg the LobbyCreatedMessage object seen on the EventBus
      *
@@ -322,12 +371,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (this.loggedInUser == null) return;
         LOG.debug("Received LobbyCreatedMessage");
         lobbyService.retrieveAllLobbies();
-        if (msg.getName() == null || msg.getName().isEmpty()) {
-            LOG.debug("---- Tried to add Lobby without name to LobbyList ");
-        } else {
-            Platform.runLater(() -> lobbies.add(msg.getName()));
-            LOG.debug("---- Added Lobby to LobbyList " + msg.getName());
-        }
     }
 
     /**
@@ -335,8 +378,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <p>
      * If a new LobbyDeletedMessage object is posted to the EventBus, the name
      * of the deleted lobby is removed from the LobbyList in the main menu.
-     * Furthermore, if the LOG-Level is set to DEBUG, the message "Removed lobby from lobby
-     * list" with the name of the removed lobby is displayed in the log.
      *
      * @param msg The LobbyDeletedMessage object seen on the EventBus
      *
@@ -348,12 +389,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
         if (this.loggedInUser == null) return;
         LOG.debug("Received LobbyDeletedMessage");
-        if (msg.getName() == null || msg.getName().isEmpty()) {
-            LOG.debug("---- Tried to delete Lobby without name from LobbyList ");
-        } else {
-            Platform.runLater(() -> lobbies.remove(msg.getName()));
-            LOG.debug("---- Removed Lobby from LobbyList " + msg.getName());
-        }
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
@@ -477,14 +513,20 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @see de.uol.swp.common.lobby.dto.LobbyDTO
      * @since 2020-11-29
      */
-    private void updateLobbyList(List<String> lobbyList) {
+    private void updateLobbyList(List<Lobby> lobbyList) {
         Platform.runLater(() -> {
             if (lobbies == null) {
                 lobbies = FXCollections.observableArrayList();
                 lobbyView.setItems(lobbies);
             }
             lobbies.clear();
-            lobbies.addAll(lobbyList);
+            lobbyList.forEach(l -> {
+                String s = l.getName() + " (" + l.getUsers().size() + "/4)";
+                if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
+                else if (l.getUsers().size() == 4)
+                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
+                lobbies.add(new Pair<>(l.getName(), s));
+            });
         });
     }
 

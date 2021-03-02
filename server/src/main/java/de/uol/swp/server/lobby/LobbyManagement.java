@@ -25,7 +25,7 @@ public class LobbyManagement implements ILobbyManagement {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name " + name + " already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner));
+        lobbies.put(name, new LobbyDTO(name, owner, false));
     }
 
     @Override
@@ -48,5 +48,12 @@ public class LobbyManagement implements ILobbyManagement {
             return Optional.of(lobby);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void setInGame(String lobbyName, boolean inGame) {
+        Optional<Lobby> found = getLobby(lobbyName);
+        if (found.isEmpty()) return;
+        found.get().setInGame(inGame);
     }
 }

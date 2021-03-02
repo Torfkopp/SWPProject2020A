@@ -32,7 +32,10 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      * @since 2020-12-12
      */
     public AllLobbiesResponse(Map<String, Lobby> lobbies) {
-        this.lobbyNames.addAll(lobbies.keySet());
+        lobbies.forEach((lobbyName, lobby) -> {
+            this.lobbyNames.add(lobbyName);
+            this.lobbies.add(lobby);
+        });
     }
 
     /**
