@@ -10,6 +10,7 @@ import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
 import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
+import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
@@ -24,14 +25,12 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
-import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.KillOldClientResponse;
+import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -322,6 +321,11 @@ public class SceneManager {
             tradingResponseStages.get(lobby).close();
             tradingResponseStages.remove(lobby);
         }
+    }
+
+    @Subscribe
+    private void onKillOldClientResponse(KillOldClientResponse rsp) {
+        showLoginScreen();
     }
 
     /**
@@ -709,6 +713,26 @@ public class SceneManager {
     }
 
     /**
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    public void showLogOldSessionOutScreen(User user) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                eventBus.post(new NukeUsersSessionsRequest(user));
+            }
+        });
+    }
+
+    @Subscribe
+    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
+        eventBus.post(new RetryLoginEvent());
+    }
+
+    /**
      * Shows the login error alert
      * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
@@ -748,27 +772,6 @@ public class SceneManager {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
                   MAINMENU_WIDTH, MAINMENU_HEIGHT);
-    }
-
-    /**
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-03
-     */
-    public void showLogOldSessionOutScreen(User user) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                eventBus.post(new NukeUsersSessionsRequest(user));
-            }
-        });
-    }
-
-    @Subscribe
-    private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        showLoginScreen();
     }
 
     /**

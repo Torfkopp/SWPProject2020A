@@ -1,6 +1,8 @@
 package de.uol.swp.client.auth;
 
+import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -56,5 +58,10 @@ public class LoginPresenter extends AbstractPresenter {
     @FXML
     private void onRegisterButtonPressed() {
         eventBus.post(showRegViewMessage);
+    }
+
+    @Subscribe
+    private void onRetryLoginEvent(RetryLoginEvent event) {
+        onLoginButtonPressed();
     }
 }

@@ -10,6 +10,7 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.KillOldClientResponse;
+import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.communication.UUIDSession;
 import de.uol.swp.server.message.*;
@@ -43,6 +44,7 @@ public class AuthenticationService extends AbstractService {
      *
      * @param bus            The EventBus used throughout the entire server
      * @param userManagement Object of the UserManagement to use
+     *
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-30
      */
@@ -56,14 +58,16 @@ public class AuthenticationService extends AbstractService {
      * Searches the session for a given user
      *
      * @param user User whose session is to be searched
+     *
      * @return Either an empty Optional or an Optional containing the session
+     *
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.user.User
      * @since 2019-09-04
      */
     public Optional<Session> getSession(User user) {
         Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
-                .filter(e -> e.getValue().equals(user)).findFirst();
+                                                               .filter(e -> e.getValue().equals(user)).findFirst();
         return entry.map(Map.Entry::getKey);
     }
 
@@ -71,7 +75,9 @@ public class AuthenticationService extends AbstractService {
      * Searches the sessions for a set of given users
      *
      * @param users Set of users whose sessions are to be searched
+     *
      * @return List containing the sessions that where found
+     *
      * @see de.uol.swp.common.user.Session
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
@@ -95,6 +101,7 @@ public class AuthenticationService extends AbstractService {
      * Otherwise, a ServerExceptionMessage gets posted there.
      *
      * @param msg The LoginRequest
+     *
      * @see de.uol.swp.common.user.request.LoginRequest
      * @see de.uol.swp.server.message.ClientAuthorisedMessage
      * @see de.uol.swp.server.message.ServerExceptionMessage
@@ -135,6 +142,7 @@ public class AuthenticationService extends AbstractService {
      * and a UserLoggedOutMessage is posted onto the EventBus.
      *
      * @param msg The LogoutRequest
+     *
      * @see de.uol.swp.common.user.request.LogoutRequest
      * @see de.uol.swp.common.user.message.UserLoggedOutMessage
      * @since 2019-08-30
@@ -159,30 +167,26 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
-     *
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
      */
     @Subscribe
-    private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest msg) {
+    private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest req) {
         LOG.debug("Received NukeUsersSessionsRequest");
-        if (msg.getUser() != null) {
-            User userToLogOut = msg.getUser();
-            // Could be already logged out
-            if (userToLogOut != null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("---- Logging out user " + userToLogOut.getUsername());
-                }
-                userManagement.logout(userToLogOut);
-                while (getSession(userToLogOut).isPresent()) {
-                    post(new FetchUserContextInternalRequest(getSession(userToLogOut).get(), new KillOldClientResponse()));
-                    userSessions.remove(getSession(userToLogOut).get());
-                }
-                Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
-                post(returnMessage);
-            }
+        if (req.getUser() == null) return;
+        User userToLogOut = req.getUser();
+        // Could be already logged out
+        LOG.debug("---- Logging out user " + userToLogOut.getUsername());
+        userManagement.logout(userToLogOut);
+        while (getSession(userToLogOut).isPresent()) {
+            post(new FetchUserContextInternalRequest(getSession(userToLogOut).get(), new KillOldClientResponse()));
+            userSessions.remove(getSession(userToLogOut).get());
         }
+        post(new UserLoggedOutMessage(userToLogOut.getUsername()));
+        NukeUsersSessionsResponse response = new NukeUsersSessionsResponse();
+        response.initWithMessage(req);
+        post(response);
     }
 
     /**
@@ -193,6 +197,7 @@ public class AuthenticationService extends AbstractService {
      * every logged in user on the EvenBus.
      *
      * @param msg RetrieveAllOnlineUsersRequest found on the EventBus
+     *
      * @see de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest
      * @see de.uol.swp.common.user.response.AllOnlineUsersResponse
      * @since 2019-08-30

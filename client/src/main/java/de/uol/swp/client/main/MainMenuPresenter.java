@@ -353,6 +353,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         });
     }
 
+    @Subscribe
+    private void onKillOldClientResponse(KillOldClientResponse rsp) {
+        lobbyService.removeFromLobbies(loggedInUser);
+        eventBus.post(showLoginViewMessage);
+        resetCharVars();
+    }
+
     /**
      * Adds a newly created lobby to LobbyList
      * <p>
@@ -498,11 +505,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received UserLoggedOutMessage");
         LOG.debug("---- User " + msg.getUsername() + " logged out");
         Platform.runLater(() -> users.remove(msg.getUsername()));
-    }
-
-    @Subscribe
-    private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        clearEventBus();
     }
 
     /**
