@@ -676,6 +676,7 @@ public class SceneManager {
                   CHANGEPW_HEIGHT);
     }
 
+
     /**
      * Shows an error message inside an error alert
      *
