@@ -118,6 +118,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
+                    if(getText().equals(lobbyMembers.get(0).getValue())) {
+                        setTextFill(GameRendering.PLAYER_1_COLOUR);
+                    }if(getText().equals(lobbyMembers.get(1).getValue())){
+                        setTextFill(GameRendering.PLAYER_2_COLOUR);
+                    }
+                    if(getText().equals(lobbyMembers.get(2).getValue())){
+                        setTextFill(GameRendering.PLAYER_3_COLOUR);
+                    }
+                    if(getText().equals(lobbyMembers.get(3).getValue())){
+                        setTextFill(GameRendering.PLAYER_4_COLOUR);
+                    }
                 });
             }
         });
