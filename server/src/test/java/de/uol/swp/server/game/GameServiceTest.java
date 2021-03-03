@@ -8,6 +8,7 @@ import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
 import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -23,9 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -280,6 +279,98 @@ public class GameServiceTest {
     }
 
     /**
+     * Tests if the lobbyManagement handles a KickUserRequest properly when he wants to
+     * kick himself
+     * <p>
+     * A KickUserRequest is posted onto the event bus and the owner
+     * wants to kick himself
+     * <p>
+     * This test fails if he is able to kick himself
+     */
+    @Test
+    void kickOwnerTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        loginUser(user[0]);
+        loginUser(user[1]);
+        loginUser(user[2]);
+        lobbyManagement.createLobby("testlobby", user[0]);
+        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby.isPresent());
+        lobby.get().joinUser(user[1]);
+        lobby.get().joinUser(user[2]);
+        //Owner tries to kick himself
+        Message kickUser = new KickUserRequest("testlobby", user[0], user[0].getUsername());
+        bus.post(kickUser);
+
+        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby2.isPresent());
+        assertEquals(3, lobby2.get().getUsers().size());
+    }
+
+    /**
+     * Tests if the lobbyManagement handles a KickUserRequest properly
+     * <p>
+     * A KickUserRequest is posted onto the event bus and the owner
+     * wants to kick another user.
+     * <p>
+     * This test fails if the other user does not get kicked
+     */
+    @Test
+    void kickUserTest() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        loginUser(user[0]);
+        loginUser(user[1]);
+        loginUser(user[2]);
+        lobbyManagement.createLobby("testlobby", user[0]);
+        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby.isPresent());
+        lobby.get().joinUser(user[1]);
+        lobby.get().joinUser(user[2]);
+
+        Message kickUser = new KickUserRequest("testlobby", user[0], user[1].getUsername());
+        bus.post(kickUser);
+
+        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby2.isPresent());
+        assertEquals(2, lobby2.get().getUsers().size());
+    }
+
+    /**
+     * Tests if the lobbyManagement handles a KickUserRequest properly while a game is running
+     * <p>
+     * A KickUserRequest is posted onto the event bus and the owner
+     * wants to kick another user.
+     * <p>
+     * This test fails if the other user gets kicked even if the game is running
+     */
+    @Test
+    void kickUserWhileGameIsActive() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        lobbyManagement.createLobby("testlobby", user[0]);
+        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby.isPresent());
+        lobby.get().joinUser(user[1]);
+        lobby.get().joinUser(user[2]);
+        gameManagement.createGame(lobby.get(), user[0]);
+
+        Message kickUser = new KickUserRequest("testlobby", user[0], user[1].getUsername());
+        bus.post(kickUser);
+
+        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby2.isPresent());
+        assertEquals(3, lobby2.get().getUsers().size());
+    }
+
+    /**
      * Helper method to login users
      * <p>
      * This method resets the gameService and gameManagement variables to null
@@ -291,6 +382,35 @@ public class GameServiceTest {
 
         assertTrue(userManagement.isLoggedIn(userToLogin));
         userManagement.dropUser(userToLogin);
+    }
+
+    /**
+     * Tests if the lobbyManagement handles a KickUserRequest properly when the user who
+     * wants to kick another user, is not the owner
+     * <p>
+     * A KickUserRequest is posted onto the event bus and the owner
+     * wants to kick another user.
+     * <p>
+     * This test fails if the other user is able to kick another user
+     */
+    @Test
+    void notOwnerKickOtherUser() {
+        User[] user = new User[3];
+        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        lobbyManagement.createLobby("testlobby", user[0]);
+        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby.isPresent());
+        lobby.get().joinUser(user[1]);
+        lobby.get().joinUser(user[2]);
+        //user[0] ist der owner, aber user[1] schickt die kick request
+        Message kickUser = new KickUserRequest("testlobby", user[1], user[2].getUsername());
+        bus.post(kickUser);
+
+        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+        assertTrue(lobby2.isPresent());
+        assertEquals(3, lobby2.get().getUsers().size());
     }
 
     /**
