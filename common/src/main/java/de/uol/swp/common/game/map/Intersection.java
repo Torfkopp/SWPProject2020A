@@ -8,20 +8,14 @@ package de.uol.swp.common.game.map;
  */
 public class Intersection implements IIntersection {
 
-    private final int[] hexes;
-    private final int[] neighbours;
     private IntersectionState state;
     private Player owner;
 
     /**
      * Constructor for an free intersection
      *
-     * @param hexes      The surrounding hexes
-     * @param neighbours The position of the neighbouring intersections
      */
-    public Intersection(int[] hexes, int[] neighbours) {
-        this.hexes = hexes;
-        this.neighbours = neighbours;
+    public Intersection() {
         this.state = IntersectionState.FREE;
     }
 
@@ -32,21 +26,9 @@ public class Intersection implements IIntersection {
      * @param neighbours The position of the neighbouring intersections
      * @param owner      The owner of the settlement
      */
-    public Intersection(int[] hexes, int[] neighbours, Player owner) {
-        this.hexes = hexes;
-        this.neighbours = neighbours;
+    public Intersection(Player owner) {
         this.state = IntersectionState.SETTLEMENT;
         this.owner = owner;
-    }
-
-    @Override
-    public int[] getHexes() {
-        return hexes;
-    }
-
-    @Override
-    public int[] getNeighbours() {
-        return neighbours;
     }
 
     @Override

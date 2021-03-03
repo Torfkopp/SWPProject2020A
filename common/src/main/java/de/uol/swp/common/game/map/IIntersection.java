@@ -18,19 +18,6 @@ public interface IIntersection {
         CITY
     }
 
-    /**
-     * Gets the surrounding hexes
-     *
-     * @return Array of three hex positions
-     */
-    int[] getHexes();
-
-    /**
-     * Gets neighbouring intersections
-     *
-     * @return Array of positions
-     */
-    int[] getNeighbours();
 
     /**
      * Gets the intersection's owner

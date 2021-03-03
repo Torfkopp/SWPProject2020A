@@ -116,7 +116,7 @@ public class GameRendering {
 
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
-        drawIntersectionsAndEdges(intersections, edges);
+        //drawIntersectionsAndEdges(intersections, edges);
     }
 
     /**

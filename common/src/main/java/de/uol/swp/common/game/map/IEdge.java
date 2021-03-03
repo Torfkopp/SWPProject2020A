@@ -21,14 +21,14 @@ public interface IEdge {
      *
      * @return Array of positions
      */
-    int[] getNeighbouringEdges();
+    //int[] getNeighbouringEdges();
 
     /**
      * Gets the two surrounding intersections
      *
      * @return Array of two positions
      */
-    int[] getNeighbouringIntersections();
+    //int[] getNeighbouringIntersections();
 
     /**
      * Gets the edge's owner or null if undeveloped
