@@ -151,7 +151,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
      */
     @FXML
-    public void onBuyDevelopmentCardButtonPressed() {
+    private void onBuyDevelopmentCardButtonPressed() {
         if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
             Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(loggedInUser, lobbyName);
             eventBus.post(buyDevelopmentCardRequest);
