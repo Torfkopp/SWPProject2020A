@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
+import de.uol.swp.common.user.User;
 
 /**
  * This response is sent when a card
@@ -11,7 +12,14 @@ import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
  */
 public class PlayCardSuccessResponse extends AbstractLobbyResponse {
 
-    public PlayCardSuccessResponse(String lobbyName) {
+    User user;
+
+    public PlayCardSuccessResponse(String lobbyName, User user) {
         super(lobbyName);
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

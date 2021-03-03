@@ -601,6 +601,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (lobbyName.equals(rsp.getLobbyName())) {
             LOG.debug("Received PlayCardSuccessResponse");
             playCard.setDisable(true);
+            lobbyService.updateInventory(rsp.getLobbyName(), rsp.getUser());
         }
     }
 

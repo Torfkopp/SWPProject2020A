@@ -12,12 +12,9 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.message.ExceptionMessage;
-import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
@@ -478,9 +475,9 @@ public class GameService extends AbstractService {
             return;
         }
         inv.setKnights(inv.getKnights() + 1);
-        inv.increaseRoadBuildingCards(-1);
+        inv.increaseKnightCards(-1);
 
-        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby());
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Sending a PlayCardSuccessResponse");
@@ -543,7 +540,7 @@ public class GameService extends AbstractService {
         }
         invMono.increaseMonopolyCards(-1);
 
-        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby());
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Sending a PlayCardSuccessResponse");
@@ -583,7 +580,7 @@ public class GameService extends AbstractService {
 
         inv.increaseRoadBuildingCards(-1);
 
-        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby());
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Sending a PlayCardSuccessResponse");
@@ -658,7 +655,7 @@ public class GameService extends AbstractService {
         }
         inv.increaseYearOfPlentyCards(-1);
 
-        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby());
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Sending a PlayCardSuccessResponse");
