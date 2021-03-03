@@ -55,7 +55,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-
     private ObservableList<Pair<Integer, User>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
@@ -132,8 +131,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            String name = newValue.getKey();
-            boolean isSelf = name.equals(this.loggedInUser.getUsername());
+            String name = newValue.getValue().getUsername();
+            boolean isSelf = newValue.getValue().equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
@@ -340,9 +339,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) return;
-        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getKey()));
+        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if ((selectedUser.getValue()) == this.loggedInUser) return;
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getValue().getUsername()));
     }
 
     /**
