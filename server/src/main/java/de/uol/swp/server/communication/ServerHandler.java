@@ -60,7 +60,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
         try {
-            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Mario
+            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Wario
             checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
             eventBus.post(msg);
         } catch (Exception e) {
@@ -164,7 +164,7 @@ public class ServerHandler implements ServerHandlerDelegate {
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent() && msg.getSession().isPresent()) {
             if (msg.getOldSession() != null) {
-                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getOldSession()));
+                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
             } else {
                 putSession(ctx.get(), msg.getSession().get());
                 sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));

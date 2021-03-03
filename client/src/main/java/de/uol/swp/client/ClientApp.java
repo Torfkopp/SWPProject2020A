@@ -207,10 +207,17 @@ public class ClientApp extends Application implements ConnectionListener {
         sceneManager.showMainScreen(user);
     }
 
+    /**
+     *
+     * @param message The AlreadyLoggedInResponse object detected on the EventBus
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
     @Subscribe
     private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse message) {
-        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getLoggedInSession().get().getUser().getUsername());
-        sceneManager.showLogOldSessionOutScreen(message.getLoggedInSession().get());
+        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getLoggedInUser());
+        sceneManager.showLogOldSessionOutScreen(message.getLoggedInUser());
     }
     
     /**

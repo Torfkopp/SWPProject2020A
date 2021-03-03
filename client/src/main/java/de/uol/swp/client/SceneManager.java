@@ -24,11 +24,14 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
+import de.uol.swp.common.user.request.LogoutRequest;
+import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
+import de.uol.swp.common.user.response.KillOldClientResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -747,14 +750,25 @@ public class SceneManager {
                   MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
-    public void showLogOldSessionOutScreen(Session session) {
+    /**
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    public void showLogOldSessionOutScreen(User user) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                System.out.println(session);
+                eventBus.post(new NukeUsersSessionsRequest(user));
             }
         });
+    }
+
+    @Subscribe
+    private void onKillOldClientResponse(KillOldClientResponse rsp) {
+        showLoginScreen();
     }
 
     /**

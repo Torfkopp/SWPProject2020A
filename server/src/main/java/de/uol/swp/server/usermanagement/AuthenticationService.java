@@ -7,15 +7,12 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.request.LoginRequest;
-import de.uol.swp.common.user.request.LogoutRequest;
-import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
+import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
+import de.uol.swp.common.user.response.KillOldClientResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.communication.UUIDSession;
-import de.uol.swp.server.message.ClientAuthorisedMessage;
-import de.uol.swp.server.message.ServerExceptionMessage;
-import de.uol.swp.server.message.ServerInternalMessage;
+import de.uol.swp.server.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -155,6 +152,33 @@ public class AuthenticationService extends AbstractService {
                 }
                 userManagement.logout(userToLogOut);
                 userSessions.remove(session);
+                Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
+                post(returnMessage);
+            }
+        }
+    }
+
+    /**
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest msg) {
+        LOG.debug("Received NukeUsersSessionsRequest");
+        if (msg.getUser() != null) {
+            User userToLogOut = msg.getUser();
+            // Could be already logged out
+            if (userToLogOut != null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("---- Logging out user " + userToLogOut.getUsername());
+                }
+                userManagement.logout(userToLogOut);
+                while (getSession(userToLogOut).isPresent()) {
+                    post(new FetchUserContextInternalRequest(getSession(userToLogOut).get(), new KillOldClientResponse()));
+                    userSessions.remove(getSession(userToLogOut).get());
+                }
                 Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
                 post(returnMessage);
             }

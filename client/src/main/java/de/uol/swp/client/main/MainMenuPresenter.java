@@ -23,6 +23,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
+import de.uol.swp.common.user.response.KillOldClientResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -497,6 +498,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received UserLoggedOutMessage");
         LOG.debug("---- User " + msg.getUsername() + " logged out");
         Platform.runLater(() -> users.remove(msg.getUsername()));
+    }
+
+    @Subscribe
+    private void onKillOldClientResponse(KillOldClientResponse rsp) {
+        clearEventBus();
     }
 
     /**

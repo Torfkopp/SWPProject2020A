@@ -1,9 +1,7 @@
 package de.uol.swp.common.user.response;
 
 import de.uol.swp.common.message.AbstractResponseMessage;
-import de.uol.swp.common.user.Session;
-
-import java.util.Optional;
+import de.uol.swp.common.user.User;
 
 /**
  * A message containing a session (typically for a new logged in user)
@@ -12,25 +10,23 @@ import java.util.Optional;
  *
  * @author Marvin Drees
  * @author Eric Vuong
- * @see de.uol.swp.common.user.request.LoginRequest
- * @see Session
  * @see AbstractResponseMessage
  * @since 2021-03-02
  */
 public class AlreadyLoggedInResponse extends AbstractResponseMessage {
 
-    private final Session oldSession;
+    private final User user;
 
     /**
      * Constructor
      *
-     * @param oldSession The already logged in session
+     * @param user The already logged in session
      */
-    public AlreadyLoggedInResponse(Session oldSession) {
-        this.oldSession = oldSession;
+    public AlreadyLoggedInResponse(User user) {
+        this.user = user;
     }
 
-    public Optional<Session> getLoggedInSession() {
-        return Optional.of(oldSession);
+    public User getLoggedInUser() {
+        return user;
     }
 }
