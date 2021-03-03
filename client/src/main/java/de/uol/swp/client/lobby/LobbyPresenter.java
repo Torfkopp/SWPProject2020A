@@ -512,6 +512,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
                     alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
+                    ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                        ButtonBar.ButtonData.OK_DONE);
+                    alert.getButtonTypes().setAll(confirm);
                     if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
                         alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
                     alert.showAndWait();
