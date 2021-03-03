@@ -385,66 +385,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a ResetOfferTradeButtonRequest found on the EventBus
-     * <p>
-     * If a ResetOfferTradeButtonRequest is found on the EventBus,
-     * a new GetUserSessionEvent is posted onto the EventBus containing
-     * the user and a new ResetOfferTradeButtonResponse which contains
-     * the lobby name.
-     *
-     * @param req The ResetOfferTradeButtonRequest found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.ResetOfferTradeButtonRequest
-     * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        Inventory[] inventories = game.getInventories();
-        Inventory offeringInventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().getUsername().equals(req.getOfferingUserName())) {
-                offeringInventory = value;
-                break;
-            }
-        }
-        if (offeringInventory == null) return;
-        ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
-        post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
-    }
-
-    /**
-     * Handles a RollDiceRequest found on the EventBus
-     * If a RollDiceRequest is detected on the EventBus, this method is called.
-     * It then sends a DiceCastMessage to all members in the lobby.
-     *
-     * @param req The RollDiceRequest found on the EventBus
-     *
-     * @see de.uol.swp.common.game.request.RollDiceRequest
-     * @see de.uol.swp.common.game.message.DiceCastMessage
-     * @since 2021-02-22
-     */
-    @Subscribe
-    private void onRollDiceRequest(RollDiceRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
-        }
-        try {
-            Game game = gameManagement.getGame(req.getOriginLobby());
-            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), game.rollDice());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-        } catch (Exception e) {
-            LOG.error(e);
-        }
-    }
-
-    /**
      * Handles a PlayKnightCardRequest found on the EventBus
      * <p>
      * If a PlayKnightCardRequest is detected on the EventBus, this method is called.
@@ -514,30 +454,45 @@ public class GameService extends AbstractService {
             return;
         }
         Inventory[] inventories = game.getInventories();
-        int i = inventories.length;
-        //Player gets one resource too much which gets reduced in the next step
+
         switch (req.getResource()) {
             case ORE:
-                invMono.increaseOre(i);
-                for (Inventory inv : inventories) if (inv.getOre() > 0) inv.increaseOre(-1);
+                for (Inventory inv : inventories)
+                    if (inv.getOre() > 0) {
+                        inv.increaseOre(-1);
+                        invMono.increaseOre(1);
+                    }
                 break;
             case WOOL:
-                invMono.increaseWool(i);
-                for (Inventory inv : inventories) if (inv.getWool() > 0) inv.increaseWool(-1);
+                for (Inventory inv : inventories)
+                    if (inv.getWool() > 0) {
+                        inv.increaseWool(-1);
+                        invMono.increaseWool(1);
+                    }
                 break;
             case BRICK:
-                invMono.increaseBrick(i);
-                for (Inventory inv : inventories) if (inv.getBrick() > 0) inv.increaseBrick(-1);
+                for (Inventory inv : inventories)
+                    if (inv.getBrick() > 0) {
+                        inv.increaseBrick(-1);
+                        invMono.increaseBrick(1);
+                    }
                 break;
             case GRAIN:
-                invMono.increaseGrain(i);
-                for (Inventory inv : inventories) if (inv.getGrain() > 0) inv.increaseGrain(-1);
+                for (Inventory inv : inventories)
+                    if (inv.getGrain() > 0) {
+                        inv.increaseGrain(-1);
+                        invMono.increaseGrain(1);
+                    }
                 break;
             case LUMBER:
-                invMono.increaseLumber(i);
-                for (Inventory inv : inventories) if (inv.getLumber() > 0) inv.increaseLumber(-1);
+                for (Inventory inv : inventories)
+                    if (inv.getLumber() > 0) {
+                        inv.increaseLumber(-1);
+                        invMono.increaseLumber(1);
+                    }
                 break;
         }
+
         invMono.increaseMonopolyCards(-1);
 
         AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
@@ -659,6 +614,66 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Sending a PlayCardSuccessResponse");
+    }
+
+    /**
+     * Handles a ResetOfferTradeButtonRequest found on the EventBus
+     * <p>
+     * If a ResetOfferTradeButtonRequest is found on the EventBus,
+     * a new GetUserSessionEvent is posted onto the EventBus containing
+     * the user and a new ResetOfferTradeButtonResponse which contains
+     * the lobby name.
+     *
+     * @param req The ResetOfferTradeButtonRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.ResetOfferTradeButtonRequest
+     * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory[] inventories = game.getInventories();
+        Inventory offeringInventory = null;
+        for (Inventory value : inventories) {
+            if (value.getPlayer().getUsername().equals(req.getOfferingUserName())) {
+                offeringInventory = value;
+                break;
+            }
+        }
+        if (offeringInventory == null) return;
+        ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
+        post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
+    }
+
+    /**
+     * Handles a RollDiceRequest found on the EventBus
+     * If a RollDiceRequest is detected on the EventBus, this method is called.
+     * It then sends a DiceCastMessage to all members in the lobby.
+     *
+     * @param req The RollDiceRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.RollDiceRequest
+     * @see de.uol.swp.common.game.message.DiceCastMessage
+     * @since 2021-02-22
+     */
+    @Subscribe
+    private void onRollDiceRequest(RollDiceRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
+        }
+        try {
+            Game game = gameManagement.getGame(req.getOriginLobby());
+            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), game.rollDice());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+        } catch (Exception e) {
+            LOG.error(e);
+        }
     }
 
     /**
