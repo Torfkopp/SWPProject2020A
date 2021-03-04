@@ -8,13 +8,12 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.ExceptionMessage;
-import de.uol.swp.common.message.Message;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.GetUserSessionEvent;
+import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.message.FetchUserContextInternalRequest;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
@@ -102,7 +101,7 @@ public class LobbyService extends AbstractService {
      *
      * @author Maximilian Lindner
      * @author Finn Haase
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @see de.uol.swp.server.message.FetchUserContextInternalRequest
      * @since 2021-02-25
      */
@@ -111,6 +110,47 @@ public class LobbyService extends AbstractService {
         Optional<Session> session = authenticationService.getSession(event.getTargetUser());
         if (session.isEmpty()) throw new RuntimeException("UserSession not found");
         post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
+    }
+
+    /**
+     * Handles a KickUserEvent found on the EventBus
+     * <p>
+     * If a KickUserEvent is detected on the EventBus a
+     * KickUserResponse for the to be kicked user is posted
+     * onto the EventBus to close his lobby window, a UserLeftLobbyMessage
+     * is posted onto the EventBus to the according lobby and a
+     * AllLobbiesMessage is posted onto the EventBus.
+     *
+     * @param event KickUserEvent found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.server.game.event.KickUserEvent
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
+     * @see de.uol.swp.common.lobby.message.AllLobbiesMessage
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserEvent(KickUserEvent event) {
+        KickUserRequest req = event.getRequest();
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+        if (req.getToBeKickedUserName().equals(req.getUser().getUsername())) return;
+        if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
+        Set<User> lobbyMembers = lobby.get().getUsers();
+        User toBeKickedUser = null;
+        for (User temp : lobbyMembers) {
+            if (temp.getUsername().equals(req.getToBeKickedUserName())) toBeKickedUser = temp;
+        }
+        if (toBeKickedUser == null) return;
+        lobby.get().unsetUserReady(toBeKickedUser);
+        lobby.get().leaveUser(toBeKickedUser);
+        ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
+        post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
+        sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
+        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
 
     /**
