@@ -140,6 +140,25 @@ public class Game {
     }
 
     /**
+     * Gets a user's player
+     *
+     * @return A player
+     */
+    public Player getPlayer(User user) {
+        int i = 0;
+        for (User u : players) {
+            if(u.equals(user)) break;
+            i++;
+        }
+        switch (i){
+            case 1: return Player.PLAYER_2;
+            case 2: return Player.PLAYER_3;
+            case 3: return Player.PLAYER_4;
+        }
+        return Player.PLAYER_1;
+    }
+
+    /**
      * Gets the next player
      *
      * @return User object of the next player

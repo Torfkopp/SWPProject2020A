@@ -12,6 +12,7 @@ import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
@@ -19,18 +20,23 @@ import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -52,7 +58,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-    private final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
+
     private ObservableList<Pair<String, String>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
@@ -62,11 +69,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private CheckBox readyCheckBox;
     @FXML
+    private Button kickUserButton;
+    @FXML
     private Button startSession;
     @FXML
     private Button rollDice;
     @FXML
     private Button endTurn;
+    @FXML
+    private Button playCard;
     @FXML
     private Button tradeWithUserButton;
     @FXML
@@ -96,7 +107,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Initialises the Presenter by setting up the membersView.
+     * Initialises the Presenter by setting up the membersView, the
+     * inventory view, the kickUserButton and the tradeWithUserButton.
      *
      * @implNote Called automatically by JavaFX
      * @author Temmo Junkhoff
@@ -114,6 +126,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
                 });
+            }
+        });
+        membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            String name = newValue.getKey();
+            boolean isSelf = name.equals(this.loggedInUser.getUsername());
+            kickUserButton.setDisable(isSelf);
+            tradeWithUserButton.setDisable(isSelf);
+            if (isSelf) {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+            } else {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
+                tradeWithUserButton
+                        .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
             }
         });
         inventoryView.setCellFactory(lv -> new ListCell<>() {
@@ -180,11 +206,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
+     * @param kicked Whether the user was kicked (true) or is leaving
+     *               voluntarily (false)
+     *
      * @author Temmo Junkhoff
      * @since 2021-01-06
      */
-    private void closeWindow() {
-        if (lobbyName != null || loggedInUser != null) {
+    private void closeWindow(boolean kicked) {
+        if (lobbyName != null || loggedInUser != null || !kicked) {
             lobbyService.leaveLobby(lobbyName, loggedInUser);
         }
         ((Stage) window).close();
@@ -239,6 +268,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.readyUsers = rsp.getReadyUsers();
             updateUsersList(rsp.getUsers());
             setStartSessionButtonState();
+            setKickUserButtonState();
         }
     }
 
@@ -281,6 +311,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
         setTradeWithUserButtonState(msg.getUser());
+        setPlayCardButtonState(msg.getUser());
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
     }
 
@@ -297,10 +328,51 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onEndTurnButtonPressed() {
         this.endTurn.setDisable(true);
         this.rollDice.setDisable(true);
+        this.playCard.setDisable(true);
         this.tradeWithBankButton.setDisable(true);
         this.tradeWithUserButton.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
         lobbyService.updateInventory(lobbyName, loggedInUser);
+    }
+
+    /**
+     * Method called when the KickUserButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests to kick
+     * the selected User of the members view.
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @since 2021-03-02
+     */
+    @FXML
+    private void onKickUserButtonPressed() {
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) return;
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getKey()));
+    }
+
+    /**
+     * Handles a KickUserResponse found on the EventBus
+     * <p>
+     * If a KickUserResponse is detected on the EventBus and its
+     * directed to this lobby and this player, the according lobby
+     * window is closed.
+     *
+     * @param rsp The KickUserResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserResponse(KickUserResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName()) && this.loggedInUser.equals(rsp.getToBeKickedUser())) {
+            Platform.runLater(() -> closeWindow(true));
+        }
     }
 
     /**
@@ -314,7 +386,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onLeaveLobbyButtonPressed() {
-        closeWindow();
+        closeWindow(false);
     }
 
     /**
@@ -348,7 +420,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (this.readyUsers == null) {
             this.readyUsers = new HashSet<>();
         }
-        this.window.setOnCloseRequest(windowEvent -> closeWindow());
+        this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
+        kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+        tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
     }
 
@@ -367,6 +441,178 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
+    }
+
+    /**
+     * Handles a click on the PlayCardButton
+     * <p>
+     * Method called when the PlayCardButton is pushed
+     * It opens a dialogue to allow the player to choose
+     * which card is to be played.
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    @FXML
+    private void onPlayCardButtonPressed(ActionEvent event) {
+        //Create a new alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
+        alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
+        alert.setContentText(resourceBundle.getString("game.playcards.alert.content"));
+        //Create the buttons
+        ButtonType bKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
+        ButtonType bMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
+        ButtonType bRoadBuilding = new ButtonType(resourceBundle.getString("game.resources.cards.roadbuilding"));
+        ButtonType bYearOfPlenty = new ButtonType(resourceBundle.getString("game.resources.cards.yearofplenty"));
+        ButtonType bCancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                            ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(bKnight, bMonopoly, bRoadBuilding, bYearOfPlenty, bCancel);
+        //Show the dialogue and get the result
+        Optional<ButtonType> result = alert.showAndWait();
+        //Create Strings based on the languages name for the resources
+        String ore = resourceBundle.getString("game.resources.ore");
+        String grain = resourceBundle.getString("game.resources.grain");
+        String brick = resourceBundle.getString("game.resources.brick");
+        String lumber = resourceBundle.getString("game.resources.lumber");
+        String wool = resourceBundle.getString("game.resources.wool");
+        //Make a list with aforementioned Strings
+        List<String> choices = new ArrayList<>();
+        choices.add(ore);
+        choices.add(grain);
+        choices.add(brick);
+        choices.add(lumber);
+        choices.add(wool);
+        //Result is the button the user has clicked on
+        if (result.get() == bKnight) { //Play a Knight Card
+            lobbyService.playKnightCard(lobbyName, loggedInUser);
+        } else if (result.get() == bMonopoly) { //Play a Monopoly Card
+            //Creating a dialogue
+            ChoiceDialog<String> dialogue = new ChoiceDialog<>(brick, choices);
+            dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
+            dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
+            dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
+            //Creating a new DialogPane so the button text can be customised
+            DialogPane pane = new DialogPane();
+            pane.setContent(dialogue.getDialogPane().getContent());
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.setDialogPane(pane);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+            //Show the dialogue and get the result
+            Optional<String> rst = dialogue.showAndWait();
+            //Convert String to Resources and send the request
+            Resources resource = Resources.BRICK;
+            if (rst.isPresent()) {
+                if (rst.get().equals(ore)) resource = Resources.ORE;
+                else if (rst.get().equals(grain)) resource = Resources.GRAIN;
+                else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
+                else if (rst.get().equals(wool)) resource = Resources.WOOL;
+                lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
+            }
+        } else if (result.get() == bRoadBuilding) { //Play a Road Building Card
+            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
+        } else if (result.get() == bYearOfPlenty) { //Play a Year Of Plenty Card
+            //Create a dialogue
+            Dialog<String> dialogue = new Dialog<>();
+            dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
+            dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
+            //Create its buttons
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+            //Make a grid to put the ChoiceBoxes and labels on
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+            //Make ChoiceBoxes and the choices
+            ChoiceBox c1 = new ChoiceBox();
+            ChoiceBox c2 = new ChoiceBox();
+            for (String s : choices) {
+                c1.getItems().add(s);
+                c2.getItems().add(s);
+            }
+            //Set which choice is shown first
+            c1.setValue(brick);
+            c2.setValue(brick);
+            //Add ChoiceBoxes and labels to the grid
+            grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
+            grid.add(c1, 1, 0);
+            grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label2")), 0, 1);
+            grid.add(c2, 1, 1);
+            //Put the grid into the dialogue and let it appear
+            dialogue.getDialogPane().setContent(grid);
+            //Get the pressed button
+            Optional<String> rst = dialogue.showAndWait();
+            Optional<String> button1 = Optional.of(confirm.toString());
+            //Checks if the pressed button is the same as the confirm button
+            if (rst.toString().equals(button1.toString())) {
+                //Create two resource variables
+                Resources resource1 = Resources.BRICK;
+                Resources resource2 = Resources.BRICK;
+                //Convert String to Resource
+                if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
+                else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
+                else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
+                else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+                //Second ChoiceBox's conversion
+                if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
+                else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
+                else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
+                else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+                //Send Request
+                lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+            }
+        }
+    }
+
+    /**
+     * Handles a PlayCardFailureResponse found on the EventBus
+     *
+     * @param rsp The PlayCardFailureResponse found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.PlayCardFailureResponse
+     */
+    @Subscribe
+    private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
+            LOG.debug("Received PlayCardFailureResponse");
+            if (loggedInUser.equals(rsp.getUser())) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
+                    alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
+                    ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                        ButtonBar.ButtonData.OK_DONE);
+                    alert.getButtonTypes().setAll(confirm);
+                    if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
+                        alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+                    alert.showAndWait();
+                });
+            }
+        }
+    }
+
+    /**
+     * Handles a PlayCardSuccessResponse found on the EventBus
+     *
+     * @param rsp The PlayCardSuccessResponse found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.PlayCardSuccessResponse
+     */
+    @Subscribe
+    private void onPlayCardSuccessResponse(PlayCardSuccessResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
+            LOG.debug("Received PlayCardSuccessResponse");
+            playCard.setDisable(true);
+            lobbyService.updateInventory(rsp.getLobbyName(), rsp.getUser());
+        }
     }
 
     /**
@@ -424,7 +670,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-22
      */
     @Subscribe
-    public void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
+    private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
             setTradeWithBankButtonState(event.getUser());
             setEndTurnButtonState(event.getUser());
@@ -462,7 +708,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-22
      */
     @FXML
-    public void onRollDiceButtonPressed() {
+    private void onRollDiceButtonPressed() {
         lobbyService.rollDice(lobbyName, loggedInUser);
         this.rollDice.setDisable(true);
     }
@@ -499,6 +745,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage msg) {
+        if (!msg.getName().equals(this.lobbyName)) return;
+        LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
+        Platform.runLater(() -> {
+            playField.setVisible(true);
+            //This Line needs to be changed/ removed in the Future
+            gameRendering.drawGameMap(new GameMapManagement());
+            setTurnIndicatorText(msg.getUser());
+            lobbyService.updateInventory(lobbyName, loggedInUser);
+            this.readyCheckBox.setVisible(false);
+            this.startSession.setVisible(false);
+            this.rollDice.setVisible(true);
+            this.tradeWithUserButton.setVisible(true);
+            this.tradeWithUserButton.setDisable(true);
+            this.tradeWithBankButton.setVisible(true);
+            setRollDiceButtonState(msg.getUser());
+            this.kickUserButton.setVisible(false);
+        });
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
             Platform.runLater(() -> {
@@ -513,6 +776,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 this.tradeWithUserButton.setVisible(true);
                 this.tradeWithBankButton.setVisible(true);
                 setRollDiceButtonState(msg.getUser());
+                this.playCard.setVisible(true);
             });
         }
     }
@@ -532,7 +796,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-22
      */
     @Subscribe
-    public void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
+    private void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
         if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
             endTurn.setDisable(false);
         }
@@ -791,6 +1055,35 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setEndTurnButtonState(User player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper function that sets the disable and visible state of the kickUserButton.
+     * <p>
+     * The button is only enabled the lobby owner when a game
+     * has not started yet and if the logged in user is the
+     * owner
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @since 2021-03-03
+     */
+    private void setKickUserButtonState() {
+        Platform.runLater(() -> {
+            this.kickUserButton.setVisible(this.loggedInUser.equals(this.owner));
+            this.kickUserButton.setDisable(this.loggedInUser.equals(this.owner));
+        });
+    }
+
+    /**
+     * Helper function that sets the disable state of the PlayCardButton
+     * The button is only enabled to the active player
+     *
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    private void setPlayCardButtonState(User player) {
+        this.playCard.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**

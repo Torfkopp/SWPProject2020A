@@ -9,12 +9,16 @@ import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
+import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
+import de.uol.swp.common.lobby.request.KickUserRequest;
+import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -118,7 +122,7 @@ public class GameService extends AbstractService {
      * @see de.uol.swp.common.game.request.AcceptUserTradeRequest
      * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
      * @see de.uol.swp.common.game.response.InvalidTradeOfUsersResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-24
      */
     @Subscribe
@@ -251,10 +255,10 @@ public class GameService extends AbstractService {
     /**
      * Handles a CreateGameMessage found on the EventBus
      * <p>
-     * If a CreateGameMessage is detected on the Eventbus, this method is called.
+     * If a CreateGameMessage is detected on the EventBus, this method is called.
      * It then requests the GameManagement to create a game.
      *
-     * @param msg The CreateGameMessage
+     * @param msg The CreateGameMessage found on the EventBus
      *
      * @see de.uol.swp.common.game.message.CreateGameMessage
      * @since 2021-01-24
@@ -293,6 +297,33 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a KickUserRequest found on the EventBus
+     * <p>
+     * If a KickUserRequest is detected on the EventBus this method
+     * checks if a game has already started in this lobby.
+     * If not, a KickUserEvent is posted onto the EventBus.
+     * Otherwise a LobbyExceptionMessage ist posted onto the EventBus.
+     *
+     * @param req KickUserRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.server.game.event.KickUserEvent
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserRequest(KickUserRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received KickUserRequest for Lobby " + req.getName());
+        if (gameManagement.getGames().containsKey(req.getName())) {
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Can not kick while a game is ongoing");
+            exceptionMessage.initWithMessage(req);
+            post(exceptionMessage);
+            LOG.debug(exceptionMessage.getException());
+        } else post(new KickUserEvent(req));
+    }
+
+    /**
      * Handles a LobbyDeletedMessage found on the EventBus
      * <p>
      * If a LobbyDeletedMessage is found on the EventBus this method drops the
@@ -327,7 +358,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
      * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-24
      */
     @Subscribe
@@ -354,6 +385,238 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a PlayKnightCardRequest found on the EventBus
+     * <p>
+     * If a PlayKnightCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayKnightCardRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayKnightCardRequest(PlayKnightCardRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received KnightCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + " wants to improve the army");
+        }
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (inv.getKnightCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough Knight cards");
+            return;
+        }
+        inv.setKnights(inv.getKnights() + 1);
+        inv.increaseKnightCards(-1);
+
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+        LOG.debug("Sending a PlayCardSuccessResponse");
+    }
+
+    /**
+     * Handles a PlayMonopolyCardRequest found on the EventBus
+     * <p>
+     * If a PlayMonopolyCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayMonopolyCardRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayMonopolyCardRequest(PlayMonopolyCardRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + " wants to monopolise " + req.getResource());
+        }
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory invMono = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (invMono.getMonopolyCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough Monopoly cards");
+            return;
+        }
+        Inventory[] inventories = game.getInventories();
+
+        switch (req.getResource()) {
+            case ORE:
+                for (Inventory inv : inventories)
+                    if (inv.getOre() > 0) {
+                        inv.increaseOre(-1);
+                        invMono.increaseOre(1);
+                    }
+                break;
+            case WOOL:
+                for (Inventory inv : inventories)
+                    if (inv.getWool() > 0) {
+                        inv.increaseWool(-1);
+                        invMono.increaseWool(1);
+                    }
+                break;
+            case BRICK:
+                for (Inventory inv : inventories)
+                    if (inv.getBrick() > 0) {
+                        inv.increaseBrick(-1);
+                        invMono.increaseBrick(1);
+                    }
+                break;
+            case GRAIN:
+                for (Inventory inv : inventories)
+                    if (inv.getGrain() > 0) {
+                        inv.increaseGrain(-1);
+                        invMono.increaseGrain(1);
+                    }
+                break;
+            case LUMBER:
+                for (Inventory inv : inventories)
+                    if (inv.getLumber() > 0) {
+                        inv.increaseLumber(-1);
+                        invMono.increaseLumber(1);
+                    }
+                break;
+        }
+
+        invMono.increaseMonopolyCards(-1);
+
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+        LOG.debug("Sending a PlayCardSuccessResponse");
+    }
+
+    /**
+     * Handles a PlayRoadBuildingCardRequest found on the EventBus
+     * <p>
+     * If a PlayRoadBuildingCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayRoadBuildingCardRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayRoadBuildingCardRequest(PlayRoadBuildingCardRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + " wants to build a road");
+        }
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (inv.getRoadBuildingCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough RoadBuilding cards");
+            return;
+        }
+        //TODO: Implementierung
+
+        inv.increaseRoadBuildingCards(-1);
+
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+        LOG.debug("Sending a PlayCardSuccessResponse");
+    }
+
+    /**
+     * Handles a PlayYearOfPlentyCardRequest found on the EventBus
+     * <p>
+     * If a PlayYearOfPlentyCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayYearOfPlentyCardRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayYearOfPlentyCardRequest(PlayYearOfPlentyCardRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + req.getUser().getUsername() + " wants " + req.getResource1() + " and " + req
+                    .getResource2());
+        }
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inv = game.getInventory(game.getPlayer(req.getUser()));
+
+        if (inv.getYearOfPlentyCards() == 0) {
+            AbstractResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                                PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("---- Not enough YearOfPlenty cards");
+            return;
+        }
+
+        switch (req.getResource1()) {
+            case ORE:
+                inv.increaseOre(1);
+                break;
+            case WOOL:
+                inv.increaseWool(1);
+                break;
+            case BRICK:
+                inv.increaseBrick(1);
+                break;
+            case GRAIN:
+                inv.increaseGrain(1);
+                break;
+            case LUMBER:
+                inv.increaseLumber(1);
+                break;
+        }
+
+        switch (req.getResource2()) {
+            case ORE:
+                inv.increaseOre(1);
+                break;
+            case WOOL:
+                inv.increaseWool(1);
+                break;
+            case BRICK:
+                inv.increaseBrick(1);
+                break;
+            case GRAIN:
+                inv.increaseGrain(1);
+                break;
+            case LUMBER:
+                inv.increaseLumber(1);
+                break;
+        }
+        inv.increaseYearOfPlentyCards(-1);
+
+        AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+        LOG.debug("Sending a PlayCardSuccessResponse");
+    }
+
+    /**
      * Handles a ResetOfferTradeButtonRequest found on the EventBus
      * <p>
      * If a ResetOfferTradeButtonRequest is found on the EventBus,
@@ -367,7 +630,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.ResetOfferTradeButtonRequest
      * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-25
      */
     @Subscribe
@@ -466,7 +729,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.TradeWithUserCancelRequest
      * @see de.uol.swp.common.game.response.TradeWithUserCancelResponse
-     * @see de.uol.swp.server.game.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
      * @since 2021-02-28
      */
     @Subscribe
@@ -620,7 +883,7 @@ public class GameService extends AbstractService {
         if (inventory == null) return;
         Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
         resourceMap.put("cards.victorypoints", inventory.getVictoryPointCards());
-        resourceMap.put("cards.knights", inventory.getKnightCards());
+        resourceMap.put("cards.knight", inventory.getKnightCards());
         resourceMap.put("cards.roadbuilding", inventory.getRoadBuildingCards());
         resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
         resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
