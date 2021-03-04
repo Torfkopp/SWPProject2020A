@@ -17,10 +17,7 @@ import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.StartSessionMessage;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
-import de.uol.swp.common.lobby.message.UserReadyMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
@@ -42,10 +39,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages the lobby's menu
@@ -126,16 +120,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                     setText(empty || item == null ? "" : item.getValue());
                     //if the background should be in colour you need to use setBackground
                     int i = membersView.getItems().size();
-                    if(i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
+                    if (i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
                         setTextFill(GameRendering.PLAYER_1_COLOUR);
                     }
-                    if(i >= 2 && getText().equals(lobbyMembers.get(1).getValue())){
+                    if (i >= 2 && getText().equals(lobbyMembers.get(1).getValue())) {
                         setTextFill(GameRendering.PLAYER_2_COLOUR);
                     }
-                    if(i >= 3 && getText().equals(lobbyMembers.get(2).getValue())){
+                    if (i >= 3 && getText().equals(lobbyMembers.get(2).getValue())) {
                         setTextFill(GameRendering.PLAYER_3_COLOUR);
                     }
-                    if(i >= 4 && getText().equals(lobbyMembers.get(3).getValue())){
+                    if (i >= 4 && getText().equals(lobbyMembers.get(3).getValue())) {
                         setTextFill(GameRendering.PLAYER_4_COLOUR);
                     }
                 });
