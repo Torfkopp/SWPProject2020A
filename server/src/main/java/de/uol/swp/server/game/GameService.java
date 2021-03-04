@@ -406,7 +406,9 @@ public class GameService extends AbstractService {
         }
         try {
             Game game = gameManagement.getGame(req.getOriginLobby());
-            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), game.rollDice());
+            int[] result = game.rollDice();
+            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
+                                                              result[1]);
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);
