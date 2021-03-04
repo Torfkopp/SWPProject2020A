@@ -2,7 +2,6 @@ package de.uol.swp.client.devmenu;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.common.devmenu.CommandParser;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
@@ -47,7 +46,6 @@ public class DevMenuPresenter extends AbstractPresenter {
     private ObservableList<String> classNameObservableList;
     private FilteredList<String> filteredClassNameList;
     private ObservableList<Map<String, Class<?>>> constructorObservableList;
-    private Map<String, Class<?>> currentlySelectedConstructor;
 
     /**
      * Initialises the DevMenu.
@@ -95,15 +93,17 @@ public class DevMenuPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles a DevMenuClassesResponse found on the EventBus
+     * Handles a {@link de.uol.swp.common.devmenu.response.DevMenuClassesResponse} found on the EventBus
      * <p>
-     * If a new DevMenuClassesResponse is found on the EventBus, this method
-     * adds a Listener to the classListView which will handle updating the
-     * constructor argument ListView (on the right).
-     * After that, {@code updateClassList} is called to display the classes
-     * contained in the DevMenuClassesResponse.
+     * If a new {@link de.uol.swp.common.devmenu.response.DevMenuClassesResponse}
+     * is found on the EventBus, this method adds a Listener to the classListView
+     * which will handle updating the constructor argument ListView (on the right).
+     * After that, {@link de.uol.swp.client.devmenu.DevMenuPresenter#updateClassList(java.util.Set)}
+     * is called to display the classes contained in the
+     * {@link de.uol.swp.common.devmenu.response.DevMenuClassesResponse}.
      *
-     * @param rsp The DevMenuClassesResponse found on the EventBus
+     * @param rsp The {@link de.uol.swp.common.devmenu.response.DevMenuClassesResponse}
+     *            found on the EventBus
      *
      * @see de.uol.swp.common.devmenu.response.DevMenuClassesResponse
      */
@@ -130,36 +130,13 @@ public class DevMenuPresenter extends AbstractPresenter {
      * class and the parsed argument list onto the EventBus.
      * TODO: can still be better I think
      *
-     * @see de.uol.swp.common.devmenu.CommandParser
-     * @see de.uol.swp.common.devmenu.CommandParser.ASTToken
      * @see de.uol.swp.common.devmenu.request.DevMenuCommandRequest
      */
     @FXML
     private void onSendButtonPressed() {
-        List<CommandParser.ASTToken> args = new LinkedList<>();
-
-        List<Class<?>> argTypes = new LinkedList<>();
-        for (Map.Entry<String, Class<?>> entry : currentlySelectedConstructor.entrySet())
-            argTypes.add(entry.getValue());
-        for (int i = 0; i < textFields.size(); i++) {
-            String text = textFields.get(i).getText();
-            CommandParser.ASTToken.Union arg = new CommandParser.ASTToken.Union(text);
-            CommandParser.ASTToken.Type type;
-            switch (argTypes.get(i).getName()) {
-                case "java.util.List":
-                case "java.util.Set":
-                case "java.util.Collection":
-                    arg = new CommandParser.ASTToken.Union(CommandParser.parse(CommandParser.lex(text)));
-                    type = CommandParser.ASTToken.Type.LIST;
-                    break;
-                case "java.util.Map":
-                    type = CommandParser.ASTToken.Type.MAP;
-                    break;
-                default: //String, int, boolean
-                    type = CommandParser.ASTToken.Type.UNTYPED;
-                    break;
-            }
-            args.add(new CommandParser.ASTToken(type, arg));
+        List<String> args = new LinkedList<>();
+        for (TextField tf : textFields) {
+            args.add(tf.getText());
         }
         LOG.debug("Sending DevMenuCommandRequest");
         eventBus.post(new DevMenuCommandRequest(classListView.getSelectionModel().getSelectedItem(), args));
@@ -213,7 +190,6 @@ public class DevMenuPresenter extends AbstractPresenter {
         parameterBox.getChildren().clear();
         Platform.runLater(() -> constructorObservableList.addAll(constructors));
         constructorList.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-            currentlySelectedConstructor = newValue;
             if (newValue != null) updateArgumentFields(newValue);
         }));
     }

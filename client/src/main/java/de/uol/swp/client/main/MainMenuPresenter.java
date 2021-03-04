@@ -11,10 +11,10 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.AllLobbiesMessage;
-import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
@@ -38,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Manages the main menu
@@ -244,8 +245,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         //give the lobby a default name
         String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"), loggedInUser.getUsername());
 
-        //create Dialogue
+        //create Dialogue, disallow any use of § in the name (used for command parsing)
+        UnaryOperator<TextFormatter.Change> filter = (s) ->
+                !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
+
         TextInputDialog dialog = new TextInputDialog(name);
+        dialog.getEditor().setTextFormatter(new TextFormatter<>(filter));
         dialog.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialog.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
         dialog.setContentText(resourceBundle.getString("lobby.dialog.content"));

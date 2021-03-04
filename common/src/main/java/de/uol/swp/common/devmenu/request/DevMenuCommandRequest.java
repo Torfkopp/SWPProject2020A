@@ -1,6 +1,5 @@
 package de.uol.swp.common.devmenu.request;
 
-import de.uol.swp.common.devmenu.CommandParser;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 import java.util.List;
@@ -18,17 +17,15 @@ import java.util.List;
 public class DevMenuCommandRequest extends AbstractRequestMessage {
 
     private final String classname;
-    private final List<CommandParser.ASTToken> args;
+    private final List<String> args;
 
     /**
      * Constructor
      *
      * @param classname The simple name of the class to instantiate
      * @param args      The List of arguments to pass to the constructor
-     *
-     * @see de.uol.swp.common.devmenu.CommandParser.ASTToken
      */
-    public DevMenuCommandRequest(String classname, List<CommandParser.ASTToken> args) {
+    public DevMenuCommandRequest(String classname, List<String> args) {
         this.classname = classname;
         this.args = args;
     }
@@ -38,10 +35,8 @@ public class DevMenuCommandRequest extends AbstractRequestMessage {
      * class
      *
      * @return List of CommandParser.ASTToken representing the arguments
-     *
-     * @see de.uol.swp.common.devmenu.CommandParser.ASTToken
      */
-    public List<CommandParser.ASTToken> getArgs() {
+    public List<String> getArgs() {
         return args;
     }
 
