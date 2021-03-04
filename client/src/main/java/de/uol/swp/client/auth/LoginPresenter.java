@@ -60,6 +60,18 @@ public class LoginPresenter extends AbstractPresenter {
         eventBus.post(showRegViewMessage);
     }
 
+    /**
+     * Method called when RetryLoginEvent received
+     * <p>
+     * This method gets called when a RetryLoginEvent is detected on
+     * the eventbus. It behaves as if the login button is pressed.
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.client.auth.events.RetryLoginEvent
+     * @since 2021-03-04
+     *
+     */
     @Subscribe
     private void onRetryLoginEvent(RetryLoginEvent event) {
         onLoginButtonPressed();

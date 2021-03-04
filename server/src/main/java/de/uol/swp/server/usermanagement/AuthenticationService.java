@@ -97,8 +97,10 @@ public class AuthenticationService extends AbstractService {
      * If a LoginRequest is detected on the EventBus, this method is called.
      * It tries to login a user via the UserManagement.
      * If this succeeds, the user and his session are stored in the userSessions map,
-     * and a ClientAuthorisedMessage is posted onto the EventBus.
-     * Otherwise, a ServerExceptionMessage gets posted there.
+     * and a ClientAuthorisedMessage is posted onto the EventBus. Additionally if
+     * the user already had a session registered the oldSession attribute of the
+     * ClientAuthorizedMessage gets set to true, otherwise to false.
+     * When login fails, a ServerExceptionMessage gets posted there.
      *
      * @param msg The LoginRequest
      *
@@ -116,9 +118,9 @@ public class AuthenticationService extends AbstractService {
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
             if (userSessions.containsValue(newUser)) {
-                returnMessage = new ClientAuthorisedMessage(newUser, getSession(newUser).get());
+                returnMessage = new ClientAuthorisedMessage(newUser, true);
             } else {
-                returnMessage = new ClientAuthorisedMessage(newUser, null);
+                returnMessage = new ClientAuthorisedMessage(newUser, false);
             }
             Session newSession = UUIDSession.create(newUser);
             userSessions.put(newSession, newUser);
@@ -167,6 +169,19 @@ public class AuthenticationService extends AbstractService {
     }
 
     /**
+     * Handles a NukeUsersSessionsRequest found on the EventBus
+     * <p>
+     * If a NukeUsersSessionsRequest is detected on the EventBus, this method is called.
+     * It takes the user from received request and logs it out via UserManagement.
+     * After that it cycles through the session store and removes all sessions matching
+     * that particular user along with sending a KillOldClientResponse to log the old
+     * client out. At last a NukeUsersSessionsResponse is posted on the EventBus
+     * as a confirmation for the requesting client.
+     *
+     * @param req NukeUsersSessionsRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
+     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
@@ -176,7 +191,6 @@ public class AuthenticationService extends AbstractService {
         LOG.debug("Received NukeUsersSessionsRequest");
         if (req.getUser() == null) return;
         User userToLogOut = req.getUser();
-        // Could be already logged out
         LOG.debug("---- Logging out user " + userToLogOut.getUsername());
         userManagement.logout(userToLogOut);
         while (getSession(userToLogOut).isPresent()) {

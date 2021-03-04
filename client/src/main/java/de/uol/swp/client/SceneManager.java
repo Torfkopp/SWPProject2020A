@@ -323,6 +323,17 @@ public class SceneManager {
         }
     }
 
+    /**
+     * Handles the KillOldClientResponse detected on the EventBus
+     * <p>
+     * If a KillOldClientResponse is detected on the EventBus, this method
+     * gets called. It causes the old client to fall back to the login screen.
+     *
+     * @see de.uol.swp.common.user.response.KillOldClientResponse
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
     @Subscribe
     private void onKillOldClientResponse(KillOldClientResponse rsp) {
         showLoginScreen();
@@ -713,6 +724,14 @@ public class SceneManager {
     }
 
     /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     * 
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
@@ -727,6 +746,19 @@ public class SceneManager {
         });
     }
 
+    /**
+     * Handles the NukeUsersSessionsResponse detected on the EventBus
+     * <p>
+     * If this method is called, it means all sessions belonging to a
+     * user have been nuked, therefore it posts a RetryLoginEvent
+     * on the EventBus to create a new session for the user.
+     *
+     * @param rsp The NukeUsersSessionsResponse detected on the EventBus
+     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
     @Subscribe
     private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
         eventBus.post(new RetryLoginEvent());
