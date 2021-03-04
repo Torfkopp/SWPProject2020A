@@ -11,6 +11,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
@@ -29,9 +30,12 @@ import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -71,6 +75,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private Button rollDice;
     @FXML
     private Button endTurn;
+    @FXML
+    private Button playCard;
     @FXML
     private Button tradeWithUserButton;
     @FXML
@@ -303,6 +309,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
         setTradeWithUserButtonState(msg.getUser());
+        setPlayCardButtonState(msg.getUser());
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
     }
 
@@ -319,6 +326,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onEndTurnButtonPressed() {
         this.endTurn.setDisable(true);
         this.rollDice.setDisable(true);
+        this.playCard.setDisable(true);
         this.tradeWithBankButton.setDisable(true);
         this.tradeWithUserButton.setDisable(true);
         lobbyService.endTurn(loggedInUser, lobbyName);
@@ -431,6 +439,178 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
+    }
+
+    /**
+     * Handles a click on the PlayCardButton
+     * <p>
+     * Method called when the PlayCardButton is pushed
+     * It opens a dialogue to allow the player to choose
+     * which card is to be played.
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    @FXML
+    private void onPlayCardButtonPressed(ActionEvent event) {
+        //Create a new alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
+        alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
+        alert.setContentText(resourceBundle.getString("game.playcards.alert.content"));
+        //Create the buttons
+        ButtonType bKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
+        ButtonType bMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
+        ButtonType bRoadBuilding = new ButtonType(resourceBundle.getString("game.resources.cards.roadbuilding"));
+        ButtonType bYearOfPlenty = new ButtonType(resourceBundle.getString("game.resources.cards.yearofplenty"));
+        ButtonType bCancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                            ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(bKnight, bMonopoly, bRoadBuilding, bYearOfPlenty, bCancel);
+        //Show the dialogue and get the result
+        Optional<ButtonType> result = alert.showAndWait();
+        //Create Strings based on the languages name for the resources
+        String ore = resourceBundle.getString("game.resources.ore");
+        String grain = resourceBundle.getString("game.resources.grain");
+        String brick = resourceBundle.getString("game.resources.brick");
+        String lumber = resourceBundle.getString("game.resources.lumber");
+        String wool = resourceBundle.getString("game.resources.wool");
+        //Make a list with aforementioned Strings
+        List<String> choices = new ArrayList<>();
+        choices.add(ore);
+        choices.add(grain);
+        choices.add(brick);
+        choices.add(lumber);
+        choices.add(wool);
+        //Result is the button the user has clicked on
+        if (result.get() == bKnight) { //Play a Knight Card
+            lobbyService.playKnightCard(lobbyName, loggedInUser);
+        } else if (result.get() == bMonopoly) { //Play a Monopoly Card
+            //Creating a dialogue
+            ChoiceDialog<String> dialogue = new ChoiceDialog<>(brick, choices);
+            dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
+            dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
+            dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
+            //Creating a new DialogPane so the button text can be customised
+            DialogPane pane = new DialogPane();
+            pane.setContent(dialogue.getDialogPane().getContent());
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.setDialogPane(pane);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+            //Show the dialogue and get the result
+            Optional<String> rst = dialogue.showAndWait();
+            //Convert String to Resources and send the request
+            Resources resource = Resources.BRICK;
+            if (rst.isPresent()) {
+                if (rst.get().equals(ore)) resource = Resources.ORE;
+                else if (rst.get().equals(grain)) resource = Resources.GRAIN;
+                else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
+                else if (rst.get().equals(wool)) resource = Resources.WOOL;
+                lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
+            }
+        } else if (result.get() == bRoadBuilding) { //Play a Road Building Card
+            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
+        } else if (result.get() == bYearOfPlenty) { //Play a Year Of Plenty Card
+            //Create a dialogue
+            Dialog<String> dialogue = new Dialog<>();
+            dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
+            dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
+            //Create its buttons
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+            //Make a grid to put the ChoiceBoxes and labels on
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+            //Make ChoiceBoxes and the choices
+            ChoiceBox c1 = new ChoiceBox();
+            ChoiceBox c2 = new ChoiceBox();
+            for (String s : choices) {
+                c1.getItems().add(s);
+                c2.getItems().add(s);
+            }
+            //Set which choice is shown first
+            c1.setValue(brick);
+            c2.setValue(brick);
+            //Add ChoiceBoxes and labels to the grid
+            grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
+            grid.add(c1, 1, 0);
+            grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label2")), 0, 1);
+            grid.add(c2, 1, 1);
+            //Put the grid into the dialogue and let it appear
+            dialogue.getDialogPane().setContent(grid);
+            //Get the pressed button
+            Optional<String> rst = dialogue.showAndWait();
+            Optional<String> button1 = Optional.of(confirm.toString());
+            //Checks if the pressed button is the same as the confirm button
+            if (rst.toString().equals(button1.toString())) {
+                //Create two resource variables
+                Resources resource1 = Resources.BRICK;
+                Resources resource2 = Resources.BRICK;
+                //Convert String to Resource
+                if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
+                else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
+                else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
+                else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+                //Second ChoiceBox's conversion
+                if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
+                else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
+                else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
+                else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+                //Send Request
+                lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+            }
+        }
+    }
+
+    /**
+     * Handles a PlayCardFailureResponse found on the EventBus
+     *
+     * @param rsp The PlayCardFailureResponse found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.PlayCardFailureResponse
+     */
+    @Subscribe
+    private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
+            LOG.debug("Received PlayCardFailureResponse");
+            if (loggedInUser.equals(rsp.getUser())) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
+                    alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
+                    ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                        ButtonBar.ButtonData.OK_DONE);
+                    alert.getButtonTypes().setAll(confirm);
+                    if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
+                        alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+                    alert.showAndWait();
+                });
+            }
+        }
+    }
+
+    /**
+     * Handles a PlayCardSuccessResponse found on the EventBus
+     *
+     * @param rsp The PlayCardSuccessResponse found on the EventBus
+     *
+     * @see de.uol.swp.common.game.response.PlayCardSuccessResponse
+     */
+    @Subscribe
+    private void onPlayCardSuccessResponse(PlayCardSuccessResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName())) {
+            LOG.debug("Received PlayCardSuccessResponse");
+            playCard.setDisable(true);
+            lobbyService.updateInventory(rsp.getLobbyName(), rsp.getUser());
+        }
     }
 
     /**
@@ -580,6 +760,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setRollDiceButtonState(msg.getUser());
             this.kickUserButton.setVisible(false);
         });
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
+            Platform.runLater(() -> {
+                playField.setVisible(true);
+                //This Line needs to be changed/ removed in the Future
+                gameRendering.drawGameMap(new GameMapManagement());
+                setTurnIndicatorText(msg.getUser());
+                lobbyService.updateInventory(lobbyName, loggedInUser);
+                this.readyCheckBox.setVisible(false);
+                this.startSession.setVisible(false);
+                this.rollDice.setVisible(true);
+                this.tradeWithUserButton.setVisible(true);
+                this.tradeWithBankButton.setVisible(true);
+                setRollDiceButtonState(msg.getUser());
+                this.playCard.setVisible(true);
+            });
+        }
     }
 
     /**
@@ -872,6 +1069,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.kickUserButton.setVisible(this.loggedInUser.equals(this.owner));
             this.kickUserButton.setDisable(this.loggedInUser.equals(this.owner));
         });
+    }
+
+    /**
+     * Helper function that sets the disable state of the PlayCardButton
+     * The button is only enabled to the active player
+     *
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    private void setPlayCardButtonState(User player) {
+        this.playCard.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**
