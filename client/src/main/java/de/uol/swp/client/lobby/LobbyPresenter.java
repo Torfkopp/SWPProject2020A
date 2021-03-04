@@ -17,7 +17,10 @@ import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.message.StartSessionMessage;
+import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
@@ -39,7 +42,10 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages the lobby's menu
@@ -118,15 +124,18 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
-                    if(getText().equals(lobbyMembers.get(0).getValue())) {
+                    //if the background should be in colour you need to use setBackground
+                    int i = membersView.getItems().size();
+                    if(i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
                         setTextFill(GameRendering.PLAYER_1_COLOUR);
-                    }if(getText().equals(lobbyMembers.get(1).getValue())){
+                    }
+                    if(i >= 2 && getText().equals(lobbyMembers.get(1).getValue())){
                         setTextFill(GameRendering.PLAYER_2_COLOUR);
                     }
-                    if(getText().equals(lobbyMembers.get(2).getValue())){
+                    if(i >= 3 && getText().equals(lobbyMembers.get(2).getValue())){
                         setTextFill(GameRendering.PLAYER_3_COLOUR);
                     }
-                    if(getText().equals(lobbyMembers.get(3).getValue())){
+                    if(i >= 4 && getText().equals(lobbyMembers.get(3).getValue())){
                         setTextFill(GameRendering.PLAYER_4_COLOUR);
                     }
                 });
@@ -473,6 +482,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
         }
     }
 
@@ -784,6 +794,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
                                                                              .equals(msg.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
             setStartSessionButtonState();
         });
     }
@@ -818,6 +829,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
             LOG.debug("---- User " + msg.getUser().getUsername() + " left");
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
         }
         Platform.runLater(() -> {
             lobbyMembers.remove(findMember(msg.getUser().getUsername()));
