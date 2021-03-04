@@ -649,9 +649,9 @@ public class GameServiceTest {
     @Test
     void onPlayKnightCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -665,9 +665,9 @@ public class GameServiceTest {
     @Test
     void onPlayMonopolyCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -686,9 +686,9 @@ public class GameServiceTest {
     @Test
     void onPlayYearOfPlentyCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
