@@ -2,6 +2,8 @@ package de.uol.swp.common.game.map;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 
+import java.util.Set;
+
 /**
  * Interface for the game's map
  *
@@ -11,21 +13,16 @@ import de.uol.swp.common.game.map.Hexes.IGameHex;
  */
 public interface IGameMapManagement {
 
-    /**
-     * Gets the edges in a usable format for rendering them as a jagged array with some extra positions filled with null
-     *
-     * @return A jagged array containing the hexes
-     */
-    IEdge[][] getEdgesAsJaggedArrayWithNullFiller();
+    IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
 
     /**
      * Gets the hex at a specified place
      *
-     * @param place The hex's place (int)
+     * @param position The hex's coordinates
      *
      * @return The hex
      */
-    IGameHex getHex(int place);
+    IGameHex getHex(MapPoint position);
 
     /**
      * Gets the hexes in a usable format for rendering them as a jagged array
@@ -41,6 +38,8 @@ public interface IGameMapManagement {
      */
     IIntersection[][] getIntersectionsAsJaggedArray();
 
+    IIntersection getIntersection(MapPoint position);
+
     /**
      * Gets the amount of points the player made with
      * settlements and cities.
@@ -49,29 +48,26 @@ public interface IGameMapManagement {
      */
     int getPlayerPoints(Player player);
 
-    /**
-     * Gets the robber's position
-     *
-     * @return int Position of the robber
-     */
-    int getRobberPos();
+    MapPoint getRobberPosition();
+
+    Set<IEdge> incidentEdges(IIntersection intersection);
 
     /**
      * Moves the robber
      *
      * @param newHex The hex the robber has moved to
      */
-    void moveRobber(int newHex);
+    void moveRobber(MapPoint newHex);
 
     /**
      * Places a street
      *
-     * @param player   The player wanting to build the street
-     * @param position The position of the road
+     * @param player The player wanting to build the street
+     * @param edge   The edge to place a road on
      *
      * @return True if placement was successful; false if not
      */
-    boolean placeRoad(Player player, int position);
+    boolean placeRoad(Player player, IEdge edge);
 
     /**
      * Places a settlement
@@ -81,17 +77,17 @@ public interface IGameMapManagement {
      *
      * @return True if placement was successful; false if not
      */
-    boolean placeSettlement(Player player, int position);
+    boolean placeSettlement(Player player, MapPoint position);
 
     /**
      * Checks if a street is placeable
      *
-     * @param player   The player wanting to place the street
-     * @param position The position of the road
+     * @param player The player wanting to place the street
+     * @param edge   The edge to place a road on
      *
      * @return True if placement is possible; false if not
      */
-    boolean roadPlaceable(Player player, int position);
+    boolean roadPlaceable(Player player, IEdge edge);
 
     /**
      * Checks if a settlement is placeable
@@ -101,7 +97,7 @@ public interface IGameMapManagement {
      *
      * @return True if placement is possible; false if not
      */
-    boolean settlementPlaceable(Player player, int position);
+    boolean settlementPlaceable(Player player, MapPoint position);
 
     /**
      * Upgrades a settlement
@@ -111,5 +107,5 @@ public interface IGameMapManagement {
      *
      * @return True if placement was successful; false if not
      */
-    boolean upgradeSettlement(Player player, int position);
+    boolean upgradeSettlement(Player player, MapPoint position);
 }

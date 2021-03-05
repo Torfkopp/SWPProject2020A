@@ -11,8 +11,7 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * GameRendering Class
@@ -33,7 +32,7 @@ public class GameRendering {
     public static final Color PLAYER_1_COLOUR = Color.BLUE;
     public static final Color PLAYER_2_COLOUR = Color.RED;
     public static final Color PLAYER_3_COLOUR = Color.PURPLE;
-    public static final Color PLAYER_4_COLOUR = Color.WHITE;
+    public static final Color PLAYER_4_COLOUR = Color.FUCHSIA;
     //Constants used for the colours
     private static final Color TOKEN_COLOUR = Color.BEIGE;
     private static final Color TEXT_COLOUR = Color.BLACK;
@@ -112,11 +111,10 @@ public class GameRendering {
         //Get hexes, intersections, and edges in a usable format from the gameMapManagement
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
-        IEdge[][] edges = gameMapManagement.getEdgesAsJaggedArrayWithNullFiller();
 
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
-        //drawIntersectionsAndEdges(intersections, edges);
+        drawIntersectionsAndEdges(intersections, gameMapManagement);
     }
 
     /**
@@ -262,9 +260,9 @@ public class GameRendering {
      * @param intersections An array containing all intersections
      * @param edges         An array containing all edges
      */
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IEdge[][] edges) {
-        goThroughHalfMap(true, intersections, edges);
-        goThroughHalfMap(false, intersections, edges);
+    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMapManagement gameMapManagement) {
+        goThroughHalfMap(true, intersections, gameMapManagement);
+        goThroughHalfMap(false, intersections, gameMapManagement);
     }
 
     /**
@@ -350,7 +348,8 @@ public class GameRendering {
      * @param intersections An array containing all intersections
      * @param edges         An array containing all edges
      */
-    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IEdge[][] edges) {
+    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections,
+                                  IGameMapManagement gameMapManagement) {
         //Sets currentY depending on topHalf
         double currentY = ((topHalf) ? (hexHeight * (3.0 / 4.0)) :
                            ((effectiveHeight / 2) + (hexHeight / 4))) + OFFSET_Y;
@@ -360,12 +359,12 @@ public class GameRendering {
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * hexWidth;
             double currentX = OFFSET_X + rowStartX + hexWidth;
             if (topHalf) currentX += hexWidth / 2.0;
-            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], edges[y]);
+            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMapManagement);
 
             currentX = OFFSET_X + rowStartX + hexWidth;
             if (!topHalf) currentX += hexWidth / 2.0;
             currentY += (hexHeight / 4.0);
-            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], edges[y]);
+            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMapManagement);
             currentY += hexHeight / 2.0;
         }
     }
@@ -384,10 +383,15 @@ public class GameRendering {
      * @param edges         An array containing all edges
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IEdge[] edges) {
-        for (int x = firstSubRow ? 1 : 0, xEdges = 0; x < intersections.length; x = x + 2, xEdges = xEdges + 3) {
+                                 IIntersection[] intersections, IGameMapManagement gameMapManagement) {
+        for (int x = firstSubRow ? 1 : 0; x < intersections.length; x = x + 2) {
             if (renderEdges) {
-                renderEdges(currentX, currentY, Arrays.copyOfRange(edges, xEdges, xEdges + 3));
+                IIntersection[] arr;
+                if (x == 0) arr = new IIntersection[]{null, intersections[x], intersections[x + 1]};
+                else if (x == intersections.length - 1)
+                    arr = new IIntersection[]{intersections[x - 1], intersections[x], null};
+                else arr = Arrays.copyOfRange(intersections, x - 1, x + 2);
+                renderEdges(currentX, currentY, arr, gameMapManagement);
             }
             renderIntersection(currentX, currentY, intersections[x]);
             currentX += hexWidth;
@@ -403,9 +407,22 @@ public class GameRendering {
      * @param currentY The current y-coordinate
      * @param edges    An array containing all edges
      */
-    private void renderEdges(double currentX, double currentY, IEdge[] edges) {
-        gfxCtx.setLineWidth(roadWidth);
+    private void renderEdges(double currentX, double currentY, IIntersection[] intersections,
+                             IGameMapManagement gameMapManagement) {
 
+        gfxCtx.setLineWidth(roadWidth);
+        IEdge[] edges = new IEdge[3];
+        edges[0] = gameMapManagement.edgeConnectingIntersections(intersections[0], intersections[1]);
+        edges[1] = gameMapManagement.edgeConnectingIntersections(intersections[1], intersections[2]);
+        Set<IEdge> incidentEdges = new HashSet<>(gameMapManagement.incidentEdges(intersections[1]));
+        if (edges[0] != null) incidentEdges.remove(edges[0]);
+        if (edges[1] != null) incidentEdges.remove(edges[1]);
+        try {
+            edges[2] = (IEdge) incidentEdges.toArray()[0];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            edges[2] = null;
+            System.err.println("OUTOFBOUNDS");
+        }
         //Northwest road
         if (edges[0] != null && edges[0].getOwner() != null) {
             gfxCtx.setStroke(getPlayerColour(edges[0].getOwner()));
@@ -456,6 +473,7 @@ public class GameRendering {
      * @param intersection The intersection to draw
      */
     private void renderIntersection(double currentX, double currentY, IIntersection intersection) {
+        System.err.println("Intersection: " + intersection.getState() + " ::: " + intersection.getOwner());
         switch (intersection.getState()) {
             case FREE:
                 //Free intersections don't need to be marked, but it could easily be added here

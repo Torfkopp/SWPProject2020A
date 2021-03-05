@@ -9,7 +9,7 @@ package de.uol.swp.common.game.map.Hexes;
  */
 public class HarborHex extends AbstractHex implements IHarborHex {
 
-    private final int belongingHex;
+    private final GameHexWrapper belongingHex;
     private final HarborSide side;
     private final HarborResource resource;
 
@@ -20,7 +20,7 @@ public class HarborHex extends AbstractHex implements IHarborHex {
      * @param side         The side the harbor faces
      * @param resource     The resource that is tradeable at the harbor
      */
-    public HarborHex(int belongingHex, HarborSide side, HarborResource resource) {
+    public HarborHex(GameHexWrapper belongingHex, HarborSide side, HarborResource resource) {
         this.belongingHex = belongingHex;
         this.side = side;
         this.resource = resource;
