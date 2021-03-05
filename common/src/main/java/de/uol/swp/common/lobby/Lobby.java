@@ -56,6 +56,28 @@ public interface Lobby extends Serializable {
     Set<User> getUsers();
 
     /**
+     * Gets whether the Lobby is currently in a game or not
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    boolean isInGame();
+
+    /**
+     * Sets whether the Lobby is currently in a game according to the boolean provided
+     *
+     * @param inGame Whether the Lobby is in a game or not
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    void setInGame(boolean inGame);
+
+    /**
      * Adds a new user to the lobby
      *
      * @param user The new user to add to the lobby

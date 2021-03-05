@@ -27,9 +27,9 @@ public class Inventory {
     private int yearOfPlentyCards = 0;
     private int monopolyCards = 0;
 
+    private int knights = 0;
     private boolean longestRoad = false;
     private boolean largestArmy = false;
-
     private int victoryPoints = 0;
 
     /**
@@ -96,6 +96,24 @@ public class Inventory {
     }
 
     /**
+     * Gets the amount of knights
+     *
+     * @return The amount of knights
+     */
+    public int getKnights() {
+        return knights;
+    }
+
+    /**
+     * Set the amount of knights
+     *
+     * @param knights The amount of knights a player has
+     */
+    public void setKnights(int knights) {
+        this.knights = knights;
+    }
+
+    /**
      * Gets the amount of Lumber a player has in their inventory
      *
      * @return The amount of Lumber
@@ -156,6 +174,19 @@ public class Inventory {
      */
     public User getPlayer() {
         return player;
+    }
+
+    /**
+     * Gets the amount of ResourceCards the user has in his inventory
+     *
+     * @return The amount of Road Building Cards
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @since 2021-02-24
+     */
+    public int getResourceAmount() {
+        return getBrick() + getWool() + getLumber() + getGrain() + getOre();
     }
 
     /**
@@ -264,6 +295,103 @@ public class Inventory {
      */
     public void setYearOfPlentyCards(int yearOfPlentyCards) {
         this.yearOfPlentyCards = yearOfPlentyCards;
+    }
+
+    /**
+     * Increases the amount of Bricks by the amount
+     *
+     * @param i The increase
+     */
+    public void increaseBrick(int i) {
+        brick += i;
+    }
+
+    /**
+     * Increases the amount of Grain by one*
+     *
+     * @param i The increase
+     */
+    public void increaseGrain(int i) {
+        grain += i;
+    }
+
+    /**
+     * Increases the amount of KnightCards by one
+     *
+     * @param i The increase
+     */
+    public void increaseKnightCards(int i) {
+        knightCards += i;
+    }
+
+    /**
+     * Increases the amount of Knights by one
+     */
+    public void increaseKnights() {
+        knights++;
+    }
+
+    /**
+     * Increases the amount of Lumber by one
+     *
+     * @param i The increase
+     */
+    public void increaseLumber(int i) {
+        lumber += i;
+    }
+
+    /**
+     * Increases the amount of MonopolyCards by one
+     *
+     * @param i The increase
+     */
+    public void increaseMonopolyCards(int i) {
+        monopolyCards += i;
+    }
+
+    /**
+     * Increases the amount of Ore by one
+     *
+     * @param i The increase
+     */
+    public void increaseOre(int i) {
+        ore += i;
+    }
+
+    /**
+     * Increases the amount of RoadBuildingCards by one
+     *
+     * @param i The increase
+     */
+    public void increaseRoadBuildingCards(int i) {
+        roadBuildingCards += i;
+    }
+
+    /**
+     * Increases the amount of VictoryPointCards by one
+     *
+     * @param i The increase
+     */
+    public void increaseVictoryPointCards(int i) {
+        victoryPointCards += i;
+    }
+
+    /**
+     * Increases the amount of Wool by one
+     *
+     * @param i The increase
+     */
+    public void increaseWool(int i) {
+        wool += i;
+    }
+
+    /**
+     * Increases the amount of YearOfPlentyCards by one
+     *
+     * @param i The increase
+     */
+    public void increaseYearOfPlentyCards(int i) {
+        yearOfPlentyCards += i;
     }
 
     /**

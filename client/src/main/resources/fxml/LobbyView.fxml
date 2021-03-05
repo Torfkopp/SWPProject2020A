@@ -41,12 +41,19 @@
                 </VBox.margin>
             </Button>
         </VBox>
-        <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" prefWidth="150.0"
-                text="%lobby.buttons.leavelobby">
+        <VBox prefHeight="200.0" prefWidth="100.0">
             <VBox.margin>
-                <Insets top="35.0"/>
+                <Insets top="10.0"/>
             </VBox.margin>
-        </Button>
+            <Button fx:id="kickUserButton" mnemonicParsing="false" onAction="#onKickUserButtonPressed"
+                    text="%lobby.buttons.kickuser" visible="false"/>
+            <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" prefWidth="150.0"
+                    text="%lobby.buttons.leavelobby">
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </Button>
+        </VBox>
     </VBox>
     <VBox>
         <HBox.margin>
@@ -61,8 +68,10 @@
                 <VBox.margin>
                     <Insets top="10"/>
                 </VBox.margin>
-                <VBox prefHeight="259.0" prefWidth="210.0">
+                <VBox prefHeight="259.0" prefWidth="210.0" spacing="5.0">
                     <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
+                    <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
+                            text="%lobby.game.buttons.rolldice" visible="false"/>
                     <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false"
                             onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
                         <VBox.margin>
@@ -79,14 +88,22 @@
                                 <Insets right="10"/>
                             </HBox.margin>
                         </CheckBox>
-                        <Button fx:id="startSession" disable="true" maxWidth="Infinity"
-                                mnemonicParsing="false" onAction="#onStartSessionButtonPressed"
-                                text="%lobby.game.buttons.startsession" visible="false" HBox.hgrow="ALWAYS">
+                        <Button fx:id="startSession" disable="true" maxWidth="Infinity" mnemonicParsing="false"
+                                onAction="#onStartSessionButtonPressed" text="%lobby.game.buttons.startsession"
+                                visible="false" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets right="5.0"/>
                             </HBox.margin>
                         </Button>
                     </HBox>
+                    <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false"
+                            onAction="#onTradeWithUserButtonPressed" text="%lobby.game.buttons.playertrade"
+                            visible="false"/>
+                    <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
+                            onAction="#onTradeWithBankButtonPressed" text="%lobby.game.buttons.banktrade"
+                            visible="false"/>
+                    <Button fx:id="playCard" mnemonicParsing="false" visible="false" disable="true"
+                            onAction="#onPlayCardButtonPressed" text="%game.playcards.button"/>
                 </VBox>
                 <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>

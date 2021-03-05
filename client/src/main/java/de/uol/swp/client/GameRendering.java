@@ -50,7 +50,7 @@ public class GameRendering {
     private static ResourceBundle resourceBundle;
 
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
-    private final double hexHeight, hexWidth, settlementSize, citySize;
+    private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth;
     private final GraphicsContext gfxCtx;
 
@@ -80,6 +80,9 @@ public class GameRendering {
         this.roadWidth = settlementSize / 2.0;
         this.robberLineWidth = roadWidth / 2.0;
         this.tokenSize = hexHeight / 3.0;
+        this.diceSize = effectiveHeight / 12.0;
+        this.diceLineWidth = diceSize / 16.0;
+        this.diceDotSize = diceSize / 4.0;
     }
 
     /**
@@ -95,6 +98,24 @@ public class GameRendering {
         gfxCtx.setFill(getPlayerColour(owner));
         gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
                              citySize / 2.0, citySize / 2.0);
+    }
+
+    /**
+     * drawDice method
+     * <p>
+     * This method draws the dice.
+     *
+     * @param die1 The first die
+     * @param die2 The second die
+     */
+    public void drawDice(int die1, int die2) {
+        gfxCtx.clearRect(OFFSET_X, OFFSET_Y, 2 * diceSize + diceSize / 8.0 + 2 * diceLineWidth,
+                         diceSize + 2 * diceLineWidth);
+        double startX = OFFSET_X;
+        double startY = OFFSET_Y;
+        renderDice(die1, startX, startY);
+        startX += diceSize + diceSize / 8.0;
+        renderDice(die2, startX, startY);
     }
 
     /**
@@ -395,6 +416,64 @@ public class GameRendering {
             }
             renderIntersection(currentX, currentY, intersections[x]);
             currentX += hexWidth;
+        }
+    }
+
+    /**
+     * renderDice method
+     * <p>
+     * This method renders a given die at the given coordinates.
+     *
+     * @param die      The die to be drawn
+     * @param currentX The current x-coordinate
+     * @param currentY The current y-coordinate
+     */
+    private void renderDice(int die, double currentX, double currentY) {
+        gfxCtx.setFill(Color.WHITE);
+        gfxCtx.setStroke(Color.BLACK);
+        gfxCtx.setLineWidth(diceLineWidth);
+        gfxCtx.fillRoundRect(currentX, currentY, diceSize, diceSize, diceSize / 3.0, diceSize / 3.0);
+        gfxCtx.strokeRoundRect(currentX, currentY, diceSize, diceSize, diceSize / 3.0, diceSize / 3.0);
+
+        double middleDotPos = diceSize / 2.0 - diceDotSize / 2.0;
+        double firstDotPos = diceDotSize / 2.0;
+        double secondDotPos = diceSize - diceDotSize / 2.0 - diceDotSize;
+
+        gfxCtx.setFill(Color.BLACK);
+        switch (die) {
+            case 1:
+                gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                break;
+            case 2:
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                break;
+            case 3:
+                gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                break;
+            case 4:
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                break;
+            case 5:
+                gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                break;
+            case 6:
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + firstDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                gfxCtx.fillOval(currentX + secondDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                break;
         }
     }
 

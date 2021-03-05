@@ -8,11 +8,13 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.ExceptionMessage;
-import de.uol.swp.common.message.Message;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.message.*;
+import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.KickUserEvent;
+import de.uol.swp.server.message.FetchUserContextInternalRequest;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,6 +89,71 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a GetUserSessionEvent found on the EventBus
+     * <p>
+     * If a GetUserSessionEvent is found on the EventBus this
+     * method gets the Session of the User contained in the GetUserSessionEvent.
+     * Then it posts a FetchUserContextInternalRequest with the session of the
+     * User and .the ResponseMessage contained in the GetUserSessionEvent,
+     * which will be handled by the ServerHandler.
+     *
+     * @param event GetUserSessionEvent found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onGetUserSessionEvent(GetUserSessionEvent event) {
+        Optional<Session> session = authenticationService.getSession(event.getTargetUser());
+        if (session.isEmpty()) throw new RuntimeException("UserSession not found");
+        post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
+    }
+
+    /**
+     * Handles a KickUserEvent found on the EventBus
+     * <p>
+     * If a KickUserEvent is detected on the EventBus a
+     * KickUserResponse for the to be kicked user is posted
+     * onto the EventBus to close his lobby window, a UserLeftLobbyMessage
+     * is posted onto the EventBus to the according lobby and a
+     * AllLobbiesMessage is posted onto the EventBus.
+     *
+     * @param event KickUserEvent found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.server.game.event.KickUserEvent
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
+     * @see de.uol.swp.common.lobby.message.AllLobbiesMessage
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserEvent(KickUserEvent event) {
+        KickUserRequest req = event.getRequest();
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+        if (req.getToBeKickedUserName().equals(req.getUser().getUsername())) return;
+        if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
+        Set<User> lobbyMembers = lobby.get().getUsers();
+        User toBeKickedUser = null;
+        for (User temp : lobbyMembers) {
+            if (temp.getUsername().equals(req.getToBeKickedUserName())) toBeKickedUser = temp;
+        }
+        if (toBeKickedUser == null) return;
+        lobby.get().unsetUserReady(toBeKickedUser);
+        lobby.get().leaveUser(toBeKickedUser);
+        ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
+        post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
+        sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
+        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+    }
+
+    /**
      * Handles a LobbyJoinUserRequest found on the EventBus
      * <p>
      * If a LobbyJoinUserRequest is detected on the EventBus, this method is called.
@@ -107,13 +174,21 @@ public class LobbyService extends AbstractService {
         if (lobby.isPresent()) {
             if (lobby.get().getUsers().size() < 4) {
                 if (!lobby.get().getUsers().contains(req.getUser())) {
-                    lobby.get().joinUser(req.getUser());
-                    Message responseMessage = new JoinLobbyResponse(req.getName());
-                    if (req.getMessageContext().isPresent()) {
-                        responseMessage.setMessageContext(req.getMessageContext().get());
+                    if (!lobby.get().isInGame()) {
+                        lobby.get().joinUser(req.getUser());
+                        Message responseMessage = new JoinLobbyResponse(req.getName());
+                        if (req.getMessageContext().isPresent()) {
+                            responseMessage.setMessageContext(req.getMessageContext().get());
+                        }
+                        post(responseMessage);
+                        sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
+                        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+                    } else {
+                        ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
+                        exceptionMessage.initWithMessage(req);
+                        post(exceptionMessage);
+                        LOG.debug(exceptionMessage.getException());
                     }
-                    post(responseMessage);
-                    sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
                 } else {
                     ExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
                     if (req.getMessageContext().isPresent()) {
@@ -163,6 +238,7 @@ public class LobbyService extends AbstractService {
             try {
                 lobby.get().leaveUser(req.getUser());
                 sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getUser()));
+                post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
             } catch (IllegalArgumentException exception) {
                 lobbyManagement.dropLobby(lobby.get().getName());
                 sendToAll(new LobbyDeletedMessage(req.getName()));
@@ -209,6 +285,7 @@ public class LobbyService extends AbstractService {
         }
         Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
         post(response);
+        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
 
     /**

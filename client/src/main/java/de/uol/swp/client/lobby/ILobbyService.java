@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.User;
 
 /**
@@ -97,6 +98,14 @@ public interface ILobbyService {
     void retrieveAllLobbyMembers(String lobbyName);
 
     /**
+     * Posts a request to roll the dices
+     *
+     * @see de.uol.swp.common.game.request.RollDiceRequest
+     * @since 2021-02-22
+     */
+    void rollDice(String lobbyName, User user);
+
+    /**
      * Posts a request to update ones Inventory
      *
      * @param lobbyName The name of the lobby the user wants to update his Inventory in
@@ -108,4 +117,40 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
+
+    /**
+     * Posts a message to play a KnightCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user The user
+     */
+    void playKnightCard (String lobbyName,User user);
+
+    /**
+     * Posts a message to play a MonopolyCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user The user
+     * @param resource The resource the user wants
+     */
+    void playMonopolyCard(String lobbyName, User user, Resources resource);
+
+    /**
+     * Posts a message to play a YearOfPlentyCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user The user
+     * @param resource1 The resource the user wants
+     * @param resource2 The resource the user wants
+     */
+    void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2);
+
+    /**
+     * Posts a message to play a RoadBuildingCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user The user
+     */
+    void playRoadBuildingCard(String lobbyName, User user);
+
 }
