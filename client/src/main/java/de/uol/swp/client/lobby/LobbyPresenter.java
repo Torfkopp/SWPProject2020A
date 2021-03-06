@@ -133,6 +133,21 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         setText(name);
                     }
+                    setText(empty || item == null ? "" : item.getValue());
+                    //if the background should be in colour you need to use setBackground
+                    int i = membersView.getItems().size();
+                    if (i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
+                        setTextFill(GameRendering.PLAYER_1_COLOUR);
+                    }
+                    if (i >= 2 && getText().equals(lobbyMembers.get(1).getValue())) {
+                        setTextFill(GameRendering.PLAYER_2_COLOUR);
+                    }
+                    if (i >= 3 && getText().equals(lobbyMembers.get(2).getValue())) {
+                        setTextFill(GameRendering.PLAYER_3_COLOUR);
+                    }
+                    if (i >= 4 && getText().equals(lobbyMembers.get(3).getValue())) {
+                        setTextFill(GameRendering.PLAYER_4_COLOUR);
+                    }
                 });
             }
         });
@@ -650,6 +665,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
         }
     }
 
@@ -760,23 +776,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setRollDiceButtonState(msg.getUser());
             this.kickUserButton.setVisible(false);
         });
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-            Platform.runLater(() -> {
-                playField.setVisible(true);
-                //This Line needs to be changed/ removed in the Future
-                gameRendering.drawGameMap(new GameMapManagement());
-                setTurnIndicatorText(msg.getUser());
-                lobbyService.updateInventory(lobbyName, loggedInUser);
-                this.readyCheckBox.setVisible(false);
-                this.startSession.setVisible(false);
-                this.rollDice.setVisible(true);
-                this.tradeWithUserButton.setVisible(true);
-                this.tradeWithBankButton.setVisible(true);
-                setRollDiceButtonState(msg.getUser());
-                this.playCard.setVisible(true);
-            });
-        }
     }
 
     /**
@@ -909,8 +908,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
-                                                            this.loggedInUser.getUsername(), this.lobbyName, rsp));
+        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(), this.loggedInUser.getUsername(), this.lobbyName, rsp));
     }
 
     /**
