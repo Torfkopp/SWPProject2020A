@@ -132,21 +132,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                         if (user.getID() == owner.getID())
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         setText(name);
-                    }
-                    setText(empty || item == null ? "" : item.getValue());
-                    //if the background should be in colour you need to use setBackground
-                    int i = membersView.getItems().size();
-                    if (i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
-                        setTextFill(GameRendering.PLAYER_1_COLOUR);
-                    }
-                    if (i >= 2 && getText().equals(lobbyMembers.get(1).getValue())) {
-                        setTextFill(GameRendering.PLAYER_2_COLOUR);
-                    }
-                    if (i >= 3 && getText().equals(lobbyMembers.get(2).getValue())) {
-                        setTextFill(GameRendering.PLAYER_3_COLOUR);
-                    }
-                    if (i >= 4 && getText().equals(lobbyMembers.get(3).getValue())) {
-                        setTextFill(GameRendering.PLAYER_4_COLOUR);
+                        //if the background should be in colour you need to use setBackground
+                        int i = lobbyMembers.size();
+                        if (i >= 1 && getText().contains(lobbyMembers.get(0).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_1_COLOUR);
+                        }
+                        if (i >= 2 && getText().contains(lobbyMembers.get(1).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_2_COLOUR);
+                        }
+                        if (i >= 3 && getText().contains(lobbyMembers.get(2).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_3_COLOUR);
+                        }
+                        if (i >= 4 && getText().contains(lobbyMembers.get(3).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_4_COLOUR);
+                        }
                     }
                 });
             }
@@ -908,7 +907,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(), this.loggedInUser.getUsername(), this.lobbyName, rsp));
+        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
+                                                            this.loggedInUser.getUsername(), this.lobbyName, rsp));
     }
 
     /**
