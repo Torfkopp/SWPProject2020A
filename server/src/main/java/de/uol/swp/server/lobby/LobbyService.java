@@ -73,16 +73,12 @@ public class LobbyService extends AbstractService {
         try {
             lobbyManagement.createLobby(req.getName(), req.getOwner());
             Message responseMessage = new CreateLobbyResponse(req.getName());
-            if (req.getMessageContext().isPresent()) {
-                responseMessage.setMessageContext(req.getMessageContext().get());
-            }
+            responseMessage.initWithMessage(req);
             post(responseMessage);
             sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
         } catch (IllegalArgumentException e) {
             Message exceptionMessage = new LobbyExceptionMessage(e.getMessage());
-            if (req.getMessageContext().isPresent()) {
-                exceptionMessage.setMessageContext(req.getMessageContext().get());
-            }
+            exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(e.getMessage());
         }
@@ -177,9 +173,7 @@ public class LobbyService extends AbstractService {
                     if (!lobby.get().isInGame()) {
                         lobby.get().joinUser(req.getUser());
                         Message responseMessage = new JoinLobbyResponse(req.getName());
-                        if (req.getMessageContext().isPresent()) {
-                            responseMessage.setMessageContext(req.getMessageContext().get());
-                        }
+                        responseMessage.initWithMessage(req);
                         post(responseMessage);
                         sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
                         post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
@@ -191,25 +185,19 @@ public class LobbyService extends AbstractService {
                     }
                 } else {
                     ExceptionMessage exceptionMessage = new LobbyExceptionMessage("You're already in this lobby!");
-                    if (req.getMessageContext().isPresent()) {
-                        exceptionMessage.setMessageContext(req.getMessageContext().get());
-                    }
+                    exceptionMessage.initWithMessage(req);
                     post(exceptionMessage);
                     LOG.debug(exceptionMessage.getException());
                 }
             } else {
                 ExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby is full!");
-                if (req.getMessageContext().isPresent()) {
-                    exceptionMessage.setMessageContext(req.getMessageContext().get());
-                }
+                exceptionMessage.initWithMessage(req);
                 post(exceptionMessage);
                 LOG.debug(exceptionMessage.getException());
             }
         } else {
             ExceptionMessage exceptionMessage = new LobbyExceptionMessage("This lobby does not exist!");
-            if (req.getMessageContext().isPresent()) {
-                exceptionMessage.setMessageContext(req.getMessageContext().get());
-            }
+            exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(exceptionMessage.getException());
         }
