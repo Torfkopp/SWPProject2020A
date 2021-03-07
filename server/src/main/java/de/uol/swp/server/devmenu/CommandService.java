@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
@@ -12,9 +13,13 @@ import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.request.EditInventoryRequest;
+import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
-import de.uol.swp.common.lobby.request.LobbyLeaveUserRequest;
+import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
 import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.message.Message;
@@ -24,6 +29,7 @@ import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.IGameManagement;
+import de.uol.swp.server.game.event.GetUserSessionEvent;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
@@ -34,8 +40,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 /**
@@ -49,13 +53,15 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("UnstableApiUsage")
 public class CommandService extends AbstractService {
 
+    public static final String QUICK_LOBBY_NAME = "§Quick Lobby";
+    public static final String TEMP_1_NAME = "§temp1";
+    public static final String TEMP_2_NAME = "§temp2";
     private static final Logger LOG = LogManager.getLogger(CommandService.class);
     private static Set<Class<?>> allClasses;
     private final IUserManagement userManagement; //use to find users by name
     private final ILobbyManagement lobbyManagement;
     private final IGameManagement gameManagement;
-    private final CountDownLatch latch = new CountDownLatch(1);
-    private final Map<String, Map.Entry<String, BiConsumer<List<String>, NewChatMessageRequest>>> commandMap = new HashMap<>();
+    private final Map<String, BiConsumer<List<String>, NewChatMessageRequest>> commandMap = new HashMap<>();
 
     /**
      * Constructor
@@ -63,6 +69,11 @@ public class CommandService extends AbstractService {
      * @param eventBus        The {@link com.google.common.eventbus.EventBus} (injected)
      * @param lobbyManagement The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
      * @param userManagement  The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
+     * @param gameManagement  The {@link de.uol.swp.server.game.IGameManagement} (injected)
+     *
+     * @see de.uol.swp.server.game.IGameManagement
+     * @see de.uol.swp.server.lobby.ILobbyManagement
+     * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     @Inject
     public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement,
@@ -72,21 +83,16 @@ public class CommandService extends AbstractService {
         this.userManagement = userManagement;
         this.gameManagement = gameManagement;
         getAllClasses();
-
-        //@formatter:off
-        //TODO: build help message on client side
-        commandMap.put("devmenu", new AbstractMap.SimpleEntry<>("/devmenu - opens the devmenu", this::command_DevMenu));
-        commandMap.put("forceendturn", new AbstractMap.SimpleEntry<>("/forceendturn - shows this help text", this::command_ForceEndTurn));
-        commandMap.put("give", new AbstractMap.SimpleEntry<>("/give [lobby] <player> <resource> <amount> - gives a player in an optionally specified lobby a specified amount of a specified resource", this::command_Give));
-        commandMap.put("help", new AbstractMap.SimpleEntry<>("/help - shows this help text", this::command_Help));
-        commandMap.put("post", new AbstractMap.SimpleEntry<>("/help - shows this help text", this::command_Post));
-        commandMap.put("quicklobby", new AbstractMap.SimpleEntry<>("/help - shows this help text", this::command_QuickLobby));
-        commandMap.put("removetemp", new AbstractMap.SimpleEntry<>("/help - shows this help text", this::command_RemoveTemp));
-        commandMap.put("skip", new AbstractMap.SimpleEntry<>("/help - shows this help text", this::command_NextPlayerIfTemp));
-        commandMap.put("skipall", new AbstractMap.SimpleEntry<>("/help - shows this help text", this::command_SkipBots));
-        commandMap.put("remove", new AbstractMap.SimpleEntry<>("/remove", this::command_Remove));
-        //@formatter:on
-
+        commandMap.put("devmenu", this::command_DevMenu);
+        commandMap.put("droptemp", this::command_DropTemp);
+        commandMap.put("forceendturn", this::command_ForceEndTurn);
+        commandMap.put("give", this::command_Give);
+        commandMap.put("help", this::command_Help);
+        commandMap.put("post", this::command_Post);
+        commandMap.put("quicklobby", this::command_QuickLobby);
+        commandMap.put("remove", this::command_Remove);
+        commandMap.put("skip", this::command_NextPlayerIfTemp);
+        commandMap.put("skipall", this::command_SkipBots);
         LOG.debug("CommandService started");
     }
 
@@ -95,7 +101,7 @@ public class CommandService extends AbstractService {
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to use the command
+     *                        used to invoke the command
      *
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
@@ -105,30 +111,100 @@ public class CommandService extends AbstractService {
         post(msg);
     }
 
-    private void command_ForceEndTurn(List<String> args, NewChatMessageRequest originalMessage) {
-        //TODO: implement this
+    /**
+     * Handles the /droptemp command
+     * <p>
+     * Usage: {@code /droptemp}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
+    private void command_DropTemp(List<String> args, NewChatMessageRequest originalMessage) {
+        Optional<User> temp1 = userManagement.getUser(TEMP_1_NAME);
+        Optional<User> temp2 = userManagement.getUser(TEMP_2_NAME);
+        if (temp1.isPresent()) {
+            post(new RemoveFromLobbiesRequest(temp1.get()));
+            userManagement.dropUser(temp1.get());
+        }
+        if (temp2.isPresent()) {
+            post(new RemoveFromLobbiesRequest(temp2.get()));
+            userManagement.dropUser(temp2.get());
+        }
     }
 
+    /**
+     * Handles the /forceendturn command
+     * <p>
+     * Usage: {@code /forceendturn <player>}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
+    private void command_ForceEndTurn(List<String> args, NewChatMessageRequest originalMessage) {
+        if (args.size() != 1 || !originalMessage.isFromLobby()) {
+            command_Invalid(args, originalMessage);
+            return;
+        }
+        try {
+            args.add(originalMessage.getOriginLobby());
+            // roll dice for the skipped player
+            Message req = parseArguments(args, RollDiceRequest.class.getConstructors()[0],
+                                         Optional.of(originalMessage.getAuthor()));
+            post(req);
+            // end their turn for them
+            req = parseArguments(args, EndTurnRequest.class.getConstructors()[0],
+                                 Optional.of(originalMessage.getAuthor()));
+            post(req);
+            // try to send them a TurnSkippedResponse to disable their buttons, etc.
+            Optional<User> user = userManagement.getUser(args.get(0));
+            if (user.isEmpty()) return;
+            post(new GetUserSessionEvent(user.get(), new TurnSkippedResponse(originalMessage.getOriginLobby())));
+        } catch (ReflectiveOperationException ignored) {}
+    }
+
+    /**
+     * Handles the /give command
+     * <p>
+     * Usage: {@code /give [lobby] <player> <resource> <amount>}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
-        //TODO: implement this
+        try {
+            if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
+            Message msg = parseArguments(args, EditInventoryRequest.class.getConstructors()[0],
+                                         Optional.of(originalMessage.getAuthor()));
+            post(msg);
+        } catch (Exception ignored) {}
     }
 
     /**
      * Handles the /help command
+     * <p>
+     * Usage: {@code /help}
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to use the command
+     *                        used to invoke the command
      *
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_Help(List<String> args, NewChatMessageRequest originalMessage) {
-        String str = new StringBuilder().append("The following Commands are available:\n")
-                                        .append("-------------------------------------\n")
-                                        .append("\"/help\": Shows this Help screen\n")
-                                        .append("\"/post <messagename> <*args>\": Posts a message on the bus\n")
-                                        .append("\"/devmenu\": Opens the developer menu").toString();
-        sendSystemMessageResponse(originalMessage, str);
+        if (args.size() == 0) sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.help"));
+        else if (commandMap.containsKey(args.get(1))) sendSystemMessageResponse(originalMessage, new I18nWrapper(
+                "devmenu.commands.help." + args.get(1).trim().toLowerCase()));
+        else sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.help.invalid",
+                                                                        args.get(1).trim().toLowerCase()));
     }
 
     /**
@@ -136,24 +212,32 @@ public class CommandService extends AbstractService {
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to use the command
+     *                        used to invoke the command
      *
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_Invalid(List<String> args, NewChatMessageRequest originalMessage) {
-        String content = new StringBuilder().append("\"" + String.join(" ", args) + "\" isn't a valid command\n")
-                                            .append("----------------------------\n")
-                                            .append("Type \"/help\" for a list of valid commands").toString();
-        sendSystemMessageResponse(originalMessage, content);
+        sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.invalid", String.join(" ", args)));
     }
 
+    /**
+     * Handles the /skip command
+     * <p>
+     * Usage: {@code /skip}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
     private void command_NextPlayerIfTemp(List<String> args, NewChatMessageRequest originalMessage) {
-        //TODO: docs, simplify if possible
-        String lobbyName = "Quick Lobby";
+        if (!originalMessage.isFromLobby()) return;
+        String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
         if (game == null) return;
         User activePlayer = game.getActivePlayer();
-        if (activePlayer.getUsername().equals("temp1") || activePlayer.getUsername().equals("temp2")) {
+        if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
             post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
         }
     }
@@ -161,14 +245,17 @@ public class CommandService extends AbstractService {
     /**
      * Handles the /post command
      * <p>
+     * Usage: {@code /post <? extends Message> <*args>}
+     * <p>
      * Finds the requested class in the List of allowed classes, figures out
      * which constructor was requested, and, after parsing the arguments, posts
      * the instance of the class to the {@link com.google.common.eventbus.EventBus}.
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to use the command
+     *                        used to invoke the command
      *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      * @see java.lang.Class#getConstructors()
      * @see java.lang.reflect.Constructor#getParameterCount()
      */
@@ -179,9 +266,13 @@ public class CommandService extends AbstractService {
                 Constructor<?>[] constructors = cls.getConstructors();
                 for (Constructor<?> constr : constructors) {
                     // 0: command name, 1: Class name, 2+: Class constructor args
-                    if (constr.getParameterCount() != args.size() - 1) continue;
-                    Message msg = parseArguments(args, constr, (originalMessage.getSession().isPresent() ? Optional.of(
-                            originalMessage.getSession().get().getUser()) : Optional.empty()));
+                    List<String> conArgs =
+                            args.size() > 0 ? new LinkedList<>(args.subList(1, args.size())) : new LinkedList<>();
+                    if (constr.getParameterCount() != conArgs.size()) continue;
+                    Message msg = parseArguments(conArgs, constr, (originalMessage.getSession().isPresent() ?
+                                                                   Optional.of(originalMessage.getSession().get()
+                                                                                              .getUser()) :
+                                                                   Optional.empty()));
                     msg.initWithMessage(originalMessage);
                     post(msg);
                     break;
@@ -191,74 +282,90 @@ public class CommandService extends AbstractService {
         }
     }
 
+    /**
+     * Handles the /quicklobby command
+     * <p>
+     * {@code /quicklobby}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
     private void command_QuickLobby(List<String> args, NewChatMessageRequest originalMessage) {
-        //TODO: docs, simplify if possible
         if (originalMessage.getSession().isEmpty()) return;
-        String lobbyName = "Quick Lobby";
         User invoker = originalMessage.getSession().get().getUser();
-        lobbyManagement.createLobby(lobbyName, invoker);
-        ResponseMessage rsp = new CreateLobbyResponse(lobbyName);
+        lobbyManagement.createLobby(QUICK_LOBBY_NAME, invoker);
+        ResponseMessage rsp = new CreateLobbyResponse(QUICK_LOBBY_NAME);
         rsp.initWithMessage(originalMessage);
         post(rsp);
 
         User temp1, temp2;
         try {
-            Optional<User> found = userManagement.getUser("temp1");
+            Optional<User> found = userManagement.getUser(TEMP_1_NAME);
             if (found.isEmpty()) throw new RuntimeException("User not found");
             temp1 = found.get();
         } catch (Exception e) {
-            temp1 = userManagement.createUser(new UserDTO("temp1", "temp1", "")); //UserDTO(-1, "temp1", "temp1", ""));
+            temp1 = userManagement
+                    .createUser(new UserDTO(TEMP_1_NAME, TEMP_1_NAME, "")); //UserDTO(-1, TEMP_1, TEMP_1, ""));
         }
 
         try {
-            Optional<User> found = userManagement.getUser("temp2");
+            Optional<User> found = userManagement.getUser(TEMP_2_NAME);
             if (found.isEmpty()) throw new RuntimeException("User not found");
             temp2 = found.get();
         } catch (Exception e) {
-            temp2 = userManagement.createUser(new UserDTO("temp2", "temp2", "")); //UserDTO(-1, "temp2", "temp2", ""));
+            temp2 = userManagement.createUser(
+                    new UserDTO(TEMP_2_NAME, TEMP_2_NAME, "")); //UserDTO(-1, TEMP_2_NAME, TEMP_2_NAME, ""));
         }
 
-        try {
-            // wait for the client to be ready to receive the ensuing notifications without NullPointerExceptions
-            latch.await(250, TimeUnit.MILLISECONDS);
-            post(new LobbyJoinUserRequest(lobbyName, temp1));
-            post(new LobbyJoinUserRequest(lobbyName, temp2));
-            post(new UserReadyRequest(lobbyName, temp1, true));
-            post(new UserReadyRequest(lobbyName, temp2, true));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        post(new LobbyJoinUserRequest(QUICK_LOBBY_NAME, temp1));
+        post(new LobbyJoinUserRequest(QUICK_LOBBY_NAME, temp2));
+        post(new UserReadyRequest(QUICK_LOBBY_NAME, temp1, true));
+        post(new UserReadyRequest(QUICK_LOBBY_NAME, temp2, true));
     }
 
+    /**
+     * Handles the /remove command
+     * <p>
+     * Usage: {@code /remove [lobby] <player> <resource> <amount>}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
     private void command_Remove(List<String> args, NewChatMessageRequest originalMessage) {
         args.set(args.size() - 1, String.valueOf(Integer.parseInt(args.get(args.size() - 1)) * -1));
         command_Give(args, originalMessage);
     }
 
-    private void command_RemoveTemp(List<String> args, NewChatMessageRequest originalMessage) {
-        //TODO: docs, simplify if possible
-        String lobbyName = "Quick Lobby";
-        Optional<Lobby> found = lobbyManagement.getLobby(lobbyName);
-        if (found.isEmpty()) return;
-        for (User user : found.get().getUsers()) {
-            if (user.getUsername().equals("temp1") || user.getUsername().equals("temp2")) {
-                post(new UserReadyRequest(lobbyName, user, false));
-                post(new LobbyLeaveUserRequest(lobbyName, user));
-                userManagement.dropUser(user);
-            }
-        }
-    }
-
+    /**
+     * Handles the /skipall command
+     * <p>
+     * Usage: {@code /skipall}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
     private void command_SkipBots(List<String> args, NewChatMessageRequest originalMessage) {
-        //TODO: docs, simplify if possible
-        String lobbyName = "Quick Lobby";
+        String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
         if (game == null) return;
         User[] players = game.getPlayers();
-        for (User ignored : players) {
+        for (int i = 0; i < players.length; i++) {
             User activePlayer = game.getActivePlayer();
-            if (activePlayer.getUsername().equals("temp1") || activePlayer.getUsername().equals("temp2")) {
+            if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
                 post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
+                activePlayer = game.getActivePlayer();
+                if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
+                    post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
+                }
                 break;
             }
         }
@@ -275,7 +382,7 @@ public class CommandService extends AbstractService {
      * @see java.lang.Class#isAssignableFrom(Class)
      * @see com.google.common.reflect.ClassPath#getTopLevelClassesRecursive(String)
      */
-    public void getAllClasses() {
+    private void getAllClasses() {
         allClasses = new HashSet<>();
         Set<Class<?>> clsSet = new HashSet<>();
         ClassLoader cl = getClass().getClassLoader();
@@ -286,9 +393,7 @@ public class CommandService extends AbstractService {
                   .filter(cls -> !Modifier.isAbstract(cls.getModifiers())) // No Abstract classes
                   .filter(cls -> !cls.isInterface()) // No interfaces
                   .forEach(allClasses::add);
-        } catch (IOException | ClassNotFoundException e) {
-            // TODO: error handling
-        }
+        } catch (IOException | ClassNotFoundException ignored) {}
     }
 
     /**
@@ -297,22 +402,22 @@ public class CommandService extends AbstractService {
      *
      * @param commandString A String representing the command and its arguments
      *
-     * @return A List with the
+     * @return A List with the String properly lexed
      */
-    private List<String> lexCommand(String commandString) {
+    private List<String> lexCommand(String commandString, String separator) {
         List<String> command = new LinkedList<>();
         int start = 0;
         String subString;
         boolean inQuotes = false;
         for (int i = 0; i <= commandString.length(); i++) {
             subString = commandString.substring(start, i);
-            if ((subString.endsWith(" ") || i == commandString.length()) && !inQuotes) {
+            if ((subString.endsWith(separator) || i == commandString.length()) && !inQuotes) {
                 if (subString.strip().length() == 0) continue;
                 command.add(subString.strip());
                 start = i;
-            } else if (subString.endsWith("\" ")) {
+            } else if (subString.endsWith("\"")) {
                 if (inQuotes) {
-                    command.add(subString.replace("\" $", "").strip());
+                    command.add(subString.replace("\"" + separator, "").replace("\"", "").strip());
                     start = i;
                 }
                 inQuotes = !inQuotes;
@@ -322,14 +427,21 @@ public class CommandService extends AbstractService {
     }
 
     /**
+     * Helper method used when the separator for lexing is the standard space
+     * @see #lexCommand(String, String)
+     */
+    private List<String> lexCommand(String commandString) {
+        return lexCommand(commandString, " ");
+    }
+
+    /**
      * Handles a {@link de.uol.swp.common.devmenu.request.DevMenuClassesRequest}
      * found on the {@link com.google.common.eventbus.EventBus}
      * <p>
      * Will create a Map of class names to a List of their constructors, each
      * as a Map of their parameter names to the parameter's type.
      *
-     * @param req The {@link de.uol.swp.common.devmenu.request.DevMenuClassesRequest}
-     *            found on the {@link com.google.common.eventbus.EventBus}
+     * @param req The DevMenuClassesRequest found on the EventBus
      *
      * @see de.uol.swp.common.devmenu.request.DevMenuClassesRequest
      */
@@ -359,11 +471,10 @@ public class CommandService extends AbstractService {
      * <p>
      * Prepends the requested class name to the List of arguments in the
      * request and then calls
-     * {@link de.uol.swp.server.devmenu.CommandService#parseArguments(java.util.List, java.lang.reflect.Constructor, java.util.Optional)}
+     * {@link #parseArguments(java.util.List, java.lang.reflect.Constructor, java.util.Optional)}
      * with that prepended list.
      *
-     * @param req The {@link de.uol.swp.common.devmenu.request.DevMenuCommandRequest}
-     *            found on the {@link com.google.common.eventbus.EventBus}
+     * @param req The DevMenuCommandRequest} found on the EventBus
      *
      * @see de.uol.swp.common.devmenu.request.DevMenuCommandRequest
      */
@@ -383,11 +494,10 @@ public class CommandService extends AbstractService {
      * This method decides which method to call based on the command String
      * contained in the message.
      * <p>
-     * This method calls on {@link de.uol.swp.server.devmenu.CommandService#lexCommand(String)}
-     * to divy up the command String.
+     * This method calls on {@link #lexCommand(String)} to divy up the command
+     * String.
      *
-     * @param msg The {@link de.uol.swp.server.devmenu.message.NewChatCommandMessage}
-     *            found on the {@link com.google.common.eventbus.EventBus}
+     * @param msg The NewChatCommandMessage found on the EventBus
      *
      * @see de.uol.swp.server.devmenu.message.NewChatCommandMessage
      */
@@ -397,16 +507,15 @@ public class CommandService extends AbstractService {
         List<String> cmd = lexCommand(msg.getCommand());
         List<String> args = cmd.size() > 0 ? new LinkedList<>(cmd.subList(1, cmd.size())) : new LinkedList<>();
 
-        var a = commandMap.get(cmd.get(0).trim().toLowerCase());
-        if (a != null) a.getValue().accept(args, msg.getOriginalMessage());
+        BiConsumer<List<String>, NewChatMessageRequest> command = commandMap.get(cmd.get(0).trim().toLowerCase());
+        if (command != null) command.accept(args, msg.getOriginalMessage());
         else command_Invalid(args, msg.getOriginalMessage());
-
-        // TODO: more cases (aka commands)
     }
 
     /**
      * Helper method used to parse the arguments provided to
-     * {@link de.uol.swp.server.devmenu.CommandService#command_Post(java.util.List, de.uol.swp.common.message.Message)}
+     * {@link #command_Post(java.util.List, de.uol.swp.common.message.Message)}
+     * and arguments used for instantiation of other Message subclasses
      * <p>
      * This method matches the parameter names provided as their canonical
      * long names (e.g. {@code java.lang.String}) and tries to convert the
@@ -416,13 +525,10 @@ public class CommandService extends AbstractService {
      * provided
      *
      * @param args        List of Strings to be used as arguments
-     * @param constr      The specific {@link java.lang.reflect.Constructor}
-     *                    to be used in instantiation
-     * @param currentUser The {@link de.uol.swp.common.user.User} who invoked the
-     *                    command (to replace '.' or 'me')
+     * @param constr      The specific Constructor to be used in instantiation
+     * @param currentUser The User who invoked the command (to replace '.' or 'me')
      *
-     * @return The instance of a {@link de.uol.swp.common.message.Message}
-     * subclass as returned by the provided constructor
+     * @return The instance of a Message subclass as returned by the provided constructor
      *
      * @throws java.lang.ReflectiveOperationException Thrown when something goes awry
      *                                                during the reflection process
@@ -435,29 +541,43 @@ public class CommandService extends AbstractService {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
-            if (args.get(i + 1).equals("§null") || args.get(i + 1).equals("§n")) argList.add(null);
+            if (args.get(i).equals("§null") || args.get(i).equals("§n")) argList.add(null);
             else switch (parameters[i].getName()) {
                 case "de.uol.swp.common.user.User":
-                    if (args.get(i + 1).equals(".") || args.get(i + 1).equals("me")) {
+                    if (args.get(i).equals(".") || args.get(i).equals("me")) {
                         if (currentUser.isPresent()) argList.add(currentUser.get());
                     } else {
-                        Optional<User> foundUser = userManagement.getUser(args.get(i + 1));
+                        Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
-                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(args.get(i + 1));
+                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(args.get(i));
                     if (foundLobby.isPresent()) argList.add(foundLobby.get());
                     break;
                 case "boolean":
-                    argList.add(Boolean.parseBoolean(args.get(i + 1)));
+                    argList.add(Boolean.parseBoolean(args.get(i)));
                     break;
                 case "int":
-                    argList.add(Integer.parseInt(args.get(i + 1)));
+                    argList.add(Integer.parseInt(args.get(i)));
                     break;
-                case "java.util.List":
+                case "de.uol.swp.common.game.map.MapPoint": //y,x
+                {
+                    List<String> tokens = lexCommand(args.get(i), ",");
+                    //argList.add(tokens.size() < 1 ? null : new MapPoint(tokens.get(0), tokens.get(1)));
+                }
+                break;
+                case "de.uol.swp.common.I18nWrapper": // attributeName!replacementString
+                {
+                    List<String> tokens = lexCommand(args.get(i), "!");
+                    argList.add(tokens.size() < 1 ? null : (tokens.size() < 2 ? new I18nWrapper(tokens.get(0)) :
+                                                            new I18nWrapper(tokens.get(0), tokens.get(1))));
+                }
+                break;
+                case "java.util.List": //Maybe one day; [item1 item2 "item3 text" item4]
+                case "java.util.Map":  //Maybe one day; {key1: value1, key2: "value2, text"}
                 default:
-                    argList.add(args.get(i + 1));
+                    argList.add(args.get(i));
                     break;
             }
         }
@@ -465,16 +585,16 @@ public class CommandService extends AbstractService {
     }
 
     /**
-     * Helper method used to post a {@link de.uol.swp.common.chat.response.SystemMessageResponse}
-     * onto the {@link com.google.common.eventbus.EventBus}
+     * Helper method used to post a SystemMessageResponse onto the EventBus
      *
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        that provoked a {@link de.uol.swp.common.chat.SystemMessage}
-     * @param content         The content of the {@link de.uol.swp.common.chat.SystemMessage}
+     * @param originalMessage The NewChatMessageRequest that provoked a
+     *                        SystemMessageResponse
+     * @param content         The content of the SystemMessageResponse
      *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      * @see de.uol.swp.common.chat.response.SystemMessageResponse
      */
-    private void sendSystemMessageResponse(NewChatMessageRequest originalMessage, String content) {
+    private void sendSystemMessageResponse(NewChatMessageRequest originalMessage, I18nWrapper content) {
         ResponseMessage response = new SystemMessageResponse(originalMessage.getOriginLobby(), content);
         response.initWithMessage(originalMessage);
         post(response);
