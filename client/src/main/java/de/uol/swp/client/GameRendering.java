@@ -31,21 +31,21 @@ public class GameRendering {
 
     public static final Color PLAYER_1_COLOUR = Color.BLUE;
     public static final Color PLAYER_2_COLOUR = Color.RED;
-    public static final Color PLAYER_3_COLOUR = Color.PURPLE;
-    public static final Color PLAYER_4_COLOUR = Color.FUCHSIA;
+    public static final Color PLAYER_3_COLOUR = Color.rgb(255, 69, 0);
+    public static final Color PLAYER_4_COLOUR = Color.rgb(255, 127, 124);
     //Constants used for the colours
     private static final Color TOKEN_COLOUR = Color.BEIGE;
     private static final Color TEXT_COLOUR = Color.BLACK;
     private static final Color BORDER_COLOUR = Color.BLACK;
     private static final Color ROBBER_COLOUR = Color.BLACK;
-    private static final Color HARBOR_COLOUR = Color.SLATEGREY;
+    private static final Color HARBOR_COLOUR = Color.rgb(80, 50, 2);
     private static final Color WATER_COLOUR = Color.CORNFLOWERBLUE;
-    private static final Color DESERT_COLOUR = Color.WHITE;
-    private static final Color HILLS_COLOUR = Color.DARKORANGE;
-    private static final Color FOREST_COLOUR = Color.DARKGREEN;
+    private static final Color DESERT_COLOUR = Color.rgb(223, 187, 22);
+    private static final Color HILLS_COLOUR = Color.rgb(240, 181, 103);
+    private static final Color FOREST_COLOUR = Color.rgb(79, 141, 67);
     private static final Color MOUNTAINS_COLOUR = Color.DARKGREY;
-    private static final Color FIELDS_COLOUR = Color.YELLOW;
-    private static final Color PASTURE_COLOUR = Color.LIGHTGREEN;
+    private static final Color FIELDS_COLOUR = Color.rgb(240, 215, 103);
+    private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     @Inject
     private static ResourceBundle resourceBundle;
 

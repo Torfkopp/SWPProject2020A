@@ -742,7 +742,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             Platform.runLater(() -> {
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future
-                gameRendering.drawGameMap(new GameMap());
+                GameMap map = new GameMap();
+                map.createBeginnerMap();
+                gameRendering.drawGameMap(map);
                 setTurnIndicatorText(msg.getUser());
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
