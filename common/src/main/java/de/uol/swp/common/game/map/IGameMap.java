@@ -11,8 +11,21 @@ import java.util.Set;
  * @author Steven Luong
  * @since 2021-01-16
  */
-public interface IGameMapManagement {
+public interface IGameMap {
 
+    /**
+     * Creates the beginner map
+     */
+    void createBeginnerMap();
+
+    /**
+     * Gets an edge that connects two intersections
+     *
+     * @param intersection1 First intersection of edge
+     * @param intersection2 Second intersection of edge
+     *
+     * @return The edge connecting the given intersections
+     */
     IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
 
     /**
@@ -32,13 +45,20 @@ public interface IGameMapManagement {
     IGameHex[][] getHexesAsJaggedArray();
 
     /**
+     * Gets the intersection object at a given position
+     *
+     * @param position The position of the intersection
+     *
+     * @return An intersection object
+     */
+    IIntersection getIntersection(MapPoint position);
+
+    /**
      * Gets the intersections in a usable format for rendering them as a jagged array
      *
      * @return A jagged array containing the intersections
      */
     IIntersection[][] getIntersectionsAsJaggedArray();
-
-    IIntersection getIntersection(MapPoint position);
 
     /**
      * Gets the amount of points the player made with
@@ -48,25 +68,38 @@ public interface IGameMapManagement {
      */
     int getPlayerPoints(Player player);
 
+    /**
+     * Gets the position of the robber
+     *
+     * @return A MapPoint containing the position of the robber
+     */
     MapPoint getRobberPosition();
 
+    /**
+     * Gets the incident edges of a given intersection
+     *
+     * @param intersection The intersection of which the edges should be returned
+     *
+     * @return A Set<> containing all edge objects
+     */
     Set<IEdge> incidentEdges(IIntersection intersection);
 
     /**
      * Moves the robber
      *
-     * @param newHex The hex the robber has moved to
+     * @param newPosition The hex the robber has moved to
      */
-    void moveRobber(MapPoint newHex);
+    void moveRobber(MapPoint newPosition);
 
     /**
-     * Places a street
+     * Places a road for the given player on the given edge.
      *
-     * @param player The player wanting to build the street
+     * @param player The player wanting to build the road
      * @param edge   The edge to place a road on
      *
      * @return True if placement was successful; false if not
      */
+
     boolean placeRoad(Player player, IEdge edge);
 
     /**

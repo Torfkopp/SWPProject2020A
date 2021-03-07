@@ -13,22 +13,9 @@ public class Intersection implements IIntersection {
 
     /**
      * Constructor for an free intersection
-     *
      */
     public Intersection() {
         this.state = IntersectionState.FREE;
-    }
-
-    /**
-     * Constructor for an intersection with settlement on it
-     *
-     * @param hexes      The surrounding hexes
-     * @param neighbours The position of the neighbouring intersections
-     * @param owner      The owner of the settlement
-     */
-    public Intersection(Player owner) {
-        this.state = IntersectionState.SETTLEMENT;
-        this.owner = owner;
     }
 
     @Override

@@ -11,7 +11,7 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ResourceBundle;
 
 /**
  * GameRendering Class
@@ -23,7 +23,7 @@ import java.util.*;
  * @author Timo Gerken
  * @author Temmo Junkhoff
  * @implNote No methods of this interface need to be implemented
- * @see de.uol.swp.common.game.map.GameMapManagement
+ * @see de.uol.swp.common.game.map.GameMap
  * @see javafx.scene.canvas.Canvas
  * @since 2021-01-31
  */
@@ -126,7 +126,7 @@ public class GameRendering {
      *
      * @param gameMapManagement A GameMapManagement providing the game map to draw
      */
-    public void drawGameMap(IGameMapManagement gameMapManagement) {
+    public void drawGameMap(IGameMap gameMapManagement) {
         LOG.debug("Drawing Game map");
 
         //Get hexes, intersections, and edges in a usable format from the gameMapManagement
@@ -278,10 +278,10 @@ public class GameRendering {
      * <p>
      * This Method draws the intersections and edges.
      *
-     * @param intersections An array containing all intersections
-     * @param edges         An array containing all edges
+     * @param intersections     An array containing all intersections
+     * @param gameMapManagement A GameMapManagement providing the game map to draw
      */
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMapManagement gameMapManagement) {
+    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMapManagement) {
         goThroughHalfMap(true, intersections, gameMapManagement);
         goThroughHalfMap(false, intersections, gameMapManagement);
     }
@@ -365,18 +365,19 @@ public class GameRendering {
      * This methods is called by drawIntersectionsAndEdges to draw all intersections and edges in the top or bottom
      * half of the map.
      *
-     * @param topHalf       A boolean indicating which half of the map needs to be drawn on
-     * @param intersections An array containing all intersections
-     * @param edges         An array containing all edges
+     * @param topHalf           A boolean indicating which half of the map needs to be drawn on
+     * @param intersections     An array containing all intersections
+     * @param gameMapManagement A GameMapManagement providing the game map to draw
      */
-    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections,
-                                  IGameMapManagement gameMapManagement) {
+    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMapManagement) {
+
         //Sets currentY depending on topHalf
         double currentY = ((topHalf) ? (hexHeight * (3.0 / 4.0)) :
                            ((effectiveHeight / 2) + (hexHeight / 4))) + OFFSET_Y;
         //Goes through all rows in the current half of the game map
         for (int y = ((topHalf) ? 0 : intersections.length / 2); y < ((topHalf) ? intersections.length / 2 :
                                                                       intersections.length); y++) {
+
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * hexWidth;
             double currentX = OFFSET_X + rowStartX + hexWidth;
             if (topHalf) currentX += hexWidth / 2.0;
@@ -396,23 +397,18 @@ public class GameRendering {
      * This method is called by goThroughHalfMap to draw all intersections and optionally all edges in a given sub row.
      * Every Row is separated in to two sub row which have slightly different y-coordinates.
      *
-     * @param firstSubRow   Used to indicate which sub row should be accessed
-     * @param renderEdges   Used to indicate whether edges should be drawn
-     * @param currentX      The current x-coordinate
-     * @param currentY      The current y-coordinate
-     * @param intersections An array containing all intersections
-     * @param edges         An array containing all edges
+     * @param firstSubRow       Used to indicate which sub row should be accessed
+     * @param renderEdges       Used to indicate whether edges should be drawn
+     * @param currentX          The current x-coordinate
+     * @param currentY          The current y-coordinate
+     * @param intersections     An array containing all intersections in the current row
+     * @param gameMapManagement A GameMapManagement providing the game map to draw
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IGameMapManagement gameMapManagement) {
+                                 IIntersection[] intersections, IGameMap gameMapManagement) {
         for (int x = firstSubRow ? 1 : 0; x < intersections.length; x = x + 2) {
             if (renderEdges) {
-                IIntersection[] arr;
-                if (x == 0) arr = new IIntersection[]{null, intersections[x], intersections[x + 1]};
-                else if (x == intersections.length - 1)
-                    arr = new IIntersection[]{intersections[x - 1], intersections[x], null};
-                else arr = Arrays.copyOfRange(intersections, x - 1, x + 2);
-                renderEdges(currentX, currentY, arr, gameMapManagement);
+                renderEdges(currentX, currentY, intersections[x], gameMapManagement);
             }
             renderIntersection(currentX, currentY, intersections[x]);
             currentX += hexWidth;
@@ -482,42 +478,32 @@ public class GameRendering {
      * <p>
      * This Method draws the 3 edges around an intersection at the given coordinates.
      *
-     * @param currentX The current x-coordinate
-     * @param currentY The current y-coordinate
-     * @param edges    An array containing all edges
+     * @param currentX          The current x-coordinate
+     * @param currentY          The current y-coordinate
+     * @param gameMapManagement A GameMapManagement providing the game map to draw
      */
-    private void renderEdges(double currentX, double currentY, IIntersection[] intersections,
-                             IGameMapManagement gameMapManagement) {
+    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMapManagement) {
 
         gfxCtx.setLineWidth(roadWidth);
-        IEdge[] edges = new IEdge[3];
-        edges[0] = gameMapManagement.edgeConnectingIntersections(intersections[0], intersections[1]);
-        edges[1] = gameMapManagement.edgeConnectingIntersections(intersections[1], intersections[2]);
-        Set<IEdge> incidentEdges = new HashSet<>(gameMapManagement.incidentEdges(intersections[1]));
-        if (edges[0] != null) incidentEdges.remove(edges[0]);
-        if (edges[1] != null) incidentEdges.remove(edges[1]);
-        try {
-            edges[2] = (IEdge) incidentEdges.toArray()[0];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            edges[2] = null;
-            System.err.println("OUTOFBOUNDS");
-        }
-        //Northwest road
-        if (edges[0] != null && edges[0].getOwner() != null) {
-            gfxCtx.setStroke(getPlayerColour(edges[0].getOwner()));
-            gfxCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
-        }
+        for (IEdge edge : gameMapManagement.incidentEdges(intersection)) {
+            //Northwest road
+            if (edge.getOwner() == null) continue;
+            if (edge.getOrientation() == IEdge.Orientation.WEST) {
+                gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
+                gfxCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+            }
 
-        //Northeast road
-        if (edges[1] != null && edges[1].getOwner() != null) {
-            gfxCtx.setStroke(getPlayerColour(edges[1].getOwner()));
-            gfxCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
-        }
+            //South road
+            else if (edge.getOrientation() == IEdge.Orientation.SOUTH) {
+                gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
+                gfxCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
+            }
 
-        //South road
-        if (edges[2] != null && edges[2].getOwner() != null) {
-            gfxCtx.setStroke(getPlayerColour(edges[2].getOwner()));
-            gfxCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+            //Northeast road
+            if (edge.getOrientation() == IEdge.Orientation.EAST) {
+                gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
+                gfxCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+            }
         }
     }
 
@@ -552,7 +538,6 @@ public class GameRendering {
      * @param intersection The intersection to draw
      */
     private void renderIntersection(double currentX, double currentY, IIntersection intersection) {
-        System.err.println("Intersection: " + intersection.getState() + " ::: " + intersection.getOwner());
         switch (intersection.getState()) {
             case FREE:
                 //Free intersections don't need to be marked, but it could easily be added here
