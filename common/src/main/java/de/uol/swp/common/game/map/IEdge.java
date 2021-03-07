@@ -9,6 +9,15 @@ package de.uol.swp.common.game.map;
 public interface IEdge {
 
     /**
+     * Enum for the orientation of the edge
+     */
+    enum Orientation {
+        WEST,
+        EAST,
+        SOUTH
+    }
+
+    /**
      * Builds a road on the edge and sets the road's owner
      * <p>
      *
@@ -17,18 +26,11 @@ public interface IEdge {
     void buildRoad(Player owner);
 
     /**
-     * Gets neighbouring edges
+     * Returns the orientation of the edge
      *
-     * @return Array of positions
+     * @return The orientation of the edge
      */
-    //int[] getNeighbouringEdges();
-
-    /**
-     * Gets the two surrounding intersections
-     *
-     * @return Array of two positions
-     */
-    //int[] getNeighbouringIntersections();
+    Orientation getOrientation();
 
     /**
      * Gets the edge's owner or null if undeveloped

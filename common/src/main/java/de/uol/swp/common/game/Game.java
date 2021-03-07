@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.GameMapManagement;
-import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
@@ -18,7 +18,7 @@ public class Game {
 
     private final Lobby lobby;
     private final Inventory[] inventories;
-    private final IGameMapManagement map;
+    private final IGameMap map;
     private final User[] players;
     private final List<String> bankInventory;
     private int activePlayer;
@@ -38,7 +38,8 @@ public class Game {
                 break;
             }
         }
-        map = new GameMapManagement();
+        map = new GameMap();
+        map.createBeginnerMap();
         inventories = new Inventory[players.length];
         int i = 0;
         for (User u : players) {
@@ -122,17 +123,8 @@ public class Game {
      *
      * @return The IGameMapManagement this game is using
      */
-    public IGameMapManagement getMap() {
+    public IGameMap getMap() {
         return map;
-    }
-
-    /**
-     * Gets an array of all participating players
-     *
-     * @return The array of Users participating in this game
-     */
-    public User[] getPlayers() {
-        return players;
     }
 
     /**
@@ -143,15 +135,27 @@ public class Game {
     public Player getPlayer(User user) {
         int i = 0;
         for (User u : players) {
-            if(u.equals(user)) break;
+            if (u.equals(user)) break;
             i++;
         }
-        switch (i){
-            case 1: return Player.PLAYER_2;
-            case 2: return Player.PLAYER_3;
-            case 3: return Player.PLAYER_4;
+        switch (i) {
+            case 1:
+                return Player.PLAYER_2;
+            case 2:
+                return Player.PLAYER_3;
+            case 3:
+                return Player.PLAYER_4;
         }
         return Player.PLAYER_1;
+    }
+
+    /**
+     * Gets an array of all participating players
+     *
+     * @return The array of Users participating in this game
+     */
+    public User[] getPlayers() {
+        return players;
     }
 
     /**
