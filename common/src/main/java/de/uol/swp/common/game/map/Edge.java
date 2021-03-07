@@ -8,13 +8,14 @@ package de.uol.swp.common.game.map;
  */
 public class Edge implements IEdge {
 
+    private final Orientation orientation;
     private Player owner;
 
     /**
      * Constructor for a edge without a road on it
      */
-    public Edge() {
-        this.owner = null;
+    public Edge(Orientation orientation) {
+        this(orientation, null);
     }
 
     /**
@@ -22,7 +23,8 @@ public class Edge implements IEdge {
      *
      * @param owner The owner of the road on the edge
      */
-    public Edge(Player owner) {
+    public Edge(Orientation orientation, Player owner) {
+        this.orientation = orientation;
         this.owner = owner;
     }
 
@@ -30,6 +32,9 @@ public class Edge implements IEdge {
     public void buildRoad(Player owner) {
         this.owner = owner;
     }
+
+    @Override
+    public Orientation getOrientation() {return orientation;}
 
     @Override
     public Player getOwner() {
