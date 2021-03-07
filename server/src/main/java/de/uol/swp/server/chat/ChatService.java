@@ -83,9 +83,7 @@ public class ChatService extends AbstractService {
             List<ChatMessage> latestMessages = chatManagement.getLatestMessages(req.getAmount());
             returnMessage = new AskLatestChatMessageResponse(latestMessages);
         }
-        if (req.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(req.getMessageContext().get());
-        }
+        returnMessage.initWithMessage(req);
         post(returnMessage);
     }
 
