@@ -122,13 +122,9 @@ public class DevMenuPresenter extends AbstractPresenter {
      * Method called when the Send Button is pressed.
      * <p>
      * This method is called when the Send Button is pressed.
-     * It gathers the constructor parameter types and then lets the
-     * CommandParser lex and parse the argument values to be able to recognize
-     * Lists, Sets, Collections, Maps, and other data types as entered by the
-     * user into the dynamically generated TextFields.
-     * Finally, it posts a DevMenuCommandRequest with the currently selected
-     * class and the parsed argument list onto the EventBus.
-     * TODO: can still be better I think
+     * It gathers the constructor parameters given by the user and posts a
+     * DevMenuCommandRequest with the currently selected class and the argument
+     * list onto the EventBus.
      *
      * @see de.uol.swp.common.devmenu.request.DevMenuCommandRequest
      */
@@ -189,8 +185,8 @@ public class DevMenuPresenter extends AbstractPresenter {
         constructorObservableList.clear();
         parameterBox.getChildren().clear();
         Platform.runLater(() -> constructorObservableList.addAll(constructors));
-        constructorList.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+        constructorList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) updateArgumentFields(newValue);
-        }));
+        });
     }
 }

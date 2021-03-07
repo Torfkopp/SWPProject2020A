@@ -177,9 +177,10 @@ public class Inventory {
     }
 
     /**
-     * Gets the amount of ResourceCards the user has in his inventory
+     * Gets the amount of Resource Cards (Bricks, Grain, Lumber, Ore, Wool)
+     * the user has in his inventory
      *
-     * @return The amount of Road Building Cards
+     * @return The amount of building resources
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -327,8 +328,8 @@ public class Inventory {
     /**
      * Increases the amount of Knights by one
      */
-    public void increaseKnights() {
-        knights++;
+    public void increaseKnights(int i) {
+        knights += i;
     }
 
     /**

@@ -77,8 +77,17 @@ public class Game {
         return points;
     }
 
+    /**
+     * Gets the active player.
+     *
+     * @return The currently active player
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
     public User getActivePlayer() {
-        return players[activePlayer]; //TODO: docs, maybe remove if not needed
+        return players[activePlayer];
     }
 
     /**
@@ -131,15 +140,6 @@ public class Game {
     }
 
     /**
-     * Gets an array of all participating players
-     *
-     * @return The array of Users participating in this game
-     */
-    public User[] getPlayers() {
-        return players;
-    }
-
-    /**
      * Gets a user's player
      *
      * @return A player
@@ -147,15 +147,27 @@ public class Game {
     public Player getPlayer(User user) {
         int i = 0;
         for (User u : players) {
-            if(u.equals(user)) break;
+            if (u.equals(user)) break;
             i++;
         }
-        switch (i){
-            case 1: return Player.PLAYER_2;
-            case 2: return Player.PLAYER_3;
-            case 3: return Player.PLAYER_4;
+        switch (i) {
+            case 1:
+                return Player.PLAYER_2;
+            case 2:
+                return Player.PLAYER_3;
+            case 3:
+                return Player.PLAYER_4;
         }
         return Player.PLAYER_1;
+    }
+
+    /**
+     * Gets an array of all participating players
+     *
+     * @return The array of Users participating in this game
+     */
+    public User[] getPlayers() {
+        return players;
     }
 
     /**

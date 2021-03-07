@@ -31,7 +31,6 @@ import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -221,6 +220,25 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Helper method to handle disabling the endTurn, rollDice, playCard,
+     * tradeWithBank, and tradeWithUser buttons after a turn was ended (either
+     * forcibly or voluntarily).
+     * Also calls on the LobbyService to update the player's inventory.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-07
+     */
+    private void disableButtonsAfterTurn() {
+        this.endTurn.setDisable(true);
+        this.rollDice.setDisable(true);
+        this.playCard.setDisable(true);
+        this.tradeWithBankButton.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
+        lobbyService.updateInventory(lobbyName, loggedInUser);
+    }
+
+    /**
      * Helper function to find the Pair for a given key
      *
      * @param name the key of the pair that should be returned
@@ -318,21 +336,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Method called when the EndTurnButton is pressed
      * <p>
-     * If the EndTurnButton is pressed, this method requests the LobbyService
-     * to end the current turn.
+     * If the EndTurnButton is pressed, this method disables all appropriate
+     * buttons and then requests the LobbyService to end the current turn.
      *
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2021-01-15
      */
     @FXML
     private void onEndTurnButtonPressed() {
-        this.endTurn.setDisable(true);
-        this.rollDice.setDisable(true);
-        this.playCard.setDisable(true);
-        this.tradeWithBankButton.setDisable(true);
-        this.tradeWithUserButton.setDisable(true);
+        disableButtonsAfterTurn();
         lobbyService.endTurn(loggedInUser, lobbyName);
-        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -455,7 +468,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-25
      */
     @FXML
-    private void onPlayCardButtonPressed(ActionEvent event) {
+    private void onPlayCardButtonPressed() {
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
@@ -913,6 +926,26 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
                                                                 this.loggedInUser.getUsername(), this.lobbyName, rsp));
         }
+    }
+
+    /**
+     * Handles a TurnSkippedResponse found on the EventBus
+     * <p>
+     * This method calls {@link #disableButtonsAfterTurn()} to make sure all
+     * buttons that a player would have access to when it is their turn are
+     * properly disabled even though the player's turn was forcibly skipped.
+     *
+     * @param rsp The TurnSkippedResponse found on the EventBus
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-07
+     */
+    @Subscribe
+    private void onTurnSkippedResponse(TurnSkippedResponse rsp) {
+        if (!this.lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received TurnSkippedResponse");
+        disableButtonsAfterTurn();
     }
 
     /**

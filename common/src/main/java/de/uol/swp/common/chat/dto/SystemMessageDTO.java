@@ -1,8 +1,7 @@
 package de.uol.swp.common.chat.dto;
 
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
-
-import java.time.Instant;
 
 /**
  * Objects of this class are used to transfer SystemMessages between the server
@@ -15,41 +14,21 @@ import java.time.Instant;
  */
 public class SystemMessageDTO implements SystemMessage {
 
-    private final Instant timestamp;
-    private final String content;
+    private final I18nWrapper contentWrapper;
 
     /**
      * Constructor
      *
-     * @param content   The content of the message
-     * @param timestamp The Instant timestamp when the message was created
-     */
-    public SystemMessageDTO(String content, Instant timestamp) {
-        this.content = content;
-        this.timestamp = timestamp;
-    }
-
-    /**
-     * Constructor
+     * @param contentWrapper A ContentWrapper with the content of the message
      *
-     * @param content The content of the message
+     * @since 2021-03-07
      */
-    public SystemMessageDTO(String content) {
-        this(content, Instant.now());
-    }
-
-    @Override
-    public String getContent() {
-        return content;
-    }
-
-    @Override
-    public Instant getTimestamp() {
-        return timestamp;
+    public SystemMessageDTO(I18nWrapper contentWrapper) {
+        this.contentWrapper = contentWrapper;
     }
 
     @Override
     public String toString() {
-        return content;
+        return contentWrapper.toString();
     }
 }

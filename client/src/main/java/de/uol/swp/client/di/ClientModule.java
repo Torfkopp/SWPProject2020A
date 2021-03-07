@@ -11,6 +11,7 @@ import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
+import de.uol.swp.common.I18nWrapper;
 import javafx.fxml.FXMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -90,5 +91,6 @@ public class ClientModule extends AbstractModule {
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
+        requestStaticInjection(I18nWrapper.class);
     }
 }

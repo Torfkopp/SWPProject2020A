@@ -299,7 +299,7 @@ public class SceneManager {
     private void onOpenDevMenuResponse(OpenDevMenuResponse rsp) {
         Platform.runLater(() -> {
             Stage devMenuStage = new Stage();
-            devMenuStage.setTitle("Developer Access Board (D.A.B.)"); // TODO name
+            devMenuStage.setTitle("Developer Access Board");
             devMenuStage.setHeight(DEVMENU_HEIGHT);
             devMenuStage.setMinHeight(DEVMENU_HEIGHT);
             devMenuStage.setWidth(DEVMENU_WIDTH);
@@ -307,13 +307,11 @@ public class SceneManager {
             Parent rootPane = initPresenter(DevMenuPresenter.fxml);
             Scene devMenuScene = new Scene(rootPane);
             devMenuScene.getStylesheets().add(styleSheet);
-            //X.put(lobbyName, devMenuScene); // TODO need to save scene?
             devMenuStage.setScene(devMenuScene);
             devMenuStage.initOwner(primaryStage);
             devMenuStage.setX(primaryStage.getX() + 100);
             devMenuStage.setY(primaryStage.getY());
             devMenuStage.show();
-            //X.add(devMenuStage); // TODO need to save stage?
         });
     }
 

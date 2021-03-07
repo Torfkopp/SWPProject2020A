@@ -34,7 +34,7 @@ public class DevMenuCommandRequest extends AbstractRequestMessage {
      * Gets the list of arguments to be used when instantiating the requested
      * class
      *
-     * @return List of CommandParser.ASTToken representing the arguments
+     * @return List of Strings representing the arguments
      */
     public List<String> getArgs() {
         return args;

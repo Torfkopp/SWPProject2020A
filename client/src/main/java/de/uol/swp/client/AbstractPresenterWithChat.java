@@ -303,6 +303,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                     setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
                 else setFont(Font.getDefault());
                 setText(empty || item == null ? "" : item.toString());
+                setMaxWidth(chatView.getWidth());
+                setPrefWidth(chatView.getWidth());
+                setWidth(chatView.getWidth());
+                setWrapText(true);
             }
         });
         chatView.setItems(chatMessages);
