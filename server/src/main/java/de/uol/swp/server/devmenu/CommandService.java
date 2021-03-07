@@ -36,9 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -428,6 +426,7 @@ public class CommandService extends AbstractService {
 
     /**
      * Helper method used when the separator for lexing is the standard space
+     *
      * @see #lexCommand(String, String)
      */
     private List<String> lexCommand(String commandString) {
@@ -561,27 +560,143 @@ public class CommandService extends AbstractService {
                 case "int":
                     argList.add(Integer.parseInt(args.get(i)));
                     break;
-                case "de.uol.swp.common.game.map.MapPoint": //y,x
-                {
+                case "java.util.List": { // format: [$item1 $item2 $item no. 3 $item4]
+                    args.set(i, args.get(i).substring(1, args.get(i).length() - 1));
+                    String[] arr = args.get(i).split("\\$");
+                    ParameterizedType type = (ParameterizedType) constr.getGenericParameterTypes()[i];
+                    Class<?> cls = (Class<?>) type.getActualTypeArguments()[0];
+                    List<Object> list = parseList(arr, cls.getName());
+                    argList.add(list);
+                }
+                break;
+                case "java.util.Map": { //format: {$key1: value1, $key2: value no. 2, $keyI: valueI}
+                    args.set(i, args.get(i).substring(1, args.get(i).length() - 1));
+                    String[] arr = args.get(i).split("\\$");
+                    ParameterizedType mapType = (ParameterizedType) constr.getGenericParameterTypes()[i];
+                    Class<?> keyCls = (Class<?>) mapType.getActualTypeArguments()[0];
+                    Class<?> valueCls = (Class<?>) mapType.getActualTypeArguments()[1];
+                    Map<Object, Object> map = parseMap(arr, keyCls.getName(), valueCls.getName());
+                    argList.add(map);
+                }
+                break;
+                case "de.uol.swp.common.game.map.MapPoint": { //format: y,x (once MapPoint are ready)
                     List<String> tokens = lexCommand(args.get(i), ",");
                     //argList.add(tokens.size() < 1 ? null : new MapPoint(tokens.get(0), tokens.get(1)));
                 }
                 break;
-                case "de.uol.swp.common.I18nWrapper": // attributeName!replacementString
-                {
+                case "de.uol.swp.common.I18nWrapper": { //format: attributeName!replacementString
                     List<String> tokens = lexCommand(args.get(i), "!");
                     argList.add(tokens.size() < 1 ? null : (tokens.size() < 2 ? new I18nWrapper(tokens.get(0)) :
                                                             new I18nWrapper(tokens.get(0), tokens.get(1))));
                 }
                 break;
-                case "java.util.List": //Maybe one day; [item1 item2 "item3 text" item4]
-                case "java.util.Map":  //Maybe one day; {key1: value1, key2: "value2, text"}
                 default:
                     argList.add(args.get(i));
                     break;
             }
         }
         return (Message) constr.newInstance(argList.toArray());
+    }
+
+    /**
+     * Helper method to parse a list when one is required by a constructor
+     *
+     * @param strings       Array of Strings, each a single item for the list
+     *                      (will be parsed to the appropriate Class)
+     * @param itemClassName The name of the class serving as the List type
+     *
+     * @return List of Object (with the correct type hidden behind the Object)
+     *
+     * @throws java.lang.IllegalArgumentException Thrown when an unsupported
+     *                                            List type is provided
+     * @implNote Only supports Lists with {@link java.lang.Integer},
+     * {@link java.lang.String}, or {@link de.uol.swp.common.user.User}.
+     */
+    private List<Object> parseList(String[] strings, String itemClassName) {
+        List<Object> list = new LinkedList<>();
+        if (strings[0].isEmpty()) strings = Arrays.copyOfRange(strings, 1, strings.length);
+        switch (itemClassName) {
+            case "java.lang.Integer":
+                for (String s : strings) list.add(Integer.parseInt(s.trim()));
+                break;
+            case "java.lang.String":
+                for (String s : strings) list.add(s.trim());
+                break;
+            case "de.uol.swp.common.user.User":
+                for (String s : strings) {
+                    Optional<User> foundUser = userManagement.getUser(s.trim());
+                    if (foundUser.isPresent()) list.add(foundUser.get());
+                }
+                break;
+            case "de.uol.swp.common.chat.ChatMessage": // this is not in my capabilities right now
+            default:
+                throw new IllegalArgumentException("Unsupported List type");
+        }
+        return list;
+    }
+
+    /**
+     * Helper method to parse a map when one is required by a constructor
+     *
+     * @param strings        Array of Strings, each looking like "key:value"
+     *                       or "key: value"
+     * @param keyClassName   The name of the class serving as the Map key type
+     * @param valueClassName The name of the class serving as the Map value type
+     *
+     * @return Map of Object, Object (with the correct type hidden behind the
+     * Object)
+     *
+     * @throws java.lang.IllegalArgumentException Thrown when an unsupported
+     *                                            key or value type is provided
+     * @implNote Only supports Maps with {@link java.lang.String} key type and one of
+     * {@link java.lang.Boolean}, {@link java.lang.Integer}, or
+     * {@link de.uol.swp.common.lobby.Lobby} as value type.
+     */
+    private Map<Object, Object> parseMap(String[] strings, String keyClassName, String valueClassName) {
+        Map<Object, Object> map = new HashMap<>();
+        if (strings[0].isEmpty()) strings = Arrays.copyOfRange(strings, 1, strings.length);
+        if (keyClassName.equals("java.lang.String")) {
+            switch (valueClassName) {
+                case "java.lang.Boolean":
+                    for (String s : strings) {
+                        String[] kvarr = s.split(":");
+                        String valueStr = kvarr[1].trim();
+                        StringBuilder valBuilder = new StringBuilder(valueStr);
+                        try {
+                            valBuilder.replace(valueStr.lastIndexOf(","), valueStr.lastIndexOf(",") + 1, "");
+                        } catch (Exception ignored) {}
+                        map.put(kvarr[0].trim(), Boolean.parseBoolean(valBuilder.toString()));
+                    }
+                    break;
+                case "java.lang.Integer":
+                    for (String s : strings) {
+                        String[] kvarr = s.split(":");
+                        String valueStr = kvarr[1].trim();
+                        StringBuilder valBuilder = new StringBuilder(valueStr);
+                        try {
+                            valBuilder.replace(valueStr.lastIndexOf(","), valueStr.lastIndexOf(",") + 1, "");
+                        } catch (Exception ignored) {}
+                        map.put(kvarr[0].trim(), Integer.parseInt(valBuilder.toString()));
+                    }
+                    break;
+                case "de.uol.swp.common.lobby.Lobby":
+                    for (String s : strings) {
+                        String[] kvarr = s.split(":");
+                        String valueStr = kvarr[1].trim();
+                        StringBuilder valBuilder = new StringBuilder(valueStr);
+                        try {
+                            valBuilder.replace(valueStr.lastIndexOf(","), valueStr.lastIndexOf(",") + 1, "");
+                        } catch (Exception ignored) {}
+                        Optional<Lobby> foundLobby = lobbyManagement.getLobby(valBuilder.toString());
+                        if (foundLobby.isEmpty()) throw new RuntimeException("Lobby not found");
+                        map.put(kvarr[0].trim(), foundLobby.get());
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported Map value type");
+            }
+            return map;
+        } else throw new IllegalArgumentException("Unsupported Map key type");
     }
 
     /**

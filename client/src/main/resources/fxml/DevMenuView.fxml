@@ -21,7 +21,7 @@
         <spacing>5</spacing>
     </HBox>
     <TextField fx:id="classFilterTextField" layoutX="10.0" layoutY="210.0" prefHeight="25.0" prefWidth="200.0"/>
-    <VBox alignment="TOP_CENTER" layoutX="430.0" layoutY="10.0" maxHeight="225.0" prefHeight="225.0" prefWidth="190.0">
+    <VBox alignment="TOP_CENTER" layoutX="430.0" layoutY="10.0" maxHeight="Infinity" prefWidth="190.0">
         <Button mnemonicParsing="false" onAction="#onSendButtonPressed" text="%devmenu.buttons.send"
                 VBox.vgrow="ALWAYS">
             <VBox.margin>

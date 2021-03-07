@@ -24,7 +24,7 @@ public class I18nWrapper implements Serializable {
     /**
      * Constructor taking only an attribute name
      *
-     * @param attributeName the attribute name
+     * @param attributeName The name of the attribute
      */
     public I18nWrapper(String attributeName) {
         this.attributeName = attributeName;
@@ -34,8 +34,8 @@ public class I18nWrapper implements Serializable {
     /**
      * Constructor taking a attribute name and a string that should be embedded in the text
      *
-     * @param attributeName the attribute name
-     * @param insertString  the insert string
+     * @param attributeName The name of the attribute
+     * @param insertString  The String to insert
      */
     public I18nWrapper(String attributeName, String insertString) {
         this.attributeName = attributeName;
