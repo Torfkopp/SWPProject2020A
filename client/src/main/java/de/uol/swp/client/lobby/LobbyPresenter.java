@@ -10,6 +10,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
@@ -664,7 +665,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
-            lobbyService.retrieveAllLobbyMembers(lobbyName);
         }
     }
 
@@ -763,7 +763,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             playField.setVisible(true);
             //This Line needs to be changed/ removed in the Future
-            gameRendering.drawGameMap(new GameMapManagement());
+            GameMap map = new GameMap();
+            map.createBeginnerMap();
+            gameRendering.drawGameMap(map);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
             this.readyCheckBox.setVisible(false);
@@ -774,6 +776,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.tradeWithBankButton.setVisible(true);
             setRollDiceButtonState(msg.getUser());
             this.kickUserButton.setVisible(false);
+            this.playCard.setVisible(true);
         });
     }
 

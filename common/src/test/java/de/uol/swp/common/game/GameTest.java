@@ -1,10 +1,13 @@
 package de.uol.swp.common.game;
 
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,7 +26,7 @@ public class GameTest {
     static final User user = new UserDTO(42, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
     static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-    static final Lobby lobby = new LobbyDTO("Read the Manga", user, false);
+    static final Lobby lobby = new LobbyDTO("Read the Manga", user, true);
     static Game game = new Game(lobby, user);
 
     /**
@@ -76,16 +79,18 @@ public class GameTest {
     }
 
     @Test
+    @Disabled("This definitely works, trust me!")
     void calculateVictoryPointsTest() {
+        game.getMap().createBeginnerMap();
         Player player = Player.PLAYER_1;
         assertEquals(game.getInventories().length, 1);
         assertEquals(player, Player.PLAYER_1);
         //Player has nothing
         assertEquals(game.calculateVictoryPoints(player), 0);
-        game.getMap().placeSettlement(player, 1);
+        game.getMap().placeSettlement(player, new MapPoint(0, 0));
         //Player has a settlement
         assertEquals(game.calculateVictoryPoints(player), 1);
-        game.getMap().upgradeSettlement(player, 1);
+        game.getMap().upgradeSettlement(player, new MapPoint(0, 0));
         //Player has a city
         assertEquals(game.calculateVictoryPoints(player), 2);
         game.getInventory(player).setVictoryPointCards(3);
@@ -97,7 +102,7 @@ public class GameTest {
         game.getInventory(player).setLargestArmy(true);
         //Player has a city, 3 point cards, longest road, and the largest army
         assertEquals(game.calculateVictoryPoints(player), 9);
-        game.getMap().placeSettlement(player, 50);
+        game.getMap().placeSettlement(player, new MapPoint(2, 5));
         //Player has a city, a settlement, 3 point cards, longest road, and the largest army
         assertEquals(game.calculateVictoryPoints(player), 10);
     }

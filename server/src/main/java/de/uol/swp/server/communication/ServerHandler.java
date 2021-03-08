@@ -8,6 +8,7 @@ import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
+import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +61,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
         try {
-            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Mario
+            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Wario
             checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
             eventBus.post(msg);
         } catch (Exception e) {
@@ -156,20 +157,27 @@ public class ServerHandler implements ServerHandlerDelegate {
      * If a ClientAuthorisedMessage is detected on the EventBus, this method is called.
      * It gets the MessageContext, then hands it over to sendToClient along with a new LoginSuccessfulResponse.
      * It then gives a new UserLoggedInMessage to sendMessage in order to notify all connected clients.
+     * If the authorized user already had a session an AlreadyLoggedInResponse is send instead of the above.
      *
      * @param msg The ClientAuthorisedMessage found on the EventBus
      *
      * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
      * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
-     * @since 2019-11-20
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
      */
     @Subscribe
     private void onClientAuthorisedMessage(ClientAuthorisedMessage msg) {
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent() && msg.getSession().isPresent()) {
-            putSession(ctx.get(), msg.getSession().get());
-            sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
-            sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
+            if (msg.hasOldSession()) {
+                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
+            } else {
+                putSession(ctx.get(), msg.getSession().get());
+                sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
+                sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
+            }
         } else {
             LOG.warn("No context for " + msg);
         }

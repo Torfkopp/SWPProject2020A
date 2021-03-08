@@ -2,6 +2,8 @@ package de.uol.swp.common.game.map;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 
+import java.util.Set;
+
 /**
  * Interface for the game's map
  *
@@ -9,23 +11,31 @@ import de.uol.swp.common.game.map.Hexes.IGameHex;
  * @author Steven Luong
  * @since 2021-01-16
  */
-public interface IGameMapManagement {
+public interface IGameMap {
 
     /**
-     * Gets the edges in a usable format for rendering them as a jagged array with some extra positions filled with null
-     *
-     * @return A jagged array containing the hexes
+     * Creates the beginner map
      */
-    IEdge[][] getEdgesAsJaggedArrayWithNullFiller();
+    void createBeginnerMap();
+
+    /**
+     * Gets an edge that connects two intersections
+     *
+     * @param intersection1 First intersection of edge
+     * @param intersection2 Second intersection of edge
+     *
+     * @return The edge connecting the given intersections
+     */
+    IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
 
     /**
      * Gets the hex at a specified place
      *
-     * @param place The hex's place (int)
+     * @param position The hex's coordinates
      *
      * @return The hex
      */
-    IGameHex getHex(int place);
+    IGameHex getHex(MapPoint position);
 
     /**
      * Gets the hexes in a usable format for rendering them as a jagged array
@@ -33,6 +43,15 @@ public interface IGameMapManagement {
      * @return A jagged array containing the hexes
      */
     IGameHex[][] getHexesAsJaggedArray();
+
+    /**
+     * Gets the intersection object at a given position
+     *
+     * @param position The position of the intersection
+     *
+     * @return An intersection object
+     */
+    IIntersection getIntersection(MapPoint position);
 
     /**
      * Gets the intersections in a usable format for rendering them as a jagged array
@@ -52,26 +71,36 @@ public interface IGameMapManagement {
     /**
      * Gets the robber's position
      *
-     * @return int Position of the robber
+     * @return A MapPoint containing the position of the robber
      */
-    int getRobberPos();
+    MapPoint getRobberPosition();
+
+    /**
+     * Gets the incident edges of a given intersection
+     *
+     * @param intersection The intersection of which the edges should be returned
+     *
+     * @return A Set<> containing all edge objects
+     */
+    Set<IEdge> incidentEdges(IIntersection intersection);
 
     /**
      * Moves the robber
      *
-     * @param newHex The hex the robber has moved to
+     * @param newPosition The hex the robber has moved to
      */
-    void moveRobber(int newHex);
+    void moveRobber(MapPoint newPosition);
 
     /**
-     * Places a street
+     * Places a road for the given player on the given edge.
      *
-     * @param player   The player wanting to build the street
-     * @param position The position of the road
+     * @param player The player wanting to build the road
+     * @param edge   The edge to place a road on
      *
      * @return True if placement was successful; false if not
      */
-    boolean placeRoad(Player player, int position);
+
+    boolean placeRoad(Player player, IEdge edge);
 
     /**
      * Places a settlement
@@ -81,17 +110,17 @@ public interface IGameMapManagement {
      *
      * @return True if placement was successful; false if not
      */
-    boolean placeSettlement(Player player, int position);
+    boolean placeSettlement(Player player, MapPoint position);
 
     /**
      * Checks if a street is placeable
      *
-     * @param player   The player wanting to place the street
-     * @param position The position of the road
+     * @param player The player wanting to place the street
+     * @param edge   The edge to place a road on
      *
      * @return True if placement is possible; false if not
      */
-    boolean roadPlaceable(Player player, int position);
+    boolean roadPlaceable(Player player, IEdge edge);
 
     /**
      * Checks if a settlement is placeable
@@ -101,7 +130,7 @@ public interface IGameMapManagement {
      *
      * @return True if placement is possible; false if not
      */
-    boolean settlementPlaceable(Player player, int position);
+    boolean settlementPlaceable(Player player, MapPoint position);
 
     /**
      * Upgrades a settlement
@@ -111,5 +140,5 @@ public interface IGameMapManagement {
      *
      * @return True if placement was successful; false if not
      */
-    boolean upgradeSettlement(Player player, int position);
+    boolean upgradeSettlement(Player player, MapPoint position);
 }

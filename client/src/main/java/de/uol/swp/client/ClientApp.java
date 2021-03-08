@@ -208,6 +208,25 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
+     * Handles an old session
+     * <p>
+     * If an AlreadyLoggedInResponse object is found on the EventBus this method
+     * is called. If a client attempts to log in but the user is already
+     * logged in elsewhere this method tells the SceneManager to open a popup
+     * which prompts the user to log the old session out.
+     *
+     * @param message The AlreadyLoggedInResponse object detected on the EventBus
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse message) {
+        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getLoggedInUser());
+        sceneManager.showLogOldSessionOutScreen(message.getLoggedInUser());
+    }
+    
+    /**
      * Handles an unsuccessful password changing process
      * <p>
      * If an ChangePasswordExceptionMessage object is detected on the EventBus, this

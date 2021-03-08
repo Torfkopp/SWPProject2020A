@@ -84,11 +84,10 @@ public class UserService extends AbstractService {
             returnMessage = new ChangePasswordExceptionMessage(
                     "Cannot change Password of " + req.getUser() + " " + e.getMessage());
         }
-        if (req.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(req.getMessageContext().get());
-            post(returnMessage);
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
         }
-    }
+
 
     /**
      * Handles a DeleteUserRequest found on the EventBus
@@ -120,9 +119,7 @@ public class UserService extends AbstractService {
             returnMessage = new UserDeletionExceptionMessage(
                     "Cannot delete user " + req.getUser() + " " + e.getMessage());
         }
-        if (req.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(req.getMessageContext().get());
-        }
+       returnMessage.initWithMessage(req);
         post(returnMessage);
     }
 
@@ -156,9 +153,7 @@ public class UserService extends AbstractService {
             returnMessage = new RegistrationExceptionMessage(
                     "Cannot create user " + req.getUser() + " " + e.getMessage());
         }
-        if (req.getMessageContext().isPresent()) {
-            returnMessage.setMessageContext(req.getMessageContext().get());
-        }
+        returnMessage.initWithMessage(req);
         post(returnMessage);
     }
 }
