@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class MainMemoryBasedChatMessageStoreTest {
 
-    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
-    private static final User secondUser = new UserDTO("test2", "test", "test@test.de");
+    private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
+    private static final User secondUser = new UserDTO(2, "test2", "test", "test@test.de");
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am more intelligent content";
     private static final String thirdContent = "I am the most intelligent content";

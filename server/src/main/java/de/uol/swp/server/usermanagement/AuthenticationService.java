@@ -7,15 +7,13 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.request.LoginRequest;
-import de.uol.swp.common.user.request.LogoutRequest;
-import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
+import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
+import de.uol.swp.common.user.response.KillOldClientResponse;
+import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.communication.UUIDSession;
-import de.uol.swp.server.message.ClientAuthorisedMessage;
-import de.uol.swp.server.message.ServerExceptionMessage;
-import de.uol.swp.server.message.ServerInternalMessage;
+import de.uol.swp.server.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,8 +97,10 @@ public class AuthenticationService extends AbstractService {
      * If a LoginRequest is detected on the EventBus, this method is called.
      * It tries to login a user via the UserManagement.
      * If this succeeds, the user and his session are stored in the userSessions map,
-     * and a ClientAuthorisedMessage is posted onto the EventBus.
-     * Otherwise, a ServerExceptionMessage gets posted there.
+     * and a ClientAuthorisedMessage is posted onto the EventBus. Additionally if
+     * the user already had a session registered the oldSession attribute of the
+     * ClientAuthorizedMessage gets set to true, otherwise to false.
+     * When login fails, a ServerExceptionMessage gets posted there.
      *
      * @param msg The LoginRequest
      *
@@ -117,7 +117,11 @@ public class AuthenticationService extends AbstractService {
         ServerInternalMessage returnMessage;
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
-            returnMessage = new ClientAuthorisedMessage(newUser);
+            if (userSessions.containsValue(newUser)) {
+                returnMessage = new ClientAuthorisedMessage(newUser, true);
+            } else {
+                returnMessage = new ClientAuthorisedMessage(newUser, false);
+            }
             Session newSession = UUIDSession.create(newUser);
             userSessions.put(newSession, newUser);
             returnMessage.setSession(newSession);
@@ -160,6 +164,41 @@ public class AuthenticationService extends AbstractService {
                 post(returnMessage);
             }
         }
+    }
+
+    /**
+     * Handles a NukeUsersSessionsRequest found on the EventBus
+     * <p>
+     * If a NukeUsersSessionsRequest is detected on the EventBus, this method is called.
+     * It takes the user from received request and logs it out via UserManagement.
+     * After that it cycles through the session store and removes all sessions matching
+     * that particular user along with sending a KillOldClientResponse to log the old
+     * client out. At last a NukeUsersSessionsResponse is posted on the EventBus
+     * as a confirmation for the requesting client.
+     *
+     * @param req NukeUsersSessionsRequest found on the EventBus
+     *
+     * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
+     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest req) {
+        LOG.debug("Received NukeUsersSessionsRequest");
+        if (req.getUser() == null) return;
+        User userToLogOut = req.getUser();
+        LOG.debug("---- Logging out user " + userToLogOut.getUsername());
+        userManagement.logout(userToLogOut);
+        while (getSession(userToLogOut).isPresent()) {
+            post(new FetchUserContextInternalRequest(getSession(userToLogOut).get(), new KillOldClientResponse()));
+            userSessions.remove(getSession(userToLogOut).get());
+        }
+        post(new UserLoggedOutMessage(userToLogOut.getUsername()));
+        NukeUsersSessionsResponse response = new NukeUsersSessionsResponse();
+        response.initWithMessage(req);
+        post(response);
     }
 
     /**

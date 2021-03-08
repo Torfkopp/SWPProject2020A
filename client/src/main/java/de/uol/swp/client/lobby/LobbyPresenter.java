@@ -11,7 +11,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
@@ -59,12 +59,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    private ObservableList<Pair<String, String>> lobbyMembers;
+    private ObservableList<Pair<Integer, User>> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
     @FXML
-    private ListView<Pair<String, String>> membersView;
+    private ListView<Pair<Integer, User>> membersView;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -120,30 +120,39 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         super.initialize();
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
+            protected void updateItem(Pair<Integer, User> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue());
-                    //if the background should be in colour you need to use setBackground
-                    int i = membersView.getItems().size();
-                    if (i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
-                        setTextFill(GameRendering.PLAYER_1_COLOUR);
-                    }
-                    if (i >= 2 && getText().equals(lobbyMembers.get(1).getValue())) {
-                        setTextFill(GameRendering.PLAYER_2_COLOUR);
-                    }
-                    if (i >= 3 && getText().equals(lobbyMembers.get(2).getValue())) {
-                        setTextFill(GameRendering.PLAYER_3_COLOUR);
-                    }
-                    if (i >= 4 && getText().equals(lobbyMembers.get(3).getValue())) {
-                        setTextFill(GameRendering.PLAYER_4_COLOUR);
+                    if (empty || item == null) setText("");
+                    else {
+                        User user = item.getValue();
+                        String name = user.getUsername();
+                        if (readyUsers.contains(user))
+                            name = String.format(resourceBundle.getString("lobby.members.ready"), name);
+                        if (user.getID() == owner.getID())
+                            name = String.format(resourceBundle.getString("lobby.members.owner"), name);
+                        setText(name);
+                        //if the background should be in colour you need to use setBackground
+                        int i = lobbyMembers.size();
+                        if (i >= 1 && getText().contains(lobbyMembers.get(0).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_1_COLOUR);
+                        }
+                        if (i >= 2 && getText().contains(lobbyMembers.get(1).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_2_COLOUR);
+                        }
+                        if (i >= 3 && getText().contains(lobbyMembers.get(2).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_3_COLOUR);
+                        }
+                        if (i >= 4 && getText().contains(lobbyMembers.get(3).getValue().getUsername())) {
+                            setTextFill(GameRendering.PLAYER_4_COLOUR);
+                        }
                     }
                 });
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            String name = newValue.getKey();
-            boolean isSelf = name.equals(this.loggedInUser.getUsername());
+            String name = newValue.getValue().getUsername();
+            boolean isSelf = newValue.getValue().equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
@@ -255,17 +264,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Helper function to find the Pair for a given key
      *
-     * @param name the key of the pair that should be returned
+     * @param id The key of the pair that should be returned
      *
-     * @return the pair matched by the name
+     * @return The pair matched by the ID
      *
      * @author Temmo Junkhoff
      * @author Timo Gerken
      * @since 2021-01-19
      */
-    private Pair<String, String> findMember(String name) {
-        for (Pair<String, String> lobbyMember : lobbyMembers) {
-            if (lobbyMember.getKey().equals(name)) return lobbyMember;
+    private Pair<Integer, User> findMember(int id) {
+        for (Pair<Integer, User> lobbyMember : lobbyMembers) {
+            if (lobbyMember.getKey() == id) return lobbyMember;
         }
         return null;
     }
@@ -291,17 +300,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
-        if (this.lobbyName.equals(rsp.getLobbyName())) {
-            LOG.debug("Received AllLobbyMembersResponse");
-            LOG.debug("---- Update of lobby member list");
-            LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
-            LOG.debug("---- Update of ready users");
-            this.owner = rsp.getOwner();
-            this.readyUsers = rsp.getReadyUsers();
-            updateUsersList(rsp.getUsers());
-            setStartSessionButtonState();
-            setKickUserButtonState();
-        }
+        if (!this.lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received AllLobbyMembersResponse");
+        LOG.debug("---- Update of lobby member list");
+        LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
+        LOG.debug("---- Update of ready users");
+        this.owner = rsp.getOwner();
+        this.readyUsers = rsp.getReadyUsers();
+        updateUsersList(rsp.getUsers());
+        setStartSessionButtonState();
+        setKickUserButtonState();
     }
 
     /**
@@ -376,9 +384,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) return;
-        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getKey()));
+        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if ((selectedUser.getValue()) == this.loggedInUser) return;
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getValue().getUsername()));
     }
 
     /**
@@ -777,7 +785,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             playField.setVisible(true);
             //This Line needs to be changed/ removed in the Future
-            gameRendering.drawGameMap(new GameMapManagement());
+            GameMap map = new GameMap();
+            map.createBeginnerMap();
+            gameRendering.drawGameMap(map);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
             this.readyCheckBox.setVisible(false);
@@ -788,24 +798,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.tradeWithBankButton.setVisible(true);
             setRollDiceButtonState(msg.getUser());
             this.kickUserButton.setVisible(false);
+            this.playCard.setVisible(true);
         });
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-            Platform.runLater(() -> {
-                playField.setVisible(true);
-                //This Line needs to be changed/ removed in the Future
-                gameRendering.drawGameMap(new GameMapManagement());
-                setTurnIndicatorText(msg.getUser());
-                lobbyService.updateInventory(lobbyName, loggedInUser);
-                this.readyCheckBox.setVisible(false);
-                this.startSession.setVisible(false);
-                this.rollDice.setVisible(true);
-                this.tradeWithUserButton.setVisible(true);
-                this.tradeWithBankButton.setVisible(true);
-                setRollDiceButtonState(msg.getUser());
-                this.playCard.setVisible(true);
-            });
-        }
     }
 
     /**
@@ -905,19 +899,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onTradeWithUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<String, String> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
+        User user = selectedUser.getValue();
         if (membersView.getSelectionModel().isEmpty()) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
-        } else if ((selectedUser.getKey()).equals(this.loggedInUser.getUsername())) {
+        } else if (selectedUser.getKey() == this.loggedInUser.getID()) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setDisable(true);
             endTurn.setDisable(true);
             LOG.debug("Sending ShowTradeWithUserViewEvent");
-            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, selectedUser.getKey()));
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user.getUsername()));
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, selectedUser.getKey()));
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, user.getUsername()));
         }
     }
 
@@ -935,11 +930,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-            eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
-                                                                this.loggedInUser.getUsername(), this.lobbyName, rsp));
-        }
+        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
+        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
+                                                            this.loggedInUser.getUsername(), this.lobbyName, rsp));
     }
 
     /**
@@ -983,25 +977,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received UpdateInventoryResponse for Lobby " + this.lobbyName);
-            Platform.runLater(() -> {
-                if (resourceList == null) {
-                    resourceList = FXCollections.observableArrayList();
-                    inventoryView.setItems(resourceList);
-                }
-                resourceList.clear();
-                for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
-                    Pair<String, String> resource = new Pair<>(entry.getKey(), entry.getValue().toString());
-                    resourceList.add(resource);
-                }
-                for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
-                    Pair<String, String> property = new Pair<>(entry.getKey(), entry.getValue() ? resourceBundle
-                            .getString("game.property.has") : resourceBundle.getString("game.property.hasnot"));
-                    resourceList.add(property);
-                }
-            });
-        }
+        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received UpdateInventoryResponse for Lobby " + this.lobbyName);
+        Platform.runLater(() -> {
+            if (resourceList == null) {
+                resourceList = FXCollections.observableArrayList();
+                inventoryView.setItems(resourceList);
+            }
+            resourceList.clear();
+            for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(), entry.getValue().toString()));
+            }
+            for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(),
+                                            entry.getValue() ? resourceBundle.getString("game.property.has") :
+                                            resourceBundle.getString("game.property.hasnot")));
+            }
+        });
     }
 
     /**
@@ -1022,12 +1014,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
-        LOG.debug("---- User " + msg.getUser().getUsername() + " joined");
+        User user = msg.getUser();
+        LOG.debug("---- User " + user.getUsername() + " joined");
+        Pair<Integer, User> pair = new Pair<>(user.getID(), user);
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
-                                                                             .equals(msg.getUser().getUsername()))
-                lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
-            lobbyService.retrieveAllLobbyMembers(lobbyName);
+            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(pair))
+                lobbyMembers.add(pair);
             setStartSessionButtonState();
         });
     }
@@ -1057,16 +1049,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby " + this.lobbyName);
-        if (msg.getUser().getUsername().equals(owner.getUsername())) {
-            LOG.debug("---- Owner " + msg.getUser().getUsername() + " left");
+        User user = msg.getUser();
+        if (user.getID() == owner.getID()) {
+            LOG.debug("---- Owner " + user.getUsername() + " left");
             lobbyService.retrieveAllLobbyMembers(lobbyName);
-        } else {
-            LOG.debug("---- User " + msg.getUser().getUsername() + " left");
-            lobbyService.retrieveAllLobbyMembers(lobbyName);
-        }
+        } else LOG.debug("---- User " + user.getUsername() + " left");
         Platform.runLater(() -> {
-            lobbyMembers.remove(findMember(msg.getUser().getUsername()));
-            readyUsers.remove(msg.getUser());
+            lobbyMembers.remove(findMember(user.getID()));
+            readyUsers.remove(user);
             setStartSessionButtonState();
         });
     }
@@ -1238,18 +1228,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 membersView.setItems(lobbyMembers);
             }
             lobbyMembers.clear();
-
-            userLobbyList.forEach(u -> {
-                String username = u.getUsername();
-                if (readyUsers.contains(u)) {
-                    username = String.format(resourceBundle.getString("lobby.members.ready"), username);
-                }
-                Pair<String, String> item = new Pair<>(u.getUsername(),
-                                                       u.getUsername().equals(this.owner.getUsername()) ?
-                                                       String.format(resourceBundle.getString("lobby.members.owner"),
-                                                                     username) : username);
-                lobbyMembers.add(item);
-            });
+            userLobbyList.forEach(u -> lobbyMembers.add(new Pair<>(u.getID(), u)));
         });
     }
 }

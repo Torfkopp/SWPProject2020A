@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
 
-    static final User userToRegister = new UserDTO("Marco", "Marco", "Marco@Grawunder.com");
-    static final User userWithSameName = new UserDTO("Marco", "Marco2", "Marco2@Grawunder.com");
+    static final User userToRegister = new UserDTO(1, "Marco", "Marco", "Marco@Grawunder.com");
+    static final User userWithSameName = new UserDTO(2, "Marco", "Marco2", "Marco2@Grawunder.com");
 
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(new MainMemoryBasedUserStore());
@@ -32,7 +32,9 @@ class UserServiceTest {
 
         // old user should be still in the store
         assertNotNull(loggedInUser);
-        assertEquals(loggedInUser, userToRegister);
+        // Cannot compare against the object or ID because RegisterUserRequest doesn't know which ID the user will get
+        assertEquals(loggedInUser.getUsername(), userToRegister.getUsername());
+        assertEquals(loggedInUser.getEMail(), userToRegister.getEMail());
 
         // old user should not be overwritten!
         assertNotEquals(loggedInUser.getEMail(), userWithSameName.getEMail());
@@ -49,6 +51,8 @@ class UserServiceTest {
         final User loggedInUser = userManagement.login(userToRegister.getUsername(), userToRegister.getPassword());
 
         assertNotNull(loggedInUser);
-        assertEquals(loggedInUser, userToRegister);
+        // Cannot compare against the object or ID because RegisterUserRequest doesn't know which ID the user will get
+        assertEquals(loggedInUser.getUsername(), userToRegister.getUsername());
+        assertEquals(loggedInUser.getEMail(), userToRegister.getEMail());
     }
 }

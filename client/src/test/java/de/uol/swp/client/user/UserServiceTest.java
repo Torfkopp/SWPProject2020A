@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
 
-    final User defaultUser = new UserDTO("Marco", "test", "marco@test.de");
+    final User defaultUser = new UserDTO(1, "Marco", "test", "marco@test.de");
 
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);

@@ -7,30 +7,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MySQLBasedUserStoreTest {
 
     private static final int NO_USERS = 10;
-    private static final List<User> users;
+    private static List<User> users;
+    private static int nextID;
+
+    { // do not make static (will cause tests to fail)
+        UserStore store = new MySQLBasedUserStore();
+        MySQLBasedUserStoreTest.nextID = store.getNextUserID();
+        MySQLBasedUserStoreTest.users = new ArrayList<>();
+        for (int i = nextID; i < NO_USERS + nextID; i++) {
+            users.add(new UserDTO(i, "Us3rName" + i, "123GoodPassword" + i, "Username" + i + "@username.de"));
+        }
+        Collections.sort(users);
+    }
 
     // Set to true if you manually want to run these tests
     // This is only needed to not run these time intensive tests in CI
     static boolean isLocal() {
         return false;
-    }
-
-    static {
-        users = new ArrayList<>();
-        for (int i = 0; i < NO_USERS; i++) {
-            users.add(new UserDTO("Us3rName" + i, "123GoodPassword" + i, "Username" + i + "@username.de"));
-        }
-        Collections.sort(users);
     }
 
     UserStore getDefaultStore() {
@@ -57,16 +57,45 @@ class MySQLBasedUserStoreTest {
 
     @Test
     @EnabledIf("isLocal")
-    void changePassword() {
+    void changePasswordWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getID());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
 
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS", userToUpdate.getEMail());
+        String newPass = userToUpdate.getPassword() + "_NEWPASS";
+        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), newPass, userToUpdate.getEMail());
 
-        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), userToUpdate.getPassword() + "_NEWPASS");
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), newPass);
 
         assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
         assertEquals(userFound.get().getEMail(), userToUpdate.getEMail());
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void changePasswordWithNoIdParameterUpdate() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getID());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+        String newPass = userToUpdate.getPassword() + "_NEWPASS";
+
+        store.updateUser(userToUpdate.getUsername(), newPass, userToUpdate.getEMail());
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername(), newPass);
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userToUpdate.getUsername(), userFound.get().getUsername());
+        assertEquals(userToUpdate.getEMail(), userFound.get().getEMail());
+        assertEquals(userFound.get().getPassword(), "");
     }
 
     @Test
@@ -79,7 +108,22 @@ class MySQLBasedUserStoreTest {
 
     @Test
     @EnabledIf("isLocal")
-    void dropUser() {
+    void dropUserById() {
+        UserStore store = getDefaultStore();
+        User userToRemove = getDefaultUsers().get(3);
+        Optional<User> userFound = store.findUser(userToRemove.getID());
+        assertTrue(userFound.isPresent());
+
+        store.removeUser(userToRemove.getID());
+
+        userFound = store.findUser(userToRemove.getID());
+
+        assertTrue(userFound.isEmpty());
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void dropUserByUsername() {
         UserStore store = getDefaultStore();
         User userToRemove = getDefaultUsers().get(3);
 
@@ -87,7 +131,22 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser(userToRemove.getUsername());
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void findUserById() {
+        UserStore store = getDefaultStore();
+        User userToFind = getDefaultUsers().get(2);
+
+        Optional<User> userFound = store.findUser(userToFind.getID());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToFind);
+        assertEquals(userFound.get().getID(), userToFind.getID());
+        assertEquals(userFound.get().getUsername(), userToFind.getUsername());
+        assertEquals(userFound.get().getEMail(), userToFind.getEMail());
     }
 
     @Test
@@ -99,7 +158,10 @@ class MySQLBasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userToFind, userFound.get());
+        assertEquals(userFound.get(), userToFind);
+        assertEquals(userFound.get().getID(), userToFind.getID());
+        assertEquals(userToFind.getUsername(), userFound.get().getUsername());
+        assertEquals(userToFind.getEMail(), userFound.get().getEMail());
         assertEquals(userFound.get().getPassword(), "");
     }
 
@@ -112,7 +174,10 @@ class MySQLBasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userToFind, userFound.get());
+        assertEquals(userFound.get(), userToFind);
+        assertEquals(userFound.get().getID(), userToFind.getID());
+        assertEquals(userToFind.getUsername(), userFound.get().getUsername());
+        assertEquals(userToFind.getEMail(), userFound.get().getEMail());
         assertEquals(userFound.get().getPassword(), "");
     }
 
@@ -123,7 +188,7 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser(null, "");
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
     }
 
     @Test
@@ -134,7 +199,7 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser(userToFind.getUsername(), "");
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
     }
 
     @Test
@@ -145,7 +210,7 @@ class MySQLBasedUserStoreTest {
 
         Optional<User> userFound = store.findUser("öööö" + userToFind.getUsername());
 
-        assertFalse(userFound.isPresent());
+        assertTrue(userFound.isEmpty());
     }
 
     @Test
@@ -155,10 +220,20 @@ class MySQLBasedUserStoreTest {
         List<User> allUsers = getDefaultUsers();
 
         List<User> allUsersFromStore = store.getAllUsers();
-
         allUsersFromStore.forEach(u -> assertEquals(u.getPassword(), ""));
-        Collections.sort(allUsersFromStore);
-        assertEquals(allUsers, allUsersFromStore);
+        // We can only reliably check the created test users.
+        List<User> allTestUsers = new ArrayList<>(
+                allUsersFromStore.subList(allUsersFromStore.size() - 10, allUsersFromStore.size()));
+
+        allTestUsers.forEach(u -> assertEquals(u.getPassword(), ""));
+        Collections.sort(allTestUsers);
+
+        assertEquals(allUsers, allTestUsers);
+        for (int i = 0; i < allUsers.size() && i < allTestUsers.size(); i++) {
+            assertEquals(allUsers.get(i).getID(), allTestUsers.get(i).getID());
+            assertEquals(allUsers.get(i).getUsername(), allTestUsers.get(i).getUsername());
+            assertEquals(allUsers.get(i).getEMail(), allTestUsers.get(i).getEMail());
+        }
     }
 
     @Test
@@ -173,15 +248,43 @@ class MySQLBasedUserStoreTest {
 
     @Test
     @EnabledIf("isLocal")
-    void updateUser() {
+    void updateEmailWithIdParameterUpdate() {
         UserStore store = getDefaultStore();
         User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+        String newEMail = userToUpdate.getEMail() + "@TESTING";
 
-        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), userToUpdate.getEMail() + "@TESTING");
+        store.updateUser(userToUpdate.getID(), userToUpdate.getUsername(), userToUpdate.getPassword(), newEMail);
 
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail() + "@TESTING");
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
+        assertEquals(userFound.get().getEMail(), newEMail);
+    }
+
+    @Test
+    @EnabledIf("isLocal")
+    void updateEmailWithNoIdParameterUpdate() {
+        UserStore store = getDefaultStore();
+        User userToUpdate = getDefaultUsers().get(2);
+        Optional<User> usr = store.findUser(userToUpdate.getUsername());
+        assertTrue(usr.isPresent());
+        userToUpdate = usr.get();
+        String newEMail = userToUpdate.getEMail() + "@TESTING";
+
+        store.updateUser(userToUpdate.getUsername(), userToUpdate.getPassword(), newEMail);
+
+        Optional<User> userFound = store.findUser(userToUpdate.getUsername());
+
+        assertTrue(userFound.isPresent());
+        assertEquals(userFound.get(), userToUpdate);
+        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
+        assertEquals(userFound.get().getEMail(), newEMail);
     }
 }

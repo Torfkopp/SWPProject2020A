@@ -29,9 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnstableApiUsage")
 class AuthenticationServiceTest {
 
-    final User user = new UserDTO("name", "password", "email@test.de");
-    final User user2 = new UserDTO("name2", "password2", "email@test.de2");
-    final User user3 = new UserDTO("name3", "password3", "email@test.de3");
+    final User user = new UserDTO(1, "name", "password", "email@test.de");
+    final User user2 = new UserDTO(2, "name2", "password2", "email@test.de2");
+    final User user3 = new UserDTO(3, "name3", "password3", "email@test.de3");
     final UserStore userStore = new MainMemoryBasedUserStore();
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(userStore);
@@ -59,17 +59,17 @@ class AuthenticationServiceTest {
 
     @Test
     void getSessionsForUsersTest() {
-        loginUser(user);
-        loginUser(user2);
-        loginUser(user3);
+        User usr1 = loginUser(user);
+        User usr2 = loginUser(user2);
+        User usr3 = loginUser(user3);
         Set<User> users = new TreeSet<>();
-        users.add(user);
-        users.add(user2);
-        users.add(user3);
+        users.add(usr1);
+        users.add(usr2);
+        users.add(usr3);
 
-        Optional<Session> session1 = authService.getSession(user);
-        Optional<Session> session2 = authService.getSession(user2);
-        Optional<Session> session3 = authService.getSession(user2);
+        Optional<Session> session1 = authService.getSession(usr1);
+        Optional<Session> session2 = authService.getSession(usr2);
+        Optional<Session> session3 = authService.getSession(usr2);
 
         assertTrue(session1.isPresent());
         assertTrue(session2.isPresent());
@@ -85,7 +85,7 @@ class AuthenticationServiceTest {
 
     @Test
     void loggedInUsers() throws InterruptedException {
-        loginUser(user);
+        User usr = loginUser(user);
 
         Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);
@@ -94,7 +94,7 @@ class AuthenticationServiceTest {
         assertTrue(event instanceof AllOnlineUsersResponse);
 
         assertEquals(((AllOnlineUsersResponse) event).getUsers().size(), 1);
-        assertEquals(((AllOnlineUsersResponse) event).getUsers().get(0), user);
+        assertEquals(((AllOnlineUsersResponse) event).getUsers().get(0), usr);
     }
 
     @Test
@@ -110,11 +110,11 @@ class AuthenticationServiceTest {
 
     @Test
     void loginTest() throws InterruptedException {
-        userManagement.createUser(user);
+        User usr = userManagement.createUser(user);
         final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword());
         bus.post(loginRequest);
         lock.await(250, TimeUnit.MILLISECONDS);
-        assertTrue(userManagement.isLoggedIn(user));
+        assertTrue(userManagement.isLoggedIn(usr));
         // is message send
         assertTrue(event instanceof ClientAuthorisedMessage);
         userManagement.dropUser(user);
@@ -122,29 +122,30 @@ class AuthenticationServiceTest {
 
     @Test
     void loginTestFail() throws InterruptedException {
-        userManagement.createUser(user);
+        User usr = userManagement.createUser(user);
         final Message loginRequest = new LoginRequest(user.getUsername(), user.getPassword() + "äüö");
         bus.post(loginRequest);
 
         lock.await(250, TimeUnit.MILLISECONDS);
-        assertFalse(userManagement.isLoggedIn(user));
+        assertFalse(userManagement.isLoggedIn(usr));
         assertTrue(event instanceof ServerExceptionMessage);
-        userManagement.dropUser(user);
+        userManagement.dropUser(usr);
     }
 
-    private void loginUser(User userToLogin) {
-        userManagement.createUser(userToLogin);
+    private User loginUser(User userToLogin) {
+        User usr = userManagement.createUser(userToLogin);
         final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
         bus.post(loginRequest);
 
-        assertTrue(userManagement.isLoggedIn(userToLogin));
+        assertTrue(userManagement.isLoggedIn(usr));
         userManagement.dropUser(userToLogin);
+        return usr;
     }
 
     @Test
     void logoutTest() throws InterruptedException {
-        loginUser(user);
-        Optional<Session> session = authService.getSession(user);
+        User usr = loginUser(user);
+        Optional<Session> session = authService.getSession(usr);
 
         assertTrue(session.isPresent());
         final Message logoutRequest = new LogoutRequest();
@@ -163,11 +164,12 @@ class AuthenticationServiceTest {
     @Test
     void twoLoggedInUsers() throws InterruptedException {
         List<User> users = new ArrayList<>();
-        users.add(user);
-        users.add(user2);
-        Collections.sort(users);
+        User usr = loginUser(user);
+        User usr2 = loginUser(user2);
+        users.add(usr);
+        users.add(usr2);
 
-        users.forEach(this::loginUser);
+        Collections.sort(users);
 
         Message request = new RetrieveAllOnlineUsersRequest();
         bus.post(request);

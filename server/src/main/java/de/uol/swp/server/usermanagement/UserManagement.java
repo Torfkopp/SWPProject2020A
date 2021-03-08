@@ -17,7 +17,7 @@ import java.util.*;
 public class UserManagement extends AbstractUserManagement {
 
     private final UserStore userStore;
-    private final SortedMap<String, User> loggedInUsers = new TreeMap<>();
+    private final SortedMap<Integer, User> loggedInUsers = new TreeMap<>();
 
     /**
      * Constructor
@@ -25,7 +25,6 @@ public class UserManagement extends AbstractUserManagement {
      * @param userStore Object of the UserStore to be used
      *
      * @see de.uol.swp.server.usermanagement.store.UserStore
-     * @since 2019-08-05
      */
     @Inject
     public UserManagement(UserStore userStore) {
@@ -47,7 +46,12 @@ public class UserManagement extends AbstractUserManagement {
         if (user.isEmpty()) {
             throw new UserManagementException("Username unknown!");
         }
-        userStore.removeUser(userToDrop.getUsername());
+        userStore.removeUser(userToDrop.getID());
+    }
+
+    @Override
+    public Optional<User> getUser(int id) {
+        return userStore.findUser(id);
     }
 
     @Override
@@ -62,14 +66,14 @@ public class UserManagement extends AbstractUserManagement {
 
     @Override
     public boolean isLoggedIn(User username) {
-        return loggedInUsers.containsKey(username.getUsername());
+        return loggedInUsers.containsKey(username.getID());
     }
 
     @Override
     public User login(String username, String password) {
         Optional<User> user = userStore.findUser(username, password);
         if (user.isPresent()) {
-            this.loggedInUsers.put(username, user.get());
+            this.loggedInUsers.put(user.get().getID(), user.get());
             return user.get();
         } else {
             throw new SecurityException("Cannot auth user " + username);
@@ -78,7 +82,7 @@ public class UserManagement extends AbstractUserManagement {
 
     @Override
     public void logout(User user) {
-        loggedInUsers.remove(user.getUsername());
+        loggedInUsers.remove(user.getID());
     }
 
     @Override
@@ -88,14 +92,15 @@ public class UserManagement extends AbstractUserManagement {
 
     @Override
     public User updateUser(User userToUpdate) {
-        Optional<User> user = userStore.findUser(userToUpdate.getUsername());
+        Optional<User> user = userStore.findUser(userToUpdate.getID());
         if (user.isEmpty()) {
-            throw new UserManagementException("Username unknown!");
+            throw new UserManagementException("User unknown!");
         }
         // Only update if there are new values
+        String newUsername = firstNotNull(userToUpdate.getUsername(), user.get().getUsername());
         String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
         String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
-        return userStore.updateUser(userToUpdate.getUsername(), newPassword, newEMail);
+        return userStore.updateUser(user.get().getID(), newUsername, newPassword, newEMail);
     }
 
     /**

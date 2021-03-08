@@ -43,7 +43,7 @@ class ServerApp {
         // Create 5 test user for ease of development
         for (int i = 0; i < 5; i++) {
             if (userManagement.getUser("test" + i).isEmpty()) {
-                userManagement.createUser(new UserDTO("test" + i, "test" + i, "test" + i + "@test.de"));
+                userManagement.createUser(new UserDTO(i, "test" + i, "test" + i, "test" + i + "@test.de"));
             }
         }
 

@@ -74,7 +74,6 @@ public class UserService extends AbstractService {
             Optional<User> optionalUser = userManagement
                     .getUserWithPassword(req.getUser().getUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
                 userManagement.updateUser(req.getUser());
                 returnMessage = new ChangePasswordSuccessfulResponse();
             } else {
@@ -147,7 +146,7 @@ public class UserService extends AbstractService {
         }
         ResponseMessage returnMessage;
         try {
-            User newUser = userManagement.createUser(req.getUser());
+            userManagement.createUser(req.getUser());
             returnMessage = new RegistrationSuccessfulResponse();
         } catch (Exception e) {
             LOG.error(e);

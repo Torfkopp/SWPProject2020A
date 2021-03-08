@@ -10,6 +10,7 @@ import de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent;
 import de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent;
 import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
+import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -29,11 +30,15 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
+import de.uol.swp.common.user.response.KillOldClientResponse;
+import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -738,6 +743,47 @@ public class SceneManager {
      */
     public void showError(String e) {
         showError(resourceBundle.getString("error.generic") + '\n', e);
+    }
+
+    /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     * 
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    public void showLogOldSessionOutScreen(User user) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                eventBus.post(new NukeUsersSessionsRequest(user));
+            }
+        });
+    }
+
+    /**
+     * Handles the NukeUsersSessionsResponse detected on the EventBus
+     * <p>
+     * If this method is called, it means all sessions belonging to a
+     * user have been nuked, therefore it posts a RetryLoginEvent
+     * on the EventBus to create a new session for the user.
+     *
+     * @param rsp The NukeUsersSessionsResponse detected on the EventBus
+     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
+        eventBus.post(new RetryLoginEvent());
     }
 
     /**

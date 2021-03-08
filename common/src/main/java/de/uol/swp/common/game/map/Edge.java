@@ -8,32 +8,23 @@ package de.uol.swp.common.game.map;
  */
 public class Edge implements IEdge {
 
-    private final int[] neighbouringIntersections;
-    private final int[] neighbouringEdges;
+    private final Orientation orientation;
     private Player owner;
 
     /**
      * Constructor for a edge without a road on it
-     *
-     * @param neighbouringIntersections The two neighbouring intersections
-     * @param neighbouringEdges         The two to four neighbouring edges
      */
-    public Edge(int[] neighbouringIntersections, int[] neighbouringEdges) {
-        this.neighbouringIntersections = neighbouringIntersections;
-        this.neighbouringEdges = neighbouringEdges;
-        this.owner = null;
+    public Edge(Orientation orientation) {
+        this(orientation, null);
     }
 
     /**
      * Constructor for a edge with a road on it
      *
-     * @param neighbouringIntersections The two neighbouring intersections
-     * @param neighbouringEdges         The two to four neighbouring edges
-     * @param owner                     The owner of the road on the edge
+     * @param owner The owner of the road on the edge
      */
-    public Edge(int[] neighbouringIntersections, int[] neighbouringEdges, Player owner) {
-        this.neighbouringIntersections = neighbouringIntersections;
-        this.neighbouringEdges = neighbouringEdges;
+    public Edge(Orientation orientation, Player owner) {
+        this.orientation = orientation;
         this.owner = owner;
     }
 
@@ -43,17 +34,10 @@ public class Edge implements IEdge {
     }
 
     @Override
-    public int[] getNeighbouringEdges() {
-        return neighbouringEdges;
-    }
+    public Orientation getOrientation() {return orientation;}
 
     @Override
     public Player getOwner() {
         return owner;
-    }
-
-    @Override
-    public int[] getNeighbouringIntersections() {
-        return neighbouringIntersections;
     }
 }

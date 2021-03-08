@@ -30,6 +30,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
     static final String PASS = "rNZcEqeiqMJpdr9M";
     Connection conn = null;
     PreparedStatement pstmt = null;
+    private int nextID;
 
     /**
      * This method registers the user with its specific and unique username,
@@ -71,10 +72,60 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                     se.printStackTrace();
                 }
             }
-            return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
+            Optional<User> usr = findUser(username);
+            if (usr.isEmpty()) throw new RuntimeException("Something went wrong when creating the user");
+            return usr.get().getWithoutPassword();
         } else {
             throw new IllegalArgumentException("Username must not be taken already");
         }
+    }
+
+    /**
+     * This method finds and returns the user specified by the provided ID
+     * without a password comparison
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    @Override
+    public Optional<User> findUser(int id) {
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "SELECT * FROM userdb WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int userId = rs.getInt("id");
+                String user = rs.getString("username");
+                String mail = rs.getString("mail");
+                String pass = rs.getString("pass");
+
+                if (userId == id) {
+                    User usr = new UserDTO(userId, user, pass, mail);
+                    return Optional.of(usr.getWithoutPassword());
+                }
+            }
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -97,12 +148,13 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                int userId = rs.getInt("id");
                 String user = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
                 if (user.equals(username)) {
-                    User usr = new UserDTO(user, pass, mail);
+                    User usr = new UserDTO(userId, user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
             }
@@ -146,12 +198,13 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                int userId = rs.getInt("id");
                 String user = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
                 if (user.equals(username) && pass.equals(passwordHash)) {
-                    User usr = new UserDTO(user, pass, mail);
+                    User usr = new UserDTO(userId, user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
             }
@@ -194,11 +247,12 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                int userId = rs.getInt("id");
                 String username = rs.getString("username");
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
-                User usr = new UserDTO(username, pass, mail);
+                User usr = new UserDTO(userId, username, pass, mail);
                 retUsers.add(usr.getWithoutPassword());
             }
             rs.close();
@@ -216,6 +270,75 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             }
         }
         return retUsers;
+    }
+
+    /**
+     * This method gets the value that will be assigned to the NEXT created user
+     * by looking up the current value of the AUTO_INCREMENT field in the MySQL
+     * database.
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-26
+     */
+    @Override
+    public int getNextUserID() {
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(
+                    "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'catan_user_schema' AND TABLE_NAME = 'userdb'");
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) nextID = rs.getInt(1);
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        return nextID;
+    }
+
+    /**
+     * This method removes the row matching the provided ID.
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-02-23
+     */
+    @Override
+    public void removeUser(int id) {
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "DELETE FROM userdb WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -252,11 +375,49 @@ public class MySQLBasedUserStore extends AbstractUserStore {
 
     /**
      * This method allows the user to change his unique username, password or e-mail.
-     * The user will not be able to update his username or e-mail into already registered once.
+     * The user will not be able to update his username or e-mail into already registered ones.
      *
      * @author Marvin Drees
      * @since 2021-02-10
      */
+    @Override
+    public User updateUser(int id, String username, String password, String eMail) {
+        if (Strings.isNullOrEmpty(username)) {
+            throw new IllegalArgumentException("Username must not be null");
+        }
+
+        String passwordHash = hash(password);
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn.setAutoCommit(true);
+
+            String sql = "UPDATE userdb SET username = ?, pass = ?, mail = ? WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.setString(2, passwordHash);
+            pstmt.setString(3, eMail);
+            pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ignored) {
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        Optional<User> usr = findUser(username);
+        if (usr.isPresent()) return usr.get().getWithoutPassword();
+        else throw new RuntimeException("Something went wrong when updating the user " + username);
+    }
+
     @Override
     public User updateUser(String username, String password, String eMail) {
         if (Strings.isNullOrEmpty(username)) {
@@ -289,6 +450,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 se.printStackTrace();
             }
         }
-        return new UserDTO(username, passwordHash, eMail).getWithoutPassword();
+        Optional<User> user = findUser(username);
+        if (user.isEmpty()) throw new RuntimeException("Something went wrong when updating the user");
+        else return user.get().getWithoutPassword();
     }
 }

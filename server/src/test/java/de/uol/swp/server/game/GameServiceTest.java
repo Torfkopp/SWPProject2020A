@@ -88,9 +88,9 @@ public class GameServiceTest {
     @Test
     void BuyDevelopmentCardWhenBankInventoryIsEmptyTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -147,9 +147,9 @@ public class GameServiceTest {
     @Test
     void buyDevelopmentCardTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -235,9 +235,9 @@ public class GameServiceTest {
     @Test
     void buyDevelopmentCardWithNotEnoughResourcesTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -295,9 +295,9 @@ public class GameServiceTest {
     @Test
     void kickOwnerTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
@@ -326,9 +326,9 @@ public class GameServiceTest {
     @Test
     void kickUserTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
@@ -357,9 +357,9 @@ public class GameServiceTest {
     @Test
     void kickUserWhileGameIsActive() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         lobbyManagement.createLobby("testlobby", user[0]);
         Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby.isPresent());
@@ -401,9 +401,9 @@ public class GameServiceTest {
     @Test
     void notOwnerKickOtherUser() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         lobbyManagement.createLobby("testlobby", user[0]);
         Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby.isPresent());
@@ -430,9 +430,9 @@ public class GameServiceTest {
     @Test
     void tradeResourceWithBankTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         Lobby lobby = new LobbyDTO("testlobby", user[0], false);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -486,9 +486,9 @@ public class GameServiceTest {
     @Test
     void tradeResourcesTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
@@ -557,9 +557,9 @@ public class GameServiceTest {
     @Test
     void tradeWithNotEnoughResources() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO("Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO("Sylvester", "Stallone", "Sly@stall.com");
+        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
@@ -649,9 +649,9 @@ public class GameServiceTest {
     @Test
     void onPlayKnightCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -665,9 +665,9 @@ public class GameServiceTest {
     @Test
     void onPlayMonopolyCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -686,9 +686,9 @@ public class GameServiceTest {
     @Test
     void onPlayYearOfPlentyCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO("Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO("Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO("Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
