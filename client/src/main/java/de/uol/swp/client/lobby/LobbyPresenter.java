@@ -10,7 +10,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
@@ -751,27 +751,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onStartSessionMessage(StartSessionMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-        Platform.runLater(() -> {
-            playField.setVisible(true);
-            //This Line needs to be changed/ removed in the Future
-            gameRendering.drawGameMap(new GameMapManagement());
-            setTurnIndicatorText(msg.getUser());
-            lobbyService.updateInventory(lobbyName, loggedInUser);
-            this.readyCheckBox.setVisible(false);
-            this.startSession.setVisible(false);
-            this.rollDice.setVisible(true);
-            this.tradeWithUserButton.setVisible(true);
-            this.tradeWithUserButton.setDisable(true);
-            this.tradeWithBankButton.setVisible(true);
-            setRollDiceButtonState(msg.getUser());
-            this.kickUserButton.setVisible(false);
-        });
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
             Platform.runLater(() -> {
                 playField.setVisible(true);
                 //This Line needs to be changed/ removed in the Future
-                gameRendering.drawGameMap(new GameMapManagement());
+                GameMap map = new GameMap();
+                map.createBeginnerMap();
+                gameRendering.drawGameMap(map);
                 setTurnIndicatorText(msg.getUser());
                 lobbyService.updateInventory(lobbyName, loggedInUser);
                 this.readyCheckBox.setVisible(false);
@@ -1118,7 +1105,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession
-                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+                    .setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
