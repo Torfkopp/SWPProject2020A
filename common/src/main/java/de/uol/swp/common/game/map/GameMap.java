@@ -38,7 +38,7 @@ public class GameMap implements IGameMap {
 
     /**
      * Creates the beginner's map as shown in the manual
-     * of "Die Siedler von Catan" [Art.-Nr.: 684617]
+     * ( https://www.catan.com/files/downloads/catan_base_rules_2020_200707.pdf )
      */
     public void createBeginnerMap() {
         //Creating the hexes

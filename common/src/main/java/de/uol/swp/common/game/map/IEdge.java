@@ -10,6 +10,10 @@ public interface IEdge {
 
     /**
      * Enum for the orientation of the edge
+     * The orientation is read relative to the intersection which is used to render the edge
+     * SOUTH is a vertical edge
+     * WEST points to the top left
+     * EAST points to the top right
      */
     enum Orientation {
         WEST,

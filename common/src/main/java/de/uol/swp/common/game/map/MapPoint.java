@@ -2,7 +2,7 @@ package de.uol.swp.common.game.map;
 
 /**
  * MapPoint class
- * This class is used to store the coordinates of a hex or intersection on the gamemap.
+ * This class is used to store the coordinates of a hex or an intersection on the game map.
  */
 public class MapPoint {
 

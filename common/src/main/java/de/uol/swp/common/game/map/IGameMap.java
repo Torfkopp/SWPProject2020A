@@ -69,7 +69,7 @@ public interface IGameMap {
     int getPlayerPoints(Player player);
 
     /**
-     * Gets the position of the robber
+     * Gets the robber's position
      *
      * @return A MapPoint containing the position of the robber
      */
