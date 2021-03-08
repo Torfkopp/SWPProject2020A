@@ -22,21 +22,36 @@ import java.util.*;
  */
 public class MainMemoryBasedUserStore extends AbstractUserStore implements UserStore {
 
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, User> usersByName = new HashMap<>();
+    private final Map<Integer, User> usersById = new HashMap<>();
+    private int id_counter;
 
     @Override
     public User createUser(String username, String password, String eMail) {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
-        User usr = new UserDTO(username, hash(password), eMail);
-        users.put(username, usr);
+        int id;
+        if (usersByName.containsKey(username)) id = usersByName.get(username).getID();
+        else id = id_counter++;
+        User usr = new UserDTO(id, username, hash(password), eMail);
+        usersById.put(id, usr);
+        usersByName.put(username, usr);
         return usr;
     }
 
     @Override
+    public Optional<User> findUser(int id) {
+        User usr = usersById.get(id);
+        if (usr != null) {
+            return Optional.of(usr.getWithoutPassword());
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<User> findUser(String username) {
-        User usr = users.get(username);
+        User usr = usersByName.get(username);
         if (usr != null) {
             return Optional.of(usr.getWithoutPassword());
         }
@@ -45,7 +60,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
 
     @Override
     public Optional<User> findUser(String username, String password) {
-        User usr = users.get(username);
+        User usr = usersByName.get(username);
         if (usr != null && Objects.equals(usr.getPassword(), hash(password))) {
             return Optional.of(usr.getWithoutPassword());
         }
@@ -55,17 +70,53 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     @Override
     public List<User> getAllUsers() {
         List<User> retUsers = new ArrayList<>();
-        users.values().forEach(u -> retUsers.add(u.getWithoutPassword()));
+        usersByName.values().forEach(u -> retUsers.add(u.getWithoutPassword()));
         return retUsers;
     }
 
     @Override
+    public int getNextUserID() {
+        return id_counter;
+    }
+
+    @Override
+    public void removeUser(int id) {
+        Optional<User> user = findUser(id);
+        if (user.isPresent()) {
+            usersByName.remove(user.get().getUsername());
+            usersById.remove(id);
+        }
+    }
+
+    @Override
     public void removeUser(String username) {
-        users.remove(username);
+        Optional<User> user = findUser(username);
+        if (user.isPresent()) {
+            usersById.remove(user.get().getID());
+            usersByName.remove(username);
+        }
+    }
+
+    @Override
+    public User updateUser(int id, String username, String password, String eMail) {
+        Optional<User> user = findUser(id);
+        if (user.isEmpty()) throw new IllegalArgumentException("No user with this ID found");
+        else {
+            if (Strings.isNullOrEmpty(username)) {
+                throw new IllegalArgumentException("Username must not be null");
+            }
+            removeUser(user.get().getUsername());
+            User usr = new UserDTO(id, username, hash(password), eMail);
+            usersByName.put(username, usr);
+            usersById.put(id, usr);
+            return usr;
+        }
     }
 
     @Override
     public User updateUser(String username, String password, String eMail) {
-        return createUser(username, password, eMail);
+        Optional<User> user = findUser(username);
+        if (user.isEmpty()) throw new IllegalArgumentException("No user with this name found");
+        else return createUser(username, password, eMail);
     }
 }

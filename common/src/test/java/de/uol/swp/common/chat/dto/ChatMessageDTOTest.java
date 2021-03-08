@@ -25,7 +25,7 @@ class ChatMessageDTOTest {
 
     public static final int defaultID = 1;
     private static final String defaultContent = "I am intelligent content";
-    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
+    private static final User defaultUser = new UserDTO(42, "test", "test", "test@test.de");
     private static final Instant defaultTimestamp = Instant.ofEpochMilli(1608370913852L); // 2020-12-19-09:41:53.852
     private static final ChatMessage defaultMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp,
                                                                          defaultContent);
@@ -85,7 +85,8 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyAuthor() {
-        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, null, defaultTimestamp, defaultContent));
+        assertThrows(IllegalArgumentException.class,
+                     () -> new ChatMessageDTO(defaultID, null, defaultTimestamp, defaultContent));
     }
 
     /**
@@ -97,7 +98,8 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyContent() {
-        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, null));
+        assertThrows(IllegalArgumentException.class,
+                     () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, null));
     }
 
     /**
@@ -109,7 +111,8 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyStringContent() {
-        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, ""));
+        assertThrows(IllegalArgumentException.class,
+                     () -> new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, ""));
     }
 
     /**
@@ -121,7 +124,8 @@ class ChatMessageDTOTest {
      */
     @Test
     void createMessageWithEmptyTimestamp() {
-        assertThrows(IllegalArgumentException.class, () -> new ChatMessageDTO(defaultID, defaultUser, null, defaultContent));
+        assertThrows(IllegalArgumentException.class,
+                     () -> new ChatMessageDTO(defaultID, defaultUser, null, defaultContent));
     }
 
     /**

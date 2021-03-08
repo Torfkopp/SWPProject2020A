@@ -16,13 +16,13 @@ class UserManagementTest {
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
-    private static final User userNotInStore = new UserDTO("marco" + NO_USERS, "marco" + NO_USERS,
+    private static final User userNotInStore = new UserDTO(NO_USERS, "marco" + NO_USERS, "marco" + NO_USERS,
                                                            "marco" + NO_USERS + "@grawunder.de");
 
     static {
         users = new ArrayList<>();
         for (int i = 0; i < NO_USERS; i++) {
-            users.add(new UserDTO("marco" + i, "marco" + i, "marco" + i + "@grawunder.de"));
+            users.add(new UserDTO(i, "marco" + i, "marco" + i, "marco" + i + "@grawunder.de"));
         }
         Collections.sort(users);
     }
@@ -148,7 +148,7 @@ class UserManagementTest {
     void updateUserPassword_LoggedIn() {
         IUserManagement management = getDefaultManagement();
         User userToUpdate = users.get(0);
-        User updatedUser = new UserDTO(userToUpdate.getUsername(), "newPassword", null);
+        User updatedUser = new UserDTO(userToUpdate.getID(), userToUpdate.getUsername(), "newPassword", null);
 
         management.login(userToUpdate.getUsername(), userToUpdate.getPassword());
         assertTrue(management.isLoggedIn(userToUpdate));
@@ -167,7 +167,7 @@ class UserManagementTest {
     void updateUserPassword_NotLoggedIn() {
         IUserManagement management = getDefaultManagement();
         User userToUpdate = users.get(0);
-        User updatedUser = new UserDTO(userToUpdate.getUsername(), "newPassword", null);
+        User updatedUser = new UserDTO(userToUpdate.getID(), userToUpdate.getUsername(), "newPassword", null);
 
         assertFalse(management.isLoggedIn(userToUpdate));
         management.updateUser(updatedUser);
@@ -180,7 +180,7 @@ class UserManagementTest {
     void updateUser_Mail() {
         IUserManagement management = getDefaultManagement();
         User userToUpdate = users.get(0);
-        User updatedUser = new UserDTO(userToUpdate.getUsername(), "", "newMail@mail.com");
+        User updatedUser = new UserDTO(userToUpdate.getID(), userToUpdate.getUsername(), "", "newMail@mail.com");
 
         management.updateUser(updatedUser);
 

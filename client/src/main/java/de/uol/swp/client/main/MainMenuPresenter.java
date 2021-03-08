@@ -453,7 +453,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 ((Stage) event.getSource()).close();
                 clearEventBus();
             });
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     /**

@@ -93,8 +93,9 @@ public class ChangePasswordPresenter extends AbstractPresenter {
         } else if (!NewPasswordField1.getText().equals(NewPasswordField2.getText())) {
             eventBus.post(new ChangePasswordErrorEvent(resourceBundle.getString("changepw.error.newnotequal")));
         } else {
-            userService.updateUserPassword(new UserDTO(user.getUsername(), NewPasswordField1.getText(), ""),
-                                           OldPasswordField1.getText());
+            userService
+                    .updateUserPassword(new UserDTO(user.getID(), user.getUsername(), NewPasswordField1.getText(), ""),
+                                        OldPasswordField1.getText());
         }
     }
 }

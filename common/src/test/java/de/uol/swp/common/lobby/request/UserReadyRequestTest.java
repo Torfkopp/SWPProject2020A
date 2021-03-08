@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class UserReadyRequestTest {
 
-    private static final User defaultUser = new UserDTO("chuck", "test", "chuck@norris.com");
+    private static final User defaultUser = new UserDTO(42, "chuck", "test", "chuck@norris.com");
 
     /**
      * Tests the userReadyRequest when isReady is false

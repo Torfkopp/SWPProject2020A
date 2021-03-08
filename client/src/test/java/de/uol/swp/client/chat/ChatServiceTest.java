@@ -29,7 +29,7 @@ class ChatServiceTest {
     private static final String defaultContent = "I am intelligent content";
     private static final int defaultId = 42;
     private static final int defaultAmount = 37;
-    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
+    private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
     private static final String defaultLobby = "I am an intelligent lobby";
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);

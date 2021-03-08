@@ -39,7 +39,7 @@ public class ClientApp extends Application implements ConnectionListener {
     private static final Logger LOG = LogManager.getLogger(ClientApp.class);
 
     @Inject
-    private ResourceBundle resourceBundle;
+    private static ResourceBundle resourceBundle;
     private String host;
     private int port;
 

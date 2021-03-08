@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserMessageSerialisableTest {
 
-    private static final User defaultUser = new UserDTO("marco", "marco", "marco@grawunder.de");
+    private static final User defaultUser = new UserDTO(1, "marco", "marco", "marco@grawunder.de");
 
     private static final int SIZE = 10;
     private static final List<String> users = new ArrayList<>();

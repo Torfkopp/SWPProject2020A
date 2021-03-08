@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class LobbyDTOTest {
 
-    private static final User defaultUser = new UserDTO("marco", "marco", "marco@grawunder.de");
-    private static final User notInLobbyUser = new UserDTO("no", "marco", "no@grawunder.de");
+    private static final User defaultUser = new UserDTO(98, "marco", "marco", "marco@grawunder.de");
+    private static final User notInLobbyUser = new UserDTO(99, "no", "marco", "no@grawunder.de");
     private static final Lobby defaultLobby = new LobbyDTO("TestLobby", defaultUser, false);
 
     private static final int NO_USERS = 10;
@@ -33,7 +33,7 @@ class LobbyDTOTest {
     static {
         users = new ArrayList<>();
         for (int i = 0; i < NO_USERS; i++) {
-            users.add(new UserDTO("marco" + i, "marco" + i, "marco" + i + "@grawunder.de"));
+            users.add(new UserDTO(i, "marco" + i, "marco" + i, "marco" + i + "@grawunder.de"));
         }
         Collections.sort(users);
     }

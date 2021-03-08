@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class ChatManagementTest {
 
-    private static final User defaultUser = new UserDTO("test", "test", "test@test.de");
+    private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am new, more intelligent content";
     private static final String defaultLobby = "I might be a lobby, or I might not be";
