@@ -318,7 +318,7 @@ public class GameService extends AbstractService {
             case "knights":
                 inventory.increaseKnights(req.getAmount());
                 break;
-            case "monopoly":
+            case "monopolycard":
             case "mc":
                 inventory.increaseMonopolyCards(req.getAmount());
                 break;
