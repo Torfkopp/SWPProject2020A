@@ -324,22 +324,6 @@ public class SceneManager {
     }
 
     /**
-     * Handles the KillOldClientResponse detected on the EventBus
-     * <p>
-     * If a KillOldClientResponse is detected on the EventBus, this method
-     * gets called. It causes the old client to fall back to the login screen.
-     *
-     * @see de.uol.swp.common.user.response.KillOldClientResponse
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        showLoginScreen();
-    }
-
-    /**
      * Handles the LobbyErrorEvent detected on the EventBus
      * <p>
      * If a LobbyErrorEvent is detected on the EventBus, this method gets

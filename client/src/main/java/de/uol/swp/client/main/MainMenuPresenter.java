@@ -357,13 +357,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Handles a KillOldClientResponse found on the EventBus
      * <p>
      * If a new KillOldClientResponse object is found on the EventBus, this
-     * method removes the user from all lobbies and posts a new
-     * showLoginViewMessage on the bus so the old client gets reset
-     * to the login screen. At last the chat map gets reset.
+     * method removes the user from all lobbies and resets the users chat vars.
+     * After that it posts a new showLoginViewMessage on the bus,
+     * so the old client gets reset to the login screen. The final step is
+     * to post a CloseLobbiesViewEvent on the bus so the remaining lobby
+     * windows get closed as well.
      *
      * @param rsp TheKillOldClientResponse object fount on the EventBus
      * @see de.uol.swp.common.user.response.KillOldClientResponse
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
+     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
@@ -371,8 +374,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onKillOldClientResponse(KillOldClientResponse rsp) {
         lobbyService.removeFromLobbies(loggedInUser);
-        eventBus.post(showLoginViewMessage);
         resetCharVars();
+        eventBus.post(showLoginViewMessage);
+        Platform.runLater(() -> eventBus.post(closeLobbiesViewEvent));
     }
 
     /**
