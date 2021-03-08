@@ -270,6 +270,104 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles an EditInventoryRequest found on the EventBus
+     * <p>
+     * This method changes the amount of the requested resource by the amount
+     * specified in the request or inverts the ownership status of unique
+     * cards like "Largest Army" or "Longest Road".
+     *
+     * @param req The EditInventoryRequest found on the EventBus
+     *
+     * @implNote The amount is ignored for "Largest Army" and "Longest Road",
+     * as those are only saved as boolean. For them, the ownership is inverted
+     * instead. So if "Largest Army" is requested and the player doesn't own
+     * the card, they will own it after this method is done (and vice versa).
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.request.EditInventoryRequest
+     * @since 2021-03-07
+     */
+    @Subscribe
+    private void onEditInventoryRequest(EditInventoryRequest req) {
+        LOG.debug("Received EditInventoryRequest");
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inventory = game.getInventory(game.getPlayer(req.getUser()));
+        switch (req.getResource().toLowerCase()) {
+            case "bricks":
+            case "brick":
+                inventory.increaseBrick(req.getAmount());
+                break;
+            case "grains":
+            case "grain":
+                inventory.increaseGrain(req.getAmount());
+                break;
+            case "ore":
+                inventory.increaseOre(req.getAmount());
+                break;
+            case "lumber":
+                inventory.increaseLumber(req.getAmount());
+                break;
+            case "wool":
+                inventory.increaseWool(req.getAmount());
+                break;
+            case "knightcard":
+            case "kc":
+                inventory.increaseKnightCards(req.getAmount());
+                break;
+            case "knight":
+            case "knights":
+                inventory.increaseKnights(req.getAmount());
+                break;
+            case "monopolycard":
+            case "mc":
+                inventory.increaseMonopolyCards(req.getAmount());
+                break;
+            case "roadbuildingcard":
+            case "rbc":
+                inventory.increaseRoadBuildingCards(req.getAmount());
+                break;
+            case "victorypointcard":
+            case "vpc":
+                inventory.increaseVictoryPointCards(req.getAmount());
+                break;
+            case "victorypoints":
+            case "vp":
+                inventory.setVictoryPoints(inventory.getVictoryPoints() + req.getAmount());
+                break;
+            case "yearofplentycard":
+            case "yearofplenty":
+            case "yopc":
+                inventory.increaseYearOfPlentyCards(req.getAmount());
+                break;
+            case "largestarmy":
+            case "la":
+                inventory.setLargestArmy(!inventory.isLargestArmy());
+                break;
+            case "longestroad":
+            case "lr":
+                inventory.setLongestRoad(!inventory.isLongestRoad());
+                break;
+        }
+        inventory = game.getInventory(game.getPlayer(req.getUser()));
+        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
+        resourceMap.put("cards.victorypoints", inventory.getVictoryPointCards());
+        resourceMap.put("cards.knight", inventory.getKnightCards());
+        resourceMap.put("cards.roadbuilding", inventory.getRoadBuildingCards());
+        resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
+        resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
+
+        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
+        armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
+        armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
+
+        ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
+                                                                    Collections.unmodifiableMap(resourceMap),
+                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+        LOG.debug("Sending GetUserSessionEvent containing UpdateInventoryResponse");
+        post(new GetUserSessionEvent(req.getUser(), returnMessage));
+    }
+
+    /**
      * Handles a EndTurnRequest found on the EventBus
      * <p>
      * If a EndTurnRequest is detected on the EventBus, this method is called.
@@ -669,7 +767,9 @@ public class GameService extends AbstractService {
         }
         try {
             Game game = gameManagement.getGame(req.getOriginLobby());
-            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), game.rollDice());
+            int[] result = game.rollDice();
+            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
+                                                              result[1]);
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         } catch (Exception e) {
             LOG.error(e);

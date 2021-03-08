@@ -11,25 +11,37 @@ import de.uol.swp.common.user.User;
  */
 public class DiceCastMessage extends AbstractGameMessage {
 
-    int dice1;
-    int dice2;
+    private final int dice1;
+    private final int dice2;
 
     /**
      * Constructor
      *
      * @param lobbyName Name of the lobby
      * @param user      Active user
+     * @param dice1     Eyes of the first dice rolled
+     * @param dice2     Eyes of the second dice rolled
      */
-    public DiceCastMessage(String lobbyName, User user, int[] dices) {
+    public DiceCastMessage(String lobbyName, User user, int dice1, int dice2) {
         super(lobbyName, user);
-        dice1 = dices[0];
-        dice2 = dices[1];
+        this.dice1 = dice1;
+        this.dice2 = dice2;
     }
 
+    /**
+     * Gets the eye count of the first dice
+     *
+     * @return Eyes on the first dice rolled
+     */
     public int getDice1() {
         return dice1;
     }
 
+    /**
+     * Gets the eye count of the second dice
+     *
+     * @return Eyes on the second dice rolled
+     */
     public int getDice2() {
         return dice2;
     }

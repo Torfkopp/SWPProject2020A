@@ -14,6 +14,7 @@ import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -219,6 +220,10 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
+        if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
+            post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
+            return;
+        }
         if (LOG.isDebugEnabled()) {
             if (req.isFromLobby()) LOG.debug("Received NewChatMessageRequest from Lobby " + req.getOriginLobby());
             else LOG.debug("Received NewChatMessageRequest");

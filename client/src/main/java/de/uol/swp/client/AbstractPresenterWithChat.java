@@ -3,10 +3,13 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -15,6 +18,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
@@ -41,10 +46,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected String lobbyName;
     protected User loggedInUser;
-    protected ObservableList<ChatMessage> chatMessages;
+    protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     @FXML
-    protected ListView<ChatMessage> chatView;
+    protected ListView<ChatOrSystemMessage> chatView;
     @FXML
     protected TextField messageField;
 
@@ -89,12 +94,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Handles new incoming ChatMessage
      * <p>
      * If a CreatedChatMessageMessage is posted to the EventBus, this method
-     * puts the incoming ChatMessage's content into the chatMessageMap with the
-     * ChatMessage's ID as the key.
-     * If the loglevel is set to DEBUG, the message "Received Chat Message: " with
-     * the incoming ChatMessage's content is displayed in the log.
+     * places the incoming ChatMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * CreatedChatMessageMessage" or "Received CreatedChatMessageMessage for
+     * Lobby {@code <lobbyName>}" is displayed in the log.
      *
-     * @param msg The CreatedChatMessageMessage object found on the EventBus
+     * @param msg The CreatedChatMessageMessage found on the EventBus
      *
      * @implNote Some code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
@@ -121,7 +126,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onDeleteMessageButtonPressed() {
-        ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
+        ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
+        ChatMessage chatMsg;
+        if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
+        else return;
         int msgId = chatMsg.getID();
         if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
         if (lobbyName != null) {
@@ -135,7 +143,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Handles incoming notification that a ChatMessage was deleted
      * <p>
      * If a DeletedChatMessageMessage is posted to the EventBus, this method
-     * removes the ChatMessage with the corresponding ID from the chatMessageMap.
+     * removes the ChatMessage with the corresponding ID from the chatMessages
+     * list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * DeletedChatMessageMessage" or "Received DeletedChatMessageMessage for
+     * Lobby {@code <lobbyName>}" is displayed in the log.
      *
      * @param msg The DeletedChatMessageMessage found on the EventBus
      *
@@ -151,9 +163,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         }
         Platform.runLater(() -> {
             for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i).getID() == msg.getId()) {
-                    chatMessages.remove(i);
-                    break;
+                if (chatMessages.get(i) instanceof ChatMessage) {
+                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
+                    if (chatMessage.getID() == msg.getId()) {
+                        chatMessages.remove(i);
+                        break;
+                    }
                 }
             }
         });
@@ -167,6 +182,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * by replacing the current content with the content found in the
      * messageField, but only when the ChatMessage author equals the logged in
      * user.
+     * Should the selected ChatMessage be a SystemMessage, the method silently
+     * returns with no further action.
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
@@ -175,7 +192,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onEditMessageButtonPressed() {
-        ChatMessage chatMsg = chatView.getSelectionModel().getSelectedItem();
+        ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
+        ChatMessage chatMsg;
+        if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
+        else return;
         int msgId = chatMsg.getID();
         if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
         if (lobbyName != null) {
@@ -190,8 +210,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Handles incoming notification that a ChatMessage was edited
      * <p>
      * If an EditedChatMessageMessage is posted to the EventBus, this method
-     * replaces the content in the chatMessageMap that is stored under the
-     * edited ChatMessage's ID.
+     * replaces the ChatMessage with the corresponding ID in the chatMessages
+     * list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * EditedChatMessageMessage" or "Received EditedChatMessageMessage for
+     * Lobby {@code <lobbyName>}" is displayed in the log.
      *
      * @param msg The EditedChatMessageMessage found on the EventBus
      *
@@ -207,8 +230,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         }
         Platform.runLater(() -> {
             for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i).getID() == msg.getMsg().getID()) {
-                    chatMessages.set(i, msg.getMsg());
+                if (chatMessages.get(i) instanceof ChatMessage) {
+                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
+                    if (chatMessage.getID() == msg.getMsg().getID()) {
+                        chatMessages.set(i, msg.getMsg());
+                    }
                 }
             }
         });
@@ -217,9 +243,10 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     /**
      * Method called when the SendMessageButton is pressed
      * <p>
-     * This Method is called when the SendMessageButton is pressed. It calls the chatService
-     * to create a new message with the contents of the messageField as its content and
-     * the currently logged in user as author. It also clears the messageField.
+     * This Method is called when the SendMessageButton is pressed. It calls
+     * the chatService to create a new message with the contents of the
+     * messageField as its content and the currently logged in user as author.
+     * It also clears the messageField.
      *
      * @see de.uol.swp.client.chat.ChatService
      */
@@ -232,6 +259,26 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         } else {
             chatService.newMessage(loggedInUser, msg);
         }
+    }
+
+    /**
+     * Handles new incoming SystemMessage
+     * <p>
+     * If a SystemMessageResponse is posted onto the EventBus, this method
+     * places the incoming SystemMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * SystemMessageResponse" or "Received SystemMessageResponse for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param rsp The SystemMessageResponse found on the EventBus
+     *
+     * @since 2021-02-22
+     */
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
+        } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) LOG.debug("Received SystemMessageResponse");
+        Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
     }
 
     /**
@@ -250,20 +297,27 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
         chatView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(ChatMessage item, boolean empty) {
+            protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
+                if (item instanceof SystemMessage)
+                    setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
+                else setFont(Font.getDefault());
                 setText(empty || item == null ? "" : item.toString());
+                setMaxWidth(chatView.getWidth());
+                setPrefWidth(chatView.getWidth());
+                setWidth(chatView.getWidth());
+                setWrapText(true);
             }
         });
         chatView.setItems(chatMessages);
     }
 
     /**
-     * Nulls the chatMessageMap and chatMessages variables
+     * Nulls the chatMessages variable
      * <p>
-     * This method is called on pressing the logout or the delete account button, and
-     * ensures that the chatMessageMap and chatMessages are reset to null, to avoid
-     * multiple instances of the chat being displayed in the chatView.
+     * This method is called on pressing the logout or the delete account
+     * button, and ensures that the chatMessages list is reset to null, to
+     * avoid multiple instances of the chat being displayed in the chatView.
      *
      * @author Finn Haase
      * @author Phillip-André Suhr

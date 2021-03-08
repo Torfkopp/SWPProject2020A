@@ -12,8 +12,7 @@ import de.uol.swp.server.game.IGameManagement;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
-import de.uol.swp.server.usermanagement.AuthenticationService;
-import de.uol.swp.server.usermanagement.UserService;
+import de.uol.swp.server.usermanagement.*;
 import de.uol.swp.server.usermanagement.store.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,6 +79,7 @@ public class ServerModule extends AbstractModule {
         bind(ChatService.class).in(Scopes.SINGLETON);
         bind(IGameManagement.class).to(GameManagement.class).in(Scopes.SINGLETON);
         bind(ILobbyManagement.class).to(LobbyManagement.class).in(Scopes.SINGLETON);
+        bind(IUserManagement.class).to(UserManagement.class).in(Scopes.SINGLETON);
         bind(GameService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);
         bind(UserService.class).in(Scopes.SINGLETON);

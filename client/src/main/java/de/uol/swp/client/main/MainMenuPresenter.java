@@ -11,6 +11,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.AllLobbiesMessage;
@@ -38,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Manages the main menu
@@ -95,33 +97,31 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Override
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName() == null) {
-            super.onAskLatestChatMessageResponse(rsp);
-        }
+        if (rsp.getLobbyName() == null) super.onAskLatestChatMessageResponse(rsp);
     }
 
     @Override
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) {
-            super.onCreatedChatMessageMessage(msg);
-        }
+        if (!msg.isLobbyChatMessage()) super.onCreatedChatMessageMessage(msg);
     }
 
     @Override
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) {
-            super.onDeletedChatMessageMessage(msg);
-        }
+        if (!msg.isLobbyChatMessage()) super.onDeletedChatMessageMessage(msg);
     }
 
     @Override
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) {
-            super.onEditedChatMessageMessage(msg);
-        }
+        if (!msg.isLobbyChatMessage()) super.onEditedChatMessageMessage(msg);
+    }
+
+    @Override
+    @Subscribe
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        if (!rsp.isLobbyChatMessage()) super.onSystemMessageResponse(rsp);
     }
 
     /**
@@ -246,8 +246,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         //give the lobby a default name
         String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"), loggedInUser.getUsername());
 
-        //create Dialogue
+        //create Dialogue, disallow any use of § in the name (used for command parsing)
+        UnaryOperator<TextFormatter.Change> filter = (s) ->
+                !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
+
         TextInputDialog dialog = new TextInputDialog(name);
+        dialog.getEditor().setTextFormatter(new TextFormatter<>(filter));
         dialog.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialog.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
         dialog.setContentText(resourceBundle.getString("lobby.dialog.content"));
@@ -438,7 +442,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
-        LOG.debug("Received LogSuccessfulResponse");
+        LOG.debug("Received LoginSuccessfulResponse");
         this.loggedInUser = rsp.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();

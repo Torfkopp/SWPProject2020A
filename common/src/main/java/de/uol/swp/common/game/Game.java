@@ -79,6 +79,19 @@ public class Game {
     }
 
     /**
+     * Gets the active player.
+     *
+     * @return The currently active player
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    public User getActivePlayer() {
+        return players[activePlayer];
+    }
+
+    /**
      * Gets the List of the items of the bank.
      *
      * @return The List of the bank inventory

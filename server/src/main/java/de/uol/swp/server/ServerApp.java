@@ -7,6 +7,7 @@ import de.uol.swp.server.chat.ChatService;
 import de.uol.swp.server.communication.ServerHandler;
 import de.uol.swp.server.communication.netty.NettyServerHandler;
 import de.uol.swp.server.communication.netty.Server;
+import de.uol.swp.server.devmenu.CommandService;
 import de.uol.swp.server.di.ServerModule;
 import de.uol.swp.server.game.GameService;
 import de.uol.swp.server.lobby.LobbyService;
@@ -52,6 +53,7 @@ class ServerApp {
         injector.getInstance(AuthenticationService.class);
         injector.getInstance(LobbyService.class);
         injector.getInstance(ChatService.class);
+        injector.getInstance(CommandService.class);
         injector.getInstance(GameService.class);
     }
 

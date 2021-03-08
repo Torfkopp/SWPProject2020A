@@ -2,7 +2,6 @@ package de.uol.swp.common.chat;
 
 import de.uol.swp.common.user.User;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -13,16 +12,15 @@ import java.time.Instant;
  *
  * @author Phillip-André Suhr
  * @see de.uol.swp.common.chat.dto.ChatMessageDTO
+ * @see de.uol.swp.common.chat.ChatOrSystemMessage
  * @since 2020-12-16
  */
-public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
+public interface ChatMessage extends Comparable<ChatMessage>, ChatOrSystemMessage {
 
     /**
      * Gets the ChatMessage's author
      *
      * @return A User object that represents the ChatMessage author#
-     *
-     * @since 2020-12-16
      */
     User getAuthor();
 
@@ -30,8 +28,6 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
      * Gets the ChatMessage's content
      *
      * @return A String containing the ChatMessage content
-     *
-     * @since 2020-12-16
      */
     String getContent();
 
@@ -40,8 +36,8 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
      *
      * @param newContent The new ChatMessage content
      *
-     * @implNote This method also automatically sets the edited attribute to true!
-     * @since 2020-12-16
+     * @implNote This method also automatically sets the edited attribute to
+     * true!
      */
     void setContent(String newContent);
 
@@ -49,17 +45,14 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
      * Getter for the ChatMessage's unique ID
      *
      * @return An int that represents the unique identifier of this ChatMessage
-     *
-     * @since 2020-12-16
      */
     int getID();
 
     /**
      * Gets the ChatMessage's timestamp
      *
-     * @return An Instant object in UTC to represent the creation time of the ChatMessage
-     *
-     * @since 2020-12-16
+     * @return An Instant object in UTC to represent the creation time of the
+     * ChatMessage
      */
     Instant getTimestamp();
 
@@ -67,8 +60,6 @@ public interface ChatMessage extends Serializable, Comparable<ChatMessage> {
      * Gets the ChatMessage's edited status
      *
      * @return False if the ChatMessage wasn't edited. True if it was edited.
-     *
-     * @since 2020-12-19
      */
     boolean isEdited();
 }

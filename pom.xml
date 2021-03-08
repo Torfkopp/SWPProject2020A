@@ -27,6 +27,11 @@
                 <configuration>
                     <source>11</source>
                     <target>11</target>
+                    <compilerArgs>
+                        <!--Used to be able to show the correct parameter names
+                        as defined in the code in the Developer Menu-->
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>

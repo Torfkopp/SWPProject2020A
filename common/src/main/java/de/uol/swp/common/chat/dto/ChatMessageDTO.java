@@ -9,7 +9,8 @@ import java.time.ZoneOffset;
 import java.util.Objects;
 
 /**
- * Objects of this class are used to transfer chat message data between the server and clients
+ * Objects of this class are used to transfer chat message data between the
+ * server and clients
  *
  * @author Phillip-André Suhr
  * @see de.uol.swp.common.chat.ChatMessage
@@ -32,14 +33,7 @@ public class ChatMessageDTO implements ChatMessage {
      * @param content   The content of the message
      */
     public ChatMessageDTO(int id, User author, Instant timestamp, String content) {
-        if (!Objects.nonNull(author)) throw new IllegalArgumentException("Author must not be null");
-        if (Strings.isNullOrEmpty(content)) throw new IllegalArgumentException("Content must not be null or empty");
-        if (!Objects.nonNull(timestamp)) throw new IllegalArgumentException("Timestamp must not be null");
-        this.id = id;
-        this.author = author;
-        this.timestamp = timestamp;
-        this.content = content;
-        this.edited = false;
+        this(id, author, timestamp, content, false);
     }
 
     /**
@@ -52,13 +46,7 @@ public class ChatMessageDTO implements ChatMessage {
      * @param content The content of the message
      */
     public ChatMessageDTO(int id, User author, String content) {
-        if (!Objects.nonNull(author)) throw new IllegalArgumentException("Author must not be null");
-        if (Strings.isNullOrEmpty(content)) throw new IllegalArgumentException("Content must not be null or empty");
-        this.id = id;
-        this.author = author;
-        this.timestamp = Instant.now();
-        this.content = content;
-        this.edited = false;
+        this(id, author, Instant.now(), content, false);
     }
 
     /**
@@ -124,10 +112,9 @@ public class ChatMessageDTO implements ChatMessage {
 
     @Override
     public void setContent(String newContent) {
-        if (newContent != null) {
-            this.content = newContent;
-            this.edited = true;
-        }
+        if (newContent == null) return;
+        this.content = newContent;
+        this.edited = true;
     }
 
     @Override
@@ -143,11 +130,6 @@ public class ChatMessageDTO implements ChatMessage {
     @Override
     public boolean isEdited() {
         return this.edited;
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     @Override
@@ -173,9 +155,7 @@ public class ChatMessageDTO implements ChatMessage {
     public String toString() {
         String text = this.getContent() + " - " + this.getAuthor().getUsername() + " - " + timestampToString(
                 this.getTimestamp());
-        if (isEdited()) {
-            text += " (ed)";
-        }
+        if (isEdited()) text += " (ed)";
         return text;
     }
 

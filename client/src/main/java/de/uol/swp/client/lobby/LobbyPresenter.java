@@ -10,6 +10,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
@@ -30,7 +31,6 @@ import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -215,6 +215,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
+    @Override
+    @Subscribe
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        LOG.debug("Received SystemMessageResponse");
+        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(super.lobbyName)) {
+            super.onSystemMessageResponse(rsp);
+        }
+    }
+
     /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
@@ -231,6 +240,25 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
         ((Stage) window).close();
         clearEventBus();
+    }
+
+    /**
+     * Helper method to handle disabling the endTurn, rollDice, playCard,
+     * tradeWithBank, and tradeWithUser buttons after a turn was ended (either
+     * forcibly or voluntarily).
+     * Also calls on the LobbyService to update the player's inventory.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-07
+     */
+    private void disableButtonsAfterTurn() {
+        this.endTurn.setDisable(true);
+        this.rollDice.setDisable(true);
+        this.playCard.setDisable(true);
+        this.tradeWithBankButton.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
+        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -330,21 +358,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Method called when the EndTurnButton is pressed
      * <p>
-     * If the EndTurnButton is pressed, this method requests the LobbyService
-     * to end the current turn.
+     * If the EndTurnButton is pressed, this method disables all appropriate
+     * buttons and then requests the LobbyService to end the current turn.
      *
      * @see de.uol.swp.client.lobby.LobbyService
      * @since 2021-01-15
      */
     @FXML
     private void onEndTurnButtonPressed() {
-        this.endTurn.setDisable(true);
-        this.rollDice.setDisable(true);
-        this.playCard.setDisable(true);
-        this.tradeWithBankButton.setDisable(true);
-        this.tradeWithUserButton.setDisable(true);
+        disableButtonsAfterTurn();
         lobbyService.endTurn(loggedInUser, lobbyName);
-        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -467,7 +490,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-02-25
      */
     @FXML
-    private void onPlayCardButtonPressed(ActionEvent event) {
+    private void onPlayCardButtonPressed() {
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
@@ -497,6 +520,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         choices.add(lumber);
         choices.add(wool);
         //Result is the button the user has clicked on
+        if (result.isEmpty()) return;
         if (result.get() == bKnight) { //Play a Knight Card
             lobbyService.playKnightCard(lobbyName, loggedInUser);
         } else if (result.get() == bMonopoly) { //Play a Monopoly Card
@@ -544,8 +568,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             grid.setVgap(10);
             grid.setPadding(new Insets(20, 150, 10, 10));
             //Make ChoiceBoxes and the choices
-            ChoiceBox c1 = new ChoiceBox();
-            ChoiceBox c2 = new ChoiceBox();
+            ChoiceBox<String> c1 = new ChoiceBox<>();
+            ChoiceBox<String> c2 = new ChoiceBox<>();
             for (String s : choices) {
                 c1.getItems().add(s);
                 c2.getItems().add(s);
@@ -911,6 +935,26 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
                                                             this.loggedInUser.getUsername(), this.lobbyName, rsp));
+    }
+
+    /**
+     * Handles a TurnSkippedResponse found on the EventBus
+     * <p>
+     * This method calls {@link #disableButtonsAfterTurn()} to make sure all
+     * buttons that a player would have access to when it is their turn are
+     * properly disabled even though the player's turn was forcibly skipped.
+     *
+     * @param rsp The TurnSkippedResponse found on the EventBus
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-07
+     */
+    @Subscribe
+    private void onTurnSkippedResponse(TurnSkippedResponse rsp) {
+        if (!this.lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received TurnSkippedResponse");
+        disableButtonsAfterTurn();
     }
 
     /**

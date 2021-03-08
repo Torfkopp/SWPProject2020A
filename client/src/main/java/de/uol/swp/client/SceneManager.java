@@ -12,6 +12,7 @@ import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
+import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
@@ -25,11 +26,11 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.KillOldClientResponse;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -58,6 +59,8 @@ public class SceneManager {
     static final String styleSheet = "css/swp.css";
     private static final int LOBBY_HEIGHT = 730;
     private static final int LOBBY_WIDTH = 685;
+    private static final int DEVMENU_HEIGHT = 450;
+    private static final int DEVMENU_WIDTH = 630;
     private static final int TRADING_HEIGHT = 600;
     private static final int TRADING_WIDTH = 600;
     private static final int LOGIN_HEIGHT = 220;
@@ -88,6 +91,7 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene ChangePasswordScene;
+    private boolean devMenuIsOpen;
 
     /**
      * Constructor
@@ -337,6 +341,62 @@ public class SceneManager {
     @Subscribe
     private void onLobbyErrorEvent(LobbyErrorEvent event) {
         showError(event.getMessage());
+    }
+
+    /**
+     * Handles the NukeUsersSessionsResponse detected on the EventBus
+     * <p>
+     * If this method is called, it means all sessions belonging to a
+     * user have been nuked, therefore it posts a RetryLoginEvent
+     * on the EventBus to create a new session for the user.
+     *
+     * @param rsp The NukeUsersSessionsResponse detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
+        eventBus.post(new RetryLoginEvent());
+    }
+
+    /**
+     * Handles the OpenDevMenuResponse detected on the EventBus
+     * <p>
+     * If an OpenDevMenuResponse is detected on the EventBus, this method gets
+     * called. It opens the Developer Menu in a new window.
+     *
+     * @param rsp The OpenDevMenuResponse detected on the EventBus
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.common.devmenu.response.OpenDevMenuResponse
+     * @since 2021-02-22
+     */
+    @Subscribe
+    private void onOpenDevMenuResponse(OpenDevMenuResponse rsp) {
+        LOG.debug("Received OpenDevMenuResponse");
+        if (devMenuIsOpen) return;
+        Platform.runLater(() -> {
+            devMenuIsOpen = true;
+            Stage devMenuStage = new Stage();
+            devMenuStage.setTitle("Developer Access Board");
+            devMenuStage.setHeight(DEVMENU_HEIGHT);
+            devMenuStage.setMinHeight(DEVMENU_HEIGHT);
+            devMenuStage.setWidth(DEVMENU_WIDTH);
+            devMenuStage.setMinWidth(DEVMENU_WIDTH);
+            Parent rootPane = initPresenter(DevMenuPresenter.fxml);
+            Scene devMenuScene = new Scene(rootPane);
+            devMenuScene.getStylesheets().add(styleSheet);
+            devMenuStage.setScene(devMenuScene);
+            devMenuStage.initOwner(primaryStage);
+            devMenuStage.setX(primaryStage.getX() + 100);
+            devMenuStage.setY(primaryStage.getY());
+            devMenuStage.show();
+            devMenuStage.setOnCloseRequest(event -> devMenuIsOpen = false);
+        });
     }
 
     /**
@@ -681,7 +741,6 @@ public class SceneManager {
                   CHANGEPW_HEIGHT);
     }
 
-
     /**
      * Shows an error message inside an error alert
      *
@@ -716,7 +775,7 @@ public class SceneManager {
      * confirmation button is pressed on the opened popup.
      *
      * @param user The user that is already logged in.
-     * 
+     *
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
@@ -729,24 +788,6 @@ public class SceneManager {
                 eventBus.post(new NukeUsersSessionsRequest(user));
             }
         });
-    }
-
-    /**
-     * Handles the NukeUsersSessionsResponse detected on the EventBus
-     * <p>
-     * If this method is called, it means all sessions belonging to a
-     * user have been nuked, therefore it posts a RetryLoginEvent
-     * on the EventBus to create a new session for the user.
-     *
-     * @param rsp The NukeUsersSessionsResponse detected on the EventBus
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
-        eventBus.post(new RetryLoginEvent());
     }
 
     /**
@@ -773,7 +814,6 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        System.out.println(lobbyStages.toString());
         showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
     }
 
