@@ -124,6 +124,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
+                    //if the background should be in colour you need to use setBackground
+                    int i = membersView.getItems().size();
+                    if (i >= 1 && getText().equals(lobbyMembers.get(0).getValue())) {
+                        setTextFill(GameRendering.PLAYER_1_COLOUR);
+                    }
+                    if (i >= 2 && getText().equals(lobbyMembers.get(1).getValue())) {
+                        setTextFill(GameRendering.PLAYER_2_COLOUR);
+                    }
+                    if (i >= 3 && getText().equals(lobbyMembers.get(2).getValue())) {
+                        setTextFill(GameRendering.PLAYER_3_COLOUR);
+                    }
+                    if (i >= 4 && getText().equals(lobbyMembers.get(3).getValue())) {
+                        setTextFill(GameRendering.PLAYER_4_COLOUR);
+                    }
                 });
             }
         });
@@ -1013,6 +1027,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMembers != null && loggedInUser != null && !loggedInUser.getUsername()
                                                                              .equals(msg.getUser().getUsername()))
                 lobbyMembers.add(new Pair<>(msg.getUser().getUsername(), msg.getUser().getUsername()));
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
             setStartSessionButtonState();
         });
     }
@@ -1047,6 +1062,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else {
             LOG.debug("---- User " + msg.getUser().getUsername() + " left");
+            lobbyService.retrieveAllLobbyMembers(lobbyName);
         }
         Platform.runLater(() -> {
             lobbyMembers.remove(findMember(msg.getUser().getUsername()));
