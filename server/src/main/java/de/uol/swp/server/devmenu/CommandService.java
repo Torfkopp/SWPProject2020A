@@ -12,6 +12,7 @@ import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
@@ -315,8 +316,7 @@ public class CommandService extends AbstractService {
             if (found.isEmpty()) throw new RuntimeException("User not found");
             temp1 = found.get();
         } catch (Exception e) {
-            temp1 = userManagement
-                    .createUser(new UserDTO(TEMP_1_NAME, TEMP_1_NAME, "")); //UserDTO(-1, TEMP_1, TEMP_1, ""));
+            temp1 = userManagement.createUser(new UserDTO(-1, TEMP_1_NAME, TEMP_1_NAME, ""));
         }
 
         try {
@@ -324,8 +324,7 @@ public class CommandService extends AbstractService {
             if (found.isEmpty()) throw new RuntimeException("User not found");
             temp2 = found.get();
         } catch (Exception e) {
-            temp2 = userManagement.createUser(
-                    new UserDTO(TEMP_2_NAME, TEMP_2_NAME, "")); //UserDTO(-1, TEMP_2_NAME, TEMP_2_NAME, ""));
+            temp2 = userManagement.createUser(new UserDTO(-1, TEMP_2_NAME, TEMP_2_NAME, ""));
         }
 
         post(new LobbyJoinUserRequest(QUICK_LOBBY_NAME, temp1));
@@ -367,16 +366,12 @@ public class CommandService extends AbstractService {
         String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
         if (game == null) return;
-        User[] players = game.getPlayers();
-        for (int i = 0; i < players.length; i++) {
-            User activePlayer = game.getActivePlayer();
+        User activePlayer = game.getActivePlayer();
+        if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
+            post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
+            activePlayer = game.getActivePlayer();
             if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
                 post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
-                activePlayer = game.getActivePlayer();
-                if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
-                    post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
-                }
-                break;
             }
         }
     }
@@ -592,9 +587,10 @@ public class CommandService extends AbstractService {
                     argList.add(map);
                 }
                 break;
-                case "de.uol.swp.common.game.map.MapPoint": { //format: y,x (once MapPoint are ready)
+                case "de.uol.swp.common.game.map.MapPoint": { //format: y,x
                     List<String> tokens = lexCommand(args.get(i), ",");
-                    //argList.add(tokens.size() < 1 ? null : new MapPoint(tokens.get(0), tokens.get(1)));
+                    argList.add(tokens.size() < 1 ? null :
+                                new MapPoint(Integer.parseInt(tokens.get(0)), Integer.parseInt(tokens.get(1))));
                 }
                 break;
                 case "de.uol.swp.common.I18nWrapper": { //format: attributeName!replacementString

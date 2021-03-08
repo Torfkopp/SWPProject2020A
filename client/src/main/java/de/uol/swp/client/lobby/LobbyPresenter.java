@@ -520,6 +520,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         choices.add(lumber);
         choices.add(wool);
         //Result is the button the user has clicked on
+        if (result.isEmpty()) return;
         if (result.get() == bKnight) { //Play a Knight Card
             lobbyService.playKnightCard(lobbyName, loggedInUser);
         } else if (result.get() == bMonopoly) { //Play a Monopoly Card
@@ -567,8 +568,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             grid.setVgap(10);
             grid.setPadding(new Insets(20, 150, 10, 10));
             //Make ChoiceBoxes and the choices
-            ChoiceBox c1 = new ChoiceBox();
-            ChoiceBox c2 = new ChoiceBox();
+            ChoiceBox<String> c1 = new ChoiceBox<>();
+            ChoiceBox<String> c2 = new ChoiceBox<>();
             for (String s : choices) {
                 c1.getItems().add(s);
                 c2.getItems().add(s);
