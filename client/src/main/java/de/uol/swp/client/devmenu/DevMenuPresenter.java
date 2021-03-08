@@ -109,6 +109,7 @@ public class DevMenuPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onDevMenuClassesResponse(DevMenuClassesResponse rsp) {
+        LOG.debug("Received DevMenuClassesResponse");
         classes = rsp.getClassesMap();
         classListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {

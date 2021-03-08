@@ -104,6 +104,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_DevMenu(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /devmenu command");
         OpenDevMenuResponse msg = new OpenDevMenuResponse();
         msg.initWithMessage(originalMessage);
         post(msg);
@@ -121,6 +122,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_DropTemp(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /droptemp command");
         Optional<User> temp1 = userManagement.getUser(TEMP_1_NAME);
         Optional<User> temp2 = userManagement.getUser(TEMP_2_NAME);
         if (temp1.isPresent()) {
@@ -145,7 +147,9 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_ForceEndTurn(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /forceendturn command");
         if (args.size() != 1 || !originalMessage.isFromLobby()) {
+            args.add(0, "forceendturn");
             command_Invalid(args, originalMessage);
             return;
         }
@@ -178,6 +182,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /give command");
         try {
             if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
             Message msg = parseArguments(args, EditInventoryRequest.class.getConstructors()[0],
@@ -198,11 +203,12 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_Help(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /help command");
         if (args.size() == 0) sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.help"));
-        else if (commandMap.containsKey(args.get(1))) sendSystemMessageResponse(originalMessage, new I18nWrapper(
-                "devmenu.commands.help." + args.get(1).trim().toLowerCase()));
+        else if (commandMap.containsKey(args.get(0))) sendSystemMessageResponse(originalMessage, new I18nWrapper(
+                "devmenu.commands.help." + args.get(0).trim().toLowerCase()));
         else sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.help.invalid",
-                                                                        args.get(1).trim().toLowerCase()));
+                                                                        args.get(0).trim().toLowerCase()));
     }
 
     /**
@@ -215,6 +221,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_Invalid(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received an invalid command");
         sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.invalid", String.join(" ", args)));
     }
 
@@ -230,6 +237,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_NextPlayerIfTemp(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /skip command");
         if (!originalMessage.isFromLobby()) return;
         String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
@@ -258,6 +266,7 @@ public class CommandService extends AbstractService {
      * @see java.lang.reflect.Constructor#getParameterCount()
      */
     private void command_Post(List<String> args, Message originalMessage) {
+        LOG.debug("Received /post command");
         for (Class<?> cls : allClasses) {
             if (!cls.getSimpleName().equals(args.get(0))) continue;
             try {
@@ -292,6 +301,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_QuickLobby(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /quicklobby command");
         if (originalMessage.getSession().isEmpty()) return;
         User invoker = originalMessage.getSession().get().getUser();
         lobbyManagement.createLobby(QUICK_LOBBY_NAME, invoker);
@@ -336,6 +346,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_Remove(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /remove command");
         args.set(args.size() - 1, String.valueOf(Integer.parseInt(args.get(args.size() - 1)) * -1));
         command_Give(args, originalMessage);
     }
@@ -352,6 +363,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      */
     private void command_SkipBots(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /skipall command");
         String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
         if (game == null) return;
@@ -446,6 +458,7 @@ public class CommandService extends AbstractService {
      */
     @Subscribe
     private void onDevMenuClassesRequest(DevMenuClassesRequest req) {
+        LOG.debug("Received DevMenuClassesRequest");
         //classes<classname, constructors<arguments<argumentname, argumenttype>>>
         SortedMap<String, List<Map<String, Class<?>>>> classesMap = new TreeMap<>();
         for (Class<?> cls : allClasses) {
@@ -508,7 +521,7 @@ public class CommandService extends AbstractService {
 
         BiConsumer<List<String>, NewChatMessageRequest> command = commandMap.get(cmd.get(0).trim().toLowerCase());
         if (command != null) command.accept(args, msg.getOriginalMessage());
-        else command_Invalid(args, msg.getOriginalMessage());
+        else command_Invalid(cmd, msg.getOriginalMessage());
     }
 
     /**
@@ -712,6 +725,7 @@ public class CommandService extends AbstractService {
     private void sendSystemMessageResponse(NewChatMessageRequest originalMessage, I18nWrapper content) {
         ResponseMessage response = new SystemMessageResponse(originalMessage.getOriginLobby(), content);
         response.initWithMessage(originalMessage);
+        LOG.debug("Sending SystemMessageResponse");
         post(response);
     }
 }
