@@ -1,6 +1,5 @@
 package de.uol.swp.client.trade.event;
 
-import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.user.User;
 
 /**
