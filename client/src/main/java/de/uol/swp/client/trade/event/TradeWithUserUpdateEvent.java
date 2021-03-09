@@ -48,5 +48,4 @@ public class TradeWithUserUpdateEvent {
     public User getUser() {
         return user;
     }
-
 }
