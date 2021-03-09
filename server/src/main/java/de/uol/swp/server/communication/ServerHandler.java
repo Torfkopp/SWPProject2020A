@@ -57,7 +57,6 @@ public class ServerHandler implements ServerHandlerDelegate {
         eventBus.register(this);
     }
 
-    //@formatter:off
     @Override
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
