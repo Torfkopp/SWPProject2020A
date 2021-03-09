@@ -16,7 +16,10 @@ import de.uol.swp.common.user.User;
  * @see de.uol.swp.client.lobby.event.LobbyUpdateEvent
  * @since 2021-02-20
  */
-public class TradeWithUserUpdateEvent extends LobbyUpdateEvent {
+public class TradeWithUserUpdateEvent {
+
+    private final String lobbyName;
+    private final User user;
 
     /**
      * Constructor
@@ -25,6 +28,25 @@ public class TradeWithUserUpdateEvent extends LobbyUpdateEvent {
      * @param user      The name of the User who wants to trade
      */
     public TradeWithUserUpdateEvent(String lobbyName, User user) {
-        super(lobbyName, user);
+        this.lobbyName = lobbyName;
+        this.user = user;
+    }
+
+    /**
+     * Getter for the lobbyName attribute
+     *
+     * @return The lobbyName
+     */
+    public String getLobbyName() {
+        return lobbyName;
+    }
+
+    /**
+     * Getter for the user attribute
+     *
+     * @return The User
+     */
+    public User getUser() {
+        return user;
     }
 }
