@@ -122,16 +122,16 @@ public interface ILobbyService {
      * Posts a message to play a KnightCard
      *
      * @param lobbyName The name of the lobby
-     * @param user The user
+     * @param user      The user
      */
-    void playKnightCard (String lobbyName,User user);
+    void playKnightCard(String lobbyName, User user);
 
     /**
      * Posts a message to play a MonopolyCard
      *
      * @param lobbyName The name of the lobby
-     * @param user The user
-     * @param resource The resource the user wants
+     * @param user      The user
+     * @param resource  The resource the user wants
      */
     void playMonopolyCard(String lobbyName, User user, Resources resource);
 
@@ -139,7 +139,7 @@ public interface ILobbyService {
      * Posts a message to play a YearOfPlentyCard
      *
      * @param lobbyName The name of the lobby
-     * @param user The user
+     * @param user      The user
      * @param resource1 The resource the user wants
      * @param resource2 The resource the user wants
      */
@@ -149,8 +149,7 @@ public interface ILobbyService {
      * Posts a message to play a RoadBuildingCard
      *
      * @param lobbyName The name of the lobby
-     * @param user The user
+     * @param user      The user
      */
     void playRoadBuildingCard(String lobbyName, User user);
-
 }

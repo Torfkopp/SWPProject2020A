@@ -178,10 +178,10 @@ public class AuthenticationService extends AbstractService {
      *
      * @param req NukeUsersSessionsRequest found on the EventBus
      *
-     * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
      * @author Eric Vuong
      * @author Marvin Drees
+     * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
+     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe

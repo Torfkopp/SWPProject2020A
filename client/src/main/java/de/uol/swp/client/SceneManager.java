@@ -125,6 +125,137 @@ public class SceneManager {
     }
 
     /**
+     * Shows the change password screen
+     * <p>
+     * Sets the scene's UserData to the current user.
+     * Switches the current Scene to the ChangePasswordScene
+     * and sets the window's title to "Change Password"
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2020-12-19
+     */
+    public void showChangePasswordScreen(User user) {
+        ChangePasswordScene.setUserData(user);
+        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"), CHANGEPW_WIDTH,
+                  CHANGEPW_HEIGHT);
+    }
+
+    /**
+     * Shows an error message inside an error alert
+     *
+     * @param message The type of error to be shown
+     * @param e       The error message
+     *
+     * @since 2019-09-03
+     */
+    public void showError(String message, String e) {
+        Platform.runLater(() -> {
+            Alert a = new Alert(Alert.AlertType.ERROR, message + e);
+            a.showAndWait();
+        });
+    }
+
+    /**
+     * Shows an error message inside an error alert
+     *
+     * @param e The error message
+     *
+     * @since 2019-09-03
+     */
+    public void showError(String e) {
+        showError(resourceBundle.getString("error.generic") + '\n', e);
+    }
+
+    /**
+     * Method to open a popup which allows to log an old session out
+     * <p>
+     * This method allows logging an old session out by posting
+     * a NukeUsersSessionsRequest on the EventBus once the
+     * confirmation button is pressed on the opened popup.
+     *
+     * @param user The user that is already logged in.
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    public void showLogOldSessionOutScreen(User user) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                eventBus.post(new NukeUsersSessionsRequest(user));
+            }
+        });
+    }
+
+    /**
+     * Shows the login error alert
+     * <p>
+     * Opens an ErrorAlert popup saying "Error logging in to server"
+     *
+     * @since 2019-09-03
+     */
+    public void showLoginErrorScreen() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
+            alert.showAndWait();
+            showLoginScreen();
+        });
+    }
+
+    /**
+     * Shows the login screen
+     * <p>
+     * Switches the current Scene to the loginScene
+     * and sets the window's title of to "Login"
+     *
+     * @since 2019-09-03
+     */
+    public void showLoginScreen() {
+        showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
+    }
+
+    /**
+     * Shows the main menu
+     * <p>
+     * Switches the current scene to the mainScene and sets the window's title
+     * to "Welcome " and the current user's username
+     *
+     * @since 2019-09-03
+     */
+    public void showMainScreen(User currentUser) {
+        showScene(mainScene,
+                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
+                  MAINMENU_WIDTH, MAINMENU_HEIGHT);
+    }
+
+    /**
+     * Shows the registration screen
+     * <p>
+     * Switches the current Scene to the registrationScene
+     * and sets the window's title to "Registration"
+     *
+     * @since 2019-09-03
+     */
+    public void showRegistrationScreen() {
+        showScene(registrationScene, resourceBundle.getString("register.window.title"), REGISTRATION_WIDTH,
+                  REGISTRATION_HEIGHT);
+    }
+
+    /**
+     * Shows a server error message inside an error alert
+     *
+     * @param e The error message
+     *
+     * @since 2019-09-03
+     */
+    public void showServerError(String e) {
+        showError(resourceBundle.getString("error.server") + '\n', e);
+    }
+
+    /**
      * Initialises the Change Password view
      * <p>
      * If the ChangePasswordScene is null, it gets set to a new scene containing the
@@ -725,126 +856,6 @@ public class SceneManager {
     }
 
     /**
-     * Shows the change password screen
-     * <p>
-     * Sets the scene's UserData to the current user.
-     * Switches the current Scene to the ChangePasswordScene
-     * and sets the window's title to "Change Password"
-     *
-     * @author Eric Vuong
-     * @author Mario Fokken
-     * @since 2020-12-19
-     */
-    public void showChangePasswordScreen(User user) {
-        ChangePasswordScene.setUserData(user);
-        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"), CHANGEPW_WIDTH,
-                  CHANGEPW_HEIGHT);
-    }
-
-    /**
-     * Shows an error message inside an error alert
-     *
-     * @param message The type of error to be shown
-     * @param e       The error message
-     *
-     * @since 2019-09-03
-     */
-    public void showError(String message, String e) {
-        Platform.runLater(() -> {
-            Alert a = new Alert(Alert.AlertType.ERROR, message + e);
-            a.showAndWait();
-        });
-    }
-
-    /**
-     * Shows an error message inside an error alert
-     *
-     * @param e The error message
-     *
-     * @since 2019-09-03
-     */
-    public void showError(String e) {
-        showError(resourceBundle.getString("error.generic") + '\n', e);
-    }
-
-    /**
-     * Method to open a popup which allows to log an old session out
-     * <p>
-     * This method allows logging an old session out by posting
-     * a NukeUsersSessionsRequest on the EventBus once the
-     * confirmation button is pressed on the opened popup.
-     *
-     * @param user The user that is already logged in.
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-03
-     */
-    public void showLogOldSessionOutScreen(User user) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                eventBus.post(new NukeUsersSessionsRequest(user));
-            }
-        });
-    }
-
-    /**
-     * Shows the login error alert
-     * <p>
-     * Opens an ErrorAlert popup saying "Error logging in to server"
-     *
-     * @since 2019-09-03
-     */
-    public void showLoginErrorScreen() {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
-            alert.showAndWait();
-            showLoginScreen();
-        });
-    }
-
-    /**
-     * Shows the login screen
-     * <p>
-     * Switches the current Scene to the loginScene
-     * and sets the window's title of to "Login"
-     *
-     * @since 2019-09-03
-     */
-    public void showLoginScreen() {
-        showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
-    }
-
-    /**
-     * Shows the main menu
-     * <p>
-     * Switches the current scene to the mainScene and sets the window's title
-     * to "Welcome " and the current user's username
-     *
-     * @since 2019-09-03
-     */
-    public void showMainScreen(User currentUser) {
-        showScene(mainScene,
-                  String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
-                  MAINMENU_WIDTH, MAINMENU_HEIGHT);
-    }
-
-    /**
-     * Shows the registration screen
-     * <p>
-     * Switches the current Scene to the registrationScene
-     * and sets the window's title to "Registration"
-     *
-     * @since 2019-09-03
-     */
-    public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"), REGISTRATION_WIDTH,
-                  REGISTRATION_HEIGHT);
-    }
-
-    /**
      * Switches the current scene and title to the given ones
      * <p>
      * The current scene and title are saved in the lastScene and lastTitle variables
@@ -870,16 +881,5 @@ public class SceneManager {
             primaryStage.setHeight(minHeight);
             primaryStage.show();
         });
-    }
-
-    /**
-     * Shows a server error message inside an error alert
-     *
-     * @param e The error message
-     *
-     * @since 2019-09-03
-     */
-    public void showServerError(String e) {
-        showError(resourceBundle.getString("error.server") + '\n', e);
     }
 }

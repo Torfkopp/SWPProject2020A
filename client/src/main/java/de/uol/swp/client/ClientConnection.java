@@ -123,22 +123,6 @@ public class ClientConnection {
     }
 
     /**
-     * Calls the ConnectionEstablished method of every ConnectionListener added
-     * to this class.
-     *
-     * @param channel The netty channel the new connection is established on
-     *
-     * @see de.uol.swp.client.ConnectionListener
-     * @since 2017-03-17
-     */
-    void fireConnectionEstablished(Channel channel) {
-        for (ConnectionListener listener : connectionListener) {
-            listener.connectionEstablished(channel);
-        }
-        this.channel = channel;
-    }
-
-    /**
      * Add a new ConnectionListener to the ConnectionListener array of this object
      *
      * @param listener The ConnectionListener to add to the array
@@ -148,6 +132,24 @@ public class ClientConnection {
      */
     public void addConnectionListener(ConnectionListener listener) {
         this.connectionListener.add(listener);
+    }
+
+    /**
+     * Handles the distribution of throwable messages
+     * <p>
+     * This method distributes throwable messages to the ConnectionListeners.
+     * It calls the ExceptionOccurred method of every ConnectionListener in the
+     * ConnectionListener array and passes the message to them.
+     *
+     * @param message The ExceptionMessage object found on the EventBus
+     *
+     * @see de.uol.swp.client.ClientHandler
+     * @since 2017-03-17
+     */
+    public void process(Throwable message) {
+        for (ConnectionListener l : connectionListener) {
+            l.exceptionOccurred(message.getMessage());
+        }
     }
 
     /**
@@ -173,6 +175,22 @@ public class ClientConnection {
         } else {
             LOG.warn("Can only process ServerMessage and ResponseMessage.");
         }
+    }
+
+    /**
+     * Calls the ConnectionEstablished method of every ConnectionListener added
+     * to this class.
+     *
+     * @param channel The netty channel the new connection is established on
+     *
+     * @see de.uol.swp.client.ConnectionListener
+     * @since 2017-03-17
+     */
+    void fireConnectionEstablished(Channel channel) {
+        for (ConnectionListener listener : connectionListener) {
+            listener.connectionEstablished(channel);
+        }
+        this.channel = channel;
     }
 
     /**
@@ -231,23 +249,5 @@ public class ClientConnection {
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
         LOG.warn("DeadEvent detected: " + deadEvent);
-    }
-
-    /**
-     * Handles the distribution of throwable messages
-     * <p>
-     * This method distributes throwable messages to the ConnectionListeners.
-     * It calls the ExceptionOccurred method of every ConnectionListener in the
-     * ConnectionListener array and passes the message to them.
-     *
-     * @param message The ExceptionMessage object found on the EventBus
-     *
-     * @see de.uol.swp.client.ClientHandler
-     * @since 2017-03-17
-     */
-    public void process(Throwable message) {
-        for (ConnectionListener l : connectionListener) {
-            l.exceptionOccurred(message.getMessage());
-        }
     }
 }

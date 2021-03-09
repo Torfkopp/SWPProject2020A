@@ -120,7 +120,6 @@ class ChatServiceTest {
      * ChatMessage differ from the parameters provided on creation.
      *
      * @throws InterruptedException the interrupted exception
-     *
      * @author Maximilian Lindner
      * @author Phillip-André Suhr
      * @since 2021-02-06

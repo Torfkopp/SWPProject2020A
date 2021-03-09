@@ -86,21 +86,6 @@ public class GameRendering {
     }
 
     /**
-     * drawCity method
-     * <p>
-     * This method draws a city at the given coordinates.
-     *
-     * @param owner    Needed to access the color of player
-     * @param currentX The current x-coordinate
-     * @param currentY The current y-coordinate
-     */
-    private void drawCity(Player owner, double currentX, double currentY) {
-        gfxCtx.setFill(getPlayerColour(owner));
-        gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
-                             citySize / 2.0, citySize / 2.0);
-    }
-
-    /**
      * drawDice method
      * <p>
      * This method draws the dice.
@@ -136,6 +121,21 @@ public class GameRendering {
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
         drawIntersectionsAndEdges(intersections, gameMapManagement);
+    }
+
+    /**
+     * drawCity method
+     * <p>
+     * This method draws a city at the given coordinates.
+     *
+     * @param owner    Needed to access the color of player
+     * @param currentX The current x-coordinate
+     * @param currentY The current y-coordinate
+     */
+    private void drawCity(Player owner, double currentX, double currentY) {
+        gfxCtx.setFill(getPlayerColour(owner));
+        gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
+                             citySize / 2.0, citySize / 2.0);
     }
 
     /**

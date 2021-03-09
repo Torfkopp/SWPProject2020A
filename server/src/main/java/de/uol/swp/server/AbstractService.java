@@ -33,18 +33,6 @@ public class AbstractService {
     }
 
     /**
-     * Posts a message onto the EventBus
-     *
-     * @param message The message to post
-     *
-     * @see de.uol.swp.common.message.Message
-     * @since 2019-10-08
-     */
-    protected void post(Message message) {
-        bus.post(message);
-    }
-
-    /**
      * Prepares a ServerMessage to be sent to all connected users
      * and posts it onto the EventBus.
      *
@@ -56,5 +44,17 @@ public class AbstractService {
     public void sendToAll(ServerMessage message) {
         message.setReceiver(Collections.emptyList());
         post(message);
+    }
+
+    /**
+     * Posts a message onto the EventBus
+     *
+     * @param message The message to post
+     *
+     * @see de.uol.swp.common.message.Message
+     * @since 2019-10-08
+     */
+    protected void post(Message message) {
+        bus.post(message);
     }
 }

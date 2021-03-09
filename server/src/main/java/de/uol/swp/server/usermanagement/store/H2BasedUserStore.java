@@ -496,6 +496,7 @@ public class H2BasedUserStore extends AbstractUserStore {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             conn.setAutoCommit(true);
 
+            //@formatter:off
             String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
                          "id int NOT NULL AUTO_INCREMENT, " +
                          "username VARCHAR(255), " +
@@ -503,6 +504,7 @@ public class H2BasedUserStore extends AbstractUserStore {
                          "pass VARCHAR(255), " +
                          "PRIMARY KEY (username)," +
                          "UNIQUE (id))";
+            //@formatter:on
 
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();

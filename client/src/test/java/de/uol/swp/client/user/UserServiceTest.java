@@ -32,23 +32,6 @@ class UserServiceTest {
     Object event;
 
     /**
-     * Handles DeadEvents detected on the EventBus
-     * <p>
-     * If a DeadEvent is detected, the event variable of this class gets updated
-     * to its event, and its event is printed to the console output.
-     *
-     * @param e The DeadEvent detected on the EventBus
-     *
-     * @since 2019-10-10
-     */
-    @Subscribe
-    private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
-        System.out.print(e.getEvent());
-        lock.countDown();
-    }
-
-    /**
      * Helper method run before each test case
      * <p>
      * This method resets the variable event to null and registers the object of
@@ -72,21 +55,6 @@ class UserServiceTest {
     @AfterEach
     void deregisterBus() {
         bus.unregister(this);
-    }
-
-    /**
-     * Subroutine used for tests that need a logged in user
-     * <p>
-     * This subroutine creates a new UserService object registered to the EventBus
-     * of this test class, and calls its login method for the default user.
-     *
-     * @throws java.lang.InterruptedException thrown by lock.await()
-     * @since 2019-10-10
-     */
-    private void loginUser() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-        userService.login(defaultUser.getUsername(), defaultUser.getPassword());
-        lock.await(250, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -258,5 +226,37 @@ class UserServiceTest {
         assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
         assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
         assertTrue(request.authorisationNeeded());
+    }
+
+    /**
+     * Handles DeadEvents detected on the EventBus
+     * <p>
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
+     *
+     * @param e The DeadEvent detected on the EventBus
+     *
+     * @since 2019-10-10
+     */
+    @Subscribe
+    private void onDeadEvent(DeadEvent e) {
+        this.event = e.getEvent();
+        System.out.print(e.getEvent());
+        lock.countDown();
+    }
+
+    /**
+     * Subroutine used for tests that need a logged in user
+     * <p>
+     * This subroutine creates a new UserService object registered to the EventBus
+     * of this test class, and calls its login method for the default user.
+     *
+     * @throws java.lang.InterruptedException thrown by lock.await()
+     * @since 2019-10-10
+     */
+    private void loginUser() throws InterruptedException {
+        ClientUserService userService = new UserService(bus);
+        userService.login(defaultUser.getUsername(), defaultUser.getPassword());
+        lock.await(250, TimeUnit.MILLISECONDS);
     }
 }

@@ -17,6 +17,7 @@ import static de.uol.swp.common.game.map.IIntersection.IntersectionState.SETTLEM
  * @author Temmo Junkhoff
  * @since 2021-01-16
  */
+@SuppressWarnings("UnstableApiUsage")
 public class GameMap implements IGameMap {
 
     //Map mapping the player and his settlements/cities
@@ -229,6 +230,10 @@ public class GameMap implements IGameMap {
         return false;
     }
 
+    void setHex(MapPoint position, IGameHex newHex) {
+        hexMap[position.getY()][position.getX()].set(newHex);
+    }
+
     private void createHexEdgeNetwork() {
         // @formatter:off
         var hexEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
@@ -339,9 +344,5 @@ public class GameMap implements IGameMap {
             }
         }
         intersectionEdgeNetwork = intersectionEdgeNetworkBuilder.build();
-    }
-
-    void setHex(MapPoint position, IGameHex newHex) {
-        hexMap[position.getY()][position.getX()].set(newHex);
     }
 }

@@ -55,6 +55,26 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Prepares a given ServerMessage to be sent to all players in the lobby and
+     * posts it onto the EventBus
+     *
+     * @param lobbyName Name of the lobby the players are in
+     * @param msg       The message to be sent to the users
+     *
+     * @see de.uol.swp.common.message.ServerMessage
+     * @since 2019-10-08
+     */
+    public void sendToAllInLobby(String lobbyName, ServerMessage msg) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
+
+        if (lobby.isPresent()) {
+            msg.setReceiver(authenticationService.getSessions(lobby.get().getUsers()));
+            post(msg);
+        }
+        // TODO: error handling for a not existing lobby
+    }
+
+    /**
      * Handles a CreateLobbyRequest found on the EventBus
      * <p>
      * If a CreateLobbyRequest is detected on the EventBus, this method is called.
@@ -379,25 +399,5 @@ public class LobbyService extends AbstractService {
             ServerMessage msg = new UserReadyMessage(req.getName(), req.getUser());
             sendToAllInLobby(req.getName(), msg);
         }
-    }
-
-    /**
-     * Prepares a given ServerMessage to be sent to all players in the lobby and
-     * posts it onto the EventBus
-     *
-     * @param lobbyName Name of the lobby the players are in
-     * @param msg       The message to be sent to the users
-     *
-     * @see de.uol.swp.common.message.ServerMessage
-     * @since 2019-10-08
-     */
-    public void sendToAllInLobby(String lobbyName, ServerMessage msg) {
-        Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
-
-        if (lobby.isPresent()) {
-            msg.setReceiver(authenticationService.getSessions(lobby.get().getUsers()));
-            post(msg);
-        }
-        // TODO: error handling for a not existing lobby
     }
 }

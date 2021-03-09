@@ -8,9 +8,9 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  * This response gets sent to new client whose users old sessions have been
  * successfully removed from the session store to allow a new login.
  *
- * @see de.uol.swp.common.message.AbstractResponseMessage
  * @author Eric Vuong
  * @author Marvin Drees
+ * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2021-03-03
  */
 public class NukeUsersSessionsResponse extends AbstractResponseMessage {}

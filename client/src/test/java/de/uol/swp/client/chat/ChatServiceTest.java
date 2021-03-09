@@ -36,21 +36,6 @@ class ChatServiceTest {
     Object event;
 
     /**
-     * Handles DeadEvents detected on the EventBus
-     * <p>
-     * If a DeadEvent is detected, the event variable of this class gets updated
-     * to its event, and its event is printed to the console output.
-     *
-     * @param e The DeadEvent detected on the EventBus
-     */
-    @Subscribe
-    private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
-        System.out.println(e.getEvent());
-        lock.countDown();
-    }
-
-    /**
      * Helper method run before each test case
      * <p>
      * This method resets the variable event to null and registers the object of
@@ -437,5 +422,20 @@ class ChatServiceTest {
         assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
         assertEquals(chatMessageRequest.getAuthor(), defaultUser);
         assertEquals(chatMessageRequest.getContent(), defaultContent);
+    }
+
+    /**
+     * Handles DeadEvents detected on the EventBus
+     * <p>
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
+     *
+     * @param e The DeadEvent detected on the EventBus
+     */
+    @Subscribe
+    private void onDeadEvent(DeadEvent e) {
+        this.event = e.getEvent();
+        System.out.println(e.getEvent());
+        lock.countDown();
     }
 }

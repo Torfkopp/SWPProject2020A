@@ -39,13 +39,6 @@ class AuthenticationServiceTest {
     private final CountDownLatch lock = new CountDownLatch(1);
     private Object event;
 
-    @Subscribe
-    private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
-        System.out.print(e.getEvent());
-        lock.countDown();
-    }
-
     @BeforeEach
     void registerBus() {
         event = null;
@@ -132,16 +125,6 @@ class AuthenticationServiceTest {
         userManagement.dropUser(usr);
     }
 
-    private User loginUser(User userToLogin) {
-        User usr = userManagement.createUser(userToLogin);
-        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
-        bus.post(loginRequest);
-
-        assertTrue(userManagement.isLoggedIn(usr));
-        userManagement.dropUser(userToLogin);
-        return usr;
-    }
-
     @Test
     void logoutTest() throws InterruptedException {
         User usr = loginUser(user);
@@ -183,5 +166,22 @@ class AuthenticationServiceTest {
 
         Collections.sort(returnedUsers);
         assertEquals(returnedUsers, users);
+    }
+
+    @Subscribe
+    private void onDeadEvent(DeadEvent e) {
+        this.event = e.getEvent();
+        System.out.print(e.getEvent());
+        lock.countDown();
+    }
+
+    private User loginUser(User userToLogin) {
+        User usr = userManagement.createUser(userToLogin);
+        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
+        bus.post(loginRequest);
+
+        assertTrue(userManagement.isLoggedIn(usr));
+        userManagement.dropUser(userToLogin);
+        return usr;
     }
 }

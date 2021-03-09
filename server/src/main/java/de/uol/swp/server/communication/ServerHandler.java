@@ -161,10 +161,10 @@ public class ServerHandler implements ServerHandlerDelegate {
      *
      * @param msg The ClientAuthorisedMessage found on the EventBus
      *
-     * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
-     * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @author Eric Vuong
      * @author Marvin Drees
+     * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
+     * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @since 2021-03-03
      */
     @Subscribe
