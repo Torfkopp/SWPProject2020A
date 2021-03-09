@@ -64,17 +64,6 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper function
-     * <p>
-     * This method is called if a window should be closed.
-     * It posts a CloseTradeWithUserResponseEvent onto
-     * the EventBus with the according lobby.
-     */
-    private void closeWindow() {
-        Platform.runLater(() -> eventBus.post(new CloseTradeWithUserResponseEvent(lobbyName)));
-    }
-
-    /**
      * Initialises the Presenter by setting up the ownInventoryView.
      *
      * @implNote Called automatically by JavaFX
@@ -91,6 +80,17 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             }
         });
         LOG.debug("TradeWithUserAcceptPresenter initialised");
+    }
+
+    /**
+     * Helper function
+     * <p>
+     * This method is called if a window should be closed.
+     * It posts a CloseTradeWithUserResponseEvent onto
+     * the EventBus with the according lobby.
+     */
+    private void closeWindow() {
+        Platform.runLater(() -> eventBus.post(new CloseTradeWithUserResponseEvent(lobbyName)));
     }
 
     /**

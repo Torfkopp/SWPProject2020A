@@ -86,8 +86,7 @@ public class UserService extends AbstractService {
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);
-        }
-
+    }
 
     /**
      * Handles a DeleteUserRequest found on the EventBus
@@ -119,7 +118,7 @@ public class UserService extends AbstractService {
             returnMessage = new UserDeletionExceptionMessage(
                     "Cannot delete user " + req.getUser() + " " + e.getMessage());
         }
-       returnMessage.initWithMessage(req);
+        returnMessage.initWithMessage(req);
         post(returnMessage);
     }
 

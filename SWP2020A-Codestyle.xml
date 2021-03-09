@@ -1,4 +1,5 @@
 <code_scheme name="SWP2020A" version="173">
+  <option name="FORMATTER_TAGS_ENABLED" value="true"/>
   <JavaCodeStyleSettings>
     <option name="ALIGN_MULTILINE_ANNOTATION_PARAMETERS" value="true" />
     <option name="ALIGN_MULTILINE_TEXT_BLOCKS" value="true" />
@@ -11,24 +12,6 @@
       <ANNO name="javafx.fxml.FXML" />
     </REPEAT_ANNOTATIONS>
   </JavaCodeStyleSettings>
-  <JetCodeStyleSettings>
-    <option name="PACKAGES_TO_USE_STAR_IMPORTS">
-      <value>
-        <package name="java.util" alias="false" withSubpackages="false" />
-        <package name="kotlinx.android.synthetic" alias="false" withSubpackages="true" />
-        <package name="io.ktor" alias="false" withSubpackages="true" />
-      </value>
-    </option>
-    <option name="PACKAGES_IMPORT_LAYOUT">
-      <value>
-        <package name="" alias="false" withSubpackages="true" />
-        <package name="java" alias="false" withSubpackages="true" />
-        <package name="javax" alias="false" withSubpackages="true" />
-        <package name="kotlin" alias="false" withSubpackages="true" />
-        <package name="" alias="true" withSubpackages="true" />
-      </value>
-    </option>
-  </JetCodeStyleSettings>
   <codeStyleSettings language="JAVA">
     <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
     <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
@@ -211,7 +194,10 @@
         <section>
           <rule>
             <match>
-              <METHOD>true</METHOD>
+              <AND>
+                <METHOD>true</METHOD>
+                <visibility/>
+              </AND>
             </match>
             <order>BY_NAME</order>
           </rule>

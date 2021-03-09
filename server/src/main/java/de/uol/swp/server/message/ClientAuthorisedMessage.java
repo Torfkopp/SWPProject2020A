@@ -23,7 +23,7 @@ public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
     /**
      * Constructor
      *
-     * @param user User whose client authorised successfully
+     * @param user       User whose client authorised successfully
      * @param oldSession Boolean whether an old session exists
      *
      * @see de.uol.swp.common.user.User

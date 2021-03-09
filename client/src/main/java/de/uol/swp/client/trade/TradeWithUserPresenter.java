@@ -76,6 +76,25 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     }
 
     /**
+     * Initialises the Presenter by setting up the ownResourceView.
+     *
+     * @implNote Called automatically by JavaFX
+     */
+    @FXML
+    public void initialize() {
+        ownInventoryView.setCellFactory(lv -> new ListCell<>() {
+            protected void updateItem(Pair<String, Integer> item, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
+                            .getString("game.resources." + item.getKey()));
+                });
+            }
+        });
+        LOG.debug("TradeWithUserPresenter initialised");
+    }
+
+    /**
      * Helper Function
      * <p>
      * Checks if there is no selected resource at all or if too
@@ -115,25 +134,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             eventBus.post(new TradeWithUserCancelRequest(lobbyName, respondingUser));
             eventBus.post(new ResetTradeWithUserButtonEvent(loggedInUser, lobbyName));
         });
-    }
-
-    /**
-     * Initialises the Presenter by setting up the ownResourceView.
-     *
-     * @implNote Called automatically by JavaFX
-     */
-    @FXML
-    public void initialize() {
-        ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<String, Integer> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey()));
-                });
-            }
-        });
-        LOG.debug("TradeWithUserPresenter initialised");
     }
 
     /**

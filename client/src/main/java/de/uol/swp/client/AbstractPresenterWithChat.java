@@ -282,6 +282,23 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
+     * Nulls the chatMessages variable
+     * <p>
+     * This method is called on pressing the logout or the delete account
+     * button, and ensures that the chatMessages list is reset to null, to
+     * avoid multiple instances of the chat being displayed in the chatView.
+     *
+     * @author Finn Haase
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessages
+     * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
+     * @since 2020-12-26
+     */
+    protected void resetCharVars() {
+        chatMessages = null;
+    }
+
+    /**
      * Prepares the variables used for the chat storage and management
      * <p>
      * This method is called on a successful login and ensures that
@@ -310,23 +327,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             }
         });
         chatView.setItems(chatMessages);
-    }
-
-    /**
-     * Nulls the chatMessages variable
-     * <p>
-     * This method is called on pressing the logout or the delete account
-     * button, and ensures that the chatMessages list is reset to null, to
-     * avoid multiple instances of the chat being displayed in the chatView.
-     *
-     * @author Finn Haase
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#chatMessages
-     * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
-     * @since 2020-12-26
-     */
-    protected void resetCharVars() {
-        chatMessages = null;
     }
 
     /**

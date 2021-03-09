@@ -376,20 +376,6 @@ public class GameServiceTest {
     }
 
     /**
-     * Helper method to login users
-     * <p>
-     * This method resets the gameService and gameManagement variables to null
-     */
-    private void loginUser(User userToLogin) {
-        userManagement.createUser(userToLogin);
-        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
-        bus.post(loginRequest);
-
-        assertTrue(userManagement.isLoggedIn(userToLogin));
-        userManagement.dropUser(userToLogin);
-    }
-
-    /**
      * Tests if the lobbyManagement handles a KickUserRequest properly when the user who
      * wants to kick another user, is not the owner
      * <p>
@@ -649,9 +635,9 @@ public class GameServiceTest {
     @Test
     void onPlayKnightCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -665,9 +651,9 @@ public class GameServiceTest {
     @Test
     void onPlayMonopolyCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -686,9 +672,9 @@ public class GameServiceTest {
     @Test
     void onPlayYearOfPlentyCardRequestTest() {
         User[] user = new User[3];
-        user[0] = new UserDTO(0,"Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
-        user[1] = new UserDTO(1,"Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-        user[2] = new UserDTO(2,"Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
@@ -704,5 +690,19 @@ public class GameServiceTest {
     @Test
     void onRoadBuildingCardRequestTest() {
         //Methode noch nicht fertig
+    }
+
+    /**
+     * Helper method to login users
+     * <p>
+     * This method resets the gameService and gameManagement variables to null
+     */
+    private void loginUser(User userToLogin) {
+        userManagement.createUser(userToLogin);
+        final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
+        bus.post(loginRequest);
+
+        assertTrue(userManagement.isLoggedIn(userToLogin));
+        userManagement.dropUser(userToLogin);
     }
 }

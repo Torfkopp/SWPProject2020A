@@ -18,7 +18,6 @@ public interface IIntersection {
         CITY
     }
 
-
     /**
      * Gets the intersection's owner
      *

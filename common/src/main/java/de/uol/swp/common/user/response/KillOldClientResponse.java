@@ -1,7 +1,6 @@
 package de.uol.swp.common.user.response;
 
 import de.uol.swp.common.message.AbstractResponseMessage;
-import de.uol.swp.common.user.User;
 
 /**
  * A response from server to client to make it fall back to the login screen

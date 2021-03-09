@@ -70,7 +70,6 @@ public class LoginPresenter extends AbstractPresenter {
      * @author Marvin Drees
      * @see de.uol.swp.client.auth.events.RetryLoginEvent
      * @since 2021-03-04
-     *
      */
     @Subscribe
     private void onRetryLoginEvent(RetryLoginEvent event) {

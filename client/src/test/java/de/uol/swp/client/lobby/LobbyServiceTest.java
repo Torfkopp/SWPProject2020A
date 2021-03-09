@@ -34,23 +34,6 @@ class LobbyServiceTest {
     Object event;
 
     /**
-     * Handles DeadEvents detected on the EventBus
-     * <p>
-     * If a DeadEvent is detected, the event variable of this class gets updated
-     * to its event, and its event is printed to the console output.
-     *
-     * @param e The DeadEvent detected on the EventBus
-     *
-     * @since 2020-11-26
-     */
-    @Subscribe
-    private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
-        System.out.print(e.getEvent());
-        lock.countDown();
-    }
-
-    /**
      * Helper method run before each test case
      * <p>
      * This method resets the variable event to null and registers the object of
@@ -137,5 +120,22 @@ class LobbyServiceTest {
         assertEquals(lobbyUpdateEvent.getUser().getUsername(), defaultUser.getUsername());
         assertEquals(lobbyUpdateEvent.getUser().getPassword(), defaultUser.getPassword());
         assertEquals(lobbyUpdateEvent.getUser().getEMail(), defaultUser.getEMail());
+    }
+
+    /**
+     * Handles DeadEvents detected on the EventBus
+     * <p>
+     * If a DeadEvent is detected, the event variable of this class gets updated
+     * to its event, and its event is printed to the console output.
+     *
+     * @param e The DeadEvent detected on the EventBus
+     *
+     * @since 2020-11-26
+     */
+    @Subscribe
+    private void onDeadEvent(DeadEvent e) {
+        this.event = e.getEvent();
+        System.out.print(e.getEvent());
+        lock.countDown();
     }
 }

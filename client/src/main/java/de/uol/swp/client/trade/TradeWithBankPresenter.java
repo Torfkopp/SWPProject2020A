@@ -71,39 +71,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper function called if an unsuccessful trade happened.
-     * <p>
-     * Posts a TradeWithBankCancelEvent with its lobbyName to close the
-     * trading window and a TradeLobbyButtonUpdateEvent with the
-     * loggedInUser and the lobbyName on the eventBus to update the
-     * button statuses in the lobby.
-     */
-    private void closeWindowAfterNotSuccessfulTrade() {
-        Platform.runLater(() -> {
-            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-            eventBus.post(new ResetTradeWithBankButtonEvent(loggedInUser, lobbyName));
-        });
-    }
-
-    /**
-     * Helper function called if a successful trade happened.
-     * <p>
-     * Posts a TradeWithBankCancelEvent with its lobbyName to close the
-     * trading window and TradeLobbyButtonUpdateEvent with the
-     * loggedInUser and the lobbyName on the eventBus to update the
-     * button statuses in the lobby.
-     *
-     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
-     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
-     */
-    private void closeWindowAfterSuccessfulTrade() {
-        Platform.runLater(() -> {
-            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-            eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
-        });
-    }
-
-    /**
      * Initialises the Presenter by setting up the ownResourceView, the bankResourceView
      * and the ownInventoryView.
      *
@@ -139,6 +106,39 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             }
         });
         LOG.debug("TradeWithBankPresenter initialised");
+    }
+
+    /**
+     * Helper function called if an unsuccessful trade happened.
+     * <p>
+     * Posts a TradeWithBankCancelEvent with its lobbyName to close the
+     * trading window and a TradeLobbyButtonUpdateEvent with the
+     * loggedInUser and the lobbyName on the eventBus to update the
+     * button statuses in the lobby.
+     */
+    private void closeWindowAfterNotSuccessfulTrade() {
+        Platform.runLater(() -> {
+            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
+            eventBus.post(new ResetTradeWithBankButtonEvent(loggedInUser, lobbyName));
+        });
+    }
+
+    /**
+     * Helper function called if a successful trade happened.
+     * <p>
+     * Posts a TradeWithBankCancelEvent with its lobbyName to close the
+     * trading window and TradeLobbyButtonUpdateEvent with the
+     * loggedInUser and the lobbyName on the eventBus to update the
+     * button statuses in the lobby.
+     *
+     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
+     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
+     */
+    private void closeWindowAfterSuccessfulTrade() {
+        Platform.runLater(() -> {
+            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
+            eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
+        });
     }
 
     /**

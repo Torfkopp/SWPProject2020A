@@ -27,7 +27,8 @@ public class SerialisationTestHelper {
         return baos.toByteArray();
     }
 
-    public static <T extends Serializable> T unpickle(byte[] b, Class<T> cl) throws IOException, ClassNotFoundException {
+    public static <T extends Serializable> T unpickle(byte[] b,
+                                                      Class<T> cl) throws IOException, ClassNotFoundException {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         ObjectInputStream ois = new ObjectInputStream(bais);
         Object o = ois.readObject();

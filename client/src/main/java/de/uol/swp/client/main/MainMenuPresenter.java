@@ -368,11 +368,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * windows get closed as well.
      *
      * @param rsp TheKillOldClientResponse object fount on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
      * @see de.uol.swp.common.user.response.KillOldClientResponse
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
-     * @author Eric Vuong
-     * @author Marvin Drees
      * @since 2021-03-03
      */
     @Subscribe
