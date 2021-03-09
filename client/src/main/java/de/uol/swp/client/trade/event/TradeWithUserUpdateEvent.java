@@ -33,7 +33,7 @@ public class TradeWithUserUpdateEvent {
     }
 
     /**
-     * Getter for the lobbyName attribute
+     * Gets the name of the lobby
      *
      * @return The lobbyName
      */
@@ -42,7 +42,7 @@ public class TradeWithUserUpdateEvent {
     }
 
     /**
-     * Getter for the user attribute
+     * Gets the user
      *
      * @return The User
      */
