@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="196.0" prefWidth="407.0" xmlns="http://javafx.com/javafx"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="196.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/11.0.1"
             fx:controller="de.uol.swp.client.auth.LoginPresenter">
     <Label layoutX="43.0" layoutY="39.0" text="%login.labels.login"/>
     <TextField id="loginField" fx:id="loginField" layoutX="142.0" layoutY="34.0" promptText="%login.prompts.username">

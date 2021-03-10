@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="196.0" prefWidth="407.0"
-            xmlns="http://javafx.com/javafx"
+            xmlns="http://javafx.com/javafx/11.0.1"
             fx:controller="de.uol.swp.client.register.RegistrationPresenter">
 
     <Label layoutX="43.0" layoutY="17.0" text="%register.labels.login"/>
