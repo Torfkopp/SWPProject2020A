@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx"
             fx:controller="de.uol.swp.client.devmenu.DevMenuPresenter">
     <ListView fx:id="classListView" layoutX="10.0" layoutY="10.0" minHeight="200.0" minWidth="200.0" prefHeight="200.0"
               prefWidth="200.0"/>

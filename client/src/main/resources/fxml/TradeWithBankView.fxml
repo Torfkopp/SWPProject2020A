@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+            xmlns="http://javafx.com/javafx" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
 
     <Button fx:id="buyDevelopmentButton" disable="true" layoutX="368.0" layoutY="200.0" mnemonicParsing="false"
             onAction="#onBuyDevelopmentCardButtonPressed" prefHeight="50" text="%game.trade.buttons.buydevcard"/>

@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600" prefWidth="600" xmlns="http://javafx.com/javafx/11.0.1"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600" prefWidth="600" xmlns="http://javafx.com/javafx"
             fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
 
     <Button layoutX="498.0" layoutY="494.0" mnemonicParsing="false" onAction="#onCancelTradeButtonPressed"

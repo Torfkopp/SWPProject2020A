@@ -2,8 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>de.uol.swp</groupId>
-        <!-- rename to group -->
-        <artifactId>SWPBaseProject</artifactId>
+        <artifactId>SWP2020A</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <properties>
@@ -19,7 +18,7 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.4</version>
+                <version>0.0.5</version>
                 <configuration>
                     <mainClass>de.uol.swp.client.Main</mainClass>
                 </configuration>
@@ -102,7 +101,7 @@
         <dependency>
             <groupId>com.gluonhq</groupId>
             <artifactId>ignite-guice</artifactId>
-            <version>1.0.2</version>
+            <version>1.1.0</version>
         </dependency>
 
     </dependencies>
