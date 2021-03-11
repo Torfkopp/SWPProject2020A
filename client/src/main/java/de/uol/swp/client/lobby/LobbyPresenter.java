@@ -730,6 +730,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onResetTradeWithUserButtonEvent(ResetTradeWithUserButtonEvent event) {
         setTradeWithBankButtonState(event.getUser());
         setTradeWithUserButtonState(event.getUser());
+        setEndTurnButtonState(event.getUser());
     }
 
     /**
