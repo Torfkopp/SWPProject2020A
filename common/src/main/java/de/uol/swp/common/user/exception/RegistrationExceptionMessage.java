@@ -1,8 +1,6 @@
 package de.uol.swp.common.user.exception;
 
-import de.uol.swp.common.message.AbstractResponseMessage;
-
-import java.util.Objects;
+import de.uol.swp.common.message.ExceptionMessage;
 
 /**
  * This exception is thrown if something went wrong during the registration process,
@@ -12,9 +10,7 @@ import java.util.Objects;
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2019-09-02
  */
-public class RegistrationExceptionMessage extends AbstractResponseMessage {
-
-    private final String message;
+public class RegistrationExceptionMessage extends ExceptionMessage {
 
     /**
      * Constructor
@@ -24,24 +20,12 @@ public class RegistrationExceptionMessage extends AbstractResponseMessage {
      * @since 2019-09-02
      */
     public RegistrationExceptionMessage(String message) {
-        this.message = message;
+        super(message);
     }
 
     @Override
     public String toString() {
-        return "RegistrationExceptionMessage: " + message;
+        return "RegistrationExceptionMessage";
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(message);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RegistrationExceptionMessage that = (RegistrationExceptionMessage) o;
-        return Objects.equals(message, that.message);
-    }
 }

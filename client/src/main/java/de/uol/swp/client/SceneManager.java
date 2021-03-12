@@ -37,6 +37,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -151,8 +152,64 @@ public class SceneManager {
      */
     public void showError(String message, String e) {
         Platform.runLater(() -> {
-            Alert a = new Alert(Alert.AlertType.ERROR, message + e);
-            a.showAndWait();
+            String context = e;
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(resourceBundle.getString("error.title"));
+            alert.setHeaderText(resourceBundle.getString("error.header"));
+            // @formatter:off
+            switch (e) {
+                //Found in LobbyService
+                case "Game session started already!":
+                    context = resourceBundle.getString("error.context.sessionstarted");
+                case "You're already in this lobby!":
+                    context = resourceBundle.getString("error.context.alreadyin");
+                case "This lobby is full!":
+                    context = resourceBundle.getString("error.context.full");
+                case "This lobby does not exist!":
+                    context = resourceBundle.getString("error.context.noexistant");
+                //Found in GameService
+                case "Can not kick while a game is ongoing":
+                    context = resourceBundle.getString("error.context.ongoing");
+                //Found in ServerHandler
+                case "Authorisation required. Client not logged in!":
+                    context = resourceBundle.getString("error.context.authneeded");
+                //Found in UserManagement
+                case "Username already used!":
+                    context = resourceBundle.getString("error.context.nameused");
+                case "Username unknown!":
+                    context = resourceBundle.getString("error.context.unknown");
+            }
+            //found in UserManagement
+            if (e.contains("Cannot auth user "))
+                context = resourceBundle.getString("error.context.cannotauth") + e.substring(16);
+            //found in UserService
+            if (e.contains("Cannot delete user ")) context =
+                    resourceBundle.getString("error.context.cannotdelete") + " " +
+                    e.substring(18);
+            if (e.contains("Cannot create user ")) context =
+                    resourceBundle.getString("error.context.cannotcreate") + " " +
+                    e.substring(18);
+            if (e.contains("Cannot change Password of ")) context =
+                    resourceBundle.getString("error.context.cannotchangepw") + " " +
+                    e.substring(26);
+            //found in LobbyManagement
+            if (e.contains(" already exists!")) context =
+                    resourceBundle.getString("error.context.lobbyname") + " " +
+                    e.substring(10, e.indexOf(" already exists!") - 17) + " " +
+                    resourceBundle.getString("error.context.alreadyexists");
+            if (e.contains(" not found!")) context =
+                    resourceBundle.getString("error.context.lobbyname") + " " +
+                    e.substring(10, e.indexOf(" not found!")) + " " +
+                    resourceBundle.getString("error.context.notfound");
+            //set context
+            alert.setContentText(message + context);
+            // @formatter:on
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            alert.showAndWait();
+            //TODO Registration/ ChangePW ExceptionMessages sind doppelt und nicht vernünftig
+            //TODO REST FUNKTIONIERT AUCH SEMI-GUT
         });
     }
 
@@ -183,8 +240,15 @@ public class SceneManager {
     public void showLogOldSessionOutScreen(User user) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
+            alert.setTitle(resourceBundle.getString("confirmation.title"));
+            alert.setHeaderText(resourceBundle.getString("confirmation.header"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(confirm, cancel);
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (result.isPresent() && result.get() == confirm) {
                 eventBus.post(new NukeUsersSessionsRequest(user));
             }
         });
@@ -200,6 +264,9 @@ public class SceneManager {
     public void showLoginErrorScreen() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
             alert.showAndWait();
             showLoginScreen();
         });

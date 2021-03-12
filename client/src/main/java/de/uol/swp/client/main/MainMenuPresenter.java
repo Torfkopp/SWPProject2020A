@@ -250,14 +250,19 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         UnaryOperator<TextFormatter.Change> filter = (s) ->
                 !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
 
-        TextInputDialog dialog = new TextInputDialog(name);
-        dialog.getEditor().setTextFormatter(new TextFormatter<>(filter));
-        dialog.setTitle(resourceBundle.getString("lobby.dialog.title"));
-        dialog.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
-        dialog.setContentText(resourceBundle.getString("lobby.dialog.content"));
+        TextInputDialog dialogue = new TextInputDialog(name);
+        dialogue.getEditor().setTextFormatter(new TextFormatter<>(filter));
+        dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
+        dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
+        dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
+
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = dialogue.showAndWait();
         result.ifPresent(s -> lobbyService.createNewLobby(s, loggedInUser));
     }
 
