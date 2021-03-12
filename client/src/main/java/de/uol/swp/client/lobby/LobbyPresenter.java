@@ -28,6 +28,7 @@ import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,12 +60,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    private ObservableList<Pair<Integer, User>> lobbyMembers;
+    private ObservableList<UserOrDummy> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
-    private Set<User> readyUsers;
+    private Set<UserOrDummy> readyUsers;
     @FXML
-    private ListView<Pair<Integer, User>> membersView;
+    private ListView<UserOrDummy> membersView;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -120,30 +121,29 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         super.initialize();
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<Integer, User> item, boolean empty) {
+            protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) setText("");
+                    super.updateItem(user, empty);
+                    if (empty || user == null) setText("");
                     else {
-                        User user = item.getValue();
                         String name = user.getUsername();
                         if (readyUsers.contains(user))
                             name = String.format(resourceBundle.getString("lobby.members.ready"), name);
-                        if (user.getID() == owner.getID())
+                        if (user.equals(owner))
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         setText(name);
                         //if the background should be in colour you need to use setBackground
                         int i = lobbyMembers.size();
-                        if (i >= 1 && getText().contains(lobbyMembers.get(0).getValue().getUsername())) {
+                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
                             setTextFill(GameRendering.PLAYER_1_COLOUR);
                         }
-                        if (i >= 2 && getText().contains(lobbyMembers.get(1).getValue().getUsername())) {
+                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
                             setTextFill(GameRendering.PLAYER_2_COLOUR);
                         }
-                        if (i >= 3 && getText().contains(lobbyMembers.get(2).getValue().getUsername())) {
+                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
                             setTextFill(GameRendering.PLAYER_3_COLOUR);
                         }
-                        if (i >= 4 && getText().contains(lobbyMembers.get(3).getValue().getUsername())) {
+                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
                             setTextFill(GameRendering.PLAYER_4_COLOUR);
                         }
                     }
@@ -151,8 +151,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            String name = newValue.getValue().getUsername();
-            boolean isSelf = newValue.getValue().equals(this.loggedInUser);
+            String name = newValue.getUsername();
+            boolean isSelf = newValue.equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
@@ -262,24 +262,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Helper function to find the Pair for a given key
-     *
-     * @param id The key of the pair that should be returned
-     *
-     * @return The pair matched by the ID
-     *
-     * @author Temmo Junkhoff
-     * @author Timo Gerken
-     * @since 2021-01-19
-     */
-    private Pair<Integer, User> findMember(int id) {
-        for (Pair<Integer, User> lobbyMember : lobbyMembers) {
-            if (lobbyMember.getKey() == id) return lobbyMember;
-        }
-        return null;
-    }
-
-    /**
      * Handles a new list of users
      * <p>
      * If a new AllOnlineUsersResponse object is posted onto the EventBus,
@@ -305,6 +287,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- Update of lobby member list");
         LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
+        for (UserOrDummy i : rsp.getUsers()){
+            System.out.println(i.getUsername());
+        }
         this.owner = rsp.getOwner();
         this.readyUsers = rsp.getReadyUsers();
         updateUsersList(rsp.getUsers());
@@ -384,9 +369,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if ((selectedUser.getValue()) == this.loggedInUser) return;
-        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getValue().getUsername()));
+        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == this.loggedInUser) return;
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getUsername()));
     }
 
     /**
@@ -900,11 +885,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onTradeWithUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        User user = selectedUser.getValue();
+        UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty()) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
-        } else if (selectedUser.getKey() == this.loggedInUser.getID()) {
+        } else if (user.getID() == this.loggedInUser.getID()) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             tradeWithUserButton.setDisable(true);
@@ -1015,12 +999,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
-        User user = msg.getUser();
+        UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
-        Pair<Integer, User> pair = new Pair<>(user.getID(), user);
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(pair))
-                lobbyMembers.add(pair);
+            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+                lobbyMembers.add(user);
             setStartSessionButtonState();
         });
     }
@@ -1050,13 +1033,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby " + this.lobbyName);
-        User user = msg.getUser();
+        UserOrDummy user = msg.getUser();
         if (user.getID() == owner.getID()) {
             LOG.debug("---- Owner " + user.getUsername() + " left");
             lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else LOG.debug("---- User " + user.getUsername() + " left");
         Platform.runLater(() -> {
-            lobbyMembers.remove(findMember(user.getID()));
+            lobbyMembers.remove(user);
             readyUsers.remove(user);
             setStartSessionButtonState();
         });
@@ -1092,8 +1075,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Mario Fokken
      * @author Marvin Drees
      * @since 2021-01-23
+     * @param player
      */
-    private void setEndTurnButtonState(User player) {
+    private void setEndTurnButtonState(UserOrDummy player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1121,8 +1105,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @author Mario Fokken
      * @since 2021-02-25
+     * @param player
      */
-    private void setPlayCardButtonState(User player) {
+    private void setPlayCardButtonState(UserOrDummy player) {
         this.playCard.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1133,7 +1118,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Mario Fokken
      * @since 2021-02-22
      */
-    private void setRollDiceButtonState(User player) {
+    private void setRollDiceButtonState(UserOrDummy player) {
         this.rollDice.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1168,8 +1153,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Alwin Bossert
      * @author Maximilian Lindner
      * @since 2021-02-21
+     * @param player
      */
-    private void setTradeWithBankButtonState(User player) {
+    private void setTradeWithBankButtonState(UserOrDummy player) {
         this.tradeWithBankButton.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1182,8 +1168,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Finn Haase
      * @author Maximilian Lindner
      * @since 2021-02-21
+     * @param player
      */
-    private void setTradeWithUserButtonState(User player) {
+    private void setTradeWithUserButtonState(UserOrDummy player) {
         this.tradeWithUserButton.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1197,7 +1184,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Marvin Drees
      * @since 2021-01-23
      */
-    private void setTurnIndicatorText(User player) {
+    private void setTurnIndicatorText(UserOrDummy player) {
         Platform.runLater(() -> turnIndicator.setText(
                 String.format(resourceBundle.getString("lobby.game.text.turnindicator"), player.getUsername())));
     }
@@ -1219,17 +1206,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.User
+     * @see de.uol.swp.common.user.UserOrDummy
      * @since 2021-01-05
      */
-    private void updateUsersList(List<User> userLobbyList) {
+    private void updateUsersList(List<UserOrDummy> userLobbyList) {
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
                 lobbyMembers = FXCollections.observableArrayList();
                 membersView.setItems(lobbyMembers);
             }
             lobbyMembers.clear();
-            userLobbyList.forEach(u -> lobbyMembers.add(new Pair<>(u.getID(), u)));
+            lobbyMembers.addAll(userLobbyList);
         });
     }
 }

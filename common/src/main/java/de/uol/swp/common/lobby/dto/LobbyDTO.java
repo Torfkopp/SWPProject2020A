@@ -1,7 +1,9 @@
 package de.uol.swp.common.lobby.dto;
 
 import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Collections;
 import java.util.Set;
@@ -21,8 +23,8 @@ import java.util.TreeSet;
 public class LobbyDTO implements Lobby {
 
     private final String name;
-    private final Set<User> users = new TreeSet<>();
-    private final Set<User> readyUsers = new TreeSet<>();
+    private final Set<UserOrDummy> users = new TreeSet<>();
+    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private boolean inGame;
     private User owner;
 
@@ -66,12 +68,23 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public Set<User> getReadyUsers() {
+    public Set<UserOrDummy> getReadyUsers() {
         return readyUsers;
     }
 
     @Override
     public Set<User> getUsers() {
+        Set<User> userSet = new TreeSet<>();
+        for (UserOrDummy userOrDummy : users) {
+            if (userOrDummy instanceof User) {
+                userSet.add((User) userOrDummy);
+            }
+        }
+        return Collections.unmodifiableSet(userSet);
+    }
+
+    @Override
+    public Set<UserOrDummy> getUserOrDummies() {
         return Collections.unmodifiableSet(users);
     }
 
@@ -86,35 +99,48 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void joinUser(User user) {
+    public void joinUser(UserOrDummy user) {
         this.users.add(user);
+        if (user instanceof Dummy){
+        readyUsers.add(user);
+        }
+        System.out.println("User joined Lobby");
+        for (UserOrDummy i : users)
+            System.out.println(i.getUsername());
     }
 
     @Override
-    public void leaveUser(User user) {
+    public void leaveUser(UserOrDummy user) {
         if (users.size() == 1) {
             throw new IllegalArgumentException("Lobby must contain at least one user!");
         }
         if (users.contains(user)) {
             this.users.remove(user);
             if (this.owner.equals(user)) {
-                updateOwner(users.iterator().next());
+                while (true) {
+                    UserOrDummy nextOwner = users.iterator().next();
+                    if (nextOwner instanceof User) {
+                        updateOwner((User) nextOwner);
+                        break;
+                    }
+                }
             }
         }
     }
 
     @Override
-    public void setUserReady(User user) {
+    public void setUserReady(UserOrDummy user) {
         this.readyUsers.add(user);
     }
 
     @Override
-    public void unsetUserReady(User user) {
+    public void unsetUserReady(UserOrDummy user) {
         this.readyUsers.remove(user);
     }
 
     @Override
     public void updateOwner(User user) {
+        //TODO: Check for dummy
         if (!this.users.contains(user)) {
             throw new IllegalArgumentException(
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");

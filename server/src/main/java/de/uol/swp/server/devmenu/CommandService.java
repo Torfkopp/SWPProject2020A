@@ -25,8 +25,7 @@ import de.uol.swp.common.lobby.request.UserReadyRequest;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.IGameManagement;
@@ -92,6 +91,8 @@ public class CommandService extends AbstractService {
         commandMap.put("remove", this::command_Remove);
         commandMap.put("skip", this::command_NextPlayerIfTemp);
         commandMap.put("skipall", this::command_SkipBots);
+        commandMap.put("adddummy", this::command_AddDummy);
+        //TODO: add help text
         LOG.debug("CommandService started");
     }
 
@@ -243,7 +244,7 @@ public class CommandService extends AbstractService {
         String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
         if (game == null) return;
-        User activePlayer = game.getActivePlayer();
+        UserOrDummy activePlayer = game.getActivePlayer();
         if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
             post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
         }
@@ -366,13 +367,39 @@ public class CommandService extends AbstractService {
         String lobbyName = originalMessage.getOriginLobby();
         Game game = gameManagement.getGame(lobbyName);
         if (game == null) return;
-        User activePlayer = game.getActivePlayer();
+        UserOrDummy activePlayer = game.getActivePlayer();
         if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
             post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
             activePlayer = game.getActivePlayer();
             if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
                 post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
             }
+        }
+    }
+
+    /**
+     * Handles the /adddummy command
+     * <p>
+     * Usage: {@code /adddummy}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     */
+    private void command_AddDummy(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /adddummy command");
+        //TODO: Add Multiple dummies add once
+        if (originalMessage.isFromLobby()) {
+            String lobbyName = originalMessage.getOriginLobby();
+            Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                Lobby lobby = optLobby.get();
+                post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+            }
+        } else {
+            command_Invalid(args, originalMessage);
         }
     }
 

@@ -5,6 +5,7 @@ import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class Game {
     private final Lobby lobby;
     private final Inventory[] inventories;
     private final IGameMap map;
-    private final User[] players;
+    private final UserOrDummy[] players;
     private final List<String> bankInventory;
     private int activePlayer;
 
@@ -29,9 +30,9 @@ public class Game {
      * @param lobby The lobby the game is taking place in
      * @param first The first player
      */
-    public Game(Lobby lobby, User first) {
+    public Game(Lobby lobby, UserOrDummy first) {
         this.lobby = lobby;
-        players = lobby.getUsers().toArray(new User[0]);
+        players = lobby.getUserOrDummies().toArray(new User[0]);
         for (int i = 0; i < players.length; i++) {
             if (players[i].equals(first)) {
                 activePlayer = i;
@@ -42,7 +43,7 @@ public class Game {
         map.createBeginnerMap();
         inventories = new Inventory[players.length];
         int i = 0;
-        for (User u : players) {
+        for (UserOrDummy u : players) {
             inventories[i++] = new Inventory(u);
         }
         BankInventory bankInvent = new BankInventory();
@@ -87,7 +88,7 @@ public class Game {
      * @author Phillip-André Suhr
      * @since 2021-03-01
      */
-    public User getActivePlayer() {
+    public UserOrDummy getActivePlayer() {
         return players[activePlayer];
     }
 
@@ -145,9 +146,9 @@ public class Game {
      *
      * @return A player
      */
-    public Player getPlayer(User user) {
+    public Player getPlayer(UserOrDummy user) {
         int i = 0;
-        for (User u : players) {
+        for (UserOrDummy u : players) {
             if (u.equals(user)) break;
             i++;
         }
@@ -167,7 +168,7 @@ public class Game {
      *
      * @return The array of Users participating in this game
      */
-    public User[] getPlayers() {
+    public UserOrDummy[] getPlayers() {
         return players;
     }
 
@@ -176,7 +177,7 @@ public class Game {
      *
      * @return User object of the next player
      */
-    public User nextPlayer() {
+    public UserOrDummy nextPlayer() {
         activePlayer = (activePlayer + 1) % players.length;
         return players[activePlayer];
     }

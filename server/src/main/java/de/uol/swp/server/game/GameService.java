@@ -16,6 +16,7 @@ import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
 import de.uol.swp.server.game.event.KickUserEvent;
@@ -387,8 +388,14 @@ public class GameService extends AbstractService {
         }
         try {
             Game game = gameManagement.getGame(req.getOriginLobby());
-            ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), game.nextPlayer());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+            UserOrDummy nextPlayer = game.nextPlayer();
+            if (nextPlayer instanceof User) {
+                ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+            } else { //Dummy
+                onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+                onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
+            }
         } catch (Exception e) {
             LOG.error(e);
         }

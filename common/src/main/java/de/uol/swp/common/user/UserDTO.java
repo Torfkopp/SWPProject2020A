@@ -67,18 +67,8 @@ public class UserDTO implements User {
     }
 
     @Override
-    public int getID() {
-        return id;
-    }
-
-    @Override
     public String getPassword() {
         return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -87,9 +77,20 @@ public class UserDTO implements User {
     }
 
     @Override
-    public int compareTo(User o) {
+    public int getID() {
+        return id;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public int compareTo(UserOrDummy o) {
         Integer id_obj = id; // compareTo is only defined on the wrapper class, so we make one here
-        return id_obj.compareTo(o.getID());
+        if (o instanceof User) return id_obj.compareTo(o.getID());
+        else return -1;
     }
 
     @Override

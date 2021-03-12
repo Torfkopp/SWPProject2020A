@@ -5,6 +5,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.lobby.LobbyManagement;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,7 @@ class GameTest {
         lobby.joinUser(user[2]);
         Game game = new Game(lobby, user[0]);
         //Lobby speichert Users alphabetisch. SMH mein Haupt
-        User[] u = game.getPlayers();
+        UserOrDummy[] u = game.getPlayers();
         assertEquals(u[0], user[0]);
         assertEquals(u[1], user[1]);
         assertEquals(u[2], user[2]);

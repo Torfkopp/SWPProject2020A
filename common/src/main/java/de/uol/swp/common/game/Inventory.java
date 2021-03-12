@@ -1,6 +1,6 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * The player's inventory
@@ -11,7 +11,7 @@ import de.uol.swp.common.user.User;
  */
 public class Inventory {
 
-    private final User player;
+    private final UserOrDummy player;
 
     private int totalResources = 0;
 
@@ -37,7 +37,7 @@ public class Inventory {
      *
      * @param player The player who this inventory belongs to
      */
-    public Inventory(User player) {
+    public Inventory(UserOrDummy player) {
         this.player = player;
     }
 
@@ -172,7 +172,7 @@ public class Inventory {
      *
      * @return The player who this inventory belongs to
      */
-    public User getPlayer() {
+    public UserOrDummy getPlayer() {
         return player;
     }
 

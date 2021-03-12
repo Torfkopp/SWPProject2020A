@@ -554,9 +554,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             lobbies.clear();
             lobbyList.forEach(l -> {
-                String s = l.getName() + " (" + l.getUsers().size() + "/4)";
+                String s = l.getName() + " (" + l.getUserOrDummies().size() + "/4)";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
-                else if (l.getUsers().size() == 4)
+                else if (l.getUserOrDummies().size() == 4)
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
             });

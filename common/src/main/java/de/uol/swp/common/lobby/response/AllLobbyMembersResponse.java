@@ -2,6 +2,7 @@ package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.*;
 
@@ -17,8 +18,8 @@ import java.util.*;
  */
 public class AllLobbyMembersResponse extends AbstractLobbyResponse {
 
-    private final List<User> users = new ArrayList<>();
-    private final Set<User> readyUsers = new TreeSet<>();
+    private final List<UserOrDummy> users = new ArrayList<>();
+    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private final User owner;
 
     /**
@@ -38,13 +39,10 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(String lobbyName, Collection<User> users, User owner, Set<User> readyUsers) {
+    public AllLobbyMembersResponse(String lobbyName, Set<UserOrDummy> users, User owner, Set<UserOrDummy> readyUsers) {
         super(lobbyName);
-        for (User user : users) {
-            this.users.add(UserDTO.createWithoutPassword(user));
-        }
-        for (User user : readyUsers) {
-            this.readyUsers.add(UserDTO.createWithoutPassword(user));
+        for (UserOrDummy user : users) {
+            if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
         }
         this.owner = UserDTO.createWithoutPassword(owner);
     }
@@ -69,7 +67,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    public Set<User> getReadyUsers() {
+    public Set<UserOrDummy> getReadyUsers() {
         return this.readyUsers;
     }
 
@@ -80,7 +78,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2020-12-21
      */
-    public List<User> getUsers() {
+    public List<UserOrDummy> getUsers() {
         return users;
     }
 }

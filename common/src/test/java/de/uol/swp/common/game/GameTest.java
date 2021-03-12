@@ -6,6 +6,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.UserOrDummy;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -111,7 +112,7 @@ public class GameTest {
         lobby.joinUser(user2);
         lobby.joinUser(user3);
         game = new Game(lobby, user);
-        User[] players = game.getPlayers();
+        UserOrDummy[] players = game.getPlayers();
         //Tests if the players are in correct order
         //Ordered by ID
         assertEquals(players[0], user);

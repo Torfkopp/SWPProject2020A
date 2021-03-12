@@ -8,9 +8,12 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.*;
+import de.uol.swp.common.message.ExceptionMessage;
+import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
 import de.uol.swp.server.game.event.KickUserEvent;
@@ -83,7 +86,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The CreateLobbyRequest found on the EventBus
      *
-     * @see de.uol.swp.server.lobby.LobbyManagement#createLobby(String, User)
+     * @see ILobbyManagement#createLobby(String, de.uol.swp.common.user.User)
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2019-10-08
      */
@@ -155,18 +158,19 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (req.getToBeKickedUserName().equals(req.getUser().getUsername())) return;
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
-        Set<User> lobbyMembers = lobby.get().getUsers();
+        Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();
         User toBeKickedUser = null;
-        for (User temp : lobbyMembers) {
-            if (temp.getUsername().equals(req.getToBeKickedUserName())) toBeKickedUser = temp;
-        }
-        if (toBeKickedUser == null) return;
-        lobby.get().unsetUserReady(toBeKickedUser);
-        lobby.get().leaveUser(toBeKickedUser);
-        ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
-        post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
-        sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
-        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        //TODO: Optimize on client side and uncomment
+        //for (User temp : lobbyMembers) {
+        //    if (temp.getUsername().equals(req.getToBeKickedUserName())) toBeKickedUser = temp;
+        //}
+        //if (toBeKickedUser == null) return;
+        //lobby.get().unsetUserReady(toBeKickedUser);
+        //lobby.get().leaveUser(toBeKickedUser);
+        //ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
+        //post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
+        //sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
+        //post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
 
     /**
@@ -188,8 +192,8 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
 
         if (lobby.isPresent()) {
-            if (lobby.get().getUsers().size() < 4) {
-                if (!lobby.get().getUsers().contains(req.getUser())) {
+            if (lobby.get().getUserOrDummies().size() < 4) {
+                if (!lobby.get().getUserOrDummies().contains(req.getUser())) {
                     if (!lobby.get().isInGame()) {
                         lobby.get().joinUser(req.getUser());
                         Message responseMessage = new JoinLobbyResponse(req.getName());
@@ -278,7 +282,7 @@ public class LobbyService extends AbstractService {
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
         Map<String, Lobby> lobbiesWithUser = new HashMap<>();
         for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUsers().contains(user)) {
+            if (entry.getValue().getUserOrDummies().contains(user)) {
                 Lobby lobby = entry.getValue();
                 String lobbyName = entry.getKey();
                 lobbiesWithUser.put(entry.getKey(), lobby);
@@ -333,7 +337,7 @@ public class LobbyService extends AbstractService {
         String lobbyName = req.getLobbyName();
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
-            Set<User> lobbyMembers = lobby.get().getUsers();
+            Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();
             Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
                                                            lobby.get().getReadyUsers());
             response.initWithMessage(req);
@@ -362,7 +366,8 @@ public class LobbyService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug("Received StartSessionRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isPresent()) {
-            if (lobby.get().getUsers().size() >= 1 && (lobby.get().getReadyUsers().equals(lobby.get().getUsers()))) {
+            if (lobby.get().getUserOrDummies().size() >= 3 && (lobby.get().getReadyUsers()
+                                                                    .equals(lobby.get().getUserOrDummies()))) {
                 LOG.debug("---- All Members are ready, proceeding with sending of StartSessionMessage...");
                 ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), req.getUser());
                 post(new CreateGameMessage(lobby.get(), req.getUser()));

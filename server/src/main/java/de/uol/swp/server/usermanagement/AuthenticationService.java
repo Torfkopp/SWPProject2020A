@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
@@ -65,7 +66,7 @@ public class AuthenticationService extends AbstractService {
      * @see de.uol.swp.common.user.User
      * @since 2019-09-04
      */
-    public Optional<Session> getSession(User user) {
+    public Optional<Session> getSession(UserOrDummy user) {
         Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
                                                                .filter(e -> e.getValue().equals(user)).findFirst();
         return entry.map(Map.Entry::getKey);
