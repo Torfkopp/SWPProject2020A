@@ -148,68 +148,21 @@ public class SceneManager {
      * @param message The type of error to be shown
      * @param e       The error message
      *
-     * @since 2019-09-03
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-03-12
      */
     public void showError(String message, String e) {
         Platform.runLater(() -> {
-            String context = e;
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(resourceBundle.getString("error.title"));
             alert.setHeaderText(resourceBundle.getString("error.header"));
-            // @formatter:off
-            switch (e) {
-                //Found in LobbyService
-                case "Game session started already!":
-                    context = resourceBundle.getString("error.context.sessionstarted");
-                case "You're already in this lobby!":
-                    context = resourceBundle.getString("error.context.alreadyin");
-                case "This lobby is full!":
-                    context = resourceBundle.getString("error.context.full");
-                case "This lobby does not exist!":
-                    context = resourceBundle.getString("error.context.noexistant");
-                //Found in GameService
-                case "Can not kick while a game is ongoing":
-                    context = resourceBundle.getString("error.context.ongoing");
-                //Found in ServerHandler
-                case "Authorisation required. Client not logged in!":
-                    context = resourceBundle.getString("error.context.authneeded");
-                //Found in UserManagement
-                case "Username already used!":
-                    context = resourceBundle.getString("error.context.nameused");
-                case "Username unknown!":
-                    context = resourceBundle.getString("error.context.unknown");
-            }
-            //found in UserManagement
-            if (e.contains("Cannot auth user "))
-                context = resourceBundle.getString("error.context.cannotauth") + e.substring(16);
-            //found in UserService
-            if (e.contains("Cannot delete user ")) context =
-                    resourceBundle.getString("error.context.cannotdelete") + " " +
-                    e.substring(18);
-            if (e.contains("Cannot create user ")) context =
-                    resourceBundle.getString("error.context.cannotcreate") + " " +
-                    e.substring(18);
-            if (e.contains("Cannot change Password of ")) context =
-                    resourceBundle.getString("error.context.cannotchangepw") + " " +
-                    e.substring(26);
-            //found in LobbyManagement
-            if (e.contains(" already exists!")) context =
-                    resourceBundle.getString("error.context.lobbyname") + " " +
-                    e.substring(10, e.indexOf(" already exists!") - 17) + " " +
-                    resourceBundle.getString("error.context.alreadyexists");
-            if (e.contains(" not found!")) context =
-                    resourceBundle.getString("error.context.lobbyname") + " " +
-                    e.substring(10, e.indexOf(" not found!")) + " " +
-                    resourceBundle.getString("error.context.notfound");
-            //set context
+            String context = internationaliseServerMessage(e);
             alert.setContentText(message + context);
-            // @formatter:on
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
             alert.showAndWait();
-            //TODO Registration/ ChangePW ExceptionMessages sind doppelt und nicht vernünftig
-            //TODO REST FUNKTIONIERT AUCH SEMI-GUT
         });
     }
 
@@ -320,6 +273,84 @@ public class SceneManager {
      */
     public void showServerError(String e) {
         showError(resourceBundle.getString("error.server") + '\n', e);
+    }
+
+    /**
+     * Internationalises a Message coming from the server
+     *
+     * @param e The original exception message
+     *
+     * @return The internationalised message
+     *
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-03-12
+     */
+    private String internationaliseServerMessage(String e) {
+        String context = e;
+        // @formatter:off
+        switch (e) {
+            //Found in LobbyService
+            case "Game session started already!":
+                context = resourceBundle.getString("error.context.sessionstarted");
+                break;
+            case "You're already in this lobby!":
+                context = resourceBundle.getString("error.context.alreadyin");
+                break;
+            case "This lobby is full!":
+                context = resourceBundle.getString("error.context.full");
+                break;
+            case "This lobby does not exist!":
+                context = resourceBundle.getString("error.context.noexistant");
+                break;
+            //Found in GameService
+            case "Can not kick while a game is ongoing":
+                context = resourceBundle.getString("error.context.ongoing");
+                break;
+            //Found in ServerHandler
+            case "Authorisation required. Client not logged in!":
+                context = resourceBundle.getString("error.context.authneeded");
+                break;
+            //Found in UserManagement
+            case "Username already used!":
+                context = resourceBundle.getString("error.context.nameused");
+                break;
+            case "Username unknown!":
+                context = resourceBundle.getString("error.context.unknown");
+                break;
+            //Found in UserService
+            case "Old Passwords are not equal":
+                context = resourceBundle.getString("error.context.oldpw");
+                break;
+        }
+        //found in UserManagement
+        if (e.contains("Cannot auth user ")) context =
+                resourceBundle.getString("error.context.cannotauth") +
+                e.substring(16);
+        //found in UserService
+        if (e.contains("Cannot delete user ")) context =
+                resourceBundle.getString("error.context.cannotdelete") + " " +
+                e.substring(e.indexOf('[')+1, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.unknown");
+        if (e.contains("Cannot create user ")) context =
+                resourceBundle.getString("error.context.cannotcreate") + " " +
+                e.substring(e.indexOf('[')+2-1, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.nameused");
+        if (e.contains("Cannot change Password of ")) context =
+                resourceBundle.getString("error.context.cannotchangepw") + " " +
+                e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.unknown");
+        //found in LobbyManagement
+        if (e.contains(" already exists!")) context =
+                resourceBundle.getString("error.context.lobbyname") + " " +
+                e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.alreadyexists");
+        if (e.contains(" not found!")) context =
+                resourceBundle.getString("error.context.lobbyname") + " " +
+                e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.notfound");
+        // @formatter:on
+        return context;
     }
 
     /**

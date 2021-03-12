@@ -22,10 +22,4 @@ public class RegistrationExceptionMessage extends ExceptionMessage {
     public RegistrationExceptionMessage(String message) {
         super(message);
     }
-
-    @Override
-    public String toString() {
-        return "RegistrationExceptionMessage";
-    }
-
 }

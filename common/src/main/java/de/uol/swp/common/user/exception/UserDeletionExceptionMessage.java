@@ -22,10 +22,4 @@ public class UserDeletionExceptionMessage extends ExceptionMessage {
     public UserDeletionExceptionMessage(String message) {
         super(message);
     }
-
-    @Override
-    public String toString() {
-        return "DeletionExceptionMessage";
-    }
-
 }

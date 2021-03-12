@@ -23,7 +23,7 @@ public class LobbyManagement implements ILobbyManagement {
     @Override
     public void createLobby(String name, User owner) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
-            throw new IllegalArgumentException("Lobby name " + name + " already exists!");
+            throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
         lobbies.put(name, new LobbyDTO(name, owner, false));
     }
@@ -31,7 +31,7 @@ public class LobbyManagement implements ILobbyManagement {
     @Override
     public void dropLobby(String name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
-            throw new IllegalArgumentException("Lobby name " + name + " not found!");
+            throw new IllegalArgumentException("Lobby name [" + name + "] not found!");
         }
         lobbies.remove(name);
     }

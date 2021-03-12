@@ -23,10 +23,4 @@ public class ChangePasswordExceptionMessage extends ExceptionMessage {
     public ChangePasswordExceptionMessage(String message) {
         super(message);
     }
-
-    @Override
-    public String toString() {
-        return "ChangePasswordExceptionMessage";
-    }
-
 }
