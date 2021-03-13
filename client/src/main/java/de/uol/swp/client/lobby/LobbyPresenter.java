@@ -371,7 +371,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == this.loggedInUser) return;
-        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getUsername()));
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser));
     }
 
     /**
@@ -889,16 +889,16 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty()) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
-        } else if (user.getID() == this.loggedInUser.getID()) {
+        } else if (user == this.loggedInUser) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setDisable(true);
             endTurn.setDisable(true);
             LOG.debug("Sending ShowTradeWithUserViewEvent");
-            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user.getUsername()));
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user));
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, user.getUsername()));
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, user));
         }
     }
 
@@ -1002,11 +1002,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
         UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
-        Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
-                lobbyMembers.add(user);
-            setStartSessionButtonState();
-        });
+        lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
     }
 
     /**
@@ -1037,13 +1033,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         UserOrDummy user = msg.getUser();
         if (user.getID() == owner.getID()) {
             LOG.debug("---- Owner " + user.getUsername() + " left");
-            lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else LOG.debug("---- User " + user.getUsername() + " left");
-        Platform.runLater(() -> {
-            lobbyMembers.remove(user);
-            readyUsers.remove(user);
-            setStartSessionButtonState();
-        });
+        lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
     }
 
     /**

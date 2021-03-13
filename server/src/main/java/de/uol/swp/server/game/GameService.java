@@ -469,6 +469,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
+        if (!(req.getRespondingUser() instanceof User))
+            post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
@@ -766,15 +768,14 @@ public class GameService extends AbstractService {
             LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
-        try {
-            Game game = gameManagement.getGame(req.getOriginLobby());
-            int[] result = game.rollDice();
-            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
-                                                              result[1]);
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-        } catch (Exception e) {
-            LOG.error(e);
-        }
+        //try {
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        int[] result = game.rollDice();
+        ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+        //} catch (Exception e) {
+        //    LOG.error(e);
+        //}
     }
 
     /**
@@ -971,7 +972,8 @@ public class GameService extends AbstractService {
      * @author Alwin Bossert
      * @since 2021-02-22
      */
-    private boolean updatePlayersInventoryWithDevelopmentCard(String developmentCard, User user, String lobbyName) {
+    private boolean updatePlayersInventoryWithDevelopmentCard(String developmentCard, UserOrDummy user,
+                                                              String lobbyName) {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
         if (inventory == null) return false;
         if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {

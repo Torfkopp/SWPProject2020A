@@ -307,7 +307,7 @@ public class GameServiceTest {
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
         //Owner tries to kick himself
-        Message kickUser = new KickUserRequest("testlobby", user[0], user[0].getUsername());
+        Message kickUser = new KickUserRequest("testlobby", user[0], user[0]);
         bus.post(kickUser);
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
@@ -338,7 +338,7 @@ public class GameServiceTest {
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
 
-        Message kickUser = new KickUserRequest("testlobby", user[0], user[1].getUsername());
+        Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
         bus.post(kickUser);
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
@@ -367,7 +367,7 @@ public class GameServiceTest {
         lobby.get().joinUser(user[2]);
         gameManagement.createGame(lobby.get(), user[0]);
 
-        Message kickUser = new KickUserRequest("testlobby", user[0], user[1].getUsername());
+        Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
         bus.post(kickUser);
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
@@ -396,7 +396,7 @@ public class GameServiceTest {
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
         //user[0] ist der owner, aber user[1] schickt die kick request
-        Message kickUser = new KickUserRequest("testlobby", user[1], user[2].getUsername());
+        Message kickUser = new KickUserRequest("testlobby", user[1], user[2]);
         bus.post(kickUser);
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
@@ -511,9 +511,8 @@ public class GameServiceTest {
         respondingResourceMap.put("grain", 0);
         respondingResourceMap.put("lumber", 4);
 
-        Message tradeWithUser = new AcceptUserTradeRequest(gameInventory[1].getPlayer().getUsername(),
-                                                           gameInventory[0].getPlayer().getUsername(), "testlobby",
-                                                           respondingResourceMap, offeringResourceMap);
+        Message tradeWithUser = new AcceptUserTradeRequest(gameInventory[1].getPlayer(), gameInventory[0].getPlayer(),
+                                                           "testlobby", respondingResourceMap, offeringResourceMap);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
@@ -593,9 +592,8 @@ public class GameServiceTest {
         respondingResourceMap.put("ore", 0);
         respondingResourceMap.put("grain", 0);
 
-        Message tradeWithUser = new AcceptUserTradeRequest(gameInventory[2].getPlayer().getUsername(),
-                                                           gameInventory[0].getPlayer().getUsername(), "testlobby",
-                                                           respondingResourceMap, offeringResourceMap);
+        Message tradeWithUser = new AcceptUserTradeRequest(gameInventory[2].getPlayer(), gameInventory[0].getPlayer(),
+                                                           "testlobby", respondingResourceMap, offeringResourceMap);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
@@ -612,9 +610,8 @@ public class GameServiceTest {
         assertEquals(0, gameInventory1[2].getGrain());
         assertEquals(0, gameInventory1[2].getLumber());
 
-        Message tradeWithUser2 = new AcceptUserTradeRequest(gameInventory[0].getPlayer().getUsername(),
-                                                            gameInventory[2].getPlayer().getUsername(), "testlobby",
-                                                            respondingResourceMap, offeringResourceMap);
+        Message tradeWithUser2 = new AcceptUserTradeRequest(gameInventory[0].getPlayer(), gameInventory[2].getPlayer(),
+                                                            "testlobby", respondingResourceMap, offeringResourceMap);
         bus.post(tradeWithUser2);
 
         Game game2 = gameManagement.getGame("testlobby");

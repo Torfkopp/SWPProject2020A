@@ -27,6 +27,7 @@ public class LobbyDTO implements Lobby {
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private boolean inGame;
     private User owner;
+    private int maxUsers = 4;
 
     /**
      * Constructor
@@ -42,6 +43,7 @@ public class LobbyDTO implements Lobby {
         this.owner = creator;
         this.users.add(creator);
         this.inGame = inGame;
+
     }
 
     /**
@@ -98,11 +100,19 @@ public class LobbyDTO implements Lobby {
         this.inGame = inGame;
     }
 
+    public int getMaxUsers() {
+        return maxUsers;
+    }
+
+    public void setMaxUsers(int maxUsers) {
+        this.maxUsers = maxUsers;
+    }
+
     @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
-        if (user instanceof Dummy){
-        readyUsers.add(user);
+        if (user instanceof Dummy) {
+            readyUsers.add(user);
         }
         System.out.println("User joined Lobby");
         for (UserOrDummy i : users)
@@ -116,14 +126,17 @@ public class LobbyDTO implements Lobby {
         }
         if (users.contains(user)) {
             this.users.remove(user);
+            unsetUserReady(user);
             if (this.owner.equals(user)) {
-                while (true) {
-                    UserOrDummy nextOwner = users.iterator().next();
+                boolean foundUser = false;
+                for (UserOrDummy nextOwner : users) {
                     if (nextOwner instanceof User) {
+                        foundUser = true;
                         updateOwner((User) nextOwner);
                         break;
                     }
                 }
+                if (!foundUser) throw new IllegalArgumentException("Lobby must contain at least one real user!");
             }
         }
     }

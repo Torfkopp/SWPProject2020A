@@ -4,7 +4,6 @@ import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class Game {
      */
     public Game(Lobby lobby, UserOrDummy first) {
         this.lobby = lobby;
-        players = lobby.getUserOrDummies().toArray(new User[0]);
+        players = lobby.getUserOrDummies().toArray(new UserOrDummy[0]);
         for (int i = 0; i < players.length; i++) {
             if (players[i].equals(first)) {
                 activePlayer = i;
@@ -120,7 +119,7 @@ public class Game {
      * @return The player's inventory
      */
     public Inventory getInventory(Player player) {
-        return inventories[player.toString().charAt(7) - 49];
+        return inventories[player.ordinal()];
     }
 
     /**
@@ -130,7 +129,7 @@ public class Game {
      *
      * @return The player's inventory
      */
-    public Inventory getInventory(User user) {
+    public Inventory getInventory(UserOrDummy user) {
         return getInventory(getPlayer(user));
     }
 
@@ -163,30 +162,6 @@ public class Game {
         int i = 0;
         for (UserOrDummy u : players) {
             if (u.equals(user)) break;
-            i++;
-        }
-        switch (i) {
-            case 1:
-                return Player.PLAYER_2;
-            case 2:
-                return Player.PLAYER_3;
-            case 3:
-                return Player.PLAYER_4;
-        }
-        return Player.PLAYER_1;
-    }
-
-    /**
-     * Gets a user's player
-     *
-     * @param name The user, but as string
-     *
-     * @return A player
-     */
-    public Player getPlayer(String name) {
-        int i = 0;
-        for (User u : players) {
-            if (u.getUsername().equals(name)) break;
             i++;
         }
         switch (i) {

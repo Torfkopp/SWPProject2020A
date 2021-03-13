@@ -1,7 +1,6 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Map;
  */
 public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
 
-    private final User offeringUser;
+    private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
     private final Map<String, Integer> resourceMap;
     private final Map<String, Integer> offeringResourceMap;
@@ -34,8 +33,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      * @param respondingResourceMap The demanded resources
      * @param lobbyName             The name of the lobby
      */
-    public TradeWithUserOfferResponse(User offeringUser, UserOrDummy respondingUser, Map<String, Integer> resourceMap,
-                                      Map<String, Integer> offeringResourceMap,
+    public TradeWithUserOfferResponse(UserOrDummy offeringUser, UserOrDummy respondingUser,
+                                      Map<String, Integer> resourceMap, Map<String, Integer> offeringResourceMap,
                                       Map<String, Integer> respondingResourceMap, String lobbyName) {
         super(lobbyName);
         this.resourceMap = resourceMap;
@@ -59,7 +58,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return A User-Object of the offering User
      */
-    public User getOfferingUser() {
+    public UserOrDummy getOfferingUser() {
         return offeringUser;
     }
 

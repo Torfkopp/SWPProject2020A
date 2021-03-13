@@ -47,6 +47,9 @@ public class GameManagement implements IGameManagement {
 
     @Override
     public Game getGame(String lobbyName) {
+
+        System.err.println(lobbyName);
+        for (String lobby : games.keySet()) System.err.println(lobby);
         return games.get(lobbyName);
     }
 

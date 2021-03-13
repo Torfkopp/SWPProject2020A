@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.user.UserOrDummy;
+
 /**
  * Request is sent to the Server to notify the responding user that
  * the trade was canceled by the offering user.
@@ -11,7 +13,7 @@ package de.uol.swp.common.game.request;
  */
 public class TradeWithUserCancelRequest extends AbstractGameRequest {
 
-    private final String respondingUser;
+    private final UserOrDummy respondingUser;
 
     /**
      * Constructor
@@ -19,7 +21,7 @@ public class TradeWithUserCancelRequest extends AbstractGameRequest {
      * @param originLobby    The lobby where the trade was opened
      * @param respondingUser The user to whom the offer was made
      */
-    public TradeWithUserCancelRequest(String originLobby, String respondingUser) {
+    public TradeWithUserCancelRequest(String originLobby, UserOrDummy respondingUser) {
         super(originLobby);
         this.respondingUser = respondingUser;
     }
@@ -29,7 +31,7 @@ public class TradeWithUserCancelRequest extends AbstractGameRequest {
      *
      * @return The name of the user to whom the offer was made
      */
-    public String getRespondingUser() {
+    public UserOrDummy getRespondingUser() {
         return respondingUser;
     }
 }

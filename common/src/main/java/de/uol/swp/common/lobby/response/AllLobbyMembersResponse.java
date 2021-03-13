@@ -43,8 +43,13 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
         super(lobbyName);
         for (UserOrDummy user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
+            else this.users.add(user);
         }
         this.owner = UserDTO.createWithoutPassword(owner);
+        for (UserOrDummy user : readyUsers) {
+            if (user instanceof User) this.readyUsers.add(UserDTO.createWithoutPassword((User) user));
+            else this.readyUsers.add(user);
+        }
     }
 
     /**

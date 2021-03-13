@@ -11,6 +11,7 @@ import de.uol.swp.common.game.request.ResetOfferTradeButtonRequest;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
+import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,8 +47,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     private ListView<Pair<String, Integer>> ownInventoryView;
 
     private String lobbyName;
-    private String offeringUserName;
-    private String respondingUserName;
+    private UserOrDummy offeringUser;
+    private UserOrDummy respondingUser;
     private Map<String, Integer> offeringResourceMap;
     private Map<String, Integer> resourceMap;
     private Map<String, Integer> respondingResourceMap;
@@ -100,7 +101,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        eventBus.post(new AcceptUserTradeRequest(respondingUserName, offeringUserName, lobbyName, respondingResourceMap,
+        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, respondingResourceMap,
                                                  offeringResourceMap));
     }
 
@@ -132,7 +133,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRejectTradeButtonPressed() {
-        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUserName));
+        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUser));
         closeWindow();
     }
 
@@ -167,8 +168,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + this.lobbyName);
-        respondingUserName = rsp.getRespondingUser().getUsername();
-        offeringUserName = rsp.getOfferingUser().getUsername();
+        respondingUser = rsp.getRespondingUser();
+        offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();
         offeringResourceMap = rsp.getOfferingResourceMap();
         resourceMap = rsp.getResourceMap();
@@ -187,7 +188,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         LOG.debug("Setting the tradeResponseLabel");
         boolean offer = false;
         StringBuilder offerText = new StringBuilder(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUserName)).append("\n");
+                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser)).append("\n");
 
         for (Map.Entry<String, Integer> entry : offeringResourceMap.entrySet()) {
             int amount = entry.getValue();

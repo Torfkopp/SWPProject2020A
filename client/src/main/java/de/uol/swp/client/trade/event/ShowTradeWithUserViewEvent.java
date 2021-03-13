@@ -1,6 +1,6 @@
 package de.uol.swp.client.trade.event;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Event used to show the window for the trading with another user
@@ -15,9 +15,9 @@ import de.uol.swp.common.user.User;
  */
 public class ShowTradeWithUserViewEvent {
 
-    private final User offeringUser;
+    private final UserOrDummy offeringUser;
     private final String lobbyName;
-    private final String respondingUserName;
+    private final UserOrDummy respondingUser;
 
     /**
      * Constructor
@@ -26,10 +26,10 @@ public class ShowTradeWithUserViewEvent {
      * @param lobbyName          Lobby name of the lobby where the player wants to trade
      * @param respondingUserName Name of the user who the offer will be made to
      */
-    public ShowTradeWithUserViewEvent(User offeringUser, String lobbyName, String respondingUserName) {
+    public ShowTradeWithUserViewEvent(UserOrDummy offeringUser, String lobbyName, UserOrDummy respondingUserName) {
         this.offeringUser = offeringUser;
         this.lobbyName = lobbyName;
-        this.respondingUserName = respondingUserName;
+        this.respondingUser = respondingUserName;
     }
 
     /**
@@ -47,7 +47,7 @@ public class ShowTradeWithUserViewEvent {
      *
      * @return User who wants to trade with another User
      */
-    public User getOfferingUser() {
+    public UserOrDummy getOfferingUser() {
         return offeringUser;
     }
 
@@ -56,7 +56,7 @@ public class ShowTradeWithUserViewEvent {
      *
      * @return Name of the responding user
      */
-    public String getRespondingUserName() {
-        return respondingUserName;
+    public UserOrDummy getRespondingUser() {
+        return respondingUser;
     }
 }

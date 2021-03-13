@@ -20,7 +20,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
     private final UserOrDummy user;
     private final Map<String, Integer> resourceMap;
     private final int tradingUsersInventorySize;
-    private final String tradingUserName;
+    private final UserOrDummy tradingUser;
 
     /**
      * Constructor
@@ -29,15 +29,15 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param lobbyName                 The lobby for which the update is supposed to happen in
      * @param resourceMap               The Map containing the name of a resource as key and the amount as value
      * @param tradingUsersInventorySize Amount of resource cards the other user has
-     * @param tradingUserName           The trading Users name
+     * @param tradingUser               The trading Users name
      */
     public InventoryForTradeWithUserResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
-                                             int tradingUsersInventorySize, String tradingUserName) {
+                                             int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
         this.tradingUsersInventorySize = tradingUsersInventorySize;
-        this.tradingUserName = tradingUserName;
+        this.tradingUser = tradingUser;
     }
 
     /**
@@ -51,8 +51,8 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
         return resourceMap;
     }
 
-    public String getTradingUserName() {
-        return tradingUserName;
+    public UserOrDummy getTradingUser() {
+        return tradingUser;
     }
 
     /**

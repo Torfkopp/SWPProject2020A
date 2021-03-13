@@ -390,13 +390,20 @@ public class CommandService extends AbstractService {
      */
     private void command_AddDummy(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /adddummy command");
+        int dummyAmount;
+        if (args.size() > 0) dummyAmount = Integer.parseInt(args.get(0));
+        else dummyAmount = 1;
         //TODO: Add Multiple dummies add once
         if (originalMessage.isFromLobby()) {
             String lobbyName = originalMessage.getOriginLobby();
             Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 Lobby lobby = optLobby.get();
-                post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+                int freeUsers = lobby.getMaxUsers() - lobby.getUserOrDummies().size();
+                if (dummyAmount > freeUsers) dummyAmount = freeUsers;
+                for (; dummyAmount > 0; dummyAmount--) {
+                    post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+                }
             }
         } else {
             command_Invalid(args, originalMessage);

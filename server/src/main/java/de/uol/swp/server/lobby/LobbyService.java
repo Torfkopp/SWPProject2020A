@@ -8,9 +8,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.ExceptionMessage;
-import de.uol.swp.common.message.Message;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -156,21 +154,14 @@ public class LobbyService extends AbstractService {
     private void onKickUserEvent(KickUserEvent event) {
         KickUserRequest req = event.getRequest();
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-        if (req.getToBeKickedUserName().equals(req.getUser().getUsername())) return;
+        if (req.getToBeKickedUser().equals(req.getUser())) return;
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
-        Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();
-        User toBeKickedUser = null;
-        //TODO: Optimize on client side and uncomment
-        //for (User temp : lobbyMembers) {
-        //    if (temp.getUsername().equals(req.getToBeKickedUserName())) toBeKickedUser = temp;
-        //}
-        //if (toBeKickedUser == null) return;
-        //lobby.get().unsetUserReady(toBeKickedUser);
-        //lobby.get().leaveUser(toBeKickedUser);
-        //ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
-        //post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
-        //sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
-        //post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        UserOrDummy toBeKickedUser = req.getToBeKickedUser();
+        lobby.get().leaveUser(toBeKickedUser);
+        ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
+        post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
+        sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
+        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
 
     /**
@@ -246,7 +237,6 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
 
         if (lobby.isPresent()) {
-            lobby.get().unsetUserReady(req.getUser());
             try {
                 lobby.get().leaveUser(req.getUser());
                 sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getUser()));

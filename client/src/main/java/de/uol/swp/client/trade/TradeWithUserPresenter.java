@@ -11,7 +11,7 @@ import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.message.RequestMessage;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,8 +51,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @FXML
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     private String lobbyName;
-    private User loggedInUser;
-    private String respondingUser;
+    private UserOrDummy loggedInUser;
+    private UserOrDummy respondingUser;
     private int traderInventorySize;
     private Map<String, Integer> selectedOwnResourceMap;
     private Map<String, Integer> selectedPartnersResourceMap;
@@ -167,7 +167,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private void onInventoryForTradeWithUserResponse(InventoryForTradeWithUserResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby " + rsp.getLobbyName());
-        respondingUser = rsp.getTradingUserName();
+        respondingUser = rsp.getTradingUser();
         resourceMap = rsp.getResourceMap();
         setTradingLists();
         traderInventorySize = rsp.getTradingUsersInventorySize();
