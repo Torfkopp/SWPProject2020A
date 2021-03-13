@@ -123,6 +123,17 @@ public class Game {
     }
 
     /**
+     * Gets a specified player's inventory
+     *
+     * @param user The user whose inventory to get
+     *
+     * @return The player's inventory
+     */
+    public Inventory getInventory(User user) {
+        return getInventory(getPlayer(user));
+    }
+
+    /**
      * Gets the lobby this game is taking place in
      *
      * @return The Lobby this game is taking place in
@@ -143,12 +154,38 @@ public class Game {
     /**
      * Gets a user's player
      *
+     * @param user The user
+     *
      * @return A player
      */
     public Player getPlayer(User user) {
         int i = 0;
         for (User u : players) {
             if (u.equals(user)) break;
+            i++;
+        }
+        switch (i) {
+            case 1:
+                return Player.PLAYER_2;
+            case 2:
+                return Player.PLAYER_3;
+            case 3:
+                return Player.PLAYER_4;
+        }
+        return Player.PLAYER_1;
+    }
+
+    /**
+     * Gets a user's player
+     *
+     * @param name The user, but as string
+     *
+     * @return A player
+     */
+    public Player getPlayer(String name) {
+        int i = 0;
+        for (User u : players) {
+            if (u.getUsername().equals(name)) break;
             i++;
         }
         switch (i) {

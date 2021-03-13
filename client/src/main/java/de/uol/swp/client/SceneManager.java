@@ -821,9 +821,6 @@ public class SceneManager {
             tradeScene.getStylesheets().add(styleSheet);
             tradingResponseStage.setScene(tradeScene);
             tradingResponseStages.put(lobbyName, tradingResponseStage);
-            System.out.println("Scene gesetzt");
-            System.out.println(tradingResponseStages.get(lobbyName));
-            System.out.println(tradingResponseStages.size());
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
