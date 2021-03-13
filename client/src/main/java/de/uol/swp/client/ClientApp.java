@@ -9,9 +9,6 @@ import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
-import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
-import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
 import de.uol.swp.common.user.response.*;
 import io.netty.channel.Channel;
 import javafx.application.Application;
@@ -168,25 +165,6 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles an unsuccessful registration
-     * <p>
-     * If a RegistrationExceptionMessage object is detected on the EventBus, this
-     * method is called. It tells the SceneManager to show the sever error alert.
-     * If the loglevel is set to Error or higher, "Registration error " and the
-     * error message are written to the log.
-     *
-     * @param message The RegistrationExceptionMessage object detected on the EventBus
-     *
-     * @see de.uol.swp.client.SceneManager
-     * @since 2019-09-02
-     */
-    @Subscribe
-    private void onRegistrationExceptionMessage(RegistrationExceptionMessage message) {
-        sceneManager.showServerError(resourceBundle.getString("error.server.registration") + ' ' + message);
-        LOG.error("Registration error " + message);
-    }
-
-    /**
      * Handles a successful login
      * <p>
      * If an LoginSuccessfulResponse object is detected on the EventBus this
@@ -228,25 +206,6 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles an unsuccessful password changing process
-     * <p>
-     * If an ChangePasswordExceptionMessage object is detected on the EventBus, this
-     * method is called. It tells the SceneManager to show the sever error alert.
-     *
-     * @param message The ChangePasswordExceptionMessage object detected on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-03
-     */
-    @Subscribe
-    private void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message) {
-        sceneManager.showServerError(resourceBundle.getString("error.server.changepw") + ' ' + message);
-        LOG.error("Change Password error: " + message);
-    }
-
-    /**
      * Handles a successful registration
      * <p>
      * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
@@ -263,24 +222,6 @@ public class ClientApp extends Application implements ConnectionListener {
     private void onRegistrationSuccessfulMessage(RegistrationSuccessfulResponse message) {
         LOG.info("Registration was successful.");
         sceneManager.showLoginScreen();
-    }
-
-    /**
-     * Handles an unsuccessful User deletion
-     * <p>
-     * If a UserDeletionExceptionMessage object is detected on the EventBus, this method is called.
-     * It tells the SceneManager to show the ServerError alert. If the loglevel is set to Error or
-     * higher, "User Deletion error " and the error message are written to the log.
-     *
-     * @param message The UserDeletionExceptionMessage object detected on the EventBus
-     *
-     * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-17
-     */
-    @Subscribe
-    private void onUserDeletionExceptionMessage(UserDeletionExceptionMessage message) {
-        sceneManager.showServerError(resourceBundle.getString("error.server.deleteuser") + ' ' + message);
-        LOG.error("User Deletion error: " + message);
     }
 
     /**

@@ -1,8 +1,6 @@
 package de.uol.swp.common.user.exception;
 
-import de.uol.swp.common.message.AbstractResponseMessage;
-
-import java.util.Objects;
+import de.uol.swp.common.message.ExceptionMessage;
 
 /**
  * This exception is thrown if something went wrong during the ChangePassword process,
@@ -13,9 +11,7 @@ import java.util.Objects;
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2020-12-03
  */
-public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
-
-    private final String message;
+public class ChangePasswordExceptionMessage extends ExceptionMessage {
 
     /**
      * Constructor
@@ -25,24 +21,6 @@ public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
      * @since 2020-12-03
      */
     public ChangePasswordExceptionMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String toString() {
-        return "ChangePasswordExceptionMessage: " + message;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(message);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChangePasswordExceptionMessage that = (ChangePasswordExceptionMessage) o;
-        return Objects.equals(message, that.message);
+        super(message);
     }
 }
