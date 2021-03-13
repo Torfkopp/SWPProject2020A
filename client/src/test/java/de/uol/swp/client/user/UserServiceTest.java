@@ -83,9 +83,9 @@ class UserServiceTest {
 
         RegisterUserRequest request = (RegisterUserRequest) event;
 
-        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), request.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), request.getUser().getEMail());
         assertFalse(request.authorisationNeeded());
     }
 
@@ -116,9 +116,9 @@ class UserServiceTest {
 
         DeleteUserRequest request = (DeleteUserRequest) event;
 
-        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), request.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), request.getUser().getEMail());
         assertTrue(request.authorisationNeeded());
     }
 
@@ -140,8 +140,8 @@ class UserServiceTest {
         assertTrue(event instanceof LoginRequest);
 
         LoginRequest loginRequest = (LoginRequest) event;
-        assertEquals(loginRequest.getUsername(), defaultUser.getUsername());
-        assertEquals(loginRequest.getPassword(), defaultUser.getPassword());
+        assertEquals(defaultUser.getUsername(), loginRequest.getUsername());
+        assertEquals(defaultUser.getPassword(), loginRequest.getPassword());
     }
 
     /**
@@ -222,9 +222,9 @@ class UserServiceTest {
 
         UpdateUserRequest request = (UpdateUserRequest) event;
 
-        assertEquals(request.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(request.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(request.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), request.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), request.getUser().getEMail());
         assertTrue(request.authorisationNeeded());
     }
 

@@ -24,6 +24,6 @@ class ShowLobbyViewEventTest {
     void createShowLobbyViewEventTest() {
         ShowLobbyViewEvent event = new ShowLobbyViewEvent("Test");
 
-        assertEquals(event.getName(), "Test");
+        assertEquals("Test", event.getName());
     }
 }

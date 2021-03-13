@@ -27,11 +27,11 @@ class UserReadyRequestTest {
     void UserIsNotReadyTest() {
         UserReadyRequest userReadyRequest = new UserReadyRequest("Lobby", defaultUser, false);
 
-        assertEquals(userReadyRequest.getName(), "Lobby");
-        assertEquals(userReadyRequest.getUser(), defaultUser);
-        assertEquals(userReadyRequest.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(userReadyRequest.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(userReadyRequest.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals("Lobby", userReadyRequest.getName());
+        assertEquals(defaultUser, userReadyRequest.getUser());
+        assertEquals(defaultUser.getUsername(), userReadyRequest.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), userReadyRequest.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), userReadyRequest.getUser().getEMail());
         assertFalse(userReadyRequest.isReady());
     }
 
@@ -44,11 +44,11 @@ class UserReadyRequestTest {
     void UserIsReadyTest() {
         UserReadyRequest userReadyRequest = new UserReadyRequest("Lobby", defaultUser, true);
 
-        assertEquals(userReadyRequest.getName(), "Lobby");
-        assertEquals(userReadyRequest.getUser(), defaultUser);
-        assertEquals(userReadyRequest.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(userReadyRequest.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(userReadyRequest.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals("Lobby", userReadyRequest.getName());
+        assertEquals(defaultUser, userReadyRequest.getUser());
+        assertEquals(defaultUser.getUsername(), userReadyRequest.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), userReadyRequest.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), userReadyRequest.getUser().getEMail());
         assertTrue(userReadyRequest.isReady());
     }
 }

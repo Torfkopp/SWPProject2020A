@@ -29,9 +29,9 @@ class LobbyUpdateEventTest {
     void createLobbyUpdateEventTest() {
         LobbyUpdateEvent event = new LobbyUpdateEvent("Am I a lobby?", defaultUser);
 
-        assertEquals(event.getLobbyName(), "Am I a lobby?");
-        assertEquals(event.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(event.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(event.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals("Am I a lobby?", event.getLobbyName());
+        assertEquals(defaultUser.getUsername(), event.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), event.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), event.getUser().getEMail());
     }
 }

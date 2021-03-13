@@ -26,6 +26,6 @@ public class ChangePasswordErrorEventTest {
     void createChangePasswordErrorEvent() {
         ChangePasswordErrorEvent event = new ChangePasswordErrorEvent("Test");
 
-        assertEquals(event.getMessage(), "Test");
+        assertEquals("Test", event.getMessage());
     }
 }

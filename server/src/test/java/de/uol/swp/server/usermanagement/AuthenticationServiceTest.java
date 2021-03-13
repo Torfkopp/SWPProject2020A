@@ -70,7 +70,7 @@ class AuthenticationServiceTest {
 
         List<Session> sessions = authService.getSessions(users);
 
-        assertEquals(sessions.size(), 3);
+        assertEquals(3, sessions.size());
         assertTrue(sessions.contains(session1.get()));
         assertTrue(sessions.contains(session2.get()));
         assertTrue(sessions.contains(session3.get()));
@@ -86,8 +86,8 @@ class AuthenticationServiceTest {
         lock.await(250, TimeUnit.MILLISECONDS);
         assertTrue(event instanceof AllOnlineUsersResponse);
 
-        assertEquals(((AllOnlineUsersResponse) event).getUsers().size(), 1);
-        assertEquals(((AllOnlineUsersResponse) event).getUsers().get(0), usr);
+        assertEquals(1, ((AllOnlineUsersResponse) event).getUsers().size());
+        assertEquals(usr, ((AllOnlineUsersResponse) event).getUsers().get(0));
     }
 
     @Test
@@ -108,7 +108,7 @@ class AuthenticationServiceTest {
         bus.post(loginRequest);
         lock.await(250, TimeUnit.MILLISECONDS);
         assertTrue(userManagement.isLoggedIn(usr));
-        // is message send
+        // is message sent
         assertTrue(event instanceof ClientAuthorisedMessage);
         userManagement.dropUser(user);
     }
@@ -162,10 +162,10 @@ class AuthenticationServiceTest {
 
         List<User> returnedUsers = new ArrayList<>(((AllOnlineUsersResponse) event).getUsers());
 
-        assertEquals(returnedUsers.size(), 2);
+        assertEquals(2, returnedUsers.size());
 
         Collections.sort(returnedUsers);
-        assertEquals(returnedUsers, users);
+        assertEquals(users, returnedUsers);
     }
 
     @Subscribe
