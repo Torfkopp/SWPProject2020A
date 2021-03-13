@@ -41,7 +41,7 @@ class ChatMessageDTOTest {
     @Test
     void compareToDifferentIds() {
         ChatMessage chatMessage = new ChatMessageDTO(42, defaultUser, defaultTimestamp, defaultContent);
-        assertNotEquals(chatMessage.compareTo(defaultMessage), 0);
+        assertNotEquals(0, chatMessage.compareTo(defaultMessage));
     }
 
     /**
@@ -54,7 +54,7 @@ class ChatMessageDTOTest {
     @Test
     void compareToSameIds() {
         ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
-        assertEquals(chatMessage.compareTo(defaultMessage), 0);
+        assertEquals(0, chatMessage.compareTo(defaultMessage));
     }
 
     /**
@@ -69,10 +69,10 @@ class ChatMessageDTOTest {
     @Test
     void createMessageWithEdited() {
         ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent, true);
-        assertEquals(chatMessage.getID(), defaultID);
-        assertEquals(chatMessage.getAuthor(), defaultUser);
-        assertEquals(chatMessage.getTimestamp(), defaultTimestamp);
-        assertEquals(chatMessage.getContent(), defaultContent);
+        assertEquals(defaultID, chatMessage.getID());
+        assertEquals(defaultUser, chatMessage.getAuthor());
+        assertEquals(defaultTimestamp, chatMessage.getTimestamp());
+        assertEquals(defaultContent, chatMessage.getContent());
         assertTrue(chatMessage.isEdited());
     }
 
@@ -140,10 +140,10 @@ class ChatMessageDTOTest {
     @Test
     void createMessageWithTimestamp() {
         ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultTimestamp, defaultContent);
-        assertEquals(chatMessage.getID(), defaultID);
-        assertEquals(chatMessage.getAuthor(), defaultUser);
-        assertEquals(chatMessage.getTimestamp(), defaultTimestamp);
-        assertEquals(chatMessage.getContent(), defaultContent);
+        assertEquals(defaultID, chatMessage.getID());
+        assertEquals(defaultUser, chatMessage.getAuthor());
+        assertEquals(defaultTimestamp, chatMessage.getTimestamp());
+        assertEquals(defaultContent, chatMessage.getContent());
         assertFalse(chatMessage.isEdited());
     }
 
@@ -159,9 +159,9 @@ class ChatMessageDTOTest {
     @Test
     void createMessageWithoutTimestamp() {
         ChatMessage chatMessage = new ChatMessageDTO(defaultID, defaultUser, defaultContent);
-        assertEquals(chatMessage.getID(), defaultID);
-        assertEquals(chatMessage.getAuthor(), defaultUser);
-        assertEquals(chatMessage.getContent(), defaultContent);
+        assertEquals(defaultID, chatMessage.getID());
+        assertEquals(defaultUser, chatMessage.getAuthor());
+        assertEquals(defaultContent, chatMessage.getContent());
         assertFalse(chatMessage.isEdited());
     }
 
@@ -228,7 +228,7 @@ class ChatMessageDTOTest {
         final String newContent = "I am new, even more intelligent content";
         ChatMessage copiedMessage = ChatMessageDTO.create(defaultMessage);
         copiedMessage.setContent(newContent);
-        assertEquals(copiedMessage.getContent(), newContent);
+        assertEquals(newContent, copiedMessage.getContent());
         assertNotEquals(defaultMessage, copiedMessage);
         assertTrue(copiedMessage.isEdited());
     }
@@ -244,7 +244,7 @@ class ChatMessageDTOTest {
     void createWithCopyConstructorAndSetContentToNull() {
         ChatMessage copiedMessage = ChatMessageDTO.create(defaultMessage);
         copiedMessage.setContent(null);
-        assertEquals(copiedMessage.getContent(), defaultContent);
+        assertEquals(defaultContent, copiedMessage.getContent());
     }
 
     /**
@@ -257,6 +257,6 @@ class ChatMessageDTOTest {
     @Test
     void messageNotEqualDifferentIds() {
         ChatMessage chatMessage = new ChatMessageDTO(42, defaultUser, defaultTimestamp, defaultContent);
-        assertNotEquals(chatMessage, defaultMessage);
+        assertNotEquals(defaultMessage, chatMessage);
     }
 }

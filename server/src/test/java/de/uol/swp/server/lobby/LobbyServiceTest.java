@@ -13,6 +13,8 @@ import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -40,11 +42,11 @@ class LobbyServiceTest {
         // The post will lead to a call of a LobbyService function
         bus.post(request);
 
-        final Lobby createdLobby = lobbyManagement.getLobby(lobbyToTest.getName()).get();
+        final Optional<Lobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
 
-        assertNotNull(createdLobby);
-        assertEquals(createdLobby.getName(), lobbyToTest.getName());
-        assertEquals(createdLobby.getOwner(), lobbyToTest.getOwner());
+        assertTrue(createdLobby.isPresent());
+        assertEquals(lobbyToTest.getName(), createdLobby.get().getName());
+        assertEquals(lobbyToTest.getOwner(), createdLobby.get().getOwner());
     }
 
     @Test
@@ -55,14 +57,14 @@ class LobbyServiceTest {
         bus.post(request1);
         bus.post(request2);
 
-        final Lobby createdLobby = lobbyManagement.getLobby(lobbyToTest.getName()).get();
+        final Optional<Lobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
 
-        assertNotNull(createdLobby);
-        assertEquals(createdLobby.getName(), lobbyToTest.getName());
-        assertEquals(createdLobby.getOwner(), lobbyToTest.getOwner());
+        assertTrue(createdLobby.isPresent());
+        assertEquals(lobbyToTest.getName(), createdLobby.get().getName());
+        assertEquals(lobbyToTest.getOwner(), createdLobby.get().getOwner());
 
         // old lobby should not be overwritten!
-        assertNotEquals(createdLobby.getOwner(), lobbyWithSameName.getOwner());
+        assertNotEquals(lobbyWithSameName.getOwner(), createdLobby.get().getOwner());
     }
 
     @Test
@@ -83,17 +85,17 @@ class LobbyServiceTest {
         bus.post(request4);
         bus.post(request5);
 
-        final Lobby createdLobby = lobbyManagement.getLobby(lobbyToTest.getName()).get();
+        final Optional<Lobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
 
         // check if joinable lobby was created
-        assertNotNull(createdLobby);
+        assertTrue(createdLobby.isPresent());
         // check if only 4 or less users are joined
-        assertTrue(createdLobby.getUsers().size() <= 4);
+        assertTrue(createdLobby.get().getUsers().size() <= 4);
         // check if every user joined except user5
-        assertTrue(createdLobby.getUsers().contains(user1));
-        assertTrue(createdLobby.getUsers().contains(user2));
-        assertTrue(createdLobby.getUsers().contains(user3));
-        assertTrue(createdLobby.getUsers().contains(user4));
-        assertFalse(createdLobby.getUsers().contains(user5));
+        assertTrue(createdLobby.get().getUsers().contains(user1));
+        assertTrue(createdLobby.get().getUsers().contains(user2));
+        assertTrue(createdLobby.get().getUsers().contains(user3));
+        assertTrue(createdLobby.get().getUsers().contains(user4));
+        assertFalse(createdLobby.get().getUsers().contains(user5));
     }
 }

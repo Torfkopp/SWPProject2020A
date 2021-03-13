@@ -27,11 +27,10 @@ class UserReadyMessageTest {
     void basicUserReadyMessageTest() {
         UserReadyMessage userReadyMessage = new UserReadyMessage("Lobby", defaultUser);
 
-        assertEquals(userReadyMessage.getName(), "Lobby");
-        assertEquals(userReadyMessage.getUser(), defaultUser);
-        assertEquals(userReadyMessage.getUser().getUsername(), defaultUser.getUsername());
-        //TODO:Update Test
-        //assertEquals(userReadyMessage.getUser().getPassword(), defaultUser.getPassword());
-        //assertEquals(userReadyMessage.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals("Lobby", userReadyMessage.getName());
+        assertEquals(defaultUser, userReadyMessage.getUser());
+        assertEquals(defaultUser.getUsername(), userReadyMessage.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), userReadyMessage.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), userReadyMessage.getUser().getEMail());
     }
 }

@@ -63,9 +63,9 @@ class LobbyDTOTest {
     void createLobbyTest() {
         Lobby lobby = new LobbyDTO("test", defaultUser, false);
 
-        assertEquals(lobby.getName(), "test");
-        assertEquals(lobby.getUsers().size(), 1);
-        assertEquals(lobby.getUsers().iterator().next(), defaultUser);
+        assertEquals("test", lobby.getName());
+        assertEquals(1, lobby.getUsers().size());
+        assertEquals(defaultUser, lobby.getUsers().iterator().next());
     }
 
     /**
@@ -80,8 +80,8 @@ class LobbyDTOTest {
         Lobby newLobby = LobbyDTO.create(defaultLobby);
 
         // Test every attribute
-        assertEquals(newLobby.getName(), defaultLobby.getName());
-        assertEquals(newLobby.getOwner(), defaultLobby.getOwner());
+        assertEquals(defaultLobby.getName(), newLobby.getName());
+        assertEquals(defaultLobby.getOwner(), newLobby.getOwner());
     }
 
     /**
@@ -97,14 +97,14 @@ class LobbyDTOTest {
         Lobby lobby = LobbyDTO.create(defaultLobby);
 
         lobby.joinUser(users.get(0));
-        assertEquals(lobby.getUsers().size(), 2);
+        assertEquals(2, lobby.getUsers().size());
         assertTrue(lobby.getUsers().contains(users.get(0)));
 
         lobby.joinUser(users.get(0));
-        assertEquals(lobby.getUsers().size(), 2);
+        assertEquals(2, lobby.getUsers().size());
 
         lobby.joinUser(users.get(1));
-        assertEquals(lobby.getUsers().size(), 3);
+        assertEquals(3, lobby.getUsers().size());
         assertTrue(lobby.getUsers().contains(users.get(1)));
     }
 
@@ -121,10 +121,10 @@ class LobbyDTOTest {
         Lobby lobby = LobbyDTO.create(defaultLobby);
         users.forEach(lobby::joinUser);
 
-        assertEquals(lobby.getUsers().size(), users.size() + 1);
+        assertEquals(users.size() + 1, lobby.getUsers().size());
         lobby.leaveUser(users.get(5));
 
-        assertEquals(lobby.getUsers().size(), users.size() + 1 - 1);
+        assertEquals(users.size() + 1 - 1, lobby.getUsers().size());
         assertFalse(lobby.getUsers().contains(users.get(5)));
     }
 
@@ -143,8 +143,7 @@ class LobbyDTOTest {
 
         lobby.leaveUser(defaultUser);
 
-        assertNotEquals(lobby.getOwner(), defaultUser);
-        //Code Analysis: "Suspicious call to 'List.contains'" -Mario
+        assertNotEquals(defaultUser, lobby.getOwner());
         assertTrue(users.contains(lobby.getOwner()));
     }
 
@@ -163,7 +162,7 @@ class LobbyDTOTest {
         users.forEach(lobby::joinUser);
 
         lobby.updateOwner(users.get(6));
-        assertEquals(lobby.getOwner(), users.get(6));
+        assertEquals(users.get(6), lobby.getOwner());
 
         assertThrows(IllegalArgumentException.class, () -> lobby.updateOwner(notInLobbyUser));
     }

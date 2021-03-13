@@ -32,7 +32,7 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
-    public User createUser(User userToCreate) {
+    public User createUser(User userToCreate) throws UserManagementException {
         Optional<User> user = userStore.findUser(userToCreate.getUsername());
         if (user.isPresent()) {
             throw new UserManagementException("Username already used!");
@@ -41,7 +41,7 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
-    public void dropUser(User userToDrop) {
+    public void dropUser(User userToDrop) throws UserManagementException {
         Optional<User> user = userStore.findUser(userToDrop.getUsername());
         if (user.isEmpty()) {
             throw new UserManagementException("Username unknown!");
@@ -70,7 +70,7 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
-    public User login(String username, String password) {
+    public User login(String username, String password) throws SecurityException {
         Optional<User> user = userStore.findUser(username, password);
         if (user.isPresent()) {
             this.loggedInUsers.put(user.get().getID(), user.get());
@@ -91,7 +91,7 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
-    public User updateUser(User userToUpdate) {
+    public User updateUser(User userToUpdate) throws UserManagementException {
         Optional<User> user = userStore.findUser(userToUpdate.getID());
         if (user.isEmpty()) {
             throw new UserManagementException("User unknown!");

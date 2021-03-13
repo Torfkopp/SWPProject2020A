@@ -71,11 +71,11 @@ public class GameTest {
         for (String s : bankInventory) {
             if (s.equals(victoryPointCard)) victoryPointCardAmount++;
         }
-        assertEquals(victoryPointCardAmount, 5);
-        assertEquals(monopolyCardAmount, 2);
-        assertEquals(yearOfPlentyCardAmount, 2);
-        assertEquals(roadBuildingCardAmount, 2);
-        assertEquals(knightCardAmount, 14);
+        assertEquals(5, victoryPointCardAmount);
+        assertEquals(2, monopolyCardAmount);
+        assertEquals(2, yearOfPlentyCardAmount);
+        assertEquals(2, roadBuildingCardAmount);
+        assertEquals(14, knightCardAmount);
     }
 
     @Test
@@ -83,28 +83,28 @@ public class GameTest {
     void calculateVictoryPointsTest() {
         game.getMap().createBeginnerMap();
         Player player = Player.PLAYER_1;
-        assertEquals(game.getInventories().length, 1);
-        assertEquals(player, Player.PLAYER_1);
+        assertEquals(1, game.getInventories().length);
+        assertEquals(Player.PLAYER_1, player);
         //Player has nothing
-        assertEquals(game.calculateVictoryPoints(player), 0);
+        assertEquals(0, game.calculateVictoryPoints(player));
         game.getMap().placeSettlement(player, new MapPoint(0, 0));
         //Player has a settlement
-        assertEquals(game.calculateVictoryPoints(player), 1);
+        assertEquals(1, game.calculateVictoryPoints(player));
         game.getMap().upgradeSettlement(player, new MapPoint(0, 0));
         //Player has a city
-        assertEquals(game.calculateVictoryPoints(player), 2);
+        assertEquals(2, game.calculateVictoryPoints(player));
         game.getInventory(player).setVictoryPointCards(3);
         //Player has a city and 3 victory point cards
-        assertEquals(game.calculateVictoryPoints(player), 5);
+        assertEquals(5, game.calculateVictoryPoints(player));
         game.getInventory(player).setLongestRoad(true);
         //Player has a city, 3 victory point cards, and the longest road
-        assertEquals(game.calculateVictoryPoints(player), 7);
+        assertEquals(7, game.calculateVictoryPoints(player));
         game.getInventory(player).setLargestArmy(true);
         //Player has a city, 3 point cards, longest road, and the largest army
-        assertEquals(game.calculateVictoryPoints(player), 9);
+        assertEquals(9, game.calculateVictoryPoints(player));
         game.getMap().placeSettlement(player, new MapPoint(2, 5));
         //Player has a city, a settlement, 3 point cards, longest road, and the largest army
-        assertEquals(game.calculateVictoryPoints(player), 10);
+        assertEquals(10, game.calculateVictoryPoints(player));
     }
 
     @Test
@@ -115,14 +115,14 @@ public class GameTest {
         UserOrDummy[] players = game.getPlayers();
         //Tests if the players are in correct order
         //Ordered by ID
-        assertEquals(players[0], user);
-        assertEquals(players[1], user2);
-        assertEquals(players[2], user3);
-        assertEquals(game.getLobby(), lobby);
+        assertEquals(user, players[0]);
+        assertEquals(user2, players[1]);
+        assertEquals(user3, players[2]);
+        assertEquals(lobby, game.getLobby());
         //Since Jolyne made the lobby, she goes first
-        assertEquals(game.nextPlayer(), user2);
-        assertEquals(game.nextPlayer(), user3);
-        assertEquals(game.nextPlayer(), user);
+        assertEquals(user2, game.nextPlayer());
+        assertEquals(user3, game.nextPlayer());
+        assertEquals(user, game.nextPlayer());
     }
 
     @Test
