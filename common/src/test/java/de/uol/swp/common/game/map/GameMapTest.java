@@ -25,12 +25,12 @@ public class GameMapTest {
         map.setHex(new MapPoint(1, 1), new ResourceHex(IResourceHex.ResourceHexType.FOREST, 11));
         // Tests getting a hex
         assertNotNull(map.getHex(new MapPoint(2, 2)));
-        assertEquals(map.getHex(new MapPoint(0, 0)).getType(), IGameHex.HexType.HARBOR);
-        assertEquals(map.getHex(new MapPoint(1, 1)).getType(), IGameHex.HexType.RESOURCE);
+        assertEquals(IGameHex.HexType.HARBOR, map.getHex(new MapPoint(0, 0)).getType());
+        assertEquals(IGameHex.HexType.RESOURCE, map.getHex(new MapPoint(1, 1)).getType());
         // Tests getting the resource type of a hex
         ResourceHex rh = (ResourceHex) map.getHex(new MapPoint(1, 2));
-        assertEquals(rh.getType(), IGameHex.HexType.RESOURCE);
-        assertEquals(rh.getResource(), IResourceHex.ResourceHexType.FOREST);
+        assertEquals(IGameHex.HexType.RESOURCE, rh.getType());
+        assertEquals(IResourceHex.ResourceHexType.FOREST, rh.getResource());
     }
 
     @Test

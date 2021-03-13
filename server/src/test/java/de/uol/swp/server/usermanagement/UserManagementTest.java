@@ -131,11 +131,11 @@ class UserManagementTest {
         List<User> allUsers = management.retrieveAllUsers();
 
         Collections.sort(allUsers);
-        assertEquals(allUsers, getDefaultUsers());
+        assertEquals(getDefaultUsers(), allUsers);
 
         // check if there are no passwords
         // TODO: Normally, there should be no logic in tests
-        allUsers.forEach(u -> assertEquals(u.getPassword(), ""));
+        allUsers.forEach(u -> assertEquals("", u.getPassword()));
     }
 
     @Test
@@ -186,6 +186,6 @@ class UserManagementTest {
 
         User user = management.login(updatedUser.getUsername(), updatedUser.getPassword());
         assertTrue(management.isLoggedIn(updatedUser));
-        assertEquals(user.getEMail(), updatedUser.getEMail());
+        assertEquals(updatedUser.getEMail(), user.getEMail());
     }
 }

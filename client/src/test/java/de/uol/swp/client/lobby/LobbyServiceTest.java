@@ -84,11 +84,11 @@ class LobbyServiceTest {
 
         CreateLobbyRequest request = (CreateLobbyRequest) event;
 
-        assertEquals(request.getName(), "Test");
+        assertEquals("Test", request.getName());
 
-        assertEquals(request.getOwner().getUsername(), defaultUser.getUsername());
-        assertEquals(request.getOwner().getPassword(), defaultUser.getPassword());
-        assertEquals(request.getOwner().getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), request.getOwner().getUsername());
+        assertEquals(defaultUser.getPassword(), request.getOwner().getPassword());
+        assertEquals(defaultUser.getEMail(), request.getOwner().getEMail());
     }
 
     /**
@@ -115,11 +115,11 @@ class LobbyServiceTest {
 
         LobbyUpdateEvent lobbyUpdateEvent = (LobbyUpdateEvent) event;
 
-        assertEquals(lobbyUpdateEvent.getLobbyName(), "Test");
+        assertEquals("Test", lobbyUpdateEvent.getLobbyName());
 
-        assertEquals(lobbyUpdateEvent.getUser().getUsername(), defaultUser.getUsername());
-        assertEquals(lobbyUpdateEvent.getUser().getPassword(), defaultUser.getPassword());
-        assertEquals(lobbyUpdateEvent.getUser().getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), lobbyUpdateEvent.getUser().getUsername());
+        assertEquals(defaultUser.getPassword(), lobbyUpdateEvent.getUser().getPassword());
+        assertEquals(defaultUser.getEMail(), lobbyUpdateEvent.getUser().getEMail());
     }
 
     /**
