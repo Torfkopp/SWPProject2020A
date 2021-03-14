@@ -11,6 +11,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
+import de.uol.swp.common.game.map.BetterMapPoint;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
@@ -35,6 +36,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -44,6 +46,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+
+import static de.uol.swp.common.game.map.BetterMapPoint.Type.HEX;
+import static de.uol.swp.common.game.map.BetterMapPoint.Type.INTERSECTION;
 
 /**
  * Manages the lobby's menu
@@ -224,6 +229,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
+    @FXML
+    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
+        BetterMapPoint mapPoint = gameRendering.mapClickToHex(mouseEvent.getX(), mouseEvent.getY());
+        if (mapPoint.getType() == HEX) {
+            System.out.println("HEX");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == INTERSECTION) {
+            System.out.println("INTERSECTION");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        }
+    }
+
     /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
@@ -305,6 +324,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- Update of lobby member list");
         LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
+        for (User i : rsp.getUsers()) {
+            System.out.println(i.getUsername());
+        }
         this.owner = rsp.getOwner();
         this.readyUsers = rsp.getReadyUsers();
         updateUsersList(rsp.getUsers());
@@ -1089,6 +1111,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * The button is only enabled to the active player when the
      * obligatory part of the turn is done.
      *
+     * @param player
+     *
      * @author Alwin Bossert
      * @author Mario Fokken
      * @author Marvin Drees
@@ -1119,6 +1143,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Helper function that sets the disable state of the PlayCardButton
      * The button is only enabled to the active player
+     *
+     * @param player
      *
      * @author Mario Fokken
      * @since 2021-02-25
@@ -1153,7 +1179,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (super.loggedInUser.equals(this.owner)) {
             this.startSession.setVisible(true);
             this.startSession
-                    .setDisable(this.readyUsers.size() < 3 || this.lobbyMembers.size() != this.readyUsers.size());
+                    .setDisable(this.readyUsers.size() < 1 || this.lobbyMembers.size() != this.readyUsers.size());
         } else {
             this.startSession.setDisable(true);
             this.startSession.setVisible(false);
@@ -1165,6 +1191,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * With Bank" button.
      * <p>
      * The button is only visible if the logged in user is the player.
+     *
+     * @param player
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
@@ -1179,6 +1207,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * With User" button.
      * <p>
      * The button is only visible if the logged in user is the player.
+     *
+     * @param player
      *
      * @author Finn Haase
      * @author Maximilian Lindner

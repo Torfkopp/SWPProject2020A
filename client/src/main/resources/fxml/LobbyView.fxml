@@ -63,7 +63,7 @@
             <VBox.margin>
                 <Insets top="10"/>
             </VBox.margin>
-            <Canvas fx:id="gameMapCanvas" height="380" width="380"/>
+            <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas" height="800" width="800"/>
             <HBox>
                 <VBox.margin>
                     <Insets top="10"/>

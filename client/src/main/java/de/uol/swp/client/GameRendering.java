@@ -1,10 +1,10 @@
 package de.uol.swp.client;
 
 import com.google.inject.Inject;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
-import de.uol.swp.common.game.map.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ResourceBundle;
+
+import static de.uol.swp.common.game.map.BetterMapPoint.*;
 
 /**
  * GameRendering Class
@@ -51,7 +53,7 @@ public class GameRendering {
 
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
-    private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth;
+    private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
     private final GraphicsContext gfxCtx;
 
     Logger LOG = LogManager.getLogger(GameRendering.class);
@@ -67,7 +69,9 @@ public class GameRendering {
         double HEX_WIDTH_FACTOR = HEX_HEIGHT_FACTOR * WIDTH_FACTOR;
 
         this.gfxCtx = canvas.getGraphicsContext2D();
-        double width = canvas.getWidth(), height = canvas.getHeight() - OFFSET_Y * 2;
+        this.width = canvas.getWidth();
+        this.height = canvas.getHeight();
+        double height = this.height - OFFSET_Y * 2;
         //Sets an effectiveHeight depending on the height and width of the game map
         this.effectiveHeight = (HEX_WIDTH_FACTOR * height * 7 < width) ? height :
                                (width - OFFSET_X * 2.0) / (7 * HEX_HEIGHT_FACTOR * (Math.sqrt(3) / 2));
@@ -83,6 +87,69 @@ public class GameRendering {
         this.diceSize = effectiveHeight / 12.0;
         this.diceLineWidth = diceSize / 16.0;
         this.diceDotSize = diceSize / 4.0;
+    }
+
+    public BetterMapPoint mapClickToHex(double x, double y) {
+        int row = (int) Math.floor((y - OFFSET_Y) / (hexHeight / 8));
+        int col = (int) Math.floor((x - OFFSET_X) / (hexWidth / 8));
+        int col8 = col % 8;
+        int hexY = row / 6;
+        int hexX = 0;
+
+        //TODO: Check for click into Offset region
+        //TODO: Filter out right nothing
+        //TODO: Intersections (bottom half), Hexes should be working
+        if (row == 0 || row == 1) { // first row
+            return InvalidMapPoint();
+        } else if (row == 52 || row == 51) { // last row // check if rows are correct
+            return InvalidMapPoint();
+        } else if ((row % 12) < 6) {// indented hex rows (0, 2, 4, 6)
+            System.out.println("indented");
+            switch (row % 6) {
+                case 0:
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            return IntersectionMapPoint(hexY - 1, ((((col + 1) / 8) * 2) - 1));
+                    }
+                case 1:
+                    switch (col8) {
+                        case 3:
+                        case 4:
+                            return IntersectionMapPoint(hexY - 1, (((col - 4) / 8) - 1) * 2);
+                    }
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    if (col8 == 3 || col8 == 4) { // Edge
+
+                    } else { // Hex
+                        hexX = (col - 4) / 8;
+                        hexX = hexX - ((7 - getHexesInRow(hexY)) / 2);
+                        return HexMapPoint(hexY, hexX);
+                    }
+            }
+        } else {// unindented hex rows (1, 3, 5, 7)
+            System.out.println("Not indented");
+            switch (row % 6) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    if (col8 == 7 || col8 == 0) { // Edge
+
+                    } else { // Hex
+                        hexX = col / 8;
+                        hexX = hexX - ((7 - getHexesInRow(hexY)) / 2);
+                        return HexMapPoint(hexY, hexX);
+                    }
+            }
+        }
+        System.out.println("Not Caught");
+        return InvalidMapPoint();
     }
 
     /**
@@ -114,6 +181,9 @@ public class GameRendering {
     public void drawGameMap(IGameMap gameMapManagement) {
         LOG.debug("Drawing Game map");
 
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.fillRect(0, 0, width, height);
+
         //Get hexes, intersections, and edges in a usable format from the gameMapManagement
         IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
@@ -121,6 +191,30 @@ public class GameRendering {
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
         drawIntersectionsAndEdges(intersections, gameMapManagement);
+        gfxCtx.setStroke(Color.RED);
+        gfxCtx.setLineWidth(1);
+        for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
+            gfxCtx.strokeLine(0, cy, width, cy);
+
+        for (double cx = OFFSET_X; cx < width; cx += hexWidth / 8)
+            gfxCtx.strokeLine(cx, 0, cx, height);
+    }
+
+    private int getHexesInRow(int y) {
+        switch (y) {
+            case 0:
+            case 6:
+                return 4;
+            case 1:
+            case 5:
+                return 5;
+            case 2:
+            case 4:
+                return 6;
+            case 3:
+            default:
+                return 7;
+        }
     }
 
     /**
