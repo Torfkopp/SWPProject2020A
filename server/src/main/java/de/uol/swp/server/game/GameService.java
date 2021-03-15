@@ -762,6 +762,14 @@ public class GameService extends AbstractService {
         try {
             Game game = gameManagement.getGame(req.getOriginLobby());
             int[] result = game.rollDice();
+            int numberOfPips = result[0] + result[1];
+            if (numberOfPips == 7) {
+                //Robber things
+                LOG.debug("");
+            } else {
+                LOG.debug("Distributing the resources");
+                game.distributeResources(numberOfPips);
+            }
             ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
                                                               result[1]);
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);

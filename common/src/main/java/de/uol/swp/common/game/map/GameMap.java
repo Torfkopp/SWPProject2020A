@@ -109,8 +109,50 @@ public class GameMap implements IGameMap {
     }
 
     @Override
+    public Set<IEdge> getEdgesFromHex(MapPoint mapPoint) {
+        return hexEdgeNetwork.incidentEdges(hexMap[mapPoint.getY()][mapPoint.getX()]);
+    }
+
+    @Override
+    public Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint) {
+        return getIntersectionFromEdges(getEdgesFromHex(mapPoint));
+    }
+
+    @Override
     public IGameHex getHex(MapPoint position) {
         return hexMap[position.getY()][position.getX()].get();
+    }
+
+    @Override
+    public Set<MapPoint> getHex(int token) {
+        ResourceHex hex;
+        Set<MapPoint> mapPoints = new HashSet<>();
+        MapPoint m;
+        //Checks ResourceHexes with x=1 and x=5
+        for (int i = 1; i < 4; i++) {
+            m = new MapPoint(1, i);
+            hex = (ResourceHex) getHex(m);
+            if (hex.getToken() == token) mapPoints.add(m);
+            m = new MapPoint(5, i);
+            hex = (ResourceHex) getHex(m);
+            if (hex.getToken() == token) mapPoints.add(m);
+        }
+        //Checks ResourceHexes with x=2 and x=4
+        for (int i = 1; i < 5; i++) {
+            m = new MapPoint(2, i);
+            hex = (ResourceHex) getHex(m);
+            if (hex.getToken() == token) mapPoints.add(m);
+            m = new MapPoint(4, i);
+            hex = (ResourceHex) getHex(m);
+            if (hex.getToken() == token) mapPoints.add(m);
+        }
+        //Checks ResourceHexes with x=3
+        for (int i : new int[]{1, 2, 4, 5}) {
+            m = new MapPoint(3, i);
+            hex = (ResourceHex) getHex(m);
+            if (hex.getToken() == token) mapPoints.add(m);
+        }
+        return mapPoints;
     }
 
     @Override
@@ -232,6 +274,16 @@ public class GameMap implements IGameMap {
 
     void setHex(MapPoint position, IGameHex newHex) {
         hexMap[position.getY()][position.getX()].set(newHex);
+    }
+
+    private Set<IIntersection> getIntersectionFromEdges(Set<IEdge> set) {
+        Set<IIntersection> intersectionSet = new HashSet<>();
+        for (IEdge edge : set) {
+            for (IIntersection i : intersectionEdgeNetwork.incidentNodes(edge)) {
+                intersectionSet.add(i);
+            }
+        }
+        return intersectionSet;
     }
 
     private void createHexEdgeNetwork() {

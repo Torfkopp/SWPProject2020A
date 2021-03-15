@@ -29,6 +29,24 @@ public interface IGameMap {
     IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
 
     /**
+     * Gets all the edges around the hex
+     *
+     * @param mapPoint The hex's mapPoint
+     *
+     * @return Set of edges
+     */
+    Set<IEdge> getEdgesFromHex(MapPoint mapPoint);
+
+    /**
+     * Gets all the intersections around the hex
+     *
+     * @param mapPoint The hex's mapPoint
+     *
+     * @return Set of intersections
+     */
+    Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint);
+
+    /**
      * Gets the hex at a specified place
      *
      * @param position The hex's coordinates
@@ -36,6 +54,15 @@ public interface IGameMap {
      * @return The hex
      */
     IGameHex getHex(MapPoint position);
+
+    /**
+     * Gets the resource hex with a specified token
+     *
+     * @param Token The hex's token
+     *
+     * @return The ResourceHex
+     */
+    Set<MapPoint> getHex(int Token);
 
     /**
      * Gets the hexes in a usable format for rendering them as a jagged array
