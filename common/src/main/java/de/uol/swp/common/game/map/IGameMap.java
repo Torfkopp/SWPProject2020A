@@ -34,6 +34,9 @@ public interface IGameMap {
      * @param mapPoint The hex's mapPoint
      *
      * @return Set of edges
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
      */
     Set<IEdge> getEdgesFromHex(MapPoint mapPoint);
 
@@ -43,6 +46,9 @@ public interface IGameMap {
      * @param mapPoint The hex's mapPoint
      *
      * @return Set of intersections
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
      */
     Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint);
 
@@ -52,6 +58,9 @@ public interface IGameMap {
      * @param position The hex's coordinates
      *
      * @return The hex
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
     IGameHex getHex(MapPoint position);
 
@@ -61,6 +70,9 @@ public interface IGameMap {
      * @param Token The hex's token
      *
      * @return The ResourceHex
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
      */
     Set<MapPoint> getHex(int Token);
 
@@ -92,6 +104,9 @@ public interface IGameMap {
      * settlements and cities.
      *
      * @return int The amount of points the player has
+     *
+     * @author Mario Fokken
+     * @since 2021-02-05
      */
     int getPlayerPoints(Player player);
 
@@ -115,6 +130,9 @@ public interface IGameMap {
      * Moves the robber
      *
      * @param newPosition The hex the robber has moved to
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
     void moveRobber(MapPoint newPosition);
 
@@ -125,8 +143,10 @@ public interface IGameMap {
      * @param edge   The edge to place a road on
      *
      * @return True if placement was successful; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
-
     boolean placeRoad(Player player, IEdge edge);
 
     /**
@@ -136,6 +156,9 @@ public interface IGameMap {
      * @param position The position of the intersection
      *
      * @return True if placement was successful; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
     boolean placeSettlement(Player player, MapPoint position);
 
@@ -146,6 +169,9 @@ public interface IGameMap {
      * @param edge   The edge to place a road on
      *
      * @return True if placement is possible; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
     boolean roadPlaceable(Player player, IEdge edge);
 
@@ -156,6 +182,9 @@ public interface IGameMap {
      * @param position The position of the intersection
      *
      * @return True if placement is possible; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
     boolean settlementPlaceable(Player player, MapPoint position);
 
@@ -166,6 +195,9 @@ public interface IGameMap {
      * @param position The position of the intersection
      *
      * @return True if placement was successful; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
 }
