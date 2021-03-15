@@ -4,6 +4,8 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LobbyServiceTest {
 
     final User defaultUser = new UserDTO(1, "chuck", "test", "chuck@norris.com");
+    final Lobby defaultLobby = new LobbyDTO("testlobby", defaultUser, false, 4, false, 60, true, true);
 
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
@@ -107,7 +110,7 @@ class LobbyServiceTest {
     @Test
     void refreshLobbyPresenterFieldsTest() throws InterruptedException {
         ILobbyService lobbyService = new LobbyService(bus);
-        lobbyService.refreshLobbyPresenterFields("Test", defaultUser);
+        lobbyService.refreshLobbyPresenterFields("Test", defaultUser, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -117,9 +120,18 @@ class LobbyServiceTest {
 
         assertEquals("Test", lobbyUpdateEvent.getLobbyName());
 
+        assertEquals(defaultUser, lobbyUpdateEvent.getUser());
+        assertEquals(defaultUser.getID(), lobbyUpdateEvent.getUser().getID());
         assertEquals(defaultUser.getUsername(), lobbyUpdateEvent.getUser().getUsername());
         assertEquals(defaultUser.getPassword(), lobbyUpdateEvent.getUser().getPassword());
         assertEquals(defaultUser.getEMail(), lobbyUpdateEvent.getUser().getEMail());
+        assertEquals(defaultLobby, lobbyUpdateEvent.getLobby());
+        assertEquals(defaultLobby.isInGame(), lobbyUpdateEvent.getLobby().isInGame());
+        assertEquals(defaultLobby.getMaxPlayers(), lobbyUpdateEvent.getLobby().getMaxPlayers());
+        assertEquals(defaultLobby.commandsAllowed(), lobbyUpdateEvent.getLobby().commandsAllowed());
+        assertEquals(defaultLobby.getMoveTime(), lobbyUpdateEvent.getLobby().getMoveTime());
+        assertEquals(defaultLobby.startUpPhaseEnabled(), lobbyUpdateEvent.getLobby().startUpPhaseEnabled());
+        assertEquals(defaultLobby.randomPlayfieldEnabled(), lobbyUpdateEvent.getLobby().randomPlayfieldEnabled());
     }
 
     /**

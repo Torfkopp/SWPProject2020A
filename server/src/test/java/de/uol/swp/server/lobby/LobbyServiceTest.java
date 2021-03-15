@@ -26,8 +26,8 @@ class LobbyServiceTest {
     static final User user4 = new UserDTO(4, "User", "NummerVier", "User@NummerVier.com");
     static final User user5 = new UserDTO(5, "Bruder", "WasGeht", "Bruder@WasGeht.com");
 
-    static final Lobby lobbyToTest = new LobbyDTO("Testlobby", user1, false);
-    static final Lobby lobbyWithSameName = new LobbyDTO("Testlobby", user2, false);
+    static final Lobby lobbyToTest = new LobbyDTO("Testlobby", user1, false, 4, false, 60, false, false);
+    static final Lobby lobbyWithSameName = new LobbyDTO("Testlobby", user2, false, 4, false, 60, false, false);
 
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(new MainMemoryBasedUserStore());
