@@ -86,6 +86,7 @@ public class Game {
      * @param token Integer between 2 and 12
      *
      * @author Mario Fokken
+     * @since 2021-03-15
      */
     public void distributeResources(int token) {
         if (token < 2 || token > 12) return;

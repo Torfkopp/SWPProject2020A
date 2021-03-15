@@ -142,13 +142,13 @@ public class GameTest {
         game = new Game(lobby, user);
         //Testing a hex
         game.distributeResources(6);
-        assertEquals(game.getInventory(Player.PLAYER_1).getBrick(), 1);
-        assertEquals(game.getInventory(Player.PLAYER_3).getBrick(), 1);
-        assertEquals(game.getInventory(Player.PLAYER_2).getGrain(), 1);
+        assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_3).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_2).getGrain());
         //Testing another hex
         game.distributeResources(4);
-        assertEquals(game.getInventory(Player.PLAYER_2).getWool(), 1);
-        assertEquals(game.getInventory(Player.PLAYER_4).getGrain(), 1);
-        assertEquals(game.getInventory(Player.PLAYER_2).getGrain(), 2);
+        assertEquals(1, game.getInventory(Player.PLAYER_2).getWool());
+        assertEquals(1, game.getInventory(Player.PLAYER_4).getGrain());
+        assertEquals(2, game.getInventory(Player.PLAYER_2).getGrain());
     }
 }
