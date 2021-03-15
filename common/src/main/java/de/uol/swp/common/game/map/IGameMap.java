@@ -15,6 +15,9 @@ public interface IGameMap {
 
     /**
      * Creates the beginner map
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-8
      */
     void createBeginnerMap();
 
@@ -25,6 +28,9 @@ public interface IGameMap {
      * @param intersection2 Second intersection of edge
      *
      * @return The edge connecting the given intersections
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
      */
     IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
 
@@ -80,6 +86,9 @@ public interface IGameMap {
      * Gets the hexes in a usable format for rendering them as a jagged array
      *
      * @return A jagged array containing the hexes
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-21
      */
     IGameHex[][] getHexesAsJaggedArray();
 
@@ -89,6 +98,9 @@ public interface IGameMap {
      * @param position The position of the intersection
      *
      * @return An intersection object
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
      */
     IIntersection getIntersection(MapPoint position);
 
@@ -96,6 +108,9 @@ public interface IGameMap {
      * Gets the intersections in a usable format for rendering them as a jagged array
      *
      * @return A jagged array containing the intersections
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-31
      */
     IIntersection[][] getIntersectionsAsJaggedArray();
 
@@ -114,6 +129,9 @@ public interface IGameMap {
      * Gets the robber's position
      *
      * @return A MapPoint containing the position of the robber
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
      */
     MapPoint getRobberPosition();
 
@@ -123,6 +141,9 @@ public interface IGameMap {
      * @param intersection The intersection of which the edges should be returned
      *
      * @return A Set<> containing all edge objects
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
      */
     Set<IEdge> incidentEdges(IIntersection intersection);
 
