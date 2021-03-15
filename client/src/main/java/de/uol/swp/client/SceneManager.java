@@ -56,26 +56,26 @@ import java.util.*;
 @SuppressWarnings("UnstableApiUsage")
 public class SceneManager {
 
-    static final Logger LOG = LogManager.getLogger(SceneManager.class);
-    static final String styleSheet = "css/swp.css";
-    private static final int LOBBY_HEIGHT = 730;
-    private static final int LOBBY_WIDTH = 685;
-    private static final int DEVMENU_HEIGHT = 450;
-    private static final int DEVMENU_WIDTH = 630;
-    private static final int TRADING_HEIGHT = 600;
-    private static final int TRADING_WIDTH = 600;
-    private static final int LOGIN_HEIGHT = 220;
-    private static final int LOGIN_WIDTH = 400;
-    private static final int REGISTRATION_HEIGHT = 250;
-    private static final int REGISTRATION_WIDTH = 410;
-    private static final int MAINMENU_HEIGHT = 550;
-    private static final int MAINMENU_WIDTH = 820;
+    private static final Logger LOG = LogManager.getLogger(SceneManager.class);
+    private static final String styleSheet = "css/swp.css";
+    private static final int BANK_TRADING_HEIGHT = 400;
+    private static final int BANK_TRADING_WIDTH = 620;
     private static final int CHANGEPW_HEIGHT = 230;
     private static final int CHANGEPW_WIDTH = 395;
-    private static final int RESPONSE_TRADING_WIDTH = 390;
+    private static final int DEVMENU_HEIGHT = 450;
+    private static final int DEVMENU_WIDTH = 630;
+    private static final int LOBBY_HEIGHT = 730;
+    private static final int LOBBY_WIDTH = 685;
+    private static final int LOGIN_HEIGHT = 220;
+    private static final int LOGIN_WIDTH = 400;
+    private static final int MAINMENU_HEIGHT = 550;
+    private static final int MAINMENU_WIDTH = 820;
+    private static final int REGISTRATION_HEIGHT = 250;
+    private static final int REGISTRATION_WIDTH = 410;
     private static final int RESPONSE_TRADING_HEIGHT = 350;
-    private static final int BANK_TRADING_HEIGHT = 420;
-    private static final int BANK_TRADING_WIDTH = 600;
+    private static final int RESPONSE_TRADING_WIDTH = 390;
+    private static final int TRADING_HEIGHT = 620;
+    private static final int TRADING_WIDTH = 520;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
