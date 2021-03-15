@@ -72,4 +72,21 @@ public interface ILobbyManagement {
      * @since 2021-03-01
      */
     void setInGame(String lobbyName, boolean inGame);
+
+    /**
+     * This method is used to update the pre-game settings of a specific lobby.
+     *
+     * @param lobbyName              The name of the lobby
+     * @param maxPlayers             The maximum amount of players for a lobby
+     * @param commandsAllowed        Whether commands are allowed or not
+     * @param moveTime               The maximum time of a move
+     * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
+     * @param randomPlayfieldEnabled Whether the randomPlayfield is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+                             boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled);
 }
