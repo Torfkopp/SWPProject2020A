@@ -25,7 +25,7 @@ public class GameTest {
     static final User user = new UserDTO(42, "Jolyne", "IloveDaddyJoJo", "JolyneCujoh@jojo.us");
     static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JohnnyJoestar@jojo.us");
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-    static final User user4 = new UserDTO(79, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
+    static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
     static final Lobby lobby = new LobbyDTO("Read the Manga", user, true);
     static Game game = new Game(lobby, user);
 
