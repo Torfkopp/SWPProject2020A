@@ -292,6 +292,12 @@ public class GameMap implements IGameMap {
         return intersectionSet;
     }
 
+    /**
+     * Creates a HexEdgeNetwork
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
+     */
     private void createHexEdgeNetwork() {
         // @formatter:off
         var hexEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
@@ -335,6 +341,12 @@ public class GameMap implements IGameMap {
         hexEdgeNetwork = hexEdgeNetworkBuilder.build();
     }
 
+    /**
+     * Creates an IntersectionEdgeNetwork
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
+     */
     private void createIntersectionEdgeNetwork() {
         var intersectionEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
                                                            .nodeOrder(ElementOrder.insertion()).expectedNodeCount(54)
