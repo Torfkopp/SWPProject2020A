@@ -17,7 +17,7 @@ public interface IGameMap {
      * Creates the beginner map
      *
      * @author Temmo Junkhoff
-     * @since 2021-03-8
+     * @since 2021-03-08
      */
     void createBeginnerMap();
 
