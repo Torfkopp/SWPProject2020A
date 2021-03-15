@@ -272,10 +272,16 @@ public class GameMap implements IGameMap {
         return false;
     }
 
-    void setHex(MapPoint position, IGameHex newHex) {
-        hexMap[position.getY()][position.getX()].set(newHex);
-    }
-
+    /**
+     * Helper method for getIntersectionFromHexes
+     *
+     * @param set Set of edges
+     *
+     * @return Set of intersections
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
+     */
     private Set<IIntersection> getIntersectionFromEdges(Set<IEdge> set) {
         Set<IIntersection> intersectionSet = new HashSet<>();
         for (IEdge edge : set) {
