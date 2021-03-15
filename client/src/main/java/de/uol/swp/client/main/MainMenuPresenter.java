@@ -14,9 +14,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.AllLobbiesMessage;
-import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
-import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
@@ -56,7 +54,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
-
     private ObservableList<String> users;
     private ObservableList<Pair<String, String>> lobbies;
 
@@ -194,6 +191,27 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles a AllowedAmountOfPlayersMessage found on the EventBus
+     * <p>
+     * If a AllowedAmountOfPlayersMessage, a lobby has changed a lobby-setting.
+     * It calls the retrieveAllLobbies method of the LobbyService to update
+     * the lobby list.
+     *
+     * @param msg AllowedAmountOfPlayersMessage found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.message.AllowedAmountOfPlayersChangedMessage
+     * @since 2021-03-14
+     */
+    @Subscribe
+    private void onAllowedAmountOfPlayersMessage(AllowedAmountOfPlayersChangedMessage msg) {
+        if (this.loggedInUser == null) return;
+        LOG.debug("Received AllowedAmountOfPlayersMessage");
+        lobbyService.retrieveAllLobbies();
+    }
+
+    /**
      * Method called when the ChangePasswordButton is pressed
      * <p>
      * This method is called when the ChangePasswordButton is pressed.
@@ -287,7 +305,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
         });
     }
 
@@ -358,7 +376,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
         });
     }
 
@@ -558,13 +576,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 lobbyView.setItems(lobbies);
             }
             lobbies.clear();
-            lobbyList.forEach(l -> {
-                String s = l.getName() + " (" + l.getUsers().size() + "/4)";
+            for (Lobby l : lobbyList) {
+                String s = l.getName() + " (" + l.getUsers().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
-                else if (l.getUsers().size() == 4)
+                else if (l.getUsers().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
-            });
+            }
         });
     }
 

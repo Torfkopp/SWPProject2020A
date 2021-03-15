@@ -33,7 +33,6 @@ public class LobbyService extends AbstractService {
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final ILobbyManagement lobbyManagement;
     private final AuthenticationService authenticationService;
-    private final List<Lobby> lobbyList = new ArrayList<>();
 
     /**
      * Constructor
@@ -75,6 +74,42 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a ChangeLobbySettingsRequest found on the EventBus
+     * <p>
+     * If a ChangeLobbySettingsRequest is detected on the EventBus this method
+     * updates the pre-game settings of a specific lobby if the requesting user
+     * is the owner and the lobby has not started a game.
+     * A AllowedAmountOfPlayersChangedMessage is posted onto the EventBus to update
+     * all clients and a UpdateLobbyMessage is posted onto the EventBus to update
+     * the lobby members about the changes.
+     *
+     * @param req The ChangeLobbySettingsRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.request.ChangeLobbySettingsRequest
+     * @see de.uol.swp.common.lobby.message.AllowedAmountOfPlayersChangedMessage
+     * @see de.uol.swp.common.lobby.message.UpdateLobbyMessage
+     * @since 2021-03-15
+     */
+    @Subscribe
+    private void onChangeLobbySettingsRequest(ChangeLobbySettingsRequest req) {
+        LOG.debug("Received a ChangeLobbySettingsRequest");
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+        if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
+        if (lobby.get().getUsers().size() > req.getAllowedPlayers()) return;
+        if (lobby.get().isInGame()) return;
+        lobbyManagement
+                .updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.isCommandsAllowed(), req.getMoveTime(),
+                                     req.isStartUpPhaseEnabled(), req.isRandomPlayfieldEnabled());
+        post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
+        Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
+        if (updatedLobby.isEmpty()) return;
+        ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(), updatedLobby.get());
+        sendToAllInLobby(req.getName(), msg);
+    }
+
+    /**
      * Handles a CreateLobbyRequest found on the EventBus
      * <p>
      * If a CreateLobbyRequest is detected on the EventBus, this method is called.
@@ -92,7 +127,9 @@ public class LobbyService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateLobbyRequest for Lobby " + req.getName());
         try {
             lobbyManagement.createLobby(req.getName(), req.getOwner());
-            Message responseMessage = new CreateLobbyResponse(req.getName());
+            Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+            if (lobby.isEmpty()) return;
+            Message responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
             responseMessage.initWithMessage(req);
             post(responseMessage);
             sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
@@ -188,11 +225,13 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
 
         if (lobby.isPresent()) {
-            if (lobby.get().getUsers().size() < 4) {
+            if (lobby.get().getUsers().size() < lobby.get().getMaxPlayers()) {
                 if (!lobby.get().getUsers().contains(req.getUser())) {
                     if (!lobby.get().isInGame()) {
                         lobby.get().joinUser(req.getUser());
-                        Message responseMessage = new JoinLobbyResponse(req.getName());
+                        lobby = lobbyManagement.getLobby(req.getName());
+                        if (lobby.isEmpty()) return;
+                        Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
                         responseMessage.initWithMessage(req);
                         post(responseMessage);
                         sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));

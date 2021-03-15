@@ -290,6 +290,10 @@ public class SceneManager {
         String context = e;
         // @formatter:off
         switch (e) {
+            //Found in ChatService
+            case "This lobby doesn't allow the use of commands!":
+                context = resourceBundle.getString("error.context.commandsforbidden");
+                break;
             //Found in LobbyService
             case "Game session started already!":
                 context = resourceBundle.getString("error.context.sessionstarted");
