@@ -341,13 +341,22 @@ public class SceneManager {
                 e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
                 resourceBundle.getString("error.context.unknown");
         //found in LobbyManagement
-        if (e.contains(" already exists!")) context =
+        if (e.contains("Lobby") && e.contains(" already exists!")) context =
                 resourceBundle.getString("error.context.lobbyname") + " " +
                 e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
                 resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains(" not found!")) context =
+        if (e.contains("Lobby") && e.contains(" not found!")) context =
                 resourceBundle.getString("error.context.lobbyname") + " " +
                 e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.notfound");
+        //found in GameManagement
+        if (e.contains("Game") && e.contains(" already exists!")) context =
+                resourceBundle.getString("error.context.gamelobby") + " " +
+                e.substring(e.indexOf('[')+6-5, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.alreadyexists");
+        if (e.contains("Game") && e.contains(" not found!")) context =
+                resourceBundle.getString("error.context.gamelobby") + " " +
+                e.substring(e.indexOf('[')+7-6, e.lastIndexOf(']')) + " " +
                 resourceBundle.getString("error.context.notfound");
         // @formatter:on
         return context;
