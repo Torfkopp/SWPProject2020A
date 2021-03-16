@@ -266,7 +266,13 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onCreateGameMessage(CreateGameMessage msg) {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameMessage for Lobby " + msg.getLobbyName());
-        gameManagement.createGame(msg.getLobby(), msg.getFirst());
+        try {
+            gameManagement.createGame(msg.getLobby(), msg.getFirst());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            post(exceptionMessage);
+        }
     }
 
     /**
@@ -438,7 +444,13 @@ public class GameService extends AbstractService {
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
         Game game = gameManagement.getGame(msg.getName());
         if (game == null) return;
-        gameManagement.dropGame(msg.getName());
+        try {
+            gameManagement.dropGame(msg.getName());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            post(exceptionMessage);
+        }
     }
 
     /**
