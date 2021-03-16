@@ -25,10 +25,11 @@
         <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
         <VBox spacing="15.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.join"/>
             <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.create">
+                    text="%mainmenu.buttons.lobby.create"/>
+
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
+                    text="%mainmenu.buttons.lobby.join">
             </Button>
         </VBox>
         <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
