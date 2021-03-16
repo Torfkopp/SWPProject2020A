@@ -128,7 +128,7 @@ public class GameMap implements IGameMap {
         ResourceHex hex;
         Set<MapPoint> mapPoints = new HashSet<>();
         MapPoint m;
-        //Checks ResourceHexes with x=1 and x=5
+        //Checks ResourceHexes with y=1 and y=5
         for (int i = 1; i < 4; i++) {
             m = new MapPoint(1, i);
             hex = (ResourceHex) getHex(m);
@@ -137,7 +137,7 @@ public class GameMap implements IGameMap {
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
         }
-        //Checks ResourceHexes with x=2 and x=4
+        //Checks ResourceHexes with y=2 and y=4
         for (int i = 1; i < 5; i++) {
             m = new MapPoint(2, i);
             hex = (ResourceHex) getHex(m);
@@ -146,7 +146,7 @@ public class GameMap implements IGameMap {
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
         }
-        //Checks ResourceHexes with x=3
+        //Checks ResourceHexes with y=3
         for (int i : new int[]{1, 2, 4, 5}) {
             m = new MapPoint(3, i);
             hex = (ResourceHex) getHex(m);
