@@ -29,8 +29,7 @@
                     text="%mainmenu.buttons.lobby.create"/>
 
             <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.join">
-            </Button>
+                    text="%mainmenu.buttons.lobby.join"/>
         </VBox>
         <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
