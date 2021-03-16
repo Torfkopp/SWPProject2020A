@@ -61,8 +61,8 @@
             <Menu mnemonicParsing="false" text="%mainmenu.settings">
                 <MenuItem mnemonicParsing="false">
                     <graphic>
-                        <Button mnemonicParsing="false" onAction="#onChangePasswordButtonPressed"
-                                text="%mainmenu.settings.buttons.changepw"/>
+                        <Button mnemonicParsing="false" onAction="#onConfirmPasswordButtonPressed"
+                                text="%mainmenu.settings.buttons.confirmpw"/>
                     </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false">

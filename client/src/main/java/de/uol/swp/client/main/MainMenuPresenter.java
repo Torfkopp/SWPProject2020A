@@ -2,7 +2,7 @@ package de.uol.swp.client.main;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
+import de.uol.swp.client.ChangePassword.event.ShowConfirmPasswordViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
@@ -194,19 +194,20 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Method called when the ChangePasswordButton is pressed
+     * Method called when the ConfirmPasswordButton is pressed
      * <p>
-     * This method is called when the ChangePasswordButton is pressed.
-     * It posts an instance of the ShowChangePasswordViewEvent to the EventBus the SceneManager is subscribed to.
+     * This method is called when the ConfirmPasswordButton is pressed.
+     * It posts an instance of the ShowConfirmPasswordViewEvent to the EventBus the SceneManager is subscribed to.
      *
      * @author Eric Vuong
+     * @author Alwin Bossert
      * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
      * @see de.uol.swp.client.SceneManager
-     * @since 2020-11-25
+     * @since 2021-03-16
      */
     @FXML
-    private void onChangePasswordButtonPressed() {
-        eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
+    private void onConfirmPasswordButtonPressed() {
+        eventBus.post(new ShowConfirmPasswordViewEvent(loggedInUser));
     }
 
     /**

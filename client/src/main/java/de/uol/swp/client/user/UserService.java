@@ -138,4 +138,25 @@ public class UserService implements ClientUserService {
         Message request = new UpdateUserPasswordRequest(user, oldPassword);
         bus.post(request);
     }
+
+    /**
+     * Method to confirm a user's password
+     * <p>
+     * This method creates a new ConfirmUserPasswordRequest object
+     * with the user and his password as parameter,
+     * and posts this instance onto the EventBus.
+     *
+     * @param user     The user to update
+     * @param password The password to verified
+     *
+     * @author Eric Vuong
+     * @author Alwin Bossert
+     * @since 2021-03-16
+     */
+    @Override
+    public void confirmUserPassword(User user, String password) {
+        LOG.debug("Sending ConfirmUserPasswordRequest");
+        Message request = new ConfirmUserPasswordRequest(user, password);
+        bus.post(request);
+    }
 }

@@ -5,15 +5,9 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
-import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
-import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
-import de.uol.swp.common.user.request.DeleteUserRequest;
-import de.uol.swp.common.user.request.RegisterUserRequest;
-import de.uol.swp.common.user.request.UpdateUserPasswordRequest;
-import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
-import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
-import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
+import de.uol.swp.common.user.exception.*;
+import de.uol.swp.common.user.request.*;
+import de.uol.swp.common.user.response.*;
 import de.uol.swp.server.AbstractService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,6 +77,44 @@ public class UserService extends AbstractService {
             LOG.error(e);
             returnMessage = new ChangePasswordExceptionMessage(
                     "Cannot change Password of " + req.getUser() + " " + e.getMessage());
+        }
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+    }
+
+    /**
+     * Handles a ConfirmUserPasswordRequest found on the EventBus
+     * <p>
+     * If a ConfirmUserPasswordRequest is detected on the EventBus, this method is called.
+     * It tries to confirm the Password of a user via the UserManagement.
+     * If this succeeds, a ConfirmPasswordSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a ConfirmPasswordExceptionMessage gets posted there.
+     *
+     * @param req The ConfirmUserPasswordRequest found on the Eventbus
+     *
+     * @author Eric Vuong
+     * @author Alwin Bossert
+     * @since 2021-03-16
+     */
+    @Subscribe
+    private void onConfirmPasswordRequest(ConfirmUserPasswordRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received ChangePasswordRequest for User " + req.getUser().getUsername());
+        }
+        ResponseMessage returnMessage;
+        try {
+            Optional<User> optionalUser = userManagement
+                    .getUserWithPassword(req.getUser().getUsername(), req.getPassword());
+            if (optionalUser.isPresent()) {
+                userManagement.updateUser(req.getUser());
+                returnMessage = new ConfirmPasswordSuccessfulResponse();
+            } else {
+                returnMessage = new ConfirmPasswordExceptionMessage("Wrong Password");
+            }
+        } catch (Exception e) {
+            LOG.error(e);
+            returnMessage = new ConfirmPasswordExceptionMessage(
+                    "Cannot confirm Password of" + req.getUser() + " " + e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);

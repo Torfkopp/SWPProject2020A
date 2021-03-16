@@ -168,6 +168,25 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
+     * Handles a successful password confirming process
+     * <p>
+     * If an ConfirmPasswordSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the ChangeAccountDetailsScreen window.
+     *
+     * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.SceneManager
+     * @since 2021-03-16
+     */
+    @Subscribe
+    private void onConfirmPasswordSuccessfulMessage(ConfirmPasswordSuccessfulResponse message) {
+        LOG.info("Password was confirmed.");
+        sceneManager.showChangePasswordScreen(user);
+    }
+
+    /**
      * Handles an unsuccessful registration
      * <p>
      * If a RegistrationExceptionMessage object is detected on the EventBus, this
