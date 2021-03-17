@@ -44,6 +44,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 /**
  * Manages the lobby's menu
@@ -84,12 +85,33 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Label turnIndicator;
     @FXML
+    private Label moveTimeLabel;
+    @FXML
     private Canvas gameMapCanvas;
     @FXML
     private VBox playField;
     @FXML
     private ListView<Pair<String, String>> inventoryView;
+    @FXML
+    private VBox preGameSettingBox;
+    @FXML
+    private TextField moveTimeTextfield;
+    @FXML
+    private ToggleGroup maxPlayersToggleGroup;
+    @FXML
+    private RadioButton threePlayerRadioButton;
+    @FXML
+    private RadioButton fourPlayerRadioButton;
+    @FXML
+    private CheckBox setStartUpPhaseCheckBox;
+    @FXML
+    private CheckBox randomPlayFieldCheckbox;
+    @FXML
+    private CheckBox commandsActivated;
+    @FXML
+    private Button changeMoveTimeButton;
 
+    private int moveTime;
     private GameRendering gameRendering;
     private Window window;
 
@@ -174,8 +196,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                 });
             }
         });
-
-        gameRendering = new GameRendering(gameMapCanvas);
+        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
+                s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
+        moveTimeTextfield.setTextFormatter(new TextFormatter<>(integerFilter));
         LOG.debug("LobbyPresenter initialised");
     }
 
@@ -308,8 +331,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.owner = rsp.getOwner();
         this.readyUsers = rsp.getReadyUsers();
         updateUsersList(rsp.getUsers());
-        setStartSessionButtonState();
-        setKickUserButtonState();
+        Platform.runLater(() -> {
+            setStartSessionButtonState();
+            setKickUserButtonState();
+            setPreGameSettings();
+        });
     }
 
     /**
@@ -329,6 +355,39 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         setTradeWithUserButtonState(rsp.getUser());
         setTradeWithBankButtonState(rsp.getUser());
+    }
+
+    /**
+     * Handles a click on the change-move-time Button which allows the ChangeMove
+     * Timer to be edited. Default: 60s
+     * <p>
+     * A TextField allows to edit the timer, which restricts the time frame between each Move.
+     * It can be set to any integer value.
+     *
+     * @author Maximilian Lindner
+     * @author AldinDervisi
+     * @since 2021-03-14
+     */
+    @FXML
+    private void onChangeMoveTimeButtonPressed() {
+        prepareLobbyUpdate();
+    }
+
+    /**
+     * Handles a click on the Commands-Activated-ChechBox to allow or disable commands in
+     * the specific lobby.
+     * <p>
+     * By enabling this option, players will be able to use quick commands in the
+     * chat to get access to specific in-game methods.
+     * Calls the prepareLobbyUpdate Method to send the new settings to the server.
+     *
+     * @author Maximilian Lindner
+     * @author AldinDervisi
+     * @since 2021-03-14
+     */
+    @FXML
+    private void onCommandsActivatedPressed() {
+        prepareLobbyUpdate();
     }
 
     /**
@@ -369,6 +428,22 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
         lobbyService.endTurn(loggedInUser, lobbyName);
+    }
+
+    /**
+     * Handles a click on the fourPlayers-RadioButton.
+     * <p>
+     * By having this Box unchecked, the Button will
+     * automatically switch the Lobby to have three players enabled.
+     * Calls the prepareLobbyUpdate Method to send the new settings to the server.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-14
+     */
+    @FXML
+    private void onFourPlayersRadioButtonSelected() {
+        prepareLobbyUpdate();
     }
 
     /**
@@ -434,6 +509,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * values found in the LobbyUpdateEvent or creates a new, empty instance.
      * Also makes sure that the lobby will be left gracefully should the window
      * be closed without using the Leave Lobby button.
+     * It also sets the pre-game Setting according to the Lobby.
      *
      * @param event The LobbyUpdateEvent found on the EventBus
      *
@@ -460,6 +536,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
+        setAllowedPlayers(event.getLobby().getMaxPlayers());
+        this.commandsActivated.setSelected(event.getLobby().commandsAllowed());
+        this.randomPlayFieldCheckbox.setSelected(event.getLobby().randomPlayfieldEnabled());
+        this.setStartUpPhaseCheckBox.setSelected(event.getLobby().startUpPhaseEnabled());
+        this.moveTime = event.getLobby().getMoveTime();
+        this.moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), this.moveTime));
+        this.moveTimeTextfield.setText(String.valueOf(this.moveTime));
+        setPreGameSettings();
     }
 
     /**
@@ -653,6 +737,19 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles the Button to enable a randomly generated play field instead
+     * of the fixed one.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @FXML
+    private void onRandomPlayFieldPressed() {
+        prepareLobbyUpdate();
+    }
+
+    /**
      * Handles the click on the ReadyCheckBox
      * <p>
      * Method called when the Ready Checkbox is clicked. It checks whether the
@@ -787,6 +884,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
         Platform.runLater(() -> {
             playField.setVisible(true);
+            this.preGameSettingBox.setVisible(false);
+            this.preGameSettingBox.setPrefHeight(0);
+            this.preGameSettingBox.setMaxHeight(0);
+            this.preGameSettingBox.setMinHeight(0);
+            gameMapCanvas.setHeight(380);
+            gameMapCanvas.setVisible(true);
+            gameRendering = new GameRendering(gameMapCanvas);
             //This Line needs to be changed/ removed in the Future
             GameMap map = new GameMap();
             map.createBeginnerMap();
@@ -803,6 +907,38 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.kickUserButton.setVisible(false);
             this.playCard.setVisible(true);
         });
+    }
+
+    /**
+     * Handles a click on the StartUpPhase-CheckBox to allow or disable the
+     * start up phase in the specific lobby.
+     * <p>
+     * By enabling this option the start up phase will start after the game started.
+     * Otherwise the first building will be created by its own.
+     * Calls the prepareLobbyUpdate Method to send the new settings to the server.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @FXML
+    private void onStartUpPhasePressed() {
+        prepareLobbyUpdate();
+    }
+
+    /**
+     * Handles a click on the ThreePlayers-RadioButton to restrict the lobby to
+     * three players.
+     * <p>
+     * Calls the prepareLobbyUpdate Method to send the new settings to the server.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Devisi
+     * @since 2021-03-15
+     */
+    @FXML
+    private void onThreePlayersRadioButtonSelected() {
+        prepareLobbyUpdate();
     }
 
     /**
@@ -1000,6 +1136,34 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles an UpdateLobbyMessage found on the EventBus
+     * <p>
+     * If an UpdateLobbyMessage is found on the EventBus, this method applies
+     * the settings contained therein to this lobby and updates the different
+     * TextFields, CheckBoxes, and RadioButtons accordingly.
+     *
+     * @param msg The UpdateLobbyMessage found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.message.UpdateLobbyMessage
+     * @since 2021-03-14
+     */
+    @Subscribe
+    private void onUpdateLobbyMessage(UpdateLobbyMessage msg) {
+        LOG.debug("Received a AllowedAmountOfPlayersMessage");
+        if (!this.lobbyName.equals(msg.getName())) return;
+        setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
+        this.setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
+        this.randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
+        this.commandsActivated.setSelected(msg.getLobby().commandsAllowed());
+        this.moveTimeTextfield.setText(String.valueOf(msg.getLobby().getMoveTime()));
+        this.moveTime = msg.getLobby().getMoveTime();
+        Platform.runLater(() -> this.moveTimeLabel
+                .setText(String.format(resourceBundle.getString("lobby.labels.movetime"), this.moveTime)));
+    }
+
+    /**
      * Handles new joined users
      * <p>
      * If a new UserJoinedLobbyMessage object is posted onto the EventBus, the name of the newly
@@ -1024,6 +1188,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(pair))
                 lobbyMembers.add(pair);
             setStartSessionButtonState();
+            setPreGameSettings();
         });
     }
 
@@ -1061,6 +1226,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             lobbyMembers.remove(findMember(user.getID()));
             readyUsers.remove(user);
             setStartSessionButtonState();
+            setPreGameSettings();
         });
     }
 
@@ -1082,6 +1248,42 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserReadyMessage for Lobby " + this.lobbyName);
         lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
+    }
+
+    /**
+     * Helper method to handle the overall update of the LobbySettings in the pre-game menu
+     * <p>
+     * This method takes the content of all the specific CheckBoxes, RadioButtons, and Textfields
+     * for the pre-game settings which the Owner selected, and calls the updateLobbySettings
+     * method of the LobbyService.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Devisi
+     * @since 2021-03-15
+     */
+    private void prepareLobbyUpdate() {
+        if (!this.loggedInUser.equals(owner)) return;
+        int moveTime =
+                !moveTimeTextfield.getText().equals("") ? Integer.parseInt(moveTimeTextfield.getText()) : this.moveTime;
+        int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+        lobbyService.updateLobbySettings(this.lobbyName, this.loggedInUser, maxPlayers,
+                                         setStartUpPhaseCheckBox.isSelected(), commandsActivated.isSelected(), moveTime,
+                                         randomPlayFieldCheckbox.isSelected());
+    }
+
+    /**
+     * Helper method to set the allowed players RadioButton
+     * according to the allowed players attribute of the lobby.
+     *
+     * @param allowedPlayers The maximum amount of players for a lobby.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    private void setAllowedPlayers(int allowedPlayers) {
+        this.threePlayerRadioButton.setSelected(allowedPlayers == 3);
+        this.fourPlayerRadioButton.setSelected(allowedPlayers == 4);
     }
 
     /**
@@ -1126,6 +1328,24 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     private void setPlayCardButtonState(User player) {
         this.playCard.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
+     * Helper method to disable pre-game Buttons and Checkboxes
+     * for everyone, expect the owner.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    private void setPreGameSettings() {
+        this.moveTimeTextfield.setDisable(!this.loggedInUser.equals(owner));
+        this.changeMoveTimeButton.setDisable(!this.loggedInUser.equals(owner));
+        this.setStartUpPhaseCheckBox.setDisable(!this.loggedInUser.equals(owner));
+        this.commandsActivated.setDisable(!this.loggedInUser.equals(owner));
+        this.randomPlayFieldCheckbox.setDisable(!this.loggedInUser.equals(owner));
+        this.fourPlayerRadioButton.setDisable(!this.loggedInUser.equals(owner));
+        this.threePlayerRadioButton.setDisable(!this.loggedInUser.equals(owner) || lobbyMembers.size() == 4);
     }
 
     /**

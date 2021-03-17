@@ -12,7 +12,8 @@ import java.util.TreeSet;
  * <p>
  * This object is used to communicate the current state of game lobbies between
  * the server and clients. It contains information about the lobby's name,
- * its owner, and who joined the lobby.
+ * its owner, who joined the lobby, and the settings that will be used in this
+ * lobby's game session.
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.Lobby
@@ -25,6 +26,11 @@ public class LobbyDTO implements Lobby {
     private final Set<User> readyUsers = new TreeSet<>();
     private boolean inGame;
     private User owner;
+    private boolean commandsAllowed;
+    private int maxPlayers;
+    private int moveTime;
+    private boolean startUpPhaseEnabled;
+    private boolean randomPlayfieldEnabled;
 
     /**
      * Constructor
@@ -35,11 +41,17 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, User creator, boolean inGame) {
+    public LobbyDTO(String name, User creator, boolean inGame, int maxPlayers, boolean commandsAllowed, int moveTime,
+                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
         this.inGame = inGame;
+        this.maxPlayers = maxPlayers;
+        this.commandsAllowed = commandsAllowed;
+        this.moveTime = moveTime;
+        this.startUpPhaseEnabled = startUpPhaseEnabled;
+        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
     }
 
     /**
@@ -52,7 +64,34 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame());
+        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame(), lobby.getMaxPlayers(),
+                            lobby.commandsAllowed(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
+                            lobby.randomPlayfieldEnabled());
+    }
+
+    @Override
+    public boolean commandsAllowed() {
+        return commandsAllowed;
+    }
+
+    @Override
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    @Override
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+    }
+
+    @Override
+    public int getMoveTime() {
+        return moveTime;
+    }
+
+    @Override
+    public void setMoveTime(int moveTime) {
+        this.moveTime = moveTime;
     }
 
     @Override
@@ -104,8 +143,33 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public boolean randomPlayfieldEnabled() {
+        return randomPlayfieldEnabled;
+    }
+
+    @Override
+    public void setCommandsAllowed(boolean commandsAllowed) {
+        this.commandsAllowed = commandsAllowed;
+    }
+
+    @Override
+    public void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled) {
+        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+    }
+
+    @Override
+    public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
+        this.startUpPhaseEnabled = startUpPhaseEnabled;
+    }
+
+    @Override
     public void setUserReady(User user) {
         this.readyUsers.add(user);
+    }
+
+    @Override
+    public boolean startUpPhaseEnabled() {
+        return startUpPhaseEnabled;
     }
 
     @Override
