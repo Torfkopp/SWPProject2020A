@@ -29,6 +29,7 @@ import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,7 +37,6 @@ import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -63,6 +63,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
+    private Integer dice1;
+    private Integer dice2;
     @FXML
     private ListView<Pair<Integer, User>> membersView;
     @FXML
@@ -86,10 +88,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Canvas gameMapCanvas;
     @FXML
-    private VBox playField;
-    @FXML
     private ListView<Pair<String, String>> inventoryView;
 
+    private GameMap gameMap;
     private GameRendering gameRendering;
     private Window window;
 
@@ -175,7 +176,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
 
-        gameRendering = new GameRendering(gameMapCanvas);
         LOG.debug("LobbyPresenter initialised");
     }
 
@@ -346,12 +346,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
+        if (!this.lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
         setTradeWithUserButtonState(msg.getUser());
         setPlayCardButtonState(msg.getUser());
+        this.dice1 = msg.getDice1();
+        this.dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
     }
 
@@ -458,6 +461,27 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+
+        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
+            double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
+            double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
+            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+            double dimension = Math.min(heightValue, widthValue);
+            gameMapCanvas.setHeight(dimension * hexFactor);
+            gameMapCanvas.setWidth(dimension);
+            if (gameMap == null) return;
+            // gameMap exists, so redraw map to fit the new canvas dimensions
+            gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
+            gameRendering.drawGameMap(gameMap);
+            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        };
+        window.widthProperty().addListener(listener);
+        window.heightProperty().addListener(listener);
+        //just to trigger the heightProperty ChangeListener and make the canvas have actual dimensions
+        window.setHeight(window.getHeight() + 0.01);
+        window.setHeight(window.getHeight() - 0.01);
+
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
     }
 
@@ -785,11 +809,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
         Platform.runLater(() -> {
-            playField.setVisible(true);
             //This Line needs to be changed/ removed in the Future
-            GameMap map = new GameMap();
-            map.createBeginnerMap();
-            gameRendering.drawGameMap(map);
+            this.gameRendering = new GameRendering(gameMapCanvas);
+            this.gameMap = new GameMap();
+            gameMap.createBeginnerMap();
+            gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
             this.readyCheckBox.setVisible(false);

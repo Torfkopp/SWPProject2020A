@@ -58,8 +58,8 @@ public class SceneManager {
 
     static final Logger LOG = LogManager.getLogger(SceneManager.class);
     static final String styleSheet = "css/swp.css";
-    private static final int LOBBY_HEIGHT = 730;
-    private static final int LOBBY_WIDTH = 685;
+    private static final int LOBBY_HEIGHT = 740;
+    private static final int LOBBY_WIDTH = 1285;
     private static final int DEVMENU_HEIGHT = 450;
     private static final int DEVMENU_WIDTH = 630;
     private static final int TRADING_HEIGHT = 600;

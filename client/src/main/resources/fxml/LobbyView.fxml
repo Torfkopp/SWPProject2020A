@@ -4,109 +4,76 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
-    <VBox>
-        <HBox.margin>
-            <Insets bottom="10" left="10" right="10"/>
-        </HBox.margin>
-        <VBox>
-            <ListView fx:id="membersView" maxHeight="95.0" minHeight="95.0">
+<GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
+          fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+    <columnConstraints>
+        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="SOMETIMES"/>
+        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints percentHeight="100.0" vgrow="ALWAYS"/>
+    </rowConstraints>
+    <VBox maxWidth="250.0" spacing="10.0">
+        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" spacing="5.0">
+            <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0"/>
+            <ListView fx:id="chatView"/>
+            <TextField fx:id="messageField">
                 <VBox.margin>
-                    <Insets top="10"/>
+                    <Insets top="-5.0"/>
                 </VBox.margin>
-            </ListView>
-            <ListView fx:id="chatView">
-                <VBox.margin>
-                    <Insets top="10"/>
-                </VBox.margin>
-            </ListView>
-            <TextField fx:id="messageField"/>
+            </TextField>
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.sendmessage">
-                <VBox.margin>
-                    <Insets top="5"/>
-                </VBox.margin>
-            </Button>
+                    text="%chat.buttons.sendmessage"/>
             <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.deletemessage">
-                <VBox.margin>
-                    <Insets top="5"/>
-                </VBox.margin>
-            </Button>
+                    text="%chat.buttons.deletemessage"/>
             <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.editmessage">
-                <VBox.margin>
-                    <Insets top="5"/>
-                </VBox.margin>
-            </Button>
+                    text="%chat.buttons.editmessage"/>
         </VBox>
-        <VBox prefHeight="200.0" prefWidth="100.0">
-            <VBox.margin>
-                <Insets top="10.0"/>
-            </VBox.margin>
-            <Button fx:id="kickUserButton" mnemonicParsing="false" onAction="#onKickUserButtonPressed"
+        <VBox spacing="5.0">
+            <Button fx:id="kickUserButton" mnemonicParsing="false" onAction="#onKickUserButtonPressed" prefWidth="150.0"
                     text="%lobby.buttons.kickuser" visible="false"/>
             <Button mnemonicParsing="false" onAction="#onLeaveLobbyButtonPressed" prefWidth="150.0"
-                    text="%lobby.buttons.leavelobby">
-                <VBox.margin>
-                    <Insets top="5.0"/>
-                </VBox.margin>
-            </Button>
+                    text="%lobby.buttons.leavelobby"/>
         </VBox>
+        <padding>
+            <Insets topRightBottomLeft="10.0"/>
+        </padding>
     </VBox>
-    <VBox>
-        <HBox.margin>
-            <Insets left="10" right="10"/>
-        </HBox.margin>
-        <VBox fx:id="playField">
-            <VBox.margin>
-                <Insets top="10"/>
-            </VBox.margin>
-            <Canvas fx:id="gameMapCanvas" height="380" width="380"/>
-            <HBox>
-                <VBox.margin>
-                    <Insets top="10"/>
-                </VBox.margin>
-                <VBox prefHeight="259.0" prefWidth="210.0" spacing="5.0">
-                    <Label fx:id="turnIndicator" maxHeight="25.0" minHeight="25.0"/>
-                    <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
-                            text="%lobby.game.buttons.rolldice" visible="false"/>
-                    <Button fx:id="endTurn" disable="true" maxWidth="Infinity" mnemonicParsing="false"
-                            onAction="#onEndTurnButtonPressed" text="%lobby.game.buttons.endturn">
-                        <VBox.margin>
-                            <Insets right="5.0" top="5.0"/>
-                        </VBox.margin>
-                    </Button>
-                    <HBox>
-                        <VBox.margin>
-                            <Insets top="20"/>
-                        </VBox.margin>
-                        <CheckBox fx:id="readyCheckBox" minHeight="25.0" mnemonicParsing="false"
-                                  onAction="#onReadyCheckBoxClicked" text="%lobby.game.readycheckbox">
-                            <HBox.margin>
-                                <Insets right="10"/>
-                            </HBox.margin>
-                        </CheckBox>
-                        <Button fx:id="startSession" disable="true" maxWidth="Infinity" mnemonicParsing="false"
-                                onAction="#onStartSessionButtonPressed" text="%lobby.game.buttons.startsession"
-                                visible="false" HBox.hgrow="ALWAYS">
-                            <HBox.margin>
-                                <Insets right="5.0"/>
-                            </HBox.margin>
-                        </Button>
-                    </HBox>
-                    <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false"
-                            onAction="#onTradeWithUserButtonPressed" text="%lobby.game.buttons.playertrade"
-                            visible="false"/>
-                    <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
-                            onAction="#onTradeWithBankButtonPressed" text="%lobby.game.buttons.banktrade"
-                            visible="false"/>
-                    <Button fx:id="playCard" mnemonicParsing="false" visible="false" disable="true"
-                            onAction="#onPlayCardButtonPressed" text="%game.playcards.button"/>
-                </VBox>
-                <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
-            </HBox>
-        </VBox>
+    <HBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <Canvas fx:id="gameMapCanvas"/>
+        <padding>
+            <Insets topRightBottomLeft="10.0"/>
+        </padding>
+    </HBox>
+    <VBox prefWidth="250.0" spacing="10.0" GridPane.columnIndex="2">
+        <ListView fx:id="inventoryView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                  minWidth="-Infinity" prefHeight="280.0" prefWidth="230.0"/>
+        <HBox maxHeight="25.0" maxWidth="-Infinity" minHeight="25.0" minWidth="-Infinity" prefWidth="230.0"
+              spacing="10.0">
+            <CheckBox fx:id="readyCheckBox" maxWidth="-Infinity" minHeight="25.0" minWidth="-Infinity"
+                      mnemonicParsing="false" onAction="#onReadyCheckBoxClicked" prefWidth="100.0"
+                      text="%lobby.game.readycheckbox"/>
+            <Button fx:id="startSession" disable="true" maxWidth="-Infinity" minWidth="-Infinity"
+                    mnemonicParsing="false" onAction="#onStartSessionButtonPressed" prefWidth="120.0"
+                    text="%lobby.game.buttons.startsession"/>
+        </HBox>
+        <Label fx:id="turnIndicator" maxHeight="30.0" maxWidth="-Infinity" minHeight="30.0" minWidth="-Infinity"
+               prefWidth="230.0"/>
+        <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
+                prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.rolldice" visible="false"/>
+        <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
+                prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.endturn" visible="false"/>
+        <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false"
+                onAction="#onTradeWithUserButtonPressed" prefHeight="30.0" prefWidth="230.0"
+                text="%lobby.game.buttons.playertrade" visible="false"/>
+        <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
+                onAction="#onTradeWithBankButtonPressed" prefHeight="30.0" prefWidth="230.0"
+                text="%lobby.game.buttons.banktrade" visible="false"/>
+        <Button fx:id="playCard" disable="true" mnemonicParsing="false" onAction="#onPlayCardButtonPressed"
+                prefHeight="30.0" prefWidth="230.0" text="%game.playcards.button" visible="false"/>
+        <padding>
+            <Insets topRightBottomLeft="10.0"/>
+        </padding>
     </VBox>
-</HBox>
+</GridPane>
