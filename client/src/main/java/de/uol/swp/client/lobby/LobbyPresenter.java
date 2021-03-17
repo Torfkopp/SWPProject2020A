@@ -47,8 +47,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.BetterMapPoint.Type.HEX;
-import static de.uol.swp.common.game.map.BetterMapPoint.Type.INTERSECTION;
+import static de.uol.swp.common.game.map.BetterMapPoint.Type.*;
 
 /**
  * Manages the lobby's menu
@@ -229,20 +228,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
-    @FXML
-    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
-        BetterMapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if (mapPoint.getType() == HEX) {
-            System.out.println("HEX");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == INTERSECTION) {
-            System.out.println("INTERSECTION");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        }
-    }
-
     /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
@@ -324,14 +309,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- Update of lobby member list");
         LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
-        for (User i : rsp.getUsers()) {
-            System.out.println(i.getUsername());
-        }
         this.owner = rsp.getOwner();
-        this.readyUsers = rsp.getReadyUsers();
-        updateUsersList(rsp.getUsers());
-        setStartSessionButtonState();
-        setKickUserButtonState();
+        if (this.readyUsers == null) this.readyUsers = new HashSet<>();
+        this.readyUsers.addAll(rsp.getReadyUsers());
+        Platform.runLater(() -> {
+            updateUsersList(rsp.getUsers());
+            setStartSessionButtonState();
+            setKickUserButtonState();
+        });
     }
 
     /**
@@ -481,6 +466,30 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
+    }
+
+    @FXML
+    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
+        BetterMapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        if (mapPoint.getType() == INVALID) {
+            System.out.println("INVALID");
+        } else if (mapPoint.getType() == HEX) {
+            System.out.println("HEX");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == INTERSECTION) {
+            System.out.println("INTERSECTION");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == EDGE) {
+            System.out.println("EDGE");
+            System.out.println("left:");
+            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
+            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
+            System.out.println("right:");
+            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
+            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
+        }
     }
 
     /**
@@ -1254,13 +1263,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-05
      */
     private void updateUsersList(List<User> userLobbyList) {
-        Platform.runLater(() -> {
-            if (lobbyMembers == null) {
-                lobbyMembers = FXCollections.observableArrayList();
-                membersView.setItems(lobbyMembers);
-            }
-            lobbyMembers.clear();
-            userLobbyList.forEach(u -> lobbyMembers.add(new Pair<>(u.getID(), u)));
-        });
+        if (lobbyMembers == null) {
+            lobbyMembers = FXCollections.observableArrayList();
+            membersView.setItems(lobbyMembers);
+        }
+        lobbyMembers.clear();
+        userLobbyList.forEach(u -> lobbyMembers.add(new Pair<>(u.getID(), u)));
     }
 }

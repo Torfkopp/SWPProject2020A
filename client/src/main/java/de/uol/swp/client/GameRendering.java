@@ -92,77 +92,7 @@ public class GameRendering {
     public BetterMapPoint coordinatesToHex(double x, double y) {
         int row = (int) Math.floor((y - OFFSET_Y) / (hexHeight / 8));
         int col = (int) Math.floor((x - OFFSET_X) / (hexWidth / 8));
-        int col8 = col % 8;
-        int hexY = row / 6;
-        int hexX = 0;
-
-        //TODO: Check for click into Offset region
-        //TODO: Filter out right nothing
-        //TODO: Intersections (bottom half), Hexes should be working
-        if (row == 0 || row == 1) { // first row
-            return InvalidMapPoint();
-        } else if (row == 52 || row == 51) { // last row // check if rows are correct
-            return InvalidMapPoint();
-        } else if ((row % 12) < 6) {// indented hex rows (0, 2, 4, 6)
-            System.out.println("indented");
-            switch (row % 6) {
-                case 0:
-                    switch (col8) {
-                        case 0:
-                        case 7:
-                            // "peak" intersection of indented row hex
-                            return IntersectionMapPoint(hexY - 1, ((((col + 1) / 8) * 2) - 1));
-                        case 1:
-                        case 2:
-                            //edge (righthand downslope road from ^ )
-                            return  InvalidMapPoint();
-                        case 3:
-                        case 4:
-                            //hex in the row above ("trough" intersection between indented row he
-                            return InvalidMapPoint();
-                        case 5:
-                        case 6:
-                            //edge
-                            return InvalidMapPoint();
-                    }
-                case 1:
-                    switch (col8) {
-                        case 3:
-                        case 4:
-                            return IntersectionMapPoint(hexY - 1, (((col - 5) / 8) * 2));
-                    }
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    if (col8 == 3 || col8 == 4) { // Edge
-
-                    } else { // Hex
-                        hexX = (col - 4) / 8;
-                        hexX = hexX - ((7 - getHexesInRow(hexY)) / 2);
-                        return HexMapPoint(hexY, hexX);
-                    }
-            }
-        } else {// unindented hex rows (1, 3, 5, 7)
-            System.out.println("Not indented");
-            switch (row % 6) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    if (col8 == 7 || col8 == 0) { // Edge
-
-                    } else { // Hex
-                        hexX = col / 8;
-                        hexX = hexX - ((7 - getHexesInRow(hexY)) / 2);
-                        return HexMapPoint(hexY, hexX);
-                    }
-            }
-        }
-        System.out.println("Not Caught");
-        return InvalidMapPoint();
+        return rowColCoordinatesToMapPoint(row, col);
     }
 
     /**
@@ -211,23 +141,6 @@ public class GameRendering {
 
         for (double cx = OFFSET_X; cx < width; cx += hexWidth / 8)
             gfxCtx.strokeLine(cx, 0, cx, height);
-    }
-
-    private int getHexesInRow(int y) {
-        switch (y) {
-            case 0:
-            case 6:
-                return 4;
-            case 1:
-            case 5:
-                return 5;
-            case 2:
-            case 4:
-                return 6;
-            case 3:
-            default:
-                return 7;
-        }
     }
 
     /**
@@ -443,6 +356,47 @@ public class GameRendering {
                         yPos + tokenSize * (3.0 / 4.0), tokenSize / 2.0);
     }
 
+    private int getHexesInRow(int y) {
+        switch (y) {
+            case 0:
+            case 6:
+                return 4;
+            case 1:
+            case 5:
+                return 5;
+            case 2:
+            case 4:
+                return 6;
+            case 3:
+            default:
+                return 7;
+        }
+    }
+
+    private int getIntersectionsInRow(int hexY) {
+        /*
+        0 7
+        1 9
+        2 11
+        3 11
+        4 9
+        5 7
+         */
+        switch (hexY) {
+            case 0:
+            case 5:
+                return 7;
+            case 1:
+            case 4:
+                return 9;
+            case 2:
+            case 3:
+                return 11;
+            default:
+                return 999999999; // ERROR
+        }
+    }
+
     /**
      * getPlayerColour method
      * <p>
@@ -520,6 +474,14 @@ public class GameRendering {
             renderIntersection(currentX, currentY, intersections[x]);
             currentX += hexWidth;
         }
+    }
+
+    private BetterMapPoint horizontalEdgeToMapPoint(int row, int col) {
+        BetterMapPoint left = rowColCoordinatesToMapPoint(row, col - 3);
+        BetterMapPoint right = rowColCoordinatesToMapPoint(row, col + 3);
+        //BetterMapPoint left = rowColCoordinatesToMapPoint(row + 2, col);
+        //BetterMapPoint right = rowColCoordinatesToMapPoint(row - 2, col);
+        return EdgeMapPoint(left, right);
     }
 
     /**
@@ -661,6 +623,164 @@ public class GameRendering {
         }
     }
 
+    private BetterMapPoint rowColCoordinatesToMapPoint(int row, int col) {
+        int col8 = col % 8;
+        int hexY = row / 6;
+        int hexX = 0;
+        int rawCol = col;
+        System.out.println("row = " + row);
+        System.out.println("col = " + col);
+
+        //TODO: Check for click into Offset region
+        //TODO: Filter out right nothing
+        //TODO: Intersections (bottom half), Hexes should be working
+
+        col = col - (((7 - getHexesInRow(hexY)) / 2) * 8); // left align all rows
+        if (row == 0 || row == 1) { // first row
+            return InvalidMapPoint();
+        } else if (row == 52 || row == 51) { // last row // check if rows are correct
+            return InvalidMapPoint();
+        } else if ((row % 12) < 6) {// indented hex rows (0, 2, 4, 6)
+            System.out.println("\nindented");
+            switch (row % 6) {
+                case 0:
+                    // 0th partial row of an indented hex row
+                    // (contains peaks of the current hex row and part of basement of the unindented row above this oene)
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            // "peak" intersection of indented row hex
+                            return IntersectionMapPoint(hexY - 1, (((col - 5) / 8) * 2));
+                        case 1:
+                        case 2:
+                        case 5:
+                        case 6:
+                            //edge (righthand downslope road from ^ )
+                            return verticalEdgeToMapPoint(row, rawCol); //EdgeMapPoint();
+                        case 3:
+                        case 4:
+                            //hex in the unindented row above (above "trough" intersection between indented row hexes)
+                            hexY = hexY - 1;
+                            hexX = (col - 5) / 8;
+                            return HexMapPoint(hexY, hexX);
+                    }
+                case 1:
+                    // 1st partial row of a hex row
+                    // (contains troughs of previous hex row and part of ceiling of current hex row)
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            // part of ceiling of current hex row
+                            hexX = (col - 5) / 8;
+                            return HexMapPoint(hexY, hexX);
+                        case 1:
+                        case 2:
+                        case 5:
+                        case 6:
+                            //edge
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        case 3:
+                        case 4:
+                            // trough intersection between indented row hexes
+                            return IntersectionMapPoint(hexY - 1, (((col - 5) / 8) * 2));
+                    }
+                case 2:
+                    // 2nd partial row of a hex row
+                    // (contains top left and top right intersections of a hex and hex itself)
+                    if (col8 == 3 || col8 == 4) {
+                        // one of the intersections bordering the hex
+                        return IntersectionMapPoint(hexY - 1, (((col - 5) / 8) * 2));
+                    } else {
+                        hexX = (col - 5) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+                case 3:
+                case 4:
+                    // 3rd and 4th partials rows of a hex row
+                    // (contains bordering edges of a hex and hex itself)
+                    if (col8 == 3 || col8 == 4) {
+                        // bordering edge
+                        return horizontalEdgeToMapPoint(row, rawCol);
+                    } else {
+                        hexX = (col - 5) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+                case 5:
+                    // 5th partial row of a hex row
+                    // (contains bottom left and bottom right intersections of a hex and hex itself)
+                    if (col8 == 3 || col8 == 4) {
+                        // on of the intersections bordering the hex
+                        return IntersectionMapPoint(hexY + 1, (((col - 5) / 8) * 2));
+                    } else {
+                        // Hex
+                        hexX = (col - 5) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+            }
+        } else {
+            // unindented hex rows (1, 3, 5, 7)
+            System.out.println("\nNot indented");
+            switch (row % 6) {
+                case 0:
+                    switch (col8) {
+                        case 0: // part of hex left above
+                        case 7: // part of hex right above
+                            hexY = hexY - 1;
+                            hexX = (col - 1) / 8;
+                            return HexMapPoint(hexY, hexX);
+                        case 1: // upward edge to peak intersection of hex
+                        case 2: // upward edge to peak intersection of hex
+                        case 5: // downward edge from peak intersection of hex
+                        case 6: // downward edge from peak intersection of hex
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        // return EdgeMapPoint();
+                        case 3: // peak intersection
+                        case 4: // peak intersection
+                            return IntersectionMapPoint(hexY - 1, (((col - 1) / 8) * 2) - 1);
+                    }
+                case 1:
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            // top right or top left intersection of hex
+                            return IntersectionMapPoint(hexY - 1, ((col - 1) / 8) * 2);
+                        case 1:
+                        case 2:
+                        case 5:
+                        case 6:
+                            // upward edge towards peak
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        case 3:
+                        case 4:
+                            // part of ceiling of current hex
+                            hexX = (col - 1) / 8;
+                            return HexMapPoint(hexY, hexX);
+                    }
+                case 3:
+                case 4:
+                    if (col8 == 7 || col8 == 0) {  // Edge
+                        return horizontalEdgeToMapPoint(row, rawCol);
+                    } else {
+                        hexX = (col - 1) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+                case 2:
+                    hexY--;
+                case 5:
+                    if (col8 == 7 || col8 == 0) {
+                        // peak intersection
+                        return IntersectionMapPoint(hexY, ((col - 1) / 8) * 2);
+                    } else {
+                        hexX = (col - 1) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+            }
+        }
+        //TODO intersections are wrong a lot of the time
+        System.out.println("Not Caught");
+        return InvalidMapPoint();
+    }
+
     /**
      * setHexColour Method
      * <p>
@@ -704,5 +824,11 @@ public class GameRendering {
                 return false;
         }
         return true;
+    }
+
+    private BetterMapPoint verticalEdgeToMapPoint(int row, int col) {
+        BetterMapPoint left = rowColCoordinatesToMapPoint(row - 2, col);
+        BetterMapPoint right = rowColCoordinatesToMapPoint(row + 2, col);
+        return EdgeMapPoint(left, right);
     }
 }
