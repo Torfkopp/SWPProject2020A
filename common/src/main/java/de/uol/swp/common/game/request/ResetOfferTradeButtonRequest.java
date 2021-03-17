@@ -28,7 +28,7 @@ public class ResetOfferTradeButtonRequest extends AbstractGameRequest {
      *
      * @return Name of the offering user
      */
-    public UserOrDummy getOfferingUserName() {
+    public UserOrDummy getOfferingUser() {
         return offeringUserName;
     }
 }

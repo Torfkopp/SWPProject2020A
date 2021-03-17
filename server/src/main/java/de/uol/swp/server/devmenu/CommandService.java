@@ -185,12 +185,16 @@ public class CommandService extends AbstractService {
      */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
-        try {
-            if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
-            Message msg = parseArguments(args, EditInventoryRequest.class.getConstructors()[0],
-                                         Optional.of(originalMessage.getAuthor()));
-            post(msg);
-        } catch (Exception ignored) {}
+        //try {
+        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
+        //Message msg = parseArguments(args, EditInventoryRequest.class.getConstructors()[0],
+        //                           Optional.of(originalMessage.getAuthor()));
+        Optional<User> user = userManagement.getUser(args.get(1));
+        if (user.isEmpty()) return;
+
+        Message msg = new EditInventoryRequest(args.get(0), user.get(), args.get(2), Integer.parseInt(args.get(3)));
+        post(msg);
+        //} catch (Exception ignored) {}
     }
 
     /**

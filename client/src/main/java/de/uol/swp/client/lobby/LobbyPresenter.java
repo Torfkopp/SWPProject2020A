@@ -287,9 +287,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- Update of lobby member list");
         LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
-        for (UserOrDummy i : rsp.getUsers()){
-            System.out.println(i.getUsername());
-        }
         this.owner = rsp.getOwner();
         this.readyUsers = rsp.getReadyUsers();
         updateUsersList(rsp.getUsers());
@@ -918,8 +915,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
-                                                            this.loggedInUser.getUsername(), this.lobbyName, rsp));
+        eventBus.post(
+                new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), this.loggedInUser, this.lobbyName, rsp));
     }
 
     /**

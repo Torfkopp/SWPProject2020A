@@ -75,7 +75,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public Set<User> getUsers() {
+    public Set<User> getRealUsers() {
         Set<User> userSet = new TreeSet<>();
         for (UserOrDummy userOrDummy : users) {
             if (userOrDummy instanceof User) {

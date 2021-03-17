@@ -118,8 +118,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         Platform.runLater(() -> {
             LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
             acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(String.format(resourceBundle.getString("game.trade.status.invalid"),
-                                                        rsp.getOfferingUserName().getUsername()));
+            tradeNotPossibleLabel.setText(
+                    String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
         });
     }
 

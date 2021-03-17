@@ -66,13 +66,13 @@ public interface Lobby extends Serializable {
     Set<UserOrDummy> getReadyUsers();
 
     /**
-     * Gets all users in the lobby
+     * Gets all real users in the lobby
      *
      * @return A Set containing all user in this lobby
      *
      * @since 2019-10-08
      */
-    Set<User> getUsers();
+    Set<User> getRealUsers();
 
     /**
      * Gets all users and dummies in the lobby

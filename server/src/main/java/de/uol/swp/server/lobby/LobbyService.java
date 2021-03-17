@@ -69,7 +69,7 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
 
         if (lobby.isPresent()) {
-            msg.setReceiver(authenticationService.getSessions(lobby.get().getUsers()));
+            msg.setReceiver(authenticationService.getSessions(lobby.get().getRealUsers()));
             post(msg);
         }
         // TODO: error handling for a not existing lobby

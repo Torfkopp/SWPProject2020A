@@ -5,6 +5,7 @@ import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.TwoKeyMap;
 
 import java.util.List;
 
@@ -17,11 +18,10 @@ import java.util.List;
 public class Game {
 
     private final Lobby lobby;
-    private final Inventory[] inventories;
     private final IGameMap map;
-    private final UserOrDummy[] players;
+    private final TwoKeyMap<UserOrDummy, Player, Inventory> players = new TwoKeyMap<>();
     private final List<String> bankInventory;
-    private int activePlayer;
+    private UserOrDummy activePlayer;
 
     /**
      * Constructor
@@ -31,22 +31,34 @@ public class Game {
      */
     public Game(Lobby lobby, UserOrDummy first) {
         this.lobby = lobby;
-        players = lobby.getUserOrDummies().toArray(new UserOrDummy[0]);
-        for (int i = 0; i < players.length; i++) {
-            if (players[i].equals(first)) {
-                activePlayer = i;
-                break;
+        {
+            Player counterPlayer = Player.PLAYER_1;
+            for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
+                players.put(userOrDummy, counterPlayer, new Inventory());
+                counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
             }
         }
+        activePlayer = first;
         map = new GameMap();
         map.createBeginnerMap();
-        inventories = new Inventory[players.length];
-        int i = 0;
-        for (UserOrDummy u : players) {
-            inventories[i++] = new Inventory(u);
-        }
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
+    }
+
+    /**
+     * Rolls two dices
+     *
+     * @return Array of two integers
+     */
+    public static int[] rollDice() {
+        int dice1 = (int) (Math.random() * 6 + 1);
+        int dice2 = (int) (Math.random() * 6 + 1);
+
+        return (new int[]{dice1, dice2});
+    }
+
+    public UserOrDummy getUserFromPlayer(Player player) {
+        return players.getKey1(player);
     }
 
     /**
@@ -58,37 +70,15 @@ public class Game {
      */
     public int calculateVictoryPoints(Player player) {
         int points = 0;
-        int num = 0;
-        switch (player) {
-            case PLAYER_2:
-                num = 1;
-            case PLAYER_3:
-                num = 2;
-            case PLAYER_4:
-                num = 3;
-        }
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += inventories[num].getVictoryPointCards();
+        points += players.getWithKey2(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (inventories[num].isLongestRoad()) points += 2;
+        if (players.getWithKey2(player).isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (inventories[num].isLargestArmy()) points += 2;
+        if (players.getWithKey2(player).isLargestArmy()) points += 2;
         return points;
-    }
-
-    /**
-     * Gets the active player.
-     *
-     * @return The currently active player
-     *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @since 2021-03-01
-     */
-    public UserOrDummy getActivePlayer() {
-        return players[activePlayer];
     }
 
     /**
@@ -103,12 +93,16 @@ public class Game {
     }
 
     /**
-     * Gets an array of all inventories in this game
+     * Gets the active player.
      *
-     * @return The array of inventories in this game
+     * @return The currently active player
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
      */
-    public Inventory[] getInventories() {
-        return inventories;
+    public UserOrDummy getActivePlayer() {
+        return activePlayer;
     }
 
     /**
@@ -119,7 +113,7 @@ public class Game {
      * @return The player's inventory
      */
     public Inventory getInventory(Player player) {
-        return inventories[player.ordinal()];
+        return players.getWithKey2(player);
     }
 
     /**
@@ -130,7 +124,7 @@ public class Game {
      * @return The player's inventory
      */
     public Inventory getInventory(UserOrDummy user) {
-        return getInventory(getPlayer(user));
+        return getInventory(players.getKey2(user));
     }
 
     /**
@@ -151,6 +145,10 @@ public class Game {
         return map;
     }
 
+    public Inventory[] getAllInventories() {
+        return players.getValues().toArray(new Inventory[0]);
+    }
+
     /**
      * Gets a user's player
      *
@@ -159,20 +157,7 @@ public class Game {
      * @return A player
      */
     public Player getPlayer(UserOrDummy user) {
-        int i = 0;
-        for (UserOrDummy u : players) {
-            if (u.equals(user)) break;
-            i++;
-        }
-        switch (i) {
-            case 1:
-                return Player.PLAYER_2;
-            case 2:
-                return Player.PLAYER_3;
-            case 3:
-                return Player.PLAYER_4;
-        }
-        return Player.PLAYER_1;
+        return players.getKey1Key2Map().get(user);
     }
 
     /**
@@ -181,7 +166,7 @@ public class Game {
      * @return The array of Users participating in this game
      */
     public UserOrDummy[] getPlayers() {
-        return players;
+        return players.getKey1Array();
     }
 
     /**
@@ -189,20 +174,17 @@ public class Game {
      *
      * @return User object of the next player
      */
-    public UserOrDummy nextPlayer() {
-        activePlayer = (activePlayer + 1) % players.length;
-        return players[activePlayer];
+    public UserOrDummy getNextPlayer() {
+        return players.getKey1(players.getKey2(activePlayer).nextPlayer(players.size()));
     }
 
     /**
-     * Rolls two dices
+     * Gets the next player and sets it as the new active player
      *
-     * @return Array of two integers
+     * @return User object of the next player
      */
-    public int[] rollDice() {
-        int dice1 = (int) (Math.random() * 6 + 1);
-        int dice2 = (int) (Math.random() * 6 + 1);
-
-        return (new int[]{dice1, dice2});
+    public UserOrDummy nextPlayer() {
+        activePlayer = getNextPlayer();
+        return activePlayer;
     }
 }

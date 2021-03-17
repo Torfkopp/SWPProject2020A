@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
 
-    private final UserOrDummy offeringUserName;
+    private final UserOrDummy offeringUser;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
      */
     public InvalidTradeOfUsersResponse(String lobbyName, UserOrDummy offeringUserName) {
         super(lobbyName);
-        this.offeringUserName = offeringUserName;
+        this.offeringUser = offeringUserName;
     }
 
     /**
@@ -32,7 +32,7 @@ public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
      *
      * @return The name of the offering user
      */
-    public UserOrDummy getOfferingUserName() {
-        return offeringUserName;
+    public UserOrDummy getOfferingUser() {
+        return offeringUser;
     }
 }

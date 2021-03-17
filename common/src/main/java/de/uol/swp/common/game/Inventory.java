@@ -1,7 +1,5 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.user.UserOrDummy;
-
 /**
  * The player's inventory
  *
@@ -10,8 +8,6 @@ import de.uol.swp.common.user.UserOrDummy;
  * @since 2021-01-16
  */
 public class Inventory {
-
-    private final UserOrDummy player;
 
     private int totalResources = 0;
 
@@ -34,11 +30,8 @@ public class Inventory {
 
     /**
      * Constructor
-     *
-     * @param player The player who this inventory belongs to
      */
-    public Inventory(UserOrDummy player) {
-        this.player = player;
+    public Inventory() {
     }
 
     /**
@@ -165,15 +158,6 @@ public class Inventory {
      */
     public void setOre(int ore) {
         this.ore = ore;
-    }
-
-    /**
-     * Gets the player who this inventory belongs to
-     *
-     * @return The player who this inventory belongs to
-     */
-    public UserOrDummy getPlayer() {
-        return player;
     }
 
     /**

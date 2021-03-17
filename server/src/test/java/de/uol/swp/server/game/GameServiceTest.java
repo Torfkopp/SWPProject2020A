@@ -96,7 +96,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
+        Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
         gameInventory[0].setBrick(5);
         gameInventory[0].setGrain(5);
@@ -124,7 +124,7 @@ public class GameServiceTest {
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
+        Inventory[] gameInventory1 = game1.getAllInventories();
         List<String> bankInv = game1.getBankInventory();
         assertEquals(bankInventory, bankInv);
         assertEquals(0, bankInv.size());
@@ -155,7 +155,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
+        Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
         gameInventory[0].setBrick(5);
         gameInventory[0].setGrain(5);
@@ -192,7 +192,7 @@ public class GameServiceTest {
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
+        Inventory[] gameInventory1 = game1.getAllInventories();
         assertEquals(4, gameInventory1[0].getOre());
         assertEquals(4, gameInventory1[0].getWool());
         assertEquals(5, gameInventory1[0].getBrick());
@@ -243,7 +243,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
+        Inventory[] gameInventory = game.getAllInventories();
         List<String> bankInventory = game.getBankInventory();
         gameInventory[0].setWool(0);
         gameInventory[0].setBrick(0);
@@ -266,7 +266,7 @@ public class GameServiceTest {
         bus.post(buyDevelopmentCardRequest);
 
         Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
+        Inventory[] gameInventory1 = game1.getAllInventories();
         List<String> bankInv = game1.getBankInventory();
 
         assertEquals(bankInventory, bankInv);
@@ -312,7 +312,7 @@ public class GameServiceTest {
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUsers().size());
+        assertEquals(3, lobby2.get().getUserOrDummies().size());
     }
 
     /**
@@ -343,7 +343,7 @@ public class GameServiceTest {
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby2.isPresent());
-        assertEquals(2, lobby2.get().getUsers().size());
+        assertEquals(2, lobby2.get().getUserOrDummies().size());
     }
 
     /**
@@ -372,7 +372,7 @@ public class GameServiceTest {
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUsers().size());
+        assertEquals(3, lobby2.get().getUserOrDummies().size());
     }
 
     /**
@@ -401,7 +401,7 @@ public class GameServiceTest {
 
         Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUsers().size());
+        assertEquals(3, lobby2.get().getUserOrDummies().size());
     }
 
     /**
@@ -424,7 +424,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
+        Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
         gameInventory[0].setBrick(5);
         gameInventory[0].setGrain(5);
@@ -442,7 +442,7 @@ public class GameServiceTest {
                                                                                                         "brick");
         bus.post(updateInventoryAfterTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
+        Inventory[] gameInventory1 = game1.getAllInventories();
         assertEquals(5, gameInventory1[0].getLumber());
         assertEquals(6, gameInventory1[0].getWool());
         assertEquals(1, gameInventory1[0].getBrick());
@@ -452,7 +452,7 @@ public class GameServiceTest {
         bus.post(updateInventoryAfterTradeWithBankRequest);
         Game game2 = gameManagement.getGame("testlobby");
         //inventory doesnt change because user had not enough resources
-        Inventory[] gameInventory2 = game2.getInventories();
+        Inventory[] gameInventory2 = game2.getAllInventories();
         assertEquals(gameInventory1[0], gameInventory2[0]);
         assertEquals(5, gameInventory2[0].getLumber());
         assertEquals(6, gameInventory2[0].getWool());
@@ -484,7 +484,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
+        Inventory[] gameInventory = game.getAllInventories();
         for (int i = 0; i < 2; i++) {
             gameInventory[i].setWool(5);
             gameInventory[i].setBrick(5);
@@ -511,12 +511,12 @@ public class GameServiceTest {
         respondingResourceMap.put("grain", 0);
         respondingResourceMap.put("lumber", 4);
 
-        Message tradeWithUser = new AcceptUserTradeRequest(gameInventory[1].getPlayer(), gameInventory[0].getPlayer(),
-                                                           "testlobby", respondingResourceMap, offeringResourceMap);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", respondingResourceMap,
+                                                           offeringResourceMap);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
+        Inventory[] gameInventory1 = game1.getAllInventories();
         assertEquals(2, gameInventory1[0].getOre());
         assertEquals(6, gameInventory1[0].getWool());
         assertEquals(3, gameInventory1[0].getBrick());
@@ -554,7 +554,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory = game.getInventories();
+        Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
         gameInventory[0].setBrick(5);
         gameInventory[0].setGrain(5);
@@ -592,12 +592,12 @@ public class GameServiceTest {
         respondingResourceMap.put("ore", 0);
         respondingResourceMap.put("grain", 0);
 
-        Message tradeWithUser = new AcceptUserTradeRequest(gameInventory[2].getPlayer(), gameInventory[0].getPlayer(),
-                                                           "testlobby", respondingResourceMap, offeringResourceMap);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[2], user[0], "testlobby", respondingResourceMap,
+                                                           offeringResourceMap);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory1 = game1.getInventories();
+        Inventory[] gameInventory1 = game1.getAllInventories();
         assertEquals(5, gameInventory1[0].getWool());
         assertEquals(5, gameInventory1[0].getBrick());
         assertEquals(5, gameInventory1[0].getOre());
@@ -610,12 +610,12 @@ public class GameServiceTest {
         assertEquals(0, gameInventory1[2].getGrain());
         assertEquals(0, gameInventory1[2].getLumber());
 
-        Message tradeWithUser2 = new AcceptUserTradeRequest(gameInventory[0].getPlayer(), gameInventory[2].getPlayer(),
-                                                            "testlobby", respondingResourceMap, offeringResourceMap);
+        Message tradeWithUser2 = new AcceptUserTradeRequest(user[0], user[2], "testlobby", respondingResourceMap,
+                                                            offeringResourceMap);
         bus.post(tradeWithUser2);
 
         Game game2 = gameManagement.getGame("testlobby");
-        Inventory[] gameInventory2 = game2.getInventories();
+        Inventory[] gameInventory2 = game2.getAllInventories();
         assertEquals(5, gameInventory2[0].getWool());
         assertEquals(5, gameInventory2[0].getBrick());
         assertEquals(5, gameInventory2[0].getOre());
@@ -656,7 +656,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame(lobby.getName());
-        Inventory[] inventories = game.getInventories();
+        Inventory[] inventories = game.getAllInventories();
         inventories[1].increaseBrick(1);
         inventories[2].increaseBrick(2);
         inventories[0].increaseMonopolyCards(1);

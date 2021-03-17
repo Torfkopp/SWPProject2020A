@@ -90,12 +90,12 @@ class LobbyServiceTest {
         // check if joinable lobby was created
         assertTrue(createdLobby.isPresent());
         // check if only 4 or less users are joined
-        assertTrue(createdLobby.get().getUsers().size() <= 4);
+        assertTrue(createdLobby.get().getUserOrDummies().size() <= 4);
         // check if every user joined except user5
-        assertTrue(createdLobby.get().getUsers().contains(user1));
-        assertTrue(createdLobby.get().getUsers().contains(user2));
-        assertTrue(createdLobby.get().getUsers().contains(user3));
-        assertTrue(createdLobby.get().getUsers().contains(user4));
-        assertFalse(createdLobby.get().getUsers().contains(user5));
+        assertTrue(createdLobby.get().getUserOrDummies().contains(user1));
+        assertTrue(createdLobby.get().getUserOrDummies().contains(user2));
+        assertTrue(createdLobby.get().getUserOrDummies().contains(user3));
+        assertTrue(createdLobby.get().getUserOrDummies().contains(user4));
+        assertFalse(createdLobby.get().getUserOrDummies().contains(user5));
     }
 }

@@ -47,6 +47,11 @@ public class UserDTO implements User {
         return new UserDTO(user.getID(), user.getUsername(), user.getPassword(), user.getEMail());
     }
 
+    @Override
+    public String toString() {
+        return getUsername();
+    }
+
     /**
      * Copy constructor leaving the password variable empty
      * <p>

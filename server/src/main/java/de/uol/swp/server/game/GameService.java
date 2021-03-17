@@ -130,21 +130,8 @@ public class GameService extends AbstractService {
     private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        Inventory[] inventories = game.getInventories();
-        Inventory offeringInventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().getUsername().equals(req.getOfferingUser())) {
-                offeringInventory = value;
-                break;
-            }
-        }
-        Inventory respondingInventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().getUsername().equals(req.getRespondingUser())) {
-                respondingInventory = value;
-                break;
-            }
-        }
+        Inventory offeringInventory = game.getInventory(req.getOfferingUser());
+        Inventory respondingInventory = game.getInventory(req.getRespondingUser());
         if (offeringInventory == null || respondingInventory == null) return;
         Map<String, Integer> offeringInventoryMap = getResourceMapFromInventory(offeringInventory);
         Map<String, Integer> responseInventoryMap = getResourceMapFromInventory(respondingInventory);
@@ -203,12 +190,12 @@ public class GameService extends AbstractService {
             }
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
             LOG.debug("Preparing a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
-            post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
+            post(new GetUserSessionEvent(req.getOfferingUser(), returnMessage));
             returnMessage.initWithMessage(req);
             post(returnMessage);
         } else {
             ResponseMessage returnMessage = new InvalidTradeOfUsersResponse(req.getOriginLobby(),
-                                                                            offeringInventory.getPlayer());
+                                                                            req.getRespondingUser());
             LOG.debug("Sending an InvalidTradeOfUsersResponse for Lobby " + req.getOriginLobby());
             returnMessage.initWithMessage(req);
             post(returnMessage);
@@ -386,19 +373,21 @@ public class GameService extends AbstractService {
             LOG.debug("Received EndTurnRequest for Lobby " + req.getOriginLobby());
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to end his turn.");
         }
-        try {
-            Game game = gameManagement.getGame(req.getOriginLobby());
-            UserOrDummy nextPlayer = game.nextPlayer();
-            if (nextPlayer instanceof User) {
-                ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-            } else { //Dummy
-                onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-                onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
-            }
-        } catch (Exception e) {
-            LOG.error(e);
+        //try {
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        UserOrDummy nextPlayer = game.nextPlayer();
+        System.out.println(nextPlayer);
+
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+        if (nextPlayer instanceof User) {
+        } else { //Dummy
+            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+            onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
         }
+        //} catch (Exception e) {
+        //}
     }
 
     /**
@@ -469,20 +458,21 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
-        if (!(req.getRespondingUser() instanceof User))
+        if (!(req.getRespondingUser() instanceof User)) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+            return;
+        }
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
-                                                                       respondingInventory.getPlayer(), resourceMap,
-                                                                       req.getOfferingResourceMap(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), req.getRespondingUser(),
+                                                                       resourceMap, req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
-        post(new GetUserSessionEvent(respondingInventory.getPlayer(), offerResponse));
+        post(new GetUserSessionEvent(req.getRespondingUser(), offerResponse));
     }
 
     /**
@@ -554,7 +544,7 @@ public class GameService extends AbstractService {
             LOG.debug("---- Not enough Monopoly cards");
             return;
         }
-        Inventory[] inventories = game.getInventories();
+        Inventory[] inventories = game.getAllInventories();
 
         switch (req.getResource()) {
             case ORE:
@@ -738,17 +728,10 @@ public class GameService extends AbstractService {
     private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        Inventory[] inventories = game.getInventories();
-        Inventory offeringInventory = null;
-        for (Inventory value : inventories) {
-            if (value.getPlayer().getUsername().equals(req.getOfferingUserName())) {
-                offeringInventory = value;
-                break;
-            }
-        }
+        Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         if (offeringInventory == null) return;
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
-        post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
+        post(new GetUserSessionEvent(req.getOfferingUser(), returnMessage));
     }
 
     /**
@@ -769,8 +752,7 @@ public class GameService extends AbstractService {
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
         //try {
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        int[] result = game.rollDice();
+        int[] result = Game.rollDice();
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         //} catch (Exception e) {
@@ -834,7 +816,7 @@ public class GameService extends AbstractService {
         if (respondingInventory == null) return;
         ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
         LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessage));
+        post(new GetUserSessionEvent(req.getRespondingUser(), returnMessage));
     }
 
     /**
@@ -858,14 +840,18 @@ public class GameService extends AbstractService {
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
         Game game = gameManagement.getGame(req.getName());
+        System.out.println(req.getUser());
+        System.out.println(req.getRespondingUser());
         Inventory inventory = game.getInventory(req.getUser());
-        Inventory traderInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
+        Inventory traderInventory = game.getInventory(req.getRespondingUser());
+        System.out.println(inventory);
+        System.out.println(traderInventory);
         if (inventory == null || traderInventory == null) return;
         int traderInventorySize = traderInventory.getResourceAmount();
         Map<String, Integer> offeringResourceMap = getResourceMapFromInventory(inventory);
         ResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), Collections
                 .unmodifiableMap(offeringResourceMap), traderInventorySize, req.getRespondingUser());
-        LOG.debug("Sent a InventoryForTradeWithUserResponse for Lobby " + req.getName());
+        LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);
     }

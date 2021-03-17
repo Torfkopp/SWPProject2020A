@@ -27,4 +27,9 @@ public class DummyDTO implements Dummy {
     public String getUsername() {
         return "Dummy" + id;
     }
+
+    @Override
+    public String toString() {
+        return "(D) " + getUsername();
+    }
 }
