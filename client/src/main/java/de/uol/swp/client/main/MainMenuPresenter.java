@@ -2,7 +2,7 @@ package de.uol.swp.client.main;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.ChangePassword.event.ShowConfirmPasswordViewEvent;
+import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
@@ -23,9 +23,7 @@ import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -201,13 +199,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @author Eric Vuong
      * @author Alwin Bossert
-     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @see de.uol.swp.client.SceneManager
      * @since 2021-03-16
      */
     @FXML
-    private void onConfirmPasswordButtonPressed() {
-        eventBus.post(new ShowConfirmPasswordViewEvent(loggedInUser));
+    private void onChangeAccountDetailsButtonPressed() {
+        eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
     }
 
     /**

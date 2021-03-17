@@ -28,8 +28,8 @@ public class UserDTO implements User {
      * @param eMail    The user's e-mail address
      */
     public UserDTO(int id, String username, String password, String eMail) {
-        if (!Objects.nonNull(username)) throw new IllegalArgumentException("Username must not be null");
-        if (!Objects.nonNull(password)) throw new IllegalArgumentException("Password must not be null");
+        //if (!Objects.nonNull(username)) throw new IllegalArgumentException("Username must not be null");
+        //if (!Objects.nonNull(password)) throw new IllegalArgumentException("Password must not be null");
         this.id = id;
         this.username = username;
         this.password = password;

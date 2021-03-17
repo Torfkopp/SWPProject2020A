@@ -100,7 +100,7 @@ public class UserManagement extends AbstractUserManagement {
         String newUsername = firstNotNull(userToUpdate.getUsername(), user.get().getUsername());
         String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
         String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
-        return userStore.updateUser(user.get().getID(), newUsername, newPassword, newEMail);
+        return userStore.updateUser(user.get().getID(), newUsername, newEMail, newPassword);
     }
 
     /**

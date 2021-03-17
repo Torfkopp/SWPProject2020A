@@ -5,9 +5,10 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
-import de.uol.swp.client.ChangePassword.ChangePasswordPresenter;
-import de.uol.swp.client.ChangePassword.PasswordConfirmationPresenter;
-import de.uol.swp.client.ChangePassword.event.*;
+import de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter;
+import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
+import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent;
+import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
@@ -68,10 +69,8 @@ public class SceneManager {
     private static final int REGISTRATION_WIDTH = 410;
     private static final int MAINMENU_HEIGHT = 550;
     private static final int MAINMENU_WIDTH = 820;
-    private static final int CHANGEPW_HEIGHT = 230;
-    private static final int CHANGEPW_WIDTH = 395;
-    private static final int CONFIRMPW_HEIGHT = 230;
-    private static final int CONFIRMPW_WIDTH = 395;
+    private static final int CHANGEACCDETAILS_HEIGHT = 230;
+    private static final int CHANGEACCDETAILS_WIDTH = 395;
     private static final int RESPONSE_TRADING_WIDTH = 390;
     private static final int RESPONSE_TRADING_HEIGHT = 350;
     private static final int BANK_TRADING_HEIGHT = 420;
@@ -91,8 +90,7 @@ public class SceneManager {
     private Scene mainScene;
     private Scene lastScene = null;
     private Scene currentScene = null;
-    private Scene ChangePasswordScene;
-    private Scene ConfirmPasswordScene;
+    private Scene ChangeAccountDetailsScene;
     private boolean devMenuIsOpen;
 
     /**
@@ -137,26 +135,10 @@ public class SceneManager {
      * @author Mario Fokken
      * @since 2020-12-19
      */
-    public void showChangePasswordScreen(User user) {
-        ChangePasswordScene.setUserData(user);
-        showScene(ChangePasswordScene, resourceBundle.getString("changepw.window.title"), CHANGEPW_WIDTH,
-                  CHANGEPW_HEIGHT);
-    }
-
-    /**
-     * Shows the confirm password screen
-     * <p>
-     * Sets the scene's UserData to the current user.
-     * Switches the current Scene to the ConfirmPasswordScene
-     * and sets the window's title to "Confirm Password"
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @since 2021-03-16
-     */
-    public void showConfirmPasswordScreen(User user) {
-        ConfirmPasswordScene.setUserData(user);
-        showScene(ConfirmPasswordScene, "Confirm Password", CONFIRMPW_WIDTH, CONFIRMPW_HEIGHT);
+    public void showChangeAccountDetailsScreen(User user) {
+        ChangeAccountDetailsScene.setUserData(user);
+        showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
+                  CHANGEACCDETAILS_WIDTH, CHANGEACCDETAILS_HEIGHT);
     }
 
     /**
@@ -281,34 +263,14 @@ public class SceneManager {
      * FXML file.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.ChangePasswordPresenter
+     * @see de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter
      * @since 2020-12-19
      */
-    private void initChangePasswordView() {
-        if (ChangePasswordScene == null) {
-            Parent rootPane = initPresenter(ChangePasswordPresenter.fxml);
-            ChangePasswordScene = new Scene(rootPane, 400, 200);
-            ChangePasswordScene.getStylesheets().add(styleSheet);
-        }
-    }
-
-    /**
-     * Initialises the Confirm Password View
-     * <p>
-     * If the ConfirmPasswordScene is null, it gets set to a new scene containing the
-     * pane showing the Confirm Password view as specified by the ConfirmPasswordView
-     * FXML file.
-     *
-     * @author Alwin Bossert
-     * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.PasswordConfirmationPresenter
-     * @since 2021-03-16
-     */
-    private void initConfirmPasswordView() {
-        if (ConfirmPasswordScene == null) {
-            Parent rootPane = initPresenter(PasswordConfirmationPresenter.fxml);
-            ConfirmPasswordScene = new Scene(rootPane, 400, 200);
-            ConfirmPasswordScene.getStylesheets().add(styleSheet);
+    private void initChangeAccountDetailsView() {
+        if (ChangeAccountDetailsScene == null) {
+            Parent rootPane = initPresenter(ChangeAccountDetailsPresenter.fxml);
+            ChangeAccountDetailsScene = new Scene(rootPane, 400, 200);
+            ChangeAccountDetailsScene.getStylesheets().add(styleSheet);
         }
     }
 
@@ -404,8 +366,7 @@ public class SceneManager {
         initLoginView();
         initMainView();
         initRegistrationView();
-        initChangePasswordView();
-        initConfirmPasswordView();
+        initChangeAccountDetailsView();
     }
 
     /**
@@ -428,33 +389,17 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ChangePasswordCanceledEvent detected on the EventBus
+     * Handles the ChangePAccountDetailsCanceledEvent detected on the EventBus
      * <p>
-     * If a ChangePasswordCanceledEvent is detected on the EventBus, this method gets
-     * called. It calls a method to show the screen shown before Change Password screen.
+     * If a ChangeAccountDetailsCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the main screen.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent
      * @since 2020-12-19
      */
     @Subscribe
-    private void onChangePasswordCanceledEvent(ChangePasswordCanceledEvent event) {
-        showScene(lastScene, lastTitle, MAINMENU_WIDTH, MAINMENU_HEIGHT);
-    }
-
-    /**
-     * Handles the ConfirmPasswordCancelEvent detected on the EventBus
-     * <p>
-     * If a ConfirmPasswordCanceledEvent is detected on the EventBus, this method gets
-     * called. It calls a method to show the screen shown before Confirm Password screen.
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordCanceledEvent
-     * @since 2021-03-16
-     */
-    @Subscribe
-    private void onConfirmPasswordErrorEvent(ConfirmPasswordCanceledEvent event) {
+    private void onChangeAccountDetailsCanceledEvent(ChangeAccountDetailsCanceledEvent event) {
         showScene(lastScene, lastTitle, MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
@@ -465,11 +410,11 @@ public class SceneManager {
      * called. It shows the error message of the event in a error alert.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent
      * @since 2020-12-19
      */
     @Subscribe
-    private void onChangePasswordErrorEvent(ChangePasswordErrorEvent event) {
+    private void onChangeAccountDetailsErrorEvent(ChangeAccountDetailsErrorEvent event) {
         showError(event.getMessage());
     }
 
@@ -618,36 +563,19 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ShowChangePasswordViewEvent detected on the EventBus
+     * Handles the ShowChangeAccountDetailsViewEvent detected on the EventBus
      * <p>
-     * If a ShowChangePasswordViewEvent is detected on the EventBus, this method gets
-     * called. It calls a method to switch the current screen to the Change Password
+     * If a ShowChangeAccountDetailsViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the Change Account Details
      * screen.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @since 2020-12-19
      */
     @Subscribe
-    private void onShowChangePasswordViewEvent(ShowChangePasswordViewEvent event) {
-        showChangePasswordScreen(event.getUser());
-    }
-
-    /**
-     * Handles the ShowConfirmPasswordViewEvent detected on the EventBus
-     * <p>
-     * If a ShowConfirmPasswordViewEvent is detected on the EventBus, this method gets
-     * called. It calls a method to switch the current screen to the Confirm Password
-     * screen.
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
-     * @since 2021-03-16
-     */
-    @Subscribe
-    private void onShowConfirmPasswordViewEvent(ShowConfirmPasswordViewEvent event) {
-        showConfirmPasswordScreen(event.getUser());
+    private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
+        showChangeAccountDetailsScreen(event.getUser());
     }
 
     /**

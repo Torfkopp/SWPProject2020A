@@ -110,7 +110,7 @@ public interface UserStore {
      * @author Phillip-André Suhr
      * @since 2021-02-23
      */
-    User updateUser(int id, String username, String password, String eMail);
+    User updateUser(int id, String username, String eMail, String password);
 
     /**
      * Update a user. Updates only given fields.

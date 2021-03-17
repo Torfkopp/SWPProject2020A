@@ -1,4 +1,4 @@
-package de.uol.swp.client.ChangePassword.event;
+package de.uol.swp.client.ChangeAccountDetails.event;
 
 /**
  * Event used to show a ConfirmPasswordError alert

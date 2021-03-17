@@ -13,7 +13,7 @@ import java.util.Objects;
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2020-12-03
  */
-public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
+public class ChangeAccountDetailsExceptionMessage extends AbstractResponseMessage {
 
     private final String message;
 
@@ -24,13 +24,13 @@ public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
      *
      * @since 2020-12-03
      */
-    public ChangePasswordExceptionMessage(String message) {
+    public ChangeAccountDetailsExceptionMessage(String message) {
         this.message = message;
     }
 
     @Override
     public String toString() {
-        return "ChangePasswordExceptionMessage: " + message;
+        return "ChangeAccountDetailsExceptionMessage: " + message;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ChangePasswordExceptionMessage extends AbstractResponseMessage {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChangePasswordExceptionMessage that = (ChangePasswordExceptionMessage) o;
+        ChangeAccountDetailsExceptionMessage that = (ChangeAccountDetailsExceptionMessage) o;
         return Objects.equals(message, that.message);
     }
 }

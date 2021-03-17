@@ -1,4 +1,4 @@
-package de.uol.swp.client.ChangePassword.event;
+package de.uol.swp.client.ChangeAccountDetails.event;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Eric Vuong
  * @author Steven Luong
- * @see de.uol.swp.client.ChangePassword.event.ChangePasswordErrorEvent
+ * @see ChangeAccountDetailsErrorEvent
  * @since 2020-12-03
  */
-public class ChangePasswordErrorEventTest {
+public class ChangeAccountDetailsErrorEventTest {
 
     /**
      * Test for the creation of ChangePasswordErrorEvents
@@ -24,7 +24,7 @@ public class ChangePasswordErrorEventTest {
      */
     @Test
     void createChangePasswordErrorEvent() {
-        ChangePasswordErrorEvent event = new ChangePasswordErrorEvent("Test");
+        ChangeAccountDetailsErrorEvent event = new ChangeAccountDetailsErrorEvent("Test");
 
         assertEquals(event.getMessage(), "Test");
     }

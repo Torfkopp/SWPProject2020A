@@ -9,7 +9,7 @@ import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
+import de.uol.swp.common.user.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
 import de.uol.swp.common.user.response.*;
@@ -162,28 +162,9 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
-        LOG.info("Password change was successful.");
-        sceneManager.showMainScreen(user);
-    }
-
-    /**
-     * Handles a successful password confirming process
-     * <p>
-     * If an ConfirmPasswordSuccessfulResponse object is detected on the EventBus this
-     * method is called. It tells the SceneManager to show the ChangeAccountDetailsScreen window.
-     *
-     * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @see de.uol.swp.client.SceneManager
-     * @since 2021-03-16
-     */
-    @Subscribe
-    private void onConfirmPasswordSuccessfulMessage(ConfirmPasswordSuccessfulResponse message) {
-        LOG.info("Password was confirmed.");
-        sceneManager.showChangePasswordScreen(user);
+    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse message) {
+        LOG.info("Account Details change was successful.");
+        sceneManager.showMainScreen(message.getUser());
     }
 
     /**
@@ -260,9 +241,9 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangePasswordExceptionMessage(ChangePasswordExceptionMessage message) {
+    private void onChangeAccountDetailsExceptionMessage(ChangeAccountDetailsExceptionMessage message) {
         sceneManager.showServerError(resourceBundle.getString("error.server.changepw") + ' ' + message);
-        LOG.error("Change Password error: " + message);
+        LOG.error("Change Account Details error: " + message);
     }
 
     /**

@@ -94,17 +94,5 @@ public interface ClientUserService {
      * @author Steven Luong
      * @since 2020-12-17
      */
-    void updateUserPassword(User user, String oldPassword);
-
-    /**
-     * Confirm the users password
-     *
-     * @param user     The user confirming the password
-     * @param password The password that is to be confirmed
-     *
-     * @author Alwin Bossert
-     * @author Eric Vuong
-     * @since 2021-03-16
-     */
-    void confirmUserPassword(User user, String password);
+    void updateAccountDetails(User user, String oldPassword, String oldUsername, String oldEMail);
 }

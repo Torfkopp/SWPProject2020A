@@ -45,76 +45,39 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles a UpdateUserPasswordRequest found on the EventBus
+     * Handles a UpdateUserAccountDetailsRequest found on the EventBus
      * <p>
-     * If a UpdateUserPasswordRequest is detected on the EventBus, this method is called.
-     * It tries to change the Password of a user via the UserManagement.
-     * If this succeeds, a ChangePasswordSuccessfulResponse is posted onto the EventBus.
-     * Otherwise, a ChangePasswordExceptionMessage gets posted there.
+     * If a UpdateUserAccountDetailsRequest is detected on the EventBus, this method is called.
+     * It tries to update the Details of a user via the UserManagement.
+     * If this succeeds, a ChangeAccountDetailsSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a ChangeAccountDetailsExceptionMessage gets posted there.
      *
-     * @param req The ChangePasswordRequest found on the Eventbus
+     * @param req The ChangeAccountDetailsRequest found on the Eventbus
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangePasswordRequest(UpdateUserPasswordRequest req) {
+    private void onChangeAccountDetailsRequest(UpdateUserAccountDetailsRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Received ChangePasswordRequest for User " + req.getUser().getUsername());
+            LOG.debug("Received ChangeAccountDetailsRequest for User " + req.getOldUsername());
         }
         ResponseMessage returnMessage;
         try {
             Optional<User> optionalUser = userManagement
-                    .getUserWithPassword(req.getUser().getUsername(), req.getOldPassword());
+                    .getUserWithPassword(req.getOldUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
                 userManagement.updateUser(req.getUser());
-                returnMessage = new ChangePasswordSuccessfulResponse();
+                returnMessage = new ChangeAccountDetailsSuccessfulResponse(req.getUser());
+                LOG.debug("Account Details were changed for " + req.getUser().getUsername());
             } else {
-                returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
+                returnMessage = new ChangeAccountDetailsExceptionMessage("Old Password was not correct");
             }
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new ChangePasswordExceptionMessage(
-                    "Cannot change Password of " + req.getUser() + " " + e.getMessage());
-        }
-        returnMessage.initWithMessage(req);
-        post(returnMessage);
-    }
-
-    /**
-     * Handles a ConfirmUserPasswordRequest found on the EventBus
-     * <p>
-     * If a ConfirmUserPasswordRequest is detected on the EventBus, this method is called.
-     * It tries to confirm the Password of a user via the UserManagement.
-     * If this succeeds, a ConfirmPasswordSuccessfulResponse is posted onto the EventBus.
-     * Otherwise, a ConfirmPasswordExceptionMessage gets posted there.
-     *
-     * @param req The ConfirmUserPasswordRequest found on the Eventbus
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @since 2021-03-16
-     */
-    @Subscribe
-    private void onConfirmPasswordRequest(ConfirmUserPasswordRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received ChangePasswordRequest for User " + req.getUser().getUsername());
-        }
-        ResponseMessage returnMessage;
-        try {
-            Optional<User> optionalUser = userManagement
-                    .getUserWithPassword(req.getUser().getUsername(), req.getPassword());
-            if (optionalUser.isPresent()) {
-                userManagement.updateUser(req.getUser());
-                returnMessage = new ConfirmPasswordSuccessfulResponse();
-            } else {
-                returnMessage = new ConfirmPasswordExceptionMessage("Wrong Password");
-            }
-        } catch (Exception e) {
-            LOG.error(e);
-            returnMessage = new ConfirmPasswordExceptionMessage(
-                    "Cannot confirm Password of" + req.getUser() + " " + e.getMessage());
+            returnMessage = new ChangeAccountDetailsExceptionMessage(
+                    "Cannot change Account Details of " + req.getUser() + " " + e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);

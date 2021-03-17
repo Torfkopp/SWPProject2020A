@@ -1,31 +1,31 @@
-package de.uol.swp.client.ChangePassword.event;
+package de.uol.swp.client.ChangeAccountDetails.event;
 
 import de.uol.swp.common.user.User;
 
 /**
- * Event used to show the ChangePassword window
+ * Event used to show the ChangeAccountDetails window
  * <p>
- * In order to show the ChangePassword window using this event, post an instance of it
+ * In order to show the ChangeAccountDetails window using this event, post an instance of it
  * onto the EventBus the SceneManager is subscribed to.
- * It contains the user object of the user changing the password.
+ * It contains the user object of the user changing the account details.
  *
  * @author Eric Vuong
  * @see de.uol.swp.client.SceneManager
  * @since 2020-11-25
  */
-public class ShowChangePasswordViewEvent {
+public class ShowChangeAccountDetailsViewEvent {
 
     private final User user;
 
     /**
      * Constructor
      *
-     * @param user The user changing his password
+     * @param user The user changing his account details
      *
      * @author Mario Fokken
      * since 2020-12-16
      */
-    public ShowChangePasswordViewEvent(User user) {
+    public ShowChangeAccountDetailsViewEvent(User user) {
         this.user = user;
     }
 

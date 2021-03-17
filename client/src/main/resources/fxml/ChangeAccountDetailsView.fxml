@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="197.0" prefWidth="329.0"
+            xmlns="http://javafx.com/javafx/11.0.1"
+            fx:controller="de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter">
+
+    <PasswordField id="NewPasswordField" fx:id="NewPasswordField" layoutX="142.0" layoutY="115.0"
+                   promptText="%changeaccdetails.prompts.newpw"/>
+    <TextField id="NewUsernameField" fx:id="NewUsernameField" layoutX="142.0" layoutY="55.0"
+                   promptText="%changeaccdetails.prompts.newusername"/>
+    <TextField id="NewEMailField" fx:id="NewEMailField" layoutX="142.0" layoutY="85.0"
+                   promptText="%changeaccdetails.prompts.newemail"/>
+    <PasswordField id="ConfirmPasswordField" fx:id="ConfirmPasswordField" layoutX="142.0" layoutY="25.0"
+                   promptText="%changeaccdetails.promts.confirmpw"/>
+
+    <Button id="ChangeAccountDetailsButton" defaultButton="true" layoutX="112.0" layoutY="144.0" mnemonicParsing="false"
+            onAction="#onChangeAccountDetailsButtonPressed" text="%changeaccdetails.button.change"/>
+    <Button id="CancelChangeButton" layoutX="203.0" layoutY="144.0" mnemonicParsing="false"
+            onAction="#onCancelButtonPressed" text="%changeaccdetails.button.cancel"/>
+
+    <Label layoutX="44.0" layoutY="120.0" text="%changeaccdetails.labels.newpw"/>
+    <Label layoutX="44.0" layoutY="60.0" text="%changeaccdetails.labels.newusername"/>
+    <Label layoutX="44.0" layoutY="90.0" text="%changeaccdetails.labels.newemail"/>
+    <Label layoutX="44.0" layoutY="30.0" text="%changepw.labels.oldpw"/>
+</AnchorPane>
