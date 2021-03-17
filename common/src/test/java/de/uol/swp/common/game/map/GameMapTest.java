@@ -1,6 +1,8 @@
 package de.uol.swp.common.game.map;
 
-import de.uol.swp.common.game.map.Hexes.*;
+import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +22,9 @@ public class GameMapTest {
     @Test
     @Disabled("This definitely works, trust me!")
     void getHexTest() {
-        map.setHex(new MapPoint(0, 0),
-                   new HarborHex(new GameHexWrapper(), IHarborHex.HarborSide.EAST, IHarborHex.HarborResource.ANY));
-        map.setHex(new MapPoint(1, 1), new ResourceHex(IResourceHex.ResourceHexType.FOREST, 11));
+        //map.setHex(new MapPoint(0, 0),
+        //           new HarborHex(new GameHexWrapper(), IHarborHex.HarborSide.EAST, IHarborHex.HarborResource.ANY));
+        //map.setHex(new MapPoint(1, 1), new ResourceHex(IResourceHex.ResourceHexType.FOREST, 11));
         // Tests getting a hex
         assertNotNull(map.getHex(new MapPoint(2, 2)));
         assertEquals(IGameHex.HexType.HARBOR, map.getHex(new MapPoint(0, 0)).getType());
