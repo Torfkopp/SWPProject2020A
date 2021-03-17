@@ -412,6 +412,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         setTradeWithUserButtonState(msg.getUser());
         setPlayCardButtonState(msg.getUser());
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
+        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
