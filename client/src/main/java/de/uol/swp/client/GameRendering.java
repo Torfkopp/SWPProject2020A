@@ -89,7 +89,7 @@ public class GameRendering {
         this.diceDotSize = diceSize / 4.0;
     }
 
-    public BetterMapPoint mapClickToHex(double x, double y) {
+    public BetterMapPoint coordinatesToHex(double x, double y) {
         int row = (int) Math.floor((y - OFFSET_Y) / (hexHeight / 8));
         int col = (int) Math.floor((x - OFFSET_X) / (hexWidth / 8));
         int col8 = col % 8;
@@ -110,13 +110,26 @@ public class GameRendering {
                     switch (col8) {
                         case 0:
                         case 7:
+                            // "peak" intersection of indented row hex
                             return IntersectionMapPoint(hexY - 1, ((((col + 1) / 8) * 2) - 1));
+                        case 1:
+                        case 2:
+                            //edge (righthand downslope road from ^ )
+                            return  InvalidMapPoint();
+                        case 3:
+                        case 4:
+                            //hex in the row above ("trough" intersection between indented row he
+                            return InvalidMapPoint();
+                        case 5:
+                        case 6:
+                            //edge
+                            return InvalidMapPoint();
                     }
                 case 1:
                     switch (col8) {
                         case 3:
                         case 4:
-                            return IntersectionMapPoint(hexY - 1, (((col - 4) / 8) - 1) * 2);
+                            return IntersectionMapPoint(hexY - 1, (((col - 5) / 8) * 2));
                     }
                 case 2:
                 case 3:

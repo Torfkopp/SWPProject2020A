@@ -231,7 +231,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
-        BetterMapPoint mapPoint = gameRendering.mapClickToHex(mouseEvent.getX(), mouseEvent.getY());
+        BetterMapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (mapPoint.getType() == HEX) {
             System.out.println("HEX");
             System.out.println("mapPoint.getY() = " + mapPoint.getY());
