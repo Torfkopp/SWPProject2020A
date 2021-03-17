@@ -4,10 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
-import de.uol.swp.common.game.request.RollDiceRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
@@ -135,6 +133,12 @@ public class LobbyService implements ILobbyService {
     public void playRoadBuildingCard(String lobbyName, User user) {
         LOG.debug("Sending PlayRoadBuildingCardRequest");
         Message msg = new PlayRoadBuildingCardRequest(lobbyName, user);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void checkVictoryPoints(String lobbyName, User user){
+        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
         eventBus.post(msg);
     }
 }

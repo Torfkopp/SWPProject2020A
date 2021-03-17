@@ -996,6 +996,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
+        lobbyService.checkVictoryPoints(this.lobbyName, this.loggedInUser);
     }
 
     /**
@@ -1081,6 +1082,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserReadyMessage for Lobby " + this.lobbyName);
         lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
+    }
+
+    @Subscribe
+    private void onCheckVictoryPointsResponse(CheckVictoryPointsResponse rsp){
+        if(!rsp.getLobbyName().equals(this.lobbyName)) return;
+
     }
 
     /**

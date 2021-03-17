@@ -152,4 +152,6 @@ public interface ILobbyService {
      * @param user      The user
      */
     void playRoadBuildingCard(String lobbyName, User user);
+
+    void checkVictoryPoints(String lobbyName, User user);
 }

@@ -1002,4 +1002,14 @@ public class GameService extends AbstractService {
         }
         return true;
     }
+    @Subscribe
+    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req){
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
+        if(vicPoints >= 10){
+            ResponseMessage response = new CheckVictoryPointsResponse(req.getOriginLobby(), req.getUser());
+            gameManagement.dropGame(req.getOriginLobby());
+        }
+    }
+
 }
