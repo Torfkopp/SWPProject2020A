@@ -79,7 +79,7 @@ class LobbyServiceTest {
     @Test
     void createNewLobbyTest() throws InterruptedException {
         ILobbyService lobbyService = new LobbyService(bus);
-        lobbyService.createNewLobby("Test", defaultUser);
+        lobbyService.createNewLobby("Test", defaultUser, 4);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

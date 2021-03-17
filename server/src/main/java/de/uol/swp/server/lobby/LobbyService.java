@@ -118,7 +118,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The CreateLobbyRequest found on the EventBus
      *
-     * @see de.uol.swp.server.lobby.LobbyManagement#createLobby(String, User)
+     * @see de.uol.swp.server.lobby.LobbyManagement#createLobby(String, User, int)
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2019-10-08
      */
@@ -126,7 +126,7 @@ public class LobbyService extends AbstractService {
     private void onCreateLobbyRequest(CreateLobbyRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateLobbyRequest for Lobby " + req.getName());
         try {
-            lobbyManagement.createLobby(req.getName(), req.getOwner());
+            lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayer());
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
             Message responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());

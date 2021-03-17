@@ -29,6 +29,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -252,12 +254,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Method called when the CreateLobbyButton is pressed
      * <p>
      * If the CreateLobbyButton is pressed, this method requests the LobbyService
-     * to create a new lobby. This lobby will get a unique name and registers the user as its creator.
+     * to create a new lobby with the selected maximum amount of players.
+     * This lobby will get a unique name and registers the user as its creator.
      *
      * @author Mario Fokken
      * @author Marvin Drees
+     * @author Maximilian Lindner
      * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2020-12-11
+     * @since 2021-03-17
      */
     @FXML
     private void onCreateLobbyButtonPressed() {
@@ -268,11 +272,23 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         UnaryOperator<TextFormatter.Change> filter = (s) ->
                 !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
 
-        TextInputDialog dialogue = new TextInputDialog(name);
-        dialogue.getEditor().setTextFormatter(new TextFormatter<>(filter));
+        TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
-        dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
+        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
+        TextField lobbyName = new TextField(name);
+        lobbyName.setTextFormatter(new TextFormatter<>(filter));
+        HBox box1 = new HBox(10, lbl, lobbyName);
+        ToggleGroup grp = new ToggleGroup();
+        RadioButton threePlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.threeplayers"));
+        RadioButton fourPlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.fourplayers"));
+        fourPlayerButton.setSelected(true);
+        threePlayerButton.setToggleGroup(grp);
+        fourPlayerButton.setToggleGroup(grp);
+        HBox box2 = new HBox(10, threePlayerButton, fourPlayerButton);
+        VBox box = new VBox(10, box1, box2);
+        dialogue.getDialogPane().setContent(box);
+        //dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
 
         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
@@ -281,7 +297,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
-        result.ifPresent(s -> lobbyService.createNewLobby(s, loggedInUser));
+        int maxPlayers;
+        if (threePlayerButton.isSelected()) maxPlayers = 3;
+        else maxPlayers = 4;
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), loggedInUser, maxPlayers));
     }
 
     /**

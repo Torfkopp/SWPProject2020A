@@ -305,7 +305,7 @@ public class CommandService extends AbstractService {
         LOG.debug("Received /quicklobby command");
         if (originalMessage.getSession().isEmpty()) return;
         User invoker = originalMessage.getSession().get().getUser();
-        lobbyManagement.createLobby(QUICK_LOBBY_NAME, invoker);
+        lobbyManagement.createLobby(QUICK_LOBBY_NAME, invoker, 4);
         Optional<Lobby> lobby = lobbyManagement.getLobby(QUICK_LOBBY_NAME);
         if (lobby.isEmpty()) return;
         ResponseMessage rsp = new CreateLobbyResponse(QUICK_LOBBY_NAME, lobby.get());

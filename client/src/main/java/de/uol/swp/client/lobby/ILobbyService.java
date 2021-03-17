@@ -16,13 +16,14 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param name The name chosen for the new lobby
-     * @param user The user wanting to create the new lobby
+     * @param name      The name chosen for the new lobby
+     * @param user      The user wanting to create the new lobby
+     * @param maxPlayer The maximum amount of players for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(String name, User user);
+    void createNewLobby(String name, User user, int maxPlayer);
 
     /**
      * Posts a request to end the turn onto the Event

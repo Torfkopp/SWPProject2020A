@@ -37,7 +37,7 @@ class LobbyServiceTest {
 
     @Test
     void createLobbyTest() {
-        final Message request = new CreateLobbyRequest("Testlobby", user1);
+        final Message request = new CreateLobbyRequest("Testlobby", user1, 4);
 
         // The post will lead to a call of a LobbyService function
         bus.post(request);
@@ -51,8 +51,8 @@ class LobbyServiceTest {
 
     @Test
     void createSecondLobbyWithSameName() {
-        final Message request1 = new CreateLobbyRequest("Testlobby", user1);
-        final Message request2 = new CreateLobbyRequest("Testlobby", user2);
+        final Message request1 = new CreateLobbyRequest("Testlobby", user1, 4);
+        final Message request2 = new CreateLobbyRequest("Testlobby", user2, 4);
 
         bus.post(request1);
         bus.post(request2);
@@ -70,7 +70,7 @@ class LobbyServiceTest {
     @Test
     void userJoinLobbyRequest() {
         // Create a joinable lobby first
-        final Message request0 = new CreateLobbyRequest("Testlobby", user1);
+        final Message request0 = new CreateLobbyRequest("Testlobby", user1, 4);
         // Create several join requests
         final Message request1 = new LobbyJoinUserRequest("Testlobby", user1);
         final Message request2 = new LobbyJoinUserRequest("Testlobby", user2);

@@ -18,8 +18,9 @@ public interface ILobbyManagement {
     /**
      * Creates a new lobby and adds it to the list
      *
-     * @param name  The name of the lobby to create
-     * @param owner The user who wants to create a lobby
+     * @param name      The name of the lobby to create
+     * @param owner     The user who wants to create a lobby
+     * @param maxPlayer The maximum amount of players for this lobby
      *
      * @throws java.lang.IllegalArgumentException Name already taken
      * @implNote The primary key of the lobbies is the name, therefore the name has
@@ -27,7 +28,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(String name, User owner) throws IllegalArgumentException;
+    void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name
