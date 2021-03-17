@@ -56,6 +56,10 @@ import java.util.*;
 public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
+    public static final int LOBBY_HEIGHT_PRE_GAME = 700;
+    public static final int LOBBY_WIDTH_PRE_GAME = 535;
+    public static final int LOBBY_HEIGHT_IN_GAME = 740;
+    public static final int LOBBY_WIDTH_IN_GAME = 1285;
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
@@ -816,9 +820,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
+            this.window.setWidth(LOBBY_WIDTH_IN_GAME);
+            this.window.setHeight(LOBBY_HEIGHT_IN_GAME);
+            ((Stage) this.window).setMinWidth(LOBBY_WIDTH_IN_GAME);
+            ((Stage) this.window).setMinHeight(LOBBY_HEIGHT_IN_GAME);
+            this.inventoryView.setVisible(true);
             this.readyCheckBox.setVisible(false);
             this.startSession.setVisible(false);
             this.rollDice.setVisible(true);
+            this.endTurn.setVisible(true);
             this.tradeWithUserButton.setVisible(true);
             this.tradeWithUserButton.setDisable(true);
             this.tradeWithBankButton.setVisible(true);
