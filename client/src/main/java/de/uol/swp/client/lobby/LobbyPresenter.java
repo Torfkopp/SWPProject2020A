@@ -929,6 +929,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.window.setHeight(LOBBY_HEIGHT_IN_GAME);
             ((Stage) this.window).setMinWidth(LOBBY_WIDTH_IN_GAME);
             ((Stage) this.window).setMinHeight(LOBBY_HEIGHT_IN_GAME);
+            this.inventoryView.setMaxHeight(280);
+            this.inventoryView.setMinHeight(280);
+            this.inventoryView.setPrefHeight(280);
             this.inventoryView.setVisible(true);
             this.readyCheckBox.setVisible(false);
             this.startSession.setVisible(false);
