@@ -45,7 +45,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
         if (o instanceof IdleStateEvent) {
             IdleStateEvent e = (IdleStateEvent) o;
             if (e.state() == IdleState.READER_IDLE) {
-               clientConnection.resetClient();
+                clientConnection.resetClient();
             }
         }
     }

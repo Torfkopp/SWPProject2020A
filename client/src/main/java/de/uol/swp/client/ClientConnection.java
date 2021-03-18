@@ -157,6 +157,17 @@ public class ClientConnection {
         }
     }
 
+    /**
+     * Handles the reset of the current Client when timing out.
+     * <p>
+     * This method shuts down the old client when the Client has no active
+     * connection to the server anymore
+     *
+     * @author Marvin Drees
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.user.response.KillOldClientResponse
+     * @since 2021-03-18
+     */
     public void resetClient() {
         eventBus.post(new KillOldClientResponse());
     }
@@ -244,12 +255,26 @@ public class ClientConnection {
         }
     }
 
+    /**
+     * Handles a PingMessage found on the EventBus
+     * <p>
+     * If a PingMessage object is found on the EventBus, this method is called.
+     * It responds by posting a PongMessage on the EventBus.
+     *
+     * @param msg The PingMessage object found on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @see de.uol.swp.common.message.PingMessage
+     * @see de.uol.swp.common.message.PongMessage
+     * @since 2021-03-18
+     */
     @Subscribe
     private void onPingMessage(PingMessage msg) {
         LOG.info("Server ping received.");
         eventBus.post(new PongMessage());
     }
-    
+
     /**
      * Handles errors produced by the EventBus
      * <p>
