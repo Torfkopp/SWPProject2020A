@@ -18,6 +18,61 @@ import java.util.Set;
 public interface Lobby extends Serializable {
 
     /**
+     * Gets whether commands are allowed or not.
+     *
+     * @return If comamnds are allowed or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    boolean commandsAllowed();
+
+    /**
+     * Gets the maximum amount of players for a lobby.
+     *
+     * @return The maximum amount of players
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    int getMaxPlayers();
+
+    /**
+     * Sets the maximum amount of players for a lobby.
+     *
+     * @param maxPlayers The maximum amount of players
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setMaxPlayers(int maxPlayers);
+
+    /**
+     * Gets the maximum time for a move.
+     *
+     * @return Maximum time for a move
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    int getMoveTime();
+
+    /**
+     * Sets the maximum time for a move.
+     *
+     * @param moveTime The maximum time for a move
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setMoveTime(int moveTime);
+
+    /**
      * Gets the lobby's name
      *
      * @return A String containing the name of the lobby
@@ -96,6 +151,50 @@ public interface Lobby extends Serializable {
     void leaveUser(User user);
 
     /**
+     * Gets whether the random playfield is enabled or not.
+     *
+     * @return If random playfield is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    boolean randomPlayfieldEnabled();
+
+    /**
+     * Sets whether commands are allowed or not.
+     *
+     * @param commandsAllowed Whether commands should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setCommandsAllowed(boolean commandsAllowed);
+
+    /**
+     * Sets the random playfield attribute.
+     *
+     * @param randomPlayfieldEnabled Whether the randomPlayfield should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled);
+
+    /**
+     * Sets the start up phase attribute.
+     *
+     * @param startUpPhaseEnabled Whether the startUpPhase should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setStartUpPhaseEnabled(boolean startUpPhaseEnabled);
+
+    /**
      * Sets a user as ready
      *
      * @param user The user to mark as ready
@@ -105,6 +204,17 @@ public interface Lobby extends Serializable {
      * @since 2021-01-19
      */
     void setUserReady(User user);
+
+    /**
+     * Gets whether the startUpPhase is enabled or not.
+     *
+     * @return If the startUpPhase is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    boolean startUpPhaseEnabled();
 
     /**
      * Marks a user as not ready.
