@@ -41,9 +41,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
 
     @FXML
-    private Label waitForResponse;
-    @FXML
-    private Label noResourcesLabel;
+    private Label statusLabel;
     @FXML
     private HBox tradingHBox;
     @FXML
@@ -175,11 +173,15 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             ownInventorySize += entry.getValue();
         }
-        if (!(traderInventorySize == 0 && ownInventorySize == 0)) setSliders();
-        else {
+        if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
+            setSliders();
+            Platform.runLater(() -> statusLabel
+                    .setText(String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser)));
+        } else {
             offerTradeButton.setDisable(true);
             tradingHBox.setVisible(false);
-            noResourcesLabel.setVisible(true);
+            Platform.runLater(() -> statusLabel
+                    .setText(String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser)));
         }
     }
 
@@ -204,8 +206,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             return;
         }
         offerTradeButton.setDisable(true);
-        waitForResponse.setVisible(true);
-        waitForResponse.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
+        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
         RequestMessage request = new OfferingTradeWithUserRequest(this.loggedInUser, respondingUser, this.lobbyName,
                                                                   selectedOwnResourceMap, selectedPartnersResourceMap);
         LOG.debug("Sending OfferingTradeWithUserRequest");
@@ -229,8 +230,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
-            waitForResponse
-                    .setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
+            statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
         });
     }
 
