@@ -64,8 +64,6 @@ public class SceneManager {
     private static final int CHANGEPW_WIDTH = 395;
     private static final int DEVMENU_HEIGHT = 450;
     private static final int DEVMENU_WIDTH = 630;
-    private static final int LOBBY_HEIGHT = 730;
-    private static final int LOBBY_WIDTH = 685;
     private static final int LOGIN_HEIGHT = 220;
     private static final int LOGIN_WIDTH = 400;
     private static final int MAINMENU_HEIGHT = 550;
@@ -707,10 +705,10 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
-        lobbyStage.setHeight(LOBBY_HEIGHT);
-        lobbyStage.setMinHeight(LOBBY_HEIGHT);
-        lobbyStage.setWidth(LOBBY_WIDTH);
-        lobbyStage.setMinWidth(LOBBY_WIDTH);
+        lobbyStage.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+        lobbyStage.setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+        lobbyStage.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+        lobbyStage.setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);

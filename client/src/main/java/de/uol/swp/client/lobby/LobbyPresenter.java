@@ -12,6 +12,7 @@ import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
@@ -29,6 +30,7 @@ import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -57,6 +59,10 @@ import java.util.function.UnaryOperator;
 public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
+    public static final int LOBBY_HEIGHT_PRE_GAME = 700;
+    public static final int LOBBY_WIDTH_PRE_GAME = 535;
+    public static final int LOBBY_HEIGHT_IN_GAME = 740;
+    public static final int LOBBY_WIDTH_IN_GAME = 1285;
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
@@ -64,6 +70,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private ObservableList<Pair<String, String>> resourceList;
     private User owner;
     private Set<User> readyUsers;
+    private Integer dice1;
+    private Integer dice2;
     @FXML
     private ListView<Pair<Integer, User>> membersView;
     @FXML
@@ -89,8 +97,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Canvas gameMapCanvas;
     @FXML
-    private VBox playField;
-    @FXML
     private ListView<Pair<String, String>> inventoryView;
     @FXML
     private VBox preGameSettingBox;
@@ -111,6 +117,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Button changeMoveTimeButton;
 
+    private IGameMap gameMap;
     private int moveTime;
     private GameRendering gameRendering;
     private Window window;
@@ -405,12 +412,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
+        if (!this.lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         setEndTurnButtonState(msg.getUser());
         setTradeWithBankButtonState(msg.getUser());
         setTradeWithUserButtonState(msg.getUser());
         setPlayCardButtonState(msg.getUser());
+        this.dice1 = msg.getDice1();
+        this.dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -535,6 +545,27 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+
+        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
+            double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
+            double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
+            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+            double dimension = Math.min(heightValue, widthValue);
+            gameMapCanvas.setHeight(dimension * hexFactor);
+            gameMapCanvas.setWidth(dimension);
+            if (gameMap == null) return;
+            // gameMap exists, so redraw map to fit the new canvas dimensions
+            gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
+            gameRendering.drawGameMap(gameMap);
+            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        };
+        window.widthProperty().addListener(listener);
+        window.heightProperty().addListener(listener);
+        //just to trigger the heightProperty ChangeListener and make the canvas have actual dimensions
+        window.setHeight(window.getHeight() + 0.01);
+        window.setHeight(window.getHeight() - 0.01);
+
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
         this.commandsActivated.setSelected(event.getLobby().commandsAllowed());
@@ -883,23 +914,29 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
         Platform.runLater(() -> {
-            playField.setVisible(true);
             this.preGameSettingBox.setVisible(false);
             this.preGameSettingBox.setPrefHeight(0);
             this.preGameSettingBox.setMaxHeight(0);
             this.preGameSettingBox.setMinHeight(0);
-            gameMapCanvas.setHeight(380);
-            gameMapCanvas.setVisible(true);
-            gameRendering = new GameRendering(gameMapCanvas);
             //This Line needs to be changed/ removed in the Future
-            GameMap map = new GameMap();
-            map.createBeginnerMap();
-            gameRendering.drawGameMap(map);
+            this.gameRendering = new GameRendering(gameMapCanvas);
+            this.gameMap = new GameMap();
+            gameMap.createBeginnerMap();
+            gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
+            this.window.setWidth(LOBBY_WIDTH_IN_GAME);
+            this.window.setHeight(LOBBY_HEIGHT_IN_GAME);
+            ((Stage) this.window).setMinWidth(LOBBY_WIDTH_IN_GAME);
+            ((Stage) this.window).setMinHeight(LOBBY_HEIGHT_IN_GAME);
+            this.inventoryView.setMaxHeight(280);
+            this.inventoryView.setMinHeight(280);
+            this.inventoryView.setPrefHeight(280);
+            this.inventoryView.setVisible(true);
             this.readyCheckBox.setVisible(false);
             this.startSession.setVisible(false);
             this.rollDice.setVisible(true);
+            this.endTurn.setVisible(true);
             this.tradeWithUserButton.setVisible(true);
             this.tradeWithUserButton.setDisable(true);
             this.tradeWithBankButton.setVisible(true);
