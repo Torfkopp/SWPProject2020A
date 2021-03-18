@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby.event;
 
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
 /**
@@ -24,16 +25,19 @@ public class LobbyUpdateEvent {
 
     private final String lobbyName;
     private final User user;
+    private final Lobby lobby;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the Lobby to update
      * @param user      The name of the User who caused this Event (Creator or Joining User)
+     * @param lobby     The Lobby-object of the lobby the user wants to join
      */
-    public LobbyUpdateEvent(String lobbyName, User user) {
+    public LobbyUpdateEvent(String lobbyName, User user, Lobby lobby) {
         this.lobbyName = lobbyName;
         this.user = user;
+        this.lobby = lobby;
     }
 
     /**
@@ -52,5 +56,18 @@ public class LobbyUpdateEvent {
      */
     public User getUser() {
         return user;
+    }
+
+    /**
+     * The Lobby-object of the lobby the user wants to join
+     *
+     * @return The lobby object
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    public Lobby getLobby() {
+        return lobby;
     }
 }

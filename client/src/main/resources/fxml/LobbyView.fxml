@@ -63,7 +63,36 @@
             <VBox.margin>
                 <Insets top="10"/>
             </VBox.margin>
-            <Canvas fx:id="gameMapCanvas" height="380" width="380"/>
+            <VBox fx:id="preGameSettingBox" prefHeight="380.0" prefWidth="390.0" spacing="10.0">
+                <HBox prefHeight="21.0" prefWidth="390.0" spacing="4.0">
+                    <Label fx:id="moveTimeLabel"/>
+                    <TextField fx:id="moveTimeTextfield" prefHeight="25.0" prefWidth="79.0"/>
+                    <Button fx:id="changeMoveTimeButton" mnemonicParsing="false"
+                            onAction="#onChangeMoveTimeButtonPressed" text="%lobby.buttons.changemovetime"/>
+                </HBox>
+                <CheckBox fx:id="setStartUpPhaseCheckBox" mnemonicParsing="false" text="%lobby.checkboxes.startupphase"
+                          onAction="#onStartUpPhasePressed"/>
+                <CheckBox fx:id="commandsActivated" mnemonicParsing="false" text="%lobby.checkboxes.commandsallowed"
+                          onAction="#onCommandsActivatedPressed"/>
+                <CheckBox fx:id="randomPlayFieldCheckbox" mnemonicParsing="false"
+                          text="%lobby.checkboxes.randomplayfield" onAction="#onRandomPlayFieldPressed"/>
+                <HBox prefHeight="28.0" prefWidth="390.0" spacing="5.0">
+                    <RadioButton fx:id="threePlayerRadioButton" mnemonicParsing="false"
+                                 onAction="#onThreePlayersRadioButtonSelected" text="%lobby.radio.threeplayers">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="maxPlayersToggleGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="fourPlayerRadioButton" mnemonicParsing="false"
+                                 onAction="#onFourPlayersRadioButtonSelected" selected="true"
+                                 text="%lobby.radio.fourplayers">
+                        <toggleGroup>
+                            <fx:reference source="maxPlayersToggleGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                </HBox>
+            </VBox>
+            <Canvas fx:id="gameMapCanvas" visible="false" width="380"/>
             <HBox>
                 <VBox.margin>
                     <Insets top="10"/>
@@ -102,8 +131,8 @@
                     <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
                             onAction="#onTradeWithBankButtonPressed" text="%lobby.game.buttons.banktrade"
                             visible="false"/>
-                    <Button fx:id="playCard" mnemonicParsing="false" visible="false" disable="true"
-                            onAction="#onPlayCardButtonPressed" text="%game.playcards.button"/>
+                    <Button fx:id="playCard" disable="true" mnemonicParsing="false" onAction="#onPlayCardButtonPressed"
+                            text="%game.playcards.button" visible="false"/>
                 </VBox>
                 <ListView fx:id="inventoryView" maxHeight="280.0" maxWidth="180.0" minHeight="280.0" minWidth="180.0"/>
             </HBox>
