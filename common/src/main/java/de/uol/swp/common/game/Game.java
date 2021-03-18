@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
@@ -26,11 +26,13 @@ public class Game {
     /**
      * Constructor
      *
-     * @param lobby The lobby the game is taking place in
-     * @param first The first player
+     * @param lobby   The lobby the game is taking place in
+     * @param first   The first player
+     * @param gameMap The IGameMap the game will be using
      */
-    public Game(Lobby lobby, User first) {
+    public Game(Lobby lobby, User first, IGameMap gameMap) {
         this.lobby = lobby;
+        this.map = gameMap;
         players = lobby.getUsers().toArray(new User[0]);
         for (int i = 0; i < players.length; i++) {
             if (players[i].equals(first)) {
@@ -38,8 +40,6 @@ public class Game {
                 break;
             }
         }
-        map = new GameMap();
-        map.createBeginnerMap();
         inventories = new Inventory[players.length];
         int i = 0;
         for (User u : players) {
@@ -191,7 +191,7 @@ public class Game {
     /**
      * Gets this game's map
      *
-     * @return The IGameMapManagement this game is using
+     * @return The IGameMap this game is using
      */
     public IGameMap getMap() {
         return map;

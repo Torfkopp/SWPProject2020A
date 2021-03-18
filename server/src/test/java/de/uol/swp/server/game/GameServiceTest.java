@@ -3,8 +3,7 @@ package de.uol.swp.server.game;
 import com.google.common.eventbus.EventBus;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
@@ -94,7 +93,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getInventories();
         gameInventory[0].setWool(5);
@@ -153,7 +154,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getInventories();
         gameInventory[0].setWool(5);
@@ -241,7 +244,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getInventories();
         List<String> bankInventory = game.getBankInventory();
@@ -365,7 +370,9 @@ public class GameServiceTest {
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
-        gameManagement.createGame(lobby.get(), user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby.get(), user[0], gameMap);
 
         Message kickUser = new KickUserRequest("testlobby", user[0], user[1].getUsername());
         bus.post(kickUser);
@@ -422,7 +429,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getInventories();
         gameInventory[0].setWool(5);
@@ -482,7 +491,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getInventories();
         for (int i = 0; i < 2; i++) {
@@ -553,7 +564,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getInventories();
         gameInventory[0].setWool(5);
@@ -641,7 +654,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
         game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
         bus.post(new PlayKnightCardRequest(lobby.getName(), user[0]));
@@ -657,7 +672,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
         Inventory[] inventories = game.getInventories();
         inventories[1].increaseBrick(1);
@@ -678,7 +695,9 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        gameManagement.createGame(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
         assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
         game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);

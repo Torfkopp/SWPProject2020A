@@ -12,7 +12,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.game.message.CreateGameMessage;
+import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
@@ -230,27 +230,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Handles a CreateGameMessage found on the EventBus
-     * <p>
-     * If a CreateGameMessage is found on the EventBus, this method calls on the
-     * LobbyService to get an updated list of all lobbies, so the "in Game" and "full"
-     * statuses are displayed correctly.
-     *
-     * @param msg The CreateGameMessage found on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @author Phillip-André Suhr
-     * @since 2021-03-01
-     */
-    @Subscribe
-    private void onCreateGameMessage(CreateGameMessage msg) {
-        if (this.loggedInUser == null) return;
-        LOG.debug("Received CreateGameMessage");
-        lobbyService.retrieveAllLobbies();
-    }
-
-    /**
      * Method called when the CreateLobbyButton is pressed
      * <p>
      * If the CreateLobbyButton is pressed, this method requests the LobbyService
@@ -350,6 +329,27 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         resetCharVars();
         eventBus.post(showLoginViewMessage);
         userService.dropUser(loggedInUser);
+    }
+
+    /**
+     * Handles a GameCreatedMessage found on the EventBus
+     * <p>
+     * If a GameCreatedMessage is found on the EventBus, this method calls on the
+     * LobbyService to get an updated list of all lobbies, so the "in Game" and "full"
+     * statuses are displayed correctly.
+     *
+     * @param msg The GameCreatedMessage found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    @Subscribe
+    private void onGameCreatedMessage(GameCreatedMessage msg) {
+        if (this.loggedInUser == null) return;
+        LOG.debug("Received GameCreatedMessage");
+        lobbyService.retrieveAllLobbies();
     }
 
     /**
