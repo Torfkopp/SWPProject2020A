@@ -33,6 +33,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -252,6 +253,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onSystemMessageResponse(rsp);
         }
+    }
+
+    public void onEnter(ActionEvent actionEvent) {
+        super.onSendMessageButtonPressed();
     }
 
     /**
