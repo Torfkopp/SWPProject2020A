@@ -1,64 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:controller="de.uol.swp.client.main.MainMenuPresenter">
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane vgap="10.0" HBox.hgrow="ALWAYS">
         <columnConstraints>
-            <ColumnConstraints percentWidth="17.5"/>
-            <ColumnConstraints hgrow="NEVER" percentWidth="2.5"/>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" percentWidth="12.5"/>
-            <ColumnConstraints hgrow="NEVER" percentWidth="2.5"/>
-            <ColumnConstraints percentWidth="20.0"/>
-            <ColumnConstraints hgrow="NEVER" percentWidth="2.5"/>
-            <ColumnConstraints percentWidth="21.25"/>
-            <ColumnConstraints percentWidth="21.25"/>
+            <ColumnConstraints percentWidth="17.5" />
+            <ColumnConstraints hgrow="NEVER" percentWidth="2.5" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" percentWidth="12.5" />
+            <ColumnConstraints hgrow="NEVER" percentWidth="2.5" />
+            <ColumnConstraints percentWidth="20.0" />
+            <ColumnConstraints hgrow="NEVER" percentWidth="2.5" />
+            <ColumnConstraints percentWidth="21.25" />
+            <ColumnConstraints percentWidth="21.25" />
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints maxHeight="50.0" minHeight="25.0" vgrow="NEVER"/>
-            <RowConstraints vgrow="ALWAYS"/>
+            <RowConstraints maxHeight="50.0" minHeight="25.0" vgrow="NEVER" />
+            <RowConstraints vgrow="ALWAYS" />
         </rowConstraints>
 
-        <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
+        <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
 
         <VBox spacing="15.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.create"/>
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed" text="%mainmenu.buttons.lobby.create" />
 
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.join"/>
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed" text="%mainmenu.buttons.lobby.join" />
         </VBox>
-        <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
+        <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
 
         <VBox spacing="10.0" GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
-            <ListView fx:id="chatView" GridPane.columnSpan="2" VBox.vgrow="ALWAYS"/>
-            <TextField fx:id="messageField" prefHeight="25.0"/>
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.sendmessage"/>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.deletemessage"/>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.editmessage"/>
+            <ListView fx:id="chatView" GridPane.columnSpan="2" VBox.vgrow="ALWAYS" />
+            <TextField fx:id="messageField" onAction="#onEnter" prefHeight="25.0" />
+            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.sendmessage" />
+            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.deletemessage" />
+            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage" />
         </VBox>
 
         <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
             <Menu mnemonicParsing="false" text="%mainmenu.settings">
-                <MenuItem mnemonicParsing="false" onAction="#onChangePasswordButtonPressed"
-                          text="%mainmenu.settings.buttons.changepw"/>
-                <MenuItem mnemonicParsing="false" onAction="#onDeleteButtonPressed"
-                          text="%mainmenu.settings.buttons.deleteuser"/>
-                <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
-                          text="%mainmenu.settings.buttons.logout"/>
+                <MenuItem mnemonicParsing="false" onAction="#onChangePasswordButtonPressed" text="%mainmenu.settings.buttons.changepw" />
+                <MenuItem mnemonicParsing="false" onAction="#onDeleteButtonPressed" text="%mainmenu.settings.buttons.deleteuser" />
+                <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed" text="%mainmenu.settings.buttons.logout" />
             </Menu>
             <GridPane.margin>
-                <Insets left="-15.0" right="-15.0"/>
+                <Insets left="-15.0" right="-15.0" />
             </GridPane.margin>
         </MenuBar>
     </GridPane>
     <padding>
-        <Insets bottom="15.0" left="15.0" right="15.0"/>
+        <Insets bottom="15.0" left="15.0" right="15.0" />
     </padding>
 </HBox>
