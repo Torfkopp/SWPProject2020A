@@ -76,11 +76,12 @@ public class NettyServerHandler implements ChannelInboundHandler {
         if (o instanceof IdleStateEvent) {
             IdleStateEvent e = (IdleStateEvent) o;
             if (e.state() == IdleState.READER_IDLE) {
-                System.err.println("READ_TIMEOUT");
-                //Add ClientDisconnectedMessage here
+                // When client timed out
+                delegate.clientDisconnected(new NettyMessageContext(ctx));
+                ctx.close();
             } else if (e.state() == IdleState.WRITER_IDLE) {
-                System.err.println("WRITE_TIMEOUT");
-                //ctx.writeAndFlush(/* Add Ping here */);
+                // When server didn't communicate with client after n seconds
+                delegate.sendPingMessage(new NettyMessageContext(ctx));
             }
         }
     }

@@ -4,10 +4,12 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
+import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
@@ -275,6 +277,30 @@ public class ServerHandler implements ServerHandlerDelegate {
                                                 msg.getReceiver()));
         }
         sendMessage(msg);
+    }
+
+    @Subscribe
+    private void onPongMessage(PongMessage msg) {
+        LOG.info("Client pong received from " + msg.getSession());
+    }
+
+    @Subscribe
+    private void onClientDisconnectedMessage(ClientDisconnectedMessage msg) {
+        if (msg.getSession().isPresent()) {
+            RequestMessage requestMessage = new RemoveFromLobbiesRequest(msg.getSession().get().getUser());
+            eventBus.post(requestMessage);
+        }
+    }
+
+    public void sendPingMessage(MessageContext ctx) {
+        Session session = this.activeSessions.get(ctx);
+        if (session != null) {
+            ResponseMessage msg = new PingMessage();
+            msg.setSession(null);
+            msg.setMessageContext(null);
+            LOG.debug("Send to client " + ctx + " message " + msg);
+            sendToClient(ctx, msg);
+        }
     }
 
     // -------------------------------------------------------------------------------
