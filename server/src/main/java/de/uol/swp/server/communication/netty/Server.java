@@ -8,6 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,6 +57,8 @@ public class Server {
 
                 @Override
                 protected void initChannel(SocketChannel ch) {
+                    // Add IdleStateHandler to handle timeouts
+                    ch.pipeline().addLast(new IdleStateHandler(60, 30, 0));
                     // Encoder and decoder are both needed!
                     // Send and receive serialisable objects
                     ch.pipeline().addLast(new MyObjectEncoder());

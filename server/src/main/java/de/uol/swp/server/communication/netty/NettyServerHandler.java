@@ -6,6 +6,8 @@ import de.uol.swp.server.communication.ServerHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,7 +72,17 @@ public class NettyServerHandler implements ChannelInboundHandler {
     }
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext channelHandlerContext, Object o) {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object o) {
+        if (o instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) o;
+            if (e.state() == IdleState.READER_IDLE) {
+                System.err.println("READ_TIMEOUT");
+                //Add ClientDisconnectedMessage here
+            } else if (e.state() == IdleState.WRITER_IDLE) {
+                System.err.println("WRITE_TIMEOUT");
+                //ctx.writeAndFlush(/* Add Ping here */);
+            }
+        }
     }
 
     @Override
