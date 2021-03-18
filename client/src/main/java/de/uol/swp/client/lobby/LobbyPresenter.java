@@ -6,11 +6,8 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
-import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
-import de.uol.swp.common.chat.message.EditedChatMessageMessage;
+import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.chat.response.SystemMessageForTradeResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.Resources;
@@ -227,10 +224,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     @Override
     @Subscribe
-    protected void onSystemMessageForTradeResponse(SystemMessageForTradeResponse rsp){
+    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg){
         LOG.debug("Received SystemMessageForTradeResponse");
-        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(super.lobbyName)){
-            super.onSystemMessageForTradeResponse(rsp);
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)){
+            super.onSystemMessageForTradeMessage(msg);
         }
     }
 

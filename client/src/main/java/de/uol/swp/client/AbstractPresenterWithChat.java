@@ -9,7 +9,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.chat.response.SystemMessageForTradeResponse;
+import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -282,11 +282,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
     }
 
-    protected void onSystemMessageForTradeResponse(SystemMessageForTradeResponse rsp){
-        if(rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)){
-            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + rsp.getLobbyName());
+    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg){
+        if(msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)){
+            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getLobbyName());
         }
-        Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
     /**

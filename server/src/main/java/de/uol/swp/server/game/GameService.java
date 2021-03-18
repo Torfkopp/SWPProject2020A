@@ -4,10 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.request.NewChatMessageRequest;
-import de.uol.swp.common.chat.response.SystemMessageForTradeResponse;
-import de.uol.swp.common.chat.response.SystemMessageResponse;
+import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
@@ -205,10 +202,12 @@ public class GameService extends AbstractService {
                 respondingInventory
                         .setBrick(respondingInventory.getBrick() - req.getRespondingResourceMap().get("brick"));
             }
-            ResponseMessage systemMessageResponse = new SystemMessageForTradeResponse(req.getOriginLobby(), req.getOfferingUser(), req.getRespondingUser(), new I18nWrapper("lobby.trade.systemmessage"));
-            LOG.debug("Sending a SystemMessageResponse for Lobby " + req.getOriginLobby());
-            systemMessageResponse.initWithMessage(req);
-            post(systemMessageResponse);
+            ServerMessage returnMessage1 = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getRespondingUser(),
+                                                                            req.getOfferingUser(), req.getRespondingResourceMap(),
+                                                                            req.getOfferingResourceMap(), new I18nWrapper(
+                    "lobby.trade.systemmessage"));
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage1);
+            LOG.debug("Sending a SystemMessageForTradeMessage for Lobby " + req.getOriginLobby());
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
             LOG.debug("Preparing a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
             post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));
