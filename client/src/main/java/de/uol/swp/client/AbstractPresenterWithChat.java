@@ -9,6 +9,7 @@ import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageForTradeResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -278,6 +279,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
         } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) LOG.debug("Received SystemMessageResponse");
+        Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+    }
+
+    protected void onSystemMessageForTradeResponse(SystemMessageForTradeResponse rsp){
+        if(rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)){
+            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + rsp.getLobbyName());
+        }
         Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
     }
 
