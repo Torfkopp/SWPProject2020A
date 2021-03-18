@@ -40,10 +40,11 @@ public class GameMap implements IGameMap {
 
     @Override
     public IGameMap createMapFromConfiguration(Map<String, List<Object>> configuration) {
-        this.configuration = Collections.unmodifiableMap(configuration);
-        List<Object> harborList = configuration.get("harbors");
-        List<Object> hexList = configuration.get("hexes");
-        List<Object> tokenList = configuration.get("tokens");
+        this.configuration = configuration;
+        Map<String, List<Object>> modifiableConfiguration = new HashMap<>(configuration);
+        List<Object> harborList = new LinkedList<>(modifiableConfiguration.get("harbors"));
+        List<Object> hexList = new LinkedList<>(modifiableConfiguration.get("hexes"));
+        List<Object> tokenList = new LinkedList<>(modifiableConfiguration.get("tokens"));
         hexMap[0][0].set(new HarborHex(hexMap[1][1], IHarborHex.HarborSide.SOUTHEAST,
                                        (IHarborHex.HarborResource) harborList.remove(0)));
         hexMap[0][1].set(new WaterHex());
@@ -277,9 +278,9 @@ public class GameMap implements IGameMap {
         Collections.shuffle(resourceHexList);
         Collections.shuffle(tokenList);
         Map<String, List<Object>> map = new HashMap<>();
-        map.put("harbors", harborResources);
-        map.put("hexes", resourceHexList);
-        map.put("tokens", tokenList);
+        map.put("harbors", Collections.unmodifiableList(harborResources));
+        map.put("hexes", Collections.unmodifiableList(resourceHexList));
+        map.put("tokens", Collections.unmodifiableList(tokenList));
         return map;
     }
 
