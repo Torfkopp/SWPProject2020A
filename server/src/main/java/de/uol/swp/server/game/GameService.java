@@ -153,61 +153,83 @@ public class GameService extends AbstractService {
                                             req.getOfferingResourceMap()) && checkEnoughResourcesInInventory(
                 responseInventoryMap, req.getRespondingResourceMap())) {
             //changes the inventories according to the offer
+            Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
+            Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
             if (req.getOfferingResourceMap().get("grain") > 0) {
-                offeringInventory.setGrain(offeringInventory.getGrain() - req.getOfferingResourceMap().get("grain"));
-                respondingInventory
-                        .setGrain(respondingInventory.getGrain() + req.getOfferingResourceMap().get("grain"));
+                offeredResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.grain"), req.getOfferingResourceMap().get("grain"));
+                offeringInventory.increaseGrain(-req.getOfferingResourceMap().get("grain"));
+                respondingInventory.increaseGrain(req.getOfferingResourceMap().get("grain"));
             }
             if (req.getOfferingResourceMap().get("ore") > 0) {
-                offeringInventory.setOre(offeringInventory.getOre() - req.getOfferingResourceMap().get("ore"));
-                respondingInventory.setOre(respondingInventory.getOre() + req.getOfferingResourceMap().get("ore"));
+                offeredResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.ore"), req.getOfferingResourceMap().get("ore"));
+                offeringInventory.increaseOre(-req.getOfferingResourceMap().get("ore"));
+                respondingInventory.increaseOre(req.getOfferingResourceMap().get("ore"));
             }
             if (req.getOfferingResourceMap().get("lumber") > 0) {
-                offeringInventory.setLumber(offeringInventory.getLumber() - req.getOfferingResourceMap().get("lumber"));
-                respondingInventory
-                        .setLumber(respondingInventory.getLumber() + req.getOfferingResourceMap().get("lumber"));
+                offeredResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.lumber"), req.getOfferingResourceMap().get("lumber"));
+                offeringInventory.increaseLumber(-req.getOfferingResourceMap().get("lumber"));
+                respondingInventory.increaseLumber(req.getOfferingResourceMap().get("lumber"));
             }
             if (req.getOfferingResourceMap().get("wool") > 0) {
-                offeringInventory.setWool(offeringInventory.getWool() - req.getOfferingResourceMap().get("wool"));
-                respondingInventory.setWool(respondingInventory.getWool() + req.getOfferingResourceMap().get("wool"));
+                offeredResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.wool"), req.getOfferingResourceMap().get("wool"));
+                offeringInventory.increaseWool(-req.getOfferingResourceMap().get("wool"));
+                respondingInventory.increaseWool(req.getOfferingResourceMap().get("wool"));
             }
             if (req.getOfferingResourceMap().get("brick") > 0) {
-                offeringInventory.setBrick(offeringInventory.getBrick() - req.getOfferingResourceMap().get("brick"));
-                respondingInventory
-                        .setBrick(respondingInventory.getBrick() + req.getOfferingResourceMap().get("brick"));
+                offeredResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.brick"), req.getOfferingResourceMap().get("brick"));
+                offeringInventory.increaseBrick(-req.getOfferingResourceMap().get("brick"));
+                respondingInventory.increaseBrick(req.getOfferingResourceMap().get("brick"));
             }
+            if (offeredResourcesWrapperMap.isEmpty())
+                offeredResourcesWrapperMap.put(new I18nWrapper("game.trade.offer.nothing"), 0);
 
             //changes the inventories according to the wanted resources
             if (req.getRespondingResourceMap().get("grain") > 0) {
-                offeringInventory.setGrain(offeringInventory.getGrain() + req.getRespondingResourceMap().get("grain"));
-                respondingInventory
-                        .setGrain(respondingInventory.getGrain() - req.getRespondingResourceMap().get("grain"));
+                respondingResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.grain"), req.getRespondingResourceMap().get("grain"));
+                offeringInventory.increaseGrain(req.getRespondingResourceMap().get("grain"));
+                respondingInventory.increaseGrain(-req.getRespondingResourceMap().get("grain"));
             }
             if (req.getRespondingResourceMap().get("ore") > 0) {
-                offeringInventory.setOre(offeringInventory.getOre() + req.getRespondingResourceMap().get("ore"));
-                respondingInventory.setOre(respondingInventory.getOre() - req.getRespondingResourceMap().get("ore"));
+                respondingResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.ore"), req.getRespondingResourceMap().get("ore"));
+                offeringInventory.increaseOre(req.getRespondingResourceMap().get("ore"));
+                respondingInventory.increaseOre(-req.getRespondingResourceMap().get("ore"));
             }
             if (req.getRespondingResourceMap().get("lumber") > 0) {
-                offeringInventory
-                        .setLumber(offeringInventory.getLumber() + req.getRespondingResourceMap().get("lumber"));
-                respondingInventory
-                        .setLumber(respondingInventory.getLumber() - req.getRespondingResourceMap().get("lumber"));
+                respondingResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.lumber"), req.getRespondingResourceMap().get("lumber"));
+                offeringInventory.increaseLumber(req.getRespondingResourceMap().get("lumber"));
+                respondingInventory.increaseLumber(-req.getRespondingResourceMap().get("lumber"));
             }
             if (req.getRespondingResourceMap().get("wool") > 0) {
-                offeringInventory.setWool(offeringInventory.getWool() + req.getRespondingResourceMap().get("wool"));
-                respondingInventory.setWool(respondingInventory.getWool() - req.getRespondingResourceMap().get("wool"));
+                respondingResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.wool"), req.getRespondingResourceMap().get("wool"));
+                offeringInventory.increaseWool(req.getRespondingResourceMap().get("wool"));
+                respondingInventory.increaseWool(-req.getRespondingResourceMap().get("wool"));
             }
             if (req.getRespondingResourceMap().get("brick") > 0) {
-                offeringInventory.setBrick(offeringInventory.getBrick() + req.getRespondingResourceMap().get("brick"));
-                respondingInventory
-                        .setBrick(respondingInventory.getBrick() - req.getRespondingResourceMap().get("brick"));
+                respondingResourcesWrapperMap
+                        .put(new I18nWrapper("game.resources.brick"), req.getRespondingResourceMap().get("brick"));
+                offeringInventory.increaseBrick(req.getRespondingResourceMap().get("brick"));
+                respondingInventory.increaseBrick(-req.getRespondingResourceMap().get("brick"));
             }
-            ServerMessage returnMessage1 = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getRespondingUser(),
-                                                                            req.getOfferingUser(), req.getRespondingResourceMap(),
-                                                                            req.getOfferingResourceMap(), new I18nWrapper(
-                    "lobby.trade.systemmessage"));
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage1);
-            LOG.debug("Sending a SystemMessageForTradeMessage for Lobby " + req.getOriginLobby());
+            if (respondingResourcesWrapperMap.isEmpty())
+                respondingResourcesWrapperMap.put(new I18nWrapper("game.trade.offer.nothing"), 0);
+
+            ServerMessage returnSystemMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
+                                                                                 req.getOfferingUser(),
+                                                                                 req.getRespondingUser(),
+                                                                                 offeredResourcesWrapperMap,
+                                                                                 respondingResourcesWrapperMap);
+            LOG.debug("Sending SystemMessageForTradeMessage for Lobby " + req.getOriginLobby());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
+            LOG.debug("Sending a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
             LOG.debug("Preparing a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
             post(new GetUserSessionEvent(offeringInventory.getPlayer(), returnMessage));

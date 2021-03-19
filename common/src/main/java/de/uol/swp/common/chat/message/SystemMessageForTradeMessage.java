@@ -12,9 +12,8 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
     private final String lobbyName;
     private final String respondingUser;
     private final String offeringUser;
-    private final Map<String, Integer> respondingResourceMap;
-    private final Map<String, Integer> offeringResourceMap;
-    private final SystemMessage msg;
+    private final Map<I18nWrapper, Integer> respondingResourceMap;
+    private final Map<I18nWrapper, Integer> offeringResourceMap;
 
     /**
      * Constructor
@@ -23,20 +22,27 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
      * attributes to the parameters provided upon calling the constructor.
      *
      * @param lobbyName             The lobby name
-     * @param respondingUser        The responding User
      * @param offeringUser          The offering User
-     * @param respondingResourceMap The demanded resources
+     * @param respondingUser        The responding User
      * @param offeringResourceMap   The offered resources
+     * @param respondingResourceMap The demanded resources
      */
-    public SystemMessageForTradeMessage(String lobbyName, String respondingUser, String offeringUser,
-                                        Map<String, Integer> respondingResourceMap,
-                                        Map<String, Integer> offeringResourceMap, I18nWrapper content) {
+    public SystemMessageForTradeMessage(String lobbyName, String offeringUser, String respondingUser,
+                                        Map<I18nWrapper, Integer> offeringResourceMap,
+                                        Map<I18nWrapper, Integer> respondingResourceMap) {
         this.lobbyName = lobbyName;
-        this.respondingUser = respondingUser;
         this.offeringUser = offeringUser;
+        this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;
         this.offeringResourceMap = offeringResourceMap;
-        this.msg = new SystemMessageDTO(content);
+    }
+
+    public String getRespondingUser() {
+        return respondingUser;
+    }
+
+    public String getOfferingUser() {
+        return offeringUser;
     }
 
     public String getLobbyName() {
@@ -49,7 +55,9 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
      * @return The encapsulated SystemMessage
      */
     public SystemMessage getMsg() {
-        return msg;
+        return new SystemMessageDTO(
+                makeSingularI18nWrapper(this.offeringUser, this.respondingUser, this.offeringResourceMap,
+                                        this.respondingResourceMap));
     }
 
     /**
@@ -59,5 +67,25 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
      */
     public boolean isLobbyChatMessage() {
         return lobbyName != null;
+    }
+
+    private I18nWrapper makeSingularI18nWrapper(String offeringUser, String respondingUser,
+                                                Map<I18nWrapper, Integer> offeringResourceMap,
+                                                Map<I18nWrapper, Integer> respondingResourceMap) {
+        StringBuilder offerString = new StringBuilder();
+        for (Map.Entry<I18nWrapper, Integer> entry : offeringResourceMap.entrySet()) {
+            offerString.append(", ");
+            if (entry.getValue() > 0) offerString.append(entry.getValue()).append(" ");
+            offerString.append(entry.getKey().toString());
+        }
+        StringBuilder demandString = new StringBuilder();
+        for (Map.Entry<I18nWrapper, Integer> entry : respondingResourceMap.entrySet()) {
+            demandString.append(", ");
+            if (entry.getValue() > 0) demandString.append(entry.getValue()).append(" ");
+            demandString.append(entry.getKey().toString());
+        }
+        return new I18nWrapper("lobby.trade.systemmessage", offeringUser, respondingUser,
+                               offerString.toString().replaceFirst("^, ", ""),
+                               demandString.toString().replaceFirst("^, ", ""));
     }
 }
