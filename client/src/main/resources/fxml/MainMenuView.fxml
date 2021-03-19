@@ -64,13 +64,6 @@
                                 text="%mainmenu.settings.buttons.logout"/>
                     </graphic>
                 </MenuItem>
-                <MenuItem mnemonicParsing="false" onAction="#onChangeAccountDetailsButtonPressed"
-                          text="%mainmenu.settings.buttons.changeaccdetails"/>
-                <MenuItem mnemonicParsing="false" onAction="#onDeleteButtonPressed"
-                          text="%mainmenu.settings.buttons.deleteuser"/>
-                <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
-                          text="%mainmenu.settings.buttons.logout"/>
->>>>>>> 89ee65ce6370640c87c9d5bfe2d8171bcdbd7ff3
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>
