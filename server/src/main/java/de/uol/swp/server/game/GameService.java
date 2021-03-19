@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
+import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
@@ -277,6 +278,8 @@ public class GameService extends AbstractService {
                                                                                developmentCard);
                 returnMessage.initWithMessage(req);
                 post(returnMessage);
+                ServerMessage serverMessage = new SystemMessageForTradeWithBankMessage(req.getUser().getUsername(), req.getOriginLobby(), developmentCard);
+                lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
                                                                                         .getUsername() + "couldnt buy a development Card");
         }
@@ -933,7 +936,6 @@ public class GameService extends AbstractService {
             LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
         Inventory inventory = gameManagement.getGame(req.getOriginLobby()).getInventory(req.getUser());
         if (inventory == null) return;
-
         if (req.getGiveResource().equals("ore") && (inventory.getOre() < 4)) return;
         if (req.getGiveResource().equals("brick") && (inventory.getBrick() < 4)) return;
         if (req.getGiveResource().equals("grain") && (inventory.getGrain() < 4)) return;

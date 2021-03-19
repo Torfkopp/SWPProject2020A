@@ -84,7 +84,7 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
             if (entry.getValue() > 0) demandString.append(entry.getValue()).append(" ");
             demandString.append(entry.getKey().toString());
         }
-        return new I18nWrapper("lobby.trade.systemmessage", offeringUser, respondingUser,
+        return new I18nWrapper("lobby.trade.withuser.systemmessage", offeringUser, respondingUser,
                                offerString.toString().replaceFirst("^, ", ""),
                                demandString.toString().replaceFirst("^, ", ""));
     }

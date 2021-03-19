@@ -266,6 +266,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
+    @Override
+    @Subscribe
+    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg){
+        LOG.debug("Received SystemMessageForTradeWithBankResponse");
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)){
+            super.onSystemMessageForTradeWithBankMessage(msg);
+        }
+    }
+
     /**
      * Helper function to let the user leave the lobby and close the window
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.

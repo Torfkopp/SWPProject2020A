@@ -286,6 +286,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
+    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg){
+        if(msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)){
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getLobbyName());
+        }
+        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+    }
+
     /**
      * Nulls the chatMessages variable
      * <p>
