@@ -1,12 +1,12 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class for a game
@@ -79,6 +79,52 @@ public class Game {
     }
 
     /**
+     * Distributes resources
+     * Gets the result of the dices to distribute
+     * the resource to the players.
+     *
+     * @param token Integer between 2 and 12
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
+     */
+    public void distributeResources(int token) {
+        if (token < 2 || token > 12) return;
+        Set<MapPoint> mapPoints = map.getHex(token);
+        int amount = 1;
+        //Hexes can have the same token
+        for (MapPoint mapPoint : mapPoints) {
+            //No resources if the robber is on the hex
+            if (mapPoint.equals(map.getRobberPosition())) return;
+            ResourceHex hex = (ResourceHex) map.getHex(mapPoint);
+            //Checks every intersection around the hex
+            for (IIntersection i : map.getIntersectionFromHex(mapPoint)) {
+                if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
+                else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
+                if (i.getOwner() != null) {
+                    switch (hex.getResource()) {
+                        case HILLS:
+                            getInventory(i.getOwner()).increaseBrick(amount);
+                            break;
+                        case FIELDS:
+                            getInventory(i.getOwner()).increaseGrain(amount);
+                            break;
+                        case FOREST:
+                            getInventory(i.getOwner()).increaseLumber(amount);
+                            break;
+                        case PASTURE:
+                            getInventory(i.getOwner()).increaseWool(amount);
+                            break;
+                        case MOUNTAINS:
+                            getInventory(i.getOwner()).increaseOre(amount);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Gets the active player.
      *
      * @return The currently active player
@@ -123,6 +169,17 @@ public class Game {
     }
 
     /**
+     * Gets a specified player's inventory
+     *
+     * @param user The user whose inventory to get
+     *
+     * @return The player's inventory
+     */
+    public Inventory getInventory(User user) {
+        return getInventory(getPlayer(user));
+    }
+
+    /**
      * Gets the lobby this game is taking place in
      *
      * @return The Lobby this game is taking place in
@@ -143,12 +200,38 @@ public class Game {
     /**
      * Gets a user's player
      *
+     * @param user The user
+     *
      * @return A player
      */
     public Player getPlayer(User user) {
         int i = 0;
         for (User u : players) {
             if (u.equals(user)) break;
+            i++;
+        }
+        switch (i) {
+            case 1:
+                return Player.PLAYER_2;
+            case 2:
+                return Player.PLAYER_3;
+            case 3:
+                return Player.PLAYER_4;
+        }
+        return Player.PLAYER_1;
+    }
+
+    /**
+     * Gets a user's player
+     *
+     * @param name The user, but as string
+     *
+     * @return A player
+     */
+    public Player getPlayer(String name) {
+        int i = 0;
+        for (User u : players) {
+            if (u.getUsername().equals(name)) break;
             i++;
         }
         switch (i) {

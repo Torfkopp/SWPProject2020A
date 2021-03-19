@@ -82,7 +82,7 @@ public class UserService extends AbstractService {
         } catch (Exception e) {
             LOG.error(e);
             returnMessage = new ChangePasswordExceptionMessage(
-                    "Cannot change Password of " + req.getUser() + " " + e.getMessage());
+                    "Cannot change Password of [" + req.getUser().getUsername() + "] " + e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);
@@ -116,7 +116,7 @@ public class UserService extends AbstractService {
         } catch (Exception e) {
             LOG.error(e);
             returnMessage = new UserDeletionExceptionMessage(
-                    "Cannot delete user " + req.getUser() + " " + e.getMessage());
+                    "Cannot delete user [" + req.getUser().getUsername() + "] " + e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);
@@ -150,7 +150,7 @@ public class UserService extends AbstractService {
         } catch (Exception e) {
             LOG.error(e);
             returnMessage = new RegistrationExceptionMessage(
-                    "Cannot create user " + req.getUser() + " " + e.getMessage());
+                    "Cannot create user [" + req.getUser().getUsername() + "] " + e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);

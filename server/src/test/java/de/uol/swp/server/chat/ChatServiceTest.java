@@ -65,7 +65,7 @@ class ChatServiceTest {
     @BeforeEach
     void setUp() {
         chatManagement = new ChatManagement(new MainMemoryBasedChatMessageStore());
-        chatService = new ChatService(bus, chatManagement, lobbyService);
+        chatService = new ChatService(bus, chatManagement, lobbyManagement, lobbyService);
     }
 
     /**
@@ -101,11 +101,11 @@ class ChatServiceTest {
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(2, defaultLobby);
-        assertEquals(latestMessages.size(), 1);
+        assertEquals(1, latestMessages.size());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg1.getID());
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(msg1.getID(), latestMessage.getID());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -119,7 +119,7 @@ class ChatServiceTest {
      * chatManagement is not of length 1, or when any of the attributes of the
      * ChatMessage differ from the parameters provided on creation.
      *
-     * @throws InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException the interrupted exception
      * @author Maximilian Lindner
      * @author Phillip-André Suhr
      * @since 2021-02-06
@@ -133,11 +133,11 @@ class ChatServiceTest {
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
-        assertEquals(latestMessages.size(), 1);
+        assertEquals(1, latestMessages.size());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg1.getID());
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(msg1.getID(), latestMessage.getID());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -161,11 +161,11 @@ class ChatServiceTest {
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(2);
-        assertEquals(latestMessages.size(), 1);
+        assertEquals(1, latestMessages.size());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg1.getID());
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(msg1.getID(), latestMessage.getID());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -193,11 +193,11 @@ class ChatServiceTest {
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1);
-        assertEquals(latestMessages.size(), 1);
+        assertEquals(1, latestMessages.size());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg1.getID());
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(msg1.getID(), latestMessage.getID());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -224,8 +224,8 @@ class ChatServiceTest {
         assertFalse(latestMessages.isEmpty());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg.getID());
-        assertEquals(latestMessage.getContent(), secondContent);
+        assertEquals(msg.getID(), latestMessage.getID());
+        assertEquals(secondContent, latestMessage.getContent());
     }
 
     /**
@@ -239,7 +239,7 @@ class ChatServiceTest {
      * chatManagement is not of length 1, or when any of the attributes of the
      * ChatMessage differ from the parameters provided on creation.
      *
-     * @throws InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException the interrupted exception
      * @author Maximilian Lindner
      * @author Phillip-André Suhr
      * @since 2021-02-06
@@ -253,11 +253,11 @@ class ChatServiceTest {
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1, defaultLobby);
-        assertEquals(latestMessages.size(), 1);
+        assertEquals(1, latestMessages.size());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg1.getID());
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(msg1.getID(), latestMessage.getID());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -283,8 +283,8 @@ class ChatServiceTest {
         assertFalse(latestMessages.isEmpty());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg.getID());
-        assertEquals(latestMessage.getContent(), secondContent);
+        assertEquals(msg.getID(), latestMessage.getID());
+        assertEquals(secondContent, latestMessage.getContent());
     }
 
     /**
@@ -298,7 +298,7 @@ class ChatServiceTest {
      * chatManagement is not of length 1, or when any of the attributes of the
      * ChatMessage differ from the parameters provided on creation.
      *
-     * @throws InterruptedException the interrupted exception
+     * @throws java.lang.InterruptedException the interrupted exception
      * @author Maximilian Lindner
      * @author Phillip-André Suhr
      * @since 2021-02-06
@@ -312,11 +312,11 @@ class ChatServiceTest {
         lock.await(75, TimeUnit.MILLISECONDS);
 
         List<ChatMessage> latestMessages = chatManagement.getLatestMessages(1);
-        assertEquals(latestMessages.size(), 1);
+        assertEquals(1, latestMessages.size());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getID(), msg1.getID());
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(msg1.getID(), latestMessage.getID());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -342,8 +342,8 @@ class ChatServiceTest {
         assertFalse(latestMessages.isEmpty());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getAuthor(), defaultUser);
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(defaultUser, latestMessage.getAuthor());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**
@@ -368,8 +368,8 @@ class ChatServiceTest {
         assertFalse(latestMessages.isEmpty());
 
         ChatMessage latestMessage = latestMessages.get(0);
-        assertEquals(latestMessage.getAuthor(), defaultUser);
-        assertEquals(latestMessage.getContent(), defaultContent);
+        assertEquals(defaultUser, latestMessage.getAuthor());
+        assertEquals(defaultContent, latestMessage.getContent());
     }
 
     /**

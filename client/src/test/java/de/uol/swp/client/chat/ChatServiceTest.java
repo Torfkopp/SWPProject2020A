@@ -83,7 +83,7 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
+        assertEquals(defaultAmount, chatMessageRequest.getAmount());
     }
 
     /**
@@ -113,7 +113,7 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
+        assertEquals(defaultAmount, chatMessageRequest.getAmount());
     }
 
     /**
@@ -141,8 +141,8 @@ class ChatServiceTest {
         AskLatestChatMessageRequest chatMessageRequest = (AskLatestChatMessageRequest) event;
 
         assertTrue(chatMessageRequest.isFromLobby());
-        assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
-        assertEquals(chatMessageRequest.getAmount(), defaultAmount);
+        assertEquals(defaultLobby, chatMessageRequest.getOriginLobby());
+        assertEquals(defaultAmount, chatMessageRequest.getAmount());
     }
 
     /**
@@ -171,8 +171,8 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
-        assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(defaultUser, chatMessageRequest.getRequestingUser());
+        assertEquals(defaultId, chatMessageRequest.getId());
     }
 
     /**
@@ -202,8 +202,8 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
-        assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(defaultUser, chatMessageRequest.getRequestingUser());
+        assertEquals(defaultId, chatMessageRequest.getId());
     }
 
     /**
@@ -232,9 +232,9 @@ class ChatServiceTest {
         DeleteChatMessageRequest chatMessageRequest = (DeleteChatMessageRequest) event;
 
         assertTrue(chatMessageRequest.isFromLobby());
-        assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
-        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
-        assertEquals(chatMessageRequest.getId(), defaultId);
+        assertEquals(defaultLobby, chatMessageRequest.getOriginLobby());
+        assertEquals(defaultUser, chatMessageRequest.getRequestingUser());
+        assertEquals(defaultId, chatMessageRequest.getId());
     }
 
     /**
@@ -263,9 +263,9 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getId(), defaultId);
-        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(defaultId, chatMessageRequest.getId());
+        assertEquals(defaultUser, chatMessageRequest.getRequestingUser());
+        assertEquals(defaultContent, chatMessageRequest.getContent());
     }
 
     /**
@@ -295,9 +295,9 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getId(), defaultId);
-        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(defaultId, chatMessageRequest.getId());
+        assertEquals(defaultUser, chatMessageRequest.getRequestingUser());
+        assertEquals(defaultContent, chatMessageRequest.getContent());
     }
 
     /**
@@ -326,10 +326,10 @@ class ChatServiceTest {
         EditChatMessageRequest chatMessageRequest = (EditChatMessageRequest) event;
 
         assertTrue(chatMessageRequest.isFromLobby());
-        assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
-        assertEquals(chatMessageRequest.getId(), defaultId);
-        assertEquals(chatMessageRequest.getRequestingUser(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(defaultLobby, chatMessageRequest.getOriginLobby());
+        assertEquals(defaultId, chatMessageRequest.getId());
+        assertEquals(defaultUser, chatMessageRequest.getRequestingUser());
+        assertEquals(defaultContent, chatMessageRequest.getContent());
     }
 
     /**
@@ -358,8 +358,8 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(defaultUser, chatMessageRequest.getAuthor());
+        assertEquals(defaultContent, chatMessageRequest.getContent());
     }
 
     /**
@@ -389,8 +389,8 @@ class ChatServiceTest {
 
         assertFalse(chatMessageRequest.isFromLobby());
         assertNull(chatMessageRequest.getOriginLobby());
-        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(defaultUser, chatMessageRequest.getAuthor());
+        assertEquals(defaultContent, chatMessageRequest.getContent());
     }
 
     /**
@@ -419,9 +419,9 @@ class ChatServiceTest {
         NewChatMessageRequest chatMessageRequest = (NewChatMessageRequest) event;
 
         assertTrue(chatMessageRequest.isFromLobby());
-        assertEquals(chatMessageRequest.getOriginLobby(), defaultLobby);
-        assertEquals(chatMessageRequest.getAuthor(), defaultUser);
-        assertEquals(chatMessageRequest.getContent(), defaultContent);
+        assertEquals(defaultLobby, chatMessageRequest.getOriginLobby());
+        assertEquals(defaultUser, chatMessageRequest.getAuthor());
+        assertEquals(defaultContent, chatMessageRequest.getContent());
     }
 
     /**

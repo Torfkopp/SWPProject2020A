@@ -21,17 +21,17 @@ public class LobbyManagement implements ILobbyManagement {
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(String name, User owner) throws IllegalArgumentException {
+    public void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
-            throw new IllegalArgumentException("Lobby name " + name + " already exists!");
+            throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, false));
+        lobbies.put(name, new LobbyDTO(name, owner, false, maxPlayer, false, 60, false, false));
     }
 
     @Override
     public void dropLobby(String name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
-            throw new IllegalArgumentException("Lobby name " + name + " not found!");
+            throw new IllegalArgumentException("Lobby name [" + name + "] not found!");
         }
         lobbies.remove(name);
     }
@@ -55,5 +55,15 @@ public class LobbyManagement implements ILobbyManagement {
         Optional<Lobby> found = getLobby(lobbyName);
         if (found.isEmpty()) return;
         found.get().setInGame(inGame);
+    }
+
+    @Override
+    public void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+                                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+        lobbies.get(lobbyName).setMaxPlayers(maxPlayers);
+        lobbies.get(lobbyName).setCommandsAllowed(commandsAllowed);
+        lobbies.get(lobbyName).setMoveTime(moveTime);
+        lobbies.get(lobbyName).setStartUpPhaseEnabled(startUpPhaseEnabled);
+        lobbies.get(lobbyName).setRandomPlayfieldEnabled(randomPlayfieldEnabled);
     }
 }

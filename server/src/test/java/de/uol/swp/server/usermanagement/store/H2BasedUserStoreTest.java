@@ -62,10 +62,10 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToUpdate.getUsername(), newPass);
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToUpdate);
-        assertEquals(userFound.get().getID(), userToUpdate.getID());
-        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
-        assertEquals(userFound.get().getEMail(), userToUpdate.getEMail());
+        assertEquals(userToUpdate, userFound.get());
+        assertEquals(userToUpdate.getID(), userFound.get().getID());
+        assertEquals(userToUpdate.getUsername(), userFound.get().getUsername());
+        assertEquals(userToUpdate.getEMail(), userFound.get().getEMail());
     }
 
     @Test
@@ -82,11 +82,11 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToUpdate.getUsername(), newPass);
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToUpdate);
-        assertEquals(userFound.get().getID(), userToUpdate.getID());
+        assertEquals(userToUpdate, userFound.get());
+        assertEquals(userToUpdate.getID(), userFound.get().getID());
         assertEquals(userToUpdate.getUsername(), userFound.get().getUsername());
         assertEquals(userToUpdate.getEMail(), userFound.get().getEMail());
-        assertEquals(userFound.get().getPassword(), "");
+        assertEquals("", userFound.get().getPassword());
     }
 
     @Test
@@ -130,10 +130,10 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getID());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToFind);
-        assertEquals(userFound.get().getID(), userToFind.getID());
-        assertEquals(userFound.get().getUsername(), userToFind.getUsername());
-        assertEquals(userFound.get().getEMail(), userToFind.getEMail());
+        assertEquals(userToFind, userFound.get());
+        assertEquals(userToFind.getID(), userFound.get().getID());
+        assertEquals(userToFind.getUsername(), userFound.get().getUsername());
+        assertEquals(userToFind.getEMail(), userFound.get().getEMail());
     }
 
     @Test
@@ -144,11 +144,11 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToFind);
-        assertEquals(userFound.get().getID(), userToFind.getID());
+        assertEquals(userToFind, userFound.get());
+        assertEquals(userToFind.getID(), userFound.get().getID());
         assertEquals(userToFind.getUsername(), userFound.get().getUsername());
         assertEquals(userToFind.getEMail(), userFound.get().getEMail());
-        assertEquals(userFound.get().getPassword(), "");
+        assertEquals("", userFound.get().getPassword());
     }
 
     @Test
@@ -159,11 +159,11 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToFind.getUsername(), userToFind.getPassword());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToFind);
-        assertEquals(userFound.get().getID(), userToFind.getID());
+        assertEquals(userToFind, userFound.get());
+        assertEquals(userToFind.getID(), userFound.get().getID());
         assertEquals(userToFind.getUsername(), userFound.get().getUsername());
         assertEquals(userToFind.getEMail(), userFound.get().getEMail());
-        assertEquals(userFound.get().getPassword(), "");
+        assertEquals("", userFound.get().getPassword());
     }
 
     @Test
@@ -202,7 +202,7 @@ class H2BasedUserStoreTest {
 
         List<User> allUsersFromStore = store.getAllUsers();
 
-        allUsersFromStore.forEach(u -> assertEquals(u.getPassword(), ""));
+        allUsersFromStore.forEach(u -> assertEquals("", u.getPassword()));
         Collections.sort(allUsersFromStore);
 
         assertEquals(allUsers, allUsersFromStore);
@@ -236,10 +236,10 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToUpdate);
-        assertEquals(userFound.get().getID(), userToUpdate.getID());
-        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
-        assertEquals(userFound.get().getEMail(), newEMail);
+        assertEquals(userToUpdate, userFound.get());
+        assertEquals(userToUpdate.getID(), userFound.get().getID());
+        assertEquals(userToUpdate.getUsername(), userFound.get().getUsername());
+        assertEquals(newEMail, userFound.get().getEMail());
     }
 
     @Test
@@ -256,9 +256,9 @@ class H2BasedUserStoreTest {
         Optional<User> userFound = store.findUser(userToUpdate.getUsername());
 
         assertTrue(userFound.isPresent());
-        assertEquals(userFound.get(), userToUpdate);
-        assertEquals(userFound.get().getID(), userToUpdate.getID());
-        assertEquals(userFound.get().getUsername(), userToUpdate.getUsername());
-        assertEquals(userFound.get().getEMail(), newEMail);
+        assertEquals(userToUpdate, userFound.get());
+        assertEquals(userToUpdate.getID(), userFound.get().getID());
+        assertEquals(userToUpdate.getUsername(), userFound.get().getUsername());
+        assertEquals(newEMail, userFound.get().getEMail());
     }
 }

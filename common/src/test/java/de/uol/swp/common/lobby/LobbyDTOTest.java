@@ -25,7 +25,7 @@ class LobbyDTOTest {
 
     private static final User defaultUser = new UserDTO(98, "marco", "marco", "marco@grawunder.de");
     private static final User notInLobbyUser = new UserDTO(99, "no", "marco", "no@grawunder.de");
-    private static final Lobby defaultLobby = new LobbyDTO("TestLobby", defaultUser, false);
+    private static final Lobby defaultLobby = new LobbyDTO("TestLobby", defaultUser, false, 4, false, 60, false, false);
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
@@ -47,7 +47,7 @@ class LobbyDTOTest {
      */
     @Test
     void assureNonEmptyLobbyTest() {
-        Lobby lobby = new LobbyDTO("test", defaultUser, false);
+        Lobby lobby = new LobbyDTO("test", defaultUser, false, 4, false, 60, false, false);
 
         assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
     }
@@ -61,11 +61,11 @@ class LobbyDTOTest {
      */
     @Test
     void createLobbyTest() {
-        Lobby lobby = new LobbyDTO("test", defaultUser, false);
+        Lobby lobby = new LobbyDTO("test", defaultUser, false, 4, false, 60, false, false);
 
-        assertEquals(lobby.getName(), "test");
-        assertEquals(lobby.getUsers().size(), 1);
-        assertEquals(lobby.getUsers().iterator().next(), defaultUser);
+        assertEquals("test", lobby.getName());
+        assertEquals(1, lobby.getUsers().size());
+        assertEquals(defaultUser, lobby.getUsers().iterator().next());
     }
 
     /**
@@ -80,8 +80,8 @@ class LobbyDTOTest {
         Lobby newLobby = LobbyDTO.create(defaultLobby);
 
         // Test every attribute
-        assertEquals(newLobby.getName(), defaultLobby.getName());
-        assertEquals(newLobby.getOwner(), defaultLobby.getOwner());
+        assertEquals(defaultLobby.getName(), newLobby.getName());
+        assertEquals(defaultLobby.getOwner(), newLobby.getOwner());
     }
 
     /**
@@ -97,14 +97,14 @@ class LobbyDTOTest {
         Lobby lobby = LobbyDTO.create(defaultLobby);
 
         lobby.joinUser(users.get(0));
-        assertEquals(lobby.getUsers().size(), 2);
+        assertEquals(2, lobby.getUsers().size());
         assertTrue(lobby.getUsers().contains(users.get(0)));
 
         lobby.joinUser(users.get(0));
-        assertEquals(lobby.getUsers().size(), 2);
+        assertEquals(2, lobby.getUsers().size());
 
         lobby.joinUser(users.get(1));
-        assertEquals(lobby.getUsers().size(), 3);
+        assertEquals(3, lobby.getUsers().size());
         assertTrue(lobby.getUsers().contains(users.get(1)));
     }
 
@@ -121,10 +121,10 @@ class LobbyDTOTest {
         Lobby lobby = LobbyDTO.create(defaultLobby);
         users.forEach(lobby::joinUser);
 
-        assertEquals(lobby.getUsers().size(), users.size() + 1);
+        assertEquals(users.size() + 1, lobby.getUsers().size());
         lobby.leaveUser(users.get(5));
 
-        assertEquals(lobby.getUsers().size(), users.size() + 1 - 1);
+        assertEquals(users.size() + 1 - 1, lobby.getUsers().size());
         assertFalse(lobby.getUsers().contains(users.get(5)));
     }
 
@@ -143,9 +143,27 @@ class LobbyDTOTest {
 
         lobby.leaveUser(defaultUser);
 
-        assertNotEquals(lobby.getOwner(), defaultUser);
-        //Code Analysis: "Suspicious call to 'List.contains'" -Mario
+        assertNotEquals(defaultUser, lobby.getOwner());
         assertTrue(users.contains(lobby.getOwner()));
+    }
+
+    /**
+     * Test to check whether the commandsAllowed setting of a lobby
+     * is updated correctly.
+     * <p>
+     * This test fails if the commandsAllowed setting is not updated.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @Test
+    void updateCommandsAllowedTest() {
+        Lobby lobby = LobbyDTO.create(defaultLobby);
+        assertFalse(lobby.commandsAllowed());
+
+        lobby.setCommandsAllowed(true);
+        assertTrue(lobby.commandsAllowed());
     }
 
     /**
@@ -163,8 +181,88 @@ class LobbyDTOTest {
         users.forEach(lobby::joinUser);
 
         lobby.updateOwner(users.get(6));
-        assertEquals(lobby.getOwner(), users.get(6));
+        assertEquals(users.get(6), lobby.getOwner());
 
         assertThrows(IllegalArgumentException.class, () -> lobby.updateOwner(notInLobbyUser));
+    }
+
+    /**
+     * Test to check whether the maxPlayers setting of a lobby
+     * is updated correctly.
+     * <p>
+     * This test fails if the maxPlayers setting is not updated.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @Test
+    void updateMaxPlayersTest() {
+        Lobby lobby = LobbyDTO.create(defaultLobby);
+        assertEquals(4, lobby.getMaxPlayers());
+
+        lobby.setMaxPlayers(3);
+
+        assertEquals(3, lobby.getMaxPlayers());
+    }
+
+    /**
+     * Test to check whether the moveTime setting of a lobby
+     * is updated correctly.
+     * <p>
+     * This test fails if the moveTime setting is not updated.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @Test
+    void updateMoveTimeTest() {
+        Lobby lobby = LobbyDTO.create(defaultLobby);
+        assertEquals(60, lobby.getMoveTime());
+
+        lobby.setMoveTime(42);
+
+        assertEquals(42, lobby.getMoveTime());
+    }
+
+    /**
+     * Test to check whether the randomPlayfield setting of a lobby
+     * is updated correctly.
+     * <p>
+     * This test fails if the randomPlayfield setting is not updated.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @Test
+    void updateRandomPlayfieldEnabledTest() {
+        Lobby lobby = LobbyDTO.create(defaultLobby);
+        assertFalse(lobby.randomPlayfieldEnabled());
+
+        lobby.setRandomPlayfieldEnabled(true);
+
+        assertTrue(lobby.randomPlayfieldEnabled());
+    }
+
+    /**
+     * Test to check whether the startUpPhase setting of a lobby
+     * is updated correctly.
+     * <p>
+     * This test fails if the startUpPhase setting is not updated.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @Test
+    void updateStartUpPhaseEnabledTest() {
+        Lobby lobby = LobbyDTO.create(defaultLobby);
+        assertFalse(lobby.startUpPhaseEnabled());
+
+        lobby.setStartUpPhaseEnabled(true);
+
+        assertTrue(lobby.startUpPhaseEnabled());
     }
 }
