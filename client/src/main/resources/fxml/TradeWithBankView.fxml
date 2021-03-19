@@ -1,24 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/11.0.1"
+      fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+    <padding>
+        <Insets topRightBottomLeft="20.0"/>
+    </padding>
+    <HBox alignment="CENTER" VBox.vgrow="NEVER">
+        <AnchorPane HBox.hgrow="NEVER" VBox.vgrow="NEVER">
+            <Button fx:id="buyDevelopmentButton" disable="true" layoutX="355.0" layoutY="165.0"
+                    mnemonicParsing="false" onAction="#onBuyDevelopmentCardButtonPressed" prefHeight="50"
+                    text="%game.trade.buttons.buydevcard"/>
+            <Button fx:id="cancelButton" layoutX="355.0" layoutY="225.0" mnemonicParsing="false"
+                    onAction="#onCancelButtonPressed" prefHeight="25.0" text="%game.trade.buttons.cancel"/>
 
-    <Button fx:id="buyDevelopmentButton" disable="true" layoutX="368.0" layoutY="200.0" mnemonicParsing="false"
-            onAction="#onBuyDevelopmentCardButtonPressed" prefHeight="50" text="%game.trade.buttons.buydevcard"/>
-    <Button fx:id="cancelButton" layoutX="368.0" layoutY="270.0" mnemonicParsing="false"
-            onAction="#onCancelButtonPressed" text="%game.trade.buttons.cancel"/>
-    <ListView fx:id="ownResourceToTradeWithView" layoutX="32.0" layoutY="35.0" prefHeight="140.0" prefWidth="200.0">
-        <placeholder>
-            <Label text="%game.trade.lists.insufficientplayerresources"/>
-        </placeholder>
-    </ListView>
-    <ListView fx:id="bankResourceView" layoutX="368.0" layoutY="35.0" prefHeight="140.0" prefWidth="200.0"/>
-    <ListView fx:id="ownInventoryView" layoutX="32.0" layoutY="200" prefHeight="140.0" prefWidth="200.0"/>
-    <VBox alignment="CENTER" layoutX="232.0" layoutY="35.0" prefHeight="140.0" prefWidth="134.0">
-        <Button fx:id="tradeResourceWithBankButton" mnemonicParsing="false"
-                onAction="#onTradeResourceWithBankButtonPressed" text="%game.trade.buttons.tradefor"/>
-    </VBox>
-</AnchorPane>
+            <ListView fx:id="ownResourceToTradeWithView" prefHeight="140.0" prefWidth="200.0">
+                <placeholder>
+                    <Label text="%game.trade.lists.insufficientplayerresources"/>
+                </placeholder>
+            </ListView>
+
+            <ListView fx:id="bankResourceView" layoutX="355.0" prefHeight="140.0" prefWidth="200.0"/>
+
+            <ListView fx:id="ownInventoryView" layoutY="165.0" prefHeight="140.0" prefWidth="200.0"/>
+
+            <VBox alignment="CENTER" layoutX="199.0" prefHeight="140.0" prefWidth="157.0">
+                <Button fx:id="tradeResourceWithBankButton" mnemonicParsing="false"
+                        onAction="#onTradeResourceWithBankButtonPressed" text="%game.trade.buttons.tradefor"/>
+                <padding>
+                    <Insets left="10.0" right="10.0"/>
+                </padding>
+            </VBox>
+        </AnchorPane>
+    </HBox>
+</VBox>

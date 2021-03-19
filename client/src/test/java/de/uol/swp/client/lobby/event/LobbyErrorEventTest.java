@@ -24,6 +24,6 @@ class LobbyErrorEventTest {
     void createLobbyErrorEventTest() {
         LobbyErrorEvent event = new LobbyErrorEvent("Test");
 
-        assertEquals(event.getMessage(), "Test");
+        assertEquals("Test", event.getMessage());
     }
 }

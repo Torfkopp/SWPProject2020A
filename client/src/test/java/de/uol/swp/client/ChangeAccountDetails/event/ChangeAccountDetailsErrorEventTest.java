@@ -26,6 +26,6 @@ public class ChangeAccountDetailsErrorEventTest {
     void createChangePasswordErrorEvent() {
         ChangeAccountDetailsErrorEvent event = new ChangeAccountDetailsErrorEvent("Test");
 
-        assertEquals(event.getMessage(), "Test");
+        assertEquals("Test", event.getMessage());
     }
 }

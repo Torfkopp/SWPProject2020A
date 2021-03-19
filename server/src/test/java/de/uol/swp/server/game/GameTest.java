@@ -26,11 +26,11 @@ class GameTest {
     void gameManagementTest() {
         IGameManagement gm = new GameManagement(new LobbyManagement());
         User user = new UserDTO(99, "", "", "");
-        Lobby lobby = new LobbyDTO("testLobby", user, false);
+        Lobby lobby = new LobbyDTO("testLobby", user, false, 4, false, 60, true, true);
         gm.createGame(lobby, user);
         assertNotNull(gm.getGame("testLobby"));
         Map<String, Game> map = gm.getGames();
-        assertEquals(map.size(), 1);
+        assertEquals(1, map.size());
         gm.dropGame("testLobby");
         map = gm.getGames();
         assertTrue(map.isEmpty());
@@ -42,18 +42,18 @@ class GameTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         Game game = new Game(lobby, user[0]);
         //Lobby speichert Users alphabetisch. SMH mein Haupt
         User[] u = game.getPlayers();
-        assertEquals(u[0], user[0]);
-        assertEquals(u[1], user[1]);
-        assertEquals(u[2], user[2]);
-        assertEquals(game.getLobby(), lobby);
-        assertEquals(game.nextPlayer(), user[1]);
-        assertEquals(game.nextPlayer(), user[2]);
-        assertEquals(game.nextPlayer(), user[0]);
+        assertEquals(user[0], u[0]);
+        assertEquals(user[1], u[1]);
+        assertEquals(user[2], u[2]);
+        assertEquals(lobby, game.getLobby());
+        assertEquals(user[1], game.nextPlayer());
+        assertEquals(user[2], game.nextPlayer());
+        assertEquals(user[0], game.nextPlayer());
     }
 }

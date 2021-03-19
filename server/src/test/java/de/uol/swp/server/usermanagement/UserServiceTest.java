@@ -33,11 +33,11 @@ class UserServiceTest {
         // old user should be still in the store
         assertNotNull(loggedInUser);
         // Cannot compare against the object or ID because RegisterUserRequest doesn't know which ID the user will get
-        assertEquals(loggedInUser.getUsername(), userToRegister.getUsername());
-        assertEquals(loggedInUser.getEMail(), userToRegister.getEMail());
+        assertEquals(userToRegister.getUsername(), loggedInUser.getUsername());
+        assertEquals(userToRegister.getEMail(), loggedInUser.getEMail());
 
         // old user should not be overwritten!
-        assertNotEquals(loggedInUser.getEMail(), userWithSameName.getEMail());
+        assertNotEquals(userWithSameName.getEMail(), loggedInUser.getEMail());
     }
 
     @Test
@@ -52,7 +52,7 @@ class UserServiceTest {
 
         assertNotNull(loggedInUser);
         // Cannot compare against the object or ID because RegisterUserRequest doesn't know which ID the user will get
-        assertEquals(loggedInUser.getUsername(), userToRegister.getUsername());
-        assertEquals(loggedInUser.getEMail(), userToRegister.getEMail());
+        assertEquals(userToRegister.getUsername(), loggedInUser.getUsername());
+        assertEquals(userToRegister.getEMail(), loggedInUser.getEMail());
     }
 }

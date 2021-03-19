@@ -53,12 +53,12 @@ class UserDTOTest {
         User newUser = UserDTO.create(defaultUser);
 
         // Test with equals method
-        assertEquals(newUser, defaultUser);
+        assertEquals(defaultUser, newUser);
 
         // Test every attribute
-        assertEquals(newUser.getUsername(), defaultUser.getUsername());
-        assertEquals(newUser.getPassword(), defaultUser.getPassword());
-        assertEquals(newUser.getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), newUser.getUsername());
+        assertEquals(defaultUser.getPassword(), newUser.getPassword());
+        assertEquals(defaultUser.getEMail(), newUser.getEMail());
     }
 
     /**
@@ -73,12 +73,12 @@ class UserDTOTest {
         User newUser = UserDTO.createWithoutPassword(defaultUser);
 
         // Test every attribute
-        assertEquals(newUser.getUsername(), defaultUser.getUsername());
-        assertEquals(newUser.getPassword(), "");
-        assertEquals(newUser.getEMail(), defaultUser.getEMail());
+        assertEquals(defaultUser.getUsername(), newUser.getUsername());
+        assertEquals("", newUser.getPassword());
+        assertEquals(defaultUser.getEMail(), newUser.getEMail());
 
         // Test with equals method
-        assertEquals(newUser, defaultUser);
+        assertEquals(defaultUser, newUser);
     }
 
     /**
@@ -92,9 +92,9 @@ class UserDTOTest {
     void getWithoutPassword() {
         User userWithoutPassword = defaultUser.getWithoutPassword();
 
-        assertEquals(userWithoutPassword.getUsername(), defaultUser.getPassword());
-        assertEquals(userWithoutPassword.getPassword(), "");
-        assertEquals(userWithoutPassword.getUsername(), defaultUser.getUsername());
+        assertEquals(defaultUser.getPassword(), userWithoutPassword.getUsername());
+        assertEquals("", userWithoutPassword.getPassword());
+        assertEquals(defaultUser.getUsername(), userWithoutPassword.getUsername());
     }
 
     /**
@@ -107,7 +107,7 @@ class UserDTOTest {
     @Test
     void testHashCode() {
         User newUser = UserDTO.create(defaultUser);
-        assertEquals(newUser.hashCode(), defaultUser.hashCode());
+        assertEquals(defaultUser.hashCode(), newUser.hashCode());
     }
 
     /**
@@ -120,7 +120,7 @@ class UserDTOTest {
      */
     @Test
     void userCompare() {
-        assertEquals(defaultUser.compareTo(secondsUser), -1);
+        assertEquals(-1, defaultUser.compareTo(secondsUser));
     }
 
     /**
@@ -132,7 +132,7 @@ class UserDTOTest {
      */
     @Test
     void usersNotEquals_String() {
-        assertNotEquals(defaultUser, "Test");
+        assertNotEquals("Test", defaultUser);
     }
 
     /**

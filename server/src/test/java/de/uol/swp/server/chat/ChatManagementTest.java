@@ -295,9 +295,9 @@ class ChatManagementTest {
         Optional<ChatMessage> foundMessage = chatManagement.findChatMessage(chatMessage.getID(), defaultLobby);
 
         assertTrue(foundMessage.isPresent());
-        assertEquals(foundMessage.get().getID(), chatMessage.getID());
-        assertEquals(foundMessage.get().getAuthor(), defaultUser);
-        assertEquals(foundMessage.get().getContent(), defaultContent);
+        assertEquals(chatMessage.getID(), foundMessage.get().getID());
+        assertEquals(defaultUser, foundMessage.get().getAuthor());
+        assertEquals(defaultContent, foundMessage.get().getContent());
     }
 
     /**
@@ -321,9 +321,9 @@ class ChatManagementTest {
         Optional<ChatMessage> foundMessage = chatManagement.findChatMessage(chatMessage.getID());
 
         assertTrue(foundMessage.isPresent());
-        assertEquals(foundMessage.get().getID(), chatMessage.getID());
-        assertEquals(foundMessage.get().getAuthor(), defaultUser);
-        assertEquals(foundMessage.get().getContent(), defaultContent);
+        assertEquals(chatMessage.getID(), foundMessage.get().getID());
+        assertEquals(defaultUser, foundMessage.get().getAuthor());
+        assertEquals(defaultContent, foundMessage.get().getContent());
     }
 
     /**
@@ -407,8 +407,8 @@ class ChatManagementTest {
 
         assertFalse(listFirstLobby.isEmpty());
 
-        assertEquals(listFirstLobby.get(0).getContent(), defaultContent);
-        assertEquals(listFirstLobby.get(1).getContent(), secondContent);
+        assertEquals(defaultContent, listFirstLobby.get(0).getContent());
+        assertEquals(secondContent, listFirstLobby.get(1).getContent());
     }
 
     /**
@@ -442,8 +442,8 @@ class ChatManagementTest {
 
         assertFalse(listMainMenu.isEmpty());
 
-        assertEquals(listMainMenu.get(0).getContent(), defaultContent);
-        assertEquals(listMainMenu.get(1).getContent(), secondContent);
+        assertEquals(defaultContent, listMainMenu.get(0).getContent());
+        assertEquals(secondContent, listMainMenu.get(1).getContent());
     }
 
     /**

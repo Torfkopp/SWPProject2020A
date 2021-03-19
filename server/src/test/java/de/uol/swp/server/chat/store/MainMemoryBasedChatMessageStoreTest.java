@@ -89,8 +89,8 @@ class MainMemoryBasedChatMessageStoreTest {
         List<ChatMessage> list = store.getLatestMessages(1);
         assertFalse(list.isEmpty());
         assertTrue(list.contains(msg));
-        assertEquals(msg.getAuthor(), defaultUser);
-        assertEquals(msg.getContent(), defaultContent);
+        assertEquals(defaultUser, msg.getAuthor());
+        assertEquals(defaultContent, msg.getContent());
     }
 
     /**
@@ -131,8 +131,8 @@ class MainMemoryBasedChatMessageStoreTest {
         List<ChatMessage> list = store.getLatestMessages(1);
         assertFalse(list.isEmpty());
         assertTrue(list.contains(msg));
-        assertEquals(msg.getAuthor(), defaultUser);
-        assertEquals(msg.getContent(), defaultContent);
+        assertEquals(defaultUser, msg.getAuthor());
+        assertEquals(defaultContent, msg.getContent());
     }
 
     /**
@@ -156,8 +156,8 @@ class MainMemoryBasedChatMessageStoreTest {
         List<ChatMessage> list = store.getLatestMessages(1, defaultLobbyName);
         assertFalse(list.isEmpty());
         assertTrue(list.contains(msg));
-        assertEquals(msg.getAuthor(), defaultUser);
-        assertEquals(msg.getContent(), defaultContent);
+        assertEquals(defaultUser, msg.getAuthor());
+        assertEquals(defaultContent, msg.getContent());
     }
 
     /**
@@ -824,7 +824,7 @@ class MainMemoryBasedChatMessageStoreTest {
 
         Optional<ChatMessage> result = store.findMessage(msg.getID());
         assertTrue(result.isPresent());
-        assertEquals(result.get().getContent(), defaultContent);
+        assertEquals(defaultContent, result.get().getContent());
     }
 
     /**
@@ -845,7 +845,7 @@ class MainMemoryBasedChatMessageStoreTest {
 
         Optional<ChatMessage> result = store.findMessage(msg.getID());
         assertTrue(result.isPresent());
-        assertEquals(result.get().getContent(), defaultContent);
+        assertEquals(defaultContent, result.get().getContent());
     }
 
     /**
@@ -868,9 +868,9 @@ class MainMemoryBasedChatMessageStoreTest {
         store.updateChatMessage(msg2.getID(), defaultContent);
 
         List<ChatMessage> list = store.getLatestMessages(3);
-        assertEquals(list.get(1).getContent(), defaultContent); // the edited ChatMessage
-        assertEquals(list.get(0).getContent(), defaultContent);
-        assertEquals(list.get(2).getContent(), thirdContent);
+        assertEquals(defaultContent, list.get(1).getContent()); // the edited ChatMessage
+        assertEquals(defaultContent, list.get(0).getContent());
+        assertEquals(thirdContent, list.get(2).getContent());
     }
 
     /**
@@ -892,7 +892,7 @@ class MainMemoryBasedChatMessageStoreTest {
 
         Optional<ChatMessage> result = store.findMessage(msg.getID(), defaultLobbyName);
         assertTrue(result.isPresent());
-        assertEquals(result.get().getContent(), defaultContent);
+        assertEquals(defaultContent, result.get().getContent());
     }
 
     /**
@@ -915,7 +915,7 @@ class MainMemoryBasedChatMessageStoreTest {
 
         Optional<ChatMessage> result = store.findMessage(msg.getID(), defaultLobbyName);
         assertTrue(result.isPresent());
-        assertEquals(result.get().getContent(), defaultContent);
+        assertEquals(defaultContent, result.get().getContent());
     }
 
     /**
@@ -939,9 +939,9 @@ class MainMemoryBasedChatMessageStoreTest {
         store.updateChatMessage(msg2.getID(), defaultContent, null);
 
         List<ChatMessage> list = store.getLatestMessages(3, null);
-        assertEquals(list.get(1).getContent(), defaultContent); // the edited ChatMessage
-        assertEquals(list.get(0).getContent(), defaultContent);
-        assertEquals(list.get(2).getContent(), thirdContent);
+        assertEquals(defaultContent, list.get(1).getContent()); // the edited ChatMessage
+        assertEquals(defaultContent, list.get(0).getContent());
+        assertEquals(thirdContent, list.get(2).getContent());
     }
 
     /**
@@ -966,9 +966,9 @@ class MainMemoryBasedChatMessageStoreTest {
         store.updateChatMessage(msg2.getID(), defaultContent, defaultLobbyName);
 
         List<ChatMessage> list = store.getLatestMessages(3, defaultLobbyName);
-        assertEquals(list.get(1).getContent(), defaultContent); // the edited ChatMessage
-        assertEquals(list.get(0).getContent(), defaultContent);
-        assertEquals(list.get(2).getContent(), thirdContent);
+        assertEquals(defaultContent, list.get(1).getContent()); // the edited ChatMessage
+        assertEquals(defaultContent, list.get(0).getContent());
+        assertEquals(thirdContent, list.get(2).getContent());
     }
 
     /**
@@ -1030,9 +1030,9 @@ class MainMemoryBasedChatMessageStoreTest {
         store.updateChatMessage(msg2.getID(), defaultContent);
 
         List<ChatMessage> list = store.getLatestMessages(3);
-        assertEquals(list.get(1).getContent(), defaultContent); // the edited ChatMessage
-        assertEquals(list.get(0).getContent(), defaultContent);
-        assertEquals(list.get(2).getContent(), thirdContent);
+        assertEquals(defaultContent, list.get(1).getContent()); // the edited ChatMessage
+        assertEquals(defaultContent, list.get(0).getContent());
+        assertEquals(thirdContent, list.get(2).getContent());
     }
 
     /**
@@ -1076,8 +1076,8 @@ class MainMemoryBasedChatMessageStoreTest {
         store.updateChatMessage(msg2.getID(), defaultContent, null);
 
         List<ChatMessage> list = store.getLatestMessages(3);
-        assertEquals(list.get(1).getContent(), defaultContent); // the edited ChatMessage
-        assertEquals(list.get(0).getContent(), defaultContent);
-        assertEquals(list.get(2).getContent(), thirdContent);
+        assertEquals(defaultContent, list.get(1).getContent()); // the edited ChatMessage
+        assertEquals(defaultContent, list.get(0).getContent());
+        assertEquals(thirdContent, list.get(2).getContent());
     }
 }

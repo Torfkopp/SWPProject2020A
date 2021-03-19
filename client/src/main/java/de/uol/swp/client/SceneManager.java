@@ -37,6 +37,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -55,26 +56,26 @@ import java.util.*;
 @SuppressWarnings("UnstableApiUsage")
 public class SceneManager {
 
-    static final Logger LOG = LogManager.getLogger(SceneManager.class);
-    static final String styleSheet = "css/swp.css";
-    private static final int LOBBY_HEIGHT = 730;
-    private static final int LOBBY_WIDTH = 685;
+    private static final Logger LOG = LogManager.getLogger(SceneManager.class);
+    private static final String styleSheet = "css/swp.css";
+    private static final int BANK_TRADING_HEIGHT = 400;
+    private static final int BANK_TRADING_WIDTH = 620;
+    private static final int CHANGEPW_HEIGHT = 230;
+    private static final int CHANGEPW_WIDTH = 395;
     private static final int DEVMENU_HEIGHT = 450;
     private static final int DEVMENU_WIDTH = 630;
-    private static final int TRADING_HEIGHT = 600;
-    private static final int TRADING_WIDTH = 600;
     private static final int LOGIN_HEIGHT = 220;
     private static final int LOGIN_WIDTH = 400;
-    private static final int REGISTRATION_HEIGHT = 250;
-    private static final int REGISTRATION_WIDTH = 410;
     private static final int MAINMENU_HEIGHT = 550;
     private static final int MAINMENU_WIDTH = 820;
     private static final int CHANGEACCDETAILS_HEIGHT = 230;
     private static final int CHANGEACCDETAILS_WIDTH = 395;
     private static final int RESPONSE_TRADING_WIDTH = 390;
+    private static final int REGISTRATION_HEIGHT = 250;
+    private static final int REGISTRATION_WIDTH = 410;
     private static final int RESPONSE_TRADING_HEIGHT = 350;
-    private static final int BANK_TRADING_HEIGHT = 420;
-    private static final int BANK_TRADING_WIDTH = 600;
+    private static final int TRADING_HEIGHT = 620;
+    private static final int TRADING_WIDTH = 520;
 
     private final ResourceBundle resourceBundle;
     private final Stage primaryStage;
@@ -147,12 +148,21 @@ public class SceneManager {
      * @param message The type of error to be shown
      * @param e       The error message
      *
-     * @since 2019-09-03
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-03-12
      */
     public void showError(String message, String e) {
         Platform.runLater(() -> {
-            Alert a = new Alert(Alert.AlertType.ERROR, message + e);
-            a.showAndWait();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(resourceBundle.getString("error.title"));
+            alert.setHeaderText(resourceBundle.getString("error.header"));
+            String context = internationaliseServerMessage(e);
+            alert.setContentText(message + context);
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            alert.showAndWait();
         });
     }
 
@@ -183,8 +193,15 @@ public class SceneManager {
     public void showLogOldSessionOutScreen(User user) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
+            alert.setTitle(resourceBundle.getString("confirmation.title"));
+            alert.setHeaderText(resourceBundle.getString("confirmation.header"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(confirm, cancel);
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (result.isPresent() && result.get() == confirm) {
                 eventBus.post(new NukeUsersSessionsRequest(user));
             }
         });
@@ -200,6 +217,9 @@ public class SceneManager {
     public void showLoginErrorScreen() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
             alert.showAndWait();
             showLoginScreen();
         });
@@ -253,6 +273,97 @@ public class SceneManager {
      */
     public void showServerError(String e) {
         showError(resourceBundle.getString("error.server") + '\n', e);
+    }
+
+    /**
+     * Internationalises a Message coming from the server
+     *
+     * @param e The original exception message
+     *
+     * @return The internationalised message
+     *
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-03-12
+     */
+    private String internationaliseServerMessage(String e) {
+        String context = e;
+        // @formatter:off
+        switch (e) {
+            //Found in ChatService
+            case "This lobby doesn't allow the use of commands!":
+                context = resourceBundle.getString("error.context.commandsforbidden");
+                break;
+            //Found in LobbyService
+            case "Game session started already!":
+                context = resourceBundle.getString("error.context.sessionstarted");
+                break;
+            case "You're already in this lobby!":
+                context = resourceBundle.getString("error.context.alreadyin");
+                break;
+            case "This lobby is full!":
+                context = resourceBundle.getString("error.context.full");
+                break;
+            case "This lobby does not exist!":
+                context = resourceBundle.getString("error.context.noexistant");
+                break;
+            //Found in GameService
+            case "Can not kick while a game is ongoing":
+                context = resourceBundle.getString("error.context.ongoing");
+                break;
+            //Found in ServerHandler
+            case "Authorisation required. Client not logged in!":
+                context = resourceBundle.getString("error.context.authneeded");
+                break;
+            //Found in UserManagement
+            case "Username already used!":
+                context = resourceBundle.getString("error.context.nameused");
+                break;
+            case "Username unknown!":
+                context = resourceBundle.getString("error.context.unknown");
+                break;
+            //Found in UserService
+            case "Old Passwords are not equal":
+                context = resourceBundle.getString("error.context.oldpw");
+                break;
+        }
+        //found in UserManagement
+        if (e.contains("Cannot auth user ")) context =
+                resourceBundle.getString("error.context.cannotauth") +
+                e.substring(16);
+        //found in UserService
+        if (e.contains("Cannot delete user ")) context =
+                resourceBundle.getString("error.context.cannotdelete") + " " +
+                e.substring(e.indexOf('[')+1, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.unknown");
+        if (e.contains("Cannot create user ")) context =
+                resourceBundle.getString("error.context.cannotcreate") + " " +
+                e.substring(e.indexOf('[')+2-1, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.nameused");
+        if (e.contains("Cannot change Password of ")) context =
+                resourceBundle.getString("error.context.cannotchangepw") + " " +
+                e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.unknown");
+        //found in LobbyManagement
+        if (e.contains("Lobby") && e.contains(" already exists!")) context =
+                resourceBundle.getString("error.context.lobbyname") + " " +
+                e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.alreadyexists");
+        if (e.contains("Lobby") && e.contains(" not found!")) context =
+                resourceBundle.getString("error.context.lobbyname") + " " +
+                e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.notfound");
+        //found in GameManagement
+        if (e.contains("Game") && e.contains(" already exists!")) context =
+                resourceBundle.getString("error.context.gamelobby") + " " +
+                e.substring(e.indexOf('[')+6-5, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.alreadyexists");
+        if (e.contains("Game") && e.contains(" not found!")) context =
+                resourceBundle.getString("error.context.gamelobby") + " " +
+                e.substring(e.indexOf('[')+7-6, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.notfound");
+        // @formatter:on
+        return context;
     }
 
     /**
@@ -596,10 +707,10 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
-        lobbyStage.setHeight(LOBBY_HEIGHT);
-        lobbyStage.setMinHeight(LOBBY_HEIGHT);
-        lobbyStage.setWidth(LOBBY_WIDTH);
-        lobbyStage.setMinWidth(LOBBY_WIDTH);
+        lobbyStage.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+        lobbyStage.setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+        lobbyStage.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+        lobbyStage.setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);
@@ -723,9 +834,6 @@ public class SceneManager {
             tradeScene.getStylesheets().add(styleSheet);
             tradingResponseStage.setScene(tradeScene);
             tradingResponseStages.put(lobbyName, tradingResponseStage);
-            System.out.println("Scene gesetzt");
-            System.out.println(tradingResponseStages.get(lobbyName));
-            System.out.println(tradingResponseStages.size());
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();

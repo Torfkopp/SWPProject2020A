@@ -25,6 +25,6 @@ class RegistrationErrorEventTest {
     void createRegistrationErrorEvent() {
         RegistrationErrorEvent event = new RegistrationErrorEvent("Test");
 
-        assertEquals(event.getMessage(), "Test");
+        assertEquals("Test", event.getMessage());
     }
 }

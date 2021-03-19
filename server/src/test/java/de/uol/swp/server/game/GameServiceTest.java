@@ -91,7 +91,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -102,37 +102,37 @@ public class GameServiceTest {
         gameInventory[0].setGrain(5);
         gameInventory[0].setOre(5);
         gameInventory[0].setLumber(5);
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
+        assertEquals(5, gameInventory[0].getWool());
+        assertEquals(5, gameInventory[0].getBrick());
+        assertEquals(5, gameInventory[0].getOre());
+        assertEquals(5, gameInventory[0].getGrain());
+        assertEquals(5, gameInventory[0].getLumber());
 
-        assertEquals(gameInventory[0].getKnightCards(), 0);
-        assertEquals(gameInventory[0].getRoadBuildingCards(), 0);
-        assertEquals(gameInventory[0].getMonopolyCards(), 0);
-        assertEquals(gameInventory[0].getYearOfPlentyCards(), 0);
-        assertEquals(gameInventory[0].getVictoryPointCards(), 0);
+        assertEquals(0, gameInventory[0].getKnightCards());
+        assertEquals(0, gameInventory[0].getRoadBuildingCards());
+        assertEquals(0, gameInventory[0].getMonopolyCards());
+        assertEquals(0, gameInventory[0].getYearOfPlentyCards());
+        assertEquals(0, gameInventory[0].getVictoryPointCards());
 
         List<String> bankInventory = game.getBankInventory();
         //deletes the bank inventory
         for (int i = 0; i < bankInventory.size(); ) {
             bankInventory.remove(0);
         }
-        assertEquals(bankInventory.size(), 0);
+        assertEquals(0, bankInventory.size());
 
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getInventories();
         List<String> bankInv = game1.getBankInventory();
-        assertEquals(bankInv, bankInventory);
-        assertEquals(bankInv.size(), 0);
-        assertEquals(gameInventory1[0].getKnightCards(), 0);
-        assertEquals(gameInventory1[0].getRoadBuildingCards(), 0);
-        assertEquals(gameInventory1[0].getMonopolyCards(), 0);
-        assertEquals(gameInventory1[0].getYearOfPlentyCards(), 0);
-        assertEquals(gameInventory1[0].getVictoryPointCards(), 0);
+        assertEquals(bankInventory, bankInv);
+        assertEquals(0, bankInv.size());
+        assertEquals(0, gameInventory1[0].getKnightCards());
+        assertEquals(0, gameInventory1[0].getRoadBuildingCards());
+        assertEquals(0, gameInventory1[0].getMonopolyCards());
+        assertEquals(0, gameInventory1[0].getYearOfPlentyCards());
+        assertEquals(0, gameInventory1[0].getVictoryPointCards());
     }
 
     /**
@@ -150,7 +150,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -161,21 +161,21 @@ public class GameServiceTest {
         gameInventory[0].setGrain(5);
         gameInventory[0].setOre(5);
         gameInventory[0].setLumber(5);
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
+        assertEquals(5, gameInventory[0].getWool());
+        assertEquals(5, gameInventory[0].getBrick());
+        assertEquals(5, gameInventory[0].getOre());
+        assertEquals(5, gameInventory[0].getGrain());
+        assertEquals(5, gameInventory[0].getLumber());
         int usersVictoryPointCards = gameInventory[0].getVictoryPointCards();
         int usersRoadBuildingCards = gameInventory[0].getRoadBuildingCards();
         int usersYearOfPlentyCards = gameInventory[0].getYearOfPlentyCards();
         int usersMonopolyCards = gameInventory[0].getMonopolyCards();
         int usersKnightCards = gameInventory[0].getKnightCards();
-        assertEquals(usersKnightCards, 0);
-        assertEquals(usersRoadBuildingCards, 0);
-        assertEquals(usersMonopolyCards, 0);
-        assertEquals(usersYearOfPlentyCards, 0);
-        assertEquals(usersVictoryPointCards, 0);
+        assertEquals(0, usersKnightCards);
+        assertEquals(0, usersRoadBuildingCards);
+        assertEquals(0, usersMonopolyCards);
+        assertEquals(0, usersYearOfPlentyCards);
+        assertEquals(0, usersVictoryPointCards);
         int knightCards = 0;
         int roadBuildingCards = 0;
         int yearOfPlentyCards = 0;
@@ -193,11 +193,11 @@ public class GameServiceTest {
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getInventories();
-        assertEquals(gameInventory1[0].getOre(), 4);
-        assertEquals(gameInventory1[0].getWool(), 4);
-        assertEquals(gameInventory1[0].getBrick(), 5);
-        assertEquals(gameInventory1[0].getGrain(), 4);
-        assertEquals(gameInventory1[0].getLumber(), 5);
+        assertEquals(4, gameInventory1[0].getOre());
+        assertEquals(4, gameInventory1[0].getWool());
+        assertEquals(5, gameInventory1[0].getBrick());
+        assertEquals(4, gameInventory1[0].getGrain());
+        assertEquals(5, gameInventory1[0].getLumber());
         int newBankKnightCards = 0;
         int newBankRoadBuildingCards = 0;
         int newBankYearOfPlentyCards = 0;
@@ -238,7 +238,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -250,17 +250,17 @@ public class GameServiceTest {
         gameInventory[0].setGrain(0);
         gameInventory[0].setOre(0);
         gameInventory[0].setLumber(0);
-        assertEquals(gameInventory[0].getWool(), 0);
-        assertEquals(gameInventory[0].getBrick(), 0);
-        assertEquals(gameInventory[0].getOre(), 0);
-        assertEquals(gameInventory[0].getGrain(), 0);
-        assertEquals(gameInventory[0].getLumber(), 0);
+        assertEquals(0, gameInventory[0].getWool());
+        assertEquals(0, gameInventory[0].getBrick());
+        assertEquals(0, gameInventory[0].getOre());
+        assertEquals(0, gameInventory[0].getGrain());
+        assertEquals(0, gameInventory[0].getLumber());
 
-        assertEquals(gameInventory[0].getKnightCards(), 0);
-        assertEquals(gameInventory[0].getRoadBuildingCards(), 0);
-        assertEquals(gameInventory[0].getMonopolyCards(), 0);
-        assertEquals(gameInventory[0].getYearOfPlentyCards(), 0);
-        assertEquals(gameInventory[0].getVictoryPointCards(), 0);
+        assertEquals(0, gameInventory[0].getKnightCards());
+        assertEquals(0, gameInventory[0].getRoadBuildingCards());
+        assertEquals(0, gameInventory[0].getMonopolyCards());
+        assertEquals(0, gameInventory[0].getYearOfPlentyCards());
+        assertEquals(0, gameInventory[0].getVictoryPointCards());
 
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
@@ -269,18 +269,18 @@ public class GameServiceTest {
         Inventory[] gameInventory1 = game1.getInventories();
         List<String> bankInv = game1.getBankInventory();
 
-        assertEquals(bankInv, bankInventory);
-        assertEquals(gameInventory1[0].getKnightCards(), 0);
-        assertEquals(gameInventory1[0].getRoadBuildingCards(), 0);
-        assertEquals(gameInventory1[0].getMonopolyCards(), 0);
-        assertEquals(gameInventory1[0].getYearOfPlentyCards(), 0);
-        assertEquals(gameInventory1[0].getVictoryPointCards(), 0);
+        assertEquals(bankInventory, bankInv);
+        assertEquals(0, gameInventory1[0].getKnightCards());
+        assertEquals(0, gameInventory1[0].getRoadBuildingCards());
+        assertEquals(0, gameInventory1[0].getMonopolyCards());
+        assertEquals(0, gameInventory1[0].getYearOfPlentyCards());
+        assertEquals(0, gameInventory1[0].getVictoryPointCards());
 
-        assertEquals(gameInventory1[0].getWool(), 0);
-        assertEquals(gameInventory1[0].getBrick(), 0);
-        assertEquals(gameInventory1[0].getOre(), 0);
-        assertEquals(gameInventory1[0].getGrain(), 0);
-        assertEquals(gameInventory1[0].getLumber(), 0);
+        assertEquals(0, gameInventory1[0].getWool());
+        assertEquals(0, gameInventory1[0].getBrick());
+        assertEquals(0, gameInventory1[0].getOre());
+        assertEquals(0, gameInventory1[0].getGrain());
+        assertEquals(0, gameInventory1[0].getLumber());
     }
 
     /**
@@ -301,7 +301,7 @@ public class GameServiceTest {
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
-        lobbyManagement.createLobby("testlobby", user[0]);
+        lobbyManagement.createLobby("testlobby", user[0], 4);
         Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
@@ -332,7 +332,7 @@ public class GameServiceTest {
         loginUser(user[0]);
         loginUser(user[1]);
         loginUser(user[2]);
-        lobbyManagement.createLobby("testlobby", user[0]);
+        lobbyManagement.createLobby("testlobby", user[0], 4);
         Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
@@ -360,7 +360,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        lobbyManagement.createLobby("testlobby", user[0]);
+        lobbyManagement.createLobby("testlobby", user[0], 4);
         Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
@@ -390,7 +390,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        lobbyManagement.createLobby("testlobby", user[0]);
+        lobbyManagement.createLobby("testlobby", user[0], 4);
         Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
@@ -419,7 +419,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -430,11 +430,11 @@ public class GameServiceTest {
         gameInventory[0].setGrain(5);
         gameInventory[0].setOre(5);
         gameInventory[0].setLumber(5);
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
+        assertEquals(5, gameInventory[0].getWool());
+        assertEquals(5, gameInventory[0].getBrick());
+        assertEquals(5, gameInventory[0].getOre());
+        assertEquals(5, gameInventory[0].getGrain());
+        assertEquals(5, gameInventory[0].getLumber());
 
         Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(user[0],
                                                                                                         "testlobby",
@@ -443,22 +443,22 @@ public class GameServiceTest {
         bus.post(updateInventoryAfterTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getInventories();
-        assertEquals(gameInventory1[0].getLumber(), 5);
-        assertEquals(gameInventory1[0].getWool(), 6);
-        assertEquals(gameInventory1[0].getBrick(), 1);
-        assertEquals(gameInventory1[0].getGrain(), 5);
-        assertEquals(gameInventory1[0].getLumber(), 5);
+        assertEquals(5, gameInventory1[0].getLumber());
+        assertEquals(6, gameInventory1[0].getWool());
+        assertEquals(1, gameInventory1[0].getBrick());
+        assertEquals(5, gameInventory1[0].getGrain());
+        assertEquals(5, gameInventory1[0].getLumber());
 
         bus.post(updateInventoryAfterTradeWithBankRequest);
         Game game2 = gameManagement.getGame("testlobby");
         //inventory doesnt change because user had not enough resources
         Inventory[] gameInventory2 = game2.getInventories();
         assertEquals(gameInventory1[0], gameInventory2[0]);
-        assertEquals(gameInventory2[0].getLumber(), 5);
-        assertEquals(gameInventory2[0].getWool(), 6);
-        assertEquals(gameInventory2[0].getBrick(), 1);
-        assertEquals(gameInventory2[0].getGrain(), 5);
-        assertEquals(gameInventory2[0].getLumber(), 5);
+        assertEquals(5, gameInventory2[0].getLumber());
+        assertEquals(6, gameInventory2[0].getWool());
+        assertEquals(1, gameInventory2[0].getBrick());
+        assertEquals(5, gameInventory2[0].getGrain());
+        assertEquals(5, gameInventory2[0].getLumber());
     }
 
     /**
@@ -479,7 +479,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -492,11 +492,11 @@ public class GameServiceTest {
             gameInventory[i].setOre(5);
             gameInventory[i].setLumber(5);
         }
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
+        assertEquals(5, gameInventory[0].getWool());
+        assertEquals(5, gameInventory[0].getBrick());
+        assertEquals(5, gameInventory[0].getOre());
+        assertEquals(5, gameInventory[0].getGrain());
+        assertEquals(5, gameInventory[0].getLumber());
 
         Map<String, Integer> offeringResourceMap = new HashMap<>();
         offeringResourceMap.put("brick", 2);
@@ -518,17 +518,17 @@ public class GameServiceTest {
 
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getInventories();
-        assertEquals(gameInventory1[0].getOre(), 2);
-        assertEquals(gameInventory1[0].getWool(), 6);
-        assertEquals(gameInventory1[0].getBrick(), 3);
-        assertEquals(gameInventory1[0].getGrain(), 5);
-        assertEquals(gameInventory1[0].getLumber(), 9);
+        assertEquals(2, gameInventory1[0].getOre());
+        assertEquals(6, gameInventory1[0].getWool());
+        assertEquals(3, gameInventory1[0].getBrick());
+        assertEquals(5, gameInventory1[0].getGrain());
+        assertEquals(9, gameInventory1[0].getLumber());
 
-        assertEquals(gameInventory1[1].getOre(), 8);
-        assertEquals(gameInventory1[1].getWool(), 4);
-        assertEquals(gameInventory1[1].getBrick(), 7);
-        assertEquals(gameInventory1[1].getGrain(), 5);
-        assertEquals(gameInventory1[1].getLumber(), 1);
+        assertEquals(8, gameInventory1[1].getOre());
+        assertEquals(4, gameInventory1[1].getWool());
+        assertEquals(7, gameInventory1[1].getBrick());
+        assertEquals(5, gameInventory1[1].getGrain());
+        assertEquals(1, gameInventory1[1].getLumber());
     }
 
     /**
@@ -550,7 +550,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -568,17 +568,17 @@ public class GameServiceTest {
         gameInventory[2].setOre(0);
         gameInventory[2].setLumber(0);
 
-        assertEquals(gameInventory[0].getWool(), 5);
-        assertEquals(gameInventory[0].getBrick(), 5);
-        assertEquals(gameInventory[0].getOre(), 5);
-        assertEquals(gameInventory[0].getGrain(), 5);
-        assertEquals(gameInventory[0].getLumber(), 5);
+        assertEquals(5, gameInventory[0].getWool());
+        assertEquals(5, gameInventory[0].getBrick());
+        assertEquals(5, gameInventory[0].getOre());
+        assertEquals(5, gameInventory[0].getGrain());
+        assertEquals(5, gameInventory[0].getLumber());
 
-        assertEquals(gameInventory[2].getWool(), 0);
-        assertEquals(gameInventory[2].getBrick(), 0);
-        assertEquals(gameInventory[2].getOre(), 0);
-        assertEquals(gameInventory[2].getGrain(), 0);
-        assertEquals(gameInventory[2].getLumber(), 0);
+        assertEquals(0, gameInventory[2].getWool());
+        assertEquals(0, gameInventory[2].getBrick());
+        assertEquals(0, gameInventory[2].getOre());
+        assertEquals(0, gameInventory[2].getGrain());
+        assertEquals(0, gameInventory[2].getLumber());
 
         Map<String, Integer> offeringResourceMap = new HashMap<>();
         offeringResourceMap.put("brick", 2);
@@ -600,17 +600,17 @@ public class GameServiceTest {
 
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getInventories();
-        assertEquals(gameInventory1[0].getWool(), 5);
-        assertEquals(gameInventory1[0].getBrick(), 5);
-        assertEquals(gameInventory1[0].getOre(), 5);
-        assertEquals(gameInventory1[0].getGrain(), 5);
-        assertEquals(gameInventory1[0].getLumber(), 5);
+        assertEquals(5, gameInventory1[0].getWool());
+        assertEquals(5, gameInventory1[0].getBrick());
+        assertEquals(5, gameInventory1[0].getOre());
+        assertEquals(5, gameInventory1[0].getGrain());
+        assertEquals(5, gameInventory1[0].getLumber());
 
-        assertEquals(gameInventory1[2].getWool(), 0);
-        assertEquals(gameInventory1[2].getBrick(), 0);
-        assertEquals(gameInventory1[2].getOre(), 0);
-        assertEquals(gameInventory1[2].getGrain(), 0);
-        assertEquals(gameInventory1[2].getLumber(), 0);
+        assertEquals(0, gameInventory1[2].getWool());
+        assertEquals(0, gameInventory1[2].getBrick());
+        assertEquals(0, gameInventory1[2].getOre());
+        assertEquals(0, gameInventory1[2].getGrain());
+        assertEquals(0, gameInventory1[2].getLumber());
 
         Message tradeWithUser2 = new AcceptUserTradeRequest(gameInventory[0].getPlayer().getUsername(),
                                                             gameInventory[2].getPlayer().getUsername(), "testlobby",
@@ -619,17 +619,17 @@ public class GameServiceTest {
 
         Game game2 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory2 = game2.getInventories();
-        assertEquals(gameInventory2[0].getWool(), 5);
-        assertEquals(gameInventory2[0].getBrick(), 5);
-        assertEquals(gameInventory2[0].getOre(), 5);
-        assertEquals(gameInventory2[0].getGrain(), 5);
-        assertEquals(gameInventory2[0].getLumber(), 5);
+        assertEquals(5, gameInventory2[0].getWool());
+        assertEquals(5, gameInventory2[0].getBrick());
+        assertEquals(5, gameInventory2[0].getOre());
+        assertEquals(5, gameInventory2[0].getGrain());
+        assertEquals(5, gameInventory2[0].getLumber());
 
-        assertEquals(gameInventory2[2].getWool(), 0);
-        assertEquals(gameInventory2[2].getBrick(), 0);
-        assertEquals(gameInventory2[2].getOre(), 0);
-        assertEquals(gameInventory2[2].getGrain(), 0);
-        assertEquals(gameInventory2[2].getLumber(), 0);
+        assertEquals(0, gameInventory2[2].getWool());
+        assertEquals(0, gameInventory2[2].getBrick());
+        assertEquals(0, gameInventory2[2].getOre());
+        assertEquals(0, gameInventory2[2].getGrain());
+        assertEquals(0, gameInventory2[2].getLumber());
     }
 
     @Test
@@ -638,14 +638,14 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame(lobby.getName());
         game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
         bus.post(new PlayKnightCardRequest(lobby.getName(), user[0]));
-        assertEquals(game.getInventory(Player.PLAYER_1).getKnights(), 1);
+        assertEquals(1, game.getInventory(Player.PLAYER_1).getKnights());
     }
 
     @Test
@@ -654,7 +654,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
@@ -664,9 +664,9 @@ public class GameServiceTest {
         inventories[2].increaseBrick(2);
         inventories[0].increaseMonopolyCards(1);
         bus.post(new PlayMonopolyCardRequest(lobby.getName(), user[0], Resources.BRICK));
-        assertEquals(inventories[0].getBrick(), 2);
-        assertEquals(inventories[1].getBrick(), 0);
-        assertEquals(inventories[2].getBrick(), 1);
+        assertEquals(2, inventories[0].getBrick());
+        assertEquals(0, inventories[1].getBrick());
+        assertEquals(1, inventories[2].getBrick());
     }
 
     @Test
@@ -675,16 +675,16 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         gameManagement.createGame(lobby, user[0]);
         Game game = gameManagement.getGame(lobby.getName());
-        assertEquals(game.getInventory(Player.PLAYER_1).getBrick(), 0);
+        assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
         game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
         bus.post(new PlayYearOfPlentyCardRequest(lobby.getName(), user[0], Resources.BRICK, Resources.GRAIN));
-        assertEquals(game.getInventory(Player.PLAYER_1).getBrick(), 1);
-        assertEquals(game.getInventory(Player.PLAYER_1).getGrain(), 1);
+        assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_1).getGrain());
     }
 
     @Test
