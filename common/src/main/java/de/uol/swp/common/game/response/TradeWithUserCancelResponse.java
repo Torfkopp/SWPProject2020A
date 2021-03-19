@@ -9,7 +9,7 @@ import de.uol.swp.common.user.User;
  * @author Maximilian Lindner
  * @author Aldin Dervisi
  * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
- * @since 2021 -03-19
+ * @since 2021-03-19
  */
 public class TradeWithUserCancelResponse extends AbstractLobbyResponse {
 

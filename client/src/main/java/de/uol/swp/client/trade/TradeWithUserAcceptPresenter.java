@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Maximilian Lindner
  * @author Finn Haase
  * @see de.uol.swp.client.AbstractPresenter
- * @since 2021 -02-25
+ * @since 2021-02-25
  */
 @SuppressWarnings("UnstableApiUsage")
 public class TradeWithUserAcceptPresenter extends AbstractPresenter {
