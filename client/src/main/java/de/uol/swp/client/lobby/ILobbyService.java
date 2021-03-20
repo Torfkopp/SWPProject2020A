@@ -1,6 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
 /**
@@ -15,13 +16,14 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param name The name chosen for the new lobby
-     * @param user The user wanting to create the new lobby
+     * @param name      The name chosen for the new lobby
+     * @param user      The user wanting to create the new lobby
+     * @param maxPlayer The maximum amount of players for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(String name, User user);
+    void createNewLobby(String name, User user, int maxPlayer);
 
     /**
      * Posts a request to end the turn onto the Event
@@ -56,6 +58,41 @@ public interface ILobbyService {
     void leaveLobby(String lobbyName, User user);
 
     /**
+     * Posts a message to play a KnightCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user
+     */
+    void playKnightCard(String lobbyName, User user);
+
+    /**
+     * Posts a message to play a MonopolyCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user
+     * @param resource  The resource the user wants
+     */
+    void playMonopolyCard(String lobbyName, User user, Resources resource);
+
+    /**
+     * Posts a message to play a RoadBuildingCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user
+     */
+    void playRoadBuildingCard(String lobbyName, User user);
+
+    /**
+     * Posts a message to play a YearOfPlentyCard
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user
+     * @param resource1 The resource the user wants
+     * @param resource2 The resource the user wants
+     */
+    void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2);
+
+    /**
      * Posts a new instance of the LobbyUpdateEvent onto the Eventbus
      * <p>
      * This ensures that a new LobbyPresenter will know what lobby it is
@@ -66,7 +103,7 @@ public interface ILobbyService {
      *
      * @since 2020-12-30
      */
-    void refreshLobbyPresenterFields(String lobbyName, User user);
+    void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby);
 
     /**
      * Posts a request to remove the user from all lobbies
@@ -106,6 +143,24 @@ public interface ILobbyService {
     void rollDice(String lobbyName, User user);
 
     /**
+     * This method is used to update the pre-game settings of a specific lobby.
+     *
+     * @param lobbyName              The name of the lobby
+     * @param user                   The User who wants to update the pre-game settings
+     * @param maxPlayers             The maximum amount of players for a lobby
+     * @param commandsAllowed        Whether commands are allowed or not
+     * @param moveTime               The maximum time of a move
+     * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
+     * @param randomPlayfieldEnabled Whether the randomPlayfield is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
+                             boolean commandsAllowed, int moveTime, boolean randomPlayfieldEnabled);
+
+    /**
      * Posts a request to update ones Inventory
      *
      * @param lobbyName The name of the lobby the user wants to update his Inventory in
@@ -117,41 +172,4 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
-
-    /**
-     * Posts a message to play a KnightCard
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user
-     */
-    void playKnightCard(String lobbyName, User user);
-
-    /**
-     * Posts a message to play a MonopolyCard
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user
-     * @param resource  The resource the user wants
-     */
-    void playMonopolyCard(String lobbyName, User user, Resources resource);
-
-    /**
-     * Posts a message to play a YearOfPlentyCard
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user
-     * @param resource1 The resource the user wants
-     * @param resource2 The resource the user wants
-     */
-    void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2);
-
-    /**
-     * Posts a message to play a RoadBuildingCard
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user
-     */
-    void playRoadBuildingCard(String lobbyName, User user);
-
-    void checkVictoryPoints(String lobbyName, User user);
 }

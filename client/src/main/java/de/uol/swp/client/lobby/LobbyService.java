@@ -6,6 +6,9 @@ import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
@@ -40,9 +43,9 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void createNewLobby(String name, User user) {
+    public void createNewLobby(String name, User user, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
-        Message createLobbyRequest = new CreateLobbyRequest(name, user);
+        Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
         eventBus.post(createLobbyRequest);
     }
 
@@ -68,9 +71,37 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void refreshLobbyPresenterFields(String lobbyName, User user) {
+    public void playKnightCard(String lobbyName, User user) {
+        LOG.debug("Sending PlayKnightCardRequest");
+        Message msg = new PlayKnightCardRequest(lobbyName, user);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void playMonopolyCard(String lobbyName, User user, Resources resource) {
+        LOG.debug("Sending PlayMonopolyCardRequest");
+        Message msg = new PlayMonopolyCardRequest(lobbyName, user, resource);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void playRoadBuildingCard(String lobbyName, User user) {
+        LOG.debug("Sending PlayRoadBuildingCardRequest");
+        Message msg = new PlayRoadBuildingCardRequest(lobbyName, user);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2) {
+        LOG.debug("Sending PlayYearOfPlentyCardRequest");
+        Message msg = new PlayYearOfPlentyCardRequest(lobbyName, user, resource1, resource2);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby) {
         LOG.debug("Sending LobbyUpdateEvent");
-        eventBus.post(new LobbyUpdateEvent(lobbyName, user));
+        eventBus.post(new LobbyUpdateEvent(lobbyName, user, lobby));
     }
 
     @Override
@@ -102,43 +133,17 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
+                                    boolean commandsAllowed, int moveTime, boolean randomPlayfieldEnabled) {
+        LOG.debug("Sending a ChangeLobbySettingsRequest");
+        eventBus.post(new ChangeLobbySettingsRequest(lobbyName, user, maxPlayers, startUpPhaseEnabled, commandsAllowed,
+                                                     moveTime, randomPlayfieldEnabled));
+    }
+
+    @Override
     public void updateInventory(String lobbyName, User user) {
         LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
-    }
-
-    @Override
-    public void playKnightCard(String lobbyName, User user) {
-        LOG.debug("Sending PlayKnightCardRequest");
-        Message msg = new PlayKnightCardRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void playMonopolyCard(String lobbyName, User user, Resources resource) {
-        LOG.debug("Sending PlayMonopolyCardRequest");
-        Message msg = new PlayMonopolyCardRequest(lobbyName, user, resource);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2) {
-        LOG.debug("Sending PlayYearOfPlentyCardRequest");
-        Message msg = new PlayYearOfPlentyCardRequest(lobbyName, user, resource1, resource2);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void playRoadBuildingCard(String lobbyName, User user) {
-        LOG.debug("Sending PlayRoadBuildingCardRequest");
-        Message msg = new PlayRoadBuildingCardRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void checkVictoryPoints(String lobbyName, User user){
-        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
-        eventBus.post(msg);
     }
 }

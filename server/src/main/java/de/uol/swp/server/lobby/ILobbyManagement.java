@@ -18,8 +18,9 @@ public interface ILobbyManagement {
     /**
      * Creates a new lobby and adds it to the list
      *
-     * @param name  The name of the lobby to create
-     * @param owner The user who wants to create a lobby
+     * @param name      The name of the lobby to create
+     * @param owner     The user who wants to create a lobby
+     * @param maxPlayer The maximum amount of players for this lobby
      *
      * @throws java.lang.IllegalArgumentException Name already taken
      * @implNote The primary key of the lobbies is the name, therefore the name has
@@ -27,7 +28,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(String name, User owner) throws IllegalArgumentException;
+    void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name
@@ -72,4 +73,21 @@ public interface ILobbyManagement {
      * @since 2021-03-01
      */
     void setInGame(String lobbyName, boolean inGame);
+
+    /**
+     * This method is used to update the pre-game settings of a specific lobby.
+     *
+     * @param lobbyName              The name of the lobby
+     * @param maxPlayers             The maximum amount of players for a lobby
+     * @param commandsAllowed        Whether commands are allowed or not
+     * @param moveTime               The maximum time of a move
+     * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
+     * @param randomPlayfieldEnabled Whether the randomPlayfield is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+                             boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled);
 }

@@ -1,12 +1,12 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class for a game
@@ -76,6 +76,52 @@ public class Game {
         //2 Points if player has the largest army
         if (inventories[num].isLargestArmy()) points += 2;
         return points;
+    }
+
+    /**
+     * Distributes resources
+     * Gets the result of the dices to distribute
+     * the resource to the players.
+     *
+     * @param token Integer between 2 and 12
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
+     */
+    public void distributeResources(int token) {
+        if (token < 2 || token > 12) return;
+        Set<MapPoint> mapPoints = map.getHex(token);
+        int amount = 1;
+        //Hexes can have the same token
+        for (MapPoint mapPoint : mapPoints) {
+            //No resources if the robber is on the hex
+            if (mapPoint.equals(map.getRobberPosition())) return;
+            ResourceHex hex = (ResourceHex) map.getHex(mapPoint);
+            //Checks every intersection around the hex
+            for (IIntersection i : map.getIntersectionFromHex(mapPoint)) {
+                if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
+                else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
+                if (i.getOwner() != null) {
+                    switch (hex.getResource()) {
+                        case HILLS:
+                            getInventory(i.getOwner()).increaseBrick(amount);
+                            break;
+                        case FIELDS:
+                            getInventory(i.getOwner()).increaseGrain(amount);
+                            break;
+                        case FOREST:
+                            getInventory(i.getOwner()).increaseLumber(amount);
+                            break;
+                        case PASTURE:
+                            getInventory(i.getOwner()).increaseWool(amount);
+                            break;
+                        case MOUNTAINS:
+                            getInventory(i.getOwner()).increaseOre(amount);
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     /**
