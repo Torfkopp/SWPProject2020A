@@ -5,7 +5,7 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 import java.util.Objects;
 
 /**
- * This exception is thrown if something went wrong during the ChangePassword process,
+ * This exception is thrown if something went wrong during the ChangeAccountDetails process,
  * e.g. the old password is not correct and not verified.
  *
  * @author Steven Luong

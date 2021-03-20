@@ -3,7 +3,7 @@ package de.uol.swp.common.user.request;
 import de.uol.swp.common.user.User;
 
 /**
- * Request to update a user's password
+ * Request to update a user's account details
  *
  * @author Eric Vuong
  * @author Steven Luong
@@ -22,6 +22,8 @@ public class UpdateUserAccountDetailsRequest extends UpdateUserRequest {
      *
      * @param user        The user whose password to update
      * @param oldPassword The user's old password
+     * @param oldUsername The user's old Username
+     * @param oldEMail    The user's old EMail
      */
     public UpdateUserAccountDetailsRequest(User user, String oldPassword, String oldUsername, String oldEMail) {
         super(user);
@@ -44,12 +46,16 @@ public class UpdateUserAccountDetailsRequest extends UpdateUserRequest {
      *
      * @return The user's new username
      */
-    public String getOldUsername(){return oldUsername;}
+    public String getOldUsername() {
+        return oldUsername;
+    }
 
     /**
      * Gets the user's new EMail
      *
      * @return The user's new EMail
      */
-    public String getOldEMail(){return oldEMail;}
+    public String getOldEMail() {
+        return oldEMail;
+    }
 }

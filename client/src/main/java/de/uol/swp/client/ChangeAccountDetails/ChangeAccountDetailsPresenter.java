@@ -69,13 +69,13 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     }
 
     /**
-     * Method called when the button to change the password is pressed
+     * Method called when the button to change the Account Detail is pressed
      * <p>
-     * This Method is called when the ChangePasswordButton is pressed. It posts an instance
-     * of the ChangePasswordErrorEvent onto the EventBus the SceneManager is subscribed
-     * to if one of the fields is empty or the password fields are not equal.
+     * This Method is called when the ChangeAccountDetailsButton is pressed. It posts an instance
+     * of the ChangeAccountDetailsErrorEvent onto the EventBus the SceneManager is subscribed
+     * to, when at least one of the field is not empty or the ConfirmPassword is not correct.
      * If everything is filled in correctly, the user service is requested to update
-     * the user's password.
+     * the user's account detail.
      *
      * @author Eric Vuong
      * @author Steven Luong

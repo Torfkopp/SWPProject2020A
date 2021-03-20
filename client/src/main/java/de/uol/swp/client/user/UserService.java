@@ -26,7 +26,6 @@ public class UserService implements ClientUserService {
      * Constructor
      *
      * @param bus The EventBus set in ClientModule
-     *
      * @see de.uol.swp.client.di.ClientModule
      * @since 2017-03-17
      */
@@ -57,7 +56,6 @@ public class UserService implements ClientUserService {
      * and posts this instance onto the EventBus.
      *
      * @param user The user to remove
-     *
      * @see de.uol.swp.common.user.request.DeleteUserRequest
      * @since 2020-11-02
      */
@@ -72,7 +70,6 @@ public class UserService implements ClientUserService {
      *
      * @param username the user's name
      * @param password the user's password
-     *
      * @since 2017-03-17
      */
     @Override
@@ -119,15 +116,16 @@ public class UserService implements ClientUserService {
     }
 
     /**
-     * Method to change a user's password
+     * Method to change a user's account details
      * <p>
-     * This method creates a new UpdateUserPasswordRequest object
-     * with the user and his oldPassword as parameter,
+     * This method creates a new UpdateUserAccountDetailsRequest object
+     * with the user, his oldPassword, oldUsername and oldEMail as parameter,
      * and posts this instance onto the EventBus.
      *
      * @param user        The user to update
      * @param oldPassword The password to change and verified
-     *
+     * @param oldUsername The Username to change
+     * @param oldEMail    The EMail to change
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17

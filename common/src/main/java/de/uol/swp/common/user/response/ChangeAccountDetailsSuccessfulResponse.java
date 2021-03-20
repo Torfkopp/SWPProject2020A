@@ -4,10 +4,10 @@ import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
 
 /**
- * A response that the password was successfully changed
+ * A response that a Account Detail was successfully changed
  * <p>
  * This response is only sent to clients that previously sent a
- * successfully executed ChangePasswordRequest.
+ * successfully executed ChangeAccountDetailsRequest.
  * Otherwise, an ExceptionMessage would have been sent.
  *
  * @author Steven Luong

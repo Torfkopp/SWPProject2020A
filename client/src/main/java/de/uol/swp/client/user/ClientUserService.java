@@ -19,7 +19,6 @@ public interface ClientUserService {
      * This method creates the user specified by the User object permanently.
      *
      * @param user The user to create
-     *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
      * @since 2019-09-02
@@ -32,7 +31,6 @@ public interface ClientUserService {
      * This method removes the user specified by the User object.
      *
      * @param user The user to remove
-     *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
      * @since 2019-10-10
@@ -46,7 +44,6 @@ public interface ClientUserService {
      *
      * @param username the user's name
      * @param password the user's password
-     *
      * @since 2017-03-17
      */
     void login(String username, String password);
@@ -77,7 +74,6 @@ public interface ClientUserService {
      * @param user The User object containing all infos to update.
      *             If some values are not set (e.g. password is ""),
      *             these fields are not updated
-     *
      * @implNote The User object has to contain a unique identifier in order to
      * update the correct user
      * @since 2019-09-02
@@ -85,11 +81,12 @@ public interface ClientUserService {
     void updateUser(User user);
 
     /**
-     * Update a user's password
+     * Update a user's account details
      *
-     * @param user        The user changing the password
+     * @param user        The user changing the Account Details
      * @param oldPassword The password that is to be changed
-     *
+     * @param oldUsername The Username that is to be changed
+     * @param oldEMail    The EMail that is to be changed
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17

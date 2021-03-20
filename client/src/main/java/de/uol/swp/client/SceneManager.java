@@ -126,11 +126,11 @@ public class SceneManager {
     }
 
     /**
-     * Shows the change password screen
+     * Shows the ChangeAccountDetailsScreen
      * <p>
      * Sets the scene's UserData to the current user.
-     * Switches the current Scene to the ChangePasswordScene
-     * and sets the window's title to "Change Password"
+     * Switches the current Scene to the ChangeAccountDetailsScreen
+     * and sets the window's title to "Change AccountDetails"
      *
      * @author Eric Vuong
      * @author Mario Fokken
@@ -367,10 +367,10 @@ public class SceneManager {
     }
 
     /**
-     * Initialises the Change Password view
+     * Initialises the ChangeAccountDetailsView
      * <p>
-     * If the ChangePasswordScene is null, it gets set to a new scene containing the
-     * pane showing the Change Password view as specified by the ChangePasswordView
+     * If the ChangeAccountDetailsScene is null, it gets set to a new scene containing the
+     * pane showing the ChangeAccountDetailsView as specified by the ChangeAccountDetailsView
      * FXML file.
      *
      * @author Eric Vuong
@@ -500,7 +500,7 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ChangePAccountDetailsCanceledEvent detected on the EventBus
+     * Handles the ChangeAccountDetailsCanceledEvent detected on the EventBus
      * <p>
      * If a ChangeAccountDetailsCanceledEvent is detected on the EventBus, this method gets
      * called. It calls a method to show the main screen.
@@ -515,9 +515,9 @@ public class SceneManager {
     }
 
     /**
-     * Handles the ChangePasswordErrorEvent detected on the EventBus
+     * Handles the ChangeAccountDetailsErrorEvent detected on the EventBus
      * <p>
-     * If a ChangePasswordErrorEvent is detected on the EventBus, this method gets
+     * If a ChangeAccountDetailsErrorEvent is detected on the EventBus, this method gets
      * called. It shows the error message of the event in a error alert.
      *
      * @author Eric Vuong
