@@ -864,12 +864,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        if (rsp.getActivePlayer().equals(this.loggedInUser)) {
-            setTradeWithBankButtonState(this.loggedInUser);
-            setTradeWithUserButtonState(this.loggedInUser);
-            setEndTurnButtonState(this.loggedInUser);
-            setPlayCardButtonState(this.loggedInUser);
-        }
+        if (!rsp.getActivePlayer().equals(this.loggedInUser)) return;
+        setTradeWithBankButtonState(this.loggedInUser);
+        setTradeWithUserButtonState(this.loggedInUser);
+        setEndTurnButtonState(this.loggedInUser);
+        setPlayCardButtonState(this.loggedInUser);
     }
 
     /**

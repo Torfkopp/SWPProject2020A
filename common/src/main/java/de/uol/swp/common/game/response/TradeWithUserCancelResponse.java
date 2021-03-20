@@ -4,7 +4,7 @@ import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.User;
 
 /**
- * This Response is sent when a trade between 2 users got cancelt.
+ * This Response is sent when a trade between 2 users got cancelled.
  *
  * @author Maximilian Lindner
  * @author Aldin Dervisi

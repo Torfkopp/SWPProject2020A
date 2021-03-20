@@ -851,7 +851,6 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
                                                                                          game.getActivePlayer());
         LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-
         post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessageForRespondingUser));
     }
 

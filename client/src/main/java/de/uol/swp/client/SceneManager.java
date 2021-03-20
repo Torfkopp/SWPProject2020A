@@ -955,10 +955,9 @@ public class SceneManager {
      */
     @Subscribe
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
-        if (tradingResponseStages.containsKey(event.getLobbyName())) {
-            tradingResponseStages.get(event.getLobbyName()).close();
-            tradingResponseStages.remove(event.getLobbyName());
-        }
+        if (!tradingResponseStages.containsKey(event.getLobbyName())) return;
+        tradingResponseStages.get(event.getLobbyName()).close();
+        tradingResponseStages.remove(event.getLobbyName());
     }
 
     /**
