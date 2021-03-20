@@ -37,7 +37,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
         User usr = new UserDTO(id, username, hash(password), eMail);
         usersById.put(id, usr);
         usersByName.put(username, usr);
-        return usr;
+        return usr.getWithoutPassword();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
             User usr = new UserDTO(id, username, hash(password), eMail);
             usersByName.put(username, usr);
             usersById.put(id, usr);
-            return usr;
+            return usr.getWithoutPassword();
         }
     }
 

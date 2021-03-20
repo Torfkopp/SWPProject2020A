@@ -41,7 +41,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * Constructor
      *
      * @param eventBus The EventBus set in ClientModule
-     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.di.ClientModule
@@ -88,15 +87,17 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
         //the UserData is set in the showChangePasswordScreen Method in the SceneManager
-        User user = (User) ConfirmPasswordField.getScene().getUserData();
-        String newPassword = user.getPassword();
-        String newUsername = user.getUsername();
-        String newEMail = user.getEMail();
 
         if (Strings.isNullOrEmpty(ConfirmPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changepw")));
         }
+
+        User user = (User) ConfirmPasswordField.getScene().getUserData();
+        String newPassword = ConfirmPasswordField.getText();
+        String newUsername = user.getUsername();
+        String newEMail = user.getEMail();
+
         if (Strings.isNullOrEmpty(NewUsernameField.getText()) && Strings
                 .isNullOrEmpty(NewEMailField.getText()) && Strings.isNullOrEmpty(NewPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
@@ -112,7 +113,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 newEMail = NewEMailField.getText();
             }
             userService.updateAccountDetails(new UserDTO(user.getID(), newUsername, newPassword, newEMail),
-                                             ConfirmPasswordField.getText(), user.getUsername(), user.getEMail());
+                    ConfirmPasswordField.getText(), user.getUsername(), user.getEMail());
         }
     }
 }

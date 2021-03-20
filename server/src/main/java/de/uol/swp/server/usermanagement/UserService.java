@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.exception.*;
+import de.uol.swp.common.user.message.UserLoggedInMessage;
+import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.*;
 import de.uol.swp.server.AbstractService;
@@ -71,6 +73,10 @@ public class UserService extends AbstractService {
                 userManagement.updateUser(req.getUser());
                 returnMessage = new ChangeAccountDetailsSuccessfulResponse(req.getUser());
                 LOG.debug("Account Details were changed for " + req.getUser().getUsername());
+                if (!req.getOldUsername().equals(req.getUser().getUsername())) {
+                    post(new UserLoggedOutMessage(req.getOldUsername()));
+                    post(new UserLoggedInMessage(req.getUser().getUsername()));
+                }
             } else {
                 returnMessage = new ChangeAccountDetailsExceptionMessage("Old Password was not correct");
             }

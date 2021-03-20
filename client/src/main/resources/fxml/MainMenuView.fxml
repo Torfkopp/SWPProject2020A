@@ -3,7 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity"
       prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1"
       fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane vgap="10.0" HBox.hgrow="ALWAYS">
@@ -46,24 +47,12 @@
 
         <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
             <Menu mnemonicParsing="false" text="%mainmenu.settings">
-                <MenuItem mnemonicParsing="false">
-                    <graphic>
-                        <Button mnemonicParsing="false" onAction="#onChangeAccountDetailsButtonPressed"
-                                text="%mainmenu.settings.buttons.changeaccdetails"/>
-                    </graphic>
-                </MenuItem>
-                <MenuItem mnemonicParsing="false">
-                    <graphic>
-                        <Button mnemonicParsing="false" onAction="#onDeleteButtonPressed"
-                                text="%mainmenu.settings.buttons.deleteuser"/>
-                    </graphic>
-                </MenuItem>
-                <MenuItem mnemonicParsing="false">
-                    <graphic>
-                        <Button mnemonicParsing="false" onAction="#onLogoutButtonPressed"
-                                text="%mainmenu.settings.buttons.logout"/>
-                    </graphic>
-                </MenuItem>
+                <MenuItem mnemonicParsing="false" onAction="#onChangeAccountDetailsButtonPressed"
+                          text="%mainmenu.settings.buttons.changeaccdetails"/>
+                <MenuItem mnemonicParsing="false" onAction="#onDeleteButtonPressed"
+                          text="%mainmenu.settings.buttons.deleteuser"/>
+                <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
+                          text="%mainmenu.settings.buttons.logout"/>
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>
