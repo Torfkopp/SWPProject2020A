@@ -9,12 +9,16 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
+import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
+import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,22 +40,26 @@ public class ChatService extends AbstractService {
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
 
     private final IChatManagement chatManagement;
+    private final ILobbyManagement lobbyManagement;
     private final LobbyService lobbyService;
 
     /**
      * Constructor
      *
-     * @param bus            the EventBus used throughout the entire server (injected)
-     * @param chatManagement the ChatManagement to use (injected)
-     * @param lobbyService   the LobbyService to use (injected)
+     * @param bus             The EventBus used throughout the entire server (injected)
+     * @param chatManagement  The ChatManagement to use (injected)
+     * @param lobbyManagement The LobbyManagement to use (injected)
+     * @param lobbyService    The LobbyService to use (injected)
      *
      * @since 2020-12-30
      */
     @Inject
-    public ChatService(EventBus bus, ChatManagement chatManagement, LobbyService lobbyService) {
+    public ChatService(EventBus bus, IChatManagement chatManagement, ILobbyManagement lobbyManagement,
+                       LobbyService lobbyService) {
         super(bus);
         LOG.debug("ChatService started");
         this.chatManagement = chatManagement;
+        this.lobbyManagement = lobbyManagement;
         this.lobbyService = lobbyService;
     }
 
@@ -210,17 +218,33 @@ public class ChatService extends AbstractService {
      * If a NewChatMessageRequest is detected on the EventBus, this method is called.
      * It then requests the ChatManagement to add a new message to the ChatMessageStore. If this succeeds, a
      * CreatedChatMessageMessage is posted onto the EventBus. Otherwise, nothing happens.
+     * If the content starts with a "/", it will be treated as a command and
+     * wrapped in a NewChatCommandMessage which will be picked up by the CommandService.
+     * However, if the lobby from which this command attempt originated doesn't allow
+     * commands, a LobbyExceptionMessage is sent to the client instead and this method
+     * returns immediately.
      *
      * @param req The NewChatMessageRequest found on the EventBus
      *
      * @see de.uol.swp.server.chat.ChatManagement#createChatMessage(User, String)
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
+     * @see de.uol.swp.server.devmenu.CommandService
+     * @see de.uol.swp.common.lobby.message.LobbyExceptionMessage
      * @since 2020-12-17
      */
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
         if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
+            if (req.isFromLobby()) {
+                Optional<Lobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
+                if (lobby.isPresent() && !lobby.get().commandsAllowed()) {
+                    ExceptionMessage msg = new LobbyExceptionMessage("This lobby doesn't allow the use of commands!");
+                    msg.initWithMessage(req);
+                    post(msg);
+                    return;
+                }
+            }
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
             return;
         }

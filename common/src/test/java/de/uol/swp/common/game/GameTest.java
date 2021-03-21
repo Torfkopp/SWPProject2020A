@@ -23,10 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class GameTest {
 
-    static final User user = new UserDTO(42, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
-    static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+    static final User user = new UserDTO(42, "Jolyne", "IloveDaddyJoJo", "JolyneCujoh@jojo.us");
+    static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JohnnyJoestar@jojo.us");
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-    static final Lobby lobby = new LobbyDTO("Read the Manga", user, true);
+    static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
+    static final Lobby lobby = new LobbyDTO("Read the Manga", user, true, 4, false, 60, false, false);
     static Game game = new Game(lobby, user);
 
     /**
@@ -121,7 +122,6 @@ public class GameTest {
         //Since Jolyne made the lobby, she goes first
         assertEquals(user2, game.nextPlayer());
         assertEquals(user3, game.nextPlayer());
-        assertEquals(user, game.nextPlayer());
     }
 
     @Test
@@ -132,5 +132,23 @@ public class GameTest {
             assertTrue(1 <= dices[0] && dices[0] <= 6);
             assertTrue(1 <= dices[1] && dices[1] <= 6);
         }
+    }
+
+    @Test
+    void distributesResourceTest() {
+        lobby.joinUser(user2);
+        lobby.joinUser(user3);
+        lobby.joinUser(user4);
+        game = new Game(lobby, user);
+        //Testing a hex
+        game.distributeResources(6);
+        assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_3).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_2).getGrain());
+        //Testing another hex
+        game.distributeResources(4);
+        assertEquals(1, game.getInventory(Player.PLAYER_2).getWool());
+        assertEquals(1, game.getInventory(Player.PLAYER_4).getGrain());
+        assertEquals(2, game.getInventory(Player.PLAYER_2).getGrain());
     }
 }

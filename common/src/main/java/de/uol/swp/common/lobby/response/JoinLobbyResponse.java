@@ -1,5 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.lobby.Lobby;
+
 /**
  * Response sent by the server when a user wants to join a lobby
  *
@@ -10,12 +12,29 @@ package de.uol.swp.common.lobby.response;
  */
 public class JoinLobbyResponse extends AbstractLobbyResponse {
 
+    private final Lobby lobby;
+
     /**
      * Constructor
      *
      * @param lobbyName The name for the new lobby
+     * @param lobby     The object of the joined lobby
      **/
-    public JoinLobbyResponse(String lobbyName) {
+    public JoinLobbyResponse(String lobbyName, Lobby lobby) {
         super(lobbyName);
+        this.lobby = lobby;
+    }
+
+    /**
+     * Gets the lobby where the user joined.
+     *
+     * @return The lobby the user joined
+     *
+     * @author Maximilian Lindner
+     * @author AldinDervisi
+     * @since 2021-03-14
+     */
+    public Lobby getLobby() {
+        return lobby;
     }
 }

@@ -30,7 +30,7 @@ public class GameManagement implements IGameManagement {
     @Override
     public void createGame(Lobby lobby, UserOrDummy first) throws IllegalArgumentException {
         if (games.containsKey(lobby.getName())) {
-            throw new IllegalArgumentException("Game of lobby " + lobby.getName() + " already exists!");
+            throw new IllegalArgumentException("Game of lobby [" + lobby.getName() + "] already exists!");
         }
         games.put(lobby.getName(), new Game(lobby, first));
         lobbyManagement.setInGame(lobby.getName(), true);
@@ -39,7 +39,7 @@ public class GameManagement implements IGameManagement {
     @Override
     public void dropGame(String lobbyName) throws IllegalArgumentException {
         if (!games.containsKey(lobbyName)) {
-            throw new IllegalArgumentException("Game of lobby " + lobbyName + " not found!");
+            throw new IllegalArgumentException("Game of lobby [" + lobbyName + "] not found!");
         }
         games.remove(lobbyName);
         lobbyManagement.setInGame(lobbyName, false);
