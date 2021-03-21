@@ -9,7 +9,6 @@ import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
@@ -294,7 +293,8 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onPongMessage(PongMessage msg) {
-        LOG.info("Client pong received from " + msg.getSession());
+        if (msg.getSession().isPresent())
+        LOG.info("Client pong received from session " + msg.getSession().get());
     }
 
     /**

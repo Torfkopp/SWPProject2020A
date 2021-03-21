@@ -58,7 +58,7 @@ public class Server {
                 @Override
                 protected void initChannel(SocketChannel ch) {
                     // Add IdleStateHandler to handle timeouts
-                    ch.pipeline().addLast(new IdleStateHandler(60, 30, 0));
+                    ch.pipeline().addLast(new IdleStateHandler(90, 30, 0));
                     // Encoder and decoder are both needed!
                     // Send and receive serialisable objects
                     ch.pipeline().addLast(new MyObjectEncoder());

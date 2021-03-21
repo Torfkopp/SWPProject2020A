@@ -3,8 +3,6 @@ package de.uol.swp.client;
 import de.uol.swp.common.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,21 +30,17 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        LOG.debug("Disconnected from server: " + ctx);
+        clientConnection.resetClient();
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object in) {
         if (in instanceof Message) {
             clientConnection.receivedMessage((Message) in);
         } else {
             LOG.error("Illegal Object read from channel. Ignored!");
-        }
-    }
-
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object o) {
-        if (o instanceof IdleStateEvent) {
-            IdleStateEvent e = (IdleStateEvent) o;
-            if (e.state() == IdleState.READER_IDLE) {
-                clientConnection.resetClient();
-            }
         }
     }
 
