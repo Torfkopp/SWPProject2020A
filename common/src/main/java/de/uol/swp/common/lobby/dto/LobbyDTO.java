@@ -102,7 +102,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public User getOwner() {
+    public UserOrDummy getOwner() {
         return owner;
     }
 
@@ -135,14 +135,6 @@ public class LobbyDTO implements Lobby {
     @Override
     public void setInGame(boolean inGame) {
         this.inGame = inGame;
-    }
-
-    public int getMaxUsers() {
-        return maxUsers;
-    }
-
-    public void setMaxUsers(int maxUsers) {
-        this.maxUsers = maxUsers;
     }
 
     @Override

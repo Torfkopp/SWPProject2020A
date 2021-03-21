@@ -763,23 +763,23 @@ public class GameService extends AbstractService {
             LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
-        try {
+        //try {
             Game game = gameManagement.getGame(req.getOriginLobby());
             int[] result = game.rollDice();
             int numberOfPips = result[0] + result[1];
             if (numberOfPips == 7) {
                 //Robber things
-                LOG.debug("");
+                LOG.debug("---- Robber things");
             } else {
-                LOG.debug("Distributing the resources");
+                LOG.debug("---- Distributing the resources");
                 game.distributeResources(numberOfPips);
             }
             ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
                                                               result[1]);
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-        } catch (Exception e) {
-            LOG.error(e);
-        }
+        //} catch (Exception e) {
+        //    LOG.error(e);
+        //}
     }
 
     /**
@@ -833,7 +833,7 @@ public class GameService extends AbstractService {
     private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
+        Inventory respondingInventory = game.getInventory(req.getRespondingUser());
 
         if (respondingInventory == null) return;
         ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
@@ -860,7 +860,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
+        LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
         Game game = gameManagement.getGame(req.getName());
         System.out.println(req.getUser());
         System.out.println(req.getRespondingUser());

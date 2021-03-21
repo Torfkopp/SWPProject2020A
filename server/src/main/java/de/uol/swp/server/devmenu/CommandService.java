@@ -405,7 +405,7 @@ public class CommandService extends AbstractService {
             Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 Lobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxUsers() - lobby.getUserOrDummies().size();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
                     post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));

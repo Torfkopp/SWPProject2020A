@@ -9,8 +9,6 @@ package de.uol.swp.common.game;
  */
 public class Inventory {
 
-    private int totalResources = 0;
-
     private int brick = 0;
     private int grain = 0;
     private int lumber = 0;
@@ -32,6 +30,7 @@ public class Inventory {
      * Constructor
      */
     public Inventory() {
+        System.out.println("Created new Inventory");
     }
 
     /**
@@ -190,24 +189,6 @@ public class Inventory {
      */
     public void setRoadBuildingCards(int roadBuildingCards) {
         this.roadBuildingCards = roadBuildingCards;
-    }
-
-    /**
-     * Gets the total amount of resources a player has in their inventory
-     *
-     * @return The total amount of resources
-     */
-    public int getTotalResources() {
-        return totalResources;
-    }
-
-    /**
-     * Sets the total amount of resources in the player's inventory
-     *
-     * @param totalResources The total amount of resources to place in the inventory
-     */
-    public void setTotalResources(int totalResources) {
-        this.totalResources = totalResources;
     }
 
     /**

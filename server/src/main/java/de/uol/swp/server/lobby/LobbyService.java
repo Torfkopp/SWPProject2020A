@@ -98,7 +98,7 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received a ChangeLobbySettingsRequest");
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
-        if (lobby.get().getUsers().size() > req.getAllowedPlayers()) return;
+        if (lobby.get().getUserOrDummies().size() > req.getAllowedPlayers()) return;
         if (lobby.get().isInGame()) return;
         lobbyManagement
                 .updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.isCommandsAllowed(), req.getMoveTime(),

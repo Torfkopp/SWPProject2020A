@@ -104,10 +104,9 @@ public class UserDTO implements User {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof UserDTO)) {
-            return false;
-        }
-        return this.id == ((UserDTO) obj).getID();
+    public boolean equals(Object o){
+        if (o instanceof UserOrDummy)
+            return compareTo((UserOrDummy) o) == 0;
+        return false;
     }
 }

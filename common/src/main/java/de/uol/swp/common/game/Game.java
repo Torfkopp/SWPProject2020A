@@ -4,7 +4,6 @@ import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.TwoKeyMap;
 
 import java.util.List;
 import java.util.Set;
@@ -19,7 +18,7 @@ public class Game {
 
     private final Lobby lobby;
     private final IGameMap map;
-    private final TwoKeyMap<UserOrDummy, Player, Inventory> players = new TwoKeyMap<>();
+    private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private UserOrDummy activePlayer;
 
@@ -32,6 +31,7 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first) {
         this.lobby = lobby;
         {
+            System.out.println("INVENTORY CREATION");
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
                 players.put(userOrDummy, counterPlayer, new Inventory());
@@ -58,7 +58,7 @@ public class Game {
     }
 
     public UserOrDummy getUserFromPlayer(Player player) {
-        return players.getKey1(player);
+        return players.getUserOrDummyFromPlayer(player);
     }
 
     /**
@@ -73,11 +73,11 @@ public class Game {
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += players.getWithKey2(player).getVictoryPointCards();
+        points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (players.getWithKey2(player).isLongestRoad()) points += 2;
+        if (players.get(player).isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (players.getWithKey2(player).isLargestArmy()) points += 2;
+        if (players.get(player).isLargestArmy()) points += 2;
         return points;
     }
 
@@ -159,7 +159,7 @@ public class Game {
      * @return The player's inventory
      */
     public Inventory getInventory(Player player) {
-        return players.getWithKey2(player);
+        return players.get(player);
     }
 
     /**
@@ -170,7 +170,7 @@ public class Game {
      * @return The player's inventory
      */
     public Inventory getInventory(UserOrDummy user) {
-        return getInventory(players.getKey2(user));
+        return players.get(user);
     }
 
     /**
@@ -192,7 +192,7 @@ public class Game {
     }
 
     public Inventory[] getAllInventories() {
-        return players.getValues().toArray(new Inventory[0]);
+        return players.getInventories().toArray(new Inventory[0]);
     }
 
     /**
@@ -203,7 +203,7 @@ public class Game {
      * @return A player
      */
     public Player getPlayer(UserOrDummy user) {
-        return players.getKey1Key2Map().get(user);
+        return players.getUserOrDummyPlayerMap().get(user);
     }
 
     /**
@@ -212,7 +212,7 @@ public class Game {
      * @return The array of Users participating in this game
      */
     public UserOrDummy[] getPlayers() {
-        return players.getKey1Array();
+        return players.getUserOrDummyArray();
     }
 
     /**
@@ -221,7 +221,7 @@ public class Game {
      * @return User object of the next player
      */
     public UserOrDummy getNextPlayer() {
-        return players.getKey1(players.getKey2(activePlayer).nextPlayer(players.size()));
+        return players.getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
     }
 
     /**

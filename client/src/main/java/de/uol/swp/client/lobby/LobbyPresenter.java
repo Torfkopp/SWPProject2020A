@@ -70,9 +70,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     private ObservableList<UserOrDummy> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
-    private User owner;
+    private UserOrDummy owner;
     private Set<UserOrDummy> readyUsers;
-    private Set<User> readyUsers;
     private Integer dice1;
     private Integer dice2;
     @FXML
@@ -1207,10 +1206,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
         UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
-        Pair<Integer, UserOrDummy> pair = new Pair<>(user.getID(), user);
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(pair))
-                lobbyMembers.add(pair);
+            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+                lobbyMembers.add(user);
             setStartSessionButtonState();
             setPreGameSettings();
         });
@@ -1246,7 +1244,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             LOG.debug("---- Owner " + user.getUsername() + " left");
         } else LOG.debug("---- User " + user.getUsername() + " left");
         Platform.runLater(() -> {
-            lobbyMembers.remove(findMember(user.getID()));
+            lobbyMembers.remove(user);
             readyUsers.remove(user);
             setStartSessionButtonState();
             setPreGameSettings();

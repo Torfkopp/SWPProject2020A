@@ -83,31 +83,13 @@ public interface Lobby extends Serializable {
     String getName();
 
     /**
-     * Gets the maximum user's for the lobby
-     *
-     * @return An int indicating the maximum user's for the lobby
-     *
-     * @since 2021-03-13
-     */
-    int getMaxUsers();
-
-    /**
-     * Sets the maximum user's for the lobby
-     *
-     * @param maxUsers The maximum user's for the lobby
-     *
-     * @since 2021-03-13
-     */
-    void setMaxUsers(int maxUsers);
-
-    /**
      * Gets the current owner of the lobby
      *
      * @return A User object containing the owner of the lobby
      *
      * @since 2019-10-08
      */
-    User getOwner();
+    UserOrDummy getOwner();
 
     /**
      * Gets a set of all users marked as ready.

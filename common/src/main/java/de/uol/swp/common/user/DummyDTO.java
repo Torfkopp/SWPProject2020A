@@ -6,16 +6,25 @@ public class DummyDTO implements Dummy {
     private final int id;
 
     public DummyDTO() {
-        idCounter++;
-        id = idCounter;
+        this(++idCounter);
+    }
+
+    public DummyDTO(int id){
+        this.id = id;
     }
 
     @Override
     public int compareTo(UserOrDummy o) {
         Integer id_obj = id; // compareTo is only defined on the wrapper class, so we make one here
-
         if (o instanceof Dummy) return id_obj.compareTo(o.getID());
         else return 1;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof UserOrDummy)
+            return compareTo((UserOrDummy)o) == 0;
+        return false;
     }
 
     @Override
