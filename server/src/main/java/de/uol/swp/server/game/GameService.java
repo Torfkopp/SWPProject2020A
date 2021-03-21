@@ -848,10 +848,11 @@ public class GameService extends AbstractService {
                                                                                        game.getActivePlayer());
         returnMessageForOfferingUser.initWithMessage(req);
         post(returnMessageForOfferingUser);
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
         ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
                                                                                          game.getActivePlayer());
-        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
         post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessageForRespondingUser));
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
     }
 
     /**

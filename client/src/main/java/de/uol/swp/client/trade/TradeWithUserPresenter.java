@@ -205,8 +205,9 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
         eventBus.post(new OfferingTradeWithUserRequest(this.loggedInUser, respondingUser, this.lobbyName,
                                                        selectedOwnResourceMap, selectedPartnersResourceMap));
-        LOG.debug("Sending OfferingTradeWithUserRequest");
+        LOG.debug("Sending a OfferingTradeWithUserRequest");
         eventBus.post(new CloseTradeResponseEvent(lobbyName));
+        LOG.debug("Sending a CloseTradeResponseEvent");
     }
 
     /**
