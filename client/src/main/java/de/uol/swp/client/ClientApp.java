@@ -59,6 +59,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * Default startup method for javafx applications
      *
      * @param args Any arguments given when starting the application
+     *
      * @since 2017-03-17
      */
     public static void main(String[] args) {
@@ -152,6 +153,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * method is called. It tells the SceneManager to show the MainScreen window.
      *
      * @param message The ChangeAccountDetailsSuccessfulResponse object detected on the EventBus
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
@@ -173,6 +175,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * logged in user are written to the log.
      *
      * @param message The LoginSuccessfulResponse object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2017-03-17
      */
@@ -192,6 +195,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * which prompts the user to log the old session out.
      *
      * @param message The AlreadyLoggedInResponse object detected on the EventBus
+     *
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
@@ -209,6 +213,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * method is called. It tells the SceneManager to show the sever error alert.
      *
      * @param message The ChangeAccountDetailsExceptionMessage object detected on the EventBus
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
@@ -229,6 +234,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * to the log.
      *
      * @param message The RegistrationSuccessfulResponse object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2019-09-02
      */
@@ -246,6 +252,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * "Deletion of user successful." is written to the log.
      *
      * @param message The UserDeletionSuccessfulResponse object detected on the EventBus
+     *
      * @see de.uol.swp.client.SceneManager
      * @since 2020-12-17
      */
@@ -263,6 +270,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * object to the log if the loglevel is set to ERROR or higher.
      *
      * @param deadEvent The DeadEvent object found on the EventBus
+     *
      * @since 2019-08-07
      */
     @Subscribe

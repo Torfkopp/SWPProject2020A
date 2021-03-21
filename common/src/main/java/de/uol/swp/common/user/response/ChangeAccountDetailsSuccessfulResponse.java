@@ -15,6 +15,7 @@ import de.uol.swp.common.user.User;
  * @since 2020-12-03
  */
 public class ChangeAccountDetailsSuccessfulResponse extends AbstractResponseMessage {
+
     private final User user;
 
     /**

@@ -5,10 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.usermanagement.store.UserStore;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Handles most user related issues, e.g. login/logout
@@ -26,6 +23,7 @@ public class UserManagement extends AbstractUserManagement {
      * Constructor
      *
      * @param userStore Object of the UserStore to be used
+     *
      * @see de.uol.swp.server.usermanagement.store.UserStore
      */
     @Inject
@@ -113,7 +111,9 @@ public class UserManagement extends AbstractUserManagement {
      *
      * @param firstValue  Value to update to. Either an empty String or null
      * @param secondValue The old value
+     *
      * @return String containing the value to be used in the update command
+     *
      * @since 2019-08-05
      */
     private String firstNotNull(String firstValue, String secondValue) {

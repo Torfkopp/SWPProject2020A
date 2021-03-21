@@ -41,6 +41,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * Constructor
      *
      * @param eventBus The EventBus set in ClientModule
+     *
      * @author Eric Vuong
      * @author Steven Luong
      * @see de.uol.swp.client.di.ClientModule
@@ -113,7 +114,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 newEMail = NewEMailField.getText();
             }
             userService.updateAccountDetails(new UserDTO(user.getID(), newUsername, newPassword, newEMail),
-                    ConfirmPasswordField.getText(), user.getUsername(), user.getEMail());
+                                             ConfirmPasswordField.getText(), user.getUsername(), user.getEMail());
         }
     }
 }
