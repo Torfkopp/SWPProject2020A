@@ -70,8 +70,8 @@ public class SceneManager {
     private static final int MAINMENU_WIDTH = 820;
     private static final int REGISTRATION_HEIGHT = 250;
     private static final int REGISTRATION_WIDTH = 410;
-    private static final int RESPONSE_TRADING_HEIGHT = 350;
-    private static final int RESPONSE_TRADING_WIDTH = 390;
+    private static final int RESPONSE_TRADING_HEIGHT = 325;
+    private static final int RESPONSE_TRADING_WIDTH = 380;
     private static final int TRADING_HEIGHT = 620;
     private static final int TRADING_WIDTH = 520;
 
@@ -820,6 +820,10 @@ public class SceneManager {
     private void onShowTradeWithUserRespondViewEvent(ShowTradeWithUserRespondViewEvent event) {
         String lobbyName = event.getLobbyName();
         Platform.runLater(() -> {
+            if (tradingStages.containsKey(lobbyName)) {
+                tradingStages.get(lobbyName).close();
+                tradingStages.remove(lobbyName);
+            }
             Stage tradingResponseStage = new Stage();
             tradingResponseStage.setTitle(String.format(resourceBundle.getString("game.trade.window.receiving.title"),
                                                         event.getOfferingUser()));
@@ -936,6 +940,24 @@ public class SceneManager {
             tradingStages.get(lobby).close();
             tradingStages.remove(lobby);
         }
+    }
+
+    /**
+     * Handles the CloseTradeResponseEvent detected on the EventBus
+     * <p>
+     * If a CloseTradeResponseEvent is detected on the EventBus, this method gets
+     * called. If there is a trading response stage in the according lobby, it gets closed.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.client.trade.event.CloseTradeResponseEvent
+     * @since 2021-03-19
+     */
+    @Subscribe
+    private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
+        if (!tradingResponseStages.containsKey(event.getLobbyName())) return;
+        tradingResponseStages.get(event.getLobbyName()).close();
+        tradingResponseStages.remove(event.getLobbyName());
     }
 
     /**

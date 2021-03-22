@@ -842,9 +842,15 @@ public class GameService extends AbstractService {
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
 
         if (respondingInventory == null) return;
-        ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
+        ResponseMessage returnMessageForOfferingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
+                                                                                       game.getActivePlayer());
+        returnMessageForOfferingUser.initWithMessage(req);
         LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessage));
+        post(returnMessageForOfferingUser);
+        ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
+                                                                                         game.getActivePlayer());
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessageForRespondingUser));
     }
 
     /**
