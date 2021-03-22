@@ -62,8 +62,10 @@ public class Game {
         switch (player) {
             case PLAYER_2:
                 num = 1;
+                break;
             case PLAYER_3:
                 num = 2;
+                break;
             case PLAYER_4:
                 num = 3;
         }
