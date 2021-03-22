@@ -40,14 +40,17 @@
             <Insets topRightBottomLeft="10.0"/>
         </padding>
     </VBox>
-    <HBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+    <VBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" spacing="10">
+        <Button fx:id="returnToLobby" visible="false" maxHeight="-Infinity" minHeight="-Infinity"
+                onAction="#onReturnToLobbyButtonPressed" prefHeight="0" text="%game.won.button.returnPreLobby" maxWidth="-Infinity"
+                minWidth="-Infinity" prefWidth="0"/>
         <Canvas fx:id="gameMapCanvas"/>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
-    </HBox>
+    </VBox>
     <VBox prefWidth="250.0" spacing="10.0" GridPane.columnIndex="2">
-        <VBox fx:id="preGameSettingBox" spacing="10.0">
+        <VBox fx:id="preGameSettingBox" spacing="10.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="190">
             <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"/>
             <HBox spacing="5.0">
                 <TextField fx:id="moveTimeTextfield" prefHeight="25.0" prefWidth="80.0"/>

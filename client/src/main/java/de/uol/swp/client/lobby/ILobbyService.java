@@ -135,6 +135,16 @@ public interface ILobbyService {
     void retrieveAllLobbyMembers(String lobbyName);
 
     /**
+     * Posts a request to return to the Pre-Game Lobby.
+     *
+     * @param lobbyName The name of the lobby.
+     *
+     * @see de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest
+     * @since 2021-03-22
+     */
+    void returnToPreGameLobby(String lobbyName);
+
+    /**
      * Posts a request to roll the dices
      *
      * @see de.uol.swp.common.game.request.RollDiceRequest
@@ -172,4 +182,6 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
+
+    void checkVictoryPoints(String lobbyName, User user);
 }

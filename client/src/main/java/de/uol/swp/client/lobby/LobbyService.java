@@ -6,8 +6,6 @@ import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
-import de.uol.swp.common.game.request.RollDiceRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
@@ -126,6 +124,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void returnToPreGameLobby(String lobbyName) {
+        LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby " + lobbyName);
+        Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
+        eventBus.post(returnToPreGameLobbyRequest);
+    }
+
+    @Override
     public void rollDice(String lobbyName, User user) {
         LOG.debug("Sending RollDiceRequest for Lobby " + lobbyName);
         Message rollDiceRequest = new RollDiceRequest(user, lobbyName);
@@ -145,5 +150,11 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
+    }
+
+    @Override
+    public void checkVictoryPoints(String lobbyName, User user) {
+        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
+        eventBus.post(msg);
     }
 }
