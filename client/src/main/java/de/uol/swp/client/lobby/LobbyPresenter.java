@@ -348,6 +348,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         setTradeWithUserButtonState(rsp.getUser());
         setTradeWithBankButtonState(rsp.getUser());
+        setPlayCardButtonState(rsp.getUser());
     }
 
     /**
@@ -826,26 +827,29 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setTradeWithBankButtonState(event.getUser());
             setEndTurnButtonState(event.getUser());
             setTradeWithUserButtonState(event.getUser());
+            setPlayCardButtonState(event.getUser());
         }
     }
 
     /**
-     * Handles a ResetTradeWithUserButtonEvent found on the event bus
+     * Handles a TradeWithUserCancelResponse found on the event bus
      * <p>
-     * If a new ResetTradeWithUserButtonEvent is posted onto the EventBus the
-     * tradeWithUserButton is enabled again.
+     * If a TradeWithUserCancelResponse is posted onto the EventBus the
+     * the possible options for the active player are re-enabled.
      *
-     * @param event The ResetTradeWithUserButtonEvent seen on the EventBus
+     * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
-     * @author Finn Haase
+     * @author Aldin Dervisi
      * @author Maximilian Lindner
-     * @since 2021-02-23
+     * @since 2021-03-19
      */
     @Subscribe
-    private void onResetTradeWithUserButtonEvent(ResetTradeWithUserButtonEvent event) {
-        setTradeWithBankButtonState(event.getUser());
-        setTradeWithUserButtonState(event.getUser());
-        setEndTurnButtonState(event.getUser());
+    private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
+        if (!rsp.getActivePlayer().equals(this.loggedInUser)) return;
+        setTradeWithBankButtonState(this.loggedInUser);
+        setTradeWithUserButtonState(this.loggedInUser);
+        setEndTurnButtonState(this.loggedInUser);
+        setPlayCardButtonState(this.loggedInUser);
     }
 
     /**
@@ -1018,6 +1022,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         setTradeWithUserButtonState(rsp.getUser());
         setTradeWithBankButtonState(rsp.getUser());
+        setPlayCardButtonState(rsp.getUser());
     }
 
     /**
@@ -1037,6 +1042,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.tradeWithBankButton.setDisable(true);
         this.endTurn.setDisable(true);
         this.tradeWithUserButton.setDisable(true);
+        this.playCard.setDisable(true);
         eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
         LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
         eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));
@@ -1062,13 +1068,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onTradeWithUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
-        if (membersView.getSelectionModel().isEmpty()) {
+        if (membersView.getSelectionModel().isEmpty() || user == null) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
-        } else if (user == this.loggedInUser) {
+        } else if (Objects.equals(user, this.loggedInUser)) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setDisable(true);
+            playCard.setDisable(true);
             endTurn.setDisable(true);
             LOG.debug("Sending ShowTradeWithUserViewEvent");
             eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user));

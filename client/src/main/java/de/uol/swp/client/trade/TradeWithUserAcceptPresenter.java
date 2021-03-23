@@ -5,9 +5,11 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.CloseTradeWithUserResponseEvent;
+import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.ResetOfferTradeButtonRequest;
+import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -84,6 +86,28 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     }
 
     /**
+     * Handles a click on the MakeCounterOfferButton
+     * <p>
+     * When the buttons gets pressed, this method calls the
+     * ShowTradeWithUserViewEvent to open up the trading window and
+     * a TradeWithUserRequest to get the needed information from the
+     * server for the trade.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
+     * @since 2021-03-19
+     */
+    @FXML
+    private void onMakeCounterOfferButtonPressed() {
+        LOG.debug("Sending ShowTradeWithUserViewEvent");
+        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUserName));
+        LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
+        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUserName));
+    }
+
+    /**
      * Helper function
      * <p>
      * This method is called if a window should be closed.
@@ -101,8 +125,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, respondingResourceMap,
-                                                 offeringResourceMap));
+        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName,
+                                                 respondingResourceMap, offeringResourceMap));
     }
 
     /**

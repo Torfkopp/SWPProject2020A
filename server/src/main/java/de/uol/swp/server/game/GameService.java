@@ -835,11 +835,15 @@ public class GameService extends AbstractService {
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
 
         if (respondingInventory == null) return;
-        ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
-        if (req.getRespondingUser() instanceof User) {
-            LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-            post(new GetUserSessionEvent(req.getRespondingUser(), returnMessage));
-        }
+        ResponseMessage returnMessageForOfferingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
+                                                                                       game.getActivePlayer());
+        returnMessageForOfferingUser.initWithMessage(req);
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        post(returnMessageForOfferingUser);
+        ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
+                                                                                         game.getActivePlayer());
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessageForRespondingUser));
     }
 
     /**
@@ -863,12 +867,8 @@ public class GameService extends AbstractService {
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
         LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
         Game game = gameManagement.getGame(req.getName());
-        System.out.println(req.getUser());
-        System.out.println(req.getRespondingUser());
         Inventory inventory = game.getInventory(req.getUser());
         Inventory traderInventory = game.getInventory(req.getRespondingUser());
-        System.out.println(inventory);
-        System.out.println(traderInventory);
         if (inventory == null || traderInventory == null) return;
         int traderInventorySize = traderInventory.getResourceAmount();
         Map<String, Integer> offeringResourceMap = getResourceMapFromInventory(inventory);
