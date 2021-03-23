@@ -5,8 +5,6 @@ import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.message.AbstractServerMessage;
 
-import java.util.Map;
-
 public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage {
 
     private final String lobbyName;
@@ -15,8 +13,7 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
     //private final Map<I18nWrapper, Integer> respondingResourceMap;
     //private final Map<I18nWrapper, Integer> offeringResourceMap;
 
-    public SystemMessageForTradeWithBankMessage(String user, String lobbyName,
-                                                String developmentCard) {
+    public SystemMessageForTradeWithBankMessage(String user, String lobbyName, String developmentCard) {
         this.lobbyName = lobbyName;
         this.user = user;
         this.developmentCard = developmentCard;
@@ -37,7 +34,7 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
     //            //                        this.respondingResourceMap));
     //}
 
-    public SystemMessage getMsg(){
+    public SystemMessage getMsg() {
         return new SystemMessageDTO(makeSingularI18nWrapper(user, developmentCard));
     }
 
@@ -50,8 +47,7 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
         return lobbyName != null;
     }
 
-    private I18nWrapper makeSingularI18nWrapper(String user,
-                                                String developmentCard) {
+    private I18nWrapper makeSingularI18nWrapper(String user, String developmentCard) {
         StringBuilder offerString = new StringBuilder();
         //for (Map.Entry<I18nWrapper, Integer> entry : offeringResourceMap.entrySet()) {
         //    offerString.append(", ");
@@ -64,8 +60,7 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
         //    if (entry.getValue() > 0) demandString.append(entry.getValue()).append(" ");
         //    demandString.append(entry.getKey().toString());
         //}
-        return new I18nWrapper("lobby.trade.withbank.systemmessage", user,
-                               developmentCard);
+        return new I18nWrapper("lobby.trade.withbank.systemmessage", user, developmentCard);
     }
 }
 

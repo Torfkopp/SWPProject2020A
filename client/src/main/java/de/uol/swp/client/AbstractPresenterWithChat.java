@@ -279,16 +279,23 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
     }
 
-    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg){
-        if(msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)){
+    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getLobbyName());
         }
         Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
-    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg){
-        if(msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)){
+    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getLobbyName());
+        }
+        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+    }
+
+    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getLobbyName());
         }
         Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }

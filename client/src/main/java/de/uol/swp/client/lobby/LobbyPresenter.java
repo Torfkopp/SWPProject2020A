@@ -253,26 +253,35 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
-    public void onEnter(ActionEvent actionEvent) {
-        super.onSendMessageButtonPressed();
-    }
-
     @Override
     @Subscribe
-    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg){
+    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
         LOG.debug("Received SystemMessageForTradeResponse");
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)){
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onSystemMessageForTradeMessage(msg);
         }
     }
 
     @Override
     @Subscribe
-    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg){
+    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
         LOG.debug("Received SystemMessageForTradeWithBankResponse");
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)){
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
             super.onSystemMessageForTradeWithBankMessage(msg);
         }
+    }
+
+    @Override
+    @Subscribe
+    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
+        LOG.debug("Received SystemMessageForPlayingCardsMessage");
+        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+            super.onSystemMessageForPlayingCardsMessage(msg);
+        }
+    }
+
+    public void onEnter(ActionEvent actionEvent) {
+        super.onSendMessageButtonPressed();
     }
 
     /**

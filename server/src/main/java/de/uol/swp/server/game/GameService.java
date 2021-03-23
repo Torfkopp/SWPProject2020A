@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.game.Game;
@@ -278,7 +279,9 @@ public class GameService extends AbstractService {
                                                                                developmentCard);
                 returnMessage.initWithMessage(req);
                 post(returnMessage);
-                ServerMessage serverMessage = new SystemMessageForTradeWithBankMessage(req.getUser().getUsername(), req.getOriginLobby(), developmentCard);
+                ServerMessage serverMessage = new SystemMessageForTradeWithBankMessage(req.getUser().getUsername(),
+                                                                                       req.getOriginLobby(),
+                                                                                       developmentCard);
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
                                                                                         .getUsername() + "couldnt buy a development Card");
@@ -553,6 +556,13 @@ public class GameService extends AbstractService {
         }
         inv.setKnights(inv.getKnights() + 1);
         inv.increaseKnightCards(-1);
+
+        I18nWrapper knightCard = new I18nWrapper("game.resources.cards.knight");
+        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(),
+                                                                                    req.getUser().getUsername(),
+                                                                                    knightCard);
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
         AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
