@@ -412,6 +412,7 @@ public class LobbyService extends AbstractService {
             }
             sendToAllInLobby(req.getLobbyName(),
                              new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
+            sendToAll(new AllLobbiesMessage(lobbyManagement.getLobbies()));
         }
     }
 
