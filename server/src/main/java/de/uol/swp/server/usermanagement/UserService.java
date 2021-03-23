@@ -76,8 +76,8 @@ public class UserService extends AbstractService {
             Optional<User> optionalUser = userManagement
                     .getUserWithPassword(req.getOldUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
-                userManagement.updateUser(req.getUser());
-                returnMessage = new ChangeAccountDetailsSuccessfulResponse(req.getUser());
+                User user = userManagement.updateUser(req.getUser());
+                returnMessage = new ChangeAccountDetailsSuccessfulResponse(user);
                 LOG.debug("Account Details were changed for " + req.getUser().getUsername());
                 if (!req.getOldUsername().equals(req.getUser().getUsername())) {
                     post(new UserLoggedOutMessage(req.getOldUsername()));
@@ -88,8 +88,7 @@ public class UserService extends AbstractService {
             }
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new ChangeAccountDetailsExceptionMessage(
-                    "Cannot change Account Details of " + req.getUser() + " " + e.getMessage());
+            returnMessage = new ChangeAccountDetailsExceptionMessage(e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);

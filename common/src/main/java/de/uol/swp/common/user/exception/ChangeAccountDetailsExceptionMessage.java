@@ -30,19 +30,6 @@ public class ChangeAccountDetailsExceptionMessage extends AbstractResponseMessag
 
     @Override
     public String toString() {
-        return "ChangeAccountDetailsExceptionMessage: " + message;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(message);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChangeAccountDetailsExceptionMessage that = (ChangeAccountDetailsExceptionMessage) o;
-        return Objects.equals(message, that.message);
+        return message;
     }
 }

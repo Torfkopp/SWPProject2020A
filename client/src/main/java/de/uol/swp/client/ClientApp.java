@@ -221,7 +221,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onChangeAccountDetailsExceptionMessage(ChangeAccountDetailsExceptionMessage message) {
-        sceneManager.showServerError(resourceBundle.getString("error.server.changepw") + ' ' + message);
+        sceneManager.showServerError(message.toString());
         LOG.error("Change Account Details error: " + message);
     }
 

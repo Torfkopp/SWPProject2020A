@@ -25,6 +25,6 @@
     <HBox alignment="CENTER" spacing="20.0">
         <Button defaultButton="true" mnemonicParsing="false" onAction="#onChangeAccountDetailsButtonPressed"
                 text="%changeaccdetails.button.change"/>
-        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%changeaccdetails.button.cancel"/>
+        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%button.cancel"/>
     </HBox>
 </VBox>

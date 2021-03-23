@@ -15,6 +15,9 @@ import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Manages the ChangeAccountDetails window
  *
@@ -53,6 +56,28 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     }
 
     /**
+     * Method called to compare the eMail string with valid regex
+     * <p>
+     * This helper method is called to compare whether a provided
+     * string complies to RFC5322 and some other restrictions like
+     * to adjacent dots. If it matches, the boolean true is returned.
+     *
+     * @param eMail the mail string provided during registration
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-02-25
+     */
+    private boolean checkMailFormat(String eMail) {
+        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(eMail);
+
+        return matcher.matches();
+    }
+
+    /**
      * Method called when the button to cancel the process is pressed
      * <p>
      * This Method is called when the CancelButton is pressed. It posts an instance
@@ -75,7 +100,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * This Method is called when the ChangeAccountDetailsButton is pressed. It posts an instance
      * of the ChangeAccountDetailsErrorEvent onto the EventBus the SceneManager is subscribed
      * to, when at least one of the field is not empty or the ConfirmPassword is not correct.
-     * If everything is filled in correctly, the user service is requested to update
+     * If the EMail-format is correct and everything is filled in correctly, the user service is requested to update
      * the user's account detail.
      *
      * @author Eric Vuong
@@ -103,6 +128,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 .isNullOrEmpty(NewEMailField.getText()) && Strings.isNullOrEmpty(NewPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails")));
+        } else if (!checkMailFormat(NewEMailField.getText()) && !NewEMailField.getText().isEmpty()) {
+            eventBus.post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else {
             if (!Strings.isNullOrEmpty(NewPasswordField.getText())) {
                 newPassword = NewPasswordField.getText();

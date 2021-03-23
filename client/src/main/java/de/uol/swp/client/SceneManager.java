@@ -315,14 +315,21 @@ public class SceneManager {
                 break;
             //Found in UserManagement
             case "Username already used!":
+            case "Username already taken":
                 context = resourceBundle.getString("error.context.nameused");
                 break;
             case "Username unknown!":
                 context = resourceBundle.getString("error.context.unknown");
                 break;
+            case "User unknown!":
+                context = resourceBundle.getString("error.context.unknownuser");
+                break;
             //Found in UserService
             case "Old Passwords are not equal":
                 context = resourceBundle.getString("error.context.oldpw");
+                break;
+            case "Old Password was not correct":
+                context = resourceBundle.getString("error.context.oldpwincorrect");
                 break;
         }
         //found in UserManagement

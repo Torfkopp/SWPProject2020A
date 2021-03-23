@@ -101,16 +101,14 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     public User updateUser(int id, String username, String password, String eMail) {
         Optional<User> user = findUser(id);
         if (user.isEmpty()) throw new IllegalArgumentException("No user with this ID found");
-        else {
-            if (Strings.isNullOrEmpty(username)) {
-                throw new IllegalArgumentException("Username must not be null");
-            }
-            removeUser(user.get().getUsername());
-            User usr = new UserDTO(id, username, hash(password), eMail);
-            usersByName.put(username, usr);
-            usersById.put(id, usr);
-            return usr.getWithoutPassword();
-        }
+        if (Strings.isNullOrEmpty(username)) throw new IllegalArgumentException("Username must not be null");
+        if (!user.get().getUsername().equals(username) && findUser(username).isPresent())
+            throw new IllegalArgumentException("Username already taken");
+        removeUser(user.get().getUsername());
+        User usr = new UserDTO(id, username, hash(password), eMail);
+        usersByName.put(username, usr);
+        usersById.put(id, usr);
+        return usr.getWithoutPassword();
     }
 
     @Override

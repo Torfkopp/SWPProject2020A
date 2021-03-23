@@ -21,9 +21,7 @@ import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -98,6 +96,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
         if (rsp.getLobbyName() == null) super.onAskLatestChatMessageResponse(rsp);
+    }
+
+    @Override
+    @Subscribe
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        super.onChangeAccountDetailsSuccessfulResponse(rsp);
     }
 
     @Override
@@ -506,8 +510,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 ((Stage) event.getSource()).close();
                 clearEventBus();
             });
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     /**
