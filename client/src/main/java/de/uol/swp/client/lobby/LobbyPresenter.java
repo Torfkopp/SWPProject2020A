@@ -42,6 +42,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -1383,6 +1384,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         ctx.fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"),
                      gameMapCanvas.getWidth() / 2, gameMapCanvas.getHeight() / 2);
         ctx.setFill(Color.BLACK);
+        ctx.setFont(Font.font(25));
         ChangeListener<Number> listener;
         if (this.loggedInUser.getID() == this.owner.getID()) {
             listener = (observable, oldValue, newValue) -> {
