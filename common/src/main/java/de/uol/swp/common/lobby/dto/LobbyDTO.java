@@ -143,9 +143,6 @@ public class LobbyDTO implements Lobby {
         if (user instanceof Dummy) {
             readyUsers.add(user);
         }
-        System.out.println("User joined Lobby");
-        for (UserOrDummy i : users)
-            System.out.println(i.getUsername());
     }
 
     @Override

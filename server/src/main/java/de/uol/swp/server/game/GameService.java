@@ -382,7 +382,6 @@ public class GameService extends AbstractService {
         //try {
         Game game = gameManagement.getGame(req.getOriginLobby());
         UserOrDummy nextPlayer = game.nextPlayer();
-        System.out.println(nextPlayer);
 
         ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);

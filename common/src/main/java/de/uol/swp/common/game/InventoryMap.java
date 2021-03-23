@@ -1,10 +1,8 @@
 package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.user.Dummy;
-import de.uol.swp.common.user.DummyDTO;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Tuple3;
+import de.uol.swp.common.util.Triple;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +13,7 @@ import java.util.Objects;
  */
 public class InventoryMap {
 
-    private final List<Tuple3<UserOrDummy, Player, Inventory>> map = new LinkedList<>();
+    private final List<Triple<UserOrDummy, Player, Inventory>> map = new LinkedList<>();
 
     /**
      * Constructor
@@ -50,10 +48,8 @@ public class InventoryMap {
      * @return The requested inventory
      */
     public Inventory get(UserOrDummy userOrDummy) {
-        if (userOrDummy instanceof Dummy) System.out.println(userOrDummy.equals(new DummyDTO(userOrDummy.getID())));
-        for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
+        for (Triple<UserOrDummy, Player, Inventory> entry : map)
             if (entry.getValue1().equals(userOrDummy)) {
-                System.out.println("Found something");
                 return entry.getValue3();
             }
         return null;
@@ -67,7 +63,7 @@ public class InventoryMap {
      * @return The requested inventory
      */
     public Inventory get(Player player) {
-        for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
+        for (Triple<UserOrDummy, Player, Inventory> entry : map)
             if (Objects.equals(entry.getValue2(), player)) return entry.getValue3();
         return null;
     }
@@ -81,17 +77,17 @@ public class InventoryMap {
      */
     public void put(UserOrDummy userOrDummy, Player player, Inventory inventory) {
         for (int i = 0; i < map.size(); i++) {
-            Tuple3<UserOrDummy, Player, Inventory> entry = map.get(i);
+            Triple<UserOrDummy, Player, Inventory> entry = map.get(i);
             if ((Objects.equals(entry.getValue1(), userOrDummy) && !Objects
                     .equals(entry.getValue2(), player)) || (Objects.equals(entry.getValue2(), player) && !Objects
                     .equals(entry.getValue1(), userOrDummy))) {
                 throw new IllegalArgumentException("Keys are not matching!");
             } else if (Objects.equals(entry.getValue1(), userOrDummy) && Objects.equals(entry.getValue2(), player)) {
-                map.set(i, new Tuple3<>(userOrDummy, player, inventory));
+                map.set(i, new Triple<>(userOrDummy, player, inventory));
                 return;
             }
         }
-        map.add(new Tuple3<>(userOrDummy, player, inventory));
+        map.add(new Triple<>(userOrDummy, player, inventory));
     }
 
     /**
@@ -102,7 +98,7 @@ public class InventoryMap {
      * @return The requested Player
      */
     public Player getPlayerFromUserOrDummy(UserOrDummy userOrDummy) {
-        for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
+        for (Triple<UserOrDummy, Player, Inventory> entry : map)
             if (Objects.equals(userOrDummy, entry.getValue1())) return entry.getValue2();
         return null;
     }
@@ -115,7 +111,7 @@ public class InventoryMap {
      * @return The requested UserOrDummy
      */
     public UserOrDummy getUserOrDummyFromPlayer(Player player) {
-        for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
+        for (Triple<UserOrDummy, Player, Inventory> entry : map)
             if (Objects.equals(player, entry.getValue2())) return entry.getValue1();
         return null;
     }

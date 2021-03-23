@@ -7,7 +7,7 @@ package de.uol.swp.common.util;
  * @param <T2> Type of the second value
  * @param <T3> Type of the third value
  */
-public class Tuple3<T1, T2, T3> {
+public class Triple<T1, T2, T3> {
 
     private final T1 value1;
     private final T2 value2;
@@ -20,7 +20,7 @@ public class Tuple3<T1, T2, T3> {
      * @param value2 second value
      * @param value3 third value
      */
-    public Tuple3(T1 value1, T2 value2, T3 value3) {
+    public Triple(T1 value1, T2 value2, T3 value3) {
         this.value1 = value1;
         this.value2 = value2;
         this.value3 = value3;
@@ -28,7 +28,7 @@ public class Tuple3<T1, T2, T3> {
 
     @Override
     public String toString() {
-        return "value1 = " + value1 + ", value2 = " + value2;
+        return "value1 = " + value1 + ", value2 = " + value2 + ", value3 = " + value3;
     }
 
     /**

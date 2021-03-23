@@ -30,7 +30,6 @@ public class Inventory {
      * Constructor
      */
     public Inventory() {
-        System.out.println("Created new Inventory");
     }
 
     /**
