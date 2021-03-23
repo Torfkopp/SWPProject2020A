@@ -28,6 +28,7 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -520,7 +521,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobbyName());
         if (super.lobbyName == null || loggedInUser == null) {
             super.lobbyName = event.getLobbyName();
-            super.loggedInUser = event.getUser();
+            super.loggedInUser = (User) event.getUser();
             super.chatService.askLatestMessages(10, super.lobbyName);
         }
         if (this.window == null) {

@@ -102,9 +102,9 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUserName));
+        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUser));
         LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUserName));
+        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUser));
     }
 
     /**
@@ -125,8 +125,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName,
-                                                 respondingResourceMap, offeringResourceMap));
+        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, respondingResourceMap,
+                                                 offeringResourceMap));
     }
 
     /**
