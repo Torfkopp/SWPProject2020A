@@ -967,27 +967,62 @@ public class GameService extends AbstractService {
             LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
         Inventory inventory = gameManagement.getGame(req.getOriginLobby()).getInventory(req.getUser());
         if (inventory == null) return;
+        Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
+        Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
         if (req.getGiveResource().equals("ore") && (inventory.getOre() < 4)) return;
         if (req.getGiveResource().equals("brick") && (inventory.getBrick() < 4)) return;
         if (req.getGiveResource().equals("grain") && (inventory.getGrain() < 4)) return;
         if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < 4)) return;
         if (req.getGiveResource().equals("wool") && (inventory.getWool() < 4)) return;
 
-        if (req.getGetResource().equals("ore")) inventory.setOre(inventory.getOre() + 1);
-        if (req.getGetResource().equals("brick")) inventory.setBrick(inventory.getBrick() + 1);
-        if (req.getGetResource().equals("grain")) inventory.setGrain(inventory.getGrain() + 1);
-        if (req.getGetResource().equals("lumber")) inventory.setLumber(inventory.getLumber() + 1);
-        if (req.getGetResource().equals("wool")) inventory.setWool(inventory.getWool() + 1);
+        if (req.getGetResource().equals("ore")) {
+            inventory.setOre(inventory.getOre() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 1);
+        }
+        if (req.getGetResource().equals("brick")) {
+            inventory.setBrick(inventory.getBrick() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 1);
+        }
+        if (req.getGetResource().equals("grain")) {
+            inventory.setGrain(inventory.getGrain() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 1);
+        }
+        if (req.getGetResource().equals("lumber")) {
+            inventory.setLumber(inventory.getLumber() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 1);
+        }
+        if (req.getGetResource().equals("wool")) {
+            inventory.setWool(inventory.getWool() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 1);
+        }
 
-        if (req.getGiveResource().equals("ore")) inventory.setOre(inventory.getOre() - 4);
-        if (req.getGiveResource().equals("brick")) inventory.setBrick(inventory.getBrick() - 4);
-        if (req.getGiveResource().equals("grain")) inventory.setGrain(inventory.getGrain() - 4);
-        if (req.getGiveResource().equals("lumber")) inventory.setLumber(inventory.getLumber() - 4);
-        if (req.getGiveResource().equals("wool")) inventory.setWool(inventory.getWool() - 4);
+        if (req.getGiveResource().equals("ore")) {
+            inventory.setOre(inventory.getOre() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 4);
+        }
+        if (req.getGiveResource().equals("brick")) {
+            inventory.setBrick(inventory.getBrick() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 4);
+        }
+        if (req.getGiveResource().equals("grain")) {
+            inventory.setGrain(inventory.getGrain() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 4);
+        }
+        if (req.getGiveResource().equals("lumber")) {
+            inventory.setLumber(inventory.getLumber() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 4);
+        }
+        if (req.getGiveResource().equals("wool")) {
+            inventory.setWool(inventory.getWool() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 4);
+        }
 
         ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
         returnMessage.initWithMessage(req);
         post(returnMessage);
+        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser().getUsername(), "Bank", offeredResourcesWrapperMap, respondingResourcesWrapperMap);
+        LOG.debug("Received a SystemMessageForTradeMessage");
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
     }
 
