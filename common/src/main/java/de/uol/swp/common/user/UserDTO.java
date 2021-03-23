@@ -47,11 +47,6 @@ public class UserDTO implements User {
         return new UserDTO(user.getID(), user.getUsername(), user.getPassword(), user.getEMail());
     }
 
-    @Override
-    public String toString() {
-        return getUsername();
-    }
-
     /**
      * Copy constructor leaving the password variable empty
      * <p>
@@ -104,9 +99,13 @@ public class UserDTO implements User {
     }
 
     @Override
-    public boolean equals(Object o){
-        if (o instanceof UserOrDummy)
-            return compareTo((UserOrDummy) o) == 0;
+    public boolean equals(Object o) {
+        if (o instanceof UserOrDummy) return compareTo((UserOrDummy) o) == 0;
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return getUsername();
     }
 }

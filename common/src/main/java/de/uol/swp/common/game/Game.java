@@ -203,7 +203,7 @@ public class Game {
      * @return A player
      */
     public Player getPlayer(UserOrDummy user) {
-        return players.getUserOrDummyPlayerMap().get(user);
+        return players.getPlayerFromUserOrDummy(user);
     }
 
     /**
@@ -221,7 +221,8 @@ public class Game {
      * @return User object of the next player
      */
     public UserOrDummy getNextPlayer() {
-        return players.getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
+        return players
+                .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
     }
 
     /**

@@ -9,7 +9,7 @@ public class DummyDTO implements Dummy {
         this(++idCounter);
     }
 
-    public DummyDTO(int id){
+    public DummyDTO(int id) {
         this.id = id;
     }
 
@@ -21,10 +21,14 @@ public class DummyDTO implements Dummy {
     }
 
     @Override
-    public boolean equals(Object o){
-        if (o instanceof UserOrDummy)
-            return compareTo((UserOrDummy)o) == 0;
+    public boolean equals(Object o) {
+        if (o instanceof UserOrDummy) return compareTo((UserOrDummy) o) == 0;
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "(D) " + getUsername();
     }
 
     @Override
@@ -35,10 +39,5 @@ public class DummyDTO implements Dummy {
     @Override
     public String getUsername() {
         return "Dummy" + id;
-    }
-
-    @Override
-    public String toString() {
-        return "(D) " + getUsername();
     }
 }

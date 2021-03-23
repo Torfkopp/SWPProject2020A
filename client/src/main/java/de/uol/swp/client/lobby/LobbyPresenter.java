@@ -28,7 +28,6 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -1240,7 +1239,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby " + this.lobbyName);
         UserOrDummy user = msg.getUser();
-        if (user.getID() == owner.getID()) {
+        if (Objects.equals(user, owner)) {
             LOG.debug("---- Owner " + user.getUsername() + " left");
         } else LOG.debug("---- User " + user.getUsername() + " left");
         Platform.runLater(() -> {
@@ -1314,11 +1313,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * The button is only enabled to the active player when the
      * obligatory part of the turn is done.
      *
+     * @param player
+     *
      * @author Alwin Bossert
      * @author Mario Fokken
      * @author Marvin Drees
      * @since 2021-01-23
-     * @param player
      */
     private void setEndTurnButtonState(UserOrDummy player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
@@ -1346,9 +1346,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function that sets the disable state of the PlayCardButton
      * The button is only enabled to the active player
      *
+     * @param player
+     *
      * @author Mario Fokken
      * @since 2021-02-25
-     * @param player
      */
     private void setPlayCardButtonState(UserOrDummy player) {
         this.playCard.setDisable(!super.loggedInUser.equals(player));
@@ -1411,10 +1412,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
+     * @param player
+     *
      * @author Alwin Bossert
      * @author Maximilian Lindner
      * @since 2021-02-21
-     * @param player
      */
     private void setTradeWithBankButtonState(UserOrDummy player) {
         this.tradeWithBankButton.setDisable(!super.loggedInUser.equals(player));
@@ -1426,10 +1428,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
+     * @param player
+     *
      * @author Finn Haase
      * @author Maximilian Lindner
      * @since 2021-02-21
-     * @param player
      */
     private void setTradeWithUserButtonState(UserOrDummy player) {
         this.tradeWithUserButton.setDisable(!super.loggedInUser.equals(player));

@@ -6,56 +6,51 @@ import de.uol.swp.common.user.DummyDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Tuple3;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
+/**
+ * A class to store the mapping of UserOrDummy, Player and Inventory
+ */
 public class InventoryMap {
 
     private final List<Tuple3<UserOrDummy, Player, Inventory>> map = new LinkedList<>();
 
+    /**
+     * Constructor
+     */
     public InventoryMap() {}
 
-    public Map<UserOrDummy, Inventory> getUserOrDummyInventoryMap() {
-        Map<UserOrDummy, Inventory> returnMap = new LinkedHashMap<>();
-        map.forEach(entry -> returnMap.put(entry.getValue1(), entry.getValue3()));
-        return returnMap;
-    }
-
+    /**
+     * Gets a list of all inventories
+     *
+     * @return A list of all inventories
+     */
     public List<Inventory> getInventories() {
         LinkedList<Inventory> returnList = new LinkedList<>();
         map.forEach(entry -> returnList.add(entry.getValue3()));
         return returnList;
     }
 
-    public Map<Player, Inventory> getPlayerInventoryMap() {
-        Map<Player, Inventory> returnMap = new LinkedHashMap<>();
-        map.forEach(entry -> returnMap.put(entry.getValue2(), entry.getValue3()));
-        return returnMap;
-    }
-
+    /**
+     * Gets the size of the map
+     *
+     * @return The size of the map
+     */
     public int size() {
         return map.size();
     }
 
-    public Map<UserOrDummy, Player> getUserOrDummyPlayerMap() {
-        Map<UserOrDummy, Player> returnMap = new LinkedHashMap<>();
-        map.forEach(entry -> {
-            System.out.println(entry.getValue1() + " ;;; " + entry.getValue2() + " ;;; " + entry.getValue3());
-            returnMap.put(entry.getValue1(), entry.getValue2());
-        });
-        return returnMap;
-    }
-
-    public Map<Player, UserOrDummy> getPlayerUserOrDummyMap() {
-        Map<Player, UserOrDummy> returnMap = new LinkedHashMap<>();
-        map.forEach(entry -> returnMap.put(entry.getValue2(), entry.getValue1()));
-        return returnMap;
-    }
-
+    /**
+     * Gets the inventory for a user or dummy
+     *
+     * @param userOrDummy The user or dummy whose inventory is needed
+     *
+     * @return The requested inventory
+     */
     public Inventory get(UserOrDummy userOrDummy) {
-        System.out.println("InventoryMap get");
-        System.out.println(userOrDummy);
-        if (userOrDummy instanceof Dummy)
-            System.out.println(userOrDummy.equals(new DummyDTO(userOrDummy.getID())));
+        if (userOrDummy instanceof Dummy) System.out.println(userOrDummy.equals(new DummyDTO(userOrDummy.getID())));
         for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
             if (entry.getValue1().equals(userOrDummy)) {
                 System.out.println("Found something");
@@ -64,12 +59,26 @@ public class InventoryMap {
         return null;
     }
 
+    /**
+     * Gets the inventory for a player
+     *
+     * @param player The player whose inventory is needed
+     *
+     * @return The requested inventory
+     */
     public Inventory get(Player player) {
         for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
             if (Objects.equals(entry.getValue2(), player)) return entry.getValue3();
         return null;
     }
 
+    /**
+     * Puts a new tuple in the list
+     *
+     * @param userOrDummy The userOrDummy key
+     * @param player      The player key
+     * @param inventory   The inventory value
+     */
     public void put(UserOrDummy userOrDummy, Player player, Inventory inventory) {
         for (int i = 0; i < map.size(); i++) {
             Tuple3<UserOrDummy, Player, Inventory> entry = map.get(i);
@@ -83,24 +92,39 @@ public class InventoryMap {
             }
         }
         map.add(new Tuple3<>(userOrDummy, player, inventory));
-        for (Tuple3<UserOrDummy, Player, Inventory> entry : map) {
-            System.out.println("entry");
-            System.out.println(entry.getValue1());
-            System.out.println(entry.getValue2());
-            System.out.println(entry.getValue3());
-        }
     }
 
+    /**
+     * Gets the player for a given UserOrDummy
+     *
+     * @param userOrDummy The user or dummy whose matching Player is needed
+     *
+     * @return The requested Player
+     */
     public Player getPlayerFromUserOrDummy(UserOrDummy userOrDummy) {
         for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
             if (Objects.equals(userOrDummy, entry.getValue1())) return entry.getValue2();
         return null;
     }
 
+    /**
+     * Gets the UserOrDummy for a given player
+     *
+     * @param player The player whose matching UserOrDummy is needed
+     *
+     * @return The requested UserOrDummy
+     */
     public UserOrDummy getUserOrDummyFromPlayer(Player player) {
-        return getPlayerUserOrDummyMap().get(player);
+        for (Tuple3<UserOrDummy, Player, Inventory> entry : map)
+            if (Objects.equals(player, entry.getValue2())) return entry.getValue1();
+        return null;
     }
 
+    /**
+     * Gets an array of the UserOrDummy objects
+     *
+     * @return The array of UserOrDummy objects
+     */
     public UserOrDummy[] getUserOrDummyArray() {
         List<UserOrDummy> returnArray = new LinkedList<>();
         map.forEach((key -> returnArray.add(key.getValue1())));

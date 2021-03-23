@@ -92,7 +92,7 @@ public class CommandService extends AbstractService {
         commandMap.put("skip", this::command_NextPlayerIfTemp);
         commandMap.put("skipall", this::command_SkipBots);
         commandMap.put("adddummy", this::command_AddDummy);
-        //TODO: add help text
+        commandMap.put("d", this::command_AddDummy);
         LOG.debug("CommandService started");
     }
 

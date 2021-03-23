@@ -764,19 +764,18 @@ public class GameService extends AbstractService {
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
         //try {
-            Game game = gameManagement.getGame(req.getOriginLobby());
-            int[] result = game.rollDice();
-            int numberOfPips = result[0] + result[1];
-            if (numberOfPips == 7) {
-                //Robber things
-                LOG.debug("---- Robber things");
-            } else {
-                LOG.debug("---- Distributing the resources");
-                game.distributeResources(numberOfPips);
-            }
-            ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
-                                                              result[1]);
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        int[] result = Game.rollDice();
+        int numberOfPips = result[0] + result[1];
+        if (numberOfPips == 7) {
+            //Robber things
+            LOG.debug("---- Robber things");
+        } else {
+            LOG.debug("---- Distributing the resources");
+            game.distributeResources(numberOfPips);
+        }
+        ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         //} catch (Exception e) {
         //    LOG.error(e);
         //}
@@ -837,8 +836,10 @@ public class GameService extends AbstractService {
 
         if (respondingInventory == null) return;
         ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
-        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-        post(new GetUserSessionEvent(req.getRespondingUser(), returnMessage));
+        if (req.getRespondingUser() instanceof User) {
+            LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+            post(new GetUserSessionEvent(req.getRespondingUser(), returnMessage));
+        }
     }
 
     /**
