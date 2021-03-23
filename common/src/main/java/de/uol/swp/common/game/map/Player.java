@@ -24,9 +24,6 @@ public enum Player {
     }
 
     public Player nextPlayer(int playersInGame) {
-        System.out.println("nextPlayer");
-        System.out.println(index);
-        System.out.println((index + 1) % playersInGame);
         return Player.byIndex((index + 1) % playersInGame);
     }
 }
