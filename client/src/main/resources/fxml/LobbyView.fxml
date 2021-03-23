@@ -18,7 +18,7 @@
         <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" spacing="5.0" VBox.vgrow="ALWAYS">
             <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0"/>
             <ListView fx:id="chatView" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
-            <TextField fx:id="messageField" onAction="#onEnter">
+            <TextField fx:id="messageField" onAction="#onSendMessageButtonPressed">
                 <VBox.margin>
                     <Insets top="-5.0"/>
                 </VBox.margin>
@@ -50,7 +50,7 @@
         <VBox fx:id="preGameSettingBox" spacing="10.0">
             <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"/>
             <HBox spacing="5.0">
-                <TextField fx:id="moveTimeTextfield" prefHeight="25.0" prefWidth="80.0"/>
+                <TextField fx:id="moveTimeTextField" prefHeight="25.0" prefWidth="80.0"/>
                 <Button fx:id="changeMoveTimeButton" mnemonicParsing="false" onAction="#onChangeMoveTimeButtonPressed"
                         text="%lobby.buttons.changemovetime"/>
                 <VBox.margin>
@@ -58,24 +58,24 @@
                 </VBox.margin>
             </HBox>
             <CheckBox fx:id="setStartUpPhaseCheckBox" maxHeight="-Infinity" minHeight="-Infinity"
-                      mnemonicParsing="false" onAction="#onStartUpPhasePressed" prefHeight="25.0"
+                      mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.startupphase"/>
             <CheckBox fx:id="commandsActivated" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
-                      onAction="#onCommandsActivatedPressed" prefHeight="25.0"
+                      onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.commandsallowed"/>
             <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity"
-                      mnemonicParsing="false" onAction="#onRandomPlayFieldPressed" prefHeight="25.0"
+                      mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.randomplayfield"/>
             <HBox spacing="5.0">
                 <RadioButton fx:id="threePlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                             mnemonicParsing="false" onAction="#onThreePlayersRadioButtonSelected" prefHeight="25.0"
+                             mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                              text="%lobby.radio.threeplayers">
                     <toggleGroup>
                         <ToggleGroup fx:id="maxPlayersToggleGroup"/>
                     </toggleGroup>
                 </RadioButton>
                 <RadioButton fx:id="fourPlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                             mnemonicParsing="false" onAction="#onFourPlayersRadioButtonSelected" prefHeight="25.0"
+                             mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                              selected="true" text="%lobby.radio.fourplayers">
                     <toggleGroup>
                         <fx:reference source="maxPlayersToggleGroup"/>

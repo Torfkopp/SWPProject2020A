@@ -35,7 +35,7 @@
 
         <VBox spacing="10.0" GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
             <ListView fx:id="chatView" GridPane.columnSpan="2" VBox.vgrow="ALWAYS"/>
-            <TextField fx:id="messageField" onAction="#onEnter" prefHeight="25.0"/>
+            <TextField fx:id="messageField" onAction="#onSendMessageButtonPressed" prefHeight="25.0"/>
             <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
                     text="%chat.buttons.sendmessage"/>
             <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"

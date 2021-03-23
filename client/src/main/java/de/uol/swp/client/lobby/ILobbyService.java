@@ -105,6 +105,8 @@ public interface ILobbyService {
      */
     void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby);
 
+    void startSession(String lobbyName, User user);
+
     /**
      * Posts a request to remove the user from all lobbies
      *
@@ -114,6 +116,8 @@ public interface ILobbyService {
      * @since 2021-01-28
      */
     void removeFromLobbies(User user);
+
+    void kickUser(String lobbyName, User loggedInUser, User userToKick);
 
     /**
      * Posts a request to retrieve all lobby names
@@ -172,4 +176,6 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
+
+    void userReady(String lobbyName, User loggedInUser, boolean isReady);
 }
