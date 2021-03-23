@@ -642,6 +642,13 @@ public class GameService extends AbstractService {
 
         invMono.increaseMonopolyCards(-1);
 
+        I18nWrapper monopolyCard = new I18nWrapper("game.resources.cards.monopoly");
+        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(),
+                                                                                    req.getUser().getUsername(),
+                                                                                    monopolyCard);
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
+
         AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
         post(returnMessage);
@@ -681,6 +688,13 @@ public class GameService extends AbstractService {
         //TODO: Implementierung
 
         inv.increaseRoadBuildingCards(-1);
+
+        I18nWrapper roadBuildingCard = new I18nWrapper("game.resources.cards.roadbuilding");
+        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(),
+                                                                                    req.getUser().getUsername(),
+                                                                                    roadBuildingCard);
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
         AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
@@ -756,6 +770,13 @@ public class GameService extends AbstractService {
                 break;
         }
         inv.increaseYearOfPlentyCards(-1);
+
+        I18nWrapper yearOfPlentyCard = new I18nWrapper("game.resources.cards.yearofplenty");
+        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(),
+                                                                                    req.getUser().getUsername(),
+                                                                                    yearOfPlentyCard);
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
         AbstractResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);

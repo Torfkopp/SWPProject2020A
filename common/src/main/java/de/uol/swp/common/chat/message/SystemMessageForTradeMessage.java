@@ -7,6 +7,15 @@ import de.uol.swp.common.message.AbstractServerMessage;
 
 import java.util.Map;
 
+/**
+ * Message sent by the server when a Trade between two Users was successfully.
+ *
+ * @author Alwin Bossert
+ * @author Sven Ahrens
+ * @see de.uol.swp.common.message.AbstractServerMessage
+ * @since 2021-03-23
+ */
+
 public class SystemMessageForTradeMessage extends AbstractServerMessage {
 
     private final String lobbyName;

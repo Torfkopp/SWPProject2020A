@@ -5,6 +5,15 @@ import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.message.AbstractServerMessage;
 
+/**
+ * Message sent by the server when a Trade between the bank and one User was successfully.
+ *
+ * @author Alwin Bossert
+ * @author Sven Ahrens
+ * @see de.uol.swp.common.message.AbstractServerMessage
+ * @since 2021-03-23
+ */
+
 public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage {
 
     private final String lobbyName;
@@ -13,6 +22,15 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
     //private final Map<I18nWrapper, Integer> respondingResourceMap;
     //private final Map<I18nWrapper, Integer> offeringResourceMap;
 
+    /**
+     * Constructor
+     * <p>
+     * This constructor sets the attributes to the parameters provided upon calling the constructor.
+     *
+     * @param user            The user, that traded with the bank
+     * @param lobbyName       The lobby name
+     * @param developmentCard The developmentCard, that the user bought successfully from the bank
+     */
     public SystemMessageForTradeWithBankMessage(String user, String lobbyName, String developmentCard) {
         this.lobbyName = lobbyName;
         this.user = user;

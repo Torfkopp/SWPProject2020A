@@ -5,6 +5,15 @@ import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.message.AbstractServerMessage;
 
+/**
+ * Message sent by the server when a Card was played successfully.
+ *
+ * @author Alwin Bossert
+ * @author Sven Ahrens
+ * @see de.uol.swp.common.message.AbstractServerMessage
+ * @since 2021-03-23
+ */
+
 public class SystemMessageForPlayingCardsMessage extends AbstractServerMessage {
 
     private final String lobbyName;
@@ -14,8 +23,7 @@ public class SystemMessageForPlayingCardsMessage extends AbstractServerMessage {
     /**
      * Constructor
      * <p>
-     * This constructor sets the ChatMessage message's isLobbyChatMessage and lobbyName
-     * attributes to the parameters provided upon calling the constructor.
+     * This constructor sets the attributes to the parameters provided upon calling the constructor.
      *
      * @param lobbyName   The lobby name
      * @param user        The User
@@ -58,10 +66,6 @@ public class SystemMessageForPlayingCardsMessage extends AbstractServerMessage {
     }
 
     private I18nWrapper makeSingularI18nWrapper(String user, I18nWrapper playingCard) {
-        StringBuilder playingString = new StringBuilder();
-        //playingString.append(user);
-        //playingString.append(playingCard);
-
         return new I18nWrapper("lobby.play.card.systemmessage", user, playingCard);
     }
 }
