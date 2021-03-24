@@ -2,7 +2,7 @@ package de.uol.swp.client.main;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
+import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
@@ -14,23 +14,22 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.AllLobbiesMessage;
-import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
-import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -56,7 +55,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
-
     private ObservableList<String> users;
     private ObservableList<Pair<String, String>> lobbies;
 
@@ -102,6 +100,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     @Override
     @Subscribe
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        super.onChangeAccountDetailsSuccessfulResponse(rsp);
+    }
+
+    @Override
+    @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (!msg.isLobbyChatMessage()) super.onCreatedChatMessageMessage(msg);
     }
@@ -122,6 +126,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
         if (!rsp.isLobbyChatMessage()) super.onSystemMessageResponse(rsp);
+    }
+
+    public void onEnter(ActionEvent actionEvent) {
+        super.onSendMessageButtonPressed();
     }
 
     /**
@@ -194,19 +202,41 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Method called when the ChangePasswordButton is pressed
+     * Handles a AllowedAmountOfPlayersMessage found on the EventBus
      * <p>
-     * This method is called when the ChangePasswordButton is pressed.
-     * It posts an instance of the ShowChangePasswordViewEvent to the EventBus the SceneManager is subscribed to.
+     * If a AllowedAmountOfPlayersMessage, a lobby has changed a lobby-setting.
+     * It calls the retrieveAllLobbies method of the LobbyService to update
+     * the lobby list.
+     *
+     * @param msg AllowedAmountOfPlayersMessage found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.common.lobby.message.AllowedAmountOfPlayersChangedMessage
+     * @since 2021-03-14
+     */
+    @Subscribe
+    private void onAllowedAmountOfPlayersMessage(AllowedAmountOfPlayersChangedMessage msg) {
+        if (this.loggedInUser == null) return;
+        LOG.debug("Received AllowedAmountOfPlayersMessage");
+        lobbyService.retrieveAllLobbies();
+    }
+
+    /**
+     * Method called when the ChangeAccountDetailsButton is pressed
+     * <p>
+     * This method is called when the ChangeAccountDetailsButton is pressed.
+     * It posts an instance of the ShowChangeAccountDetailsViewEvent to the EventBus the SceneManager is subscribed to.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @see de.uol.swp.client.SceneManager
-     * @since 2020-11-25
+     * @since 2021-03-16
      */
     @FXML
-    private void onChangePasswordButtonPressed() {
-        eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
+    private void onChangeAccountDetailsButtonPressed() {
+        eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
     }
 
     /**
@@ -234,12 +264,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Method called when the CreateLobbyButton is pressed
      * <p>
      * If the CreateLobbyButton is pressed, this method requests the LobbyService
-     * to create a new lobby. This lobby will get a unique name and registers the user as its creator.
+     * to create a new lobby with the selected maximum amount of players.
+     * This lobby will get a unique name and registers the user as its creator.
      *
      * @author Mario Fokken
      * @author Marvin Drees
+     * @author Maximilian Lindner
      * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2020-12-11
+     * @since 2021-03-17
      */
     @FXML
     private void onCreateLobbyButtonPressed() {
@@ -250,11 +282,23 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         UnaryOperator<TextFormatter.Change> filter = (s) ->
                 !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
 
-        TextInputDialog dialogue = new TextInputDialog(name);
-        dialogue.getEditor().setTextFormatter(new TextFormatter<>(filter));
+        TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
-        dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
+        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
+        TextField lobbyName = new TextField(name);
+        lobbyName.setTextFormatter(new TextFormatter<>(filter));
+        HBox box1 = new HBox(10, lbl, lobbyName);
+        ToggleGroup grp = new ToggleGroup();
+        RadioButton threePlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.threeplayers"));
+        RadioButton fourPlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.fourplayers"));
+        fourPlayerButton.setSelected(true);
+        threePlayerButton.setToggleGroup(grp);
+        fourPlayerButton.setToggleGroup(grp);
+        HBox box2 = new HBox(10, threePlayerButton, fourPlayerButton);
+        VBox box = new VBox(10, box1, box2);
+        dialogue.getDialogPane().setContent(box);
+        //dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
 
         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
@@ -263,7 +307,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
-        result.ifPresent(s -> lobbyService.createNewLobby(s, loggedInUser));
+        int maxPlayers;
+        if (threePlayerButton.isSelected()) maxPlayers = 3;
+        else maxPlayers = 4;
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), loggedInUser, maxPlayers));
     }
 
     /**
@@ -287,7 +334,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
         });
     }
 
@@ -358,7 +405,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser);
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
         });
     }
 
@@ -558,13 +605,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 lobbyView.setItems(lobbies);
             }
             lobbies.clear();
-            lobbyList.forEach(l -> {
-                String s = l.getName() + " (" + l.getUsers().size() + "/4)";
+            for (Lobby l : lobbyList) {
+                String s = l.getName() + " (" + l.getUsers().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
-                else if (l.getUsers().size() == 4)
+                else if (l.getUsers().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
-            });
+            }
         });
     }
 

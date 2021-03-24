@@ -266,7 +266,13 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onCreateGameMessage(CreateGameMessage msg) {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameMessage for Lobby " + msg.getLobbyName());
-        gameManagement.createGame(msg.getLobby(), msg.getFirst());
+        try {
+            gameManagement.createGame(msg.getLobby(), msg.getFirst());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            post(exceptionMessage);
+        }
     }
 
     /**
@@ -438,7 +444,13 @@ public class GameService extends AbstractService {
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
         Game game = gameManagement.getGame(msg.getName());
         if (game == null) return;
-        gameManagement.dropGame(msg.getName());
+        try {
+            gameManagement.dropGame(msg.getName());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            post(exceptionMessage);
+        }
     }
 
     /**
@@ -762,6 +774,14 @@ public class GameService extends AbstractService {
         try {
             Game game = gameManagement.getGame(req.getOriginLobby());
             int[] result = game.rollDice();
+            int numberOfPips = result[0] + result[1];
+            if (numberOfPips == 7) {
+                //Robber things
+                LOG.debug("");
+            } else {
+                LOG.debug("Distributing the resources");
+                game.distributeResources(numberOfPips);
+            }
             ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0],
                                                               result[1]);
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
@@ -824,9 +844,15 @@ public class GameService extends AbstractService {
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
 
         if (respondingInventory == null) return;
-        ResponseMessage returnMessage = new TradeWithUserCancelResponse(req.getOriginLobby());
+        ResponseMessage returnMessageForOfferingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
+                                                                                       game.getActivePlayer());
+        returnMessageForOfferingUser.initWithMessage(req);
         LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
-        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessage));
+        post(returnMessageForOfferingUser);
+        ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
+                                                                                         game.getActivePlayer());
+        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        post(new GetUserSessionEvent(respondingInventory.getPlayer(), returnMessageForRespondingUser));
     }
 
     /**

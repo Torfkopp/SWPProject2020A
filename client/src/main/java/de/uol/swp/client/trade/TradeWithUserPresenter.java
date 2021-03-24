@@ -10,7 +10,6 @@ import de.uol.swp.common.game.request.TradeWithUserCancelRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
-import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -41,9 +40,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
 
     @FXML
-    private Label waitForResponse;
-    @FXML
-    private Label noResourcesLabel;
+    private Label statusLabel;
     @FXML
     private HBox tradingHBox;
     @FXML
@@ -121,18 +118,15 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * Helper function called if a unsuccessful trade happened.
      * <p>
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
-     * trading window, a TradeWithUserCancelResponse to close the responding
-     * trading window, if existent and a ResetTradeWithUserButtonEvent to
-     * reset the TradeWithUser-Button in the Lobby.
+     * trading window and a TradeWithUserCancelResponse to close the responding
+     * trading window, if existent.
      *
      * @see de.uol.swp.client.trade.event.TradeWithUserCancelEvent
-     * @see de.uol.swp.client.trade.event.ResetTradeWithUserButtonEvent
      */
     private void closeWindow() {
         Platform.runLater(() -> {
             eventBus.post(new TradeWithUserCancelEvent(lobbyName));
             eventBus.post(new TradeWithUserCancelRequest(lobbyName, respondingUser));
-            eventBus.post(new ResetTradeWithUserButtonEvent(loggedInUser, lobbyName));
         });
     }
 
@@ -175,11 +169,15 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             ownInventorySize += entry.getValue();
         }
-        if (!(traderInventorySize == 0 && ownInventorySize == 0)) setSliders();
-        else {
+        if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
+            setSliders();
+            Platform.runLater(() -> statusLabel
+                    .setText(String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser)));
+        } else {
             offerTradeButton.setDisable(true);
             tradingHBox.setVisible(false);
-            noResourcesLabel.setVisible(true);
+            Platform.runLater(() -> statusLabel
+                    .setText(String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser)));
         }
     }
 
@@ -204,12 +202,12 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             return;
         }
         offerTradeButton.setDisable(true);
-        waitForResponse.setVisible(true);
-        waitForResponse.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        RequestMessage request = new OfferingTradeWithUserRequest(this.loggedInUser, respondingUser, this.lobbyName,
-                                                                  selectedOwnResourceMap, selectedPartnersResourceMap);
-        LOG.debug("Sending OfferingTradeWithUserRequest");
-        eventBus.post(request);
+        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
+        LOG.debug("Sending an OfferingTradeWithUserRequest");
+        eventBus.post(new OfferingTradeWithUserRequest(this.loggedInUser, respondingUser, this.lobbyName,
+                                                       selectedOwnResourceMap, selectedPartnersResourceMap));
+        LOG.debug("Sending a CloseTradeResponseEvent");
+        eventBus.post(new CloseTradeResponseEvent(lobbyName));
     }
 
     /**
@@ -229,8 +227,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
-            waitForResponse
-                    .setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
+            statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
         });
     }
 
