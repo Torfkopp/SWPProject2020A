@@ -85,14 +85,16 @@ public interface ClientUserService {
     void updateUser(User user);
 
     /**
-     * Update a user's password
+     * Update a user's account details
      *
-     * @param user        The user changing the password
+     * @param user        The user changing the Account Details
      * @param oldPassword The password that is to be changed
+     * @param oldUsername The Username that is to be changed
+     * @param oldEMail    The EMail that is to be changed
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17
      */
-    void updateUserPassword(User user, String oldPassword);
+    void updateAccountDetails(User user, String oldPassword, String oldUsername, String oldEMail);
 }
