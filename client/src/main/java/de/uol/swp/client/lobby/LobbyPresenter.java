@@ -28,6 +28,7 @@ import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -238,6 +239,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
+    }
+
+    @Override
+    @Subscribe
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        super.onChangeAccountDetailsSuccessfulResponse(rsp);
     }
 
     @Override

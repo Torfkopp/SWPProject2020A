@@ -119,23 +119,25 @@ public class UserService implements ClientUserService {
     }
 
     /**
-     * Method to change a user's password
+     * Method to change a user's account details
      * <p>
-     * This method creates a new UpdateUserPasswordRequest object
-     * with the user and his oldPassword as parameter,
+     * This method creates a new UpdateUserAccountDetailsRequest object
+     * with the user, his oldPassword, oldUsername and oldEMail as parameter
      * and posts this instance onto the EventBus.
      *
      * @param user        The user to update
      * @param oldPassword The password to change and verified
+     * @param oldUsername The Username to change
+     * @param oldEMail    The EMail to change
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17
      */
     @Override
-    public void updateUserPassword(User user, String oldPassword) {
-        LOG.debug("Sending UpdateUserPasswordRequest");
-        Message request = new UpdateUserPasswordRequest(user, oldPassword);
+    public void updateAccountDetails(User user, String oldPassword, String oldUsername, String oldEMail) {
+        LOG.debug("Sending UpdateAccountDetailsRequest");
+        Message request = new UpdateUserAccountDetailsRequest(user, oldPassword, oldUsername, oldEMail);
         bus.post(request);
     }
 }
