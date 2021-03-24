@@ -21,12 +21,11 @@ public interface IGameMap {
     /**
      * Gets an edge that connects two intersections
      *
-     * @param intersection1 First intersection of edge
-     * @param intersection2 Second intersection of edge
+     * @param position The MapPoint of the Edge
      *
      * @return The edge connecting the given intersections
      */
-    IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
+    IEdge getEdge(MapPoint position);
 
     /**
      * Gets the hex at a specified place

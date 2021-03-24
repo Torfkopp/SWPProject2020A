@@ -11,8 +11,8 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.game.map.BetterMapPoint;
 import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
@@ -47,7 +47,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.BetterMapPoint.Type.*;
+import static de.uol.swp.common.game.map.MapPoint.Type.*;
 
 /**
  * Manages the lobby's menu
@@ -468,9 +468,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
     }
 
+    /**
+     * Handles a click on the gameMapCanvas
+     * <p>
+     * This method calls on the GameRendering to map the x,y coordinates of the
+     * mouse click to the proper element located in that location, e.g. a Hex.
+     *
+     * @param mouseEvent The Event produced by the mouse clicking on the Canvas
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.GameRendering#coordinatesToHex(double, double)
+     * @since 2021-03-14
+     */
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
-        BetterMapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        // TODO: extend documentation to final implementation behaviour
+        MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (mapPoint.getType() == INVALID) {
             System.out.println("INVALID");
         } else if (mapPoint.getType() == HEX) {

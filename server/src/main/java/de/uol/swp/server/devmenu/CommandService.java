@@ -12,7 +12,6 @@ import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.Game;
-import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
@@ -585,12 +584,6 @@ public class CommandService extends AbstractService {
                     Class<?> valueCls = (Class<?>) mapType.getActualTypeArguments()[1];
                     Map<Object, Object> map = parseMap(arr, keyCls.getName(), valueCls.getName());
                     argList.add(map);
-                }
-                break;
-                case "de.uol.swp.common.game.map.MapPoint": { //format: y,x
-                    List<String> tokens = lexCommand(args.get(i), ",");
-                    argList.add(tokens.size() < 1 ? null :
-                                new MapPoint(Integer.parseInt(tokens.get(0)), Integer.parseInt(tokens.get(1))));
                 }
                 break;
                 case "de.uol.swp.common.I18nWrapper": { //format: attributeName!replacementString
