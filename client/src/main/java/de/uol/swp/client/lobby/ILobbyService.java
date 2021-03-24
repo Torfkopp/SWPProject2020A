@@ -16,8 +16,8 @@ public interface ILobbyService {
     /**
      * Posts a request to check the number of victory points from a player
      *
-     * @param lobbyName
-     * @param user
+     * @param lobbyName The name of the lobby
+     * @param user      The user whose VictoryPoints gets checked
      *
      * @author Steven Luong
      * @author Finn Haase
@@ -196,5 +196,4 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
-
 }
