@@ -107,7 +107,9 @@ public interface Lobby extends Serializable {
      *
      * @return A Set containing all user in this lobby
      *
-     * @since 2019-10-08
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
      */
     Set<User> getRealUsers();
 
@@ -116,7 +118,9 @@ public interface Lobby extends Serializable {
      *
      * @return A Set containing all users and dummies in this lobby
      *
-     * @since 2019-10-08
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
      */
     Set<UserOrDummy> getUserOrDummies();
 

@@ -43,8 +43,8 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, UserOrDummy creator, boolean inGame, int maxPlayers, boolean commandsAllowed, int moveTime,
-                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public LobbyDTO(String name, UserOrDummy creator, boolean inGame, int maxPlayers, boolean commandsAllowed,
+                    int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);

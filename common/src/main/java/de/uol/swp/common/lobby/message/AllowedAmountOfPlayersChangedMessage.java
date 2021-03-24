@@ -1,6 +1,5 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**

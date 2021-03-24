@@ -379,7 +379,6 @@ public class GameService extends AbstractService {
             LOG.debug("Received EndTurnRequest for Lobby " + req.getOriginLobby());
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to end his turn.");
         }
-        //try {
         Game game = gameManagement.getGame(req.getOriginLobby());
         UserOrDummy nextPlayer = game.nextPlayer();
 
@@ -391,8 +390,6 @@ public class GameService extends AbstractService {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
         }
-        //} catch (Exception e) {
-        //}
     }
 
     /**
@@ -762,7 +759,6 @@ public class GameService extends AbstractService {
             LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
-        //try {
         Game game = gameManagement.getGame(req.getOriginLobby());
         int[] result = Game.rollDice();
         int numberOfPips = result[0] + result[1];
@@ -775,9 +771,6 @@ public class GameService extends AbstractService {
         }
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-        //} catch (Exception e) {
-        //    LOG.error(e);
-        //}
     }
 
     /**

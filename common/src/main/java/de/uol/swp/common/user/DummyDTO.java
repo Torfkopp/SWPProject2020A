@@ -1,14 +1,29 @@
 package de.uol.swp.common.user;
 
+/**
+ * A class for dummy users
+ *
+ * @author Alwin Bossert
+ * @author Temmo Junkhoff
+ * @since 2021-03-14
+ */
 public class DummyDTO implements Dummy {
 
     private static int idCounter = 0;
     private final int id;
 
+    /**
+     * A constructor
+     */
     public DummyDTO() {
         this(++idCounter);
     }
 
+    /**
+     * A constructor needed for cloning a dummy
+     *
+     * @param id The ID of the dummy
+     */
     public DummyDTO(int id) {
         this.id = id;
     }

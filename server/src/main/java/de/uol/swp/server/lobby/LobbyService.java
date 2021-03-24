@@ -119,8 +119,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The CreateLobbyRequest found on the EventBus
      *
-     * @see ILobbyManagement#createLobby(String, de.uol.swp.common.user.User)
-     * @see de.uol.swp.server.lobby.LobbyManagement#createLobby(String, User, int)
+     * @see de.uol.swp.server.lobby.ILobbyManagement#createLobby(String, de.uol.swp.common.user.User, int)
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2019-10-08
      */

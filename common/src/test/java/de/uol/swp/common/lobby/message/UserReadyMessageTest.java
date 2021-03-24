@@ -30,7 +30,5 @@ class UserReadyMessageTest {
         assertEquals("Lobby", userReadyMessage.getName());
         assertEquals(defaultUser, userReadyMessage.getUser());
         assertEquals(defaultUser.getUsername(), userReadyMessage.getUser().getUsername());
-        //assertEquals(defaultUser.getPassword(), userReadyMessage.getUser().getPassword());
-        //assertEquals(defaultUser.getEMail(), userReadyMessage.getUser().getEMail());
     }
 }
