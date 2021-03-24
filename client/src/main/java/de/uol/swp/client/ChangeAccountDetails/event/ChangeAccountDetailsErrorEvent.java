@@ -1,16 +1,16 @@
-package de.uol.swp.client.ChangePassword.event;
+package de.uol.swp.client.ChangeAccountDetails.event;
 
 /**
- * Event used to show a ChangePasswordError alert
+ * Event used to show a ChangeAccountDetailsError alert
  * <p>
- * In order to show a ChangePasswordError alert using this event, post an instance of it
+ * In order to show a ChangeAccountDetailsError alert using this event, post an instance of it
  * onto the EventBus the SceneManager is subscribed to.
  *
  * @author Eric Vuong
  * @see de.uol.swp.client.SceneManager
  * @since 2020-11-25
  */
-public class ChangePasswordErrorEvent {
+public class ChangeAccountDetailsErrorEvent {
 
     private final String message;
 
@@ -19,7 +19,7 @@ public class ChangePasswordErrorEvent {
      *
      * @since 2020-11-25
      */
-    public ChangePasswordErrorEvent(String message) {
+    public ChangeAccountDetailsErrorEvent(String message) {
         this.message = message;
     }
 
