@@ -5,6 +5,8 @@ import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.message.AbstractServerMessage;
 
+import java.util.Map;
+
 /**
  * Message sent by the server when a Trade between the bank and one User was successfully.
  *
@@ -18,9 +20,7 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
 
     private final String lobbyName;
     private final String user;
-    private final String developmentCard;
-    //private final Map<I18nWrapper, Integer> respondingResourceMap;
-    //private final Map<I18nWrapper, Integer> offeringResourceMap;
+    private final Map<I18nWrapper, Integer> offeringResourceMap;
 
     /**
      * Constructor
@@ -29,31 +29,21 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
      *
      * @param user            The user, that traded with the bank
      * @param lobbyName       The lobby name
-     * @param developmentCard The developmentCard, that the user bought successfully from the bank
+     * @param offeringResourceMap The offeringResourceMap, that the user bought a card successfully from the bank
+     *                            /TODO Doku anpassen
      */
-    public SystemMessageForTradeWithBankMessage(String user, String lobbyName, String developmentCard) {
+    public SystemMessageForTradeWithBankMessage(String user, String lobbyName, Map<I18nWrapper, Integer> offeringResourceMap) {
         this.lobbyName = lobbyName;
         this.user = user;
-        this.developmentCard = developmentCard;
+        this.offeringResourceMap=offeringResourceMap;
     }
 
     public String getLobbyName() {
         return lobbyName;
     }
 
-    ///**
-    // * Gets the SystemMessage object.
-    // *
-    // * @return The encapsulated SystemMessage
-    // */
-    //public SystemMessage getMsg() {
-    //    return new SystemMessageDTO(
-    //            //makeSingularI18nWrapper(this.user, this.offeringResourceMap,
-    //            //                        this.respondingResourceMap));
-    //}
-
     public SystemMessage getMsg() {
-        return new SystemMessageDTO(makeSingularI18nWrapper(user, developmentCard));
+        return new SystemMessageDTO(makeSingularI18nWrapper(this.user, this.offeringResourceMap));
     }
 
     /**
@@ -65,20 +55,14 @@ public class SystemMessageForTradeWithBankMessage extends AbstractServerMessage 
         return lobbyName != null;
     }
 
-    private I18nWrapper makeSingularI18nWrapper(String user, String developmentCard) {
+    private I18nWrapper makeSingularI18nWrapper(String user, Map<I18nWrapper, Integer> offeringResourceMap) {
         StringBuilder offerString = new StringBuilder();
-        //for (Map.Entry<I18nWrapper, Integer> entry : offeringResourceMap.entrySet()) {
-        //    offerString.append(", ");
-        //    if (entry.getValue() > 0) offerString.append(entry.getValue()).append(" ");
-        //    offerString.append(entry.getKey().toString());
-        //}
-        StringBuilder demandString = new StringBuilder();
-        //for (Map.Entry<I18nWrapper, Integer> entry : respondingResourceMap.entrySet()) {
-        //    demandString.append(", ");
-        //    if (entry.getValue() > 0) demandString.append(entry.getValue()).append(" ");
-        //    demandString.append(entry.getKey().toString());
-        //}
-        return new I18nWrapper("lobby.trade.withbank.systemmessage", user, developmentCard);
+        for (Map.Entry<I18nWrapper, Integer> entry : offeringResourceMap.entrySet()) {
+            offerString.append(", ");
+            if (entry.getValue() > 0) offerString.append(entry.getValue()).append(" ");
+            offerString.append(entry.getKey().toString());
+        }
+        return new I18nWrapper("lobby.trade.withbank.systemmessage", user, offerString.toString().replaceFirst("^, ", ""));
     }
 }
 
