@@ -11,10 +11,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
@@ -35,7 +32,6 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -266,7 +262,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         }
     }
 
-    public void onEnter(ActionEvent actionEvent) {
+    public void onEnter() {
         super.onSendMessageButtonPressed();
     }
 
