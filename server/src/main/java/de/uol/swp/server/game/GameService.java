@@ -7,6 +7,7 @@ import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
+import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.CreateGameMessage;
@@ -1016,7 +1017,10 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
         returnMessage.initWithMessage(req);
         post(returnMessage);
-        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser().getUsername(), "Bank", offeredResourcesWrapperMap, respondingResourcesWrapperMap);
+        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
+                                                                       req.getUser().getUsername(), "Bank",
+                                                                       offeredResourcesWrapperMap,
+                                                                       respondingResourcesWrapperMap);
         LOG.debug("Received a SystemMessageForTradeMessage");
         lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
@@ -1082,34 +1086,30 @@ public class GameService extends AbstractService {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
         if (inventory == null) return false;
         if (inventory.getOre() >= 1 && inventory.getGrain() >= 1 && inventory.getWool() >= 1) {
-            Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
             inventory.setOre(inventory.getOre() - 1);
             inventory.setGrain(inventory.getGrain() - 1);
             inventory.setWool(inventory.getWool() - 1);
-            if (developmentCard.equals("knightCard")) {
-                inventory.setKnightCards(inventory.getKnightCards() + 1);
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.cards.knight"), 1);
+            switch (developmentCard) {
+                case "game.resources.cards.knight":
+                    inventory.increaseKnightCards(1);
+                    break;
+                case "game.resources.cards.roadbuilding":
+                    inventory.increaseRoadBuildingCards(1);
+                    break;
+                case "game.resources.cards.yearofplenty":
+                    inventory.increaseYearOfPlentyCards(1);
+                    break;
+                case "game.resources.cards.monopoly":
+                    inventory.increaseMonopolyCards(1);
+                    break;
+                case "game.resources.cards.victorypoints":
+                    inventory.increaseVictoryPointCards(1);
+                    break;
             }
-            if (developmentCard.equals("roadBuildingCard")) {
-                inventory.setRoadBuildingCards(inventory.getRoadBuildingCards() + 1);
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.cards.roadbuilding"), 1);
-            }
-            if (developmentCard.equals("yearOfPlentyCard")) {
-                inventory.setYearOfPlentyCards(inventory.getYearOfPlentyCards() + 1);
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.cards.yearofplenty"), 1);
-            }
-            if (developmentCard.equals("monopolyCard")) {
-                inventory.setMonopolyCards(inventory.getMonopolyCards() + 1);
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.cards.monopoly"), 1);
-            }
-            if (developmentCard.equals("victoryPointCard")) {
-                inventory.setVictoryPointCards(inventory.getVictoryPointCards() + 1);
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.cards.victorypoints"), 1);
-            }
-            ServerMessage serverMessage = new SystemMessageForTradeWithBankMessage(user.getUsername(),
-                                                                                   lobbyName,
-                                                                                   offeredResourcesWrapperMap);
-            post(serverMessage);
+            ResponseMessage serverMessage = new SystemMessageForTradeWithBankResponse(user.getUsername(), lobbyName,
+                                                                                      developmentCard);
+            post(new GetUserSessionEvent(user, serverMessage));
+            lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
     }

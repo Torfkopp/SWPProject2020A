@@ -7,6 +7,7 @@ import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
@@ -297,8 +298,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getLobbyName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
-        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
     /**
@@ -317,10 +318,32 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @since 2021-03-23
      */
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getLobbyName());
+        if (msg.getName().equals(this.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
-        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+    }
+
+    /**
+     * Handles an incoming SystemMessageForTradeWithBankResponse
+     * <p>
+     * If a SystemMessageForTradeWithBankResponse is posted onto the EventBus, this method
+     * places the incoming SystemMessageForTradeWithBankResponse into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeWithBankResponse for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param rsp The SystemMessageForTradeWithBankResponse found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse
+     * @since 2021-03-25
+     */
+    protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
+        if (rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + rsp.getLobbyName());
+            Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+        }
     }
 
     /**
@@ -341,8 +364,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getLobbyName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
-        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
     /**

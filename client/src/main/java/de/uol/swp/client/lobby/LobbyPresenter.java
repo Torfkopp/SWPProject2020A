@@ -8,6 +8,7 @@ import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
@@ -266,8 +267,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
         LOG.debug("Received SystemMessageForTradeWithBankResponse");
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+        if (msg.getName().equals(super.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
             super.onSystemMessageForTradeWithBankMessage(msg);
+        }
+    }
+
+    @Override
+    @Subscribe
+    protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
+        LOG.debug("Received SystemMessageForTradeWithBankResponse");
+        if (rsp.getLobbyName().equals(super.lobbyName)) {
+            super.onSystemMessageForTradeWithBankResponse(rsp);
         }
     }
 
