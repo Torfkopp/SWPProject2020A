@@ -9,6 +9,7 @@ import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
+import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
@@ -293,8 +294,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onPongMessage(PongMessage msg) {
-        if (msg.getSession().isPresent())
-        LOG.info("Client pong received from " + msg.getSession().get());
+        if (msg.getSession().isPresent()) LOG.info("Client pong received from " + msg.getSession().get());
     }
 
     /**
@@ -303,7 +303,8 @@ public class ServerHandler implements ServerHandlerDelegate {
      * If a ClientDisconnectedMessage is found on the EventBus, this Method will be called.
      * It is responsible for sending a new RemoveFromLobbiesRequest
      * to remove the User, which has no active connection to the server anymore,
-     * from all lobbies.
+     * from all lobbies. In addition a new LogoutRequest gets sent to fully log
+     * the disconnected user out.
      *
      * @param msg The ClientDisconnectedMessage found on the EventBus
      *
@@ -314,10 +315,12 @@ public class ServerHandler implements ServerHandlerDelegate {
     @Subscribe
     private void onClientDisconnectedMessage(ClientDisconnectedMessage msg) {
         if (msg.getSession().isPresent()) {
-            RequestMessage requestMessage = new RemoveFromLobbiesRequest(msg.getSession().get().getUser());
+            eventBus.post(new RemoveFromLobbiesRequest(msg.getSession().get().getUser()));
+            LogoutRequest req = new LogoutRequest();
+            req.setSession(msg.getSession().get());
+            eventBus.post(req);
             Optional<MessageContext> ctx = getCtx(msg);
             ctx.ifPresent(this::removeSession);
-            eventBus.post(requestMessage);
         }
     }
 

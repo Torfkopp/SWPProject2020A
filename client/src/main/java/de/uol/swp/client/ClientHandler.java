@@ -34,7 +34,6 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         LOG.debug("Disconnected from server: " + ctx);
-        clientConnection.resetClient();
     }
 
     @Override

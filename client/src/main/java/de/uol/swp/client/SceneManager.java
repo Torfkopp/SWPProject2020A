@@ -250,14 +250,34 @@ public class SceneManager {
                   MAINMENU_WIDTH, MAINMENU_HEIGHT);
     }
 
+    /**
+     * Method used to close down the client
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-03-25
+     */
     public void closeMainScreen() {
         primaryStage.close();
     }
 
+    /**
+     * Method used to close the client and show an error.
+     * <p>
+     * This method is called when a ClientDisconnectedFromServerEvent
+     * is found on the EventBus. It shows an error indicating that the
+     * connection timed out and closes the client.
+     *
+     * @param msg ClientDisconnectedFromServerEvent found on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-03-25
+     */
     @Subscribe
     private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
-        LOG.debug("Received ClientDisconnectedFromServerMessage");
-        showError("Connection timed out!" ,"You've been disconnected from the server!");
+        LOG.debug("Client disconnected from server");
+        showError(resourceBundle.getString("error.title.disconnected"), resourceBundle.getString("error.context.disconnected"));
         Platform.runLater(this::closeMainScreen);
     }
 
