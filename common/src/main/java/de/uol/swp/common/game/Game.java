@@ -3,7 +3,7 @@ package de.uol.swp.common.game;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
 import java.util.Set;
@@ -17,11 +17,10 @@ import java.util.Set;
 public class Game {
 
     private final Lobby lobby;
-    private final Inventory[] inventories;
     private final IGameMap map;
-    private final User[] players;
+    private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
-    private int activePlayer;
+    private UserOrDummy activePlayer;
 
     /**
      * Constructor
@@ -29,24 +28,43 @@ public class Game {
      * @param lobby The lobby the game is taking place in
      * @param first The first player
      */
-    public Game(Lobby lobby, User first) {
+    public Game(Lobby lobby, UserOrDummy first) {
         this.lobby = lobby;
-        players = lobby.getUsers().toArray(new User[0]);
-        for (int i = 0; i < players.length; i++) {
-            if (players[i].equals(first)) {
-                activePlayer = i;
-                break;
+        {
+            Player counterPlayer = Player.PLAYER_1;
+            for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
+                players.put(userOrDummy, counterPlayer, new Inventory());
+                counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
             }
         }
+        activePlayer = first;
         map = new GameMap();
         map.createBeginnerMap();
-        inventories = new Inventory[players.length];
-        int i = 0;
-        for (User u : players) {
-            inventories[i++] = new Inventory(u);
-        }
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
+    }
+
+    /**
+     * Rolls two dices
+     *
+     * @return Array of two integers
+     */
+    public static int[] rollDice() {
+        int dice1 = (int) (Math.random() * 6 + 1);
+        int dice2 = (int) (Math.random() * 6 + 1);
+
+        return (new int[]{dice1, dice2});
+    }
+
+    /**
+     * Returns the user corresponding with the given player
+     *
+     * @param player The player whose User is required
+     *
+     * @return The user needed
+     */
+    public UserOrDummy getUserFromPlayer(Player player) {
+        return players.getUserOrDummyFromPlayer(player);
     }
 
     /**
@@ -58,25 +76,14 @@ public class Game {
      */
     public int calculateVictoryPoints(Player player) {
         int points = 0;
-        int num = 0;
-        switch (player) {
-            case PLAYER_2:
-                num = 1;
-                break;
-            case PLAYER_3:
-                num = 2;
-                break;
-            case PLAYER_4:
-                num = 3;
-        }
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += inventories[num].getVictoryPointCards();
+        points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (inventories[num].isLongestRoad()) points += 2;
+        if (players.get(player).isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (inventories[num].isLargestArmy()) points += 2;
+        if (players.get(player).isLargestArmy()) points += 2;
         return points;
     }
 
@@ -127,19 +134,6 @@ public class Game {
     }
 
     /**
-     * Gets the active player.
-     *
-     * @return The currently active player
-     *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @since 2021-03-01
-     */
-    public User getActivePlayer() {
-        return players[activePlayer];
-    }
-
-    /**
      * Gets the List of the items of the bank.
      *
      * @return The List of the bank inventory
@@ -151,12 +145,16 @@ public class Game {
     }
 
     /**
-     * Gets an array of all inventories in this game
+     * Gets the active player.
      *
-     * @return The array of inventories in this game
+     * @return The currently active player
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
      */
-    public Inventory[] getInventories() {
-        return inventories;
+    public UserOrDummy getActivePlayer() {
+        return activePlayer;
     }
 
     /**
@@ -167,7 +165,7 @@ public class Game {
      * @return The player's inventory
      */
     public Inventory getInventory(Player player) {
-        return inventories[player.toString().charAt(7) - 49];
+        return players.get(player);
     }
 
     /**
@@ -177,8 +175,8 @@ public class Game {
      *
      * @return The player's inventory
      */
-    public Inventory getInventory(User user) {
-        return getInventory(getPlayer(user));
+    public Inventory getInventory(UserOrDummy user) {
+        return players.get(user);
     }
 
     /**
@@ -200,51 +198,23 @@ public class Game {
     }
 
     /**
+     * Gets all the inventories in the game
+     *
+     * @return An array of all inventories
+     */
+    public Inventory[] getAllInventories() {
+        return players.getInventories().toArray(new Inventory[0]);
+    }
+
+    /**
      * Gets a user's player
      *
      * @param user The user
      *
      * @return A player
      */
-    public Player getPlayer(User user) {
-        int i = 0;
-        for (User u : players) {
-            if (u.equals(user)) break;
-            i++;
-        }
-        switch (i) {
-            case 1:
-                return Player.PLAYER_2;
-            case 2:
-                return Player.PLAYER_3;
-            case 3:
-                return Player.PLAYER_4;
-        }
-        return Player.PLAYER_1;
-    }
-
-    /**
-     * Gets a user's player
-     *
-     * @param name The user, but as string
-     *
-     * @return A player
-     */
-    public Player getPlayer(String name) {
-        int i = 0;
-        for (User u : players) {
-            if (u.getUsername().equals(name)) break;
-            i++;
-        }
-        switch (i) {
-            case 1:
-                return Player.PLAYER_2;
-            case 2:
-                return Player.PLAYER_3;
-            case 3:
-                return Player.PLAYER_4;
-        }
-        return Player.PLAYER_1;
+    public Player getPlayer(UserOrDummy user) {
+        return players.getPlayerFromUserOrDummy(user);
     }
 
     /**
@@ -252,8 +222,8 @@ public class Game {
      *
      * @return The array of Users participating in this game
      */
-    public User[] getPlayers() {
-        return players;
+    public UserOrDummy[] getPlayers() {
+        return players.getUserOrDummyArray();
     }
 
     /**
@@ -261,20 +231,18 @@ public class Game {
      *
      * @return User object of the next player
      */
-    public User nextPlayer() {
-        activePlayer = (activePlayer + 1) % players.length;
-        return players[activePlayer];
+    public UserOrDummy getNextPlayer() {
+        return players
+                .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
     }
 
     /**
-     * Rolls two dices
+     * Gets the next player and sets it as the new active player
      *
-     * @return Array of two integers
+     * @return User object of the next player
      */
-    public int[] rollDice() {
-        int dice1 = (int) (Math.random() * 6 + 1);
-        int dice2 = (int) (Math.random() * 6 + 1);
-
-        return (new int[]{dice1, dice2});
+    public UserOrDummy nextPlayer() {
+        activePlayer = getNextPlayer();
+        return activePlayer;
     }
 }

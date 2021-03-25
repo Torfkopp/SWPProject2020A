@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.request;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Request sent to the server when a user wants to roll the dices
@@ -11,14 +11,14 @@ import de.uol.swp.common.user.User;
  */
 public class RollDiceRequest extends AbstractGameRequest {
 
-    private final User user;
+    private final UserOrDummy user;
 
-    public RollDiceRequest(User user, String originLobby) {
+    public RollDiceRequest(UserOrDummy user, String originLobby) {
         super(originLobby);
         this.user = user;
     }
 
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

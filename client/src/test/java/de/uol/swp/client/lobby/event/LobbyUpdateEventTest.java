@@ -37,8 +37,6 @@ class LobbyUpdateEventTest {
         assertEquals(defaultUser, event.getUser());
         assertEquals(defaultUser.getID(), event.getUser().getID());
         assertEquals(defaultUser.getUsername(), event.getUser().getUsername());
-        assertEquals(defaultUser.getPassword(), event.getUser().getPassword());
-        assertEquals(defaultUser.getEMail(), event.getUser().getEMail());
         assertEquals(defaultLobby, event.getLobby());
         assertEquals(defaultLobby.isInGame(), event.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), event.getLobby().getMaxPlayers());

@@ -30,6 +30,7 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import javafx.application.Platform;
@@ -869,10 +870,10 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
         String lobbyName = event.getLobbyName();
-        User offeringUser = event.getOfferingUser();
+        UserOrDummy offeringUser = event.getOfferingUser();
         Stage tradingStage = new Stage();
-        tradingStage.setTitle(String.format(resourceBundle.getString("game.trade.window.offering.title"),
-                                            event.getRespondingUserName()));
+        tradingStage.setTitle(
+                String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
         tradingStage.setHeight(TRADING_HEIGHT);
         tradingStage.setMinHeight(TRADING_HEIGHT);
         tradingStage.setWidth(TRADING_WIDTH);

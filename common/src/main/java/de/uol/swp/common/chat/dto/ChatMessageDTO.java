@@ -2,7 +2,7 @@ package de.uol.swp.common.chat.dto;
 
 import com.google.common.base.Strings;
 import de.uol.swp.common.chat.ChatMessage;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -19,7 +19,7 @@ import java.util.Objects;
 public class ChatMessageDTO implements ChatMessage {
 
     private final Integer id;
-    private final User author;
+    private final UserOrDummy author;
     private final Instant timestamp;
     private String content;
     private boolean edited;
@@ -32,7 +32,7 @@ public class ChatMessageDTO implements ChatMessage {
      * @param timestamp The Instant timestamp when the message was created
      * @param content   The content of the message
      */
-    public ChatMessageDTO(int id, User author, Instant timestamp, String content) {
+    public ChatMessageDTO(int id, UserOrDummy author, Instant timestamp, String content) {
         this(id, author, timestamp, content, false);
     }
 
@@ -45,7 +45,7 @@ public class ChatMessageDTO implements ChatMessage {
      * @param author  The User who wrote the message
      * @param content The content of the message
      */
-    public ChatMessageDTO(int id, User author, String content) {
+    public ChatMessageDTO(int id, UserOrDummy author, String content) {
         this(id, author, Instant.now(), content, false);
     }
 
@@ -58,7 +58,7 @@ public class ChatMessageDTO implements ChatMessage {
      * @param content   The content of the message
      * @param edited    The edit status of the ChatMessage
      */
-    public ChatMessageDTO(int id, User author, Instant timestamp, String content, boolean edited) {
+    public ChatMessageDTO(int id, UserOrDummy author, Instant timestamp, String content, boolean edited) {
         if (!Objects.nonNull(author)) throw new IllegalArgumentException("Author must not be null");
         if (Strings.isNullOrEmpty(content)) throw new IllegalArgumentException("Content must not be null or empty");
         if (!Objects.nonNull(timestamp)) throw new IllegalArgumentException("Timestamp must not be null");
@@ -101,7 +101,7 @@ public class ChatMessageDTO implements ChatMessage {
     }
 
     @Override
-    public User getAuthor() {
+    public UserOrDummy getAuthor() {
         return this.author;
     }
 
@@ -153,8 +153,7 @@ public class ChatMessageDTO implements ChatMessage {
      */
     @Override
     public String toString() {
-        String text = this.getContent() + " - " + this.getAuthor().getUsername() + " - " + timestampToString(
-                this.getTimestamp());
+        String text = this.getContent() + " - " + this.getAuthor() + " - " + timestampToString(this.getTimestamp());
         if (isEdited()) text += " (ed)";
         return text;
     }

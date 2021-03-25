@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
 
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
-    private final User user;
+    private final UserOrDummy user;
     private final Map<String, Integer> resourceMap;
 
     /**
@@ -25,7 +25,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      * @param lobbyName   The lobby for which the update is supposed to happen in
      * @param resourceMap The Map containing the name of a resource as key and the amount as value
      */
-    public InventoryForTradeResponse(User user, String lobbyName, Map<String, Integer> resourceMap) {
+    public InventoryForTradeResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
@@ -47,7 +47,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      *
      * @return The User who wants to get his inventory
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

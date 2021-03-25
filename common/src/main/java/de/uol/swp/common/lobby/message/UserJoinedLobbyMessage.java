@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Message sent by the server when a user joins a lobby successfully.
@@ -20,7 +20,7 @@ public class UserJoinedLobbyMessage extends AbstractLobbyMessage {
      *
      * @since 2019-10-08
      */
-    public UserJoinedLobbyMessage(String lobbyName, User user) {
+    public UserJoinedLobbyMessage(String lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }
