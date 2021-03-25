@@ -403,7 +403,7 @@ public class H2BasedUserStore extends AbstractUserStore {
         String passwordHash = hash(password);
 
         Optional<User> usr = findUser(username);
-        if (usr.isPresent() && usr.get().getID() != id) throw new IllegalArgumentException("Username is already taken");
+        if (usr.isPresent() && usr.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
         try {
             Class.forName(JDBC_DRIVER);

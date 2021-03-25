@@ -9,6 +9,7 @@ import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.user.response.*;
 import io.netty.channel.Channel;
 import javafx.application.Application;
@@ -146,12 +147,12 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles a successful password changing process
+     * Handles a successful account detail changing process
      * <p>
-     * If an ChangePasswordSuccessfulResponse object is detected on the EventBus this
+     * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
      * method is called. It tells the SceneManager to show the MainScreen window.
      *
-     * @param message The ChangePasswordSuccessfulResponse object detected on the EventBus
+     * @param message The ChangeAccountDetailsSuccessfulResponse object detected on the EventBus
      *
      * @author Eric Vuong
      * @author Steven Luong
@@ -159,9 +160,9 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangePasswordSuccessfulMessage(ChangePasswordSuccessfulResponse message) {
-        LOG.info("Password change was successful.");
-        sceneManager.showMainScreen(user);
+    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse message) {
+        LOG.info("Account Details change was successful.");
+        sceneManager.showMainScreen(message.getUser());
     }
 
     /**
@@ -206,6 +207,25 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
+     * Handles an unsuccessful account detail changing process
+     * <p>
+     * If an ChangeAccountDetailsExceptionMessage object is detected on the EventBus, this
+     * method is called. It tells the SceneManager to show the sever error alert.
+     *
+     * @param message The ChangeAccountDetailsExceptionMessage object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @see de.uol.swp.client.SceneManager
+     * @since 2020-12-03
+     */
+    @Subscribe
+    private void onChangeAccountDetailsExceptionMessage(ChangeAccountDetailsExceptionMessage message) {
+        sceneManager.showServerError(message.toString());
+        LOG.error("Change Account Details error: " + message);
+    }
+
+    /**
      * Handles a successful registration
      * <p>
      * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
@@ -219,7 +239,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2019-09-02
      */
     @Subscribe
-    private void onRegistrationSuccessfulMessage(RegistrationSuccessfulResponse message) {
+    private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse message) {
         LOG.info("Registration was successful.");
         sceneManager.showLoginScreen();
     }
@@ -237,7 +257,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-17
      */
     @Subscribe
-    private void onUserDeletionSuccessfulMessage(UserDeletionSuccessfulResponse message) {
+    private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse message) {
         LOG.info("Deletion of user was successful.");
         sceneManager.showLoginScreen();
     }
