@@ -401,7 +401,7 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getLobbyName());
         if (lobby.isPresent()) {
             lobbyManagement.setInGame(req.getLobbyName(), false);
-            for (User user : lobby.get().getUsers()) {
+            for (User user : lobby.get().getRealUsers()) {
                 post(new UserReadyRequest(req.getLobbyName(), user, false));
             }
             sendToAllInLobby(req.getLobbyName(),
