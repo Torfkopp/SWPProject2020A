@@ -317,8 +317,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @since 2021-03-23
      */
     protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getLobbyName());
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }

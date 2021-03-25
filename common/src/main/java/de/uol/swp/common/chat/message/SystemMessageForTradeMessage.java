@@ -3,7 +3,8 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.message.AbstractServerMessage;
+import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
 
@@ -15,11 +16,9 @@ import java.util.Map;
  * @see de.uol.swp.common.message.AbstractServerMessage
  * @since 2021-03-23
  */
-public class SystemMessageForTradeMessage extends AbstractServerMessage {
+public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
-    private final String lobbyName;
     private final String respondingUser;
-    private final String offeringUser;
     private final Map<I18nWrapper, Integer> respondingResourceMap;
     private final Map<I18nWrapper, Integer> offeringResourceMap;
 
@@ -35,11 +34,10 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
      * @param offeringResourceMap   The offered resources
      * @param respondingResourceMap The demanded resources
      */
-    public SystemMessageForTradeMessage(String lobbyName, String offeringUser, String respondingUser,
+    public SystemMessageForTradeMessage(String lobbyName, UserOrDummy offeringUser, String respondingUser,
                                         Map<I18nWrapper, Integer> offeringResourceMap,
                                         Map<I18nWrapper, Integer> respondingResourceMap) {
-        this.lobbyName = lobbyName;
-        this.offeringUser = offeringUser;
+        super(lobbyName, offeringUser);
         this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;
         this.offeringResourceMap = offeringResourceMap;
@@ -55,41 +53,13 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
     }
 
     /**
-     * Gets the offering User
-     *
-     * @return The offering User
-     */
-    public String getOfferingUser() {
-        return offeringUser;
-    }
-
-    /**
-     * Gets the lobbyName
-     *
-     * @return The lobbyName
-     */
-    public String getLobbyName() {
-        return lobbyName;
-    }
-
-    /**
      * Gets the SystemMessage object
      *
      * @return The encapsulated SystemMessage
      */
     public SystemMessage getMsg() {
-        return new SystemMessageDTO(
-                makeSingularI18nWrapper(this.offeringUser, this.respondingUser, this.offeringResourceMap,
-                                        this.respondingResourceMap));
-    }
-
-    /**
-     * Check if the ChatMessage message is destined for a lobby chat
-     *
-     * @return True, if the SystemMessage message is meant for a lobby chat; False if not
-     */
-    public boolean isLobbyChatMessage() {
-        return lobbyName != null;
+        return new SystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
+                                                            this.respondingResourceMap));
     }
 
     /**
@@ -105,7 +75,7 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
      * @return An I18nWrapper that contains all the details provided and will
      * be displayed in the client's chosen language
      */
-    private I18nWrapper makeSingularI18nWrapper(String offeringUser, String respondingUser,
+    private I18nWrapper makeSingularI18nWrapper(UserOrDummy offeringUser, String respondingUser,
                                                 Map<I18nWrapper, Integer> offeringResourceMap,
                                                 Map<I18nWrapper, Integer> respondingResourceMap) {
         StringBuilder offerString = new StringBuilder();
@@ -120,7 +90,7 @@ public class SystemMessageForTradeMessage extends AbstractServerMessage {
             if (entry.getValue() > 0) demandString.append(entry.getValue()).append(" ");
             demandString.append(entry.getKey().toString());
         }
-        return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser, respondingUser,
+        return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser,
                                offerString.toString().replaceFirst("^, ", ""),
                                demandString.toString().replaceFirst("^, ", ""));
     }

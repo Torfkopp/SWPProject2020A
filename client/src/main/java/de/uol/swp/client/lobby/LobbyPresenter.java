@@ -256,45 +256,36 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
         LOG.debug("Received SystemMessageResponse");
-        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(super.lobbyName)) {
-            super.onSystemMessageResponse(rsp);
-        }
+        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(super.lobbyName)) super.onSystemMessageResponse(rsp);
     }
 
     @Override
     @Subscribe
     protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
         LOG.debug("Received SystemMessageForTradeResponse");
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
-            super.onSystemMessageForTradeMessage(msg);
-        }
+        if (msg.getName().equals(super.lobbyName)) super.onSystemMessageForTradeMessage(msg);
     }
 
     @Override
     @Subscribe
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
         LOG.debug("Received SystemMessageForTradeWithBankResponse");
-        if (msg.getName().equals(super.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
+        if (msg.getName().equals(super.lobbyName) && !this.loggedInUser.equals(msg.getUser()))
             super.onSystemMessageForTradeWithBankMessage(msg);
-        }
     }
 
     @Override
     @Subscribe
     protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
         LOG.debug("Received SystemMessageForTradeWithBankResponse");
-        if (rsp.getLobbyName().equals(super.lobbyName)) {
-            super.onSystemMessageForTradeWithBankResponse(rsp);
-        }
+        if (rsp.getLobbyName().equals(super.lobbyName)) super.onSystemMessageForTradeWithBankResponse(rsp);
     }
 
     @Override
     @Subscribe
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
         LOG.debug("Received SystemMessageForPlayingCardsMessage");
-        if (msg.getName().equals(super.lobbyName)) {
-            super.onSystemMessageForPlayingCardsMessage(msg);
-        }
+        if (msg.getName().equals(super.lobbyName)) super.onSystemMessageForPlayingCardsMessage(msg);
     }
 
     public void onEnter(ActionEvent actionEvent) {

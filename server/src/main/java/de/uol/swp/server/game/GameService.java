@@ -217,7 +217,7 @@ public class GameService extends AbstractService {
 
             ServerMessage returnSystemMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
                                                                                  req.getOfferingUser(),
-                                                                                 req.getRespondingUser(),
+                                                                                 req.getRespondingUser().getUsername(),
                                                                                  offeredResourcesWrapperMap,
                                                                                  respondingResourcesWrapperMap);
             LOG.debug("Sending SystemMessageForTradeMessage for Lobby " + req.getOriginLobby());
@@ -1015,7 +1015,7 @@ public class GameService extends AbstractService {
         post(returnMessage);
         LOG.debug("Received a SystemMessageForTradeMessage");
         ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
-                                                                       req.getUser().getUsername(), "Bank",
+                                                                       req.getUser(), "Bank",
                                                                        offeredResourcesWrapperMap,
                                                                        respondingResourcesWrapperMap);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
