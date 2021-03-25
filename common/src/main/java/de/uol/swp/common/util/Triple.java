@@ -6,6 +6,9 @@ package de.uol.swp.common.util;
  * @param <T1> Type of the first value
  * @param <T2> Type of the second value
  * @param <T3> Type of the third value
+ *
+ * @author Temmo Junkhoff
+ * @since 2021-03-19
  */
 public class Triple<T1, T2, T3> {
 

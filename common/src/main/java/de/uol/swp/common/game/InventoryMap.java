@@ -10,6 +10,9 @@ import java.util.Objects;
 
 /**
  * A class to store the mapping of UserOrDummy, Player and Inventory
+ *
+ * @author Temmo Junkhoff
+ * @since 2021-03-19
  */
 public class InventoryMap {
 

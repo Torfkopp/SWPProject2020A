@@ -204,7 +204,6 @@ public class LobbyDTO implements Lobby {
 
     @Override
     public void updateOwner(User user) {
-        //TODO: Check for dummy
         if (!this.users.contains(user)) {
             throw new IllegalArgumentException(
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");

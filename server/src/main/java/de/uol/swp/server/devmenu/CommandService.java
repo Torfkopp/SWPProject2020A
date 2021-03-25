@@ -261,7 +261,10 @@ public class CommandService extends AbstractService {
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
      *                        used to invoke the command
      *
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-03-13
      */
     private void command_AddDummy(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /adddummy command");

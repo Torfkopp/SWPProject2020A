@@ -14,9 +14,7 @@ public interface UserOrDummy extends Comparable<UserOrDummy> {
      *
      * @return ID of the user
      *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-23
+     * @since 2021-03-14
      */
     int getID();
 
@@ -25,7 +23,7 @@ public interface UserOrDummy extends Comparable<UserOrDummy> {
      *
      * @return Username of the user as a string
      *
-     * @since 2019-08-05
+     * @since 2021-03-14
      */
     String getUsername();
 }
