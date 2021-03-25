@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.common.MyObjectDecoder;
 import de.uol.swp.common.message.*;
-import de.uol.swp.common.user.response.KillOldClientResponse;
+import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -15,6 +15,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -93,6 +94,8 @@ public class ClientConnection {
              .handler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  protected void initChannel(SocketChannel ch) {
+                     // Add IdleStateHandler to handle timeouts
+                     ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
                      // Add both Encoder and Decoder to send and receive serialisable objects
                      ch.pipeline().addLast(new ObjectEncoder());
                      ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
@@ -161,11 +164,11 @@ public class ClientConnection {
      *
      * @author Marvin Drees
      * @author Aldin Dervisi
-     * @see de.uol.swp.common.user.response.KillOldClientResponse
+     * @see de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent
      * @since 2021-03-18
      */
     public void resetClient() {
-        eventBus.post(new KillOldClientResponse());
+        eventBus.post(new ClientDisconnectedFromServerEvent());
     }
 
     /**

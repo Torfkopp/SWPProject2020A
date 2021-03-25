@@ -294,7 +294,7 @@ public class ServerHandler implements ServerHandlerDelegate {
     @Subscribe
     private void onPongMessage(PongMessage msg) {
         if (msg.getSession().isPresent())
-        LOG.info("Client pong received from session " + msg.getSession().get());
+        LOG.info("Client pong received from " + msg.getSession().get());
     }
 
     /**
@@ -311,11 +311,12 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @author Aldin Dervisi
      * @since 2021-03-18
      */
-
     @Subscribe
     private void onClientDisconnectedMessage(ClientDisconnectedMessage msg) {
         if (msg.getSession().isPresent()) {
             RequestMessage requestMessage = new RemoveFromLobbiesRequest(msg.getSession().get().getUser());
+            Optional<MessageContext> ctx = getCtx(msg);
+            ctx.ifPresent(this::removeSession);
             eventBus.post(requestMessage);
         }
     }

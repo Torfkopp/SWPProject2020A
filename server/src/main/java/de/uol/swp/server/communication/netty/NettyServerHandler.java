@@ -81,7 +81,8 @@ public class NettyServerHandler implements ChannelInboundHandler {
                 ctx.close();
             } else if (e.state() == IdleState.WRITER_IDLE) {
                 // When server didn't communicate with client after n seconds
-                delegate.sendPingMessage(new NettyMessageContext(ctx));
+                System.err.println("ping should be here theoretically");
+                //delegate.sendPingMessage(new NettyMessageContext(ctx));
             }
         }
     }

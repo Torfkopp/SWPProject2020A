@@ -3,6 +3,8 @@ package de.uol.swp.client;
 import de.uol.swp.common.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,6 +35,18 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) {
         LOG.debug("Disconnected from server: " + ctx);
         clientConnection.resetClient();
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object o) {
+        if (o instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) o;
+            if (e.state() == IdleState.READER_IDLE) {
+                // When client timed out
+                clientConnection.resetClient();
+                ctx.close();
+            }
+        }
     }
 
     @Override

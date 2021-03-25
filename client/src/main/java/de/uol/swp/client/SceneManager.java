@@ -30,6 +30,7 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import javafx.application.Platform;
@@ -247,6 +248,17 @@ public class SceneManager {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
                   MAINMENU_WIDTH, MAINMENU_HEIGHT);
+    }
+
+    public void closeMainScreen() {
+        primaryStage.close();
+    }
+
+    @Subscribe
+    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
+        LOG.debug("Received ClientDisconnectedFromServerMessage");
+        showError("Connection timed out!" ,"You've been disconnected from the server!");
+        Platform.runLater(this::closeMainScreen);
     }
 
     /**
