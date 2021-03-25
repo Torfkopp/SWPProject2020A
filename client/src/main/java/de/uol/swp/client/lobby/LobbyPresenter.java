@@ -285,7 +285,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @Subscribe
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
         LOG.debug("Received SystemMessageForPlayingCardsMessage");
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(super.lobbyName)) {
+        if (msg.getName().equals(super.lobbyName)) {
             super.onSystemMessageForPlayingCardsMessage(msg);
         }
     }

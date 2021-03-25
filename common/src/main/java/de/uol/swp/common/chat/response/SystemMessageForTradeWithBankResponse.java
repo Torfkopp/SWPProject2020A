@@ -15,30 +15,18 @@ import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
  */
 public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse {
 
-    private final String user;
     private final SystemMessageDTO msg;
 
     /**
      * Constructor
      *
-     * @param user            The user that traded with the bank
      * @param lobbyName       The lobby name
      * @param developmentCard The developmentCard that the user bought
      */
-    public SystemMessageForTradeWithBankResponse(String user, String lobbyName, String developmentCard) {
+    public SystemMessageForTradeWithBankResponse(String lobbyName, String developmentCard) {
         super(lobbyName);
-        this.user = user;
         this.msg = new SystemMessageDTO(
                 new I18nWrapper("lobby.trade.withbank.systemresponse", new I18nWrapper(developmentCard)));
-    }
-
-    /**
-     * Gets the user who bought the development card
-     *
-     * @return The user
-     */
-    public String getUser() {
-        return user;
     }
 
     /**
@@ -50,4 +38,3 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
         return msg;
     }
 }
-

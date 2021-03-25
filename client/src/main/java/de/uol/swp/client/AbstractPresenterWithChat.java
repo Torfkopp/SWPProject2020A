@@ -362,8 +362,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @since 2021-03-23
      */
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
-        if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getLobbyName());
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }
