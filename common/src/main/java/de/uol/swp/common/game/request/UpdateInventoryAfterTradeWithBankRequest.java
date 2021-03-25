@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.request;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Request sent to the server when a user wants to update his Inventory
@@ -24,7 +24,7 @@ public class UpdateInventoryAfterTradeWithBankRequest extends UpdateInventoryReq
      * @param getResource  The name of the resource he gets from the bank
      * @param giveResource The name of the resource he has to give to the bank
      */
-    public UpdateInventoryAfterTradeWithBankRequest(User user, String originLobby, String getResource,
+    public UpdateInventoryAfterTradeWithBankRequest(UserOrDummy user, String originLobby, String getResource,
                                                     String giveResource) {
         super(user, originLobby);
         this.getResource = getResource;

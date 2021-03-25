@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.request;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Request used to change the amount of a resource in a player's inventory
@@ -12,7 +12,7 @@ import de.uol.swp.common.user.User;
  */
 public class EditInventoryRequest extends AbstractGameRequest {
 
-    private final User user;
+    private final UserOrDummy user;
     private final String resource;
     private final int amount;
 
@@ -25,7 +25,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      * @param amount      The amount to be added (substracted if negative)
      *                    to/from the resource
      */
-    public EditInventoryRequest(String originLobby, User user, String resource, int amount) {
+    public EditInventoryRequest(String originLobby, UserOrDummy user, String resource, int amount) {
         super(originLobby);
         this.user = user;
         this.resource = resource;
@@ -56,7 +56,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *
      * @return The user whose inventory to update
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

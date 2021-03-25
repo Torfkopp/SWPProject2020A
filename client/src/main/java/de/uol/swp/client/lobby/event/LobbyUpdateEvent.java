@@ -1,7 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Event used to communicate Lobby details to new LobbyPresenter instances
@@ -24,7 +24,7 @@ import de.uol.swp.common.user.User;
 public class LobbyUpdateEvent {
 
     private final String lobbyName;
-    private final User user;
+    private final UserOrDummy user;
     private final Lobby lobby;
 
     /**
@@ -34,7 +34,7 @@ public class LobbyUpdateEvent {
      * @param user      The name of the User who caused this Event (Creator or Joining User)
      * @param lobby     The Lobby-object of the lobby the user wants to join
      */
-    public LobbyUpdateEvent(String lobbyName, User user, Lobby lobby) {
+    public LobbyUpdateEvent(String lobbyName, UserOrDummy user, Lobby lobby) {
         this.lobbyName = lobbyName;
         this.user = user;
         this.lobby = lobby;
@@ -54,7 +54,7 @@ public class LobbyUpdateEvent {
      *
      * @return The User
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 

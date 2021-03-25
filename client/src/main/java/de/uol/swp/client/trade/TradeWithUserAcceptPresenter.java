@@ -13,7 +13,7 @@ import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -49,8 +49,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     private ListView<Pair<String, Integer>> ownInventoryView;
 
     private String lobbyName;
-    private String offeringUserName;
-    private User respondingUser;
+    private UserOrDummy offeringUser;
+    private UserOrDummy respondingUser;
     private Map<String, Integer> offeringResourceMap;
     private Map<String, Integer> resourceMap;
     private Map<String, Integer> respondingResourceMap;
@@ -102,9 +102,9 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUserName));
+        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUser));
         LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUserName));
+        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUser));
     }
 
     /**
@@ -125,8 +125,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        eventBus.post(new AcceptUserTradeRequest(respondingUser.getUsername(), offeringUserName, lobbyName,
-                                                 respondingResourceMap, offeringResourceMap));
+        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, respondingResourceMap,
+                                                 offeringResourceMap));
     }
 
     /**
@@ -142,8 +142,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         Platform.runLater(() -> {
             LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
             acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(String.format(resourceBundle.getString("game.trade.status.invalid"),
-                                                        rsp.getOfferingUserName().getUsername()));
+            tradeNotPossibleLabel.setText(
+                    String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
         });
     }
 
@@ -157,7 +157,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRejectTradeButtonPressed() {
-        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUserName));
+        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUser));
         closeWindow();
     }
 
@@ -193,7 +193,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + this.lobbyName);
         respondingUser = rsp.getRespondingUser();
-        offeringUserName = rsp.getOfferingUser().getUsername();
+        offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();
         offeringResourceMap = rsp.getOfferingResourceMap();
         resourceMap = rsp.getResourceMap();
@@ -212,7 +212,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         LOG.debug("Setting the tradeResponseLabel");
         boolean offer = false;
         StringBuilder offerText = new StringBuilder(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUserName)).append("\n");
+                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser)).append("\n");
 
         for (Map.Entry<String, Integer> entry : offeringResourceMap.entrySet()) {
             int amount = entry.getValue();

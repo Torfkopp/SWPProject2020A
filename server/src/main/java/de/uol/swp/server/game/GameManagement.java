@@ -3,7 +3,7 @@ package de.uol.swp.server.game;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.lobby.ILobbyManagement;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class GameManagement implements IGameManagement {
     }
 
     @Override
-    public void createGame(Lobby lobby, User first) throws IllegalArgumentException {
+    public void createGame(Lobby lobby, UserOrDummy first) throws IllegalArgumentException {
         if (games.containsKey(lobby.getName())) {
             throw new IllegalArgumentException("Game of lobby [" + lobby.getName() + "] already exists!");
         }

@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Request sent to the server when a user wants to kick another user
@@ -13,18 +13,18 @@ import de.uol.swp.common.user.User;
  */
 public class KickUserRequest extends AbstractLobbyRequest {
 
-    private final String toBeKickedUserName;
+    private final UserOrDummy toBeKickedUser;
 
     /**
      * Constructor
      *
-     * @param name               Name of the lobby
-     * @param user               The user who wants to kick someone
-     * @param toBeKickedUserName The user about to be kicked
+     * @param name           Name of the lobby
+     * @param user           The user who wants to kick someone
+     * @param toBeKickedUser The user about to be kicked
      */
-    public KickUserRequest(String name, User user, String toBeKickedUserName) {
+    public KickUserRequest(String name, UserOrDummy user, UserOrDummy toBeKickedUser) {
         super(name, user);
-        this.toBeKickedUserName = toBeKickedUserName;
+        this.toBeKickedUser = toBeKickedUser;
     }
 
     /**
@@ -32,7 +32,7 @@ public class KickUserRequest extends AbstractLobbyRequest {
      *
      * @return Name of the User
      */
-    public String getToBeKickedUserName() {
-        return toBeKickedUserName;
+    public UserOrDummy getToBeKickedUser() {
+        return toBeKickedUser;
     }
 }

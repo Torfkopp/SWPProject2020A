@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * This Response has up-to-date info about the bought development card to
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.User;
  */
 public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
 
-    private final User user;
+    private final UserOrDummy user;
     private final String developmentCard;
 
     /**
@@ -23,7 +23,7 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
      * @param user      user who bought a development card
      * @param lobbyName name of the lobby where the user bought the card
      */
-    public BuyDevelopmentCardResponse(User user, String lobbyName, String developmentCard) {
+    public BuyDevelopmentCardResponse(UserOrDummy user, String lobbyName, String developmentCard) {
         super(lobbyName);
         this.user = user;
         this.developmentCard = developmentCard;
@@ -43,7 +43,7 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
      *
      * @return User The User who bought a development card
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }
