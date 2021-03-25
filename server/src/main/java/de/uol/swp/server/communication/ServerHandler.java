@@ -281,6 +281,7 @@ public class ServerHandler implements ServerHandlerDelegate {
 
     /**
      * Handles a PongMessage found on the EventBus
+     * <p>
      * If a PongMessage is detected on the EventBus, this method is called.
      * It simply logs the fact that it received the message as this
      * message is only used to keep the connection alive.
