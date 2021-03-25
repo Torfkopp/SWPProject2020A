@@ -11,22 +11,17 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
-import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
-import de.uol.swp.common.lobby.request.UserReadyRequest;
-import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.common.user.DummyDTO;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.IGameManagement;
@@ -83,15 +78,13 @@ public class CommandService extends AbstractService {
         this.gameManagement = gameManagement;
         getAllClasses();
         commandMap.put("devmenu", this::command_DevMenu);
-        commandMap.put("droptemp", this::command_DropTemp);
         commandMap.put("forceendturn", this::command_ForceEndTurn);
         commandMap.put("give", this::command_Give);
         commandMap.put("help", this::command_Help);
         commandMap.put("post", this::command_Post);
-        commandMap.put("quicklobby", this::command_QuickLobby);
         commandMap.put("remove", this::command_Remove);
-        commandMap.put("skip", this::command_NextPlayerIfTemp);
-        commandMap.put("skipall", this::command_SkipBots);
+        commandMap.put("adddummy", this::command_AddDummy);
+        commandMap.put("d", this::command_AddDummy);
         LOG.debug("CommandService started");
     }
 
@@ -109,31 +102,6 @@ public class CommandService extends AbstractService {
         OpenDevMenuResponse msg = new OpenDevMenuResponse();
         msg.initWithMessage(originalMessage);
         post(msg);
-    }
-
-    /**
-     * Handles the /droptemp command
-     * <p>
-     * Usage: {@code /droptemp}
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     */
-    private void command_DropTemp(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /droptemp command");
-        Optional<User> temp1 = userManagement.getUser(TEMP_1_NAME);
-        Optional<User> temp2 = userManagement.getUser(TEMP_2_NAME);
-        if (temp1.isPresent()) {
-            post(new RemoveFromLobbiesRequest(temp1.get()));
-            userManagement.dropUser(temp1.get());
-        }
-        if (temp2.isPresent()) {
-            post(new RemoveFromLobbiesRequest(temp2.get()));
-            userManagement.dropUser(temp2.get());
-        }
     }
 
     /**
@@ -184,12 +152,12 @@ public class CommandService extends AbstractService {
      */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
-        try {
-            if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
-            Message msg = parseArguments(args, EditInventoryRequest.class.getConstructors()[0],
-                                         Optional.of(originalMessage.getAuthor()));
-            post(msg);
-        } catch (Exception ignored) {}
+        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
+        Optional<User> user = userManagement.getUser(args.get(1));
+        if (user.isEmpty()) return;
+
+        Message msg = new EditInventoryRequest(args.get(0), user.get(), args.get(2), Integer.parseInt(args.get(3)));
+        post(msg);
     }
 
     /**
@@ -224,29 +192,6 @@ public class CommandService extends AbstractService {
     private void command_Invalid(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received an invalid command");
         sendSystemMessageResponse(originalMessage, new I18nWrapper("devmenu.commands.invalid", String.join(" ", args)));
-    }
-
-    /**
-     * Handles the /skip command
-     * <p>
-     * Usage: {@code /skip}
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     */
-    private void command_NextPlayerIfTemp(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /skip command");
-        if (!originalMessage.isFromLobby()) return;
-        String lobbyName = originalMessage.getOriginLobby();
-        Game game = gameManagement.getGame(lobbyName);
-        if (game == null) return;
-        User activePlayer = game.getActivePlayer();
-        if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
-            post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
-        }
     }
 
     /**
@@ -291,51 +236,6 @@ public class CommandService extends AbstractService {
     }
 
     /**
-     * Handles the /quicklobby command
-     * <p>
-     * {@code /quicklobby}
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     */
-    private void command_QuickLobby(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /quicklobby command");
-        if (originalMessage.getSession().isEmpty()) return;
-        User invoker = originalMessage.getSession().get().getUser();
-        lobbyManagement.createLobby(QUICK_LOBBY_NAME, invoker, 4);
-        Optional<Lobby> lobby = lobbyManagement.getLobby(QUICK_LOBBY_NAME);
-        if (lobby.isEmpty()) return;
-        ResponseMessage rsp = new CreateLobbyResponse(QUICK_LOBBY_NAME, lobby.get());
-        rsp.initWithMessage(originalMessage);
-        post(rsp);
-
-        User temp1, temp2;
-        try {
-            Optional<User> found = userManagement.getUser(TEMP_1_NAME);
-            if (found.isEmpty()) throw new RuntimeException("User not found");
-            temp1 = found.get();
-        } catch (Exception e) {
-            temp1 = userManagement.createUser(new UserDTO(-1, TEMP_1_NAME, TEMP_1_NAME, ""));
-        }
-
-        try {
-            Optional<User> found = userManagement.getUser(TEMP_2_NAME);
-            if (found.isEmpty()) throw new RuntimeException("User not found");
-            temp2 = found.get();
-        } catch (Exception e) {
-            temp2 = userManagement.createUser(new UserDTO(-1, TEMP_2_NAME, TEMP_2_NAME, ""));
-        }
-
-        post(new LobbyJoinUserRequest(QUICK_LOBBY_NAME, temp1));
-        post(new LobbyJoinUserRequest(QUICK_LOBBY_NAME, temp2));
-        post(new UserReadyRequest(QUICK_LOBBY_NAME, temp1, true));
-        post(new UserReadyRequest(QUICK_LOBBY_NAME, temp2, true));
-    }
-
-    /**
      * Handles the /remove command
      * <p>
      * Usage: {@code /remove [lobby] <player> <resource> <amount>}
@@ -353,28 +253,37 @@ public class CommandService extends AbstractService {
     }
 
     /**
-     * Handles the /skipall command
+     * Handles the /adddummy command
      * <p>
-     * Usage: {@code /skipall}
+     * Usage: {@code /adddummy}
      *
      * @param args            List of Strings to be used as arguments
      * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
      *                        used to invoke the command
      *
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-03-13
      */
-    private void command_SkipBots(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /skipall command");
-        String lobbyName = originalMessage.getOriginLobby();
-        Game game = gameManagement.getGame(lobbyName);
-        if (game == null) return;
-        User activePlayer = game.getActivePlayer();
-        if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
-            post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
-            activePlayer = game.getActivePlayer();
-            if (activePlayer.getUsername().equals(TEMP_1_NAME) || activePlayer.getUsername().equals(TEMP_2_NAME)) {
-                post(new NextPlayerMessage(lobbyName, game.nextPlayer()));
+    private void command_AddDummy(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /adddummy command");
+        int dummyAmount;
+        if (args.size() > 0) dummyAmount = Integer.parseInt(args.get(0));
+        else dummyAmount = 1;
+        if (originalMessage.isFromLobby()) {
+            String lobbyName = originalMessage.getOriginLobby();
+            Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                Lobby lobby = optLobby.get();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                if (dummyAmount > freeUsers) dummyAmount = freeUsers;
+                for (; dummyAmount > 0; dummyAmount--) {
+                    post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+                }
             }
+        } else {
+            command_Invalid(args, originalMessage);
         }
     }
 

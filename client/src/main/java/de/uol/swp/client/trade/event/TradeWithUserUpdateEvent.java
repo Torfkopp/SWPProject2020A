@@ -1,6 +1,6 @@
 package de.uol.swp.client.trade.event;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Event used to trigger the updating of the TradeWithUserPresenter
@@ -18,7 +18,7 @@ import de.uol.swp.common.user.User;
 public class TradeWithUserUpdateEvent {
 
     private final String lobbyName;
-    private final User user;
+    private final UserOrDummy user;
 
     /**
      * Constructor
@@ -26,7 +26,7 @@ public class TradeWithUserUpdateEvent {
      * @param lobbyName The name of the Lobby of the trade
      * @param user      The name of the User who wants to trade
      */
-    public TradeWithUserUpdateEvent(String lobbyName, User user) {
+    public TradeWithUserUpdateEvent(String lobbyName, UserOrDummy user) {
         this.lobbyName = lobbyName;
         this.user = user;
     }
@@ -45,7 +45,7 @@ public class TradeWithUserUpdateEvent {
      *
      * @return The User
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

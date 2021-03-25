@@ -1,7 +1,5 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.user.User;
-
 /**
  * The player's inventory
  *
@@ -10,10 +8,6 @@ import de.uol.swp.common.user.User;
  * @since 2021-01-16
  */
 public class Inventory {
-
-    private final User player;
-
-    private int totalResources = 0;
 
     private int brick = 0;
     private int grain = 0;
@@ -34,11 +28,8 @@ public class Inventory {
 
     /**
      * Constructor
-     *
-     * @param player The player who this inventory belongs to
      */
-    public Inventory(User player) {
-        this.player = player;
+    public Inventory() {
     }
 
     /**
@@ -168,15 +159,6 @@ public class Inventory {
     }
 
     /**
-     * Gets the player who this inventory belongs to
-     *
-     * @return The player who this inventory belongs to
-     */
-    public User getPlayer() {
-        return player;
-    }
-
-    /**
      * Gets the amount of Resource Cards (Bricks, Grain, Lumber, Ore, Wool)
      * the user has in his inventory
      *
@@ -206,24 +188,6 @@ public class Inventory {
      */
     public void setRoadBuildingCards(int roadBuildingCards) {
         this.roadBuildingCards = roadBuildingCards;
-    }
-
-    /**
-     * Gets the total amount of resources a player has in their inventory
-     *
-     * @return The total amount of resources
-     */
-    public int getTotalResources() {
-        return totalResources;
-    }
-
-    /**
-     * Sets the total amount of resources in the player's inventory
-     *
-     * @param totalResources The total amount of resources to place in the inventory
-     */
-    public void setTotalResources(int totalResources) {
-        this.totalResources = totalResources;
     }
 
     /**

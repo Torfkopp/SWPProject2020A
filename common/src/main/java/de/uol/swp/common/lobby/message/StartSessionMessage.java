@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param configuration       The field configuration used in the game
      * @param startUpPhaseEnabled Whether the game has the startup phase enabled
      */
-    public StartSessionMessage(String name, User user, Map<String, List<Object>> configuration,
+    public StartSessionMessage(String name, UserOrDummy user, Map<String, List<Object>> configuration,
                                boolean startUpPhaseEnabled) {
         super(name, user);
         this.configuration = configuration;

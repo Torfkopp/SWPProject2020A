@@ -5,12 +5,15 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.CloseTradeWithUserResponseEvent;
+import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.ResetOfferTradeButtonRequest;
+import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
+import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,8 +49,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     private ListView<Pair<String, Integer>> ownInventoryView;
 
     private String lobbyName;
-    private String offeringUserName;
-    private String respondingUserName;
+    private UserOrDummy offeringUser;
+    private UserOrDummy respondingUser;
     private Map<String, Integer> offeringResourceMap;
     private Map<String, Integer> resourceMap;
     private Map<String, Integer> respondingResourceMap;
@@ -83,6 +86,28 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     }
 
     /**
+     * Handles a click on the MakeCounterOfferButton
+     * <p>
+     * When the buttons gets pressed, this method calls the
+     * ShowTradeWithUserViewEvent to open up the trading window and
+     * a TradeWithUserRequest to get the needed information from the
+     * server for the trade.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
+     * @since 2021-03-19
+     */
+    @FXML
+    private void onMakeCounterOfferButtonPressed() {
+        LOG.debug("Sending ShowTradeWithUserViewEvent");
+        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUser));
+        LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
+        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUser));
+    }
+
+    /**
      * Helper function
      * <p>
      * This method is called if a window should be closed.
@@ -100,7 +125,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        eventBus.post(new AcceptUserTradeRequest(respondingUserName, offeringUserName, lobbyName, respondingResourceMap,
+        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, respondingResourceMap,
                                                  offeringResourceMap));
     }
 
@@ -117,8 +142,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         Platform.runLater(() -> {
             LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
             acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(String.format(resourceBundle.getString("game.trade.status.invalid"),
-                                                        rsp.getOfferingUserName().getUsername()));
+            tradeNotPossibleLabel.setText(
+                    String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
         });
     }
 
@@ -132,7 +157,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRejectTradeButtonPressed() {
-        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUserName));
+        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUser));
         closeWindow();
     }
 
@@ -167,8 +192,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + this.lobbyName);
-        respondingUserName = rsp.getRespondingUser().getUsername();
-        offeringUserName = rsp.getOfferingUser().getUsername();
+        respondingUser = rsp.getRespondingUser();
+        offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();
         offeringResourceMap = rsp.getOfferingResourceMap();
         resourceMap = rsp.getResourceMap();
@@ -187,7 +212,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         LOG.debug("Setting the tradeResponseLabel");
         boolean offer = false;
         StringBuilder offerText = new StringBuilder(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUserName)).append("\n");
+                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser)).append("\n");
 
         for (Map.Entry<String, Integer> entry : offeringResourceMap.entrySet()) {
             int amount = entry.getValue();

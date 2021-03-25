@@ -1,6 +1,6 @@
 package de.uol.swp.common.chat;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.time.Instant;
 
@@ -22,7 +22,7 @@ public interface ChatMessage extends Comparable<ChatMessage>, ChatOrSystemMessag
      *
      * @return A User object that represents the ChatMessage author#
      */
-    User getAuthor();
+    UserOrDummy getAuthor();
 
     /**
      * Gets the ChatMessage's content

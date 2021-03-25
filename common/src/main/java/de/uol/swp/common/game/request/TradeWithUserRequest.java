@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Request is sent to the Server the get the Inventory
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.User;
  */
 public class TradeWithUserRequest extends AbstractLobbyRequest {
 
-    private final String respondingUser;
+    private final UserOrDummy respondingUser;
 
     /**
      * Constructor
@@ -23,7 +23,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      * @param user           The User who wants to start a game session
      * @param tradingPartner The username of the trading partner
      */
-    public TradeWithUserRequest(String name, User user, String tradingPartner) {
+    public TradeWithUserRequest(String name, UserOrDummy user, UserOrDummy tradingPartner) {
         super(name, user);
         this.respondingUser = tradingPartner;
     }
@@ -33,7 +33,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      *
      * @return The username of the trading partner
      */
-    public String getRespondingUser() {
+    public UserOrDummy getRespondingUser() {
         return respondingUser;
     }
 }

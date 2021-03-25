@@ -5,13 +5,15 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.exception.ChangePasswordExceptionMessage;
+import de.uol.swp.common.user.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
+import de.uol.swp.common.user.message.UserLoggedInMessage;
+import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.DeleteUserRequest;
 import de.uol.swp.common.user.request.RegisterUserRequest;
-import de.uol.swp.common.user.request.UpdateUserPasswordRequest;
-import de.uol.swp.common.user.response.ChangePasswordSuccessfulResponse;
+import de.uol.swp.common.user.request.UpdateUserAccountDetailsRequest;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.response.UserDeletionSuccessfulResponse;
 import de.uol.swp.server.AbstractService;
@@ -51,38 +53,42 @@ public class UserService extends AbstractService {
     }
 
     /**
-     * Handles a UpdateUserPasswordRequest found on the EventBus
+     * Handles a UpdateUserAccountDetailsRequest found on the EventBus
      * <p>
-     * If a UpdateUserPasswordRequest is detected on the EventBus, this method is called.
-     * It tries to change the Password of a user via the UserManagement.
-     * If this succeeds, a ChangePasswordSuccessfulResponse is posted onto the EventBus.
-     * Otherwise, a ChangePasswordExceptionMessage gets posted there.
+     * If a UpdateUserAccountDetailsRequest is detected on the EventBus, this method is called.
+     * It tries to update the Details of a user via the UserManagement.
+     * If this succeeds, a ChangeAccountDetailsSuccessfulResponse is posted onto the EventBus.
+     * Otherwise, a ChangeAccountDetailsExceptionMessage gets posted there.
      *
-     * @param req The ChangePasswordRequest found on the Eventbus
+     * @param req The ChangeAccountDetailsRequest found on the Eventbus
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangePasswordRequest(UpdateUserPasswordRequest req) {
+    private void onChangeAccountDetailsRequest(UpdateUserAccountDetailsRequest req) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Received ChangePasswordRequest for User " + req.getUser().getUsername());
+            LOG.debug("Received ChangeAccountDetailsRequest for User " + req.getOldUsername());
         }
         ResponseMessage returnMessage;
         try {
             Optional<User> optionalUser = userManagement
-                    .getUserWithPassword(req.getUser().getUsername(), req.getOldPassword());
+                    .getUserWithPassword(req.getOldUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
-                userManagement.updateUser(req.getUser());
-                returnMessage = new ChangePasswordSuccessfulResponse();
+                User user = userManagement.updateUser(req.getUser());
+                returnMessage = new ChangeAccountDetailsSuccessfulResponse(user);
+                LOG.debug("Account Details were changed for " + req.getUser().getUsername());
+                if (!req.getOldUsername().equals(req.getUser().getUsername())) {
+                    post(new UserLoggedOutMessage(req.getOldUsername()));
+                    post(new UserLoggedInMessage(req.getUser().getUsername()));
+                }
             } else {
-                returnMessage = new ChangePasswordExceptionMessage("Old Passwords are not equal");
+                returnMessage = new ChangeAccountDetailsExceptionMessage("Old Password was not correct");
             }
         } catch (Exception e) {
             LOG.error(e);
-            returnMessage = new ChangePasswordExceptionMessage(
-                    "Cannot change Password of [" + req.getUser().getUsername() + "] " + e.getMessage());
+            returnMessage = new ChangeAccountDetailsExceptionMessage(e.getMessage());
         }
         returnMessage.initWithMessage(req);
         post(returnMessage);

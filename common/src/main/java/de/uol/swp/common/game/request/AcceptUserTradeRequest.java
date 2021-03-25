@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.user.UserOrDummy;
+
 import java.util.Map;
 
 /**
@@ -12,8 +14,8 @@ import java.util.Map;
  */
 public class AcceptUserTradeRequest extends AbstractGameRequest {
 
-    private final String respondingUser;
-    private final String offeringUser;
+    private final UserOrDummy respondingUser;
+    private final UserOrDummy offeringUser;
     private final Map<String, Integer> respondingResourceMap;
     private final Map<String, Integer> offeringResourceMap;
 
@@ -26,7 +28,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @param respondingResourceMap The demanded resources
      * @param offeringResourceMap   The offered resources
      */
-    public AcceptUserTradeRequest(String respondingUser, String offeringUser, String lobbyName,
+    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, String lobbyName,
                                   Map<String, Integer> respondingResourceMap,
                                   Map<String, Integer> offeringResourceMap) {
         super(lobbyName);
@@ -50,7 +52,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Name of the offering user
      */
-    public String getOfferingUser() {
+    public UserOrDummy getOfferingUser() {
         return offeringUser;
     }
 
@@ -68,7 +70,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Name of the responding user
      */
-    public String getRespondingUser() {
+    public UserOrDummy getRespondingUser() {
         return respondingUser;
     }
 }
