@@ -978,6 +978,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             window.widthProperty().addListener(canvasResizeListener);
             window.heightProperty().addListener(canvasResizeListener);
             this.gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
+            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
             this.gameMap = new GameMap();
             gameMap.createBeginnerMap();
             gameRendering.drawGameMap(gameMap);
@@ -995,12 +997,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.startSession.setVisible(false);
             this.rollDice.setVisible(true);
             this.endTurn.setVisible(true);
+            this.endTurn.setDisable(true);
             this.tradeWithUserButton.setVisible(true);
             this.tradeWithUserButton.setDisable(true);
             this.tradeWithBankButton.setVisible(true);
+            this.tradeWithBankButton.setDisable(true);
             setRollDiceButtonState(msg.getUser());
             this.kickUserButton.setVisible(false);
             this.playCard.setVisible(true);
+            this.playCard.setDisable(true);
         });
     }
 
