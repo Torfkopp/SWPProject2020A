@@ -31,7 +31,6 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first) {
         this.lobby = lobby;
         {
-            System.out.println("INVENTORY CREATION");
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
                 players.put(userOrDummy, counterPlayer, new Inventory());
