@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Response of the server is sent to the lobby where a trade with the bank
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.User;
  */
 public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
 
-    private final User user;
+    private final UserOrDummy user;
 
     /**
      * Constructor
@@ -22,7 +22,7 @@ public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
      * @param user      user who had a successful trade with the bank
      * @param lobbyName name of the lobby where the trade happened
      */
-    public TradeWithBankAcceptedResponse(User user, String lobbyName) {
+    public TradeWithBankAcceptedResponse(UserOrDummy user, String lobbyName) {
         super(lobbyName);
         this.user = user;
     }
@@ -32,7 +32,7 @@ public class TradeWithBankAcceptedResponse extends AbstractLobbyResponse {
      *
      * @return The User who had a successful trade
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

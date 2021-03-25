@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
 
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
-    private final User user;
+    private final UserOrDummy user;
     private final Map<String, Integer> resourceMap;
     private final Map<String, Boolean> armyAndRoadMap;
 
@@ -27,7 +27,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @param resourceMap    The Map containing the name of a resource as key and the amount as value
      * @param armyAndRoadMap The Map containing "Largest Army" and "Longest Road" with the appropriate boolean as the value
      */
-    public UpdateInventoryResponse(User user, String lobbyName, Map<String, Integer> resourceMap,
+    public UpdateInventoryResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
                                    Map<String, Boolean> armyAndRoadMap) {
         super(lobbyName);
         this.user = user;
@@ -61,7 +61,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The User whose inventory is being updated
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

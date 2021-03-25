@@ -173,12 +173,12 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
         //todo Show the User what card they got?
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
         closeWindowAfterSuccessfulTrade();
-        LOG.debug("The user got a " + rsp.getDevelopmentCard());
-        LOG.debug("Sending UpdateInventoryRequest");
+        LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
+        LOG.debug("---- Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
         eventBus.post(updateInventoryRequest);
         tradeResourceWithBankButton.setDisable(true);

@@ -2,7 +2,7 @@ package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
 
@@ -19,13 +19,14 @@ public interface IGameManagement {
      * Creates a new game and adds it to the list
      *
      * @param lobby The game's lobby
+     * @param first The user or dummy that takes the first turn
      *
      * @throws java.lang.IllegalArgumentException Lobby already has a game
      * @implNote The primary key of games is the lobby's name, therefore
      * only one game per lobby is possible
      * @since 2021-01-24
      */
-    void createGame(Lobby lobby, User first) throws IllegalArgumentException;
+    void createGame(Lobby lobby, UserOrDummy first) throws IllegalArgumentException;
 
     /**
      * Deletes a game with its lobby's name

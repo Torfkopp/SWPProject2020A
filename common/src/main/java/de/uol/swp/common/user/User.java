@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @see java.lang.Comparable
  * @since 2019-08-05
  */
-public interface User extends Serializable, Comparable<User> {
+public interface User extends UserOrDummy, Serializable {
 
     /**
      * Gets the e-mail variable
@@ -27,17 +27,6 @@ public interface User extends Serializable, Comparable<User> {
     String getEMail();
 
     /**
-     * Gets the ID variable
-     *
-     * @return ID of the user
-     *
-     * @author Aldin Dervisi
-     * @author Phillip-André Suhr
-     * @since 2021-02-23
-     */
-    int getID();
-
-    /**
      * Gets the password variable
      *
      * @return Password of the user as a string
@@ -45,15 +34,6 @@ public interface User extends Serializable, Comparable<User> {
      * @since 2019-08-05
      */
     String getPassword();
-
-    /**
-     * Gets the username variable
-     *
-     * @return Username of the user as a string
-     *
-     * @since 2019-08-05
-     */
-    String getUsername();
 
     /**
      * Creates a duplicate of this object leaving its password empty
