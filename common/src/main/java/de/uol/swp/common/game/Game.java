@@ -56,6 +56,13 @@ public class Game {
         return (new int[]{dice1, dice2});
     }
 
+    /**
+     * Returns the user corresponding with the given player
+     *
+     * @param player The player whose User is required
+     *
+     * @return The user needed
+     */
     public UserOrDummy getUserFromPlayer(Player player) {
         return players.getUserOrDummyFromPlayer(player);
     }
@@ -190,6 +197,11 @@ public class Game {
         return map;
     }
 
+    /**
+     * Gets all the inventories in the game
+     *
+     * @return An array of all inventories
+     */
     public Inventory[] getAllInventories() {
         return players.getInventories().toArray(new Inventory[0]);
     }
