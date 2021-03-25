@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Message sent by the server when a game session was started.
@@ -19,7 +19,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param name The Name of the Lobby
      * @param user The User who started the Session
      */
-    public StartSessionMessage(String name, User user) {
+    public StartSessionMessage(String name, UserOrDummy user) {
         super(name, user);
     }
 }

@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * This method is called if a trade between two users
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.User;
  */
 public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
 
-    private final User offeringUserName;
+    private final UserOrDummy offeringUser;
 
     /**
      * Constructor
@@ -22,9 +22,9 @@ public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
      * @param lobbyName        Name of the lobby
      * @param offeringUserName Name of the offering user
      */
-    public InvalidTradeOfUsersResponse(String lobbyName, User offeringUserName) {
+    public InvalidTradeOfUsersResponse(String lobbyName, UserOrDummy offeringUserName) {
         super(lobbyName);
-        this.offeringUserName = offeringUserName;
+        this.offeringUser = offeringUserName;
     }
 
     /**
@@ -32,7 +32,7 @@ public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
      *
      * @return The name of the offering user
      */
-    public User getOfferingUserName() {
-        return offeringUserName;
+    public UserOrDummy getOfferingUser() {
+        return offeringUser;
     }
 }

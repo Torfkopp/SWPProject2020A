@@ -10,6 +10,7 @@ import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -87,6 +88,26 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Received AskLatestChatMessageResponse");
             updateChatMessageList(rsp.getChatHistory());
         }
+    }
+
+    /**
+     * Handles ChangeAccountDetailsSuccessfulResponse
+     * <p>
+     * If a ChangeAccountDetailsSuccessfulResponse is found on the EventBus,
+     * this method overwrites the currently saved loggedInUser if and only if
+     * the ID of the updated User is identical to the one of the loggedInUser.
+     *
+     * @param rsp The ChangeAccountDetailsSuccessfulResponse found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse
+     * @since 2021-03-23
+     */
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        if (this.loggedInUser.getID() != rsp.getUser().getID()) return;
+        LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
+        this.loggedInUser = rsp.getUser();
     }
 
     /**

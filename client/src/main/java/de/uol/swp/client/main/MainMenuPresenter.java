@@ -2,7 +2,7 @@ package de.uol.swp.client.main;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent;
+import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
@@ -21,9 +21,7 @@ import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -98,6 +96,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
         if (rsp.getLobbyName() == null) super.onAskLatestChatMessageResponse(rsp);
+    }
+
+    @Override
+    @Subscribe
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        super.onChangeAccountDetailsSuccessfulResponse(rsp);
     }
 
     @Override
@@ -219,19 +223,20 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Method called when the ChangePasswordButton is pressed
+     * Method called when the ChangeAccountDetailsButton is pressed
      * <p>
-     * This method is called when the ChangePasswordButton is pressed.
-     * It posts an instance of the ShowChangePasswordViewEvent to the EventBus the SceneManager is subscribed to.
+     * This method is called when the ChangeAccountDetailsButton is pressed.
+     * It posts an instance of the ShowChangeAccountDetailsViewEvent to the EventBus the SceneManager is subscribed to.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangePassword.event.ShowChangePasswordViewEvent
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @see de.uol.swp.client.SceneManager
-     * @since 2020-11-25
+     * @since 2021-03-16
      */
     @FXML
-    private void onChangePasswordButtonPressed() {
-        eventBus.post(new ShowChangePasswordViewEvent(loggedInUser));
+    private void onChangeAccountDetailsButtonPressed() {
+        eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
     }
 
     /**
@@ -601,9 +606,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             lobbies.clear();
             for (Lobby l : lobbyList) {
-                String s = l.getName() + " (" + l.getUsers().size() + "/" + l.getMaxPlayers() + ")";
+                String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
-                else if (l.getUsers().size() == l.getMaxPlayers())
+                else if (l.getUserOrDummies().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
             }

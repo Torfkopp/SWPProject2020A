@@ -1,6 +1,7 @@
 package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -88,7 +89,7 @@ public interface Lobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    User getOwner();
+    UserOrDummy getOwner();
 
     /**
      * Gets a set of all users marked as ready.
@@ -99,16 +100,29 @@ public interface Lobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    Set<User> getReadyUsers();
+    Set<UserOrDummy> getReadyUsers();
 
     /**
-     * Gets all users in the lobby
+     * Gets all real users in the lobby
      *
      * @return A Set containing all user in this lobby
      *
-     * @since 2019-10-08
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
      */
-    Set<User> getUsers();
+    Set<User> getRealUsers();
+
+    /**
+     * Gets all users and dummies in the lobby
+     *
+     * @return A Set containing all users and dummies in this lobby
+     *
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @since 2021-03-13
+     */
+    Set<UserOrDummy> getUserOrDummies();
 
     /**
      * Gets whether the Lobby is currently in a game or not
@@ -139,7 +153,7 @@ public interface Lobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    void joinUser(User user);
+    void joinUser(UserOrDummy user);
 
     /**
      * Removes a user from the lobby
@@ -148,7 +162,7 @@ public interface Lobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    void leaveUser(User user);
+    void leaveUser(UserOrDummy user);
 
     /**
      * Gets whether the random playfield is enabled or not.
@@ -203,7 +217,7 @@ public interface Lobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    void setUserReady(User user);
+    void setUserReady(UserOrDummy user);
 
     /**
      * Gets whether the startUpPhase is enabled or not.
@@ -225,7 +239,7 @@ public interface Lobby extends Serializable {
      * @author Maximilian Lindner
      * @since 2021-01-19
      */
-    void unsetUserReady(User user);
+    void unsetUserReady(UserOrDummy user);
 
     /**
      * Changes the owner of the lobby

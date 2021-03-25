@@ -28,6 +28,8 @@ import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -66,14 +68,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    private ObservableList<Pair<Integer, User>> lobbyMembers;
+    private ObservableList<UserOrDummy> lobbyMembers;
     private ObservableList<Pair<String, String>> resourceList;
-    private User owner;
-    private Set<User> readyUsers;
+    private UserOrDummy owner;
+    private Set<UserOrDummy> readyUsers;
     private Integer dice1;
     private Integer dice2;
     @FXML
-    private ListView<Pair<Integer, User>> membersView;
+    private ListView<UserOrDummy> membersView;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -149,30 +151,29 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         super.initialize();
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<Integer, User> item, boolean empty) {
+            protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) setText("");
+                    super.updateItem(user, empty);
+                    if (empty || user == null) setText("");
                     else {
-                        User user = item.getValue();
                         String name = user.getUsername();
                         if (readyUsers.contains(user))
                             name = String.format(resourceBundle.getString("lobby.members.ready"), name);
-                        if (user.getID() == owner.getID())
+                        if (user.equals(owner))
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         setText(name);
                         //if the background should be in colour you need to use setBackground
                         int i = lobbyMembers.size();
-                        if (i >= 1 && getText().contains(lobbyMembers.get(0).getValue().getUsername())) {
+                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
                             setTextFill(GameRendering.PLAYER_1_COLOUR);
                         }
-                        if (i >= 2 && getText().contains(lobbyMembers.get(1).getValue().getUsername())) {
+                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
                             setTextFill(GameRendering.PLAYER_2_COLOUR);
                         }
-                        if (i >= 3 && getText().contains(lobbyMembers.get(2).getValue().getUsername())) {
+                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
                             setTextFill(GameRendering.PLAYER_3_COLOUR);
                         }
-                        if (i >= 4 && getText().contains(lobbyMembers.get(3).getValue().getUsername())) {
+                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
                             setTextFill(GameRendering.PLAYER_4_COLOUR);
                         }
                     }
@@ -180,8 +181,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            String name = newValue.getValue().getUsername();
-            boolean isSelf = newValue.getValue().equals(this.loggedInUser);
+            String name = newValue.getUsername();
+            boolean isSelf = newValue.equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
@@ -216,6 +217,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
+    }
+
+    @Override
+    @Subscribe
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        super.onChangeAccountDetailsSuccessfulResponse(rsp);
     }
 
     @Override
@@ -332,24 +339,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Helper function to find the Pair for a given key
-     *
-     * @param id The key of the pair that should be returned
-     *
-     * @return The pair matched by the ID
-     *
-     * @author Temmo Junkhoff
-     * @author Timo Gerken
-     * @since 2021-01-19
-     */
-    private Pair<Integer, User> findMember(int id) {
-        for (Pair<Integer, User> lobbyMember : lobbyMembers) {
-            if (lobbyMember.getKey() == id) return lobbyMember;
-        }
-        return null;
-    }
-
-    /**
      * Handles a new list of users
      * <p>
      * If a new AllOnlineUsersResponse object is posted onto the EventBus,
@@ -402,6 +391,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         setTradeWithUserButtonState(rsp.getUser());
         setTradeWithBankButtonState(rsp.getUser());
+        setPlayCardButtonState(rsp.getUser());
     }
 
     /**
@@ -510,9 +500,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if ((selectedUser.getValue()) == this.loggedInUser) return;
-        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser.getValue().getUsername()));
+        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == this.loggedInUser) return;
+        eventBus.post(new KickUserRequest(lobbyName, this.loggedInUser, selectedUser));
     }
 
     /**
@@ -573,7 +563,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobbyName());
         if (super.lobbyName == null || loggedInUser == null) {
             super.lobbyName = event.getLobbyName();
-            super.loggedInUser = event.getUser();
+            super.loggedInUser = (User) event.getUser();
             super.chatService.askLatestMessages(10, super.lobbyName);
         }
         if (this.window == null) {
@@ -880,26 +870,29 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setTradeWithBankButtonState(event.getUser());
             setEndTurnButtonState(event.getUser());
             setTradeWithUserButtonState(event.getUser());
+            setPlayCardButtonState(event.getUser());
         }
     }
 
     /**
-     * Handles a ResetTradeWithUserButtonEvent found on the event bus
+     * Handles a TradeWithUserCancelResponse found on the event bus
      * <p>
-     * If a new ResetTradeWithUserButtonEvent is posted onto the EventBus the
-     * tradeWithUserButton is enabled again.
+     * If a TradeWithUserCancelResponse is posted onto the EventBus the
+     * the possible options for the active player are re-enabled.
      *
-     * @param event The ResetTradeWithUserButtonEvent seen on the EventBus
+     * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
-     * @author Finn Haase
+     * @author Aldin Dervisi
      * @author Maximilian Lindner
-     * @since 2021-02-23
+     * @since 2021-03-19
      */
     @Subscribe
-    private void onResetTradeWithUserButtonEvent(ResetTradeWithUserButtonEvent event) {
-        setTradeWithBankButtonState(event.getUser());
-        setTradeWithUserButtonState(event.getUser());
-        setEndTurnButtonState(event.getUser());
+    private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
+        if (!rsp.getActivePlayer().equals(this.loggedInUser)) return;
+        setTradeWithBankButtonState(this.loggedInUser);
+        setTradeWithUserButtonState(this.loggedInUser);
+        setEndTurnButtonState(this.loggedInUser);
+        setPlayCardButtonState(this.loggedInUser);
     }
 
     /**
@@ -1072,6 +1065,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         setTradeWithUserButtonState(rsp.getUser());
         setTradeWithBankButtonState(rsp.getUser());
+        setPlayCardButtonState(rsp.getUser());
     }
 
     /**
@@ -1091,6 +1085,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.tradeWithBankButton.setDisable(true);
         this.endTurn.setDisable(true);
         this.tradeWithUserButton.setDisable(true);
+        this.playCard.setDisable(true);
         eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
         LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
         eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));
@@ -1115,20 +1110,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onTradeWithUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        User user = selectedUser.getValue();
-        if (membersView.getSelectionModel().isEmpty()) {
+        UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
+        if (membersView.getSelectionModel().isEmpty() || user == null) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
-        } else if (selectedUser.getKey() == this.loggedInUser.getID()) {
+        } else if (Objects.equals(user, this.loggedInUser)) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setDisable(true);
+            playCard.setDisable(true);
             endTurn.setDisable(true);
             LOG.debug("Sending ShowTradeWithUserViewEvent");
-            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user.getUsername()));
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user));
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, user.getUsername()));
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, user));
         }
     }
 
@@ -1148,8 +1143,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser().getUsername(),
-                                                            this.loggedInUser.getUsername(), this.lobbyName, rsp));
+        eventBus.post(
+                new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), this.loggedInUser, this.lobbyName, rsp));
     }
 
     /**
@@ -1258,12 +1253,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + this.lobbyName);
-        User user = msg.getUser();
+        UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
-        Pair<Integer, User> pair = new Pair<>(user.getID(), user);
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(pair))
-                lobbyMembers.add(pair);
+            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+                lobbyMembers.add(user);
             setStartSessionButtonState();
             setPreGameSettings();
         });
@@ -1294,17 +1288,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby " + this.lobbyName);
-        User user = msg.getUser();
-        if (user.getID() == owner.getID()) {
+        UserOrDummy user = msg.getUser();
+        if (Objects.equals(user, owner)) {
             LOG.debug("---- Owner " + user.getUsername() + " left");
-            lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else LOG.debug("---- User " + user.getUsername() + " left");
         Platform.runLater(() -> {
-            lobbyMembers.remove(findMember(user.getID()));
+            lobbyMembers.remove(user);
             readyUsers.remove(user);
             setStartSessionButtonState();
             setPreGameSettings();
         });
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
 
     /**
@@ -1369,12 +1363,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * The button is only enabled to the active player when the
      * obligatory part of the turn is done.
      *
+     * @param player
+     *
      * @author Alwin Bossert
      * @author Mario Fokken
      * @author Marvin Drees
      * @since 2021-01-23
      */
-    private void setEndTurnButtonState(User player) {
+    private void setEndTurnButtonState(UserOrDummy player) {
         this.endTurn.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1400,10 +1396,12 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function that sets the disable state of the PlayCardButton
      * The button is only enabled to the active player
      *
+     * @param player
+     *
      * @author Mario Fokken
      * @since 2021-02-25
      */
-    private void setPlayCardButtonState(User player) {
+    private void setPlayCardButtonState(UserOrDummy player) {
         this.playCard.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1432,7 +1430,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Mario Fokken
      * @since 2021-02-22
      */
-    private void setRollDiceButtonState(User player) {
+    private void setRollDiceButtonState(UserOrDummy player) {
         this.rollDice.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1464,11 +1462,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
+     * @param player
+     *
      * @author Alwin Bossert
      * @author Maximilian Lindner
      * @since 2021-02-21
      */
-    private void setTradeWithBankButtonState(User player) {
+    private void setTradeWithBankButtonState(UserOrDummy player) {
         this.tradeWithBankButton.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1478,11 +1478,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
+     * @param player
+     *
      * @author Finn Haase
      * @author Maximilian Lindner
      * @since 2021-02-21
      */
-    private void setTradeWithUserButtonState(User player) {
+    private void setTradeWithUserButtonState(UserOrDummy player) {
         this.tradeWithUserButton.setDisable(!super.loggedInUser.equals(player));
     }
 
@@ -1496,7 +1498,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @author Marvin Drees
      * @since 2021-01-23
      */
-    private void setTurnIndicatorText(User player) {
+    private void setTurnIndicatorText(UserOrDummy player) {
         Platform.runLater(() -> turnIndicator.setText(
                 String.format(resourceBundle.getString("lobby.game.text.turnindicator"), player.getUsername())));
     }
@@ -1518,17 +1520,17 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.User
+     * @see de.uol.swp.common.user.UserOrDummy
      * @since 2021-01-05
      */
-    private void updateUsersList(List<User> userLobbyList) {
+    private void updateUsersList(List<UserOrDummy> userLobbyList) {
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
                 lobbyMembers = FXCollections.observableArrayList();
                 membersView.setItems(lobbyMembers);
             }
             lobbyMembers.clear();
-            userLobbyList.forEach(u -> lobbyMembers.add(new Pair<>(u.getID(), u)));
+            lobbyMembers.addAll(userLobbyList);
         });
     }
 }

@@ -123,8 +123,6 @@ class LobbyServiceTest {
         assertEquals(defaultUser, lobbyUpdateEvent.getUser());
         assertEquals(defaultUser.getID(), lobbyUpdateEvent.getUser().getID());
         assertEquals(defaultUser.getUsername(), lobbyUpdateEvent.getUser().getUsername());
-        assertEquals(defaultUser.getPassword(), lobbyUpdateEvent.getUser().getPassword());
-        assertEquals(defaultUser.getEMail(), lobbyUpdateEvent.getUser().getEMail());
         assertEquals(defaultLobby, lobbyUpdateEvent.getLobby());
         assertEquals(defaultLobby.isInGame(), lobbyUpdateEvent.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), lobbyUpdateEvent.getLobby().getMaxPlayers());
