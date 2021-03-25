@@ -40,8 +40,6 @@ public class Game {
             }
         }
         activePlayer = first;
-        map = new GameMap();
-        map.createBeginnerMap();
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
     }

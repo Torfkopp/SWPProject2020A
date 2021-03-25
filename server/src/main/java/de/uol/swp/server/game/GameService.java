@@ -270,7 +270,7 @@ public class GameService extends AbstractService {
             }
             gameMap = gameMap.createMapFromConfiguration(configuration);
             if (!msg.getLobby().startUpPhaseEnabled()) {
-                gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUsers().size());
+                gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             } // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
