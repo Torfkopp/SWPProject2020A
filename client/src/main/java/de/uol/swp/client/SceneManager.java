@@ -208,6 +208,24 @@ public class SceneManager {
     }
 
     /**
+     * Method used to display a custom error for the
+     * connection timeout.
+     *
+     * @author Marvin Drees
+     * @since 2021-03-26
+     */
+    public void showTimeoutErrorScreen() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
+            alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            alert.showAndWait();
+        });
+    }
+
+    /**
      * Shows the login error alert
      * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
@@ -278,7 +296,7 @@ public class SceneManager {
     @Subscribe
     private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
         LOG.debug("Client disconnected from server");
-        showError(resourceBundle.getString("error.title.disconnected"), resourceBundle.getString("error.context.disconnected"));
+        showTimeoutErrorScreen();
         Platform.runLater(this::closeMainScreen);
     }
 

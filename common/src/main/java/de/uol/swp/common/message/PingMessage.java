@@ -9,11 +9,4 @@ package de.uol.swp.common.message;
  * @author Marvin Drees
  * @since 2021-03-18
  */
-public class PingMessage extends AbstractResponseMessage {
-
-    /**
-     * Constructor
-     */
-    public PingMessage() {
-    }
-}
+public class PingMessage extends AbstractResponseMessage {}

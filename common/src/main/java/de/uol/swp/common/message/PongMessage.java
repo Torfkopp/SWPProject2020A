@@ -10,11 +10,4 @@ package de.uol.swp.common.message;
  * @see de.uol.swp.common.message.PingMessage
  * @since 2021-03-18
  */
-public class PongMessage extends AbstractRequestMessage {
-
-    /**
-     * Constructor
-     */
-    public PongMessage() {
-    }
-}
+public class PongMessage extends AbstractRequestMessage {}
