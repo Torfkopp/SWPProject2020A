@@ -388,6 +388,9 @@ public class MySQLBasedUserStore extends AbstractUserStore {
 
         String passwordHash = hash(password);
 
+        Optional<User> user = findUser(username);
+        if (user.isPresent() && user.get().getID() != id) throw new IllegalArgumentException("Username already taken");
+
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);

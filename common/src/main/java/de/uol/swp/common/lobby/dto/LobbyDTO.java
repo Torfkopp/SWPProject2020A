@@ -1,7 +1,9 @@
 package de.uol.swp.common.lobby.dto;
 
 import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Collections;
 import java.util.Set;
@@ -22,10 +24,10 @@ import java.util.TreeSet;
 public class LobbyDTO implements Lobby {
 
     private final String name;
-    private final Set<User> users = new TreeSet<>();
-    private final Set<User> readyUsers = new TreeSet<>();
+    private final Set<UserOrDummy> users = new TreeSet<>();
+    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private boolean inGame;
-    private User owner;
+    private UserOrDummy owner;
     private boolean commandsAllowed;
     private int maxPlayers;
     private int moveTime;
@@ -41,8 +43,8 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, User creator, boolean inGame, int maxPlayers, boolean commandsAllowed, int moveTime,
-                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public LobbyDTO(String name, UserOrDummy creator, boolean inGame, int maxPlayers, boolean commandsAllowed,
+                    int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
@@ -100,17 +102,28 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public User getOwner() {
+    public UserOrDummy getOwner() {
         return owner;
     }
 
     @Override
-    public Set<User> getReadyUsers() {
+    public Set<UserOrDummy> getReadyUsers() {
         return readyUsers;
     }
 
     @Override
-    public Set<User> getUsers() {
+    public Set<User> getRealUsers() {
+        Set<User> userSet = new TreeSet<>();
+        for (UserOrDummy userOrDummy : users) {
+            if (userOrDummy instanceof User) {
+                userSet.add((User) userOrDummy);
+            }
+        }
+        return Collections.unmodifiableSet(userSet);
+    }
+
+    @Override
+    public Set<UserOrDummy> getUserOrDummies() {
         return Collections.unmodifiableSet(users);
     }
 
@@ -125,19 +138,31 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void joinUser(User user) {
+    public void joinUser(UserOrDummy user) {
         this.users.add(user);
+        if (user instanceof Dummy) {
+            readyUsers.add(user);
+        }
     }
 
     @Override
-    public void leaveUser(User user) {
+    public void leaveUser(UserOrDummy user) {
         if (users.size() == 1) {
             throw new IllegalArgumentException("Lobby must contain at least one user!");
         }
         if (users.contains(user)) {
             this.users.remove(user);
+            unsetUserReady(user);
             if (this.owner.equals(user)) {
-                updateOwner(users.iterator().next());
+                boolean foundUser = false;
+                for (UserOrDummy nextOwner : users) {
+                    if (nextOwner instanceof User) {
+                        foundUser = true;
+                        updateOwner((User) nextOwner);
+                        break;
+                    }
+                }
+                if (!foundUser) throw new IllegalArgumentException("Lobby must contain at least one real user!");
             }
         }
     }
@@ -163,7 +188,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void setUserReady(User user) {
+    public void setUserReady(UserOrDummy user) {
         this.readyUsers.add(user);
     }
 
@@ -173,7 +198,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void unsetUserReady(User user) {
+    public void unsetUserReady(UserOrDummy user) {
         this.readyUsers.remove(user);
     }
 

@@ -130,9 +130,12 @@ public interface IUserManagement {
      *
      * @return The updated user object
      *
+     * @throws de.uol.swp.server.usermanagement.UserManagementException Thrown if
+     *                                                                  the provided
+     *                                                                  User is unknown
      * @implNote The User object has to contain a unique identifier in order to
      * update the correct user
      * @since 2019-09-02
      */
-    User updateUser(User user);
+    User updateUser(User user) throws UserManagementException;
 }

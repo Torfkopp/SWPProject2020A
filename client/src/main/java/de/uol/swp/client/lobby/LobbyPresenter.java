@@ -15,6 +15,8 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -48,8 +50,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     public static final int LOBBY_WIDTH_IN_GAME = 1285;
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    private ObservableList<Pair<Integer, User>> lobbyMembers;
-    private Set<User> readyUsers;
+    private ObservableList<UserOrDummy> lobbyMembers;
+    private Set<UserOrDummy> readyUsers;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -106,30 +108,29 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
         super.initialize();
         membersView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<Integer, User> item, boolean empty) {
+            protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) setText("");
+                    super.updateItem(user, empty);
+                    if (empty || user == null) setText("");
                     else {
-                        User user = item.getValue();
                         String name = user.getUsername();
                         if (readyUsers.contains(user))
                             name = String.format(resourceBundle.getString("lobby.members.ready"), name);
-                        if (user.getID() == owner.getID())
+                        if (user.equals(owner))
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         setText(name);
                         //if the background should be in colour you need to use setBackground
                         int i = lobbyMembers.size();
-                        if (i >= 1 && getText().contains(lobbyMembers.get(0).getValue().getUsername())) {
+                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
                             setTextFill(GameRendering.PLAYER_1_COLOUR);
                         }
-                        if (i >= 2 && getText().contains(lobbyMembers.get(1).getValue().getUsername())) {
+                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
                             setTextFill(GameRendering.PLAYER_2_COLOUR);
                         }
-                        if (i >= 3 && getText().contains(lobbyMembers.get(2).getValue().getUsername())) {
+                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
                             setTextFill(GameRendering.PLAYER_3_COLOUR);
                         }
-                        if (i >= 4 && getText().contains(lobbyMembers.get(3).getValue().getUsername())) {
+                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
                             setTextFill(GameRendering.PLAYER_4_COLOUR);
                         }
                     }
@@ -137,8 +138,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            String name = newValue.getValue().getUsername();
-            boolean isSelf = newValue.getValue().equals(this.loggedInUser);
+            String name = newValue.getUsername();
+            boolean isSelf = newValue.equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
@@ -173,6 +174,12 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
         if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(super.lobbyName)) {
             super.onAskLatestChatMessageResponse(rsp);
         }
+    }
+
+    @Override
+    @Subscribe
+    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        super.onChangeAccountDetailsSuccessfulResponse(rsp);
     }
 
     @Override
@@ -230,21 +237,22 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     }
 
     /**
-     * Helper function to find the Pair for a given key
-     *
-     * @param id The key of the pair that should be returned
-     *
-     * @return The pair matched by the ID
+     * Helper method to handle disabling the endTurn, rollDice, playCard,
+     * tradeWithBank, and tradeWithUser buttons after a turn was ended (either
+     * forcibly or voluntarily).
+     * Also calls on the LobbyService to update the player's inventory.
      *
      * @author Temmo Junkhoff
-     * @author Timo Gerken
-     * @since 2021-01-19
+     * @author Phillip-André Suhr
+     * @since 2021-03-07
      */
-    private Pair<Integer, User> findMember(int id) {
-        for (Pair<Integer, User> lobbyMember : lobbyMembers) {
-            if (lobbyMember.getKey() == id) return lobbyMember;
-        }
-        return null;
+    private void disableButtonsAfterTurn() {
+        this.endTurn.setDisable(true);
+        this.rollDice.setDisable(true);
+        this.playCard.setDisable(true);
+        this.tradeWithBankButton.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
+        lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -297,9 +305,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     @FXML
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        Pair<Integer, User> selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if ((selectedUser.getValue()) == loggedInUser) return;
-        lobbyService.kickUser(lobbyName, loggedInUser, selectedUser.getValue());
+        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == loggedInUser) return;
+        eventBus.post(new KickUserRequest(lobbyName, loggedInUser, selectedUser));
     }
 
     /**
@@ -360,7 +368,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
         LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobbyName());
         if (lobbyName == null || loggedInUser == null) {
             lobbyName = event.getLobbyName();
-            loggedInUser = event.getUser();
+            loggedInUser = (User) event.getUser();
             chatService.askLatestMessages(10, lobbyName);
         }
         if (window == null) {
@@ -514,6 +522,234 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     }
 
     /**
+     * Handles a click on the StartUpPhase-CheckBox to allow or disable the
+     * start up phase in the specific lobby.
+     * <p>
+     * By enabling this option the start up phase will start after the game started.
+     * Otherwise the first building will be created by its own.
+     * Calls the prepareLobbyUpdate Method to send the new settings to the server.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    @FXML
+    private void onStartUpPhasePressed() {
+        prepareLobbyUpdate();
+    }
+
+    /**
+     * Handles a click on the ThreePlayers-RadioButton to restrict the lobby to
+     * three players.
+     * <p>
+     * Calls the prepareLobbyUpdate Method to send the new settings to the server.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Devisi
+     * @since 2021-03-15
+     */
+    @FXML
+    private void onThreePlayersRadioButtonSelected() {
+        prepareLobbyUpdate();
+    }
+
+    /**
+     * Handles an TradeLobbyButtonUpdateEvent found on the EventBus
+     * <p>
+     * If the TradeLobbyButtonUpdateEvent is intended for the current Lobby
+     * the trade With Bank button is disabled. The end turn button gets
+     * enabled again.
+     *
+     * @param event The TradeLobbyButtonUpdateEvent found on the event bus
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
+     * @since 2021-02-22
+     */
+    @Subscribe
+    private void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
+        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
+            endTurn.setDisable(false);
+        }
+    }
+
+    /**
+     * Handles a TradeOfUsersAcceptedResponse found on the EventBus
+     * Updates the Inventories of the trading User.
+     *
+     * @param rsp The TradeOfUsersAcceptedResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
+        lobbyService.updateInventory(this.lobbyName, this.loggedInUser);
+    }
+
+    /**
+     * If a TradeWithBankAcceptedResponse is found on the EventBus,
+     * this method calls 2 methods to reset the trade with bank button
+     * and the trade with user button for the users in the response.
+     *
+     * @param rsp TradeWithBankButtonAcceptedResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeWithBankAcceptedResponse
+     * @since 2021-02-28
+     */
+    @Subscribe
+    private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        setTradeWithUserButtonState(rsp.getUser());
+        setTradeWithBankButtonState(rsp.getUser());
+        setPlayCardButtonState(rsp.getUser());
+    }
+
+    /**
+     * Handles a click on the TradeWithBank Button
+     * <p>
+     * Method called when the TradeWithBankButton is pressed. It posts a
+     * ShowTradeWithViewEvent and a TradeWithBankRequest onto the event bus.
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
+     * @see de.uol.swp.common.game.request.TradeWithBankRequest
+     * @since 2021-02-20
+     */
+    @FXML
+    private void onTradeWithBankButtonPressed() {
+        this.tradeWithBankButton.setDisable(true);
+        this.endTurn.setDisable(true);
+        this.tradeWithUserButton.setDisable(true);
+        this.playCard.setDisable(true);
+        eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
+        LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
+        eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));
+        LOG.debug("Sending a TradeWithBankRequest for Lobby " + this.lobbyName);
+    }
+
+    /**
+     * Handles a Click on the TradeWithUserButton
+     * <p>
+     * If another player of the lobby-member-list is selected and the button gets pressed,
+     * this button gets disabled, a new ShowTradeWithUserViewEvent is posted onto the
+     * EventBus to show the trading window and a TradeWithUserRequest is posted
+     * onto the EventBus to get the necessary inventory information.
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
+     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @since 2021-02-23
+     */
+    @FXML
+    private void onTradeWithUserButtonPressed() {
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
+        if (membersView.getSelectionModel().isEmpty() || user == null) {
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
+        } else if (Objects.equals(user, this.loggedInUser)) {
+            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
+        } else {
+            tradeWithUserButton.setDisable(true);
+            tradeWithBankButton.setDisable(true);
+            playCard.setDisable(true);
+            endTurn.setDisable(true);
+            LOG.debug("Sending ShowTradeWithUserViewEvent");
+            eventBus.post(new ShowTradeWithUserViewEvent(this.loggedInUser, this.lobbyName, user));
+            LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
+            eventBus.post(new TradeWithUserRequest(this.lobbyName, this.loggedInUser, user));
+        }
+    }
+
+    /**
+     * Handles the TradeWithUserOfferResponse found on the EventBus
+     * If a user gets a trading offer a new ShowTradeWithUserRespondViewEvent is posted onto
+     * the  EventBus to show the AcceptView.
+     *
+     * @param rsp The TradeWithUserOfferResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
+        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
+        eventBus.post(
+                new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), this.loggedInUser, this.lobbyName, rsp));
+    }
+
+    /**
+     * Handles a TurnSkippedResponse found on the EventBus
+     * <p>
+     * This method calls {@link #disableButtonsAfterTurn()} to make sure all
+     * buttons that a player would have access to when it is their turn are
+     * properly disabled even though the player's turn was forcibly skipped.
+     *
+     * @param rsp The TurnSkippedResponse found on the EventBus
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-07
+     */
+    @Subscribe
+    private void onTurnSkippedResponse(TurnSkippedResponse rsp) {
+        if (!this.lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received TurnSkippedResponse");
+        disableButtonsAfterTurn();
+    }
+
+    /**
+     * Handles an UpdateInventoryResponse found on the EventBus
+     * <p>
+     * If the UpdateInventoryResponse is intended for the current Lobby, the
+     * resourceList linked to the inventoryView is cleared and updated with the
+     * items as listed in the maps contained in the UpdateInventoryResponse.
+     * The item names are localised with the ResourceBundle injected into the
+     * LobbyPresenter.
+     *
+     * @param rsp The UpdateInventoryResponse found on the EventBus
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @author Phillip-André Suhr
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.game.response.UpdateInventoryResponse
+     * @since 2021-01-27
+     */
+    @Subscribe
+    private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
+        if (!rsp.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received UpdateInventoryResponse for Lobby " + this.lobbyName);
+        Platform.runLater(() -> {
+            if (resourceList == null) {
+                resourceList = FXCollections.observableArrayList();
+                inventoryView.setItems(resourceList);
+            }
+            resourceList.clear();
+            for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(), entry.getValue().toString()));
+            }
+            for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(),
+                                            entry.getValue() ? resourceBundle.getString("game.property.has") :
+                                            resourceBundle.getString("game.property.hasnot")));
+            }
+        });
+    }
+
+    /**
      * Handles an UpdateLobbyMessage found on the EventBus
      * <p>
      * If an UpdateLobbyMessage is found on the EventBus, this method applies
@@ -559,12 +795,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received UserJoinedLobbyMessage for Lobby " + lobbyName);
-        User user = msg.getUser();
+        UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
-        Pair<Integer, User> pair = new Pair<>(user.getID(), user);
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(pair))
-                lobbyMembers.add(pair);
+            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+                lobbyMembers.add(user);
             setStartSessionButtonState();
             setPreGameSettings();
         });
@@ -595,17 +830,17 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby " + lobbyName);
-        User user = msg.getUser();
-        if (user.getID() == owner.getID()) {
+        UserOrDummy user = msg.getUser();
+        if (Objects.equals(user, owner)) {
             LOG.debug("---- Owner " + user.getUsername() + " left");
-            lobbyService.retrieveAllLobbyMembers(lobbyName);
         } else LOG.debug("---- User " + user.getUsername() + " left");
         Platform.runLater(() -> {
-            lobbyMembers.remove(findMember(user.getID()));
+            lobbyMembers.remove(user);
             readyUsers.remove(user);
             setStartSessionButtonState();
             setPreGameSettings();
         });
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
 
     /**
@@ -666,6 +901,23 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
     }
 
     /**
+     * Helper function that sets the disable state of the endTurnButton.
+     * <p>
+     * The button is only enabled to the active player when the
+     * obligatory part of the turn is done.
+     *
+     * @param player
+     *
+     * @author Alwin Bossert
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-01-23
+     */
+    private void setEndTurnButtonState(UserOrDummy player) {
+        this.endTurn.setDisable(!super.loggedInUser.equals(player));
+    }
+
+    /**
      * Helper function that sets the disable and visible state of the kickUserButton.
      * <p>
      * The button is only enabled the lobby owner when a game
@@ -677,8 +929,23 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
      * @since 2021-03-03
      */
     private void setKickUserButtonState() {
-        kickUserButton.setVisible(loggedInUser.equals(owner));
-        kickUserButton.setDisable(loggedInUser.equals(owner));
+        Platform.runLater(() -> {
+            kickUserButton.setVisible(loggedInUser.equals(owner));
+            kickUserButton.setDisable(loggedInUser.equals(owner));
+        });
+    }
+
+    /**
+     * Helper function that sets the disable state of the PlayCardButton
+     * The button is only enabled to the active player
+     *
+     * @param player
+     *
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    private void setPlayCardButtonState(UserOrDummy player) {
+        this.playCard.setDisable(!super.loggedInUser.equals(player));
     }
 
     /**
@@ -737,17 +1004,17 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGame {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.User
+     * @see de.uol.swp.common.user.UserOrDummy
      * @since 2021-01-05
      */
-    private void updateUsersList(List<User> userLobbyList) {
+    private void updateUsersList(List<UserOrDummy> userLobbyList) {
         Platform.runLater(() -> {
             if (lobbyMembers == null) {
                 lobbyMembers = FXCollections.observableArrayList();
                 membersView.setItems(lobbyMembers);
             }
             lobbyMembers.clear();
-            userLobbyList.forEach(u -> lobbyMembers.add(new Pair<>(u.getID(), u)));
+            lobbyMembers.addAll(userLobbyList);
         });
     }
 }

@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Message sent to create a new game
@@ -19,7 +19,7 @@ public class CreateGameMessage extends AbstractGameMessage {
      * @param lobby The lobby this game is taking place in
      * @param first The first player
      */
-    public CreateGameMessage(Lobby lobby, User first) {
+    public CreateGameMessage(Lobby lobby, UserOrDummy first) {
         super(lobby.getName(), first);
         this.lobby = lobby;
     }
@@ -29,7 +29,7 @@ public class CreateGameMessage extends AbstractGameMessage {
      *
      * @return The first player
      */
-    public User getFirst() {
+    public UserOrDummy getFirst() {
         return super.getUser();
     }
 

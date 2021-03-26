@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * This Response is sent when a trade between 2 users got cancelled.
@@ -13,7 +13,7 @@ import de.uol.swp.common.user.User;
  */
 public class TradeWithUserCancelResponse extends AbstractLobbyResponse {
 
-    private final User activePlayer;
+    private final UserOrDummy activePlayer;
 
     /**
      * Constructor.
@@ -21,7 +21,7 @@ public class TradeWithUserCancelResponse extends AbstractLobbyResponse {
      * @param lobbyName    The name of the Lobby
      * @param activePlayer The active player in the actual game
      */
-    public TradeWithUserCancelResponse(String lobbyName, User activePlayer) {
+    public TradeWithUserCancelResponse(String lobbyName, UserOrDummy activePlayer) {
         super(lobbyName);
         this.activePlayer = activePlayer;
     }
@@ -31,7 +31,7 @@ public class TradeWithUserCancelResponse extends AbstractLobbyResponse {
      *
      * @return The active player
      */
-    public User getActivePlayer() {
+    public UserOrDummy getActivePlayer() {
         return activePlayer;
     }
 }
