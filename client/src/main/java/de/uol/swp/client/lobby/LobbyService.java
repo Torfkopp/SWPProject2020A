@@ -119,7 +119,7 @@ public class LobbyService implements ILobbyService {
 
     @Override
     public void kickUser(String lobbyName, User loggedInUser, User userToKick) {
-        Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick.getUsername());
+        Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick);
         eventBus.post(kickUserRequest);
     }
 

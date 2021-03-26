@@ -51,7 +51,7 @@
             <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"/>
             <HBox spacing="5.0">
                 <TextField fx:id="moveTimeTextField" prefHeight="25.0" prefWidth="80.0"/>
-                <Button fx:id="changeMoveTimeButton" mnemonicParsing="false" onAction="#onChangeMoveTimeButtonPressed"
+                <Button fx:id="changeMoveTimeButton" mnemonicParsing="false" onAction="#prepareLobbyUpdate"
                         text="%lobby.buttons.changemovetime"/>
                 <VBox.margin>
                     <Insets top="-10.0"/>
