@@ -30,6 +30,7 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
@@ -207,6 +208,24 @@ public class SceneManager {
     }
 
     /**
+     * Method used to display a custom error for the
+     * connection timeout.
+     *
+     * @author Marvin Drees
+     * @since 2021-03-26
+     */
+    public void showTimeoutErrorScreen() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
+            alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            alert.showAndWait();
+        });
+    }
+
+    /**
      * Shows the login error alert
      * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
@@ -248,6 +267,37 @@ public class SceneManager {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
                   MAINMENU_WIDTH, MAINMENU_HEIGHT);
+    }
+
+    /**
+     * Method used to close down the client
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-03-25
+     */
+    public void closeMainScreen() {
+        primaryStage.close();
+    }
+
+    /**
+     * Method used to close the client and show an error.
+     * <p>
+     * This method is called when a ClientDisconnectedFromServerEvent
+     * is found on the EventBus. It shows an error indicating that the
+     * connection timed out and closes the client.
+     *
+     * @param msg ClientDisconnectedFromServerEvent found on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-03-25
+     */
+    @Subscribe
+    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
+        LOG.debug("Client disconnected from server");
+        showTimeoutErrorScreen();
+        Platform.runLater(this::closeMainScreen);
     }
 
     /**
