@@ -918,9 +918,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.preGameSettingBox.setMinHeight(0);
             //This Line needs to be changed/ removed in the Future
             this.gameRendering = new GameRendering(gameMapCanvas);
-            this.gameMap = new GameMap();
-            gameMap.createBeginnerMap();
-            gameRendering.drawGameMap(gameMap);
+            this.gameMap = new GameMap().createMapFromConfiguration(msg.getConfiguration());
+            if (!msg.isStartUpPhaseEnabled()) this.gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
+            gameRendering.drawGameMap(this.gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
             this.window.setWidth(LOBBY_WIDTH_IN_GAME);

@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -25,11 +25,13 @@ public class Game {
     /**
      * Constructor
      *
-     * @param lobby The lobby the game is taking place in
-     * @param first The first player
+     * @param lobby   The lobby the game is taking place in
+     * @param first   The first player
+     * @param gameMap The IGameMap the game will be using
      */
-    public Game(Lobby lobby, UserOrDummy first) {
+    public Game(Lobby lobby, UserOrDummy first, IGameMap gameMap) {
         this.lobby = lobby;
+        this.map = gameMap;
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
@@ -38,8 +40,6 @@ public class Game {
             }
         }
         activePlayer = first;
-        map = new GameMap();
-        map.createBeginnerMap();
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
     }
@@ -107,7 +107,7 @@ public class Game {
             if (mapPoint.equals(map.getRobberPosition())) return;
             ResourceHex hex = (ResourceHex) map.getHex(mapPoint);
             //Checks every intersection around the hex
-            for (IIntersection i : map.getIntersectionFromHex(mapPoint)) {
+            for (IIntersection i : map.getIntersectionsFromHex(mapPoint)) {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
                 if (i.getOwner() != null) {
@@ -191,7 +191,7 @@ public class Game {
     /**
      * Gets this game's map
      *
-     * @return The IGameMapManagement this game is using
+     * @return The IGameMap this game is using
      */
     public IGameMap getMap() {
         return map;

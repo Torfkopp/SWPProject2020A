@@ -3,7 +3,6 @@ package de.uol.swp.server.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.common.game.message.CreateGameMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
@@ -13,9 +12,11 @@ import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
 import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.message.FetchUserContextInternalRequest;
+import de.uol.swp.server.message.ServerInternalMessage;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -380,29 +381,26 @@ public class LobbyService extends AbstractService {
      * Handles a StartSessionRequest found on the EventBus
      * <p>
      * If a StartSessionRequest is detected on the EventBus, this method is called.
-     * It posts a StartSessionMessage including the lobby name and the user onto the EventBus if there are
-     * at least 3 player in the lobby and every player is ready.
+     * It posts a CreateGameInternalRequest including the lobby and the user onto
+     * the EventBus if there are at least 3 players in the lobby and every player
+     * is ready.
      *
      * @param req The StartSessionMessage found on the EventBus
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
-     * @see de.uol.swp.common.lobby.message.StartSessionMessage
+     * @see de.uol.swp.server.game.event.CreateGameInternalRequest
      * @since 2021-01-21
      */
     @Subscribe
     private void onStartSessionRequest(StartSessionRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received StartSessionRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-        if (lobby.isPresent()) {
-            if (lobby.get().getUserOrDummies().size() >= 3 && (lobby.get().getReadyUsers()
-                                                                    .equals(lobby.get().getUserOrDummies()))) {
-                LOG.debug("---- All Members are ready, proceeding with sending of StartSessionMessage...");
-                ServerMessage startSessionMessage = new StartSessionMessage(lobby.get().getName(), req.getUser());
-                post(new CreateGameMessage(lobby.get(), req.getUser()));
-                sendToAllInLobby(lobby.get().getName(), startSessionMessage);
-            }
-        }
+        if (lobby.isEmpty()) return;
+        if (lobby.get().getUserOrDummies().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getUserOrDummies()))) return;
+        LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
+        ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
+        post(msg);
     }
 
     /**

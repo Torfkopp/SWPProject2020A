@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.map;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 
 import java.util.Set;
 
@@ -14,12 +15,18 @@ import java.util.Set;
 public interface IGameMap {
 
     /**
-     * Creates the beginner map
+     * Creates an IGameMap from the provided configuration
      *
-     * @author Temmo Junkhoff
-     * @since 2021-03-08
+     * @param configuration The map configuration used in the current Game
+     *
+     * @return The IGameMap with the configuration as provided
+     *
+     * @author Finn Haase
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
+     * @since 2021-03-18
      */
-    void createBeginnerMap();
+    IGameMap createMapFromConfiguration(IConfiguration configuration);
 
     /**
      * Gets an edge that connects two intersections
@@ -35,6 +42,36 @@ public interface IGameMap {
     IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2);
 
     /**
+     * Creates the beginner map configuration
+     * <p>
+     * Creates the beginner's map configuration as shown in the manual WITHOUT beginner
+     * settlements or roads; those are created by {@link #makeBeginnerSettlementsAndRoads(int)}
+     *
+     * @return The beginner, read-only configuration
+     *
+     * @author Finn Haase
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
+     * @see <a href="https://www.catan.com/files/downloads/catan_base_rules_2020_200707.pdf">
+     * https://www.catan.com/files/downloads/catan_base_rules_2020_200707.pdf</a>
+     * @since 2021-03-18
+     */
+    IConfiguration getBeginnerConfiguration();
+
+    /**
+     * Gets the current configuration of the IGameMap
+     *
+     * @return The current, read-only configuration
+     *
+     * @author Finn Haase
+     * @author Phillip-André Suhr
+     * @implNote Not used currently; could be used in future (e.g. rejoining a game)
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
+     * @since 2021-03-18
+     */
+    IConfiguration getCurrentConfiguration();
+
+    /**
      * Gets all the edges around the hex
      *
      * @param mapPoint The hex's mapPoint
@@ -45,18 +82,6 @@ public interface IGameMap {
      * @since 2021-03-15
      */
     Set<IEdge> getEdgesFromHex(MapPoint mapPoint);
-
-    /**
-     * Gets all the intersections around the hex
-     *
-     * @param mapPoint The hex's mapPoint
-     *
-     * @return Set of intersections
-     *
-     * @author Mario Fokken
-     * @since 2021-03-15
-     */
-    Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint);
 
     /**
      * Gets the hex at a specified place
@@ -105,6 +130,18 @@ public interface IGameMap {
     IIntersection getIntersection(MapPoint position);
 
     /**
+     * Gets all the intersections around the hex
+     *
+     * @param mapPoint The hex's mapPoint
+     *
+     * @return Set of intersections
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
+     */
+    Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint);
+
+    /**
      * Gets the intersections in a usable format for rendering them as a jagged array
      *
      * @return A jagged array containing the intersections
@@ -124,6 +161,18 @@ public interface IGameMap {
      * @since 2021-02-05
      */
     int getPlayerPoints(Player player);
+
+    /**
+     * Creates a randomised map with the standard tiles
+     *
+     * @return A randomised, read-only configuration
+     *
+     * @author Finn Haase
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
+     * @since 2021-03-18
+     */
+    IConfiguration getRandomisedConfiguration();
 
     /**
      * Gets the robber's position
@@ -146,6 +195,14 @@ public interface IGameMap {
      * @since 2021-03-05
      */
     Set<IEdge> incidentEdges(IIntersection intersection);
+
+    /**
+     * Places beginner settlements for 3 or 4 players, depending on the
+     * provided parameter
+     *
+     * @param playerCount The amount of players in the game
+     */
+    void makeBeginnerSettlementsAndRoads(int playerCount);
 
     /**
      * Moves the robber
