@@ -766,7 +766,7 @@ public class GameService extends AbstractService {
             //Robber things
             LOG.debug("---- Robber things");
         } else {
-            LOG.debug("---- Distributing the resources");
+            LOG.debug("---- Distributing the resources for token " + numberOfPips);
             game.distributeResources(numberOfPips);
         }
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
