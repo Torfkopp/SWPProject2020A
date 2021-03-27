@@ -4,10 +4,12 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
+import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
@@ -275,6 +277,75 @@ public class ServerHandler implements ServerHandlerDelegate {
                                                 msg.getReceiver()));
         }
         sendMessage(msg);
+    }
+
+    /**
+     * Handles a PongMessage found on the EventBus
+     * <p>
+     * If a PongMessage is detected on the EventBus, this method is called.
+     * It simply logs the fact that it received the message as this
+     * message is only used to keep the connection alive.
+     *
+     * @param msg The PongMessage found on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @see de.uol.swp.common.message.PongMessage
+     * @since 2021-03-18
+     */
+    @Subscribe
+    private void onPongMessage(PongMessage msg) {
+        if (msg.getSession().isPresent()) LOG.info("Client pong received from " + msg.getSession().get());
+    }
+
+    /**
+     * Handles a ClientDisconnectedMessage on the Eventbus
+     * <p>
+     * If a ClientDisconnectedMessage is found on the EventBus, this Method will be called.
+     * It is responsible for sending a new RemoveFromLobbiesRequest
+     * to remove the User, which has no active connection to the server anymore,
+     * from all lobbies. In addition a new LogoutRequest gets sent to fully log
+     * the disconnected user out.
+     *
+     * @param msg The ClientDisconnectedMessage found on the EventBus
+     *
+     * @author Marvin Drees
+     * @author Aldin Dervisi
+     * @since 2021-03-18
+     */
+    @Subscribe
+    private void onClientDisconnectedMessage(ClientDisconnectedMessage msg) {
+        if (msg.getSession().isPresent()) {
+            eventBus.post(new RemoveFromLobbiesRequest(msg.getSession().get().getUser()));
+            LogoutRequest req = new LogoutRequest();
+            req.setSession(msg.getSession().get());
+            eventBus.post(req);
+            Optional<MessageContext> ctx = getCtx(msg);
+            ctx.ifPresent(this::removeSession);
+        }
+    }
+
+    /**
+     * Sends a PingMessage onto the Eventbus
+     * <p>
+     * This method is responsible for sending a PingMessage to the
+     * clients. It gets invoked by an IdleEventHandler.
+     *
+     * @param ctx Message context to determine the clients
+     *
+     * @author Marvin Drees
+     * @author Aldin Dervisi
+     * @since 2021-03-18
+     */
+    public void sendPingMessage(MessageContext ctx) {
+        Session session = this.activeSessions.get(ctx);
+        if (session != null) {
+            ResponseMessage msg = new PingMessage();
+            msg.setSession(null);
+            msg.setMessageContext(null);
+            LOG.debug("Send to client " + ctx + " message " + msg);
+            sendToClient(ctx, msg);
+        }
     }
 
     // -------------------------------------------------------------------------------
