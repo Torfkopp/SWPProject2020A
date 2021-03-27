@@ -3,6 +3,8 @@ package de.uol.swp.server.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
+import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
@@ -374,6 +376,38 @@ public class LobbyService extends AbstractService {
             post(response);
         } else {
             LOG.error("---- Lobby " + lobbyName + " not found.");
+        }
+    }
+
+    /**
+     * Handles a ReturnToPreGameLobbyRequest found on the EventBus
+     * <p>
+     * If a ReturnToPreGameLobbyRequest is found on the EventBus, this method
+     * sets InGame to false in LobbyManagement. It also posts a new UserReadyRequest
+     * for every user in the lobby and a ReturnToPreGameLobbyMessage to every user
+     * in the lobby onto the EventBus.
+     *
+     * @param req The ReturnToPreGameLobbyRequest found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest
+     * @see de.uol.swp.common.lobby.request.UserReadyRequest
+     * @see de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyRequest(ReturnToPreGameLobbyRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received ReturnToPreGameLobbyRequest for Lobby " + req.getLobbyName());
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getLobbyName());
+        if (lobby.isPresent()) {
+            lobbyManagement.setInGame(req.getLobbyName(), false);
+            for (User user : lobby.get().getRealUsers()) {
+                post(new UserReadyRequest(req.getLobbyName(), user, false));
+            }
+            sendToAllInLobby(req.getLobbyName(),
+                             new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
+            sendToAll(new AllLobbiesMessage(lobbyManagement.getLobbies()));
         }
     }
 

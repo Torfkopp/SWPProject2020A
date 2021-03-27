@@ -14,8 +14,7 @@ import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.message.DiceCastMessage;
-import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
@@ -38,10 +37,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
@@ -90,6 +94,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     @FXML
     private Button playCard;
     @FXML
+    private Button returnToLobby;
+    @FXML
     private Button tradeWithUserButton;
     @FXML
     private Button tradeWithBankButton;
@@ -124,6 +130,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private int moveTime;
     private GameRendering gameRendering;
     private Window window;
+    private ChangeListener<Number> canvasResizeListener;
 
     /**
      * Constructor
@@ -208,6 +215,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextfield.setTextFormatter(new TextFormatter<>(integerFilter));
+        canvasResizeListener = (observable, oldValue, newValue) -> {
+            double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
+            double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
+            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+            double dimension = Math.min(heightValue, widthValue);
+            gameMapCanvas.setHeight(dimension * hexFactor);
+            gameMapCanvas.setWidth(dimension);
+            if (gameMap == null) return;
+            // gameMap exists, so redraw map to fit the new canvas dimensions
+            gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
+            gameRendering.drawGameMap(gameMap);
+            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        };
         LOG.debug("LobbyPresenter initialised");
     }
 
@@ -541,26 +562,6 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
 
-        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
-            double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
-            double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
-            double dimension = Math.min(heightValue, widthValue);
-            gameMapCanvas.setHeight(dimension * hexFactor);
-            gameMapCanvas.setWidth(dimension);
-            if (gameMap == null) return;
-            // gameMap exists, so redraw map to fit the new canvas dimensions
-            gameRendering = new GameRendering(gameMapCanvas);
-            gameMapCanvas.getGraphicsContext2D().clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
-            gameRendering.drawGameMap(gameMap);
-            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
-        };
-        window.widthProperty().addListener(listener);
-        window.heightProperty().addListener(listener);
-        //just to trigger the heightProperty ChangeListener and make the canvas have actual dimensions
-        window.setHeight(window.getHeight() + 0.01);
-        window.setHeight(window.getHeight() - 0.01);
-
         lobbyService.retrieveAllLobbyMembers(this.lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
         this.commandsActivated.setSelected(event.getLobby().commandsAllowed());
@@ -861,6 +862,63 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles the click on the ReturnToLobby-Button.
+     *
+     * @since 2021-03-22
+     */
+    @FXML
+    private void onReturnToLobbyButtonPressed() {
+        lobbyService.returnToPreGameLobby(this.lobbyName);
+    }
+
+    /**
+     * Handles a ReturnToPreGameLobbyMessage
+     * <p>
+     * If a new ReturnToLobbyMessage is posted onto the EventBus the
+     * Settings and visibility of the Buttons will be set to their
+     * Pre-Game states.
+     *
+     * @param msg The ReturnToPreGameLobbyMessage seen on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @since 2021-03-2021
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        Platform.runLater(() -> {
+            this.returnToLobby.setVisible(false);
+            this.returnToLobby.setPrefHeight(0);
+            this.returnToLobby.setPrefWidth(0);
+            this.window.setWidth(LOBBY_WIDTH_PRE_GAME);
+            this.window.setHeight(LOBBY_HEIGHT_PRE_GAME);
+            ((Stage) this.window).setMinWidth(LOBBY_WIDTH_PRE_GAME);
+            ((Stage) this.window).setMinHeight(LOBBY_HEIGHT_PRE_GAME);
+            this.preGameSettingBox.setVisible(true);
+            this.preGameSettingBox.setPrefHeight(190);
+            this.preGameSettingBox.setMaxHeight(190);
+            this.turnIndicator.setText("");
+            this.preGameSettingBox.setMinHeight(190);
+            this.inventoryView.setMaxHeight(0);
+            this.inventoryView.setMinHeight(0);
+            this.inventoryView.setPrefHeight(0);
+            this.inventoryView.setVisible(false);
+            this.readyCheckBox.setVisible(true);
+            this.readyCheckBox.setSelected(false);
+            lobbyService.retrieveAllLobbyMembers(this.lobbyName);
+            setStartSessionButtonState();
+            this.rollDice.setVisible(false);
+            this.endTurn.setVisible(false);
+            this.tradeWithUserButton.setVisible(false);
+            this.tradeWithUserButton.setDisable(false);
+            this.tradeWithBankButton.setVisible(false);
+            this.rollDice.setVisible(false);
+            this.kickUserButton.setVisible(true);
+            this.playCard.setVisible(false);
+        });
+    }
+
+    /**
      * Method called when the rollDice Button is pressed
      * <p>
      * If the rollDice Button is pressed, this method requests the LobbyService
@@ -917,7 +975,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.preGameSettingBox.setMaxHeight(0);
             this.preGameSettingBox.setMinHeight(0);
             //This Line needs to be changed/ removed in the Future
+            window.widthProperty().addListener(canvasResizeListener);
+            window.heightProperty().addListener(canvasResizeListener);
             this.gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
+            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
             this.gameMap = new GameMap().createMapFromConfiguration(msg.getConfiguration());
             if (!msg.isStartUpPhaseEnabled()) this.gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
             gameRendering.drawGameMap(this.gameMap);
@@ -935,12 +997,15 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.startSession.setVisible(false);
             this.rollDice.setVisible(true);
             this.endTurn.setVisible(true);
+            this.endTurn.setDisable(true);
             this.tradeWithUserButton.setVisible(true);
             this.tradeWithUserButton.setDisable(true);
             this.tradeWithBankButton.setVisible(true);
+            this.tradeWithBankButton.setDisable(true);
             setRollDiceButtonState(msg.getUser());
             this.kickUserButton.setVisible(false);
             this.playCard.setVisible(true);
+            this.playCard.setDisable(true);
         });
     }
 
@@ -1170,6 +1235,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
+        lobbyService.checkVictoryPoints(this.lobbyName, this.loggedInUser);
     }
 
     /**
@@ -1284,6 +1350,74 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserReadyMessage for Lobby " + this.lobbyName);
         lobbyService.retrieveAllLobbyMembers(this.lobbyName); // for updateUserList
+    }
+
+    /**
+     * Handles the PlayerWonGameMessage
+     * <p>
+     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
+     * with the Player that won is shown. For the owner of the Lobby appears a
+     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
+     *
+     * @param msg The CheckVictoryPointsMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        GraphicsContext ctx = gameMapCanvas.getGraphicsContext2D();
+        ctx.clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
+        this.gameMap = null;
+        ctx.setTextAlign(TextAlignment.CENTER);
+        ctx.setTextBaseline(VPos.CENTER);
+        ctx.fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"),
+                     gameMapCanvas.getWidth() / 2, gameMapCanvas.getHeight() / 2);
+        ctx.setFill(Color.BLACK);
+        ctx.setFont(Font.font(25));
+        ChangeListener<Number> listener;
+        if (this.loggedInUser.getID() == this.owner.getID()) {
+            listener = (observable, oldValue, newValue) -> {
+                double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
+                double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
+                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+                double dimension = Math.min(heightValue, widthValue);
+                gameMapCanvas.setHeight((dimension * hexFactor) - 40);
+                gameMapCanvas.setWidth(dimension);
+                // gameMap exists, so redraw map to fit the new canvas dimensions
+                gameMapCanvas.getGraphicsContext2D()
+                             .clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
+                gameMapCanvas.getGraphicsContext2D().fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"),
+                                                              gameMapCanvas.getWidth() / 2,
+                                                              gameMapCanvas.getHeight() / 2);
+
+            };
+            this.returnToLobby.setVisible(true);
+            this.returnToLobby.setPrefHeight(30);
+            this.returnToLobby.setPrefWidth(250);
+        } else {
+            listener = (observable, oldValue, newValue) -> {
+                double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
+                double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
+                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+                double dimension = Math.min(heightValue, widthValue);
+                gameMapCanvas.setHeight(dimension * hexFactor);
+                gameMapCanvas.setWidth(dimension);
+                // gameMap exists, so redraw map to fit the new canvas dimensions
+                gameMapCanvas.getGraphicsContext2D()
+                             .clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
+                gameMapCanvas.getGraphicsContext2D()
+                             .fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"), gameMapCanvas.getWidth() / 2, gameMapCanvas.getHeight() / 2);
+            };
+        }
+        this.window.widthProperty().removeListener(canvasResizeListener);
+        this.window.heightProperty().removeListener(canvasResizeListener);
+        this.window.widthProperty().addListener(listener);
+        this.window.heightProperty().addListener(listener);
+        this.window.setHeight(this.window.getHeight() - 1);
+        this.window.setHeight(this.window.getHeight() + 1);
     }
 
     /**

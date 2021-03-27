@@ -14,6 +14,18 @@ import de.uol.swp.common.user.User;
 public interface ILobbyService {
 
     /**
+     * Posts a request to check the number of victory points from a player
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user whose VictoryPoints gets checked
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @since 2021-03-23
+     */
+    void checkVictoryPoints(String lobbyName, User user);
+
+    /**
      * Posts a request to create a lobby onto the EventBus
      *
      * @param name      The name chosen for the new lobby
@@ -133,6 +145,18 @@ public interface ILobbyService {
      * @since 2020-12-20
      */
     void retrieveAllLobbyMembers(String lobbyName);
+
+    /**
+     * Posts a request to return to the Pre-Game Lobby.
+     *
+     * @param lobbyName The name of the lobby.
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest
+     * @since 2021-03-22
+     */
+    void returnToPreGameLobby(String lobbyName);
 
     /**
      * Posts a request to roll the dices
