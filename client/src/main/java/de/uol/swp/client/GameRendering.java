@@ -399,32 +399,6 @@ public class GameRendering {
     }
 
     /**
-     * getIntersectionsInRow method
-     * <p>
-     * This method returns the amount of Intersections contained in the hexY row.
-     *
-     * @param hexY The row for which to return the Intersection count
-     *
-     * @return The amount of Intersections in this row
-     */
-    private int getIntersectionsInRow(int hexY) {
-        // TODO: unused, so remove?
-        switch (hexY) {
-            case 0:
-            case 5:
-                return 7;
-            case 1:
-            case 4:
-                return 9;
-            case 2:
-            case 3:
-                return 11;
-            default:
-                return 999999999; // ERROR
-        }
-    }
-
-    /**
      * getPlayerColour method
      * <p>
      * This method gets the colour of the indicated player.
@@ -522,8 +496,6 @@ public class GameRendering {
     private MapPoint horizontalEdgeToMapPoint(int row, int col) {
         MapPoint left = rowColCoordinatesToMapPoint(row, col - 3);
         MapPoint right = rowColCoordinatesToMapPoint(row, col + 3);
-        //MapPoint left = rowColCoordinatesToMapPoint(row + 2, col);
-        //MapPoint right = rowColCoordinatesToMapPoint(row - 2, col);
         return EdgeMapPoint(left, right);
     }
 
@@ -684,7 +656,7 @@ public class GameRendering {
     private MapPoint rowColCoordinatesToMapPoint(int row, int col) {
         int col8 = col % 8;
         int hexY = row / 6;
-        int hexX = 0;
+        int hexX;
         int rawCol = col;
         boolean lowerHalf = hexY > 3;
 

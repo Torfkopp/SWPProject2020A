@@ -606,8 +606,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
-        // TODO: extend documentation to final implementation behaviour
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
         if (mapPoint.getType() == INVALID) {
             System.out.println("INVALID");
         } else if (mapPoint.getType() == HEX) {
