@@ -25,7 +25,7 @@ public class LobbyManagement implements ILobbyManagement {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, false, maxPlayer, false, 60, false, false));
+        lobbies.put(name, new LobbyDTO(name, owner, false, maxPlayer, true, 60, false, false));
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
+import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -1021,5 +1022,31 @@ public class GameService extends AbstractService {
             }
         }
         return true;
+    }
+
+    /**
+     * Handles a CheckVictoryPointsRequest found on the EventBus
+     * If a CheckVictoryPointsRequest is found on the EventBus, this method
+     * checks if the player has 10 or more victory points. If he has 10 ore more
+     * victory points, a new PlayerWonGameMessage is sent to all lobby members
+     * and the GameManagement drops the game.
+     *
+     * @param req The CheckVictoryPointsRequest found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.CheckVictoryPointsRequest
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req) {
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
+        if (vicPoints >= 10) {
+            ServerMessage message = new PlayerWonGameMessage(req.getOriginLobby(), req.getUser());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), message);
+            gameManagement.dropGame(req.getOriginLobby());
+        }
     }
 }
