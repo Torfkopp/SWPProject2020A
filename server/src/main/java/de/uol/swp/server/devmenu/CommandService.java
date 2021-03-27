@@ -462,11 +462,20 @@ public class CommandService extends AbstractService {
             if (args.get(i).equals("§null") || args.get(i).equals("§n")) argList.add(null);
             else switch (parameters[i].getName()) {
                 case "de.uol.swp.common.user.User":
+                case "de.uol.swp.common.user.UserOrDummy":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
                         if (currentUser.isPresent()) argList.add(currentUser.get());
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
+                        else {
+                            // Dummy
+                            // Dummies aren't saved anywhere, so we parse the integer at the end of the name
+                            // and use the cloning constructor to recreate one
+                            StringBuilder x = new StringBuilder();
+                            for (Character c : args.get(i).toCharArray()) if (Character.isDigit(c)) x.append(c);
+                            argList.add(new DummyDTO(Integer.parseInt(x.toString())));
+                        }
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
