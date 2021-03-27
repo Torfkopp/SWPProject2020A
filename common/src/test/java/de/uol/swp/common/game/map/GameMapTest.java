@@ -32,13 +32,13 @@ public class GameMapTest {
 
     @Test
     void getHex_DesertHexType_BeginnerMapTest() {
-        IGameHex hex = map.getHex(new MapPoint(3, 3));
+        IGameHex hex = map.getHex(HexMapPoint(3, 3));
         assertEquals(IGameHex.HexType.DESERT, hex.getType());
     }
 
     @Test
     void getHex_HarborHex_AnyResource_BeginnerMapTest() {
-        IGameHex hex = map.getHex(new MapPoint(0, 0));
+        IGameHex hex = map.getHex(HexMapPoint(0, 0));
         assertEquals(IGameHex.HexType.HARBOR, hex.getType());
         IHarborHex harborHex = (IHarborHex) hex;
         assertEquals(IHarborHex.HarborResource.ANY, harborHex.getResource());
@@ -46,7 +46,7 @@ public class GameMapTest {
 
     @Test
     void getHex_HarborHex_BeginnerMapTest() {
-        IGameHex hex = map.getHex(new MapPoint(2, 0));
+        IGameHex hex = map.getHex(HexMapPoint(2, 0));
         assertEquals(IGameHex.HexType.HARBOR, hex.getType());
         IHarborHex harborHex = (IHarborHex) hex;
         assertEquals(IHarborHex.HarborResource.LUMBER, harborHex.getResource());
@@ -54,7 +54,7 @@ public class GameMapTest {
 
     @Test
     void getHex_ResourceHex_BeginnerMapTest() {
-        IGameHex hex = map.getHex(new MapPoint(1, 3));
+        IGameHex hex = map.getHex(HexMapPoint(1, 3));
         assertEquals(IGameHex.HexType.RESOURCE, hex.getType());
         IResourceHex resourceHex = (IResourceHex) hex;
         assertEquals(IResourceHex.ResourceHexType.FOREST, resourceHex.getResource());

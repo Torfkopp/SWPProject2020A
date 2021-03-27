@@ -309,19 +309,19 @@ public class GameMap implements IGameMap {
         intersectionMap[3][8].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
 
         //Create roads
-        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[1][3], intersectionMap[1][4]));
-        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[3][2], intersectionMap[3][3]));
-        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[1][5], intersectionMap[1][6]));
-        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[4][4], intersectionMap[4][5]));
-        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[3][8], intersectionMap[2][8]));
-        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[2][2], intersectionMap[2][3]));
+        placeRoad(Player.PLAYER_1, getEdge(EdgeMapPoint(IntersectionMapPoint(1, 3), IntersectionMapPoint(1, 4))));
+        placeRoad(Player.PLAYER_1, getEdge(EdgeMapPoint(IntersectionMapPoint(3, 2), IntersectionMapPoint(3, 3))));
+        placeRoad(Player.PLAYER_2, getEdge(EdgeMapPoint(IntersectionMapPoint(1, 5), IntersectionMapPoint(1, 6))));
+        placeRoad(Player.PLAYER_2, getEdge(EdgeMapPoint(IntersectionMapPoint(4, 4), IntersectionMapPoint(4, 5))));
+        placeRoad(Player.PLAYER_3, getEdge(EdgeMapPoint(IntersectionMapPoint(3, 8), IntersectionMapPoint(2, 8))));
+        placeRoad(Player.PLAYER_3, getEdge(EdgeMapPoint(IntersectionMapPoint(2, 2), IntersectionMapPoint(2, 3))));
 
         // For 4 players, create more settlements and roads
         if (playerCount == 4) {
             intersectionMap[4][2].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
             intersectionMap[4][6].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
-            placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][2], intersectionMap[4][3]));
-            placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][6], intersectionMap[3][7]));
+            placeRoad(Player.PLAYER_4, getEdge(EdgeMapPoint(IntersectionMapPoint(4, 2), IntersectionMapPoint(4, 3))));
+            placeRoad(Player.PLAYER_4, getEdge(EdgeMapPoint(IntersectionMapPoint(4, 6), IntersectionMapPoint(3, 7))));
         }
     }
 

@@ -182,6 +182,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                return;
+            }
             String name = newValue.getUsername();
             boolean isSelf = newValue.equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
@@ -331,6 +335,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- Update of ready users");
         this.owner = rsp.getOwner();
         if (this.readyUsers == null) this.readyUsers = new HashSet<>();
+        this.readyUsers.clear();
         this.readyUsers.addAll(rsp.getReadyUsers());
         Platform.runLater(() -> {
             updateUsersList(rsp.getUsers());
@@ -1265,6 +1270,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setStartSessionButtonState();
             setPreGameSettings();
         });
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
 
     /**

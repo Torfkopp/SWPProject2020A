@@ -41,7 +41,7 @@
         </padding>
     </VBox>
     <HBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
-        <Canvas fx:id="gameMapCanvas"/>
+        <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas"/>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
