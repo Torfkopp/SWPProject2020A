@@ -4,6 +4,8 @@ import com.google.common.graph.ElementOrder;
 import com.google.common.graph.ImmutableNetwork;
 import com.google.common.graph.NetworkBuilder;
 import de.uol.swp.common.game.map.Hexes.*;
+import de.uol.swp.common.game.map.configuration.Configuration;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 
 import java.util.*;
 
@@ -27,7 +29,7 @@ public class GameMap implements IGameMap {
     private IIntersection[][] intersectionMap;
     private ImmutableNetwork<GameHexWrapper, IEdge> hexEdgeNetwork;
     private ImmutableNetwork<IIntersection, IEdge> intersectionEdgeNetwork;
-    private Map<String, List<Object>> configuration;
+    private IConfiguration configuration;
 
     /**
      * Constructor
@@ -39,57 +41,48 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public IGameMap createMapFromConfiguration(Map<String, List<Object>> configuration) {
+    public IGameMap createMapFromConfiguration(IConfiguration configuration) {
         this.configuration = configuration;
-        Map<String, List<Object>> modifiableConfiguration = new HashMap<>(configuration);
-        List<Object> harborList = new LinkedList<>(modifiableConfiguration.get("harbors"));
-        List<Object> hexList = new LinkedList<>(modifiableConfiguration.get("hexes"));
-        List<Object> tokenList = new LinkedList<>(modifiableConfiguration.get("tokens"));
-        hexMap[0][0].set(new HarborHex(hexMap[1][1], IHarborHex.HarborSide.SOUTHEAST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
+        // create new LinkedLists because lists are transmitted ordered and read-only in the IConfiguration
+        List<IHarborHex.HarborResource> harborList = new LinkedList<>(configuration.getHarborList());
+        List<IResourceHex.ResourceHexType> hexList = new LinkedList<>(configuration.getHexList());
+        List<Integer> tokenList = new LinkedList<>(configuration.getTokenList());
+        hexMap[0][0].set(new HarborHex(hexMap[1][1], IHarborHex.HarborSide.SOUTHEAST, harborList.remove(0)));
         hexMap[0][1].set(new WaterHex());
-        hexMap[0][2].set(new HarborHex(hexMap[1][2], IHarborHex.HarborSide.SOUTHWEST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
+        hexMap[0][2].set(new HarborHex(hexMap[1][2], IHarborHex.HarborSide.SOUTHWEST, harborList.remove(0)));
         hexMap[0][3].set(new WaterHex());
         hexMap[1][0].set(new WaterHex());
-        hexMap[1][1].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[1][2].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[1][3].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[1][4].set(new HarborHex(hexMap[2][4], IHarborHex.HarborSide.SOUTHWEST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
-        hexMap[2][0].set(new HarborHex(hexMap[2][1], IHarborHex.HarborSide.EAST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
-        hexMap[2][1].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[2][2].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[2][3].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[2][4].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
+        hexMap[1][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[1][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[1][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[1][4].set(new HarborHex(hexMap[2][4], IHarborHex.HarborSide.SOUTHWEST, harborList.remove(0)));
+        hexMap[2][0].set(new HarborHex(hexMap[2][1], IHarborHex.HarborSide.EAST, harborList.remove(0)));
+        hexMap[2][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[2][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[2][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[2][4].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
         hexMap[2][5].set(new WaterHex());
         hexMap[3][0].set(new WaterHex());
-        hexMap[3][1].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[3][2].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
+        hexMap[3][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[3][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
         hexMap[3][3].set(new DesertHex());
-        hexMap[3][4].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[3][5].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[3][6].set(new HarborHex(hexMap[3][6], IHarborHex.HarborSide.WEST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
-        hexMap[4][0].set(new HarborHex(hexMap[4][1], IHarborHex.HarborSide.EAST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
-        hexMap[4][1].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[4][2].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[4][3].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[4][4].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
+        hexMap[3][4].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[3][5].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[3][6].set(new HarborHex(hexMap[3][6], IHarborHex.HarborSide.WEST, harborList.remove(0)));
+        hexMap[4][0].set(new HarborHex(hexMap[4][1], IHarborHex.HarborSide.EAST, harborList.remove(0)));
+        hexMap[4][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[4][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[4][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[4][4].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
         hexMap[4][5].set(new WaterHex());
         hexMap[5][0].set(new WaterHex());
-        hexMap[5][1].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[5][2].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[5][3].set(new ResourceHex((IResourceHex.ResourceHexType) hexList.remove(0), (int) tokenList.remove(0)));
-        hexMap[5][4].set(new HarborHex(hexMap[4][4], IHarborHex.HarborSide.NORTHWEST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
-        hexMap[6][0].set(new HarborHex(hexMap[5][1], IHarborHex.HarborSide.NORTHEAST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
+        hexMap[5][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[5][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[5][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[5][4].set(new HarborHex(hexMap[4][4], IHarborHex.HarborSide.NORTHWEST, harborList.remove(0)));
+        hexMap[6][0].set(new HarborHex(hexMap[5][1], IHarborHex.HarborSide.NORTHEAST, harborList.remove(0)));
         hexMap[6][1].set(new WaterHex());
-        hexMap[6][2].set(new HarborHex(hexMap[5][2], IHarborHex.HarborSide.NORTHWEST,
-                                       (IHarborHex.HarborResource) harborList.remove(0)));
+        hexMap[6][2].set(new HarborHex(hexMap[5][2], IHarborHex.HarborSide.NORTHWEST, harborList.remove(0)));
         hexMap[6][3].set(new WaterHex());
 
         return this;
@@ -102,8 +95,8 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public Map<String, List<Object>> getBeginnerConfiguration() {
-        List<Object> hexList = new LinkedList<>();
+    public IConfiguration getBeginnerConfiguration() {
+        List<IResourceHex.ResourceHexType> hexList = new LinkedList<>();
         hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
         hexList.add(IResourceHex.ResourceHexType.PASTURE);
         hexList.add(IResourceHex.ResourceHexType.FOREST);
@@ -122,17 +115,17 @@ public class GameMap implements IGameMap {
         hexList.add(IResourceHex.ResourceHexType.HILLS);
         hexList.add(IResourceHex.ResourceHexType.FIELDS);
         hexList.add(IResourceHex.ResourceHexType.PASTURE);
-        List<Object> harborResources = new LinkedList<>();
-        harborResources.add(IHarborHex.HarborResource.ANY);
-        harborResources.add(IHarborHex.HarborResource.GRAIN);
-        harborResources.add(IHarborHex.HarborResource.ORE);
-        harborResources.add(IHarborHex.HarborResource.LUMBER);
-        harborResources.add(IHarborHex.HarborResource.ANY);
-        harborResources.add(IHarborHex.HarborResource.BRICK);
-        harborResources.add(IHarborHex.HarborResource.WOOL);
-        harborResources.add(IHarborHex.HarborResource.ANY);
-        harborResources.add(IHarborHex.HarborResource.ANY);
-        List<Object> tokenList = new LinkedList<>();
+        List<IHarborHex.HarborResource> harborList = new LinkedList<>();
+        harborList.add(IHarborHex.HarborResource.ANY);
+        harborList.add(IHarborHex.HarborResource.GRAIN);
+        harborList.add(IHarborHex.HarborResource.ORE);
+        harborList.add(IHarborHex.HarborResource.LUMBER);
+        harborList.add(IHarborHex.HarborResource.ANY);
+        harborList.add(IHarborHex.HarborResource.BRICK);
+        harborList.add(IHarborHex.HarborResource.WOOL);
+        harborList.add(IHarborHex.HarborResource.ANY);
+        harborList.add(IHarborHex.HarborResource.ANY);
+        List<Integer> tokenList = new LinkedList<>();
         tokenList.add(10);
         tokenList.add(2);
         tokenList.add(9);
@@ -151,15 +144,16 @@ public class GameMap implements IGameMap {
         tokenList.add(5);
         tokenList.add(6);
         tokenList.add(11);
-        Map<String, List<Object>> map = new HashMap<>();
-        map.put("hexes", hexList);
-        map.put("harbors", harborResources);
-        map.put("tokens", tokenList);
-        return map;
+        // wrapped as unmodifiable so it can be reliably retrieved.
+        // Create new LinkedList objects with the Getter results when creating the map from a Configuration
+        configuration = new Configuration(Collections.unmodifiableList(harborList),
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList));
+        return configuration;
     }
 
     @Override
-    public Map<String, List<Object>> getCurrentConfiguration() {
+    public IConfiguration getCurrentConfiguration() {
         return configuration;
     }
 
@@ -223,8 +217,8 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint) {
-        return getIntersectionFromEdges(getEdgesFromHex(mapPoint));
+    public Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint) {
+        return getIntersectionsFromEdges(getEdgesFromHex(mapPoint));
     }
 
     @Override
@@ -249,21 +243,21 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public Map<String, List<Object>> getRandomisedConfiguration() {
-        List<Object> harborResources = new ArrayList<>();
-        harborResources.addAll(Collections.nCopies(4, IHarborHex.HarborResource.ANY));
-        harborResources.addAll(Collections.nCopies(1, IHarborHex.HarborResource.GRAIN));
-        harborResources.addAll(Collections.nCopies(1, IHarborHex.HarborResource.ORE));
-        harborResources.addAll(Collections.nCopies(1, IHarborHex.HarborResource.LUMBER));
-        harborResources.addAll(Collections.nCopies(1, IHarborHex.HarborResource.BRICK));
-        harborResources.addAll(Collections.nCopies(1, IHarborHex.HarborResource.WOOL));
-        List<Object> resourceHexList = new ArrayList<>();
-        resourceHexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FOREST));
-        resourceHexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FIELDS));
-        resourceHexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.MOUNTAINS));
-        resourceHexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.PASTURE));
-        resourceHexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.HILLS));
-        List<Object> tokenList = new ArrayList<>();
+    public IConfiguration getRandomisedConfiguration() {
+        List<IHarborHex.HarborResource> harborList = new ArrayList<>();
+        harborList.addAll(Collections.nCopies(4, IHarborHex.HarborResource.ANY));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.GRAIN));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.ORE));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.LUMBER));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.BRICK));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.WOOL));
+        List<IResourceHex.ResourceHexType> hexList = new ArrayList<>();
+        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FOREST));
+        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FIELDS));
+        hexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.MOUNTAINS));
+        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.PASTURE));
+        hexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.HILLS));
+        List<Integer> tokenList = new ArrayList<>();
         tokenList.addAll(Collections.nCopies(1, 2));
         tokenList.addAll(Collections.nCopies(1, 12));
         tokenList.addAll(Collections.nCopies(2, 3));
@@ -274,14 +268,15 @@ public class GameMap implements IGameMap {
         tokenList.addAll(Collections.nCopies(2, 9));
         tokenList.addAll(Collections.nCopies(2, 10));
         tokenList.addAll(Collections.nCopies(2, 11));
-        Collections.shuffle(harborResources);
-        Collections.shuffle(resourceHexList);
+        Collections.shuffle(harborList);
+        Collections.shuffle(hexList);
         Collections.shuffle(tokenList);
-        Map<String, List<Object>> map = new HashMap<>();
-        map.put("harbors", Collections.unmodifiableList(harborResources));
-        map.put("hexes", Collections.unmodifiableList(resourceHexList));
-        map.put("tokens", Collections.unmodifiableList(tokenList));
-        return map;
+        // wrapped as unmodifiable so it can be reliably retrieved.
+        // Create new LinkedList objects with the Getter results when creating the map from a Configuration
+        configuration = new Configuration(Collections.unmodifiableList(harborList),
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList));
+        return configuration;
     }
 
     @Override
@@ -524,7 +519,7 @@ public class GameMap implements IGameMap {
      * @author Mario Fokken
      * @since 2021-03-15
      */
-    private Set<IIntersection> getIntersectionFromEdges(Set<IEdge> set) {
+    private Set<IIntersection> getIntersectionsFromEdges(Set<IEdge> set) {
         Set<IIntersection> intersectionSet = new HashSet<>();
         for (IEdge edge : set) {
             for (IIntersection i : intersectionEdgeNetwork.incidentNodes(edge)) {

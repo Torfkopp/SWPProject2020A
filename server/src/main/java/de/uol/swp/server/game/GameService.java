@@ -7,6 +7,7 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.DiceCastMessage;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.game.message.NextPlayerMessage;
@@ -262,7 +263,7 @@ public class GameService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameInternalRequest for Lobby " + lobbyName);
         try {
             IGameMap gameMap = new GameMap();
-            Map<String, List<Object>> configuration;
+            IConfiguration configuration;
             if (msg.getLobby().randomPlayfieldEnabled()) {
                 configuration = gameMap.getRandomisedConfiguration();
             } else {

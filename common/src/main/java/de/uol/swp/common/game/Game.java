@@ -107,7 +107,7 @@ public class Game {
             if (mapPoint.equals(map.getRobberPosition())) return;
             ResourceHex hex = (ResourceHex) map.getHex(mapPoint);
             //Checks every intersection around the hex
-            for (IIntersection i : map.getIntersectionFromHex(mapPoint)) {
+            for (IIntersection i : map.getIntersectionsFromHex(mapPoint)) {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
                 if (i.getOwner() != null) {

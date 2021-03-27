@@ -1,9 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Message sent by the server when a game session was started.
@@ -16,7 +14,7 @@ import java.util.Map;
  */
 public class StartSessionMessage extends AbstractLobbyMessage {
 
-    private final Map<String, List<Object>> configuration;
+    private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
 
     /**
@@ -27,7 +25,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param configuration       The field configuration used in the game
      * @param startUpPhaseEnabled Whether the game has the startup phase enabled
      */
-    public StartSessionMessage(String name, UserOrDummy user, Map<String, List<Object>> configuration,
+    public StartSessionMessage(String name, UserOrDummy user, IConfiguration configuration,
                                boolean startUpPhaseEnabled) {
         super(name, user);
         this.configuration = configuration;
@@ -41,9 +39,12 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      *
      * @author Finn Haase
      * @author Phillip-André Suhr
+     * @implNote The Lists contained will be read-only and ordered, so create
+     * new LinkedList objects with the results
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
      * @since 2021-03-18
      */
-    public Map<String, List<Object>> getConfiguration() {
+    public IConfiguration getConfiguration() {
         return configuration;
     }
 

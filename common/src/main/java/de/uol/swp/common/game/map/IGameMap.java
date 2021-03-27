@@ -1,9 +1,8 @@
 package de.uol.swp.common.game.map;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,16 +17,16 @@ public interface IGameMap {
     /**
      * Creates an IGameMap from the provided configuration
      *
-     * @param configuration The map configuration as a Map of String to List
-     *                      of Object
+     * @param configuration The map configuration used in the current Game
      *
      * @return The IGameMap with the configuration as provided
      *
      * @author Finn Haase
      * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
      * @since 2021-03-18
      */
-    IGameMap createMapFromConfiguration(Map<String, List<Object>> configuration);
+    IGameMap createMapFromConfiguration(IConfiguration configuration);
 
     /**
      * Gets an edge that connects two intersections
@@ -48,27 +47,29 @@ public interface IGameMap {
      * Creates the beginner's map configuration as shown in the manual WITHOUT beginner
      * settlements or roads; those are created by {@link #makeBeginnerSettlementsAndRoads(int)}
      *
-     * @return The beginner configuration as a Map of String to List of Object
+     * @return The beginner, read-only configuration
      *
      * @author Finn Haase
      * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
      * @see <a href="https://www.catan.com/files/downloads/catan_base_rules_2020_200707.pdf">
      * https://www.catan.com/files/downloads/catan_base_rules_2020_200707.pdf</a>
      * @since 2021-03-18
      */
-    Map<String, List<Object>> getBeginnerConfiguration();
+    IConfiguration getBeginnerConfiguration();
 
     /**
      * Gets the current configuration of the IGameMap
      *
-     * @return The current configuration as a Map of String to List of Object
+     * @return The current, read-only configuration
      *
      * @author Finn Haase
      * @author Phillip-André Suhr
      * @implNote Not used currently; could be used in future (e.g. rejoining a game)
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
      * @since 2021-03-18
      */
-    Map<String, List<Object>> getCurrentConfiguration();
+    IConfiguration getCurrentConfiguration();
 
     /**
      * Gets all the edges around the hex
@@ -138,7 +139,7 @@ public interface IGameMap {
      * @author Mario Fokken
      * @since 2021-03-15
      */
-    Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint);
+    Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint);
 
     /**
      * Gets the intersections in a usable format for rendering them as a jagged array
@@ -164,13 +165,14 @@ public interface IGameMap {
     /**
      * Creates a randomised map with the standard tiles
      *
-     * @return A randomised configuration as a Map of String to List of Object
+     * @return A randomised, read-only configuration
      *
      * @author Finn Haase
      * @author Phillip-André Suhr
+     * @see de.uol.swp.common.game.map.configuration.IConfiguration
      * @since 2021-03-18
      */
-    Map<String, List<Object>> getRandomisedConfiguration();
+    IConfiguration getRandomisedConfiguration();
 
     /**
      * Gets the robber's position
