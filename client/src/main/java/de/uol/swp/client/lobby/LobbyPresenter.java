@@ -980,9 +980,9 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.gameRendering = new GameRendering(gameMapCanvas);
             gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
             gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
-            this.gameMap = new GameMap();
-            gameMap.createBeginnerMap();
-            gameRendering.drawGameMap(gameMap);
+            this.gameMap = new GameMap().createMapFromConfiguration(msg.getConfiguration());
+            if (!msg.isStartUpPhaseEnabled()) this.gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
+            gameRendering.drawGameMap(this.gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
             this.window.setWidth(LOBBY_WIDTH_IN_GAME);

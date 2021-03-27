@@ -4,6 +4,8 @@ import com.google.common.graph.ElementOrder;
 import com.google.common.graph.ImmutableNetwork;
 import com.google.common.graph.NetworkBuilder;
 import de.uol.swp.common.game.map.Hexes.*;
+import de.uol.swp.common.game.map.configuration.Configuration;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 
 import java.util.*;
 
@@ -27,6 +29,7 @@ public class GameMap implements IGameMap {
     private IIntersection[][] intersectionMap;
     private ImmutableNetwork<GameHexWrapper, IEdge> hexEdgeNetwork;
     private ImmutableNetwork<IIntersection, IEdge> intersectionEdgeNetwork;
+    private IConfiguration configuration;
 
     /**
      * Constructor
@@ -37,69 +40,52 @@ public class GameMap implements IGameMap {
         hexMap[robberPosition.getX()][robberPosition.getY()].get().setRobberOnField(false);
     }
 
-    /**
-     * Creates the beginner's map as shown in the manual
-     * ( https://www.catan.com/files/downloads/catan_base_rules_2020_200707.pdf )
-     */
-    public void createBeginnerMap() {
-        //Creating the hexes
-        hexMap[0][0].set(new HarborHex(hexMap[1][1], IHarborHex.HarborSide.SOUTHEAST, IHarborHex.HarborResource.ANY));
+    @Override
+    public IGameMap createMapFromConfiguration(IConfiguration configuration) {
+        this.configuration = configuration;
+        // create new LinkedLists because lists are transmitted ordered and read-only in the IConfiguration
+        List<IHarborHex.HarborResource> harborList = new LinkedList<>(configuration.getHarborList());
+        List<IResourceHex.ResourceHexType> hexList = new LinkedList<>(configuration.getHexList());
+        List<Integer> tokenList = new LinkedList<>(configuration.getTokenList());
+        hexMap[0][0].set(new HarborHex(hexMap[1][1], IHarborHex.HarborSide.SOUTHEAST, harborList.remove(0)));
         hexMap[0][1].set(new WaterHex());
-        hexMap[0][2].set(new HarborHex(hexMap[1][2], IHarborHex.HarborSide.SOUTHWEST, IHarborHex.HarborResource.GRAIN));
+        hexMap[0][2].set(new HarborHex(hexMap[1][2], IHarborHex.HarborSide.SOUTHWEST, harborList.remove(0)));
         hexMap[0][3].set(new WaterHex());
         hexMap[1][0].set(new WaterHex());
-        hexMap[1][1].set(new ResourceHex(IResourceHex.ResourceHexType.MOUNTAINS, 10));
-        hexMap[1][2].set(new ResourceHex(IResourceHex.ResourceHexType.PASTURE, 2));
-        hexMap[1][3].set(new ResourceHex(IResourceHex.ResourceHexType.FOREST, 9));
-        hexMap[1][4].set(new HarborHex(hexMap[2][4], IHarborHex.HarborSide.SOUTHWEST, IHarborHex.HarborResource.ORE));
-        hexMap[2][0].set(new HarborHex(hexMap[2][1], IHarborHex.HarborSide.EAST, IHarborHex.HarborResource.LUMBER));
-        hexMap[2][1].set(new ResourceHex(IResourceHex.ResourceHexType.FIELDS, 12));
-        hexMap[2][2].set(new ResourceHex(IResourceHex.ResourceHexType.HILLS, 6));
-        hexMap[2][3].set(new ResourceHex(IResourceHex.ResourceHexType.PASTURE, 4));
-        hexMap[2][4].set(new ResourceHex(IResourceHex.ResourceHexType.HILLS, 10));
+        hexMap[1][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[1][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[1][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[1][4].set(new HarborHex(hexMap[2][4], IHarborHex.HarborSide.SOUTHWEST, harborList.remove(0)));
+        hexMap[2][0].set(new HarborHex(hexMap[2][1], IHarborHex.HarborSide.EAST, harborList.remove(0)));
+        hexMap[2][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[2][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[2][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[2][4].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
         hexMap[2][5].set(new WaterHex());
         hexMap[3][0].set(new WaterHex());
-        hexMap[3][1].set(new ResourceHex(IResourceHex.ResourceHexType.FIELDS, 9));
-        hexMap[3][2].set(new ResourceHex(IResourceHex.ResourceHexType.FOREST, 11));
+        hexMap[3][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[3][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
         hexMap[3][3].set(new DesertHex());
-        hexMap[3][4].set(new ResourceHex(IResourceHex.ResourceHexType.FOREST, 3));
-        hexMap[3][5].set(new ResourceHex(IResourceHex.ResourceHexType.MOUNTAINS, 8));
-        hexMap[3][6].set(new HarborHex(hexMap[3][6], IHarborHex.HarborSide.WEST, IHarborHex.HarborResource.ANY));
-        hexMap[4][0].set(new HarborHex(hexMap[4][1], IHarborHex.HarborSide.EAST, IHarborHex.HarborResource.BRICK));
-        hexMap[4][1].set(new ResourceHex(IResourceHex.ResourceHexType.FOREST, 8));
-        hexMap[4][2].set(new ResourceHex(IResourceHex.ResourceHexType.MOUNTAINS, 3));
-        hexMap[4][3].set(new ResourceHex(IResourceHex.ResourceHexType.FIELDS, 4));
-        hexMap[4][4].set(new ResourceHex(IResourceHex.ResourceHexType.PASTURE, 5));
+        hexMap[3][4].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[3][5].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[3][6].set(new HarborHex(hexMap[3][6], IHarborHex.HarborSide.WEST, harborList.remove(0)));
+        hexMap[4][0].set(new HarborHex(hexMap[4][1], IHarborHex.HarborSide.EAST, harborList.remove(0)));
+        hexMap[4][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[4][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[4][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[4][4].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
         hexMap[4][5].set(new WaterHex());
         hexMap[5][0].set(new WaterHex());
-        hexMap[5][1].set(new ResourceHex(IResourceHex.ResourceHexType.HILLS, 5));
-        hexMap[5][2].set(new ResourceHex(IResourceHex.ResourceHexType.FIELDS, 6));
-        hexMap[5][3].set(new ResourceHex(IResourceHex.ResourceHexType.PASTURE, 11));
-        hexMap[5][4].set(new HarborHex(hexMap[4][4], IHarborHex.HarborSide.NORTHWEST, IHarborHex.HarborResource.WOOL));
-        hexMap[6][0].set(new HarborHex(hexMap[5][1], IHarborHex.HarborSide.NORTHEAST, IHarborHex.HarborResource.ANY));
+        hexMap[5][1].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[5][2].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[5][3].set(new ResourceHex(hexList.remove(0), tokenList.remove(0)));
+        hexMap[5][4].set(new HarborHex(hexMap[4][4], IHarborHex.HarborSide.NORTHWEST, harborList.remove(0)));
+        hexMap[6][0].set(new HarborHex(hexMap[5][1], IHarborHex.HarborSide.NORTHEAST, harborList.remove(0)));
         hexMap[6][1].set(new WaterHex());
-        hexMap[6][2].set(new HarborHex(hexMap[5][2], IHarborHex.HarborSide.NORTHWEST, IHarborHex.HarborResource.ANY));
+        hexMap[6][2].set(new HarborHex(hexMap[5][2], IHarborHex.HarborSide.NORTHWEST, harborList.remove(0)));
         hexMap[6][3].set(new WaterHex());
 
-        //Create settlements
-        intersectionMap[1][3].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
-        intersectionMap[3][2].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
-        intersectionMap[1][6].setOwnerAndState(Player.PLAYER_2, SETTLEMENT);
-        intersectionMap[4][4].setOwnerAndState(Player.PLAYER_2, SETTLEMENT);
-        intersectionMap[2][3].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
-        intersectionMap[3][8].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
-        intersectionMap[4][2].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
-        intersectionMap[4][6].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
-
-        //Create roads
-        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[1][3], intersectionMap[1][4]));
-        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[3][2], intersectionMap[3][3]));
-        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[1][5], intersectionMap[1][6]));
-        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[4][4], intersectionMap[4][5]));
-        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[3][8], intersectionMap[2][8]));
-        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[2][2], intersectionMap[2][3]));
-        placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][2], intersectionMap[4][3]));
-        placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][6], intersectionMap[3][7]));
+        return this;
     }
 
     @Override
@@ -109,13 +95,71 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public Set<IEdge> getEdgesFromHex(MapPoint mapPoint) {
-        return hexEdgeNetwork.incidentEdges(hexMap[mapPoint.getY()][mapPoint.getX()]);
+    public IConfiguration getBeginnerConfiguration() {
+        List<IResourceHex.ResourceHexType> hexList = new LinkedList<>();
+        hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
+        hexList.add(IResourceHex.ResourceHexType.PASTURE);
+        hexList.add(IResourceHex.ResourceHexType.FOREST);
+        hexList.add(IResourceHex.ResourceHexType.FIELDS);
+        hexList.add(IResourceHex.ResourceHexType.HILLS);
+        hexList.add(IResourceHex.ResourceHexType.PASTURE);
+        hexList.add(IResourceHex.ResourceHexType.HILLS);
+        hexList.add(IResourceHex.ResourceHexType.FIELDS);
+        hexList.add(IResourceHex.ResourceHexType.FOREST);
+        hexList.add(IResourceHex.ResourceHexType.FOREST);
+        hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
+        hexList.add(IResourceHex.ResourceHexType.FOREST);
+        hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
+        hexList.add(IResourceHex.ResourceHexType.FIELDS);
+        hexList.add(IResourceHex.ResourceHexType.PASTURE);
+        hexList.add(IResourceHex.ResourceHexType.HILLS);
+        hexList.add(IResourceHex.ResourceHexType.FIELDS);
+        hexList.add(IResourceHex.ResourceHexType.PASTURE);
+        List<IHarborHex.HarborResource> harborList = new LinkedList<>();
+        harborList.add(IHarborHex.HarborResource.ANY);
+        harborList.add(IHarborHex.HarborResource.GRAIN);
+        harborList.add(IHarborHex.HarborResource.ORE);
+        harborList.add(IHarborHex.HarborResource.LUMBER);
+        harborList.add(IHarborHex.HarborResource.ANY);
+        harborList.add(IHarborHex.HarborResource.BRICK);
+        harborList.add(IHarborHex.HarborResource.WOOL);
+        harborList.add(IHarborHex.HarborResource.ANY);
+        harborList.add(IHarborHex.HarborResource.ANY);
+        List<Integer> tokenList = new LinkedList<>();
+        tokenList.add(10);
+        tokenList.add(2);
+        tokenList.add(9);
+        tokenList.add(12);
+        tokenList.add(6);
+        tokenList.add(4);
+        tokenList.add(10);
+        tokenList.add(9);
+        tokenList.add(11);
+        tokenList.add(3);
+        tokenList.add(8);
+        tokenList.add(8);
+        tokenList.add(3);
+        tokenList.add(4);
+        tokenList.add(5);
+        tokenList.add(5);
+        tokenList.add(6);
+        tokenList.add(11);
+        // wrapped as unmodifiable so it can be reliably retrieved.
+        // Create new LinkedList objects with the Getter results when creating the map from a Configuration
+        configuration = new Configuration(Collections.unmodifiableList(harborList),
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList));
+        return configuration;
     }
 
     @Override
-    public Set<IIntersection> getIntersectionFromHex(MapPoint mapPoint) {
-        return getIntersectionFromEdges(getEdgesFromHex(mapPoint));
+    public IConfiguration getCurrentConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public Set<IEdge> getEdgesFromHex(MapPoint mapPoint) {
+        return hexEdgeNetwork.incidentEdges(hexMap[mapPoint.getY()][mapPoint.getX()]);
     }
 
     @Override
@@ -173,6 +217,11 @@ public class GameMap implements IGameMap {
     }
 
     @Override
+    public Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint) {
+        return getIntersectionsFromEdges(getEdgesFromHex(mapPoint));
+    }
+
+    @Override
     public IIntersection[][] getIntersectionsAsJaggedArray() {
         return intersectionMap;
     }
@@ -194,6 +243,43 @@ public class GameMap implements IGameMap {
     }
 
     @Override
+    public IConfiguration getRandomisedConfiguration() {
+        List<IHarborHex.HarborResource> harborList = new ArrayList<>();
+        harborList.addAll(Collections.nCopies(4, IHarborHex.HarborResource.ANY));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.GRAIN));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.ORE));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.LUMBER));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.BRICK));
+        harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.WOOL));
+        List<IResourceHex.ResourceHexType> hexList = new ArrayList<>();
+        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FOREST));
+        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FIELDS));
+        hexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.MOUNTAINS));
+        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.PASTURE));
+        hexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.HILLS));
+        List<Integer> tokenList = new ArrayList<>();
+        tokenList.addAll(Collections.nCopies(1, 2));
+        tokenList.addAll(Collections.nCopies(1, 12));
+        tokenList.addAll(Collections.nCopies(2, 3));
+        tokenList.addAll(Collections.nCopies(2, 4));
+        tokenList.addAll(Collections.nCopies(2, 5));
+        tokenList.addAll(Collections.nCopies(2, 6));
+        tokenList.addAll(Collections.nCopies(2, 8));
+        tokenList.addAll(Collections.nCopies(2, 9));
+        tokenList.addAll(Collections.nCopies(2, 10));
+        tokenList.addAll(Collections.nCopies(2, 11));
+        Collections.shuffle(harborList);
+        Collections.shuffle(hexList);
+        Collections.shuffle(tokenList);
+        // wrapped as unmodifiable so it can be reliably retrieved.
+        // Create new LinkedList objects with the Getter results when creating the map from a Configuration
+        configuration = new Configuration(Collections.unmodifiableList(harborList),
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList));
+        return configuration;
+    }
+
+    @Override
     public MapPoint getRobberPosition() {
         return robberPosition;
     }
@@ -201,6 +287,33 @@ public class GameMap implements IGameMap {
     @Override
     public Set<IEdge> incidentEdges(IIntersection intersection) {
         return intersectionEdgeNetwork.incidentEdges(intersection);
+    }
+
+    @Override
+    public void makeBeginnerSettlementsAndRoads(int playerCount) {
+        //Create settlements
+        intersectionMap[1][3].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
+        intersectionMap[3][2].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
+        intersectionMap[1][6].setOwnerAndState(Player.PLAYER_2, SETTLEMENT);
+        intersectionMap[4][4].setOwnerAndState(Player.PLAYER_2, SETTLEMENT);
+        intersectionMap[2][3].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
+        intersectionMap[3][8].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
+
+        //Create roads
+        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[1][3], intersectionMap[1][4]));
+        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[3][2], intersectionMap[3][3]));
+        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[1][5], intersectionMap[1][6]));
+        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[4][4], intersectionMap[4][5]));
+        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[3][8], intersectionMap[2][8]));
+        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[2][2], intersectionMap[2][3]));
+
+        // For 4 players, create more settlements and roads
+        if (playerCount == 4) {
+            intersectionMap[4][2].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
+            intersectionMap[4][6].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
+            placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][2], intersectionMap[4][3]));
+            placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][6], intersectionMap[3][7]));
+        }
     }
 
     @Override
@@ -270,26 +383,6 @@ public class GameMap implements IGameMap {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Helper method for getIntersectionFromHexes
-     *
-     * @param set Set of edges
-     *
-     * @return Set of intersections
-     *
-     * @author Mario Fokken
-     * @since 2021-03-15
-     */
-    private Set<IIntersection> getIntersectionFromEdges(Set<IEdge> set) {
-        Set<IIntersection> intersectionSet = new HashSet<>();
-        for (IEdge edge : set) {
-            for (IIntersection i : intersectionEdgeNetwork.incidentNodes(edge)) {
-                intersectionSet.add(i);
-            }
-        }
-        return intersectionSet;
     }
 
     /**
@@ -414,5 +507,25 @@ public class GameMap implements IGameMap {
             }
         }
         intersectionEdgeNetwork = intersectionEdgeNetworkBuilder.build();
+    }
+
+    /**
+     * Helper method for getIntersectionFromHexes
+     *
+     * @param set Set of edges
+     *
+     * @return Set of intersections
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
+     */
+    private Set<IIntersection> getIntersectionsFromEdges(Set<IEdge> set) {
+        Set<IIntersection> intersectionSet = new HashSet<>();
+        for (IEdge edge : set) {
+            for (IIntersection i : intersectionEdgeNetwork.incidentNodes(edge)) {
+                intersectionSet.add(i);
+            }
+        }
+        return intersectionSet;
     }
 }

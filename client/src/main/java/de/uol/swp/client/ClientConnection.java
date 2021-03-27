@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.common.MyObjectDecoder;
 import de.uol.swp.common.message.*;
+import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,6 +15,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -92,6 +94,8 @@ public class ClientConnection {
              .handler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  protected void initChannel(SocketChannel ch) {
+                     // Add IdleStateHandler to handle timeouts
+                     ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
                      // Add both Encoder and Decoder to send and receive serialisable objects
                      ch.pipeline().addLast(new ObjectEncoder());
                      ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
@@ -150,6 +154,21 @@ public class ClientConnection {
         for (ConnectionListener l : connectionListener) {
             l.exceptionOccurred(message.getMessage());
         }
+    }
+
+    /**
+     * Handles the reset of the current Client when timing out.
+     * <p>
+     * This method shuts down the old client when the Client has no active
+     * connection to the server anymore
+     *
+     * @author Marvin Drees
+     * @author Aldin Dervisi
+     * @see de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent
+     * @since 2021-03-18
+     */
+    public void resetClient() {
+        eventBus.post(new ClientDisconnectedFromServerEvent());
     }
 
     /**
@@ -233,6 +252,26 @@ public class ClientConnection {
         for (ConnectionListener l : connectionListener) {
             l.exceptionOccurred(message.getException());
         }
+    }
+
+    /**
+     * Handles a PingMessage found on the EventBus
+     * <p>
+     * If a PingMessage object is found on the EventBus, this method is called.
+     * It responds by posting a PongMessage on the EventBus.
+     *
+     * @param msg The PingMessage object found on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @see de.uol.swp.common.message.PingMessage
+     * @see de.uol.swp.common.message.PongMessage
+     * @since 2021-03-18
+     */
+    @Subscribe
+    private void onPingMessage(PingMessage msg) {
+        LOG.info("Server ping received.");
+        eventBus.post(new PongMessage());
     }
 
     /**

@@ -6,16 +6,24 @@ import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.message.DiceCastMessage;
+import de.uol.swp.common.game.message.GameCreatedMessage;
+import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
+import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
+import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
 import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.lobby.LobbyService;
@@ -239,21 +247,38 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a CreateGameMessage found on the EventBus
+     * Handles a CreateGameInternalRequest found on the EventBus
      * <p>
-     * If a CreateGameMessage is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to create a game.
+     * If a CreateGameInternalRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to create a game. Afterwards, it sets up
+     * the map of the game according to the settings of the lobby.
      *
-     * @param msg The CreateGameMessage found on the EventBus
+     * @param msg The CreateGameInternalRequest found on the EventBus
      *
-     * @see de.uol.swp.common.game.message.CreateGameMessage
+     * @see de.uol.swp.server.game.event.CreateGameInternalRequest
      * @since 2021-01-24
      */
     @Subscribe
-    private void onCreateGameMessage(CreateGameMessage msg) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameMessage for Lobby " + msg.getLobbyName());
+    private void onCreateGameInternalRequest(CreateGameInternalRequest msg) {
+        String lobbyName = msg.getLobby().getName();
+        if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameInternalRequest for Lobby " + lobbyName);
         try {
-            gameManagement.createGame(msg.getLobby(), msg.getFirst());
+            IGameMap gameMap = new GameMap();
+            IConfiguration configuration;
+            if (msg.getLobby().randomPlayfieldEnabled()) {
+                configuration = gameMap.getRandomisedConfiguration();
+            } else {
+                configuration = gameMap.getBeginnerConfiguration();
+            }
+            gameMap = gameMap.createMapFromConfiguration(configuration);
+            if (!msg.getLobby().startUpPhaseEnabled()) {
+                gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
+            } // TODO: handle founder phase
+            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
+            post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
+            StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
+                                                                  msg.getLobby().startUpPhaseEnabled());
+            lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
             ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
             exceptionMessage.initWithMessage(msg);
@@ -764,7 +789,7 @@ public class GameService extends AbstractService {
             //Robber things
             LOG.debug("---- Robber things");
         } else {
-            LOG.debug("---- Distributing the resources");
+            LOG.debug("---- Distributing the resources for token " + numberOfPips);
             game.distributeResources(numberOfPips);
         }
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
