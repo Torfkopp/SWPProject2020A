@@ -1,10 +1,13 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.lobby.LobbyManagement;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +30,9 @@ class GameTest {
         IGameManagement gm = new GameManagement(new LobbyManagement());
         User user = new UserDTO(99, "", "", "");
         Lobby lobby = new LobbyDTO("testLobby", user, false, 4, false, 60, true, true);
-        gm.createGame(lobby, user);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gm.createGame(lobby, user, gameMap);
         assertNotNull(gm.getGame("testLobby"));
         Map<String, Game> map = gm.getGames();
         assertEquals(1, map.size());
@@ -45,9 +50,11 @@ class GameTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        Game game = new Game(lobby, user[0]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        Game game = new Game(lobby, user[0], gameMap);
         //Lobby speichert Users alphabetisch. SMH mein Haupt
-        User[] u = game.getPlayers();
+        UserOrDummy[] u = game.getPlayers();
         assertEquals(user[0], u[0]);
         assertEquals(user[1], u[1]);
         assertEquals(user[2], u[2]);

@@ -1,7 +1,7 @@
 package de.uol.swp.server.game.event;
 
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
 
 /**
@@ -17,7 +17,7 @@ import de.uol.swp.server.message.AbstractServerInternalMessage;
  */
 public class GetUserSessionEvent extends AbstractServerInternalMessage {
 
-    private final User targetUser;
+    private final UserOrDummy targetUser;
     private final ResponseMessage responseMessage;
 
     /**
@@ -26,7 +26,7 @@ public class GetUserSessionEvent extends AbstractServerInternalMessage {
      * @param targetUser      User object of the targetUser
      * @param responseMessage Stored ResponseMessage
      */
-    public GetUserSessionEvent(User targetUser, ResponseMessage responseMessage) {
+    public GetUserSessionEvent(UserOrDummy targetUser, ResponseMessage responseMessage) {
         this.responseMessage = responseMessage;
         this.targetUser = targetUser;
     }
@@ -45,7 +45,7 @@ public class GetUserSessionEvent extends AbstractServerInternalMessage {
      *
      * @return A User-Object of the target User
      */
-    public User getTargetUser() {
+    public UserOrDummy getTargetUser() {
         return targetUser;
     }
 }

@@ -1,6 +1,6 @@
 package de.uol.swp.client.trade.event;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Event used to trigger the updating of the Trade with Bank Button status
@@ -16,7 +16,7 @@ import de.uol.swp.common.user.User;
  */
 public class TradeLobbyButtonUpdateEvent {
 
-    private final User user;
+    private final UserOrDummy user;
     private final String lobbyName;
 
     /**
@@ -25,7 +25,7 @@ public class TradeLobbyButtonUpdateEvent {
      * @param user      User that wants to update the button status
      * @param lobbyName The name of the lobby where the button should be disabled
      */
-    public TradeLobbyButtonUpdateEvent(User user, String lobbyName) {
+    public TradeLobbyButtonUpdateEvent(UserOrDummy user, String lobbyName) {
         this.user = user;
         this.lobbyName = lobbyName;
     }
@@ -44,7 +44,7 @@ public class TradeLobbyButtonUpdateEvent {
      *
      * @return The User who wants to update the button status
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }

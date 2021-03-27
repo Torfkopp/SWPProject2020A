@@ -128,24 +128,22 @@ public class GameRendering {
     /**
      * drawGameMap Method
      * <p>
-     * This method draws the game map represented in the given GameMapManagement on the given canvas
+     * This method draws the game map represented in the given IGameMap on the given canvas
      * This method is the only one that ever needs to be accessed from outside this interface.
      *
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param gameMap An IGameMap providing the game map to draw
      */
-    public void drawGameMap(IGameMap gameMapManagement) {
+    public void drawGameMap(IGameMap gameMap) {
         LOG.debug("Drawing Game map");
 
-        gfxCtx.setFill(Color.BLACK);
-        gfxCtx.fillRect(0, 0, width, height);
-
-        //Get hexes, intersections, and edges in a usable format from the gameMapManagement
-        IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
-        IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
+        //Get hexes, intersections, and edges in a usable format from the IGameMap
+        IGameHex[][] hexes = gameMap.getHexesAsJaggedArray();
+        IIntersection[][] intersections = gameMap.getIntersectionsAsJaggedArray();
 
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
-        drawIntersectionsAndEdges(intersections, gameMapManagement);
+        drawIntersectionsAndEdges(intersections, gameMap);
+        //TODO: make optional
         gfxCtx.setStroke(Color.RED);
         gfxCtx.setLineWidth(1);
         for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
@@ -310,12 +308,12 @@ public class GameRendering {
      * <p>
      * This Method draws the intersections and edges.
      *
-     * @param intersections     An array containing all intersections
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param intersections An array containing all intersections
+     * @param gameMap       An IGameMap providing the game map to draw
      */
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMapManagement) {
-        goThroughHalfMap(true, intersections, gameMapManagement);
-        goThroughHalfMap(false, intersections, gameMapManagement);
+    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMap) {
+        goThroughHalfMap(true, intersections, gameMap);
+        goThroughHalfMap(false, intersections, gameMap);
     }
 
     /**
@@ -427,12 +425,11 @@ public class GameRendering {
      * This methods is called by drawIntersectionsAndEdges to draw all intersections and edges in the top or bottom
      * half of the map.
      *
-     * @param topHalf           A boolean indicating which half of the map needs to be drawn on
-     * @param intersections     An array containing all intersections
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param topHalf       A boolean indicating which half of the map needs to be drawn on
+     * @param intersections An array containing all intersections
+     * @param gameMap       A IGameMap providing the game map to draw
      */
-    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMapManagement) {
-
+    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMap) {
         //Sets currentY depending on topHalf
         double currentY = ((topHalf) ? (hexHeight * (3.0 / 4.0)) :
                            ((effectiveHeight / 2) + (hexHeight / 4))) + OFFSET_Y;
@@ -443,12 +440,12 @@ public class GameRendering {
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * hexWidth;
             double currentX = OFFSET_X + rowStartX + hexWidth;
             if (topHalf) currentX += hexWidth / 2.0;
-            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMapManagement);
+            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMap);
 
             currentX = OFFSET_X + rowStartX + hexWidth;
             if (!topHalf) currentX += hexWidth / 2.0;
             currentY += (hexHeight / 4.0);
-            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMapManagement);
+            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMap);
             currentY += hexHeight / 2.0;
         }
     }
@@ -459,18 +456,18 @@ public class GameRendering {
      * This method is called by goThroughHalfMap to draw all intersections and optionally all edges in a given sub row.
      * Every Row is separated in to two sub row which have slightly different y-coordinates.
      *
-     * @param firstSubRow       Used to indicate which sub row should be accessed
-     * @param renderEdges       Used to indicate whether edges should be drawn
-     * @param currentX          The current x-coordinate
-     * @param currentY          The current y-coordinate
-     * @param intersections     An array containing all intersections in the current row
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param firstSubRow   Used to indicate which sub row should be accessed
+     * @param renderEdges   Used to indicate whether edges should be drawn
+     * @param currentX      The current x-coordinate
+     * @param currentY      The current y-coordinate
+     * @param intersections An array containing all intersections in the current row
+     * @param gameMap       An IGameMap providing the game map to draw
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IGameMap gameMapManagement) {
+                                 IIntersection[] intersections, IGameMap gameMap) {
         for (int x = firstSubRow ? 1 : 0; x < intersections.length; x = x + 2) {
             if (renderEdges) {
-                renderEdges(currentX, currentY, intersections[x], gameMapManagement);
+                renderEdges(currentX, currentY, intersections[x], gameMap);
             }
             renderIntersection(currentX, currentY, intersections[x]);
             currentX += hexWidth;
@@ -562,14 +559,13 @@ public class GameRendering {
      * <p>
      * This Method draws the 3 edges around an intersection at the given coordinates.
      *
-     * @param currentX          The current x-coordinate
-     * @param currentY          The current y-coordinate
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param currentX The current x-coordinate
+     * @param currentY The current y-coordinate
+     * @param gameMap  An IGameMap providing the game map to draw
      */
-    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMapManagement) {
-
+    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMap) {
         gfxCtx.setLineWidth(roadWidth);
-        for (IEdge edge : gameMapManagement.incidentEdges(intersection)) {
+        for (IEdge edge : gameMap.incidentEdges(intersection)) {
             //Northwest road
             if (edge.getOwner() == null) continue;
             if (edge.getOrientation() == IEdge.Orientation.WEST) {

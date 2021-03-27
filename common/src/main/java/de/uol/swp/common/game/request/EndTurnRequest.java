@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.request;
 
-import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Request sent to the server when a user wants to end his turn
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.User;
  */
 public class EndTurnRequest extends AbstractGameRequest {
 
-    private final User user;
+    private final UserOrDummy user;
 
     /**
      * Constructor
@@ -26,7 +26,7 @@ public class EndTurnRequest extends AbstractGameRequest {
      *
      * @since 2021-01-15
      */
-    public EndTurnRequest(User user, String originLobby) {
+    public EndTurnRequest(UserOrDummy user, String originLobby) {
         super(originLobby);
         this.user = user;
     }
@@ -36,7 +36,7 @@ public class EndTurnRequest extends AbstractGameRequest {
      *
      * @return The user of the EndTurnRequest
      */
-    public User getUser() {
+    public UserOrDummy getUser() {
         return user;
     }
 }
