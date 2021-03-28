@@ -1,6 +1,7 @@
 package de.uol.swp.client;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
@@ -49,6 +50,9 @@ public class GameRendering {
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     @Inject
     private static ResourceBundle resourceBundle;
+    @Inject
+    @Named("drawGrid")
+    private static boolean drawGrid;
 
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
@@ -143,7 +147,8 @@ public class GameRendering {
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
         drawIntersectionsAndEdges(intersections, gameMap);
-        //TODO: make optional
+
+        if (!drawGrid) return;
         gfxCtx.setStroke(Color.RED);
         gfxCtx.setLineWidth(1);
         for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)

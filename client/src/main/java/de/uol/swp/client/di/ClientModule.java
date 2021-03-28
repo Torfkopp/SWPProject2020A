@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
 import de.uol.swp.client.*;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
@@ -39,8 +40,9 @@ public class ClientModule extends AbstractModule {
         //Default Properties
         Properties defaultProps = new Properties();
 
-        //Default language
+        //Default settings
         defaultProps.setProperty("lang", "en_GB");
+        defaultProps.setProperty("draw_grid", "false");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -73,6 +75,8 @@ public class ClientModule extends AbstractModule {
                 locale = Locale.UK;
         }
 
+        final boolean drawGrid = Boolean.parseBoolean(properties.getProperty("draw_grid"));
+
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
 
@@ -85,6 +89,7 @@ public class ClientModule extends AbstractModule {
         bind(EventBus.class).toInstance(eventBus);
         bind(Properties.class).toInstance(properties);
         bind(ResourceBundle.class).toInstance(resourceBundle);
+        bindConstant().annotatedWith(Names.named("drawGrid")).to(drawGrid);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
