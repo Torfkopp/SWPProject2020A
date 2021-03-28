@@ -42,7 +42,7 @@ public class ClientModule extends AbstractModule {
 
         //Default settings
         defaultProps.setProperty("lang", "en_GB");
-        defaultProps.setProperty("draw_grid", "false");
+        defaultProps.setProperty("debug.draw_hitbox_grid", "false");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -78,8 +78,8 @@ public class ClientModule extends AbstractModule {
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
 
-        //Setting the drawGrid value
-        final boolean drawGrid = Boolean.parseBoolean(properties.getProperty("draw_grid"));
+        //Setting the drawHitboxGrid value
+        final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
 
         //DI stuff
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class).
@@ -90,7 +90,7 @@ public class ClientModule extends AbstractModule {
         bind(EventBus.class).toInstance(eventBus);
         bind(Properties.class).toInstance(properties);
         bind(ResourceBundle.class).toInstance(resourceBundle);
-        bindConstant().annotatedWith(Names.named("drawGrid")).to(drawGrid);
+        bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);

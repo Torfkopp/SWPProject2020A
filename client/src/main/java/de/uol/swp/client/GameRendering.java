@@ -51,8 +51,8 @@ public class GameRendering {
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
-    @Named("drawGrid")
-    private static boolean drawGrid;
+    @Named("drawHitboxGrid")
+    private static boolean drawHitboxGrid;
 
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
@@ -148,7 +148,19 @@ public class GameRendering {
         drawHexTiles(hexes);
         drawIntersectionsAndEdges(intersections, gameMap);
 
-        if (!drawGrid) return;
+        if (drawHitboxGrid) draw_hitbox_grid();
+    }
+
+    /**
+     * Helper method to draw a hitbox grid
+     * <p>
+     * This method draws a grid showing the hitboxes on the playing field.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-27
+     */
+    private void draw_hitbox_grid() {
         gfxCtx.setStroke(Color.RED);
         gfxCtx.setLineWidth(1);
         for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
