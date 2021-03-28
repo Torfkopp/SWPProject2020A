@@ -15,7 +15,6 @@ import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.message.RefreshCardAmountMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
@@ -260,7 +259,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         canvasResizeListener = (observable, oldValue, newValue) -> {
             double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
             double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
             double dimension = Math.min(heightValue, widthValue);
             gameMapCanvas.setHeight(dimension * hexFactor);
             gameMapCanvas.setWidth(dimension);
@@ -913,10 +912,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Handles the click on the ReturnToLobby-Button.
      *
+     * @author Finn Haase
+     * @author Steven Luong
      * @since 2021-03-22
      */
     @FXML
     private void onReturnToLobbyButtonPressed() {
+        inGame = false;
         lobbyService.returnToPreGameLobby(this.lobbyName);
     }
 
@@ -948,6 +950,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.preGameSettingBox.setMaxHeight(190);
             this.turnIndicator.setText("");
             this.preGameSettingBox.setMinHeight(190);
+            this.uniqueCardView.setMaxHeight(0);
+            this.uniqueCardView.setMinHeight(0);
+            this.uniqueCardView.setPrefHeight(0);
+            this.uniqueCardView.setVisible(false);
             this.inventoryView.setMaxHeight(0);
             this.inventoryView.setMinHeight(0);
             this.inventoryView.setPrefHeight(0);
@@ -1018,7 +1024,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onStartSessionMessage(StartSessionMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
-        inGame = true; //inGame = false where victor is announced
+        inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
             this.preGameSettingBox.setVisible(false);
@@ -1459,7 +1465,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             listener = (observable, oldValue, newValue) -> {
                 double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
                 double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
                 double dimension = Math.min(heightValue, widthValue);
                 gameMapCanvas.setHeight((dimension * hexFactor) - 40);
                 gameMapCanvas.setWidth(dimension);
@@ -1478,7 +1484,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             listener = (observable, oldValue, newValue) -> {
                 double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
                 double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
                 double dimension = Math.min(heightValue, widthValue);
                 gameMapCanvas.setHeight(dimension * hexFactor);
                 gameMapCanvas.setWidth(dimension);
