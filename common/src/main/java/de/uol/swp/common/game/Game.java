@@ -4,7 +4,9 @@ import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Triple;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -244,5 +246,24 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
+    }
+
+    /**
+     * Gets a list of triples consisting of the UserOrDummy, the amount of
+     * resource cards they have, and the amount of development cards they have
+     *
+     * @return List of Triples of UserOrDummy, Integer, Integer
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @see de.uol.swp.common.util.Triple
+     * @since 2021-03-27
+     */
+    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmounts() {
+        List<Triple<UserOrDummy, Integer, Integer>> list = new ArrayList<>();
+        for (UserOrDummy u : lobby.getUserOrDummies()) {
+            list.add(new Triple<>(u, players.get(u).getResourceAmount(), players.get(u).getAmountOfDevelopmentCards()));
+        }
+        return list;
     }
 }
