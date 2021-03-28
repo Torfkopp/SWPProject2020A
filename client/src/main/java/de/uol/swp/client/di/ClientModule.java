@@ -75,10 +75,11 @@ public class ClientModule extends AbstractModule {
                 locale = Locale.UK;
         }
 
-        final boolean drawGrid = Boolean.parseBoolean(properties.getProperty("draw_grid"));
-
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
+
+        //Setting the drawGrid value
+        final boolean drawGrid = Boolean.parseBoolean(properties.getProperty("draw_grid"));
 
         //DI stuff
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class).
