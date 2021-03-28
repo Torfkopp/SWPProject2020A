@@ -173,6 +173,19 @@ public class Inventory {
     }
 
     /**
+     * Gets the amount of Development Cards the user has in his inventory
+     *
+     * @return The amount of Development Cards
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @since 2021-03-27
+     */
+    public int getAmountOfDevelopmentCards() {
+        return getYearOfPlentyCards() + getMonopolyCards() + getKnightCards() + getVictoryPointCards() + getRoadBuildingCards();
+    }
+
+    /**
      * Gets the amount of Road Building Cards a player has in their inventory
      *
      * @return The amount of Road Building Cards

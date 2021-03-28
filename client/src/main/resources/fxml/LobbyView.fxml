@@ -7,16 +7,18 @@
 <GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
           fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <columnConstraints>
-        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
         <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
     </columnConstraints>
     <rowConstraints>
         <RowConstraints percentHeight="100.0" vgrow="ALWAYS"/>
     </rowConstraints>
-    <VBox maxWidth="250.0" spacing="10.0" GridPane.vgrow="ALWAYS">
-        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" spacing="5.0" VBox.vgrow="ALWAYS">
+    <VBox maxWidth="400.0" spacing="10.0" GridPane.vgrow="ALWAYS">
+        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="380.0" spacing="5.0" VBox.vgrow="ALWAYS">
             <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0"/>
+            <ListView fx:id="uniqueCardView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
+                      visible="false"/>
             <ListView fx:id="chatView" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
             <TextField fx:id="messageField" onAction="#onEnter">
                 <VBox.margin>
