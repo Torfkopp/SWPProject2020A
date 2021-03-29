@@ -1,5 +1,7 @@
 package de.uol.swp.common.util;
 
+import java.io.Serializable;
+
 /**
  * Class for a Tuple with 3 different types
  *
@@ -10,7 +12,7 @@ package de.uol.swp.common.util;
  * @author Temmo Junkhoff
  * @since 2021-03-19
  */
-public class Triple<T1, T2, T3> {
+public class Triple<T1, T2, T3> implements Serializable {
 
     private final T1 value1;
     private final T2 value2;

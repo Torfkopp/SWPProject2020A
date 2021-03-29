@@ -14,9 +14,7 @@ import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
-import de.uol.swp.common.game.message.DiceCastMessage;
-import de.uol.swp.common.game.message.GameCreatedMessage;
-import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
@@ -234,6 +232,10 @@ public class GameService extends AbstractService {
             returnMessage.initWithMessage(req);
             LOG.debug("Sending a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
             post(returnMessage);
+            ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getOfferingUser(),
+                                                             game.getCardAmounts());
+            LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         } else {
             ResponseMessage returnMessage = new InvalidTradeOfUsersResponse(req.getOriginLobby(),
                                                                             req.getRespondingUser());
@@ -276,6 +278,10 @@ public class GameService extends AbstractService {
                 returnMessage.initWithMessage(req);
                 LOG.debug("Sending a BuyDevelopmentCardResponse for Lobby " + req.getOriginLobby());
                 post(returnMessage);
+                ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(),
+                                                                 game.getCardAmounts());
+                LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+                lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
                                                                                         .getUsername() + "couldnt buy a development Card");
         }
@@ -418,6 +424,9 @@ public class GameService extends AbstractService {
                                                                     Collections.unmodifiableMap(armyAndRoadMap));
         LOG.debug("Sending GetUserSessionEvent containing UpdateInventoryResponse");
         post(new GetUserSessionEvent(req.getUser(), returnMessage));
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -591,6 +600,9 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         LOG.debug("Sending a PlayCardSuccessResponse");
         post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -674,6 +686,9 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         LOG.debug("Sending a PlayCardSuccessResponse");
         post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -720,6 +735,9 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         LOG.debug("Sending a PlayCardSuccessResponse");
         post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -801,6 +819,9 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         LOG.debug("Sending a PlayCardSuccessResponse");
         post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -861,6 +882,9 @@ public class GameService extends AbstractService {
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
         LOG.debug("Sending DiceCastMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -981,7 +1005,8 @@ public class GameService extends AbstractService {
     private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest req) {
         if (LOG.isDebugEnabled())
             LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
-        Inventory inventory = gameManagement.getGame(req.getOriginLobby()).getInventory(req.getUser());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
         Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
@@ -1043,6 +1068,9 @@ public class GameService extends AbstractService {
                                                                        respondingResourcesWrapperMap);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -1065,7 +1093,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onUpdateInventoryRequest(UpdateInventoryRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received UpdateInventoryRequest for Lobby " + req.getOriginLobby());
-        Inventory inventory = gameManagement.getGame(req.getOriginLobby()).getInventory(req.getUser());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
         resourceMap.put("cards.victorypoints", inventory.getVictoryPointCards());
@@ -1084,6 +1113,9 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         LOG.debug("Sending UpdateInventoryResponse for Lobby " + req.getOriginLobby());
         post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**

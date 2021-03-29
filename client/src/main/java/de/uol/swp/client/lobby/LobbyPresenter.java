@@ -27,6 +27,7 @@ import de.uol.swp.common.message.RequestMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
+import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -66,13 +67,14 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int LOBBY_HEIGHT_PRE_GAME = 700;
-    public static final int LOBBY_WIDTH_PRE_GAME = 535;
+    public static final int LOBBY_WIDTH_PRE_GAME = 685;
     public static final int LOBBY_HEIGHT_IN_GAME = 740;
-    public static final int LOBBY_WIDTH_IN_GAME = 1285;
+    public static final int LOBBY_WIDTH_IN_GAME = 1435;
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
     private ObservableList<UserOrDummy> lobbyMembers;
+    private ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     private ObservableList<Pair<String, String>> resourceList;
     private UserOrDummy owner;
     private Set<UserOrDummy> readyUsers;
@@ -80,6 +82,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private Integer dice2;
     @FXML
     private ListView<UserOrDummy> membersView;
+    @FXML
+    private ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -129,6 +133,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private int moveTime;
     private GameRendering gameRendering;
     private Window window;
+    private List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
+    private boolean inGame;
     private ChangeListener<Number> canvasResizeListener;
 
     /**
@@ -168,6 +174,20 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                             name = String.format(resourceBundle.getString("lobby.members.ready"), name);
                         if (user.equals(owner))
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
+                        if (inGame) {
+                            if (cardAmountTripleList == null) {
+                                cardAmountTripleList = new ArrayList<>();
+                                // At the start of the game, nobody has any cards, so add 0s for each user
+                                for (UserOrDummy u : lobbyMembers) cardAmountTripleList.add(new Triple<>(u, 0, 0));
+                            }
+                            for (Triple<UserOrDummy, Integer, Integer> triple : cardAmountTripleList) {
+                                if (triple.getValue1().equals(user)) {
+                                    name = String.format(resourceBundle.getString("lobby.members.amount"), name,
+                                                         triple.getValue2(), triple.getValue3());
+                                    break;
+                                }
+                            }
+                        }
                         setText(name);
                         //if the background should be in colour you need to use setBackground
                         int i = lobbyMembers.size();
@@ -205,6 +225,23 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
                         .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
             }
         });
+        uniqueCardView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Triple<String, UserOrDummy, Integer> uniqueCardTriple, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(uniqueCardTriple, empty);
+                    if (empty || uniqueCardTriple == null) setText("");
+                    else {
+                        UserOrDummy value2 = uniqueCardTriple.getValue2();
+                        String who;
+                        if (value2 == null) who = resourceBundle.getString("game.resources.whohas.nobody");
+                        else who = value2.getUsername();
+                        setText(String.format(resourceBundle.getString(uniqueCardTriple.getValue1()), who,
+                                              uniqueCardTriple.getValue3()));
+                    }
+                });
+            }
+        });
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Pair<String, String> item, boolean empty) {
@@ -221,7 +258,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         canvasResizeListener = (observable, oldValue, newValue) -> {
             double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
             double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
             double dimension = Math.min(heightValue, widthValue);
             gameMapCanvas.setHeight(dimension * hexFactor);
             gameMapCanvas.setWidth(dimension);
@@ -232,6 +269,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             gameRendering.drawGameMap(gameMap);
             if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
         };
+        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
+        if (uniqueCardList == null) {
+            uniqueCardList = FXCollections.observableArrayList();
+            uniqueCardView.setItems(uniqueCardList);
+        }
+        uniqueCardList.add(new Triple<>("game.resources.whohas.largestarmy", null, 0));
+        uniqueCardList.add(new Triple<>("game.resources.whohas.longestroad", null, 0));
         LOG.debug("LobbyPresenter initialised");
     }
 
@@ -934,10 +978,13 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     /**
      * Handles the click on the ReturnToLobby-Button.
      *
+     * @author Finn Haase
+     * @author Steven Luong
      * @since 2021-03-22
      */
     @FXML
     private void onReturnToLobbyButtonPressed() {
+        inGame = false;
         lobbyService.returnToPreGameLobby(this.lobbyName);
     }
 
@@ -969,6 +1016,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.preGameSettingBox.setMaxHeight(190);
             this.turnIndicator.setText("");
             this.preGameSettingBox.setMinHeight(190);
+            this.uniqueCardView.setMaxHeight(0);
+            this.uniqueCardView.setMinHeight(0);
+            this.uniqueCardView.setPrefHeight(0);
+            this.uniqueCardView.setVisible(false);
             this.inventoryView.setMaxHeight(0);
             this.inventoryView.setMinHeight(0);
             this.inventoryView.setPrefHeight(0);
@@ -1039,6 +1090,8 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
     private void onStartSessionMessage(StartSessionMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received StartSessionMessage for Lobby " + this.lobbyName);
+        inGame = true;
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
             this.preGameSettingBox.setVisible(false);
             this.preGameSettingBox.setPrefHeight(0);
@@ -1063,6 +1116,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.inventoryView.setMinHeight(280);
             this.inventoryView.setPrefHeight(280);
             this.inventoryView.setVisible(true);
+            this.uniqueCardView.setMaxHeight(48);
+            this.uniqueCardView.setMinHeight(48);
+            this.uniqueCardView.setPrefHeight(48);
+            this.uniqueCardView.setVisible(true);
             this.readyCheckBox.setVisible(false);
             this.startSession.setVisible(false);
             this.rollDice.setVisible(true);
@@ -1077,6 +1134,28 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             this.playCard.setVisible(true);
             this.playCard.setDisable(true);
         });
+    }
+
+    /**
+     * Handles a RefreshCardAmountMessage found on the EventBus
+     * <p>
+     * If a RefreshCardAmountMessage is found on the EventBus, this method
+     * stores the contained cardAmountTripleList in the class attribute and
+     * then calls the LobbyService to refresh the member list (which will
+     * then contain the new card amounts).
+     *
+     * @param msg The RefreshCardAmountMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @see de.uol.swp.common.game.message.RefreshCardAmountMessage
+     * @since 2021-03-27
+     */
+    @Subscribe
+    private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        cardAmountTripleList = msg.getCardAmountTriples();
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
 
     /**
@@ -1453,7 +1532,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             listener = (observable, oldValue, newValue) -> {
                 double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
                 double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
                 double dimension = Math.min(heightValue, widthValue);
                 gameMapCanvas.setHeight((dimension * hexFactor) - 40);
                 gameMapCanvas.setWidth(dimension);
@@ -1472,7 +1551,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             listener = (observable, oldValue, newValue) -> {
                 double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
                 double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
+                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
                 double dimension = Math.min(heightValue, widthValue);
                 gameMapCanvas.setHeight(dimension * hexFactor);
                 gameMapCanvas.setWidth(dimension);
