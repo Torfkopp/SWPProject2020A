@@ -11,6 +11,7 @@ import java.util.*;
 
 import static de.uol.swp.common.game.map.IIntersection.IntersectionState.CITY;
 import static de.uol.swp.common.game.map.IIntersection.IntersectionState.SETTLEMENT;
+import static de.uol.swp.common.game.map.MapPoint.*;
 
 /**
  * Management of the gameMap
@@ -24,7 +25,7 @@ public class GameMap implements IGameMap {
 
     //Map mapping the player and his settlements/cities
     private final Map<Player, List<MapPoint>> playerSettlementsAndCities = new HashMap<>();
-    MapPoint robberPosition = new MapPoint(3, 3);
+    private MapPoint robberPosition = HexMapPoint(3, 3);
     private GameHexWrapper[][] hexMap;
     private IIntersection[][] intersectionMap;
     private ImmutableNetwork<GameHexWrapper, IEdge> hexEdgeNetwork;
@@ -89,9 +90,15 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public IEdge edgeConnectingIntersections(IIntersection intersection1, IIntersection intersection2) {
-        if (intersection1 == null || intersection2 == null) return null;
-        return intersectionEdgeNetwork.edgeConnectingOrNull(intersection1, intersection2);
+    public IEdge getEdge(MapPoint position) {
+        if (position.getType() != MapPoint.Type.EDGE) return null;
+        if (position.getL().getType() == MapPoint.Type.INTERSECTION && position.getR()
+                                                                               .getType() == MapPoint.Type.INTERSECTION)
+            return intersectionEdgeNetwork
+                    .edgeConnectingOrNull(getIntersection(position.getL()), getIntersection(position.getR()));
+        else if (position.getL().getType() == MapPoint.Type.HEX && position.getR().getType() == MapPoint.Type.HEX)
+            return hexEdgeNetwork.edgeConnectingOrNull(getHexWrapper(position.getL()), getHexWrapper(position.getR()));
+        return null;
     }
 
     @Override
@@ -164,7 +171,8 @@ public class GameMap implements IGameMap {
 
     @Override
     public IGameHex getHex(MapPoint position) {
-        return hexMap[position.getY()][position.getX()].get();
+        GameHexWrapper returnValue = getHexWrapper(position);
+        return returnValue == null ? null : returnValue.get();
     }
 
     @Override
@@ -174,25 +182,25 @@ public class GameMap implements IGameMap {
         MapPoint m;
         //Checks ResourceHexes with y=1 and y=5
         for (int i = 1; i < 4; i++) {
-            m = new MapPoint(1, i);
+            m = HexMapPoint(1, i);
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
-            m = new MapPoint(5, i);
+            m = HexMapPoint(5, i);
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
         }
         //Checks ResourceHexes with y=2 and y=4
         for (int i = 1; i < 5; i++) {
-            m = new MapPoint(2, i);
+            m = HexMapPoint(2, i);
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
-            m = new MapPoint(4, i);
+            m = HexMapPoint(4, i);
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
         }
         //Checks ResourceHexes with y=3
         for (int i : new int[]{1, 2, 4, 5}) {
-            m = new MapPoint(3, i);
+            m = HexMapPoint(3, i);
             hex = (ResourceHex) getHex(m);
             if (hex.getToken() == token) mapPoints.add(m);
         }
@@ -213,7 +221,8 @@ public class GameMap implements IGameMap {
 
     @Override
     public IIntersection getIntersection(MapPoint position) {
-        return intersectionMap[position.getY()][position.getX()];
+        return position.getType() == MapPoint.Type.INTERSECTION ? intersectionMap[position.getY()][position.getX()] :
+               null;
     }
 
     @Override
@@ -300,24 +309,26 @@ public class GameMap implements IGameMap {
         intersectionMap[3][8].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
 
         //Create roads
-        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[1][3], intersectionMap[1][4]));
-        placeRoad(Player.PLAYER_1, edgeConnectingIntersections(intersectionMap[3][2], intersectionMap[3][3]));
-        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[1][5], intersectionMap[1][6]));
-        placeRoad(Player.PLAYER_2, edgeConnectingIntersections(intersectionMap[4][4], intersectionMap[4][5]));
-        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[3][8], intersectionMap[2][8]));
-        placeRoad(Player.PLAYER_3, edgeConnectingIntersections(intersectionMap[2][2], intersectionMap[2][3]));
+        placeRoad(Player.PLAYER_1, getEdge(EdgeMapPoint(IntersectionMapPoint(1, 3), IntersectionMapPoint(1, 4))));
+        placeRoad(Player.PLAYER_1, getEdge(EdgeMapPoint(IntersectionMapPoint(3, 2), IntersectionMapPoint(3, 3))));
+        placeRoad(Player.PLAYER_2, getEdge(EdgeMapPoint(IntersectionMapPoint(1, 5), IntersectionMapPoint(1, 6))));
+        placeRoad(Player.PLAYER_2, getEdge(EdgeMapPoint(IntersectionMapPoint(4, 4), IntersectionMapPoint(4, 5))));
+        placeRoad(Player.PLAYER_3, getEdge(EdgeMapPoint(IntersectionMapPoint(3, 8), IntersectionMapPoint(2, 8))));
+        placeRoad(Player.PLAYER_3, getEdge(EdgeMapPoint(IntersectionMapPoint(2, 2), IntersectionMapPoint(2, 3))));
 
         // For 4 players, create more settlements and roads
         if (playerCount == 4) {
             intersectionMap[4][2].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
             intersectionMap[4][6].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
-            placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][2], intersectionMap[4][3]));
-            placeRoad(Player.PLAYER_4, edgeConnectingIntersections(intersectionMap[4][6], intersectionMap[3][7]));
+            placeRoad(Player.PLAYER_4, getEdge(EdgeMapPoint(IntersectionMapPoint(4, 2), IntersectionMapPoint(4, 3))));
+            placeRoad(Player.PLAYER_4, getEdge(EdgeMapPoint(IntersectionMapPoint(4, 6), IntersectionMapPoint(3, 7))));
         }
     }
 
     @Override
     public void moveRobber(MapPoint newPosition) {
+        if (newPosition.getType() != MapPoint.Type.HEX)
+            throw new IllegalArgumentException("The robber can only move to a hex");
         hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
         robberPosition = newPosition;
         hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
@@ -334,6 +345,7 @@ public class GameMap implements IGameMap {
 
     @Override
     public boolean placeSettlement(Player player, MapPoint position) {
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         if (settlementPlaceable(player, position)) {
             if (!playerSettlementsAndCities.containsKey(player))
                 playerSettlementsAndCities.put(player, new ArrayList<>());
@@ -363,6 +375,7 @@ public class GameMap implements IGameMap {
     public boolean settlementPlaceable(Player player, MapPoint position) {
         boolean hasRoad = false;
         boolean neighbouringIntersectionsFree = true;
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         for (IEdge edge : intersectionEdgeNetwork.incidentEdges(intersectionMap[position.getY()][position.getX()])) {
             if (edge.getOwner() == player) hasRoad = true;
         }
@@ -376,6 +389,7 @@ public class GameMap implements IGameMap {
 
     @Override
     public boolean upgradeSettlement(Player player, MapPoint position) {
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         if (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
                 .getY()][position.getX()].getOwner() == player) {
             intersectionMap[position.getY()][position.getX()]
@@ -383,6 +397,32 @@ public class GameMap implements IGameMap {
             return true;
         }
         return false;
+    }
+
+    void setHex(MapPoint position, IGameHex newHex) {
+        if (position.getType() != MapPoint.Type.HEX)
+            throw new IllegalArgumentException("MapPoint should point to a hex");
+        hexMap[position.getY()][position.getX()].set(newHex);
+    }
+
+    /**
+     * Helper method for getIntersectionFromHexes
+     *
+     * @param set Set of edges
+     *
+     * @return Set of intersections
+     *
+     * @author Mario Fokken
+     * @since 2021-03-15
+     */
+    private Set<IIntersection> getIntersectionFromEdges(Set<IEdge> set) {
+        Set<IIntersection> intersectionSet = new HashSet<>();
+        for (IEdge edge : set) {
+            for (IIntersection i : intersectionEdgeNetwork.incidentNodes(edge)) {
+                intersectionSet.add(i);
+            }
+        }
+        return intersectionSet;
     }
 
     /**
@@ -507,6 +547,21 @@ public class GameMap implements IGameMap {
             }
         }
         intersectionEdgeNetwork = intersectionEdgeNetworkBuilder.build();
+    }
+
+    /**
+     * Helper method to get the GameHexWrapper of a Hex instead of the IGameHex
+     *
+     * @param position The MapPoint of the Hex
+     *
+     * @return GameHexWrapper containing the Hex, or null
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-23
+     */
+    private GameHexWrapper getHexWrapper(MapPoint position) {
+        return position.getType() == MapPoint.Type.HEX ? hexMap[position.getY()][position.getX()] : null;
     }
 
     /**

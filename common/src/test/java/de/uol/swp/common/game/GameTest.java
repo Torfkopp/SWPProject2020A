@@ -10,6 +10,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.List;
 
+import static de.uol.swp.common.game.map.MapPoint.IntersectionMapPoint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -102,10 +103,10 @@ public class GameTest {
         assertEquals(Player.PLAYER_1, player);
         //Player has nothing
         assertEquals(0, game.calculateVictoryPoints(player));
-        game.getMap().placeSettlement(player, new MapPoint(0, 0));
+        game.getMap().placeSettlement(player, IntersectionMapPoint(0, 0));
         //Player has a settlement
         assertEquals(1, game.calculateVictoryPoints(player));
-        game.getMap().upgradeSettlement(player, new MapPoint(0, 0));
+        game.getMap().upgradeSettlement(player, IntersectionMapPoint(0, 0));
         //Player has a city
         assertEquals(2, game.calculateVictoryPoints(player));
         game.getInventory(player).setVictoryPointCards(3);
@@ -117,7 +118,7 @@ public class GameTest {
         game.getInventory(player).setLargestArmy(true);
         //Player has a city, 3 point cards, longest road, and the largest army
         assertEquals(9, game.calculateVictoryPoints(player));
-        game.getMap().placeSettlement(player, new MapPoint(2, 5));
+        game.getMap().placeSettlement(player, IntersectionMapPoint(2, 5));
         //Player has a city, a settlement, 3 point cards, longest road, and the largest army
         assertEquals(10, game.calculateVictoryPoints(player));
     }

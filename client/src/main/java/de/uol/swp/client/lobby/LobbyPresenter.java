@@ -10,9 +10,7 @@ import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
@@ -33,13 +31,13 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -53,6 +51,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.function.UnaryOperator;
+
+import static de.uol.swp.common.game.map.MapPoint.Type.*;
 
 /**
  * Manages the lobby's menu
@@ -188,6 +188,10 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             }
         });
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                return;
+            }
             String name = newValue.getUsername();
             boolean isSelf = newValue.equals(this.loggedInUser);
             kickUserButton.setDisable(isSelf);
@@ -309,7 +313,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         if (msg.getName().equals(super.lobbyName)) super.onSystemMessageForPlayingCardsMessage(msg);
     }
 
-    public void onEnter(ActionEvent actionEvent) {
+    public void onEnter() {
         super.onSendMessageButtonPressed();
     }
 
@@ -377,9 +381,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
         this.owner = rsp.getOwner();
-        this.readyUsers = rsp.getReadyUsers();
-        updateUsersList(rsp.getUsers());
+        if (this.readyUsers == null) this.readyUsers = new HashSet<>();
+        this.readyUsers.clear();
+        this.readyUsers.addAll(rsp.getReadyUsers());
         Platform.runLater(() -> {
+            updateUsersList(rsp.getUsers());
             setStartSessionButtonState();
             setKickUserButtonState();
             setPreGameSettings();
@@ -597,6 +603,44 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
         this.moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), this.moveTime));
         this.moveTimeTextfield.setText(String.valueOf(this.moveTime));
         setPreGameSettings();
+    }
+
+    /**
+     * Handles a click on the gameMapCanvas
+     * <p>
+     * This method calls on the GameRendering to map the x,y coordinates of the
+     * mouse click to the proper element located in that location, e.g. a Hex.
+     *
+     * @param mouseEvent The Event produced by the mouse clicking on the Canvas
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.GameRendering#coordinatesToHex(double, double)
+     * @since 2021-03-14
+     */
+    @FXML
+    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
+        MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
+        if (mapPoint.getType() == INVALID) {
+            System.out.println("INVALID");
+        } else if (mapPoint.getType() == HEX) {
+            System.out.println("HEX");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == INTERSECTION) {
+            System.out.println("INTERSECTION");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == EDGE) {
+            System.out.println("EDGE");
+            System.out.println("left:");
+            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
+            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
+            System.out.println("right:");
+            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
+            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
+        }
     }
 
     /**
@@ -1318,6 +1362,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
             setStartSessionButtonState();
             setPreGameSettings();
         });
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
 
     /**
@@ -1488,7 +1533,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * The button is only enabled to the active player when the
      * obligatory part of the turn is done.
      *
-     * @param player
+     * @param player The User whose turn it is currently
      *
      * @author Alwin Bossert
      * @author Mario Fokken
@@ -1521,7 +1566,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * Helper function that sets the disable state of the PlayCardButton
      * The button is only enabled to the active player
      *
-     * @param player
+     * @param player The User whose turn it currently is
      *
      * @author Mario Fokken
      * @since 2021-02-25
@@ -1587,7 +1632,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
-     * @param player
+     * @param player The User whose turn it is currently
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
@@ -1603,7 +1648,7 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * <p>
      * The button is only visible if the logged in user is the player.
      *
-     * @param player
+     * @param player The User whose turn it is currently
      *
      * @author Finn Haase
      * @author Maximilian Lindner
@@ -1649,13 +1694,11 @@ public class LobbyPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-05
      */
     private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        Platform.runLater(() -> {
-            if (lobbyMembers == null) {
-                lobbyMembers = FXCollections.observableArrayList();
-                membersView.setItems(lobbyMembers);
-            }
-            lobbyMembers.clear();
-            lobbyMembers.addAll(userLobbyList);
-        });
+        if (lobbyMembers == null) {
+            lobbyMembers = FXCollections.observableArrayList();
+            membersView.setItems(lobbyMembers);
+        }
+        lobbyMembers.clear();
+        lobbyMembers.addAll(userLobbyList);
     }
 }

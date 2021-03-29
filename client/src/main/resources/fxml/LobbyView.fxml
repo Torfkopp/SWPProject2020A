@@ -45,7 +45,7 @@
         <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                 minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
                 text="%game.won.button.returnPreLobby" visible="false"/>
-        <Canvas fx:id="gameMapCanvas"/>
+        <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas"/>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
