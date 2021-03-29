@@ -186,11 +186,11 @@ public class GameServiceTest {
         int victoryPointCards = 0;
         List<String> bankInventory = game.getBankInventory();
         for (String value : bankInventory) {
-            if (value.equals("knightCard")) knightCards++;
-            if (value.equals("roadBuildingCard")) roadBuildingCards++;
-            if (value.equals("yearOfPlentyCard")) yearOfPlentyCards++;
-            if (value.equals("monopolyCard")) monopolyCards++;
-            if (value.equals("victoryPointCard")) victoryPointCards++;
+            if (value.equals("game.resources.cards.knight")) knightCards++;
+            if (value.equals("game.resources.cards.roadbuilding")) roadBuildingCards++;
+            if (value.equals("game.resources.cards.yearofplenty")) yearOfPlentyCards++;
+            if (value.equals("game.resources.cards.monopoly")) monopolyCards++;
+            if (value.equals("game.resources.cards.victorypoints")) victoryPointCards++;
         }
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
@@ -208,11 +208,11 @@ public class GameServiceTest {
         int newBankVictoryPointCards = 0;
         List<String> newBankInventory = game1.getBankInventory();
         for (String s : newBankInventory) {
-            if (s.equals("knightCard")) newBankKnightCards++;
-            if (s.equals("roadBuildingCard")) newBankRoadBuildingCards++;
-            if (s.equals("yearOfPlentyCard")) newBankYearOfPlentyCards++;
-            if (s.equals("monopolyCard")) newBankMonopolyCards++;
-            if (s.equals("victoryPointCard")) newBankVictoryPointCards++;
+            if (s.equals("game.resources.cards.knight")) newBankKnightCards++;
+            if (s.equals("game.resources.cards.roadbuilding")) newBankRoadBuildingCards++;
+            if (s.equals("game.resources.cards.yearofplenty")) newBankYearOfPlentyCards++;
+            if (s.equals("game.resources.cards.monopoly")) newBankMonopolyCards++;
+            if (s.equals("game.resources.cards.victorypoints")) newBankVictoryPointCards++;
         }
         assertTrue(
                 ((newBankKnightCards == knightCards - 1) || (newBankMonopolyCards == monopolyCards - 1) || (newBankVictoryPointCards == victoryPointCards - 1) || (newBankYearOfPlentyCards == yearOfPlentyCards - 1) || (newBankRoadBuildingCards == roadBuildingCards - 1)));
@@ -449,6 +449,7 @@ public class GameServiceTest {
                                                                                                         "testlobby",
                                                                                                         "wool",
                                                                                                         "brick");
+
         bus.post(updateInventoryAfterTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getAllInventories();
