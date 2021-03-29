@@ -109,10 +109,22 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void startSession(String lobbyName, User user) {
+        Message startSessionRequest = new StartSessionRequest(lobbyName, user);
+        eventBus.post(startSessionRequest);
+    }
+
+    @Override
     public void removeFromLobbies(User user) {
         LOG.debug("Sending RemoveFromLobbiesRequest");
         Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
         eventBus.post(removeFromLobbiesRequest);
+    }
+
+    @Override
+    public void kickUser(String lobbyName, User loggedInUser, User userToKick) {
+        Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick);
+        eventBus.post(kickUserRequest);
     }
 
     @Override
@@ -156,5 +168,11 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
+    }
+
+    @Override
+    public void userReady(String lobbyName, User loggedInUser, boolean isReady) {
+        Message userReadyRequest = new UserReadyRequest(lobbyName, loggedInUser, isReady);
+        eventBus.post(userReadyRequest);
     }
 }

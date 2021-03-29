@@ -118,6 +118,18 @@ public interface ILobbyService {
     void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby);
 
     /**
+     * Posts a request to start the game session
+     *
+     * @param lobbyName The name of the lobby where the session should be started.
+     * @param user      The user who wants to start the session.
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    void startSession(String lobbyName, User user);
+
+    /**
      * Posts a request to remove the user from all lobbies
      *
      * @param user The logged in user
@@ -126,6 +138,19 @@ public interface ILobbyService {
      * @since 2021-01-28
      */
     void removeFromLobbies(User user);
+
+    /**
+     * Posts a request to kick a user
+     *
+     * @param lobbyName    The name of the lobby the user should be kicked out.
+     * @param loggedInUser The user who wants to kick another user.
+     * @param userToKick   The user who should be kicked.
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    void kickUser(String lobbyName, User loggedInUser, User userToKick);
 
     /**
      * Posts a request to retrieve all lobby names
@@ -196,4 +221,17 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
+
+    /**
+     * Posts a request to change the ready status of a user
+     *
+     * @param lobbyName    The name of the lobby the user wants to change his ready status in.
+     * @param loggedInUser The user who wants to change his ready status.
+     * @param isReady      The ready status the user wants to change to.
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    void userReady(String lobbyName, User loggedInUser, boolean isReady);
 }

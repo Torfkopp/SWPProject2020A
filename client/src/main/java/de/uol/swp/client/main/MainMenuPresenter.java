@@ -127,10 +127,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (!rsp.isLobbyChatMessage()) super.onSystemMessageResponse(rsp);
     }
 
-    public void onEnter() {
-        super.onSendMessageButtonPressed();
-    }
-
     /**
      * Helper function to log out the user
      * <p>
