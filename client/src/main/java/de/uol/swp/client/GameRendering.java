@@ -6,9 +6,12 @@ import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
 import de.uol.swp.common.game.map.*;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -143,12 +146,40 @@ public class GameRendering {
         //Get hexes, intersections, and edges in a usable format from the IGameMap
         IGameHex[][] hexes = gameMap.getHexesAsJaggedArray();
         IIntersection[][] intersections = gameMap.getIntersectionsAsJaggedArray();
-
+        clearGameMap();
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
         drawIntersectionsAndEdges(intersections, gameMap);
 
-        if (drawHitboxGrid) draw_hitbox_grid();
+        if (drawHitboxGrid) drawHitboxGrid();
+    }
+
+    /**
+     * Helper method to clear the gamemap
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-29
+     */
+    public void clearGameMap() {
+        gfxCtx.clearRect(0, 0, width, height);
+    }
+
+    /**
+     * Shows a winner notification on the canvas
+     *
+     * @param text The text to display
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
+     */
+    public void showWinnerText(String text) {
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        clearGameMap();
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.setFont(Font.font(25));
+        gfxCtx.fillText(text, width / 2.0, height / 2.0);
     }
 
     /**
@@ -160,7 +191,7 @@ public class GameRendering {
      * @author Phillip-André Suhr
      * @since 2021-03-27
      */
-    private void draw_hitbox_grid() {
+    private void drawHitboxGrid() {
         gfxCtx.setStroke(Color.RED);
         gfxCtx.setLineWidth(1);
         for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
