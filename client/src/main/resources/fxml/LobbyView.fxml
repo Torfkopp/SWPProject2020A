@@ -4,19 +4,22 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
+<?import javafx.scene.text.Font?>
+<GridPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <columnConstraints>
-        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
         <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
     </columnConstraints>
     <rowConstraints>
         <RowConstraints percentHeight="100.0" vgrow="ALWAYS"/>
     </rowConstraints>
-    <VBox maxWidth="250.0" spacing="10.0" GridPane.vgrow="ALWAYS">
-        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" spacing="5.0" VBox.vgrow="ALWAYS">
+    <VBox maxWidth="400.0" spacing="10.0" GridPane.vgrow="ALWAYS">
+        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="380.0" spacing="5.0" VBox.vgrow="ALWAYS">
             <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0"/>
+            <ListView fx:id="uniqueCardView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
+                      visible="false"/>
             <ListView fx:id="chatView" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
             <TextField fx:id="messageField" onAction="#onSendMessageButtonPressed">
                 <VBox.margin>
@@ -40,14 +43,17 @@
             <Insets topRightBottomLeft="10.0"/>
         </padding>
     </VBox>
-    <HBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
-        <Canvas fx:id="gameMapCanvas"/>
+    <VBox alignment="TOP_CENTER" spacing="10" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
+                text="%game.won.button.returnPreLobby" visible="false"/>
+        <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas"/>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
-    </HBox>
+    </VBox>
     <VBox prefWidth="250.0" spacing="10.0" GridPane.columnIndex="2">
-        <VBox fx:id="preGameSettingBox" spacing="10.0">
+        <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="190" spacing="10.0">
             <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"/>
             <HBox spacing="5.0">
                 <TextField fx:id="moveTimeTextField" prefHeight="25.0" prefWidth="80.0"/>
@@ -95,7 +101,11 @@
                     text="%lobby.game.buttons.startsession"/>
         </HBox>
         <Label fx:id="turnIndicator" maxHeight="30.0" maxWidth="-Infinity" minHeight="30.0" minWidth="-Infinity"
-               prefWidth="230.0"/>
+               prefWidth="230.0" wrapText="true">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
         <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
                 prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.rolldice" visible="false"/>
         <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"

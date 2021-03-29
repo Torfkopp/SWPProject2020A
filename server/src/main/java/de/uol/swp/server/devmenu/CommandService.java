@@ -11,7 +11,8 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
@@ -462,11 +463,20 @@ public class CommandService extends AbstractService {
             if (args.get(i).equals("§null") || args.get(i).equals("§n")) argList.add(null);
             else switch (parameters[i].getName()) {
                 case "de.uol.swp.common.user.User":
+                case "de.uol.swp.common.user.UserOrDummy":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
                         if (currentUser.isPresent()) argList.add(currentUser.get());
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
+                        else {
+                            // Dummy
+                            // Dummies aren't saved anywhere, so we parse the integer at the end of the name
+                            // and use the cloning constructor to recreate one
+                            StringBuilder x = new StringBuilder();
+                            for (Character c : args.get(i).toCharArray()) if (Character.isDigit(c)) x.append(c);
+                            argList.add(new DummyDTO(Integer.parseInt(x.toString())));
+                        }
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
@@ -496,12 +506,6 @@ public class CommandService extends AbstractService {
                     Class<?> valueCls = (Class<?>) mapType.getActualTypeArguments()[1];
                     Map<Object, Object> map = parseMap(arr, keyCls.getName(), valueCls.getName());
                     argList.add(map);
-                }
-                break;
-                case "de.uol.swp.common.game.map.MapPoint": { //format: y,x
-                    List<String> tokens = lexCommand(args.get(i), ",");
-                    argList.add(tokens.size() < 1 ? null :
-                                new MapPoint(Integer.parseInt(tokens.get(0)), Integer.parseInt(tokens.get(1))));
                 }
                 break;
                 case "de.uol.swp.common.I18nWrapper": { //format: attributeName!replacementString

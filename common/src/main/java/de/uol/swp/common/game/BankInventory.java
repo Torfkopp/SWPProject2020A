@@ -57,19 +57,19 @@ public class BankInventory {
     public List<String> getDevelopmentCards() {
         developmentCards = new ArrayList<>();
         for (int i = 0; i < knightCards; i++) {
-            developmentCards.add("knightCard");
+            developmentCards.add("game.resources.cards.knight");
         }
         for (int i = 0; i < roadBuildingCards; i++) {
-            developmentCards.add("roadBuildingCard");
+            developmentCards.add("game.resources.cards.roadbuilding");
         }
         for (int i = 0; i < yearOfPlentyCards; i++) {
-            developmentCards.add("yearOfPlentyCard");
+            developmentCards.add("game.resources.cards.yearofplenty");
         }
         for (int i = 0; i < monopolyCards; i++) {
-            developmentCards.add("monopolyCard");
+            developmentCards.add("game.resources.cards.monopoly");
         }
         for (int i = 0; i < victoryPointCards; i++) {
-            developmentCards.add("victoryPointCard");
+            developmentCards.add("game.resources.cards.victorypoints");
         }
         return developmentCards;
     }

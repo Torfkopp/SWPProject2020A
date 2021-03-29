@@ -1,17 +1,16 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.List;
 
+import static de.uol.swp.common.game.map.MapPoint.IntersectionMapPoint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -28,7 +27,28 @@ public class GameTest {
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
     static final Lobby lobby = new LobbyDTO("Read the Manga", user, true, 4, false, 60, false, false);
-    static Game game = new Game(lobby, user);
+    static IGameMap gameMap;
+    static Game game;
+
+    @BeforeEach
+    protected void setUp() {
+        gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameMap.makeBeginnerSettlementsAndRoads(4);
+        lobby.joinUser(user2);
+        lobby.joinUser(user3);
+        lobby.joinUser(user4);
+        game = new Game(lobby, user, gameMap);
+    }
+
+    @AfterEach
+    protected void tearDown() {
+        gameMap = null;
+        game = null;
+        lobby.leaveUser(user2);
+        lobby.leaveUser(user3);
+        lobby.leaveUser(user4);
+    }
 
     /**
      * Tests if the bankInventory gets created properly when a game is created
@@ -43,19 +63,16 @@ public class GameTest {
      */
     @Test
     void bankInventoryCheck() {
-        String knightCard = "knightCard";
-        String roadBuildingCard = "roadBuildingCard";
-        String yearOfPlentyCard = "yearOfPlentyCard";
-        String monopolyCard = "monopolyCard";
-        String victoryPointCard = "victoryPointCard";
+        String knightCard = "game.resources.cards.knight";
+        String roadBuildingCard = "game.resources.cards.roadbuilding";
+        String yearOfPlentyCard = "game.resources.cards.yearofplenty";
+        String monopolyCard = "game.resources.cards.monopoly";
+        String victoryPointCard = "game.resources.cards.victorypoints";
         int victoryPointCardAmount = 0;
         int monopolyCardAmount = 0;
         int yearOfPlentyCardAmount = 0;
         int roadBuildingCardAmount = 0;
         int knightCardAmount = 0;
-        lobby.joinUser(user2);
-        lobby.joinUser(user3);
-        game = new Game(lobby, user);
         List<String> bankInventory = game.getBankInventory();
         for (String s : bankInventory) {
             if (s.equals(knightCard)) knightCardAmount++;
@@ -82,15 +99,14 @@ public class GameTest {
     @Test
     @Disabled("This definitely works, trust me!")
     void calculateVictoryPointsTest() {
-        game.getMap().createBeginnerMap();
         Player player = Player.PLAYER_1;
         assertEquals(Player.PLAYER_1, player);
         //Player has nothing
         assertEquals(0, game.calculateVictoryPoints(player));
-        game.getMap().placeSettlement(player, new MapPoint(0, 0));
+        game.getMap().placeSettlement(player, IntersectionMapPoint(0, 0));
         //Player has a settlement
         assertEquals(1, game.calculateVictoryPoints(player));
-        game.getMap().upgradeSettlement(player, new MapPoint(0, 0));
+        game.getMap().upgradeSettlement(player, IntersectionMapPoint(0, 0));
         //Player has a city
         assertEquals(2, game.calculateVictoryPoints(player));
         game.getInventory(player).setVictoryPointCards(3);
@@ -102,16 +118,13 @@ public class GameTest {
         game.getInventory(player).setLargestArmy(true);
         //Player has a city, 3 point cards, longest road, and the largest army
         assertEquals(9, game.calculateVictoryPoints(player));
-        game.getMap().placeSettlement(player, new MapPoint(2, 5));
+        game.getMap().placeSettlement(player, IntersectionMapPoint(2, 5));
         //Player has a city, a settlement, 3 point cards, longest road, and the largest army
         assertEquals(10, game.calculateVictoryPoints(player));
     }
 
     @Test
     void nextPlayerTest() {
-        lobby.joinUser(user2);
-        lobby.joinUser(user3);
-        game = new Game(lobby, user);
         UserOrDummy[] players = game.getPlayers();
         //Tests if the players are in correct order
         //Ordered by ID
@@ -136,10 +149,6 @@ public class GameTest {
 
     @Test
     void distributesResourceTest() {
-        lobby.joinUser(user2);
-        lobby.joinUser(user3);
-        lobby.joinUser(user4);
-        game = new Game(lobby, user);
         //Testing a hex
         game.distributeResources(6);
         assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());

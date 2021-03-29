@@ -1,6 +1,7 @@
 package de.uol.swp.client;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
@@ -13,16 +14,16 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ResourceBundle;
 
+import static de.uol.swp.common.game.map.MapPoint.*;
+
 /**
  * GameRendering Class
  * <p>
- * Class that can be used to draw a game map on a canvas.
- * This provides one public method drawGameMap that can be called
- * to draw a given game map on a canvas given to the constructor on instantiation.
+ * This class handles the rendering of the game board, the dice, and maps
+ * x,y coordinates to their MapPoint pendant.
  *
  * @author Timo Gerken
  * @author Temmo Junkhoff
- * @implNote No methods of this interface need to be implemented
  * @see de.uol.swp.common.game.map.GameMap
  * @see javafx.scene.canvas.Canvas
  * @since 2021-01-31
@@ -46,15 +47,17 @@ public class GameRendering {
     private static final Color MOUNTAINS_COLOUR = Color.DARKGREY;
     private static final Color FIELDS_COLOUR = Color.rgb(240, 215, 103);
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
+    private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     @Inject
     private static ResourceBundle resourceBundle;
+    @Inject
+    @Named("drawHitboxGrid")
+    private static boolean drawHitboxGrid;
 
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
-    private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth;
+    private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
     private final GraphicsContext gfxCtx;
-
-    Logger LOG = LogManager.getLogger(GameRendering.class);
 
     /**
      * Constructor
@@ -62,19 +65,21 @@ public class GameRendering {
      * @param canvas The canvas that should be drawn on
      */
     public GameRendering(Canvas canvas) {
-        double WIDTH_FACTOR = (Math.sqrt(3) / 2);
+        double WIDTH_FACTOR = Math.sqrt(3) / 2;
         double HEX_HEIGHT_FACTOR = 1.0 / 5.5;
         double HEX_WIDTH_FACTOR = HEX_HEIGHT_FACTOR * WIDTH_FACTOR;
 
         this.gfxCtx = canvas.getGraphicsContext2D();
-        double width = canvas.getWidth(), height = canvas.getHeight() - OFFSET_Y * 2;
+        this.width = canvas.getWidth();
+        this.height = canvas.getHeight();
+        double height = this.height - OFFSET_Y * 2;
         //Sets an effectiveHeight depending on the height and width of the game map
         this.effectiveHeight = (HEX_WIDTH_FACTOR * height * 7 < width) ? height :
-                               (width - OFFSET_X * 2.0) / (7 * HEX_HEIGHT_FACTOR * (Math.sqrt(3) / 2));
+                               (width - OFFSET_X * 2.0) / (7 * HEX_HEIGHT_FACTOR * WIDTH_FACTOR);
 
-        this.effectiveWidth = (Math.sqrt(3) / 2) * effectiveHeight;
+        this.effectiveWidth = WIDTH_FACTOR * effectiveHeight;
         this.hexHeight = 1.0 / 5.5 * effectiveHeight;
-        this.hexWidth = (Math.sqrt(3) / 2) * hexHeight;
+        this.hexWidth = WIDTH_FACTOR * hexHeight;
         this.settlementSize = hexHeight / 4.0;
         this.citySize = settlementSize * 1.25;
         this.roadWidth = settlementSize / 2.0;
@@ -83,6 +88,27 @@ public class GameRendering {
         this.diceSize = effectiveHeight / 12.0;
         this.diceLineWidth = diceSize / 16.0;
         this.diceDotSize = diceSize / 4.0;
+    }
+
+    /**
+     * coordinatesToHex method
+     * <p>
+     * This method maps x,y coordinates on the game canvas to the Hex, Edge,
+     * or Intersection that is located in that position.
+     *
+     * @param x The x coordinate on the canvas
+     * @param y The y coordinate on the canvas
+     *
+     * @return MapPoint representing the element located at the provided x,y position
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-23
+     */
+    public MapPoint coordinatesToHex(double x, double y) {
+        int row = (int) Math.floor((y - OFFSET_Y) / (hexHeight / 8));
+        int col = (int) Math.floor((x - OFFSET_X) / (hexWidth / 8));
+        return rowColCoordinatesToMapPoint(row, col);
     }
 
     /**
@@ -106,21 +132,42 @@ public class GameRendering {
     /**
      * drawGameMap Method
      * <p>
-     * This method draws the game map represented in the given GameMapManagement on the given canvas
+     * This method draws the game map represented in the given IGameMap on the given canvas
      * This method is the only one that ever needs to be accessed from outside this interface.
      *
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param gameMap An IGameMap providing the game map to draw
      */
-    public void drawGameMap(IGameMap gameMapManagement) {
+    public void drawGameMap(IGameMap gameMap) {
         LOG.debug("Drawing Game map");
 
-        //Get hexes, intersections, and edges in a usable format from the gameMapManagement
-        IGameHex[][] hexes = gameMapManagement.getHexesAsJaggedArray();
-        IIntersection[][] intersections = gameMapManagement.getIntersectionsAsJaggedArray();
+        //Get hexes, intersections, and edges in a usable format from the IGameMap
+        IGameHex[][] hexes = gameMap.getHexesAsJaggedArray();
+        IIntersection[][] intersections = gameMap.getIntersectionsAsJaggedArray();
 
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
-        drawIntersectionsAndEdges(intersections, gameMapManagement);
+        drawIntersectionsAndEdges(intersections, gameMap);
+
+        if (drawHitboxGrid) draw_hitbox_grid();
+    }
+
+    /**
+     * Helper method to draw a hitbox grid
+     * <p>
+     * This method draws a grid showing the hitboxes on the playing field.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-27
+     */
+    private void draw_hitbox_grid() {
+        gfxCtx.setStroke(Color.RED);
+        gfxCtx.setLineWidth(1);
+        for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
+            gfxCtx.strokeLine(0, cy, width, cy);
+
+        for (double cx = OFFSET_X; cx < width; cx += hexWidth / 8)
+            gfxCtx.strokeLine(cx, 0, cx, height);
     }
 
     /**
@@ -278,12 +325,12 @@ public class GameRendering {
      * <p>
      * This Method draws the intersections and edges.
      *
-     * @param intersections     An array containing all intersections
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param intersections An array containing all intersections
+     * @param gameMap       An IGameMap providing the game map to draw
      */
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMapManagement) {
-        goThroughHalfMap(true, intersections, gameMapManagement);
-        goThroughHalfMap(false, intersections, gameMapManagement);
+    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMap) {
+        goThroughHalfMap(true, intersections, gameMap);
+        goThroughHalfMap(false, intersections, gameMap);
     }
 
     /**
@@ -337,6 +384,36 @@ public class GameRendering {
     }
 
     /**
+     * getHexesInRow method
+     * <p>
+     * This method returns the amount of Hexes contained in the y row.
+     *
+     * @param y The row for which to return the Hex count
+     *
+     * @return The amount of Hexes in this row
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-14
+     */
+    private int getHexesInRow(int y) {
+        switch (y) {
+            case 0:
+            case 6:
+                return 4;
+            case 1:
+            case 5:
+                return 5;
+            case 2:
+            case 4:
+                return 6;
+            case 3:
+            default:
+                return 7;
+        }
+    }
+
+    /**
      * getPlayerColour method
      * <p>
      * This method gets the colour of the indicated player.
@@ -365,12 +442,11 @@ public class GameRendering {
      * This methods is called by drawIntersectionsAndEdges to draw all intersections and edges in the top or bottom
      * half of the map.
      *
-     * @param topHalf           A boolean indicating which half of the map needs to be drawn on
-     * @param intersections     An array containing all intersections
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param topHalf       A boolean indicating which half of the map needs to be drawn on
+     * @param intersections An array containing all intersections
+     * @param gameMap       A IGameMap providing the game map to draw
      */
-    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMapManagement) {
-
+    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMap) {
         //Sets currentY depending on topHalf
         double currentY = ((topHalf) ? (hexHeight * (3.0 / 4.0)) :
                            ((effectiveHeight / 2) + (hexHeight / 4))) + OFFSET_Y;
@@ -381,12 +457,12 @@ public class GameRendering {
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * hexWidth;
             double currentX = OFFSET_X + rowStartX + hexWidth;
             if (topHalf) currentX += hexWidth / 2.0;
-            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMapManagement);
+            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMap);
 
             currentX = OFFSET_X + rowStartX + hexWidth;
             if (!topHalf) currentX += hexWidth / 2.0;
             currentY += (hexHeight / 4.0);
-            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMapManagement);
+            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMap);
             currentY += hexHeight / 2.0;
         }
     }
@@ -397,22 +473,44 @@ public class GameRendering {
      * This method is called by goThroughHalfMap to draw all intersections and optionally all edges in a given sub row.
      * Every Row is separated in to two sub row which have slightly different y-coordinates.
      *
-     * @param firstSubRow       Used to indicate which sub row should be accessed
-     * @param renderEdges       Used to indicate whether edges should be drawn
-     * @param currentX          The current x-coordinate
-     * @param currentY          The current y-coordinate
-     * @param intersections     An array containing all intersections in the current row
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param firstSubRow   Used to indicate which sub row should be accessed
+     * @param renderEdges   Used to indicate whether edges should be drawn
+     * @param currentX      The current x-coordinate
+     * @param currentY      The current y-coordinate
+     * @param intersections An array containing all intersections in the current row
+     * @param gameMap       An IGameMap providing the game map to draw
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IGameMap gameMapManagement) {
+                                 IIntersection[] intersections, IGameMap gameMap) {
         for (int x = firstSubRow ? 1 : 0; x < intersections.length; x = x + 2) {
             if (renderEdges) {
-                renderEdges(currentX, currentY, intersections[x], gameMapManagement);
+                renderEdges(currentX, currentY, intersections[x], gameMap);
             }
             renderIntersection(currentX, currentY, intersections[x]);
             currentX += hexWidth;
         }
+    }
+
+    /**
+     * horizontalEdgeToMapPoint method
+     * <p>
+     * This method maps a row, column coordinate for a horizontal Edge to
+     * the neighbouring Hexes and returns an EdgeMapPoint defined by those
+     * hexes.
+     *
+     * @param row The row in which this Edge is located
+     * @param col The column in which this Edge is located
+     *
+     * @return MapPoint representing the Edge
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-18
+     */
+    private MapPoint horizontalEdgeToMapPoint(int row, int col) {
+        MapPoint left = rowColCoordinatesToMapPoint(row, col - 3);
+        MapPoint right = rowColCoordinatesToMapPoint(row, col + 3);
+        return EdgeMapPoint(left, right);
     }
 
     /**
@@ -478,14 +576,13 @@ public class GameRendering {
      * <p>
      * This Method draws the 3 edges around an intersection at the given coordinates.
      *
-     * @param currentX          The current x-coordinate
-     * @param currentY          The current y-coordinate
-     * @param gameMapManagement A GameMapManagement providing the game map to draw
+     * @param currentX The current x-coordinate
+     * @param currentY The current y-coordinate
+     * @param gameMap  An IGameMap providing the game map to draw
      */
-    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMapManagement) {
-
+    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMap) {
         gfxCtx.setLineWidth(roadWidth);
-        for (IEdge edge : gameMapManagement.incidentEdges(intersection)) {
+        for (IEdge edge : gameMap.incidentEdges(intersection)) {
             //Northwest road
             if (edge.getOwner() == null) continue;
             if (edge.getOrientation() == IEdge.Orientation.WEST) {
@@ -555,6 +652,189 @@ public class GameRendering {
     }
 
     /**
+     * rowColCoordinatesToMapPoint method
+     * <p>
+     * This method takes a pair of row and column coordinates and returns
+     * a MapPoint representing the element located at that location.
+     *
+     * @param row The row location to map to a MapPoint
+     * @param col The column location to map to a MapPoint
+     *
+     * @return MapPoint representing the element in the row, col location
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-14
+     */
+    private MapPoint rowColCoordinatesToMapPoint(int row, int col) {
+        int col8 = col % 8;
+        int hexY = row / 6;
+        int hexX;
+        int rawCol = col;
+        boolean lowerHalf = hexY > 3;
+
+        col = col - (((7 - getHexesInRow(hexY)) / 2) * 8); // left align all rows
+        if (row == 0 || row == 1) { // first row
+            return InvalidMapPoint();
+        } else if (row == 42 || row == 43) { // last row // check if rows are correct
+            return InvalidMapPoint();
+        } else if ((row % 12) < 6) {// indented hex rows (0, 2, 4, 6)
+            if (col < 4 + 1 || col > (getHexesInRow(hexY) * 8) + 4 - 1) return InvalidMapPoint();
+            switch (row % 6) {
+                case 0:
+                    // 0th partial row of an indented hex row
+                    // (contains peaks of the current hex row and part of basement of the unindented row above this oene)
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            // "peak" intersection of indented row hex
+                            hexX = (((col - 5) / 8) * 2) - 1;
+                            if (lowerHalf) hexX++;
+                            return IntersectionMapPoint(hexY - 1, hexX);
+                        case 1:
+                        case 2:
+                        case 5:
+                        case 6:
+                            //edge (righthand downslope road from ^ )
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        case 3:
+                        case 4:
+                            //hex in the unindented row above (above "trough" intersection between indented row hexes)
+                            hexY = hexY - 1;
+                            hexX = (col - 5) / 8;
+                            if (lowerHalf) hexX++;
+                            return HexMapPoint(hexY, hexX);
+                    }
+                case 1:
+                    // 1st partial row of a hex row
+                    // (contains troughs of previous hex row and part of ceiling of current hex row)
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            // part of ceiling of current hex row
+                            hexX = (col - 5) / 8;
+                            return HexMapPoint(hexY, hexX);
+                        case 1:
+                        case 2:
+                        case 5:
+                        case 6:
+                            //edge
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        case 3:
+                        case 4:
+                            // trough intersection between indented row hexes
+                            hexX = (((col - 5) / 8) * 2);
+                            if (lowerHalf) hexX++;
+                            return IntersectionMapPoint(hexY - 1, hexX);
+                    }
+                case 2:
+                    // 2nd partial row of a hex row
+                    // (contains top left and top right intersections of a hex and hex itself)
+                    if (col8 == 3 || col8 == 4) {
+                        // one of the intersections bordering the hex
+                        hexX = (((col - 5) / 8) * 2);
+                        if (lowerHalf) hexX++;
+                        return IntersectionMapPoint(hexY - 1, hexX);
+                    } else {
+                        hexX = (col - 5) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+                case 3:
+                case 4:
+                    // 3rd and 4th partials rows of a hex row
+                    // (contains bordering edges of a hex and hex itself)
+                    if (col8 == 3 || col8 == 4) {
+                        // bordering edge
+                        return horizontalEdgeToMapPoint(row, rawCol);
+                    } else {
+                        hexX = (col - 5) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+                case 5:
+                    // 5th partial row of a hex row
+                    // (contains bottom left and bottom right intersections of a hex and hex itself)
+                    if (col8 == 3 || col8 == 4) {
+                        // on of the intersections bordering the hex
+                        hexX = (((col - 5) / 8) * 2) + 1;
+                        if (lowerHalf) hexX--;
+                        return IntersectionMapPoint(hexY, hexX);
+                    } else {
+                        // Hex
+                        hexX = (col - 5) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+            }
+        } else {
+            // unindented hex rows (1, 3, 5, 7)
+            if (col < 1 || col > (getHexesInRow(hexY) * 8) - 1) return InvalidMapPoint();
+            switch (row % 6) {
+                case 0:
+                    switch (col8) {
+                        case 0: // part of hex left above
+                        case 7: // part of hex right above
+                            hexY = hexY - 1;
+                            hexX = (col - 1) / 8;
+                            if (lowerHalf) hexX++;
+                            return HexMapPoint(hexY, hexX);
+                        case 1: // upward edge to peak intersection of hex
+                        case 2: // upward edge to peak intersection of hex
+                        case 5: // downward edge from peak intersection of hex
+                        case 6: // downward edge from peak intersection of hex
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        case 3: // peak intersection
+                        case 4: // peak intersection
+                            hexX = (((col - 1) / 8) * 2) - 1;
+                            if (lowerHalf) hexX++;
+                            return IntersectionMapPoint(hexY - 1, hexX);
+                    }
+                case 1:
+                    switch (col8) {
+                        case 0:
+                        case 7:
+                            // top right or top left intersection of hex
+                            hexX = ((col - 1) / 8) * 2;
+                            if (lowerHalf) hexX++;  // (((((((hexX++)++)--)++)--)--)++)
+                            return IntersectionMapPoint(hexY - 1, hexX);
+                        case 1:
+                        case 2:
+                        case 5:
+                        case 6:
+                            // upward edge towards peak
+                            return verticalEdgeToMapPoint(row, rawCol);
+                        case 3:
+                        case 4:
+                            // part of ceiling of current hex
+                            hexX = (col - 1) / 8;
+                            if (lowerHalf) hexX--;
+                            return HexMapPoint(hexY, hexX);
+                    }
+                case 3:
+                case 4:
+                    if (col8 == 7 || col8 == 0) {
+                        // Edge
+                        return horizontalEdgeToMapPoint(row, rawCol);
+                    } else {
+                        hexX = (col - 1) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+                case 2:
+                    if (lowerHalf) hexY--;
+                case 5:
+                    if (col8 == 7 || col8 == 0) {
+                        // peak intersection
+                        hexX = ((col - 1) / 8) * 2;
+                        if (lowerHalf && row % 6 == 2) hexX++;
+                        return IntersectionMapPoint(hexY, hexX);
+                    } else {
+                        hexX = (col - 1) / 8;
+                        return HexMapPoint(hexY, hexX);
+                    }
+            }
+        }
+        return InvalidMapPoint();
+    }
+
+    /**
      * setHexColour Method
      * <p>
      * This method sets the colour according to a hex tile.
@@ -597,5 +877,27 @@ public class GameRendering {
                 return false;
         }
         return true;
+    }
+
+    /**
+     * verticalEdgeToMapPoint method
+     * <p>
+     * This method maps a row, column coordinate for a vertical Edge to
+     * the neighbouring Hexes and returns an EdgeMapPoint defined by those
+     * hexes.
+     *
+     * @param row The row in which this Edge is located
+     * @param col The column in which this Edge is located
+     *
+     * @return MapPoint representing the Edge
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-18
+     */
+    private MapPoint verticalEdgeToMapPoint(int row, int col) {
+        MapPoint left = rowColCoordinatesToMapPoint(row - 2, col);
+        MapPoint right = rowColCoordinatesToMapPoint(row + 2, col);
+        return EdgeMapPoint(left, right);
     }
 }

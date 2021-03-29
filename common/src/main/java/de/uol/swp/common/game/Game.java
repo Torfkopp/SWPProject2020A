@@ -1,10 +1,12 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Triple;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,11 +27,13 @@ public class Game {
     /**
      * Constructor
      *
-     * @param lobby The lobby the game is taking place in
-     * @param first The first player
+     * @param lobby   The lobby the game is taking place in
+     * @param first   The first player
+     * @param gameMap The IGameMap the game will be using
      */
-    public Game(Lobby lobby, UserOrDummy first) {
+    public Game(Lobby lobby, UserOrDummy first, IGameMap gameMap) {
         this.lobby = lobby;
+        this.map = gameMap;
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
@@ -38,8 +42,6 @@ public class Game {
             }
         }
         activePlayer = first;
-        map = new GameMap();
-        map.createBeginnerMap();
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
     }
@@ -107,7 +109,7 @@ public class Game {
             if (mapPoint.equals(map.getRobberPosition())) return;
             ResourceHex hex = (ResourceHex) map.getHex(mapPoint);
             //Checks every intersection around the hex
-            for (IIntersection i : map.getIntersectionFromHex(mapPoint)) {
+            for (IIntersection i : map.getIntersectionsFromHex(mapPoint)) {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
                 if (i.getOwner() != null) {
@@ -191,7 +193,7 @@ public class Game {
     /**
      * Gets this game's map
      *
-     * @return The IGameMapManagement this game is using
+     * @return The IGameMap this game is using
      */
     public IGameMap getMap() {
         return map;
@@ -244,5 +246,24 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
+    }
+
+    /**
+     * Gets a list of triples consisting of the UserOrDummy, the amount of
+     * resource cards they have, and the amount of development cards they have
+     *
+     * @return List of Triples of UserOrDummy, Integer, Integer
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @see de.uol.swp.common.util.Triple
+     * @since 2021-03-27
+     */
+    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmounts() {
+        List<Triple<UserOrDummy, Integer, Integer>> list = new ArrayList<>();
+        for (UserOrDummy u : lobby.getUserOrDummies()) {
+            list.add(new Triple<>(u, players.get(u).getResourceAmount(), players.get(u).getAmountOfDevelopmentCards()));
+        }
+        return list;
     }
 }

@@ -4,10 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
-import de.uol.swp.common.game.request.RollDiceRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
@@ -40,6 +38,12 @@ public class LobbyService implements ILobbyService {
         LOG.debug("LobbyService started");
         this.eventBus = eventBus;
         this.eventBus.register(this);
+    }
+
+    @Override
+    public void checkVictoryPoints(String lobbyName, User user) {
+        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
+        eventBus.post(msg);
     }
 
     @Override
@@ -135,6 +139,13 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby " + lobbyName);
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
+    }
+
+    @Override
+    public void returnToPreGameLobby(String lobbyName) {
+        LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby " + lobbyName);
+        Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
+        eventBus.post(returnToPreGameLobbyRequest);
     }
 
     @Override
