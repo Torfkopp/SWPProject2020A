@@ -5,10 +5,9 @@ import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
-import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
-import de.uol.swp.common.chat.message.EditedChatMessageMessage;
+import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
@@ -300,6 +299,94 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
         } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) LOG.debug("Received SystemMessageResponse");
         Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+    }
+
+    /**
+     * Handles new incoming SystemMessageForTradeMessage
+     * <p>
+     * If a SystemMessageForTradeMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageForTradeMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeMessage for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param msg The SystemMessageForTradeMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.message.SystemMessageForTradeMessage
+     * @since 2021-03-23
+     */
+    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        }
+    }
+
+    /**
+     * Handles new incoming SystemMessageForTradeWithBankMessage
+     * <p>
+     * If a SystemMessageForTradeWithBankMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageForTradeWithBankMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeWithBankMessage for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param msg The SystemMessageForTradeWithBankMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage
+     * @since 2021-03-23
+     */
+    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
+        if (msg.getName().equals(this.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        }
+    }
+
+    /**
+     * Handles an incoming SystemMessageForTradeWithBankResponse
+     * <p>
+     * If a SystemMessageForTradeWithBankResponse is posted onto the EventBus, this method
+     * places the incoming SystemMessageForTradeWithBankResponse into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeWithBankResponse for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param rsp The SystemMessageForTradeWithBankResponse found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse
+     * @since 2021-03-25
+     */
+    protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
+        if (rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + rsp.getLobbyName());
+            Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+        }
+    }
+
+    /**
+     * Handles new incoming SystemMessageForPlayingCardsMessage
+     * <p>
+     * If a SystemMessageForPlayingCardsMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageForPlayingCardsMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageForPlayingCardsMessage for Lobby
+     * {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param msg The SystemMessageForPlayingCardsMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
+     * @since 2021-03-23
+     */
+    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        }
     }
 
     /**

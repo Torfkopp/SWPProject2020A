@@ -62,11 +62,11 @@ public class GameTest {
      */
     @Test
     void bankInventoryCheck() {
-        String knightCard = "knightCard";
-        String roadBuildingCard = "roadBuildingCard";
-        String yearOfPlentyCard = "yearOfPlentyCard";
-        String monopolyCard = "monopolyCard";
-        String victoryPointCard = "victoryPointCard";
+        String knightCard = "game.resources.cards.knight";
+        String roadBuildingCard = "game.resources.cards.roadbuilding";
+        String yearOfPlentyCard = "game.resources.cards.yearofplenty";
+        String monopolyCard = "game.resources.cards.monopoly";
+        String victoryPointCard = "game.resources.cards.victorypoints";
         int victoryPointCardAmount = 0;
         int monopolyCardAmount = 0;
         int yearOfPlentyCardAmount = 0;
