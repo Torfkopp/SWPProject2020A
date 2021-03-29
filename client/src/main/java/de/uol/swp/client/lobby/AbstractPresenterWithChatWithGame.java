@@ -156,8 +156,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
         if (gameWon) {
             gameRendering.showWinnerText(Objects.equals(winner, loggedInUser) ?
-                                         String.format(resourceBundle.getString("game.won.info"), winner) :
-                                         resourceBundle.getString("game.won.you"));
+                                         resourceBundle.getString("game.won.you") :
+                                         String.format(resourceBundle.getString("game.won.info"), winner));
         } else {
             if (gameMap != null)
                 // gameMap exists, so redraw map to fit the new canvas dimensions
