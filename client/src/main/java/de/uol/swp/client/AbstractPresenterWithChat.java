@@ -326,6 +326,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.common.chat.message.SystemMessageForTradeMessage
      * @since 2021-03-23
      */
+    @Subscribe
     protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getName());
@@ -348,6 +349,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage
      * @since 2021-03-23
      */
+    @Subscribe
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
         if (msg.getName().equals(this.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
             LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getName());
@@ -370,6 +372,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse
      * @since 2021-03-25
      */
+    @Subscribe
     protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
         if (rsp.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + rsp.getLobbyName());
@@ -392,6 +395,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
      * @since 2021-03-23
      */
+    @Subscribe
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());

@@ -3,16 +3,6 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.chat.message.*;
-import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
-import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.game.map.*;
-import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.request.TradeWithBankRequest;
-import de.uol.swp.common.game.request.TradeWithUserRequest;
-import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -21,34 +11,15 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
-import javafx.stage.Window;
-import javafx.util.Pair;
 import javafx.scene.control.ListCell;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-
-import static de.uol.swp.common.game.map.MapPoint.Type.*;
 
 /**
  * Manages the lobby's menu
@@ -67,15 +38,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final int LOBBY_WIDTH_IN_GAME = 1435;
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    private ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
-
-    @FXML
-    private ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
-    @FXML
-    private Button returnToLobby;
-
-    private List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
-    private boolean inGame;
     /**
      * Constructor
      *
@@ -108,6 +70,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     /**
      * Prepares the MembersView
      * Adds listeners for the MembersView
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-24
      */
     private void prepareMembersView() {
         membersView.setCellFactory(lv -> new ListCell<>() {
@@ -175,37 +141,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             }
         });
     }
-
-
-    @Override
-    @Subscribe
-    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
-        LOG.debug("Received SystemMessageForTradeResponse");
-        if (msg.getName().equals(super.lobbyName)) super.onSystemMessageForTradeMessage(msg);
-    }
-
-    @Override
-    @Subscribe
-    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
-        LOG.debug("Received SystemMessageForTradeWithBankResponse");
-        if (msg.getName().equals(super.lobbyName) && !this.loggedInUser.equals(msg.getUser()))
-            super.onSystemMessageForTradeWithBankMessage(msg);
-    }
-
-    @Override
-    @Subscribe
-    protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
-        LOG.debug("Received SystemMessageForTradeWithBankResponse");
-        if (rsp.getLobbyName().equals(super.lobbyName)) super.onSystemMessageForTradeWithBankResponse(rsp);
-    }
-
-    @Override
-    @Subscribe
-    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
-        LOG.debug("Received SystemMessageForPlayingCardsMessage");
-        if (msg.getName().equals(super.lobbyName)) super.onSystemMessageForPlayingCardsMessage(msg);
-    }
-
 
     /**
      * Handles a new list of users
@@ -296,9 +231,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
 
         addSizeChangeListener();
-        //just to trigger the heightProperty ChangeListener and make the canvas have actual dimensions
-        window.setHeight(window.getHeight() + 0.01);
-        window.setHeight(window.getHeight() - 0.01);
+        fitCanvasToSize();
 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
@@ -309,63 +242,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
         setPreGameSettings();
-    }
-
-    private void addSizeChangeListener() {
-        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
-            double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
-            double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-            double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - 535;
-            double dimension = Math.min(heightValue, widthValue);
-            gameMapCanvas.setHeight(dimension * hexFactor);
-            gameMapCanvas.setWidth(dimension);
-            if (gameMap == null) return;
-            // gameMap exists, so redraw map to fit the new canvas dimensions
-            gameRendering = new GameRendering(gameMapCanvas);
-            gameMapCanvas.getGraphicsContext2D().clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
-            gameRendering.drawGameMap(gameMap);
-            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
-        };
-        window.widthProperty().addListener(listener);
-        window.heightProperty().addListener(listener);
-    }
-
-    /**
-     * Handles a click on the gameMapCanvas
-     * <p>
-     * This method calls on the GameRendering to map the x,y coordinates of the
-     * mouse click to the proper element located in that location, e.g. a Hex.
-     *
-     * @param mouseEvent The Event produced by the mouse clicking on the Canvas
-     *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.GameRendering#coordinatesToHex(double, double)
-     * @since 2021-03-14
-     */
-    @FXML
-    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
-        MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
-        if (mapPoint.getType() == INVALID) {
-            System.out.println("INVALID");
-        } else if (mapPoint.getType() == HEX) {
-            System.out.println("HEX");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == INTERSECTION) {
-            System.out.println("INTERSECTION");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == EDGE) {
-            System.out.println("EDGE");
-            System.out.println("left:");
-            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
-            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
-            System.out.println("right:");
-            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
-            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
-        }
     }
 
     /**
@@ -389,92 +265,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             lobbyService.leaveLobby(entry.getKey(), loggedInUser);
         }
     }
-    /**
-     * Handles the click on the ReturnToLobby-Button.
-     *
-     * @author Finn Haase
-     * @author Steven Luong
-     * @since 2021-03-22
-     */
-    @FXML
-    private void onReturnToLobbyButtonPressed() {
-        inGame = false;
-        lobbyService.returnToPreGameLobby(this.lobbyName);
-    }
-
-    /**
-     * Handles a ReturnToPreGameLobbyMessage
-     * <p>
-     * If a new ReturnToLobbyMessage is posted onto the EventBus the
-     * Settings and visibility of the Buttons will be set to their
-     * Pre-Game states.
-     *
-     * @param msg The ReturnToPreGameLobbyMessage seen on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-2021
-     */
-    @Subscribe
-    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
-        Platform.runLater(() -> {
-            this.returnToLobby.setVisible(false);
-            this.returnToLobby.setPrefHeight(0);
-            this.returnToLobby.setPrefWidth(0);
-            this.window.setWidth(LOBBY_WIDTH_PRE_GAME);
-            this.window.setHeight(LOBBY_HEIGHT_PRE_GAME);
-            ((Stage) this.window).setMinWidth(LOBBY_WIDTH_PRE_GAME);
-            ((Stage) this.window).setMinHeight(LOBBY_HEIGHT_PRE_GAME);
-            this.preGameSettingBox.setVisible(true);
-            this.preGameSettingBox.setPrefHeight(190);
-            this.preGameSettingBox.setMaxHeight(190);
-            this.turnIndicator.setText("");
-            this.preGameSettingBox.setMinHeight(190);
-            this.uniqueCardView.setMaxHeight(0);
-            this.uniqueCardView.setMinHeight(0);
-            this.uniqueCardView.setPrefHeight(0);
-            this.uniqueCardView.setVisible(false);
-            this.inventoryView.setMaxHeight(0);
-            this.inventoryView.setMinHeight(0);
-            this.inventoryView.setPrefHeight(0);
-            this.inventoryView.setVisible(false);
-            this.readyCheckBox.setVisible(true);
-            this.readyCheckBox.setSelected(false);
-            lobbyService.retrieveAllLobbyMembers(this.lobbyName);
-            setStartSessionButtonState();
-            this.rollDice.setVisible(false);
-            this.endTurn.setVisible(false);
-            this.tradeWithUserButton.setVisible(false);
-            this.tradeWithUserButton.setDisable(false);
-            this.tradeWithBankButton.setVisible(false);
-            this.rollDice.setVisible(false);
-            this.kickUserButton.setVisible(true);
-            this.playCard.setVisible(false);
-        });
-    }
-    /**
-     * Handles a RefreshCardAmountMessage found on the EventBus
-     * <p>
-     * If a RefreshCardAmountMessage is found on the EventBus, this method
-     * stores the contained cardAmountTripleList in the class attribute and
-     * then calls the LobbyService to refresh the member list (which will
-     * then contain the new card amounts).
-     *
-     * @param msg The RefreshCardAmountMessage found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Eric Vuong
-     * @see de.uol.swp.common.game.message.RefreshCardAmountMessage
-     * @since 2021-03-27
-     */
-    @Subscribe
-    private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        cardAmountTripleList = msg.getCardAmountTriples();
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
-    }
-
-
 
     /**
      * Handles an UpdateLobbyMessage found on the EventBus
@@ -570,74 +360,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         });
         lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
-    /**
-     * Handles the PlayerWonGameMessage
-     * <p>
-     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
-     * with the Player that won is shown. For the owner of the Lobby appears a
-     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
-     *
-     * @param msg The CheckVictoryPointsMessage found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
-        GraphicsContext ctx = gameMapCanvas.getGraphicsContext2D();
-        ctx.clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
-        this.gameMap = null;
-        ctx.setTextAlign(TextAlignment.CENTER);
-        ctx.setTextBaseline(VPos.CENTER);
-        ctx.fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"),
-                     gameMapCanvas.getWidth() / 2, gameMapCanvas.getHeight() / 2);
-        ctx.setFill(Color.BLACK);
-        ctx.setFont(Font.font(25));
-        ChangeListener<Number> listener;
-        if (this.loggedInUser.getID() == this.owner.getID()) {
-            listener = (observable, oldValue, newValue) -> {
-                double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
-                double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
-                double dimension = Math.min(heightValue, widthValue);
-                gameMapCanvas.setHeight((dimension * hexFactor) - 40);
-                gameMapCanvas.setWidth(dimension);
-                // gameMap exists, so redraw map to fit the new canvas dimensions
-                gameMapCanvas.getGraphicsContext2D()
-                             .clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
-                gameMapCanvas.getGraphicsContext2D().fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"),
-                                                              gameMapCanvas.getWidth() / 2,
-                                                              gameMapCanvas.getHeight() / 2);
-
-            };
-            this.returnToLobby.setVisible(true);
-            this.returnToLobby.setPrefHeight(30);
-            this.returnToLobby.setPrefWidth(250);
-        } else {
-            listener = (observable, oldValue, newValue) -> {
-                double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
-                double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-                double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LOBBY_WIDTH_PRE_GAME;
-                double dimension = Math.min(heightValue, widthValue);
-                gameMapCanvas.setHeight(dimension * hexFactor);
-                gameMapCanvas.setWidth(dimension);
-                // gameMap exists, so redraw map to fit the new canvas dimensions
-                gameMapCanvas.getGraphicsContext2D()
-                             .clearRect(0, 0, gameMapCanvas.getWidth(), gameMapCanvas.getHeight());
-                gameMapCanvas.getGraphicsContext2D()
-                             .fillText(msg.getUser().getUsername() + " " + resourceBundle.getString("game.won.info"), gameMapCanvas.getWidth() / 2, gameMapCanvas.getHeight() / 2);
-            };
-        }
-        this.window.widthProperty().removeListener(canvasResizeListener);
-        this.window.heightProperty().removeListener(canvasResizeListener);
-        this.window.widthProperty().addListener(listener);
-        this.window.heightProperty().addListener(listener);
-        this.window.setHeight(this.window.getHeight() - 1);
-        this.window.setHeight(this.window.getHeight() + 1);
-    }
-
 
     /**
      * Updates the lobby's member list according to the list given

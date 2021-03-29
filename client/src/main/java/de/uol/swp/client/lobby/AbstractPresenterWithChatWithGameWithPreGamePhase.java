@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
@@ -13,8 +14,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -48,7 +50,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected CheckBox randomPlayFieldCheckbox;
     @FXML
     protected CheckBox commandsActivated;
-    protected Window window;
+
     @FXML
     private CheckBox readyCheckBox;
     @FXML
@@ -203,6 +205,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     /**
      * Prepare the MoveTimeTextField
+     * <p>
      * Lets the moveTimeTextField only accept numbers.
      */
     private void prepareMoveTimeTextField() {
@@ -261,6 +264,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onStartSessionMessage(StartSessionMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
+        gameWon = false;
+        winner = null;
+        inGame = true;
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
             preGameSettingBox.setVisible(false);
             preGameSettingBox.setPrefHeight(0);
@@ -268,8 +275,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setMinHeight(0);
             //This Line needs to be changed/ removed in the Future
             gameRendering = new GameRendering(gameMapCanvas);
-            gameMap = new GameMap();
-            gameMap.createBeginnerMap();
+            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
+            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
+            gameMap = new GameMap().createMapFromConfiguration(msg.getConfiguration());
+            if (!msg.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
@@ -281,16 +290,24 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             inventoryView.setMinHeight(280);
             inventoryView.setPrefHeight(280);
             inventoryView.setVisible(true);
+
+            uniqueCardView.setMaxHeight(48);
+            uniqueCardView.setMinHeight(48);
+            uniqueCardView.setPrefHeight(48);
+            uniqueCardView.setVisible(true);
             readyCheckBox.setVisible(false);
             startSession.setVisible(false);
             rollDice.setVisible(true);
             endTurn.setVisible(true);
+            endTurn.setDisable(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
+            tradeWithBankButton.setDisable(true);
             setRollDiceButtonState(msg.getUser());
             kickUserButton.setVisible(false);
             playCard.setVisible(true);
+            playCard.setDisable(true);
         });
     }
 
@@ -334,5 +351,56 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.updateLobbySettings(lobbyName, loggedInUser, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
                                          commandsActivated.isSelected(), moveTime,
                                          randomPlayFieldCheckbox.isSelected());
+    }
+
+    /**
+     * Handles a ReturnToPreGameLobbyMessage
+     * <p>
+     * If a new ReturnToLobbyMessage is posted onto the EventBus the
+     * Settings and visibility of the Buttons will be set to their
+     * Pre-Game states.
+     *
+     * @param msg The ReturnToPreGameLobbyMessage seen on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @since 2021-03-2021
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        Platform.runLater(() -> {
+            returnToLobby.setVisible(false);
+            returnToLobby.setPrefHeight(0);
+            returnToLobby.setPrefWidth(0);
+            window.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+            preGameSettingBox.setVisible(true);
+            preGameSettingBox.setPrefHeight(190);
+            preGameSettingBox.setMaxHeight(190);
+            turnIndicator.setText("");
+            preGameSettingBox.setMinHeight(190);
+            uniqueCardView.setMaxHeight(0);
+            uniqueCardView.setMinHeight(0);
+            uniqueCardView.setPrefHeight(0);
+            uniqueCardView.setVisible(false);
+            inventoryView.setMaxHeight(0);
+            inventoryView.setMinHeight(0);
+            inventoryView.setPrefHeight(0);
+            inventoryView.setVisible(false);
+            readyCheckBox.setVisible(true);
+            readyCheckBox.setSelected(false);
+            lobbyService.retrieveAllLobbyMembers(this.lobbyName);
+            setStartSessionButtonState();
+            rollDice.setVisible(false);
+            endTurn.setVisible(false);
+            tradeWithUserButton.setVisible(false);
+            tradeWithUserButton.setDisable(false);
+            tradeWithBankButton.setVisible(false);
+            rollDice.setVisible(false);
+            kickUserButton.setVisible(true);
+            playCard.setVisible(false);
+        });
     }
 }

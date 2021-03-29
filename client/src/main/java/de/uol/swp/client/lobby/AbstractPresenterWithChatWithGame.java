@@ -5,25 +5,31 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.message.DiceCastMessage;
-import de.uol.swp.common.game.message.NextPlayerMessage;
+import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Window;
 import javafx.util.Pair;
 
 import java.util.*;
+
+import static de.uol.swp.common.game.map.MapPoint.Type.*;
 
 /**
  * This class is the base for creating a new Presenter that uses the game.
@@ -63,14 +69,26 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected IGameMap gameMap;
     protected int moveTime;
     protected GameRendering gameRendering;
-    private ObservableList<Pair<String, String>> resourceList;
+    protected boolean inGame;
+    protected Window window;
     @FXML
-    private Label turnIndicator;
+    protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
+    protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
+    @FXML
+    protected Label turnIndicator;
+    @FXML
+    protected Button returnToLobby;
+    protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
+    protected boolean gameWon = false;
+    protected UserOrDummy winner = null;
+    private ObservableList<Pair<String, String>> resourceList;
 
     @Override
+    @FXML
     protected void initialize() {
         super.initialize();
         prepareInventoryView();
+        prepareUniqueCardView();
     }
 
     /**
@@ -97,6 +115,113 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void setTurnIndicatorText(UserOrDummy user) {
         Platform.runLater(() -> turnIndicator
                 .setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername())));
+    }
+
+    /**
+     * Prepares the change size listener
+     * <p>
+     * Changes the size of the game map when the window size
+     * gets changed.
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-24
+     */
+    protected void addSizeChangeListener() {
+        ChangeListener<Number> listener = (observable, oldValue, newValue) -> fitCanvasToSize();
+        window.widthProperty().addListener(listener);
+        window.heightProperty().addListener(listener);
+    }
+
+    /**
+     * Helper method to resize canvas
+     * <p>
+     * If the window size gets changed, the size of the
+     * canvas gets updated accordingly.
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
+     */
+    protected void fitCanvasToSize() {
+        double heightDiff = 0;
+        if (gameWon && Objects.equals(owner, loggedInUser)) heightDiff = 40;
+        double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
+        double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
+        double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.LOBBY_WIDTH_PRE_GAME;
+        double dimension = Math.min(heightValue, widthValue);
+        gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
+        gameMapCanvas.setWidth(dimension);
+        gameRendering = new GameRendering(gameMapCanvas);
+
+        if (gameWon) {
+            gameRendering.showWinnerText(Objects.equals(winner, loggedInUser) ?
+                                         String.format(resourceBundle.getString("game.won.info"), winner) :
+                                         resourceBundle.getString("game.won.you"));
+        } else {
+            if (gameMap != null)
+                // gameMap exists, so redraw map to fit the new canvas dimensions
+                gameRendering.drawGameMap(gameMap);
+            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        }
+    }
+
+    /**
+     * Prepares the UniqueCardView
+     * <p>
+     * Adds listener to the UniqueCardView
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
+     */
+    private void prepareUniqueCardView() {
+        uniqueCardView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Triple<String, UserOrDummy, Integer> uniqueCardTriple, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(uniqueCardTriple, empty);
+                    if (empty || uniqueCardTriple == null) setText("");
+                    else {
+                        UserOrDummy value2 = uniqueCardTriple.getValue2();
+                        String who;
+                        if (value2 == null) who = resourceBundle.getString("game.resources.whohas.nobody");
+                        else who = value2.getUsername();
+                        setText(String.format(resourceBundle.getString(uniqueCardTriple.getValue1()), who,
+                                              uniqueCardTriple.getValue3()));
+                    }
+                });
+            }
+        });
+        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
+        if (uniqueCardList == null) {
+            uniqueCardList = FXCollections.observableArrayList();
+            uniqueCardView.setItems(uniqueCardList);
+        }
+        uniqueCardList.add(new Triple<>("game.resources.whohas.largestarmy", null, 0));
+        uniqueCardList.add(new Triple<>("game.resources.whohas.longestroad", null, 0));
+    }
+
+    /**
+     * Handles a RefreshCardAmountMessage found on the EventBus
+     * <p>
+     * If a RefreshCardAmountMessage is found on the EventBus, this method
+     * stores the contained cardAmountTripleList in the class attribute and
+     * then calls the LobbyService to refresh the member list (which will
+     * then contain the new card amounts).
+     *
+     * @param msg The RefreshCardAmountMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @see de.uol.swp.common.game.message.RefreshCardAmountMessage
+     * @since 2021-03-27
+     */
+    @Subscribe
+    private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        cardAmountTripleList = msg.getCardAmountTriples();
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
     }
 
     /**
@@ -164,7 +289,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If the EndTurnButton is pressed, this method disables all appropriate
      * buttons and then requests the LobbyService to end the current turn.
      *
-     * @see LobbyService
+     * @see de.uol.swp.client.lobby.ILobbyService
      * @since 2021-01-15
      */
     @FXML
@@ -192,7 +317,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Prepares the InventoryView
+     * <p>
      * Prepares the inventoryView for proper formatting.
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
      */
     private void prepareInventoryView() {
         inventoryView.setCellFactory(lv -> new ListCell<>() {
@@ -263,6 +393,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Helper Method to play a year of plenty card.
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
      */
     private void playYearOfPlentyCard(String ore, String grain, String brick, String lumber, String wool,
                                       List<String> choices) {
@@ -322,6 +456,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Helper Method to play a monopoly card
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
      */
     private void playMonopolyCard(String ore, String grain, String brick, String lumber, String wool,
                                   List<String> choices) {
@@ -356,7 +494,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @param rsp The PlayCardFailureResponse found on the EventBus
      *
+     * @author Mario Fokken
+     * @author Eric Vuong
      * @see de.uol.swp.common.game.response.PlayCardFailureResponse
+     * @since 2021-02-26
      */
     @Subscribe
     private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
@@ -382,7 +523,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @param rsp The PlayCardSuccessResponse found on the EventBus
      *
+     * @author Mario Fokken
+     * @author Eric Vuong
      * @see de.uol.swp.common.game.response.PlayCardSuccessResponse
+     * @since 2021-02-26
      */
     @Subscribe
     private void onPlayCardSuccessResponse(PlayCardSuccessResponse rsp) {
@@ -643,5 +787,84 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
+        lobbyService.checkVictoryPoints(this.lobbyName, this.loggedInUser);
+    }
+
+    /**
+     * Handles a click on the gameMapCanvas
+     * <p>
+     * This method calls on the GameRendering to map the x,y coordinates of the
+     * mouse click to the proper element located in that location, e.g. a Hex.
+     *
+     * @param mouseEvent The Event produced by the mouse clicking on the Canvas
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.GameRendering#coordinatesToHex(double, double)
+     * @since 2021-03-14
+     */
+    @FXML
+    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
+        MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
+        if (mapPoint.getType() == INVALID) {
+            System.out.println("INVALID");
+        } else if (mapPoint.getType() == HEX) {
+            System.out.println("HEX");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == INTERSECTION) {
+            System.out.println("INTERSECTION");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == EDGE) {
+            System.out.println("EDGE");
+            System.out.println("left:");
+            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
+            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
+            System.out.println("right:");
+            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
+            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
+        }
+    }
+
+    /**
+     * Handles the click on the ReturnToLobby-Button.
+     *
+     * @author Finn Haase
+     * @author Steven Luong
+     * @since 2021-03-22
+     */
+    @FXML
+    private void onReturnToLobbyButtonPressed() {
+        inGame = false;
+        lobbyService.returnToPreGameLobby(this.lobbyName);
+    }
+
+    /**
+     * Handles the PlayerWonGameMessage
+     * <p>
+     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
+     * with the Player that won is shown. For the owner of the Lobby appears a
+     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
+     *
+     * @param msg The CheckVictoryPointsMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        gameMap = null;
+        gameWon = true;
+        winner = msg.getUser();
+        if (Objects.equals(owner, loggedInUser)) {
+            returnToLobby.setVisible(true);
+            returnToLobby.setPrefHeight(30);
+            returnToLobby.setPrefWidth(250);
+        }
+        fitCanvasToSize();
     }
 }
