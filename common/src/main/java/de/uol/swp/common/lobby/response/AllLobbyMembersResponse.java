@@ -39,16 +39,15 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(String lobbyName, Set<UserOrDummy> users, UserOrDummy owner, Set<UserOrDummy> readyUsers) {
+    public AllLobbyMembersResponse(String lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
+                                   Set<UserOrDummy> readyUsers) {
         super(lobbyName);
         for (UserOrDummy user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
             else this.users.add(user);
         }
-        if (owner instanceof User)
-            this.owner = UserDTO.createWithoutPassword((User)owner);
-        else
-            this.owner = owner;
+        if (owner instanceof User) this.owner = UserDTO.createWithoutPassword((User) owner);
+        else this.owner = owner;
         for (UserOrDummy user : readyUsers) {
             if (user instanceof User) this.readyUsers.add(UserDTO.createWithoutPassword((User) user));
             else this.readyUsers.add(user);

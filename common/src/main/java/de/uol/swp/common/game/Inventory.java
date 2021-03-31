@@ -27,9 +27,16 @@ public class Inventory {
     private int victoryPoints = 0;
 
     /**
-     * Constructor
+     * Gets the amount of Development Cards the user has in his inventory
+     *
+     * @return The amount of Development Cards
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @since 2021-03-27
      */
-    public Inventory() {
+    public int getAmountOfDevelopmentCards() {
+        return getYearOfPlentyCards() + getMonopolyCards() + getKnightCards() + getVictoryPointCards() + getRoadBuildingCards();
     }
 
     /**
@@ -170,19 +177,6 @@ public class Inventory {
      */
     public int getResourceAmount() {
         return getBrick() + getWool() + getLumber() + getGrain() + getOre();
-    }
-
-    /**
-     * Gets the amount of Development Cards the user has in his inventory
-     *
-     * @return The amount of Development Cards
-     *
-     * @author Alwin Bossert
-     * @author Eric Vuong
-     * @since 2021-03-27
-     */
-    public int getAmountOfDevelopmentCards() {
-        return getYearOfPlentyCards() + getMonopolyCards() + getKnightCards() + getVictoryPointCards() + getRoadBuildingCards();
     }
 
     /**

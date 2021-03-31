@@ -59,17 +59,6 @@ public class Game {
     }
 
     /**
-     * Returns the user corresponding with the given player
-     *
-     * @param player The player whose User is required
-     *
-     * @return The user needed
-     */
-    public UserOrDummy getUserFromPlayer(Player player) {
-        return players.getUserOrDummyFromPlayer(player);
-    }
-
-    /**
      * Calculates the player's victory points
      *
      * @param player The User object
@@ -136,6 +125,28 @@ public class Game {
     }
 
     /**
+     * Gets the active player.
+     *
+     * @return The currently active player
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-01
+     */
+    public UserOrDummy getActivePlayer() {
+        return activePlayer;
+    }
+
+    /**
+     * Gets all the inventories in the game
+     *
+     * @return An array of all inventories
+     */
+    public Inventory[] getAllInventories() {
+        return players.getInventories().toArray(new Inventory[0]);
+    }
+
+    /**
      * Gets the List of the items of the bank.
      *
      * @return The List of the bank inventory
@@ -147,16 +158,22 @@ public class Game {
     }
 
     /**
-     * Gets the active player.
+     * Gets a list of triples consisting of the UserOrDummy, the amount of
+     * resource cards they have, and the amount of development cards they have
      *
-     * @return The currently active player
+     * @return List of Triples of UserOrDummy, Integer, Integer
      *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @since 2021-03-01
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @see de.uol.swp.common.util.Triple
+     * @since 2021-03-27
      */
-    public UserOrDummy getActivePlayer() {
-        return activePlayer;
+    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmounts() {
+        List<Triple<UserOrDummy, Integer, Integer>> list = new ArrayList<>();
+        for (UserOrDummy u : lobby.getUserOrDummies()) {
+            list.add(new Triple<>(u, players.get(u).getResourceAmount(), players.get(u).getAmountOfDevelopmentCards()));
+        }
+        return list;
     }
 
     /**
@@ -200,12 +217,13 @@ public class Game {
     }
 
     /**
-     * Gets all the inventories in the game
+     * Gets the next player
      *
-     * @return An array of all inventories
+     * @return User object of the next player
      */
-    public Inventory[] getAllInventories() {
-        return players.getInventories().toArray(new Inventory[0]);
+    public UserOrDummy getNextPlayer() {
+        return players
+                .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
     }
 
     /**
@@ -229,13 +247,14 @@ public class Game {
     }
 
     /**
-     * Gets the next player
+     * Returns the user corresponding with the given player
      *
-     * @return User object of the next player
+     * @param player The player whose User is required
+     *
+     * @return The user needed
      */
-    public UserOrDummy getNextPlayer() {
-        return players
-                .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
+    public UserOrDummy getUserFromPlayer(Player player) {
+        return players.getUserOrDummyFromPlayer(player);
     }
 
     /**
@@ -246,24 +265,5 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
-    }
-
-    /**
-     * Gets a list of triples consisting of the UserOrDummy, the amount of
-     * resource cards they have, and the amount of development cards they have
-     *
-     * @return List of Triples of UserOrDummy, Integer, Integer
-     *
-     * @author Alwin Bossert
-     * @author Eric Vuong
-     * @see de.uol.swp.common.util.Triple
-     * @since 2021-03-27
-     */
-    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmounts() {
-        List<Triple<UserOrDummy, Integer, Integer>> list = new ArrayList<>();
-        for (UserOrDummy u : lobby.getUserOrDummies()) {
-            list.add(new Triple<>(u, players.get(u).getResourceAmount(), players.get(u).getAmountOfDevelopmentCards()));
-        }
-        return list;
     }
 }

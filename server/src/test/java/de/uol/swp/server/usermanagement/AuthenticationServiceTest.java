@@ -39,15 +39,15 @@ class AuthenticationServiceTest {
     private final CountDownLatch lock = new CountDownLatch(1);
     private Object event;
 
-    @BeforeEach
-    void registerBus() {
-        event = null;
-        bus.register(this);
+    @AfterEach
+    protected void deregisterBus() {
+        bus.unregister(this);
     }
 
-    @AfterEach
-    void deregisterBus() {
-        bus.unregister(this);
+    @BeforeEach
+    protected void registerBus() {
+        event = null;
+        bus.register(this);
     }
 
     @Test
@@ -168,13 +168,6 @@ class AuthenticationServiceTest {
         assertEquals(users, returnedUsers);
     }
 
-    @Subscribe
-    private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
-        System.out.print(e.getEvent());
-        lock.countDown();
-    }
-
     private User loginUser(User userToLogin) {
         User usr = userManagement.createUser(userToLogin);
         final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
@@ -183,5 +176,12 @@ class AuthenticationServiceTest {
         assertTrue(userManagement.isLoggedIn(usr));
         userManagement.dropUser(userToLogin);
         return usr;
+    }
+
+    @Subscribe
+    private void onDeadEvent(DeadEvent e) {
+        this.event = e.getEvent();
+        System.out.print(e.getEvent());
+        lock.countDown();
     }
 }

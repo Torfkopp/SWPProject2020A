@@ -43,7 +43,7 @@ class ChatManagementTest {
      * one test's ChatMessage objects don't interfere with another test's
      */
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         chatMessageStore = new MainMemoryBasedChatMessageStore();
         chatManagement = new ChatManagement(chatMessageStore);
     }
@@ -54,7 +54,7 @@ class ChatManagementTest {
      * This method resets the chatManagement and chatMessageStore variables to null
      */
     @AfterEach
-    void tearDown() {
+    protected void tearDown() {
         chatManagement = null;
         chatMessageStore = null;
     }

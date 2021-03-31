@@ -63,7 +63,7 @@ class ChatServiceTest {
      * one test's ChatMessage objects don't interfere with another test's
      */
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         chatManagement = new ChatManagement(new MainMemoryBasedChatMessageStore());
         chatService = new ChatService(bus, chatManagement, lobbyManagement, lobbyService);
     }
@@ -74,7 +74,7 @@ class ChatServiceTest {
      * This method resets the chatManagement and chatService variables to null
      */
     @AfterEach
-    void tearDown() {
+    protected void tearDown() {
         chatManagement = null;
         chatService = null;
     }

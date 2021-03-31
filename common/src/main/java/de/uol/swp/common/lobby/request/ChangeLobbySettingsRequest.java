@@ -17,7 +17,7 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
     private final boolean startUpPhaseEnabled;
     private final boolean commandsAllowed;
     private final int moveTime;
-    private final boolean randomPlayfieldEnabled;
+    private final boolean randomPlayFieldEnabled;
 
     /**
      * Constructor
@@ -28,16 +28,16 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
      * @param startUpPhaseEnabled    Whether the startup phase is enabled or not
      * @param commandsAllowed        Whether commands are enabled or not
      * @param moveTime               The maximum move time in seconds
-     * @param randomPlayfieldEnabled Whether a randomly generated play field will be used
+     * @param randomPlayFieldEnabled Whether a randomly generated play field will be used
      */
     public ChangeLobbySettingsRequest(String name, User user, int allowedPlayers, boolean startUpPhaseEnabled,
-                                      boolean commandsAllowed, int moveTime, boolean randomPlayfieldEnabled) {
+                                      boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
         super(name, user);
         this.allowedPlayers = allowedPlayers;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.commandsAllowed = commandsAllowed;
         this.moveTime = moveTime;
-        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+        this.randomPlayFieldEnabled = randomPlayFieldEnabled;
     }
 
     /**
@@ -50,12 +50,12 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
     }
 
     /**
-     * Gets whether the lobby has a start up phase or not
+     * Gets the new maximum move time in seconds
      *
-     * @return true if the startup phase is enabled, false if not
+     * @return The new maximum move time in seconds
      */
-    public boolean isStartUpPhaseEnabled() {
-        return startUpPhaseEnabled;
+    public int getMoveTime() {
+        return moveTime;
     }
 
     /**
@@ -68,20 +68,20 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
     }
 
     /**
-     * Gets the new maximum move time in seconds
-     *
-     * @return The new maximum move time in seconds
-     */
-    public int getMoveTime() {
-        return moveTime;
-    }
-
-    /**
      * Gets whether a randomly generated play field will be used or not
      *
      * @return true if a randomly generated play field will be used, false if not
      */
-    public boolean isRandomPlayfieldEnabled() {
-        return randomPlayfieldEnabled;
+    public boolean isRandomPlayFieldEnabled() {
+        return randomPlayFieldEnabled;
+    }
+
+    /**
+     * Gets whether the lobby has a start up phase or not
+     *
+     * @return true if the startup phase is enabled, false if not
+     */
+    public boolean isStartUpPhaseEnabled() {
+        return startUpPhaseEnabled;
     }
 }

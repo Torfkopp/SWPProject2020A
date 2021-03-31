@@ -37,6 +37,18 @@ class LobbyServiceTest {
     Object event;
 
     /**
+     * Helper method run after each test case
+     * <p>
+     * This method only unregisters the object of this class from the EventBus.
+     *
+     * @since 2020-11-26
+     */
+    @AfterEach
+    protected void deregisterBus() {
+        bus.unregister(this);
+    }
+
+    /**
      * Helper method run before each test case
      * <p>
      * This method resets the variable event to null and registers the object of
@@ -45,21 +57,9 @@ class LobbyServiceTest {
      * @since 2020-11-26
      */
     @BeforeEach
-    void registerBus() {
+    protected void registerBus() {
         event = null;
         bus.register(this);
-    }
-
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method only unregisters the object of this class from the EventBus.
-     *
-     * @since 2020-11-26
-     */
-    @AfterEach
-    void deregisterBus() {
-        bus.unregister(this);
     }
 
     /**

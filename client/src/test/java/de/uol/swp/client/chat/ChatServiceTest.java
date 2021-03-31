@@ -36,25 +36,25 @@ class ChatServiceTest {
     Object event;
 
     /**
+     * Helper method run after each test case
+     * <p>
+     * This method only unregisters the object of this class from the EventBus.
+     */
+    @AfterEach
+    protected void deregisterBus() {
+        bus.unregister(this);
+    }
+
+    /**
      * Helper method run before each test case
      * <p>
      * This method resets the variable event to null and registers the object of
      * this class to the EventBus.
      */
     @BeforeEach
-    void registerBus() {
+    protected void registerBus() {
         event = null;
         bus.register(this);
-    }
-
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method only unregisters the object of this class from the EventBus.
-     */
-    @AfterEach
-    void deregisterBus() {
-        bus.unregister(this);
     }
 
     /**

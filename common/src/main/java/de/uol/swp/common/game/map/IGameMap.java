@@ -29,18 +29,6 @@ public interface IGameMap {
     IGameMap createMapFromConfiguration(IConfiguration configuration);
 
     /**
-     * Gets an edge that connects two intersections
-     *
-     * @param position The MapPoint of the Edge
-     *
-     * @return The edge connecting the given intersections
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-03-05
-     */
-    IEdge getEdge(MapPoint position);
-
-    /**
      * Creates the beginner map configuration
      * <p>
      * Creates the beginner's map configuration as shown in the manual WITHOUT beginner
@@ -69,6 +57,18 @@ public interface IGameMap {
      * @since 2021-03-18
      */
     IConfiguration getCurrentConfiguration();
+
+    /**
+     * Gets an edge that connects two intersections
+     *
+     * @param position The MapPoint of the Edge
+     *
+     * @return The edge connecting the given intersections
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-05
+     */
+    IEdge getEdge(MapPoint position);
 
     /**
      * Gets all the edges around the hex
@@ -129,6 +129,16 @@ public interface IGameMap {
     IIntersection getIntersection(MapPoint position);
 
     /**
+     * Gets the intersections in a usable format for rendering them as a jagged array
+     *
+     * @return A jagged array containing the intersections
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-01-31
+     */
+    IIntersection[][] getIntersectionsAsJaggedArray();
+
+    /**
      * Gets all the intersections around the hex
      *
      * @param mapPoint The hex's mapPoint
@@ -139,16 +149,6 @@ public interface IGameMap {
      * @since 2021-03-15
      */
     Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint);
-
-    /**
-     * Gets the intersections in a usable format for rendering them as a jagged array
-     *
-     * @return A jagged array containing the intersections
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-01-31
-     */
-    IIntersection[][] getIntersectionsAsJaggedArray();
 
     /**
      * Gets the amount of points the player made with

@@ -74,7 +74,6 @@ public class LobbyService extends AbstractService {
             msg.setReceiver(authenticationService.getSessions(lobby.get().getRealUsers()));
             post(msg);
         }
-        // TODO: error handling for a not existing lobby
     }
 
     /**
@@ -105,7 +104,7 @@ public class LobbyService extends AbstractService {
         if (lobby.get().isInGame()) return;
         lobbyManagement
                 .updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.isCommandsAllowed(), req.getMoveTime(),
-                                     req.isStartUpPhaseEnabled(), req.isRandomPlayfieldEnabled());
+                                     req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled());
         post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
         Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
         if (updatedLobby.isEmpty()) return;
@@ -130,7 +129,7 @@ public class LobbyService extends AbstractService {
     private void onCreateLobbyRequest(CreateLobbyRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateLobbyRequest for Lobby " + req.getName());
         try {
-            lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayer());
+            lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayers());
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
             Message responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
@@ -431,7 +430,8 @@ public class LobbyService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug("Received StartSessionRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
-        if (lobby.get().getUserOrDummies().size() < 3 || (!lobby.get().getReadyUsers().equals(lobby.get().getUserOrDummies()))) return;
+        if (lobby.get().getUserOrDummies().size() < 3 || (!lobby.get().getReadyUsers()
+                                                                .equals(lobby.get().getUserOrDummies()))) return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
         post(msg);

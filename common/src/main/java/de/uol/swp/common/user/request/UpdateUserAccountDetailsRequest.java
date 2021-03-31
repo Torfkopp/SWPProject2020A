@@ -33,6 +33,15 @@ public class UpdateUserAccountDetailsRequest extends UpdateUserRequest {
     }
 
     /**
+     * Gets the user's new EMail
+     *
+     * @return The user's new EMail
+     */
+    public String getOldEMail() {
+        return oldEMail;
+    }
+
+    /**
      * Gets the user's old password
      *
      * @return The user's old password
@@ -48,14 +57,5 @@ public class UpdateUserAccountDetailsRequest extends UpdateUserRequest {
      */
     public String getOldUsername() {
         return oldUsername;
-    }
-
-    /**
-     * Gets the user's new EMail
-     *
-     * @return The user's new EMail
-     */
-    public String getOldEMail() {
-        return oldEMail;
     }
 }

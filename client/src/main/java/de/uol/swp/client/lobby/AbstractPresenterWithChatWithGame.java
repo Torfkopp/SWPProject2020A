@@ -46,41 +46,42 @@ import static de.uol.swp.common.game.map.MapPoint.Type.*;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
-    protected User owner;
-    protected Integer dice1;
-    protected Integer dice2;
-
-    @FXML
-    protected ListView<UserOrDummy> membersView;
-    @FXML
-    protected Button rollDice;
     @FXML
     protected Button endTurn;
-    @FXML
-    protected Button playCard;
-    @FXML
-    protected Button tradeWithUserButton;
-    @FXML
-    protected Button tradeWithBankButton;
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
     protected ListView<Pair<String, String>> inventoryView;
-    protected IGameMap gameMap;
-    protected int moveTime;
-    protected GameRendering gameRendering;
-    protected boolean inGame;
-    protected Window window;
     @FXML
-    protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
-    protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
+    protected ListView<UserOrDummy> membersView;
+    @FXML
+    protected Button playCard;
+    @FXML
+    protected Button returnToLobby;
+    @FXML
+    protected Button rollDice;
+    @FXML
+    protected Button tradeWithBankButton;
+    @FXML
+    protected Button tradeWithUserButton;
     @FXML
     protected Label turnIndicator;
     @FXML
-    protected Button returnToLobby;
+    protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
+
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
+    protected Integer dice1;
+    protected Integer dice2;
+    protected IGameMap gameMap;
+    protected GameRendering gameRendering;
     protected boolean gameWon = false;
+    protected boolean inGame;
+    protected int moveTime;
+    protected User owner;
+    protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
+    protected Window window;
     protected UserOrDummy winner = null;
+
     private ObservableList<Pair<String, String>> resourceList;
 
     @Override
@@ -89,32 +90,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryView();
         prepareUniqueCardView();
-    }
-
-    /**
-     * Helper function that sets the disable state of the rollDiceButton
-     *
-     * @author Sven Ahrens
-     * @author Mario Fokken
-     * @since 2021-02-22
-     */
-    protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(!loggedInUser.equals(user));
-    }
-
-    /**
-     * Helper function that sets the text's text.
-     * <p>
-     * The text states whose turn it is.
-     *
-     * @author Alwin Bossert
-     * @author Mario Fokken
-     * @author Marvin Drees
-     * @since 2021-01-23
-     */
-    protected void setTurnIndicatorText(UserOrDummy user) {
-        Platform.runLater(() -> turnIndicator
-                .setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername())));
     }
 
     /**
@@ -155,9 +130,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameRendering = new GameRendering(gameMapCanvas);
 
         if (gameWon) {
-            gameRendering.showWinnerText(Objects.equals(winner, loggedInUser) ?
-                                         resourceBundle.getString("game.won.you") :
-                                         String.format(resourceBundle.getString("game.won.info"), winner));
+            gameRendering.showWinnerText(!Objects.equals(winner, loggedInUser) ?
+                                         String.format(resourceBundle.getString("game.won.info"), winner) :
+                                         resourceBundle.getString("game.won.you"));
         } else {
             if (gameMap != null)
                 // gameMap exists, so redraw map to fit the new canvas dimensions
@@ -167,61 +142,43 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Prepares the UniqueCardView
-     * <p>
-     * Adds listener to the UniqueCardView
+     * Helper function that sets the disable state of the rollDiceButton
      *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
+     * @author Sven Ahrens
+     * @author Mario Fokken
+     * @since 2021-02-22
      */
-    private void prepareUniqueCardView() {
-        uniqueCardView.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(Triple<String, UserOrDummy, Integer> uniqueCardTriple, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(uniqueCardTriple, empty);
-                    if (empty || uniqueCardTriple == null) setText("");
-                    else {
-                        UserOrDummy value2 = uniqueCardTriple.getValue2();
-                        String who;
-                        if (value2 == null) who = resourceBundle.getString("game.resources.whohas.nobody");
-                        else who = value2.getUsername();
-                        setText(String.format(resourceBundle.getString(uniqueCardTriple.getValue1()), who,
-                                              uniqueCardTriple.getValue3()));
-                    }
-                });
-            }
-        });
-        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
-        if (uniqueCardList == null) {
-            uniqueCardList = FXCollections.observableArrayList();
-            uniqueCardView.setItems(uniqueCardList);
-        }
-        uniqueCardList.add(new Triple<>("game.resources.whohas.largestarmy", null, 0));
-        uniqueCardList.add(new Triple<>("game.resources.whohas.longestroad", null, 0));
+    protected void setRollDiceButtonState(UserOrDummy user) {
+        rollDice.setDisable(!loggedInUser.equals(user));
     }
 
     /**
-     * Handles a RefreshCardAmountMessage found on the EventBus
+     * Helper function that sets the text's text.
      * <p>
-     * If a RefreshCardAmountMessage is found on the EventBus, this method
-     * stores the contained cardAmountTripleList in the class attribute and
-     * then calls the LobbyService to refresh the member list (which will
-     * then contain the new card amounts).
-     *
-     * @param msg The RefreshCardAmountMessage found on the EventBus
+     * The text states whose turn it is.
      *
      * @author Alwin Bossert
-     * @author Eric Vuong
-     * @see de.uol.swp.common.game.message.RefreshCardAmountMessage
-     * @since 2021-03-27
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-01-23
      */
-    @Subscribe
-    private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        cardAmountTripleList = msg.getCardAmountTriples();
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
+    protected void setTurnIndicatorText(UserOrDummy user) {
+        Platform.runLater(() -> turnIndicator
+                .setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername())));
+    }
+
+    /**
+     * Helper Method to disable all game related buttons
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    private void disableButtonStates() {
+        tradeWithBankButton.setDisable(true);
+        endTurn.setDisable(true);
+        tradeWithUserButton.setDisable(true);
+        playCard.setDisable(true);
     }
 
     /**
@@ -299,6 +256,44 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a click on the gameMapCanvas
+     * <p>
+     * This method calls on the GameRendering to map the x,y coordinates of the
+     * mouse click to the proper element located in that location, e.g. a Hex.
+     *
+     * @param mouseEvent The Event produced by the mouse clicking on the Canvas
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.GameRendering#coordinatesToHex(double, double)
+     * @since 2021-03-14
+     */
+    @FXML
+    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
+        MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
+        if (mapPoint.getType() == INVALID) {
+            System.out.println("INVALID");
+        } else if (mapPoint.getType() == HEX) {
+            System.out.println("HEX");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == INTERSECTION) {
+            System.out.println("INTERSECTION");
+            System.out.println("mapPoint.getY() = " + mapPoint.getY());
+            System.out.println("mapPoint.getX() = " + mapPoint.getX());
+        } else if (mapPoint.getType() == EDGE) {
+            System.out.println("EDGE");
+            System.out.println("left:");
+            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
+            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
+            System.out.println("right:");
+            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
+            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
+        }
+    }
+
+    /**
      * Handles a NextPlayerMessage
      * <p>
      * If a new NextPlayerMessage object is posted onto the EventBus,
@@ -313,28 +308,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
-    }
-
-    /**
-     * Prepares the InventoryView
-     * <p>
-     * Prepares the inventoryView for proper formatting.
-     *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
-     */
-    private void prepareInventoryView() {
-        inventoryView.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
-                });
-            }
-        });
     }
 
     /**
@@ -392,104 +365,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Helper Method to play a year of plenty card.
-     *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
-     */
-    private void playYearOfPlentyCard(String ore, String grain, String brick, String lumber, String wool,
-                                      List<String> choices) {
-        //Create a dialogue
-        Dialog<String> dialogue = new Dialog<>();
-        dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
-        dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
-        //Create its buttons
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
-        //Make a grid to put the ChoiceBoxes and labels on
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-        //Make ChoiceBoxes and the choices
-        ChoiceBox<String> c1 = new ChoiceBox<>();
-        ChoiceBox<String> c2 = new ChoiceBox<>();
-        for (String s : choices) {
-            c1.getItems().add(s);
-            c2.getItems().add(s);
-        }
-        //Set which choice is shown first
-        c1.setValue(brick);
-        c2.setValue(brick);
-        //Add ChoiceBoxes and labels to the grid
-        grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
-        grid.add(c1, 1, 0);
-        grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label2")), 0, 1);
-        grid.add(c2, 1, 1);
-        //Put the grid into the dialogue and let it appear
-        dialogue.getDialogPane().setContent(grid);
-        //Get the pressed button
-        Optional<String> rst = dialogue.showAndWait();
-        Optional<String> button1 = Optional.of(confirm.toString());
-        //Checks if the pressed button is the same as the confirm button
-        if (rst.toString().equals(button1.toString())) {
-            //Create two resource variables
-            Resources resource1 = Resources.BRICK;
-            Resources resource2 = Resources.BRICK;
-            //Convert String to Resource
-            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
-            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
-            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
-            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
-            //Second ChoiceBox's conversion
-            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
-            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
-            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
-            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
-            //Send Request
-            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
-        }
-    }
-
-    /**
-     * Helper Method to play a monopoly card
-     *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
-     */
-    private void playMonopolyCard(String ore, String grain, String brick, String lumber, String wool,
-                                  List<String> choices) {
-        //Creating a dialogue
-        ChoiceDialog<String> dialogue = new ChoiceDialog<>(brick, choices);
-        dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
-        dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
-        dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
-        //Creating a new DialogPane so the button text can be customised
-        DialogPane pane = new DialogPane();
-        pane.setContent(dialogue.getDialogPane().getContent());
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialogue.setDialogPane(pane);
-        dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
-        //Show the dialogue and get the result
-        Optional<String> rst = dialogue.showAndWait();
-        //Convert String to Resources and send the request
-        Resources resource = Resources.BRICK;
-        if (rst.isPresent()) {
-            if (rst.get().equals(ore)) resource = Resources.ORE;
-            else if (rst.get().equals(grain)) resource = Resources.GRAIN;
-            else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
-            else if (rst.get().equals(wool)) resource = Resources.WOOL;
-            lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
-        }
-    }
-
-    /**
      * Handles a PlayCardFailureResponse found on the EventBus
      *
      * @param rsp The PlayCardFailureResponse found on the EventBus
@@ -537,6 +412,56 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles the PlayerWonGameMessage
+     * <p>
+     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
+     * with the Player that won is shown. For the owner of the Lobby appears a
+     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
+     *
+     * @param msg The CheckVictoryPointsMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        gameMap = null;
+        gameWon = true;
+        winner = msg.getUser();
+        if (Objects.equals(owner, loggedInUser)) {
+            returnToLobby.setVisible(true);
+            returnToLobby.setPrefHeight(30);
+            returnToLobby.setPrefWidth(250);
+        }
+        fitCanvasToSize();
+    }
+
+    /**
+     * Handles a RefreshCardAmountMessage found on the EventBus
+     * <p>
+     * If a RefreshCardAmountMessage is found on the EventBus, this method
+     * stores the contained cardAmountTripleList in the class attribute and
+     * then calls the LobbyService to refresh the member list (which will
+     * then contain the new card amounts).
+     *
+     * @param msg The RefreshCardAmountMessage found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Eric Vuong
+     * @see de.uol.swp.common.game.message.RefreshCardAmountMessage
+     * @since 2021-03-27
+     */
+    @Subscribe
+    private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        cardAmountTripleList = msg.getCardAmountTriples();
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
+    }
+
+    /**
      * Handles an ResetTradeWithBankButtonEvent found on the EventBus
      * <p>
      * If the ResetTradeWithBankButtonEvent is intended for the current Lobby
@@ -558,37 +483,16 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Helper Method to reset all game related states
+     * Handles the click on the ReturnToLobby-Button.
      *
-     * @param user The user who is currently active
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
+     * @author Finn Haase
+     * @author Steven Luong
+     * @since 2021-03-22
      */
-    private void resetButtonStates(UserOrDummy user) {
-        tradeWithBankButton.setDisable(!loggedInUser.equals(user));
-        endTurn.setDisable(!loggedInUser.equals(user));
-        tradeWithUserButton.setDisable(!loggedInUser.equals(user));
-        playCard.setDisable(!loggedInUser.equals(user));
-    }
-
-    /**
-     * Handles a TradeWithUserCancelResponse found on the event bus
-     * <p>
-     * If a TradeWithUserCancelResponse is posted onto the EventBus the
-     * the possible options for the active player are re-enabled.
-     *
-     * @param rsp The TradeWithUserCancelResponse seen on the EventBus
-     *
-     * @author Aldin Dervisi
-     * @author Maximilian Lindner
-     * @since 2021-03-19
-     */
-    @Subscribe
-    private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        if (!rsp.getActivePlayer().equals(loggedInUser)) return;
-        resetButtonStates(loggedInUser);
+    @FXML
+    private void onReturnToLobbyButtonPressed() {
+        inGame = false;
+        lobbyService.returnToPreGameLobby(this.lobbyName);
     }
 
     /**
@@ -685,20 +589,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Helper Method to disable all game related buttons
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
-     */
-    private void disableButtonStates() {
-        tradeWithBankButton.setDisable(true);
-        endTurn.setDisable(true);
-        tradeWithUserButton.setDisable(true);
-        playCard.setDisable(true);
-    }
-
-    /**
      * Handles a Click on the TradeWithUserButton
      * <p>
      * If another player of the lobby-member-list is selected and the button gets pressed,
@@ -728,6 +618,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             LOG.debug("Sending a TradeWithUserRequest for Lobby " + lobbyName);
             eventBus.post(new TradeWithUserRequest(lobbyName, loggedInUser, user));
         }
+    }
+
+    /**
+     * Handles a TradeWithUserCancelResponse found on the event bus
+     * <p>
+     * If a TradeWithUserCancelResponse is posted onto the EventBus the
+     * the possible options for the active player are re-enabled.
+     *
+     * @param rsp The TradeWithUserCancelResponse seen on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Maximilian Lindner
+     * @since 2021-03-19
+     */
+    @Subscribe
+    private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
+        if (!rsp.getActivePlayer().equals(loggedInUser)) return;
+        resetButtonStates(loggedInUser);
     }
 
     /**
@@ -791,80 +699,174 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a click on the gameMapCanvas
-     * <p>
-     * This method calls on the GameRendering to map the x,y coordinates of the
-     * mouse click to the proper element located in that location, e.g. a Hex.
-     *
-     * @param mouseEvent The Event produced by the mouse clicking on the Canvas
+     * Helper Method to play a monopoly card
      *
      * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.GameRendering#coordinatesToHex(double, double)
-     * @since 2021-03-14
+     * @author Maximilian Lindner
+     * @since 2021-03-29
      */
-    @FXML
-    private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
-        MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
-        if (mapPoint.getType() == INVALID) {
-            System.out.println("INVALID");
-        } else if (mapPoint.getType() == HEX) {
-            System.out.println("HEX");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == INTERSECTION) {
-            System.out.println("INTERSECTION");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == EDGE) {
-            System.out.println("EDGE");
-            System.out.println("left:");
-            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
-            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
-            System.out.println("right:");
-            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
-            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
+    private void playMonopolyCard(String ore, String grain, String brick, String lumber, String wool,
+                                  List<String> choices) {
+        //Creating a dialogue
+        ChoiceDialog<String> dialogue = new ChoiceDialog<>(brick, choices);
+        dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
+        dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
+        dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
+        //Creating a new DialogPane so the button text can be customised
+        DialogPane pane = new DialogPane();
+        pane.setContent(dialogue.getDialogPane().getContent());
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.setDialogPane(pane);
+        dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+        //Show the dialogue and get the result
+        Optional<String> rst = dialogue.showAndWait();
+        //Convert String to Resources and send the request
+        Resources resource = Resources.BRICK;
+        if (rst.isPresent()) {
+            if (rst.get().equals(ore)) resource = Resources.ORE;
+            else if (rst.get().equals(grain)) resource = Resources.GRAIN;
+            else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
+            else if (rst.get().equals(wool)) resource = Resources.WOOL;
+            lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
         }
     }
 
     /**
-     * Handles the click on the ReturnToLobby-Button.
+     * Helper Method to play a year of plenty card.
      *
-     * @author Finn Haase
-     * @author Steven Luong
-     * @since 2021-03-22
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
      */
-    @FXML
-    private void onReturnToLobbyButtonPressed() {
-        inGame = false;
-        lobbyService.returnToPreGameLobby(this.lobbyName);
+    private void playYearOfPlentyCard(String ore, String grain, String brick, String lumber, String wool,
+                                      List<String> choices) {
+        //Create a dialogue
+        Dialog<String> dialogue = new Dialog<>();
+        dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
+        dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
+        //Create its buttons
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+        //Make a grid to put the ChoiceBoxes and labels on
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        //Make ChoiceBoxes and the choices
+        ChoiceBox<String> c1 = new ChoiceBox<>();
+        ChoiceBox<String> c2 = new ChoiceBox<>();
+        for (String s : choices) {
+            c1.getItems().add(s);
+            c2.getItems().add(s);
+        }
+        //Set which choice is shown first
+        c1.setValue(brick);
+        c2.setValue(brick);
+        //Add ChoiceBoxes and labels to the grid
+        grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
+        grid.add(c1, 1, 0);
+        grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label2")), 0, 1);
+        grid.add(c2, 1, 1);
+        //Put the grid into the dialogue and let it appear
+        dialogue.getDialogPane().setContent(grid);
+        //Get the pressed button
+        Optional<String> rst = dialogue.showAndWait();
+        Optional<String> button1 = Optional.of(confirm.toString());
+        //Checks if the pressed button is the same as the confirm button
+        if (rst.toString().equals(button1.toString())) {
+            //Create two resource variables
+            Resources resource1 = Resources.BRICK;
+            Resources resource2 = Resources.BRICK;
+            //Convert String to Resource
+            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
+            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
+            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
+            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+            //Second ChoiceBox's conversion
+            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
+            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
+            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
+            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+            //Send Request
+            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+        }
     }
 
     /**
-     * Handles the PlayerWonGameMessage
+     * Prepares the InventoryView
      * <p>
-     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
-     * with the Player that won is shown. For the owner of the Lobby appears a
-     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
+     * Prepares the inventoryView for proper formatting.
      *
-     * @param msg The CheckVictoryPointsMessage found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-22
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
      */
-    @Subscribe
-    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
-        gameMap = null;
-        gameWon = true;
-        winner = msg.getUser();
-        if (Objects.equals(owner, loggedInUser)) {
-            returnToLobby.setVisible(true);
-            returnToLobby.setPrefHeight(30);
-            returnToLobby.setPrefWidth(250);
+    private void prepareInventoryView() {
+        inventoryView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Pair<String, String> item, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
+                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                });
+            }
+        });
+    }
+
+    /**
+     * Prepares the UniqueCardView
+     * <p>
+     * Adds listener to the UniqueCardView
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
+     */
+    private void prepareUniqueCardView() {
+        uniqueCardView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Triple<String, UserOrDummy, Integer> uniqueCardTriple, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(uniqueCardTriple, empty);
+                    if (empty || uniqueCardTriple == null) setText("");
+                    else {
+                        UserOrDummy value2 = uniqueCardTriple.getValue2();
+                        String who;
+                        if (value2 == null) who = resourceBundle.getString("game.resources.whohas.nobody");
+                        else who = value2.getUsername();
+                        setText(String.format(resourceBundle.getString(uniqueCardTriple.getValue1()), who,
+                                              uniqueCardTriple.getValue3()));
+                    }
+                });
+            }
+        });
+        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
+        if (uniqueCardList == null) {
+            uniqueCardList = FXCollections.observableArrayList();
+            uniqueCardView.setItems(uniqueCardList);
         }
-        fitCanvasToSize();
+        uniqueCardList.add(new Triple<>("game.resources.whohas.largestarmy", null, 0));
+        uniqueCardList.add(new Triple<>("game.resources.whohas.longestroad", null, 0));
+    }
+
+    /**
+     * Helper Method to reset all game related states
+     *
+     * @param user The user who is currently active
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    private void resetButtonStates(UserOrDummy user) {
+        tradeWithBankButton.setDisable(!loggedInUser.equals(user));
+        endTurn.setDisable(!loggedInUser.equals(user));
+        tradeWithUserButton.setDisable(!loggedInUser.equals(user));
+        playCard.setDisable(!loggedInUser.equals(user));
     }
 }

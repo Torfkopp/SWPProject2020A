@@ -48,14 +48,14 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Inject
     protected IChatService chatService;
 
-    protected String lobbyName;
-    protected User loggedInUser;
-    protected ObservableList<ChatOrSystemMessage> chatMessages;
-
     @FXML
     protected ListView<ChatOrSystemMessage> chatView;
     @FXML
     protected TextField messageField;
+
+    protected String lobbyName;
+    protected User loggedInUser;
+    protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     /**
      * Called by the constructor of inheriting classes to set the Logger
@@ -135,10 +135,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received CreatedChatMessageMessage for Lobby " + msg.getLobbyName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received CreatedChatMessageMessage");
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
-        Platform.runLater(() -> chatMessages.add(msg.getMsg()));
     }
 
     /**
@@ -186,20 +187,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received DeletedChatMessageMessage for Lobby " + msg.getLobbyName());
+            dropChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received DeletedChatMessageMessage");
+            dropChatMessage(msg);
         }
-        Platform.runLater(() -> {
-            for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i) instanceof ChatMessage) {
-                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
-                    if (chatMessage.getID() == msg.getId()) {
-                        chatMessages.remove(i);
-                        break;
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -254,19 +246,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received EditedChatMessageMessage for Lobby " + msg.getLobbyName());
+            editChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received EditedChatMessageMessage");
+            editChatMessage(msg);
         }
-        Platform.runLater(() -> {
-            for (int i = 0; i < chatMessages.size(); i++) {
-                if (chatMessages.get(i) instanceof ChatMessage) {
-                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
-                    if (chatMessage.getID() == msg.getMsg().getID()) {
-                        chatMessages.set(i, msg.getMsg());
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -291,24 +275,26 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Handles new incoming SystemMessage
+     * Handles new incoming SystemMessageForPlayingCardsMessage
      * <p>
-     * If a SystemMessageResponse is posted onto the EventBus, this method
-     * places the incoming SystemMessage into the chatMessages list.
-     * If the loglevel is set to DEBUG, the message "Received
-     * SystemMessageResponse" or "Received SystemMessageResponse for Lobby
+     * If a SystemMessageForPlayingCardsMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageForPlayingCardsMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received SystemMessageForPlayingCardsMessage for Lobby
      * {@code <lobbyName>}" is displayed in the log.
      *
-     * @param rsp The SystemMessageResponse found on the EventBus
+     * @param msg The SystemMessageForPlayingCardsMessage found on the EventBus
      *
-     * @since 2021-02-22
+     * @author Alwin Bossert
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
+     * @since 2021-03-23
      */
     @Subscribe
-    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
-        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
-        } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) LOG.debug("Received SystemMessageResponse");
-        Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());
+            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        }
     }
 
     /**
@@ -381,25 +367,26 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Handles new incoming SystemMessageForPlayingCardsMessage
+     * Handles new incoming SystemMessage
      * <p>
-     * If a SystemMessageForPlayingCardsMessage is posted onto the EventBus, this method
-     * places the incoming SystemMessageForPlayingCardsMessage into the chatMessages list.
-     * If the loglevel is set to DEBUG, the message "Received SystemMessageForPlayingCardsMessage for Lobby
+     * If a SystemMessageResponse is posted onto the EventBus, this method
+     * places the incoming SystemMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the message "Received
+     * SystemMessageResponse" or "Received SystemMessageResponse for Lobby
      * {@code <lobbyName>}" is displayed in the log.
      *
-     * @param msg The SystemMessageForPlayingCardsMessage found on the EventBus
+     * @param rsp The SystemMessageResponse found on the EventBus
      *
-     * @author Alwin Bossert
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
-     * @since 2021-03-23
+     * @since 2021-02-22
      */
     @Subscribe
-    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());
-            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
+        if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
+            Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
+        } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) {
+            LOG.debug("Received SystemMessageResponse");
+            Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         }
     }
 
@@ -418,6 +405,49 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     protected void resetCharVars() {
         chatMessages = null;
+    }
+
+    /**
+     * Helper method to delete a ChatMessage
+     *
+     * @param msg The DeletedChatMessageMessage to act upon
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-03-30
+     */
+    private void dropChatMessage(DeletedChatMessageMessage msg) {
+        Platform.runLater(() -> {
+            for (int i = 0; i < chatMessages.size(); i++) {
+                if (chatMessages.get(i) instanceof ChatMessage) {
+                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
+                    if (chatMessage.getID() == msg.getId()) {
+                        chatMessages.remove(i);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Helper method to apply edits to a ChatMessage
+     *
+     * @param msg The EditedChatMessageMessage to act upon
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-03-30
+     */
+    private void editChatMessage(EditedChatMessageMessage msg) {
+        Platform.runLater(() -> {
+            for (int i = 0; i < chatMessages.size(); i++) {
+                if (chatMessages.get(i) instanceof ChatMessage) {
+                    ChatMessage chatMessage = (ChatMessage) chatMessages.get(i);
+                    if (chatMessage.getID() == msg.getMsg().getID()) {
+                        chatMessages.set(i, msg.getMsg());
+                    }
+                }
+            }
+        });
     }
 
     /**

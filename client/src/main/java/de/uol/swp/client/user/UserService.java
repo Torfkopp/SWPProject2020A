@@ -105,20 +105,6 @@ public class UserService implements ClientUserService {
     }
 
     /**
-     * Posts a UpdateUserRequest onto the EventBus.
-     *
-     * @param user The User object containing all infos to update.
-     *             If some values are not set (e.g. password is ""),
-     *             these fields are not updated
-     */
-    @Override
-    public void updateUser(User user) {
-        LOG.debug("Sending UpdateUserRequest");
-        Message request = new UpdateUserRequest(user);
-        bus.post(request);
-    }
-
-    /**
      * Method to change a user's account details
      * <p>
      * This method creates a new UpdateUserAccountDetailsRequest object
@@ -138,6 +124,20 @@ public class UserService implements ClientUserService {
     public void updateAccountDetails(User user, String oldPassword, String oldUsername, String oldEMail) {
         LOG.debug("Sending UpdateAccountDetailsRequest");
         Message request = new UpdateUserAccountDetailsRequest(user, oldPassword, oldUsername, oldEMail);
+        bus.post(request);
+    }
+
+    /**
+     * Posts a UpdateUserRequest onto the EventBus.
+     *
+     * @param user The User object containing all infos to update.
+     *             If some values are not set (e.g. password is ""),
+     *             these fields are not updated
+     */
+    @Override
+    public void updateUser(User user) {
+        LOG.debug("Sending UpdateUserRequest");
+        Message request = new UpdateUserRequest(user);
         bus.post(request);
     }
 }
