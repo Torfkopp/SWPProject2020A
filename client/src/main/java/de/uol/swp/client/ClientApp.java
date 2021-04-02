@@ -40,15 +40,10 @@ public class ClientApp extends Application implements ConnectionListener {
     private static ResourceBundle resourceBundle;
     private String host;
     private int port;
-
     private ClientUserService userService;
-
     private User user;
-
     private ClientConnection clientConnection;
-
     private EventBus eventBus;
-
     private SceneManager sceneManager;
 
     // -----------------------------------------------------
@@ -147,46 +142,6 @@ public class ClientApp extends Application implements ConnectionListener {
     }
 
     /**
-     * Handles a successful account detail changing process
-     * <p>
-     * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
-     * method is called. It tells the SceneManager to show the MainScreen window.
-     *
-     * @param message The ChangeAccountDetailsSuccessfulResponse object detected on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-03
-     */
-    @Subscribe
-    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse message) {
-        LOG.info("Account Details change was successful.");
-        sceneManager.showMainScreen(message.getUser());
-    }
-
-    /**
-     * Handles a successful login
-     * <p>
-     * If an LoginSuccessfulResponse object is detected on the EventBus this
-     * method is called. It tells the SceneManager to show the main menu, and sets
-     * this clients user to the user found in the object. If the loglevel is set
-     * to DEBUG or higher, "User logged in successfully " and the username of the
-     * logged in user are written to the log.
-     *
-     * @param message The LoginSuccessfulResponse object detected on the EventBus
-     *
-     * @see de.uol.swp.client.SceneManager
-     * @since 2017-03-17
-     */
-    @Subscribe
-    private void onLoginSuccessfulResponse(LoginSuccessfulResponse message) {
-        LOG.debug("Received LoginSuccessfulResponse for User " + message.getUser().getUsername());
-        this.user = message.getUser();
-        sceneManager.showMainScreen(user);
-    }
-
-    /**
      * Handles an old session
      * <p>
      * If an AlreadyLoggedInResponse object is found on the EventBus this method
@@ -194,16 +149,16 @@ public class ClientApp extends Application implements ConnectionListener {
      * logged in elsewhere this method tells the SceneManager to open a popup
      * which prompts the user to log the old session out.
      *
-     * @param message The AlreadyLoggedInResponse object detected on the EventBus
+     * @param rsp The AlreadyLoggedInResponse object detected on the EventBus
      *
      * @author Eric Vuong
      * @author Marvin Drees
      * @since 2021-03-03
      */
     @Subscribe
-    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse message) {
-        LOG.debug("Received AlreadyLoggedInResponse for User " + message.getLoggedInUser());
-        sceneManager.showLogOldSessionOutScreen(message.getLoggedInUser());
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
+        LOG.debug("Received AlreadyLoggedInResponse for User " + rsp.getLoggedInUser());
+        sceneManager.showLogOldSessionOutScreen(rsp.getLoggedInUser());
     }
 
     /**
@@ -212,7 +167,7 @@ public class ClientApp extends Application implements ConnectionListener {
      * If an ChangeAccountDetailsExceptionMessage object is detected on the EventBus, this
      * method is called. It tells the SceneManager to show the sever error alert.
      *
-     * @param message The ChangeAccountDetailsExceptionMessage object detected on the EventBus
+     * @param msg The ChangeAccountDetailsExceptionMessage object detected on the EventBus
      *
      * @author Eric Vuong
      * @author Steven Luong
@@ -220,46 +175,28 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2020-12-03
      */
     @Subscribe
-    private void onChangeAccountDetailsExceptionMessage(ChangeAccountDetailsExceptionMessage message) {
-        sceneManager.showServerError(message.toString());
-        LOG.error("Change Account Details error: " + message);
+    private void onChangeAccountDetailsExceptionMessage(ChangeAccountDetailsExceptionMessage msg) {
+        sceneManager.showServerError(msg.toString());
+        LOG.error("Change Account Details error: " + msg);
     }
 
     /**
-     * Handles a successful registration
+     * Handles a successful account detail changing process
      * <p>
-     * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
-     * method is called. It tells the SceneManager to show the login window. If
-     * the loglevel is set to INFO or higher, "Registration Successful." is written
-     * to the log.
+     * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
      *
-     * @param message The RegistrationSuccessfulResponse object detected on the EventBus
+     * @param rsp The ChangeAccountDetailsSuccessfulResponse object detected on the EventBus
      *
+     * @author Eric Vuong
+     * @author Steven Luong
      * @see de.uol.swp.client.SceneManager
-     * @since 2019-09-02
+     * @since 2020-12-03
      */
     @Subscribe
-    private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse message) {
-        LOG.info("Registration was successful.");
-        sceneManager.showLoginScreen();
-    }
-
-    /**
-     * Handles a successful User deletions
-     * <p>
-     * If a UserDeletionSuccessfulResponse object is detected on the EventBus, this method is called.
-     * It tells the SceneManager to show the login window. If the loglevel is set to INFO or higher,
-     * "Deletion of user successful." is written to the log.
-     *
-     * @param message The UserDeletionSuccessfulResponse object detected on the EventBus
-     *
-     * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-17
-     */
-    @Subscribe
-    private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse message) {
-        LOG.info("Deletion of user was successful.");
-        sceneManager.showLoginScreen();
+    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        LOG.info("Account Details change was successful.");
+        sceneManager.showMainScreen(rsp.getUser());
     }
 
     /**
@@ -276,5 +213,63 @@ public class ClientApp extends Application implements ConnectionListener {
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
         LOG.error("DeadEvent detected: " + deadEvent);
+    }
+
+    /**
+     * Handles a successful login
+     * <p>
+     * If an LoginSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the main menu, and sets
+     * this clients user to the user found in the object. If the loglevel is set
+     * to DEBUG or higher, "User logged in successfully " and the username of the
+     * logged in user are written to the log.
+     *
+     * @param rsp The LoginSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2017-03-17
+     */
+    @Subscribe
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
+        LOG.debug("Received LoginSuccessfulResponse for User " + rsp.getUser().getUsername());
+        this.user = rsp.getUser();
+        sceneManager.showMainScreen(user);
+    }
+
+    /**
+     * Handles a successful registration
+     * <p>
+     * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
+     * method is called. It tells the SceneManager to show the login window. If
+     * the loglevel is set to INFO or higher, "Registration Successful." is written
+     * to the log.
+     *
+     * @param rsp The RegistrationSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2019-09-02
+     */
+    @Subscribe
+    private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
+        LOG.info("Registration was successful.");
+        sceneManager.showLoginScreen();
+    }
+
+    /**
+     * Handles a successful User deletions
+     * <p>
+     * If a UserDeletionSuccessfulResponse object is detected on the EventBus, this method is called.
+     * It tells the SceneManager to show the login window. If the loglevel is set to INFO or higher,
+     * "Deletion of user successful." is written to the log.
+     *
+     * @param rsp The UserDeletionSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2020-12-17
+     */
+    @Subscribe
+    private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
+        LOG.info("Deletion of user was successful.");
+        sceneManager.showLoginScreen();
     }
 }

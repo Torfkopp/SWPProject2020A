@@ -11,8 +11,6 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.Game;
-import de.uol.swp.common.game.message.NextPlayerMessage;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
@@ -23,9 +21,9 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.DummyDTO;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
-import de.uol.swp.server.game.IGameManagement;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.usermanagement.IUserManagement;
@@ -48,14 +46,10 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("UnstableApiUsage")
 public class CommandService extends AbstractService {
 
-    public static final String QUICK_LOBBY_NAME = "§Quick Lobby";
-    public static final String TEMP_1_NAME = "§temp1";
-    public static final String TEMP_2_NAME = "§temp2";
     private static final Logger LOG = LogManager.getLogger(CommandService.class);
     private static Set<Class<?>> allClasses;
-    private final IUserManagement userManagement; //use to find users by name
+    private final IUserManagement userManagement;
     private final ILobbyManagement lobbyManagement;
-    private final IGameManagement gameManagement;
     private final Map<String, BiConsumer<List<String>, NewChatMessageRequest>> commandMap = new HashMap<>();
 
     /**
@@ -64,19 +58,15 @@ public class CommandService extends AbstractService {
      * @param eventBus        The {@link com.google.common.eventbus.EventBus} (injected)
      * @param lobbyManagement The {@link de.uol.swp.server.lobby.ILobbyManagement} (injected)
      * @param userManagement  The {@link de.uol.swp.server.usermanagement.IUserManagement} (injected)
-     * @param gameManagement  The {@link de.uol.swp.server.game.IGameManagement} (injected)
      *
-     * @see de.uol.swp.server.game.IGameManagement
      * @see de.uol.swp.server.lobby.ILobbyManagement
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     @Inject
-    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement,
-                          IGameManagement gameManagement) {
+    public CommandService(EventBus eventBus, ILobbyManagement lobbyManagement, IUserManagement userManagement) {
         super(eventBus);
         this.lobbyManagement = lobbyManagement;
         this.userManagement = userManagement;
-        this.gameManagement = gameManagement;
         getAllClasses();
         commandMap.put("devmenu", this::command_DevMenu);
         commandMap.put("forceendturn", this::command_ForceEndTurn);
@@ -87,6 +77,41 @@ public class CommandService extends AbstractService {
         commandMap.put("adddummy", this::command_AddDummy);
         commandMap.put("d", this::command_AddDummy);
         LOG.debug("CommandService started");
+    }
+
+    /**
+     * Handles the /adddummy command
+     * <p>
+     * Usage: {@code /adddummy}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Alwin Bossert
+     * @author Temmo Junkhoff
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-03-13
+     */
+    private void command_AddDummy(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /adddummy command");
+        int dummyAmount;
+        if (args.size() > 0) dummyAmount = Integer.parseInt(args.get(0));
+        else dummyAmount = 1;
+        if (originalMessage.isFromLobby()) {
+            String lobbyName = originalMessage.getOriginLobby();
+            Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                Lobby lobby = optLobby.get();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                if (dummyAmount > freeUsers) dummyAmount = freeUsers;
+                for (; dummyAmount > 0; dummyAmount--) {
+                    post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+                }
+            }
+        } else {
+            command_Invalid(args, originalMessage);
+        }
     }
 
     /**
@@ -134,9 +159,8 @@ public class CommandService extends AbstractService {
                                  Optional.of(originalMessage.getAuthor()));
             post(req);
             // try to send them a TurnSkippedResponse to disable their buttons, etc.
-            Optional<User> user = userManagement.getUser(args.get(0));
-            if (user.isEmpty()) return;
-            post(new GetUserSessionEvent(user.get(), new TurnSkippedResponse(originalMessage.getOriginLobby())));
+            UserOrDummy user = getUserOrDummy(args.get(0));
+            post(new GetUserSessionEvent(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
     }
 
@@ -154,10 +178,9 @@ public class CommandService extends AbstractService {
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
         if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
-        Optional<User> user = userManagement.getUser(args.get(1));
-        if (user.isEmpty()) return;
-
-        Message msg = new EditInventoryRequest(args.get(0), user.get(), args.get(2), Integer.parseInt(args.get(3)));
+        UserOrDummy user = getUserOrDummy(args.get(1));
+        if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
+        Message msg = new EditInventoryRequest(args.get(0), user, args.get(2), Integer.parseInt(args.get(3)));
         post(msg);
     }
 
@@ -254,41 +277,6 @@ public class CommandService extends AbstractService {
     }
 
     /**
-     * Handles the /adddummy command
-     * <p>
-     * Usage: {@code /adddummy}
-     *
-     * @param args            List of Strings to be used as arguments
-     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
-     *                        used to invoke the command
-     *
-     * @author Alwin Bossert
-     * @author Temmo Junkhoff
-     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
-     * @since 2021-03-13
-     */
-    private void command_AddDummy(List<String> args, NewChatMessageRequest originalMessage) {
-        LOG.debug("Received /adddummy command");
-        int dummyAmount;
-        if (args.size() > 0) dummyAmount = Integer.parseInt(args.get(0));
-        else dummyAmount = 1;
-        if (originalMessage.isFromLobby()) {
-            String lobbyName = originalMessage.getOriginLobby();
-            Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
-            if (optLobby.isPresent()) {
-                Lobby lobby = optLobby.get();
-                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
-                if (dummyAmount > freeUsers) dummyAmount = freeUsers;
-                for (; dummyAmount > 0; dummyAmount--) {
-                    post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
-                }
-            }
-        } else {
-            command_Invalid(args, originalMessage);
-        }
-    }
-
-    /**
      * Helper method that filters through all classes in the project modules
      * and returns a list that contains only classes the Developer Menu is
      * allowed to request an instantiation and posting of.
@@ -311,6 +299,36 @@ public class CommandService extends AbstractService {
                   .filter(cls -> !cls.isInterface()) // No interfaces
                   .forEach(allClasses::add);
         } catch (IOException | ClassNotFoundException ignored) {}
+    }
+
+    /**
+     * Helper method used to find either a User or a Dummy, depending on the input
+     * String
+     * <p>
+     * This method looks up the provided name in the UserManagement and returns the
+     * found User, if one exists. If no matching user is found and the name happens
+     * to match the naming scheme for Dummy users, a cloned Dummy user is returned
+     * instead.
+     * If neither case happens, the returned value will be null.
+     *
+     * @param name The name of the User or Dummy to look up
+     *
+     * @return UserOrDummy object representing the found result (null if nothing found)
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-03-30
+     */
+    private UserOrDummy getUserOrDummy(String name) {
+        Optional<User> userOptional = userManagement.getUser(name);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            if (name.matches("^Dummy\\d+")) {
+                StringBuilder x = new StringBuilder();
+                for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
+                return new DummyDTO(Integer.parseInt(x.toString()));
+            } else return null;
+        }
     }
 
     /**

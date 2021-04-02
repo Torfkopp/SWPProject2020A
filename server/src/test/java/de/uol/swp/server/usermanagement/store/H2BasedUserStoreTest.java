@@ -26,26 +26,26 @@ class H2BasedUserStoreTest {
         Collections.sort(users);
     }
 
-    UserStore getDefaultStore() {
-        return new H2BasedUserStore();
-    }
-
-    List<User> getDefaultUsers() {
-        return Collections.unmodifiableList(users);
+    @AfterEach
+    protected void cleanDatabase() {
+        UserStore store = getDefaultStore();
+        List<User> users = getDefaultUsers();
+        users.forEach(u -> store.removeUser(u.getUsername()));
     }
 
     @BeforeEach
-    void fillDatabase() {
+    protected void fillDatabase() {
         UserStore store = getDefaultStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
     }
 
-    @AfterEach
-    void cleanDatabase() {
-        UserStore store = getDefaultStore();
-        List<User> users = getDefaultUsers();
-        users.forEach(u -> store.removeUser(u.getUsername()));
+    protected UserStore getDefaultStore() {
+        return new H2BasedUserStore();
+    }
+
+    protected List<User> getDefaultUsers() {
+        return Collections.unmodifiableList(users);
     }
 
     @Test

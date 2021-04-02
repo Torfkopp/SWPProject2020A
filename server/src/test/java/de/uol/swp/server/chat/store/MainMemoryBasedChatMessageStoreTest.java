@@ -42,7 +42,7 @@ class MainMemoryBasedChatMessageStoreTest {
      * ChatMessage objects don't interfere with another test's.
      */
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         store = new MainMemoryBasedChatMessageStore();
     }
 
@@ -52,7 +52,7 @@ class MainMemoryBasedChatMessageStoreTest {
      * This method resets the store variable to null
      */
     @AfterEach
-    void tearDown() {
+    protected void tearDown() {
         store = null;
     }
 

@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * An interface for all methods of the clientLobbyService
@@ -40,7 +41,8 @@ public interface ILobbyService {
     /**
      * Posts a request to end the turn onto the Event
      *
-     * @param user The user who wants to end the turn
+     * @param user      The user who wants to end the turn
+     * @param lobbyName The name of the lobby in which to end the turn
      *
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @since 2021-01-15
@@ -57,6 +59,19 @@ public interface ILobbyService {
      * @since 2019-11-20
      */
     void joinLobby(String name, User user);
+
+    /**
+     * Posts a request to kick a user
+     *
+     * @param lobbyName    The name of the lobby the user should be kicked out.
+     * @param loggedInUser The user who wants to kick another user.
+     * @param userToKick   The user who should be kicked.
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    void kickUser(String lobbyName, User loggedInUser, UserOrDummy userToKick);
 
     /**
      * Posts a request to leave a specified lobby onto the EventBus
@@ -112,22 +127,11 @@ public interface ILobbyService {
      *
      * @param lobbyName The name of the Lobby
      * @param user      The currently logged in User
+     * @param lobby     The Lobby to present
      *
      * @since 2020-12-30
      */
     void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby);
-
-    /**
-     * Posts a request to start the game session
-     *
-     * @param lobbyName The name of the lobby where the session should be started.
-     * @param user      The user who wants to start the session.
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
-     */
-    void startSession(String lobbyName, User user);
 
     /**
      * Posts a request to remove the user from all lobbies
@@ -138,19 +142,6 @@ public interface ILobbyService {
      * @since 2021-01-28
      */
     void removeFromLobbies(User user);
-
-    /**
-     * Posts a request to kick a user
-     *
-     * @param lobbyName    The name of the lobby the user should be kicked out.
-     * @param loggedInUser The user who wants to kick another user.
-     * @param userToKick   The user who should be kicked.
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
-     */
-    void kickUser(String lobbyName, User loggedInUser, User userToKick);
 
     /**
      * Posts a request to retrieve all lobby names
@@ -186,28 +177,25 @@ public interface ILobbyService {
     /**
      * Posts a request to roll the dices
      *
+     * @param lobbyName The Lobby in which to roll the dice
+     * @param user      The User who wants to roll the dice
+     *
      * @see de.uol.swp.common.game.request.RollDiceRequest
      * @since 2021-02-22
      */
     void rollDice(String lobbyName, User user);
 
     /**
-     * This method is used to update the pre-game settings of a specific lobby.
+     * Posts a request to start the game session
      *
-     * @param lobbyName              The name of the lobby
-     * @param user                   The User who wants to update the pre-game settings
-     * @param maxPlayers             The maximum amount of players for a lobby
-     * @param commandsAllowed        Whether commands are allowed or not
-     * @param moveTime               The maximum time of a move
-     * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
-     * @param randomPlayfieldEnabled Whether the randomPlayfield is enabled or not
+     * @param lobbyName The name of the lobby where the session should be started.
+     * @param user      The user who wants to start the session.
      *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
      */
-    void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
-                             boolean commandsAllowed, int moveTime, boolean randomPlayfieldEnabled);
+    void startSession(String lobbyName, User user);
 
     /**
      * Posts a request to update ones Inventory
@@ -221,6 +209,24 @@ public interface ILobbyService {
      * @since 2021-01-25
      */
     void updateInventory(String lobbyName, User user);
+
+    /**
+     * This method is used to update the pre-game settings of a specific lobby.
+     *
+     * @param lobbyName              The name of the lobby
+     * @param user                   The User who wants to update the pre-game settings
+     * @param maxPlayers             The maximum amount of players for a lobby
+     * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
+     * @param commandsAllowed        Whether commands are allowed or not
+     * @param moveTime               The maximum time of a move
+     * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
+                             boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled);
 
     /**
      * Posts a request to change the ready status of a user

@@ -175,7 +175,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
-        //todo Show the User what card they got?
         closeWindowAfterSuccessfulTrade();
         LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
         LOG.debug("---- Sending UpdateInventoryRequest");

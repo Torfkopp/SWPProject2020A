@@ -27,14 +27,14 @@ class UserManagementTest {
         Collections.sort(users);
     }
 
-    IUserManagement getDefaultManagement() {
+    protected IUserManagement getDefaultManagement() {
         UserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return new UserManagement(store);
     }
 
-    List<User> getDefaultUsers() {
+    protected List<User> getDefaultUsers() {
         return Collections.unmodifiableList(users);
     }
 
@@ -134,7 +134,6 @@ class UserManagementTest {
         assertEquals(getDefaultUsers(), allUsers);
 
         // check if there are no passwords
-        // TODO: Normally, there should be no logic in tests
         allUsers.forEach(u -> assertEquals("", u.getPassword()));
     }
 

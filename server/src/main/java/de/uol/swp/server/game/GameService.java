@@ -10,7 +10,6 @@ import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -283,7 +282,33 @@ public class GameService extends AbstractService {
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
-                                                                                        .getUsername() + "couldnt buy a development Card");
+                                                                                        .getUsername() + "couldn't buy a development Card");
+        }
+    }
+
+    /**
+     * Handles a CheckVictoryPointsRequest found on the EventBus
+     * If a CheckVictoryPointsRequest is found on the EventBus, this method
+     * checks if the player has 10 or more victory points. If he has 10 ore more
+     * victory points, a new PlayerWonGameMessage is sent to all lobby members
+     * and the GameManagement drops the game.
+     *
+     * @param req The CheckVictoryPointsRequest found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.CheckVictoryPointsRequest
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req) {
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
+        if (vicPoints >= 10) {
+            ServerMessage message = new PlayerWonGameMessage(req.getOriginLobby(), req.getUser());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), message);
+            gameManagement.dropGame(req.getOriginLobby());
         }
     }
 
@@ -316,7 +341,9 @@ public class GameService extends AbstractService {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             } // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
+            LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
+            LOG.debug("Sending StartSessionMessage for Lobby " + lobbyName);
             StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
                                                                   msg.getLobby().startUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
@@ -1062,8 +1089,7 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Received a SystemMessageForTradeMessage");
-        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
-                                                                       req.getUser(), "Bank",
+        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser(), "Bank",
                                                                        offeredResourcesWrapperMap,
                                                                        respondingResourcesWrapperMap);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
@@ -1166,31 +1192,5 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
-    }
-
-    /**
-     * Handles a CheckVictoryPointsRequest found on the EventBus
-     * If a CheckVictoryPointsRequest is found on the EventBus, this method
-     * checks if the player has 10 or more victory points. If he has 10 ore more
-     * victory points, a new PlayerWonGameMessage is sent to all lobby members
-     * and the GameManagement drops the game.
-     *
-     * @param req The CheckVictoryPointsRequest found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.CheckVictoryPointsRequest
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req) {
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
-        if (vicPoints >= 10) {
-            ServerMessage message = new PlayerWonGameMessage(req.getOriginLobby(), req.getUser());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), message);
-            gameManagement.dropGame(req.getOriginLobby());
-        }
     }
 }

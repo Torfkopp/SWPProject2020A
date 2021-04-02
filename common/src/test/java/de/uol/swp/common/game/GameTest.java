@@ -1,6 +1,8 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
@@ -124,6 +126,20 @@ public class GameTest {
     }
 
     @Test
+    void distributesResourceTest() {
+        //Testing a hex
+        game.distributeResources(6);
+        assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_3).getBrick());
+        assertEquals(1, game.getInventory(Player.PLAYER_2).getGrain());
+        //Testing another hex
+        game.distributeResources(4);
+        assertEquals(1, game.getInventory(Player.PLAYER_2).getWool());
+        assertEquals(1, game.getInventory(Player.PLAYER_4).getGrain());
+        assertEquals(2, game.getInventory(Player.PLAYER_2).getGrain());
+    }
+
+    @Test
     void nextPlayerTest() {
         UserOrDummy[] players = game.getPlayers();
         //Tests if the players are in correct order
@@ -145,19 +161,5 @@ public class GameTest {
             assertTrue(1 <= dices[0] && dices[0] <= 6);
             assertTrue(1 <= dices[1] && dices[1] <= 6);
         }
-    }
-
-    @Test
-    void distributesResourceTest() {
-        //Testing a hex
-        game.distributeResources(6);
-        assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
-        assertEquals(1, game.getInventory(Player.PLAYER_3).getBrick());
-        assertEquals(1, game.getInventory(Player.PLAYER_2).getGrain());
-        //Testing another hex
-        game.distributeResources(4);
-        assertEquals(1, game.getInventory(Player.PLAYER_2).getWool());
-        assertEquals(1, game.getInventory(Player.PLAYER_4).getGrain());
-        assertEquals(2, game.getInventory(Player.PLAYER_2).getGrain());
     }
 }

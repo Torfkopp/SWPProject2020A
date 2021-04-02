@@ -90,18 +90,6 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public IEdge getEdge(MapPoint position) {
-        if (position.getType() != MapPoint.Type.EDGE) return null;
-        if (position.getL().getType() == MapPoint.Type.INTERSECTION && position.getR()
-                                                                               .getType() == MapPoint.Type.INTERSECTION)
-            return intersectionEdgeNetwork
-                    .edgeConnectingOrNull(getIntersection(position.getL()), getIntersection(position.getR()));
-        else if (position.getL().getType() == MapPoint.Type.HEX && position.getR().getType() == MapPoint.Type.HEX)
-            return hexEdgeNetwork.edgeConnectingOrNull(getHexWrapper(position.getL()), getHexWrapper(position.getR()));
-        return null;
-    }
-
-    @Override
     public IConfiguration getBeginnerConfiguration() {
         List<IResourceHex.ResourceHexType> hexList = new LinkedList<>();
         hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
@@ -162,6 +150,18 @@ public class GameMap implements IGameMap {
     @Override
     public IConfiguration getCurrentConfiguration() {
         return configuration;
+    }
+
+    @Override
+    public IEdge getEdge(MapPoint position) {
+        if (position.getType() != MapPoint.Type.EDGE) return null;
+        if (position.getL().getType() == MapPoint.Type.INTERSECTION && position.getR()
+                                                                               .getType() == MapPoint.Type.INTERSECTION)
+            return intersectionEdgeNetwork
+                    .edgeConnectingOrNull(getIntersection(position.getL()), getIntersection(position.getR()));
+        else if (position.getL().getType() == MapPoint.Type.HEX && position.getR().getType() == MapPoint.Type.HEX)
+            return hexEdgeNetwork.edgeConnectingOrNull(getHexWrapper(position.getL()), getHexWrapper(position.getR()));
+        return null;
     }
 
     @Override
@@ -226,13 +226,13 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint) {
-        return getIntersectionsFromEdges(getEdgesFromHex(mapPoint));
+    public IIntersection[][] getIntersectionsAsJaggedArray() {
+        return intersectionMap;
     }
 
     @Override
-    public IIntersection[][] getIntersectionsAsJaggedArray() {
-        return intersectionMap;
+    public Set<IIntersection> getIntersectionsFromHex(MapPoint mapPoint) {
+        return getIntersectionsFromEdges(getEdgesFromHex(mapPoint));
     }
 
     @Override
@@ -406,26 +406,6 @@ public class GameMap implements IGameMap {
     }
 
     /**
-     * Helper method for getIntersectionFromHexes
-     *
-     * @param set Set of edges
-     *
-     * @return Set of intersections
-     *
-     * @author Mario Fokken
-     * @since 2021-03-15
-     */
-    private Set<IIntersection> getIntersectionFromEdges(Set<IEdge> set) {
-        Set<IIntersection> intersectionSet = new HashSet<>();
-        for (IEdge edge : set) {
-            for (IIntersection i : intersectionEdgeNetwork.incidentNodes(edge)) {
-                intersectionSet.add(i);
-            }
-        }
-        return intersectionSet;
-    }
-
-    /**
      * Creates a HexEdgeNetwork
      *
      * @author Temmo Junkhoff
@@ -436,7 +416,6 @@ public class GameMap implements IGameMap {
         var hexEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
                                                   .nodeOrder(ElementOrder.insertion()).expectedNodeCount(37)
                                                   .expectedEdgeCount(72).<GameHexWrapper, IEdge>immutable();
-
         // @formatter:on
         hexMap = new GameHexWrapper[7][];
         hexMap[0] = new GameHexWrapper[4];

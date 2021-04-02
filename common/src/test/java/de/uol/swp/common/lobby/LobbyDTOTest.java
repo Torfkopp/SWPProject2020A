@@ -167,26 +167,6 @@ class LobbyDTOTest {
     }
 
     /**
-     * This test checks if the owner of a lobby is in it
-     * and if he is updatable.
-     * <p>
-     * This test fails when the owner is not in the lobby,
-     * or when he's not updatable.
-     *
-     * @since 2019-10-08
-     */
-    @Test
-    void updateOwnerTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
-        users.forEach(lobby::joinUser);
-
-        lobby.updateOwner(users.get(6));
-        assertEquals(users.get(6), lobby.getOwner());
-
-        assertThrows(IllegalArgumentException.class, () -> lobby.updateOwner(notInLobbyUser));
-    }
-
-    /**
      * Test to check whether the maxPlayers setting of a lobby
      * is updated correctly.
      * <p>
@@ -224,6 +204,26 @@ class LobbyDTOTest {
         lobby.setMoveTime(42);
 
         assertEquals(42, lobby.getMoveTime());
+    }
+
+    /**
+     * This test checks if the owner of a lobby is in it
+     * and if he is updatable.
+     * <p>
+     * This test fails when the owner is not in the lobby,
+     * or when he's not updatable.
+     *
+     * @since 2019-10-08
+     */
+    @Test
+    void updateOwnerTest() {
+        Lobby lobby = LobbyDTO.create(defaultLobby);
+        users.forEach(lobby::joinUser);
+
+        lobby.updateOwner(users.get(6));
+        assertEquals(users.get(6), lobby.getOwner());
+
+        assertThrows(IllegalArgumentException.class, () -> lobby.updateOwner(notInLobbyUser));
     }
 
     /**

@@ -24,14 +24,14 @@ class MainMemoryBasedUserStoreTest {
         Collections.sort(users);
     }
 
-    UserStore getDefaultStore() {
+    protected UserStore getDefaultStore() {
         UserStore store = new MainMemoryBasedUserStore();
         List<User> users = getDefaultUsers();
         users.forEach(u -> store.createUser(u.getUsername(), u.getPassword(), u.getEMail()));
         return store;
     }
 
-    List<User> getDefaultUsers() {
+    protected List<User> getDefaultUsers() {
         return Collections.unmodifiableList(users);
     }
 

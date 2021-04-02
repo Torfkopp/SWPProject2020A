@@ -24,9 +24,6 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
     /**
      * Constructor
-     * <p>
-     * This constructor sets the ChatMessage message's isLobbyChatMessage and lobbyName
-     * attributes to the parameters provided upon calling the constructor.
      *
      * @param lobbyName             The lobby name
      * @param offeringUser          The offering User
@@ -44,15 +41,6 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     }
 
     /**
-     * Gets the responding User
-     *
-     * @return The responding User
-     */
-    public String getRespondingUser() {
-        return respondingUser;
-    }
-
-    /**
      * Gets the SystemMessage object
      *
      * @return The encapsulated SystemMessage
@@ -60,6 +48,15 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     public SystemMessage getMsg() {
         return new SystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
                                                             this.respondingResourceMap));
+    }
+
+    /**
+     * Gets the responding User
+     *
+     * @return The responding User
+     */
+    public String getRespondingUser() {
+        return respondingUser;
     }
 
     /**
