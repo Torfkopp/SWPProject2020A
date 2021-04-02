@@ -100,8 +100,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         this.readyUsers.addAll(rsp.getReadyUsers());
         Platform.runLater(() -> {
             updateUsersList(rsp.getUsers());
-            setStartSessionButtonState();
-            setKickUserButtonState();
+            if(!inGame) {
+                setStartSessionButtonState();
+                setKickUserButtonState();
+            }
             setPreGameSettings();
         });
     }
