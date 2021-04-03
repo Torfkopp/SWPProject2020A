@@ -5,9 +5,9 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.exception.ChangeAccountDetailsExceptionMessage;
-import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
-import de.uol.swp.common.user.exception.UserDeletionExceptionMessage;
+import de.uol.swp.common.exception.ChangeAccountDetailsExceptionMessage;
+import de.uol.swp.common.exception.RegistrationExceptionMessage;
+import de.uol.swp.common.exception.UserDeletionExceptionMessage;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.DeleteUserRequest;
@@ -86,7 +86,7 @@ public class UserService extends AbstractService {
             } else {
                 returnMessage = new ChangeAccountDetailsExceptionMessage("Old Password was not correct");
             }
-        } catch (Exception e) {
+        } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new ChangeAccountDetailsExceptionMessage(e.getMessage());
         }
@@ -107,7 +107,7 @@ public class UserService extends AbstractService {
      * @see de.uol.swp.server.usermanagement.UserManagement#dropUser(User)
      * @see de.uol.swp.common.user.request.DeleteUserRequest
      * @see de.uol.swp.common.user.response.UserDeletionSuccessfulResponse
-     * @see de.uol.swp.common.user.exception.UserDeletionExceptionMessage
+     * @see de.uol.swp.common.exception.UserDeletionExceptionMessage
      * @since 2020-11-02
      */
     @Subscribe
@@ -119,7 +119,7 @@ public class UserService extends AbstractService {
         try {
             userManagement.dropUser(req.getUser());
             returnMessage = new UserDeletionSuccessfulResponse();
-        } catch (Exception e) {
+        } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new UserDeletionExceptionMessage(
                     "Cannot delete user [" + req.getUser().getUsername() + "] " + e.getMessage());
@@ -141,7 +141,7 @@ public class UserService extends AbstractService {
      * @see de.uol.swp.server.usermanagement.UserManagement#createUser(User)
      * @see de.uol.swp.common.user.request.RegisterUserRequest
      * @see de.uol.swp.common.user.response.RegistrationSuccessfulResponse
-     * @see de.uol.swp.common.user.exception.RegistrationExceptionMessage
+     * @see de.uol.swp.common.exception.RegistrationExceptionMessage
      * @since 2019-09-02
      */
     @Subscribe
@@ -153,7 +153,7 @@ public class UserService extends AbstractService {
         try {
             userManagement.createUser(req.getUser());
             returnMessage = new RegistrationSuccessfulResponse();
-        } catch (Exception e) {
+        } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new RegistrationExceptionMessage(
                     "Cannot create user [" + req.getUser().getUsername() + "] " + e.getMessage());

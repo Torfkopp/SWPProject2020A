@@ -126,7 +126,7 @@ public class AuthenticationService extends AbstractService {
             Session newSession = UUIDSession.create(newUser);
             userSessions.put(newSession, newUser);
             returnMessage.setSession(newSession);
-        } catch (Exception e) {
+        } catch (SecurityException e) {
             LOG.error(e);
             returnMessage = new ServerExceptionMessage(new LoginException("Cannot auth user " + msg.getUsername()));
         }
