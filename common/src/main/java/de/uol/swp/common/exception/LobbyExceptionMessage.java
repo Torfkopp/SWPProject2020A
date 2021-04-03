@@ -1,13 +1,11 @@
-package de.uol.swp.common.lobby.message;
-
-import de.uol.swp.common.message.ExceptionMessage;
+package de.uol.swp.common.exception;
 
 /**
  * This class returns exceptions to the client caused by
  * various lobby related errors on the server's side.
  *
  * @author Marvin Drees
- * @see de.uol.swp.common.message.ExceptionMessage
+ * @see ExceptionMessage
  * @since 2020-12-19
  */
 public class LobbyExceptionMessage extends ExceptionMessage {
