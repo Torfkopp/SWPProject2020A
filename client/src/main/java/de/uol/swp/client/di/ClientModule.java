@@ -10,7 +10,7 @@ import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
-import de.uol.swp.client.user.ClientUserService;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
 import javafx.fxml.FXMLLoader;
@@ -93,7 +93,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
-        bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
+        bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
