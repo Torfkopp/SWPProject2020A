@@ -274,10 +274,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onTradeUpdateEvent(TradeUpdateEvent event) {
-        if (lobbyName == null && loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = event.getUser();
-        }
+        if (lobbyName == null) lobbyName = event.getLobbyName();
         LOG.debug("Received TradeUpdateEvent for Lobby " + this.lobbyName);
 
         Window window = ownResourceToTradeWithView.getScene().getWindow();

@@ -118,7 +118,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllLobbiesMessage(AllLobbiesMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllLobbiesMessage");
         updateLobbyList(msg.getLobbies());
     }
@@ -173,7 +173,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllowedAmountOfPlayersMessage(AllowedAmountOfPlayersChangedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -211,7 +211,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onCreateLobbyButtonPressed() {
         //give the lobby a default name
-        String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"), loggedInUser.getUsername());
+        String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"),
+                                    userService.getLoggedInUser().getUsername());
 
         //create Dialogue, disallow any use of § in the name (used for command parsing)
         UnaryOperator<TextFormatter.Change> filter = (s) ->
@@ -291,10 +292,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onDeleteButtonPressed() {
-        userService.logout(loggedInUser);
+        userService.logout(userService.getLoggedInUser());
         resetCharVars();
         eventBus.post(showLoginViewMessage);
-        userService.dropUser(loggedInUser);
+        userService.dropUser(userService.getLoggedInUser());
     }
 
     /**
@@ -313,7 +314,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onGameCreatedMessage(GameCreatedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received GameCreatedMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -408,7 +409,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received LobbyCreatedMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -427,7 +428,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received LobbyDeletedMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -451,7 +452,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
-        this.loggedInUser = rsp.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
@@ -508,11 +508,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedInMessage");
         LOG.debug("---- New user " + msg.getUsername() + " logged in");
         Platform.runLater(() -> {
-            if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(msg.getUsername()))
+            if (users != null && !userService.getLoggedInUser().getUsername().equals(msg.getUsername()))
                 users.add(msg.getUsername());
         });
     }
@@ -532,7 +532,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedOutMessage");
         LOG.debug("---- User " + msg.getUsername() + " logged out");
         Platform.runLater(() -> users.remove(msg.getUsername()));

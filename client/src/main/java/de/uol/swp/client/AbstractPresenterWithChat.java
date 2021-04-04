@@ -72,7 +72,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @implNote Called automatically by JavaFX
      */
     @FXML
-    protected void initialize() { prepareChatVars(); }
+    protected void initialize() {
+        prepareChatVars();
+    }
 
     /**
      * Handles AskLatestChatMessageResponse
@@ -93,27 +95,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Received AskLatestChatMessageResponse");
             updateChatMessageList(rsp.getChatHistory());
         }
-    }
-
-    /**
-     * Handles ChangeAccountDetailsSuccessfulResponse
-     * <p>
-     * If a ChangeAccountDetailsSuccessfulResponse is found on the EventBus,
-     * this method overwrites the currently saved loggedInUser if and only if
-     * the ID of the updated User is identical to the one of the loggedInUser.
-     *
-     * @param rsp The ChangeAccountDetailsSuccessfulResponse found on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse
-     * @since 2021-03-23
-     */
-    @Subscribe
-    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
-        if (this.loggedInUser.getID() != rsp.getUser().getID()) return;
-        LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
-        this.loggedInUser = rsp.getUser();
     }
 
     /**
@@ -159,7 +140,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
         else return;
         int msgId = chatMsg.getID();
-        if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
+        if (!chatMsg.getAuthor().equals(userService.getLoggedInUser())) return;
         if (lobbyName != null) {
             chatService.deleteMessage(msgId, this.loggedInUser, lobbyName);
         } else {
@@ -217,7 +198,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
         else return;
         int msgId = chatMsg.getID();
-        if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
+        if (!chatMsg.getAuthor().equals(userService.getLoggedInUser())) return;
         if (lobbyName != null) {
             chatService.editMessage(msgId, messageField.getText(), this.loggedInUser, lobbyName);
         } else {
@@ -337,7 +318,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
-        if (msg.getName().equals(this.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
+        if (msg.getName().equals(this.lobbyName) && !userService.getLoggedInUser().equals(msg.getUser())) {
             LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }

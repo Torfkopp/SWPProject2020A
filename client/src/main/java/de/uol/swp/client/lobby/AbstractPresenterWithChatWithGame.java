@@ -120,7 +120,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     protected void fitCanvasToSize() {
         double heightDiff = 0;
-        if (gameWon && Objects.equals(owner, loggedInUser)) heightDiff = 40;
+        if (gameWon && Objects.equals(owner, userService.getLoggedInUser())) heightDiff = 40;
         double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
         double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
         double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.LOBBY_WIDTH_PRE_GAME;
@@ -130,7 +130,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameRendering = new GameRendering(gameMapCanvas);
 
         if (gameWon) {
-            gameRendering.showWinnerText(!Objects.equals(winner, loggedInUser) ?
+            gameRendering.showWinnerText(!Objects.equals(winner, userService.getLoggedInUser()) ?
                                          String.format(resourceBundle.getString("game.won.info"), winner) :
                                          resourceBundle.getString("game.won.you"));
         } else {
@@ -149,7 +149,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-02-22
      */
     protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(!loggedInUser.equals(user));
+        rollDice.setDisable(!userService.getLoggedInUser().equals(user));
     }
 
     /**
@@ -230,12 +230,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
-        if (!this.lobbyName.equals(msg.getLobbyName())) return;
+        if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         resetButtonStates(msg.getUser());
-        this.dice1 = msg.getDice1();
-        this.dice2 = msg.getDice2();
+        dice1 = msg.getDice1();
+        dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         lobbyService.updateInventory(lobbyName, loggedInUser);
     }
@@ -304,7 +304,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
@@ -378,19 +378,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardFailureResponse");
-        if (loggedInUser.equals(rsp.getUser())) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
-                alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
-                ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                    ButtonBar.ButtonData.OK_DONE);
-                alert.getButtonTypes().setAll(confirm);
-                if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
-                    alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
-                alert.showAndWait();
-            });
-        }
+        if (!userService.getLoggedInUser().equals(rsp.getUser())) return;
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
+            alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
+                alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+            alert.showAndWait();
+        });
     }
 
     /**
@@ -427,11 +426,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        if (!lobbyName.equals(msg.getLobbyName())) return;
         gameMap = null;
         gameWon = true;
         winner = msg.getUser();
-        if (Objects.equals(owner, loggedInUser)) {
+        if (Objects.equals(owner, userService.getLoggedInUser())) {
             returnToLobby.setVisible(true);
             returnToLobby.setPrefHeight(30);
             returnToLobby.setPrefWidth(250);
@@ -477,9 +476,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
-        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
-            resetButtonStates(event.getUser());
-        }
+        if (!lobbyName.equals(event.getLobbyName())) return;
+        resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -492,7 +490,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onReturnToLobbyButtonPressed() {
         inGame = false;
-        lobbyService.returnToPreGameLobby(this.lobbyName);
+        lobbyService.returnToPreGameLobby(lobbyName);
     }
 
     /**
@@ -528,9 +526,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
-        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
-            endTurn.setDisable(false);
-        }
+        if (lobbyName.equals(event.getLobbyName())) endTurn.setDisable(false);
     }
 
     /**
@@ -609,7 +605,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
-        } else if (Objects.equals(user, loggedInUser)) {
+        } else if (Objects.equals(user, userService.getLoggedInUser())) {
             eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
         } else {
             disableButtonStates();
@@ -634,8 +630,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        if (!rsp.getActivePlayer().equals(loggedInUser)) return;
-        resetButtonStates(loggedInUser);
+        if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
+        resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -864,9 +860,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-03-23
      */
     private void resetButtonStates(UserOrDummy user) {
-        tradeWithBankButton.setDisable(!loggedInUser.equals(user));
-        endTurn.setDisable(!loggedInUser.equals(user));
-        tradeWithUserButton.setDisable(!loggedInUser.equals(user));
-        playCard.setDisable(!loggedInUser.equals(user));
+        tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
+        endTurn.setDisable(!userService.getLoggedInUser().equals(user));
+        tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
+        playCard.setDisable(!userService.getLoggedInUser().equals(user));
     }
 }

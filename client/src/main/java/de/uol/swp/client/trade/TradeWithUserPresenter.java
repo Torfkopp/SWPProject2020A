@@ -261,10 +261,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @Subscribe
     private void onTradeWithUserUpdateEvent(TradeWithUserUpdateEvent event) {
         LOG.debug("Received TradeWithUserUpdateEvent for Lobby " + event.getLobbyName());
-        if (lobbyName == null || loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = event.getUser();
-        }
+        if (lobbyName == null) lobbyName = event.getLobbyName();
         Window window = ownInventoryView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }

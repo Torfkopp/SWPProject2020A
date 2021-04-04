@@ -119,8 +119,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     protected void setKickUserButtonState() {
         Platform.runLater(() -> {
-            kickUserButton.setVisible(loggedInUser.equals(owner));
-            kickUserButton.setDisable(loggedInUser.equals(owner));
+            kickUserButton.setVisible(userService.getLoggedInUser().equals(owner));
+            kickUserButton.setDisable(userService.getLoggedInUser().equals(owner));
         });
     }
 
@@ -133,13 +133,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-03-15
      */
     protected void setPreGameSettings() {
-        moveTimeTextField.setDisable(!loggedInUser.equals(owner));
-        changeMoveTimeButton.setDisable(!loggedInUser.equals(owner));
-        setStartUpPhaseCheckBox.setDisable(!loggedInUser.equals(owner));
-        commandsActivated.setDisable(!loggedInUser.equals(owner));
-        randomPlayFieldCheckbox.setDisable(!loggedInUser.equals(owner));
-        fourPlayerRadioButton.setDisable(!loggedInUser.equals(owner));
-        threePlayerRadioButton.setDisable(!loggedInUser.equals(owner) || lobbyMembers.size() == 4);
+        moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
+        commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
+        randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
+        fourPlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        threePlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner) || lobbyMembers.size() == 4);
     }
 
     /**
@@ -154,7 +154,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (loggedInUser.equals(owner)) {
+        if (userService.getLoggedInUser().equals(owner)) {
             startSession.setVisible(true);
             startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
         } else {
@@ -198,7 +198,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && loggedInUser.equals(rsp.getToBeKickedUser())) {
+        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
             Platform.runLater(() -> closeWindow(true));
         }
     }
@@ -384,7 +384,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void prepareLobbyUpdate() {
-        if (!loggedInUser.equals(owner)) return;
+        if (!userService.getLoggedInUser().equals(owner)) return;
         int moveTime =
                 !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
         int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;

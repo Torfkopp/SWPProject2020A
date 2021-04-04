@@ -147,8 +147,7 @@ public class SceneManager {
      * @author Mario Fokken
      * @since 2020-12-19
      */
-    public void showChangeAccountDetailsScreen(User user) {
-        ChangeAccountDetailsScene.setUserData(user);
+    public void showChangeAccountDetailsScreen() {
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
                   CHANGEACCDETAILS_WIDTH, CHANGEACCDETAILS_HEIGHT);
     }
@@ -754,13 +753,15 @@ public class SceneManager {
      * called. It calls a method to switch the current screen to the Change Account Details
      * screen.
      *
+     * @param event The ShowChangeAccountDetailsViewEvent detected on the EventBus
+     *
      * @author Eric Vuong
      * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @since 2020-12-19
      */
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
-        showChangeAccountDetailsScreen(event.getUser());
+        showChangeAccountDetailsScreen();
     }
 
     /**
@@ -852,7 +853,6 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
         //gets the lobby's name
-        User user = event.getUser();
         String lobbyName = event.getLobbyName();
         //New window (Stage)
         Stage bankStage = new Stage();
@@ -874,7 +874,7 @@ public class SceneManager {
         //Shows the window
         bankStage.show();
         LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
-        eventBus.post(new TradeUpdateEvent(lobbyName, user));
+        eventBus.post(new TradeUpdateEvent(lobbyName));
     }
 
     /**
@@ -915,7 +915,7 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to Lobby " + lobbyName);
             eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
         });
     }
@@ -938,7 +938,6 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
         String lobbyName = event.getLobbyName();
-        UserOrDummy offeringUser = event.getOfferingUser();
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
@@ -954,7 +953,7 @@ public class SceneManager {
         tradingStage.initModality(Modality.NONE);
         tradingStage.initOwner(primaryStage);
         tradingStage.show();
-        eventBus.post(new TradeWithUserUpdateEvent(lobbyName, offeringUser));
+        eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
         LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
     }
 

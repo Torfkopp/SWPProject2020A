@@ -142,10 +142,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent event) {
-        LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobbyName());
-        if (lobbyName == null || loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = (User) event.getUser();
+        LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobby().getName());
+        if (lobbyName == null) {
+            lobbyName = event.getLobby().getName();
             chatService.askLatestMessages(10, lobbyName);
         }
         if (window == null) {
@@ -243,7 +242,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+            if (lobbyMembers != null && userService.getLoggedInUser() != user && !lobbyMembers.contains(user))
                 lobbyMembers.add(user);
             setStartSessionButtonState();
             setPreGameSettings();
@@ -351,7 +350,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 return;
             }
             String name = newValue.getUsername();
-            boolean isSelf = newValue.equals(this.loggedInUser);
+            boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {

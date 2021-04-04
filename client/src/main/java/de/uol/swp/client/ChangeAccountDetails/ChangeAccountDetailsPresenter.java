@@ -29,16 +29,16 @@ import java.util.regex.Pattern;
 public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangeAccountDetailsView.fxml";
-    private static final ChangeAccountDetailsCanceledEvent ChangeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
+    private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
     @FXML
-    private PasswordField NewPasswordField;
+    private PasswordField newPasswordField;
     @FXML
-    private TextField NewUsernameField;
+    private TextField newUsernameField;
     @FXML
-    private TextField NewEMailField;
+    private TextField newEMailField;
     @FXML
-    private PasswordField ConfirmPasswordField;
+    private PasswordField confirmPasswordField;
 
     /**
      * Constructor
@@ -91,7 +91,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
-        eventBus.post(ChangeAccountDetailsCanceledEvent);
+        eventBus.post(changeAccountDetailsCanceledEvent);
     }
 
     /**
@@ -114,34 +114,34 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     private void onChangeAccountDetailsButtonPressed() {
         //the UserData is set in the showChangePasswordScreen Method in the SceneManager
 
-        if (Strings.isNullOrEmpty(ConfirmPasswordField.getText())) {
+        if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changepw")));
         }
 
-        User user = (User) ConfirmPasswordField.getScene().getUserData();
-        String newPassword = ConfirmPasswordField.getText();
+        User user = userService.getLoggedInUser();
+        String newPassword = confirmPasswordField.getText();
         String newUsername = user.getUsername();
         String newEMail = user.getEMail();
 
-        if (Strings.isNullOrEmpty(NewUsernameField.getText()) && Strings
-                .isNullOrEmpty(NewEMailField.getText()) && Strings.isNullOrEmpty(NewPasswordField.getText())) {
+        if (Strings.isNullOrEmpty(newUsernameField.getText()) && Strings
+                .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails")));
-        } else if (!checkMailFormat(NewEMailField.getText()) && !NewEMailField.getText().isEmpty()) {
+        } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else {
-            if (!Strings.isNullOrEmpty(NewPasswordField.getText())) {
-                newPassword = NewPasswordField.getText();
+            if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
+                newPassword = newPasswordField.getText();
             }
-            if (!Strings.isNullOrEmpty(NewUsernameField.getText())) {
-                newUsername = NewUsernameField.getText();
+            if (!Strings.isNullOrEmpty(newUsernameField.getText())) {
+                newUsername = newUsernameField.getText();
             }
-            if (!Strings.isNullOrEmpty(NewEMailField.getText())) {
-                newEMail = NewEMailField.getText();
+            if (!Strings.isNullOrEmpty(newEMailField.getText())) {
+                newEMail = newEMailField.getText();
             }
             userService.updateAccountDetails(new UserDTO(user.getID(), newUsername, newPassword, newEMail),
-                                             ConfirmPasswordField.getText(), user.getUsername(), user.getEMail());
+                                             confirmPasswordField.getText(), user.getUsername(), user.getEMail());
         }
     }
 }
