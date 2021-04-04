@@ -99,5 +99,6 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(ClientApp.class);
         requestStaticInjection(I18nWrapper.class);
+        requestStaticInjection(SceneManager.class);
     }
 }

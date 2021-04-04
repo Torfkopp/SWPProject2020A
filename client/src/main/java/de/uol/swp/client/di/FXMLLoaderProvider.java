@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 public class FXMLLoaderProvider implements Provider<FXMLLoader> {
 
     @Inject
-    Injector injector;
+    private Injector injector;
 
     @Override
     public FXMLLoader get() {
