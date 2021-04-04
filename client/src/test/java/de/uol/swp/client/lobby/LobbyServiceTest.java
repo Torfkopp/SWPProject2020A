@@ -4,6 +4,8 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
@@ -35,6 +37,8 @@ class LobbyServiceTest {
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
     Object event;
+    private ILobbyService lobbyService;
+    private IUserService userService;
 
     /**
      * Helper method run after each test case
@@ -46,6 +50,8 @@ class LobbyServiceTest {
     @AfterEach
     protected void deregisterBus() {
         bus.unregister(this);
+        lobbyService = null;
+        userService = null;
     }
 
     /**
@@ -60,6 +66,9 @@ class LobbyServiceTest {
     protected void registerBus() {
         event = null;
         bus.register(this);
+        userService = new UserService(bus);
+        userService.setLoggedInUser(defaultUser);
+        lobbyService = new LobbyService(bus, userService);
     }
 
     /**
@@ -78,8 +87,7 @@ class LobbyServiceTest {
      */
     @Test
     void createNewLobbyTest() throws InterruptedException {
-        ILobbyService lobbyService = new LobbyService(bus);
-        lobbyService.createNewLobby("Test", defaultUser, 4);
+        lobbyService.createNewLobby("Test", 4);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -109,8 +117,7 @@ class LobbyServiceTest {
      */
     @Test
     void refreshLobbyPresenterFieldsTest() throws InterruptedException {
-        ILobbyService lobbyService = new LobbyService(bus);
-        lobbyService.refreshLobbyPresenterFields("Test", defaultUser, defaultLobby);
+        lobbyService.refreshLobbyPresenterFields(defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -118,12 +125,8 @@ class LobbyServiceTest {
 
         LobbyUpdateEvent lobbyUpdateEvent = (LobbyUpdateEvent) event;
 
-        assertEquals("Test", lobbyUpdateEvent.getLobbyName());
-
-        assertEquals(defaultUser, lobbyUpdateEvent.getUser());
-        assertEquals(defaultUser.getID(), lobbyUpdateEvent.getUser().getID());
-        assertEquals(defaultUser.getUsername(), lobbyUpdateEvent.getUser().getUsername());
         assertEquals(defaultLobby, lobbyUpdateEvent.getLobby());
+        assertEquals(defaultLobby.getName(), lobbyUpdateEvent.getLobby().getName());
         assertEquals(defaultLobby.isInGame(), lobbyUpdateEvent.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), lobbyUpdateEvent.getLobby().getMaxPlayers());
         assertEquals(defaultLobby.commandsAllowed(), lobbyUpdateEvent.getLobby().commandsAllowed());

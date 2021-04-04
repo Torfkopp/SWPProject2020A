@@ -30,18 +30,7 @@ class UserServiceTest {
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
     Object event;
-
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method only unregisters the object of this class from the EventBus.
-     *
-     * @since 2019-10-10
-     */
-    @AfterEach
-    protected void deregisterBus() {
-        bus.unregister(this);
-    }
+    private IUserService userService;
 
     /**
      * Helper method run before each test case
@@ -52,9 +41,23 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     @BeforeEach
-    protected void registerBus() {
+    protected void setUp() {
         event = null;
         bus.register(this);
+        userService = new UserService(bus);
+    }
+
+    /**
+     * Helper method run after each test case
+     * <p>
+     * This method only unregisters the object of this class from the EventBus.
+     *
+     * @since 2019-10-10
+     */
+    @AfterEach
+    protected void tearDown() {
+        bus.unregister(this);
+        userService = null;
     }
 
     /**
@@ -74,7 +77,6 @@ class UserServiceTest {
      */
     @Test
     void createUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
         userService.createUser(defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -106,7 +108,6 @@ class UserServiceTest {
      */
     @Test
     void dropUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
 
         userService.dropUser(defaultUser);
 
@@ -163,7 +164,6 @@ class UserServiceTest {
         loginUser();
         event = null;
 
-        ClientUserService userService = new UserService(bus);
         userService.logout(defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -188,7 +188,6 @@ class UserServiceTest {
      */
     @Test
     void retrieveAllUsersTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
         userService.retrieveAllUsers();
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -213,7 +212,6 @@ class UserServiceTest {
      */
     @Test
     void updateUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
         userService.updateUser(defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -238,7 +236,6 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     private void loginUser() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
         userService.login(defaultUser.getUsername(), defaultUser.getPassword());
         lock.await(250, TimeUnit.MILLISECONDS);
     }
