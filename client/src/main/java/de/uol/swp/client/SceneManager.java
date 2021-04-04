@@ -77,13 +77,16 @@ public class SceneManager {
     private static final int TRADING_HEIGHT = 620;
     private static final int TRADING_WIDTH = 520;
 
-    private final ResourceBundle resourceBundle;
+    @Inject
+    private static Injector injector;
+    @Inject
+    private static ResourceBundle resourceBundle;
+
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
     private final Map<String, Stage> tradingResponseStages = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
-    private final Injector injector;
     private final EventBus eventBus;
     private Scene loginScene;
     private String lastTitle;
@@ -98,16 +101,13 @@ public class SceneManager {
      * Constructor
      *
      * @param eventBus     The EventBus
-     * @param injected     The Guice injector module
      * @param primaryStage The primary Stage
      */
     @Inject
-    public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
+    public SceneManager(EventBus eventBus, @Assisted Stage primaryStage) {
         eventBus.register(this);
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;
-        this.injector = injected;
-        this.resourceBundle = this.injector.getInstance(ResourceBundle.class);
         initViews();
     }
 
