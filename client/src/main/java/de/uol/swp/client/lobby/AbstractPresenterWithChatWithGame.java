@@ -8,8 +8,6 @@ import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.request.TradeWithBankRequest;
-import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -193,8 +191,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     private void disableButtonsAfterTurn() {
         disableButtonStates();
-        this.rollDice.setDisable(true);
-        lobbyService.updateInventory(lobbyName, loggedInUser);
+        rollDice.setDisable(true);
+        lobbyService.updateInventory(lobbyName);
     }
 
     /**
@@ -237,7 +235,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
-        lobbyService.updateInventory(lobbyName, loggedInUser);
+        lobbyService.updateInventory(lobbyName);
     }
 
     /**
@@ -252,7 +250,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
-        lobbyService.endTurn(loggedInUser, lobbyName);
+        lobbyService.endTurn(lobbyName);
     }
 
     /**
@@ -354,11 +352,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Result is the button the user has clicked on
         if (result.isEmpty()) return;
         if (result.get() == btnKnight) { //Play a Knight Card
-            lobbyService.playKnightCard(lobbyName, loggedInUser);
+            lobbyService.playKnightCard(lobbyName);
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
+            lobbyService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -407,7 +405,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
-        lobbyService.updateInventory(rsp.getLobbyName(), rsp.getUser());
+        lobbyService.updateInventory(rsp.getLobbyName());
     }
 
     /**
@@ -506,8 +504,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onRollDiceButtonPressed() {
-        lobbyService.rollDice(lobbyName, loggedInUser);
-        this.rollDice.setDisable(true);
+        lobbyService.rollDice(lobbyName);
+        rollDice.setDisable(true);
     }
 
     /**
@@ -542,7 +540,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        lobbyService.updateInventory(this.lobbyName, this.loggedInUser);
+        lobbyService.updateInventory(lobbyName);
     }
 
     /**
@@ -578,10 +576,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onTradeWithBankButtonPressed() {
         disableButtonStates();
-        eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
-        LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
-        eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));
-        LOG.debug("Sending a TradeWithBankRequest for Lobby " + this.lobbyName);
+        LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + lobbyName);
+        eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
+        lobbyService.tradeWithBank(lobbyName);
     }
 
     /**
@@ -610,9 +607,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else {
             disableButtonStates();
             LOG.debug("Sending ShowTradeWithUserViewEvent");
-            eventBus.post(new ShowTradeWithUserViewEvent(loggedInUser, lobbyName, user));
-            LOG.debug("Sending a TradeWithUserRequest for Lobby " + lobbyName);
-            eventBus.post(new TradeWithUserRequest(lobbyName, loggedInUser, user));
+            eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, user));
+            lobbyService.tradeWithUser(lobbyName, user);
         }
     }
 
@@ -650,7 +646,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), loggedInUser, lobbyName, rsp));
+        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
     }
 
     /**
@@ -691,7 +687,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
-        lobbyService.checkVictoryPoints(this.lobbyName, this.loggedInUser);
+        lobbyService.checkVictoryPoints(lobbyName);
     }
 
     /**
@@ -725,7 +721,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             else if (rst.get().equals(grain)) resource = Resources.GRAIN;
             else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
             else if (rst.get().equals(wool)) resource = Resources.WOOL;
-            lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
+            lobbyService.playMonopolyCard(lobbyName, resource);
         }
     }
 
@@ -788,7 +784,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
             else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
             //Send Request
-            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+            lobbyService.playYearOfPlentyCard(lobbyName, resource1, resource2);
         }
     }
 

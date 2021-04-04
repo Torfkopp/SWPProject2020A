@@ -6,14 +6,9 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
-import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
-import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +35,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     public static final String fxml = "/fxml/TradeWithBankView.fxml";
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
     private String lobbyName;
-    private User loggedInUser;
     private Map<String, Integer> resourceMap;
     private ObservableList<Pair<String, Integer>> resourceList;
     private ObservableList<Pair<String, Integer>> bankResourceList;
@@ -119,7 +113,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private void closeWindowAfterNotSuccessfulTrade() {
         Platform.runLater(() -> {
             eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-            eventBus.post(new ResetTradeWithBankButtonEvent(loggedInUser, lobbyName));
+            eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
         });
     }
 
@@ -137,7 +131,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private void closeWindowAfterSuccessfulTrade() {
         Platform.runLater(() -> {
             eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-            eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
+            eventBus.post(new TradeLobbyButtonUpdateEvent(lobbyName));
         });
     }
 
@@ -153,8 +147,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
         if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
-            Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(loggedInUser, lobbyName);
-            eventBus.post(buyDevelopmentCardRequest);
+            lobbyService.buyDevelopmentCard(lobbyName);
         }
     }
 
@@ -174,12 +167,11 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + lobbyName);
         closeWindowAfterSuccessfulTrade();
         LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
         LOG.debug("---- Sending UpdateInventoryRequest");
-        Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
-        eventBus.post(updateInventoryRequest);
+        lobbyService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
     }
 
@@ -254,9 +246,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             String userLosesResource = giveResource.getKey();
             if (userGetsResource.equals(userLosesResource)) return;
             LOG.debug("Sending a UpdateInventoryAfterTradeWithBankRequest for Lobby " + this.lobbyName);
-            Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(
-                    loggedInUser, lobbyName, userGetsResource, userLosesResource);
-            eventBus.post(updateInventoryAfterTradeWithBankRequest);
+            lobbyService.updateInventoryAfterTradeWithBank(lobbyName, userGetsResource, userLosesResource);
         }
     }
 
@@ -296,8 +286,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         closeWindowAfterSuccessfulTrade();
         LOG.debug("Sending UpdateInventoryRequest");
-        Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
-        eventBus.post(updateInventoryRequest);
+        lobbyService.updateInventory(lobbyName);
     }
 
     /**

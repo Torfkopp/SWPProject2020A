@@ -10,8 +10,6 @@ import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,7 +52,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected TextField messageField;
 
     protected String lobbyName;
-    protected User loggedInUser;
     protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     /**
@@ -142,9 +139,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         int msgId = chatMsg.getID();
         if (!chatMsg.getAuthor().equals(userService.getLoggedInUser())) return;
         if (lobbyName != null) {
-            chatService.deleteMessage(msgId, this.loggedInUser, lobbyName);
+            chatService.deleteMessage(msgId, lobbyName);
         } else {
-            chatService.deleteMessage(msgId, this.loggedInUser);
+            chatService.deleteMessage(msgId);
         }
     }
 
@@ -200,9 +197,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         int msgId = chatMsg.getID();
         if (!chatMsg.getAuthor().equals(userService.getLoggedInUser())) return;
         if (lobbyName != null) {
-            chatService.editMessage(msgId, messageField.getText(), this.loggedInUser, lobbyName);
+            chatService.editMessage(msgId, messageField.getText(), lobbyName);
         } else {
-            chatService.editMessage(msgId, messageField.getText(), this.loggedInUser);
+            chatService.editMessage(msgId, messageField.getText());
         }
         messageField.clear();
     }
@@ -249,9 +246,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         String msg = messageField.getText();
         messageField.clear();
         if (lobbyName != null) {
-            chatService.newMessage(loggedInUser, msg, lobbyName);
+            chatService.newMessage(msg, lobbyName);
         } else {
-            chatService.newMessage(loggedInUser, msg);
+            chatService.newMessage(msg);
         }
     }
 

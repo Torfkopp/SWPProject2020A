@@ -97,8 +97,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-06
      */
     private void logout() {
-        lobbyService.removeFromLobbies(loggedInUser);
-        userService.logout(loggedInUser);
+        lobbyService.removeFromAllLobbies();
+        userService.logout(userService.getLoggedInUser());
         resetCharVars();
     }
 
@@ -192,7 +192,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
+        eventBus.post(new ShowChangeAccountDetailsViewEvent());
     }
 
     /**
@@ -246,7 +246,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), loggedInUser, maxPlayers));
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers));
     }
 
     /**
@@ -270,7 +270,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
     }
 
@@ -336,7 +336,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
         } else {
             String lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
-            lobbyService.joinLobby(lobbyName, loggedInUser);
+            lobbyService.joinLobby(lobbyName);
         }
     }
 
@@ -361,7 +361,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
     }
 
@@ -386,7 +386,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        lobbyService.removeFromLobbies(loggedInUser);
+        lobbyService.removeFromAllLobbies();
         resetCharVars();
         eventBus.post(showLoginViewMessage);
         Platform.runLater(() -> eventBus.post(closeLobbiesViewEvent));
@@ -436,13 +436,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     /**
      * Handles a successful login
      * <p>
-     * If a LoginSuccessfulResponse is posted onto the EventBus, the loggedInUser
-     * of this client is set to the one in the message received.
-     * The list of the currently logged in users and the list of lobbies is requested,
+     * If a LoginSuccessfulResponse is posted onto the EventBus, the list of
+     * the currently logged in users and the list of lobbies is requested,
      * as well as a set amount of history for the global chat.
-     * Makes sure that the user is logged out gracefully
-     * should the window be closed without using the Logout button. Closing
-     * the window also clears the EventBus to avoid NullPointerExceptions.
+     * Makes sure that the user is logged out gracefully, should the window be
+     * closed without using the Logout button. Closing the window also clears
+     * the EventBus to avoid NullPointerExceptions.
      *
      * @param rsp The LoginSuccessfulResponse object seen on the EventBus
      *
@@ -473,7 +472,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <p>
      * This method is called when the LogoutButton is pressed. It calls the
      * logout(user) method of the UserService to log out the user, resets the
-     * variables used for storing the chat history, calls the removeFromLobbies
+     * variables used for storing the chat history, calls the removeFromAllLobbies
      * method of the LobbyService, and then posts an
      * instance of the ShowLoginViewEvent and CloseLobbiesViewEvent to the
      * EventBus the SceneManager is subscribed to.

@@ -9,7 +9,6 @@ import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.ResetOfferTradeButtonRequest;
-import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -143,9 +142,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUser));
-        LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUser));
+        eventBus.post(new ShowTradeWithUserViewEvent(this.lobbyName, offeringUser));
+        lobbyService.tradeWithUser(lobbyName, offeringUser);
     }
 
     /**
@@ -192,7 +190,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         TradeWithUserOfferResponse rsp = event.getRsp();
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
         respondingUser = rsp.getRespondingUser();
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();

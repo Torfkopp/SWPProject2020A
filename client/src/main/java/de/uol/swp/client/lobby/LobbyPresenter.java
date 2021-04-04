@@ -189,7 +189,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse rsp) {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
-            lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+            lobbyService.leaveLobby(entry.getKey());
         }
     }
 

@@ -31,7 +31,6 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import javafx.application.Platform;

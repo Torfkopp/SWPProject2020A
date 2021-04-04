@@ -84,8 +84,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-06
      */
     protected void closeWindow(boolean kicked) {
-        if (lobbyName != null || loggedInUser != null || !kicked) {
-            lobbyService.leaveLobby(lobbyName, loggedInUser);
+        if (lobbyName != null || !kicked) {
+            lobbyService.leaveLobby(lobbyName);
         }
         ((Stage) window).close();
         clearEventBus();
@@ -178,8 +178,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if (selectedUser == loggedInUser) return;
-        lobbyService.kickUser(lobbyName, loggedInUser, selectedUser);
+        if (selectedUser == userService.getLoggedInUser()) return;
+        lobbyService.kickUser(lobbyName, selectedUser);
     }
 
     /**
@@ -217,7 +217,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void onReadyCheckBoxClicked() {
         boolean isReady = readyCheckBox.isSelected();
-        lobbyService.userReady(lobbyName, loggedInUser, isReady);
+        lobbyService.userReady(lobbyName, isReady);
     }
 
     /**
@@ -285,7 +285,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onStartSessionButtonPressed() {
-        lobbyService.startSession(lobbyName, loggedInUser);
+        lobbyService.startSession(lobbyName);
     }
 
     /**
@@ -322,7 +322,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             if (!msg.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
-            lobbyService.updateInventory(lobbyName, loggedInUser);
+            lobbyService.updateInventory(lobbyName);
             window.setWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
             window.setHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
             ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
@@ -388,9 +388,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         int moveTime =
                 !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
         int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-        lobbyService.updateLobbySettings(lobbyName, loggedInUser, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                         commandsActivated.isSelected(), moveTime,
-                                         randomPlayFieldCheckbox.isSelected());
+        lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
+                                         commandsActivated.isSelected(), moveTime, randomPlayFieldCheckbox.isSelected());
     }
 
     /**

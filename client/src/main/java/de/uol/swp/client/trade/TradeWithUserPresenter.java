@@ -5,7 +5,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.game.request.OfferingTradeWithUserRequest;
 import de.uol.swp.common.game.request.TradeWithUserCancelRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
@@ -48,7 +47,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @FXML
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     private String lobbyName;
-    private UserOrDummy loggedInUser;
     private UserOrDummy respondingUser;
     private int traderInventorySize;
     private Map<String, Integer> selectedOwnResourceMap;
@@ -203,9 +201,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         }
         offerTradeButton.setDisable(true);
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        LOG.debug("Sending an OfferingTradeWithUserRequest");
-        eventBus.post(new OfferingTradeWithUserRequest(this.loggedInUser, respondingUser, this.lobbyName,
-                                                       selectedOwnResourceMap, selectedPartnersResourceMap));
+        lobbyService.offerTrade(lobbyName, respondingUser, selectedOwnResourceMap, selectedPartnersResourceMap);
         LOG.debug("Sending a CloseTradeResponseEvent");
         eventBus.post(new CloseTradeResponseEvent(lobbyName));
     }
