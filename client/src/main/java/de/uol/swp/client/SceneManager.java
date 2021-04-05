@@ -74,7 +74,7 @@ public class SceneManager {
     private static final int REGISTRATION_WIDTH = 410;
     private static final int RESPONSE_TRADING_HEIGHT = 340;
     private static final int RESPONSE_TRADING_WIDTH = 380;
-    private static final int TRADING_HEIGHT = 620;
+    private static final int TRADING_HEIGHT = 650;
     private static final int TRADING_WIDTH = 520;
 
     @Inject
