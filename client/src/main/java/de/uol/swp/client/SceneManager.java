@@ -60,7 +60,7 @@ public class SceneManager {
 
     private static final Logger LOG = LogManager.getLogger(SceneManager.class);
     private static final String styleSheet = "css/swp.css";
-    private static final int BANK_TRADING_HEIGHT = 400;
+    private static final int BANK_TRADING_HEIGHT = 433;
     private static final int BANK_TRADING_WIDTH = 620;
     private static final int CHANGEACCDETAILS_HEIGHT = 230;
     private static final int CHANGEACCDETAILS_WIDTH = 395;
@@ -72,9 +72,9 @@ public class SceneManager {
     private static final int MAINMENU_WIDTH = 820;
     private static final int REGISTRATION_HEIGHT = 250;
     private static final int REGISTRATION_WIDTH = 410;
-    private static final int RESPONSE_TRADING_HEIGHT = 325;
+    private static final int RESPONSE_TRADING_HEIGHT = 340;
     private static final int RESPONSE_TRADING_WIDTH = 380;
-    private static final int TRADING_HEIGHT = 620;
+    private static final int TRADING_HEIGHT = 650;
     private static final int TRADING_WIDTH = 520;
 
     @Inject

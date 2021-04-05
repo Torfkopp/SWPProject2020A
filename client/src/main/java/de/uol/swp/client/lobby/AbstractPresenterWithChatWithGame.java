@@ -701,6 +701,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper Method to play a monopoly card
      *
+     * @author Mario Fokken
      * @author Temmo Junkhoff
      * @author Maximilian Lindner
      * @since 2021-03-29
@@ -736,6 +737,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper Method to play a year of plenty card.
      *
+     * @author Mario Fokken
      * @author Temmo Junkhoff
      * @author Maximilian Lindner
      * @since 2021-03-29
