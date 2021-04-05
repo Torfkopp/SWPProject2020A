@@ -59,10 +59,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 pstmt.setString(2, eMail);
                 pstmt.setString(3, passwordHash);
                 pstmt.executeUpdate();
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
-            } catch (SQLException s) {
-                s.printStackTrace();
             } finally {
                 try {
                     if (pstmt != null) pstmt.close();
@@ -114,10 +112,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -163,10 +159,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -215,10 +209,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -264,10 +256,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 retUsers.add(usr.getWithoutPassword());
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -302,10 +292,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) nextID = rs.getInt(1);
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -338,10 +326,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -372,10 +358,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -419,10 +403,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             pstmt.setString(3, eMail);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -458,10 +440,8 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();

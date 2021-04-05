@@ -39,7 +39,7 @@ public class H2BasedUserStore extends AbstractUserStore {
      * password and e-mail and saves it in the H2 Database.
      */
     @Override
-    public User createUser(String username, String password, String eMail) throws IllegalArgumentException, RuntimeException {
+    public User createUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -60,10 +60,8 @@ public class H2BasedUserStore extends AbstractUserStore {
                 pstmt.setString(2, eMail);
                 pstmt.setString(3, passwordHash);
                 pstmt.executeUpdate();
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
-            } catch (SQLException s) {
-                s.printStackTrace();
             } finally {
                 try {
                     if (pstmt != null) pstmt.close();
@@ -118,10 +116,8 @@ public class H2BasedUserStore extends AbstractUserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -166,10 +162,8 @@ public class H2BasedUserStore extends AbstractUserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -217,10 +211,8 @@ public class H2BasedUserStore extends AbstractUserStore {
                 }
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -265,10 +257,8 @@ public class H2BasedUserStore extends AbstractUserStore {
                 retUsers.add(usr.getWithoutPassword());
             }
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -314,10 +304,8 @@ public class H2BasedUserStore extends AbstractUserStore {
             rs = pstmt.executeQuery();
             while (rs.next()) nextID = rs.getInt(1) + 1;
             rs.close();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -351,10 +339,8 @@ public class H2BasedUserStore extends AbstractUserStore {
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -384,10 +370,8 @@ public class H2BasedUserStore extends AbstractUserStore {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -433,10 +417,8 @@ public class H2BasedUserStore extends AbstractUserStore {
             pstmt.setString(3, eMail);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -483,10 +465,8 @@ public class H2BasedUserStore extends AbstractUserStore {
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();
@@ -518,20 +498,18 @@ public class H2BasedUserStore extends AbstractUserStore {
 
             //@formatter:off
             String sql = "CREATE TABLE IF NOT EXISTS USERDB (" +
-                         "id int NOT NULL AUTO_INCREMENT, " +
-                         "username VARCHAR(255), " +
-                         "mail VARCHAR(255), " +
-                         "pass VARCHAR(255), " +
-                         "PRIMARY KEY (username)," +
-                         "UNIQUE (id))";
+                    "id int NOT NULL AUTO_INCREMENT, " +
+                    "username VARCHAR(255), " +
+                    "mail VARCHAR(255), " +
+                    "pass VARCHAR(255), " +
+                    "PRIMARY KEY (username)," +
+                    "UNIQUE (id))";
             //@formatter:on
 
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        } catch (SQLException s) {
-            s.printStackTrace();
         } finally {
             try {
                 if (pstmt != null) pstmt.close();

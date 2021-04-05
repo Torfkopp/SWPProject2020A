@@ -19,10 +19,8 @@ public class SerialisationTestHelper {
             //https://youtu.be/0tr2o9-KVFI?t=3
             T obj2 = unpickle(bytes, cl);
             return obj.equals(obj2);
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
-        } catch (ClassNotFoundException e2) {
-            throw new RuntimeException(e2);
         }
     }
 
