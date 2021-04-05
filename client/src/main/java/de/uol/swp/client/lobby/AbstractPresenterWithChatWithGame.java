@@ -811,8 +811,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             protected void updateItem(Pair<String, String> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                    setText(empty || item == null ? "" :
+                            item.getValue() + " " + resourceBundle.getString(item.getKey()));
                 });
             }
         });
