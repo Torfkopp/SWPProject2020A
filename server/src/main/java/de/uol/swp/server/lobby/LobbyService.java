@@ -10,14 +10,12 @@ import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.*;
-import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
-import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.game.event.KickUserEvent;
-import de.uol.swp.server.message.FetchUserContextInternalRequest;
 import de.uol.swp.server.message.ServerInternalMessage;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import org.apache.logging.log4j.LogManager;
@@ -145,30 +143,6 @@ public class LobbyService extends AbstractService {
     }
 
     /**
-     * Handles a GetUserSessionEvent found on the EventBus
-     * <p>
-     * If a GetUserSessionEvent is found on the EventBus this
-     * method gets the Session of the User contained in the GetUserSessionEvent.
-     * Then it posts a FetchUserContextInternalRequest with the session of the
-     * User and .the ResponseMessage contained in the GetUserSessionEvent,
-     * which will be handled by the ServerHandler.
-     *
-     * @param event GetUserSessionEvent found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
-     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onGetUserSessionEvent(GetUserSessionEvent event) {
-        Optional<Session> session = authenticationService.getSession(event.getTargetUser());
-        if (session.isEmpty()) throw new RuntimeException("UserSession not found");
-        post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
-    }
-
-    /**
      * Handles a KickUserEvent found on the EventBus
      * <p>
      * If a KickUserEvent is detected on the EventBus a
@@ -184,7 +158,7 @@ public class LobbyService extends AbstractService {
      * @see de.uol.swp.server.game.event.KickUserEvent
      * @see de.uol.swp.common.lobby.request.KickUserRequest
      * @see de.uol.swp.common.lobby.response.KickUserResponse
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @see de.uol.swp.common.lobby.message.AllLobbiesMessage
      * @since 2021-03-02
@@ -198,7 +172,7 @@ public class LobbyService extends AbstractService {
         UserOrDummy toBeKickedUser = req.getToBeKickedUser();
         lobby.get().leaveUser(toBeKickedUser);
         ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
-        post(new GetUserSessionEvent(toBeKickedUser, kickResponse));
+        post(new ForwardToUserInternalRequest(toBeKickedUser, kickResponse));
         sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
         post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
