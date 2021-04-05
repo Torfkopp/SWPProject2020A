@@ -81,7 +81,7 @@ public interface IUserManagement {
      * @implNote The User object has to contain a unique identifier in order to
      * get the correct user
      */
-    Optional<User> getUserWithPassword(String userName, String password);
+    Optional<User> getUser(String userName, String password);
 
     /**
      * Test if given user is logged in

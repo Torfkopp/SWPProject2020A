@@ -60,7 +60,7 @@ public class UserManagement extends AbstractUserManagement {
     }
 
     @Override
-    public Optional<User> getUserWithPassword(String userName, String password) {
+    public Optional<User> getUser(String userName, String password) {
         return userStore.findUser(userName, password);
     }
 
