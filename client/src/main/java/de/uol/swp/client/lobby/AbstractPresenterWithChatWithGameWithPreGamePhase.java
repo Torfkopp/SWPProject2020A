@@ -236,6 +236,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
         Platform.runLater(() -> {
+            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby " + lobbyName);
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
