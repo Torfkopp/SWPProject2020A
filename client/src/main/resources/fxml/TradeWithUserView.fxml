@@ -4,79 +4,92 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<VBox alignment="CENTER" fillWidth="false" spacing="25.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
-    <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" text="%game.trade.status.makingoffer" textAlignment="CENTER">
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" fillWidth="false" spacing="25.0"
+      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
+    <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" text="%game.trade.status.makingoffer"
+           textAlignment="CENTER">
         <font>
-            <Font size="18.0" />
+            <Font size="18.0"/>
         </font>
     </Label>
 
     <HBox fx:id="tradingHBox" alignment="CENTER" spacing="40.0">
         <VBox alignment="CENTER" spacing="15.0">
-         <Label text="%game.trade.labels.yougive" />
+            <Label text="%game.trade.labels.yougive"/>
             <VBox>
-                <Label text="%game.resources.brick" />
-                <Slider fx:id="ownBrickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.brick"/>
+                <Slider fx:id="ownBrickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.ore" />
-                <Slider fx:id="ownOreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.ore"/>
+                <Slider fx:id="ownOreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.grain" />
-                <Slider fx:id="ownGrainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.grain"/>
+                <Slider fx:id="ownGrainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.wool" />
-                <Slider fx:id="ownWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.wool"/>
+                <Slider fx:id="ownWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.lumber" />
-                <Slider fx:id="ownLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.lumber"/>
+                <Slider fx:id="ownLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150.0"
+                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
         </VBox>
 
         <VBox alignment="CENTER" spacing="20.0">
-            <Button fx:id="offerTradeButton" mnemonicParsing="false" onAction="#onOfferTradeButtonPressed" text="%game.trade.buttons.makeoffer" />
-            <Button mnemonicParsing="false" onAction="#onCancelTradeButtonPressed" text="%game.trade.buttons.cancel" />
+            <Button fx:id="offerTradeButton" mnemonicParsing="false" onAction="#onOfferTradeButtonPressed"
+                    text="%game.trade.buttons.makeoffer"/>
+            <Button mnemonicParsing="false" onAction="#onCancelTradeButtonPressed" text="%game.trade.buttons.cancel"/>
         </VBox>
 
         <VBox alignment="CENTER" spacing="15.0">
-         <Label text="%game.trade.labels.youget"/>
+            <Label text="%game.trade.labels.youget"/>
             <VBox>
-                <Label text="%game.resources.brick" />
-                <Slider fx:id="tradingPartnerBrickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.brick"/>
+                <Slider fx:id="tradingPartnerBrickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
+                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.ore" />
-                <Slider fx:id="tradingPartnerOreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.ore"/>
+                <Slider fx:id="tradingPartnerOreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
+                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.grain" />
-                <Slider fx:id="tradingPartnerGrainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.grain"/>
+                <Slider fx:id="tradingPartnerGrainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
+                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.wool" />
-                <Slider fx:id="tradingPartnerWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.wool"/>
+                <Slider fx:id="tradingPartnerWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
+                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.lumber" />
-                <Slider fx:id="tradingPartnerLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                <Label text="%game.resources.lumber"/>
+                <Slider fx:id="tradingPartnerLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
+                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             </VBox>
         </VBox>
         <VBox.margin>
-            <Insets left="10.0" />
+            <Insets left="10.0"/>
         </VBox.margin>
     </HBox>
 
     <VBox alignment="CENTER" spacing="10.0">
-        <Label text="%game.trade.labels.owninventory" />
-        <ListView fx:id="ownInventoryView" prefHeight="120.0" prefWidth="200.0" />
+        <Label text="%game.trade.labels.owninventory"/>
+        <ListView fx:id="ownInventoryView" prefHeight="120.0" prefWidth="200.0"/>
         <VBox.margin>
-            <Insets bottom="10.0" left="10.0" />
+            <Insets bottom="10.0" left="10.0"/>
         </VBox.margin>
     </VBox>
     <padding>
-        <Insets top="10.0" />
+        <Insets top="10.0"/>
     </padding>
 </VBox>
