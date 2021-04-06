@@ -38,6 +38,8 @@ import java.util.Map;
 public class TradeWithUserAcceptPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithUserAcceptView.fxml";
+    public static final int MIN_HEIGHT = 340;
+    public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
     @FXML

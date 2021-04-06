@@ -31,8 +31,11 @@ import java.util.*;
 public class DevMenuPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/DevMenuView.fxml";
+    public static final int MIN_HEIGHT = 450;
+    public static final int MIN_WIDTH = 630;
     private static final Logger LOG = LogManager.getLogger(DevMenuPresenter.class);
     private final List<TextField> textFields = new LinkedList<>();
+
     @FXML
     private TextField classFilterTextField;
     @FXML
