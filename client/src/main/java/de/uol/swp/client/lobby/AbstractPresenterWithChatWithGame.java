@@ -8,6 +8,9 @@ import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.message.robber.RobberChooseVictimResponse;
+import de.uol.swp.common.game.message.robber.RobberNewPositionResponse;
+import de.uol.swp.common.game.message.robber.RobberTaxMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
@@ -75,6 +78,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected IGameMap gameMap;
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
+    protected boolean robberNewPosition = false;
     protected boolean inGame;
     protected int moveTime;
     protected User owner;
@@ -271,10 +275,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
+        // TODO: Replace this placeholder code with handling the results in context of, e.g. building, info, etc
         if (mapPoint.getType() == INVALID) {
             System.out.println("INVALID");
         } else if (mapPoint.getType() == HEX) {
+            if (robberNewPosition) {
+                lobbyService.robberNewPosition(lobbyName, loggedInUser, mapPoint);
+                robberNewPosition = false;
+            }
             System.out.println("HEX");
             System.out.println("mapPoint.getY() = " + mapPoint.getY());
             System.out.println("mapPoint.getX() = " + mapPoint.getX());
@@ -496,6 +504,69 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a RobberChooseVictimResponse
+     *
+     * @param rsp The RobberChooseVictimResponse found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    @Subscribe
+    private void onRobberChooseVictimResponse(RobberChooseVictimResponse rsp) {
+        LOG.debug("Received RobberChooseVictimResponse");
+        if (loggedInUser.equals(rsp.getPlayer())) {
+            List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
+            ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
+            dialogue.setTitle("Title");
+            dialogue.setHeaderText("Header");
+            dialogue.setContentText("Content");
+            DialogPane pane = new DialogPane();
+            pane.setContent(dialogue.getDialogPane().getContent());
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.setDialogPane(pane);
+            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+            Optional<UserOrDummy> rst = dialogue.showAndWait();
+            rst.ifPresent(userOrDummy -> lobbyService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
+        }
+    }
+
+    /**
+     * Handles a RobberNewPositionResponse
+     *
+     * @param rsp The RobberNewPositionResponse found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    @Subscribe
+    private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
+        LOG.debug("Received RobberNewPositionResponse");
+        robberNewPosition = true;
+    }
+
+    /**
+     * Handles a RobberTaxMessage
+     *
+     * @param msg The RobberTaxMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    @Subscribe
+    private void onRobberTaxMessage(RobberTaxMessage msg) {
+        LOG.debug("Received RobberTaxMessage");
+        if (msg.getPlayers().containsKey(loggedInUser)) {
+            //todo FXML View fürs Auswählen der Resourcenkarten
+        }
+    }
+
+    /**
      * Method called when the rollDice Button is pressed
      * <p>
      * If the rollDice Button is pressed, this method requests the LobbyService
@@ -701,9 +772,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper Method to play a monopoly card
      *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
+     * @author Mario Fokken
+     * @since 2021-02-25
      */
     private void playMonopolyCard(String ore, String grain, String brick, String lumber, String wool,
                                   List<String> choices) {
@@ -736,9 +806,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper Method to play a year of plenty card.
      *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
+     * @author Mario Fokken
+     * @since 2021-02-25
      */
     private void playYearOfPlentyCard(String ore, String grain, String brick, String lumber, String wool,
                                       List<String> choices) {

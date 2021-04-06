@@ -3,7 +3,10 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.message.robber.RobberChosenVictimRequest;
+import de.uol.swp.common.game.message.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.lobby.Lobby;
@@ -141,6 +144,18 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby " + lobbyName);
         Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
         eventBus.post(returnToPreGameLobbyRequest);
+    }
+
+    @Override
+    public void robberChooseVictim(String lobbyName, User user, UserOrDummy victim) {
+        Message msg = new RobberChosenVictimRequest(lobbyName, user, victim);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void robberNewPosition(String lobbyName, User user, MapPoint mapPoint) {
+        Message msg = new RobberNewPositionChosenRequest(lobbyName, user, mapPoint);
+        eventBus.post(msg);
     }
 
     @Override

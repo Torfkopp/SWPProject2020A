@@ -85,7 +85,7 @@ public class GameMap implements IGameMap {
         hexMap[6][1].set(new WaterHex());
         hexMap[6][2].set(new HarborHex(hexMap[5][2], IHarborHex.HarborSide.NORTHWEST, harborList.remove(0)));
         hexMap[6][3].set(new WaterHex());
-
+        moveRobber(configuration.getRobberPosition());
         return this;
     }
 
@@ -143,7 +143,7 @@ public class GameMap implements IGameMap {
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
                                           Collections.unmodifiableList(hexList),
-                                          Collections.unmodifiableList(tokenList));
+                                          Collections.unmodifiableList(tokenList), robberPosition);
         return configuration;
     }
 
@@ -252,6 +252,17 @@ public class GameMap implements IGameMap {
     }
 
     @Override
+    public Set<Player> getPlayersAroundHex(MapPoint mapPoint) {
+        Set<Player> players = new HashSet<>();
+        for (IIntersection i : getIntersectionsFromHex(mapPoint)) {
+            if (i.getOwner() != null) {
+                players.add(i.getOwner());
+            }
+        }
+        return players;
+    }
+
+    @Override
     public IConfiguration getRandomisedConfiguration() {
         List<IHarborHex.HarborResource> harborList = new ArrayList<>();
         harborList.addAll(Collections.nCopies(4, IHarborHex.HarborResource.ANY));
@@ -284,7 +295,7 @@ public class GameMap implements IGameMap {
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
                                           Collections.unmodifiableList(hexList),
-                                          Collections.unmodifiableList(tokenList));
+                                          Collections.unmodifiableList(tokenList), robberPosition);
         return configuration;
     }
 
@@ -414,8 +425,8 @@ public class GameMap implements IGameMap {
     private void createHexEdgeNetwork() {
         // @formatter:off
         var hexEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
-                                                  .nodeOrder(ElementOrder.insertion()).expectedNodeCount(37)
-                                                  .expectedEdgeCount(72).<GameHexWrapper, IEdge>immutable();
+                .nodeOrder(ElementOrder.insertion()).expectedNodeCount(37)
+                .expectedEdgeCount(72).<GameHexWrapper, IEdge>immutable();
         // @formatter:on
         hexMap = new GameHexWrapper[7][];
         hexMap[0] = new GameHexWrapper[4];
