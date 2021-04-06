@@ -38,6 +38,8 @@ import java.util.Map;
 public class TradeWithBankPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithBankView.fxml";
+    public static final int BANK_TRADING_HEIGHT = 433;
+    public static final int BANK_TRADING_WIDTH = 620;
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
     private String lobbyName;
     private User loggedInUser;

@@ -37,8 +37,9 @@ import java.util.Map;
 public class TradeWithUserPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithUserView.fxml";
+    public static final int TRADING_HEIGHT = 650;
+    public static final int TRADING_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
-
     @FXML
     private Label statusLabel;
     @FXML

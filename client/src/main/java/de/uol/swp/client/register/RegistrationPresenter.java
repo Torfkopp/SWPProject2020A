@@ -27,9 +27,10 @@ import java.util.regex.Pattern;
 public class RegistrationPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RegistrationView.fxml";
+    public static final int REGISTRATION_HEIGHT = 250;
+    public static final int REGISTRATION_WIDTH = 410;
     private static final RegistrationCanceledEvent registrationCanceledEvent = new RegistrationCanceledEvent();
     private final Logger LOG = LogManager.getLogger(RegistrationPresenter.class);
-
     @FXML
     private TextField loginField;
     @FXML
