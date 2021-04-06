@@ -134,8 +134,8 @@ public class SceneManager {
     public void showChangeAccountDetailsScreen(User user) {
         ChangeAccountDetailsScene.setUserData(user);
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
-                  ChangeAccountDetailsPresenter.CHANGEACCDETAILS_WIDTH,
-                  ChangeAccountDetailsPresenter.CHANGEACCDETAILS_HEIGHT);
+                  ChangeAccountDetailsPresenter.MIN_WIDTH,
+                  ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -230,8 +230,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        showScene(loginScene, resourceBundle.getString("login.window.title"), LoginPresenter.LOGIN_WIDTH,
-                  LoginPresenter.LOGIN_HEIGHT);
+        showScene(loginScene, resourceBundle.getString("login.window.title"), LoginPresenter.MIN_WIDTH,
+                  LoginPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -245,7 +245,7 @@ public class SceneManager {
     public void showMainScreen(User currentUser) {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
-                  MainMenuPresenter.MAINMENU_WIDTH, MainMenuPresenter.MAINMENU_HEIGHT);
+                  MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -258,7 +258,7 @@ public class SceneManager {
      */
     public void showRegistrationScreen() {
         showScene(registrationScene, resourceBundle.getString("register.window.title"),
-                  RegistrationPresenter.REGISTRATION_WIDTH, RegistrationPresenter.REGISTRATION_HEIGHT);
+                  RegistrationPresenter.MIN_WIDTH, RegistrationPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -533,7 +533,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onChangeAccountDetailsCanceledEvent(ChangeAccountDetailsCanceledEvent event) {
-        showScene(lastScene, lastTitle, MainMenuPresenter.MAINMENU_WIDTH, MainMenuPresenter.MAINMENU_HEIGHT);
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -685,10 +685,10 @@ public class SceneManager {
             devMenuIsOpen = true;
             Stage devMenuStage = new Stage();
             devMenuStage.setTitle("Developer Access Board");
-            devMenuStage.setHeight(DevMenuPresenter.DEVMENU_HEIGHT);
-            devMenuStage.setMinHeight(DevMenuPresenter.DEVMENU_HEIGHT);
-            devMenuStage.setWidth(DevMenuPresenter.DEVMENU_WIDTH);
-            devMenuStage.setMinWidth(DevMenuPresenter.DEVMENU_WIDTH);
+            devMenuStage.setHeight(DevMenuPresenter.MIN_HEIGHT);
+            devMenuStage.setMinHeight(DevMenuPresenter.MIN_HEIGHT);
+            devMenuStage.setWidth(DevMenuPresenter.MIN_WIDTH);
+            devMenuStage.setMinWidth(DevMenuPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(DevMenuPresenter.fxml);
             Scene devMenuScene = new Scene(rootPane);
             devMenuScene.getStylesheets().add(styleSheet);
@@ -714,7 +714,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
-        showScene(lastScene, lastTitle, LoginPresenter.LOGIN_WIDTH, LoginPresenter.LOGIN_HEIGHT);
+        showScene(lastScene, lastTitle, LoginPresenter.MIN_WIDTH, LoginPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -767,10 +767,10 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
-        lobbyStage.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-        lobbyStage.setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-        lobbyStage.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-        lobbyStage.setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+        lobbyStage.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+        lobbyStage.setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);
@@ -843,10 +843,10 @@ public class SceneManager {
         //New window (Stage)
         Stage bankStage = new Stage();
         bankStage.setTitle(resourceBundle.getString("game.trade.window.bank.title"));
-        bankStage.setHeight(TradeWithBankPresenter.BANK_TRADING_HEIGHT);
-        bankStage.setMinHeight(TradeWithBankPresenter.BANK_TRADING_HEIGHT);
-        bankStage.setWidth(TradeWithBankPresenter.BANK_TRADING_WIDTH);
-        bankStage.setMinWidth(TradeWithBankPresenter.BANK_TRADING_WIDTH);
+        bankStage.setHeight(TradeWithBankPresenter.MIN_HEIGHT);
+        bankStage.setMinHeight(TradeWithBankPresenter.MIN_HEIGHT);
+        bankStage.setWidth(TradeWithBankPresenter.MIN_WIDTH);
+        bankStage.setMinWidth(TradeWithBankPresenter.MIN_WIDTH);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
         Scene bankScene = new Scene(rootPane);
@@ -889,10 +889,10 @@ public class SceneManager {
             Stage tradingResponseStage = new Stage();
             tradingResponseStage.setTitle(String.format(resourceBundle.getString("game.trade.window.receiving.title"),
                                                         event.getOfferingUser()));
-            tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.RESPONSE_TRADING_HEIGHT);
-            tradingResponseStage.setMinHeight(TradeWithUserAcceptPresenter.RESPONSE_TRADING_HEIGHT);
-            tradingResponseStage.setWidth(TradeWithUserAcceptPresenter.RESPONSE_TRADING_WIDTH);
-            tradingResponseStage.setMinWidth(TradeWithUserAcceptPresenter.RESPONSE_TRADING_WIDTH);
+            tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
+            tradingResponseStage.setMinHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
+            tradingResponseStage.setWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
+            tradingResponseStage.setMinWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
             Scene tradeScene = new Scene(rootPane);
             tradeScene.getStylesheets().add(styleSheet);
@@ -928,10 +928,10 @@ public class SceneManager {
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
-        tradingStage.setHeight(TradeWithUserPresenter.TRADING_HEIGHT);
-        tradingStage.setMinHeight(TradeWithUserPresenter.TRADING_HEIGHT);
-        tradingStage.setWidth(TradeWithUserPresenter.TRADING_WIDTH);
-        tradingStage.setMinWidth(TradeWithUserPresenter.TRADING_WIDTH);
+        tradingStage.setHeight(TradeWithUserPresenter.MIN_HEIGHT);
+        tradingStage.setMinHeight(TradeWithUserPresenter.MIN_HEIGHT);
+        tradingStage.setWidth(TradeWithUserPresenter.MIN_WIDTH);
+        tradingStage.setMinWidth(TradeWithUserPresenter.MIN_WIDTH);
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
         Scene tradeScene = new Scene(rootPane);
         tradeScene.getStylesheets().add(styleSheet);

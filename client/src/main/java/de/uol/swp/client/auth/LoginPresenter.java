@@ -21,10 +21,11 @@ import org.apache.logging.log4j.Logger;
 public class LoginPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/LoginView.fxml";
-    public static final int LOGIN_HEIGHT = 220;
-    public static final int LOGIN_WIDTH = 400;
+    public static final int MIN_HEIGHT = 220;
+    public static final int MIN_WIDTH = 400;
     private static final Logger LOG = LogManager.getLogger(LoginPresenter.class);
     private static final ShowRegistrationViewEvent showRegViewMessage = new ShowRegistrationViewEvent();
+
     @FXML
     private PasswordField passwordField;
     @FXML

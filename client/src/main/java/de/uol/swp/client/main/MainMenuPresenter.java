@@ -48,11 +48,12 @@ import java.util.function.UnaryOperator;
 public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/MainMenuView.fxml";
-    public static final int MAINMENU_HEIGHT = 550;
-    public static final int MAINMENU_WIDTH = 820;
+    public static final int MIN_HEIGHT = 550;
+    public static final int MIN_WIDTH = 820;
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
+
     @FXML
     private ListView<Pair<String, String>> lobbyView;
     @FXML

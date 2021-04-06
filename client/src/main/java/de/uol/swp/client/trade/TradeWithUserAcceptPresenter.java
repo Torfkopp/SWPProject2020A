@@ -38,9 +38,10 @@ import java.util.Map;
 public class TradeWithUserAcceptPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithUserAcceptView.fxml";
-    public static final int RESPONSE_TRADING_HEIGHT = 340;
-    public static final int RESPONSE_TRADING_WIDTH = 380;
+    public static final int MIN_HEIGHT = 340;
+    public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
+
     @FXML
     private Button acceptTradeButton;
     @FXML
@@ -49,6 +50,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     private Label tradeResponseLabel;
     @FXML
     private ListView<Pair<String, Integer>> ownInventoryView;
+
     private String lobbyName;
     private UserOrDummy offeringUser;
     private UserOrDummy respondingUser;

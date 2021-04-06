@@ -37,9 +37,10 @@ import java.util.Map;
 public class TradeWithUserPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithUserView.fxml";
-    public static final int TRADING_HEIGHT = 650;
-    public static final int TRADING_WIDTH = 520;
+    public static final int MIN_HEIGHT = 650;
+    public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+
     @FXML
     private Label statusLabel;
     @FXML
@@ -48,6 +49,11 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private Slider tradingPartnerLumberSlider, tradingPartnerWoolSlider, tradingPartnerGrainSlider, tradingPartnerOreSlider, tradingPartnerBrickSlider;
     @FXML
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
+    @FXML
+    private ListView<Pair<String, Integer>> ownInventoryView;
+    @FXML
+    private Button offerTradeButton;
+
     private String lobbyName;
     private UserOrDummy loggedInUser;
     private UserOrDummy respondingUser;
@@ -56,10 +62,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private Map<String, Integer> selectedPartnersResourceMap;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
     private Map<String, Integer> resourceMap;
-    @FXML
-    private ListView<Pair<String, Integer>> ownInventoryView;
-    @FXML
-    private Button offerTradeButton;
 
     /**
      * Constructor
