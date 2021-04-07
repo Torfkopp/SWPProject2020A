@@ -6,6 +6,16 @@ import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Set;
 
+/**
+ * Request sent to a client to ask
+ * which opponent the player wants
+ * to rob a resource card from.
+ *
+ * @author Mario Fokken
+ * @author Timo Gerken
+ * @see de.uol.swp.common.game.message.robber.RobberChosenVictimRequest
+ * @since 2021-04-06
+ */
 public class RobberChooseVictimResponse extends AbstractResponseMessage {
 
     private final User player;

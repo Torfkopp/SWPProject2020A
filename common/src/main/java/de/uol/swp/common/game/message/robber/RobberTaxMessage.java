@@ -10,8 +10,12 @@ import java.util.Map;
 /**
  * Gets sent to all players with more than seven resource
  * cards when the dice shows a seven.
+ * These players have to chose which
+ * resource cards to give up on.
  *
  * @author Mario Fokken
+ * @author Timo Gerken
+ * @see de.uol.swp.common.game.message.robber.RobberTaxChosenRequest
  * @since 2021-04-05
  */
 public class RobberTaxMessage extends AbstractGameMessage {

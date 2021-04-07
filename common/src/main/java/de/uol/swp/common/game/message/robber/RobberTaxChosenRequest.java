@@ -7,11 +7,12 @@ import de.uol.swp.common.user.User;
 import java.util.Map;
 
 /**
- * Gets sent to the server.
- * Contains the resource cards the player picked
- * to use for the robber tax.
+ * Answer to the RobberTaxMessage containing
+ * the player's chosen resource cards.
  *
  * @author Mario Fokken
+ * @author Timo Gerken
+ * @see de.uol.swp.common.game.message.robber.RobberTaxMessage
  * @since 2021-04-05
  */
 public class RobberTaxChosenRequest extends AbstractResponseMessage {

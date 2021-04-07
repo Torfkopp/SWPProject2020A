@@ -4,6 +4,15 @@ import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 
+/**
+ * Answer to the RobberNewPositionResponse containing
+ * the player's desired robber position
+ *
+ * @author Mario Fokken
+ * @author Timo Gerken
+ * @see de.uol.swp.common.game.message.robber.RobberNewPositionResponse
+ * @since 2021-04-05
+ */
 public class RobberNewPositionChosenRequest extends AbstractRequestMessage {
 
     private final String lobby;
