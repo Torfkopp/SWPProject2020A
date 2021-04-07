@@ -3,7 +3,10 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -11,10 +14,12 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
+import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.communication.UUIDSession;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
+import de.uol.swp.server.lobby.ILobbyManagement;
+import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +45,8 @@ public class AuthenticationService extends AbstractService {
     private final Map<Session, User> userSessions = new HashMap<>();
 
     private final IUserManagement userManagement;
+    
+    private final ILobbyManagement lobbyManagement;
 
     /**
      * Constructor
@@ -51,9 +58,10 @@ public class AuthenticationService extends AbstractService {
      * @since 2019-08-30
      */
     @Inject
-    public AuthenticationService(EventBus bus, UserManagement userManagement) {
+    public AuthenticationService(EventBus bus, UserManagement userManagement, ILobbyManagement lobbyManagement) {
         super(bus);
         this.userManagement = userManagement;
+        this.lobbyManagement = lobbyManagement;
     }
 
     /**
@@ -207,24 +215,39 @@ public class AuthenticationService extends AbstractService {
      * @author Eric Vuong
      * @author Marvin Drees
      * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe
     private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest req) {
         LOG.debug("Received NukeUsersSessionsRequest");
         if (req.getUser() == null) return;
-        User userToLogOut = req.getUser();
-        LOG.debug("---- Logging out user " + userToLogOut.getUsername());
-        userManagement.logout(userToLogOut);
-        while (getSession(userToLogOut).isPresent()) {
-            post(new FetchUserContextInternalRequest(getSession(userToLogOut).get(), new KillOldClientResponse()));
-            userSessions.remove(getSession(userToLogOut).get());
+        User user = req.getUser();
+        LOG.debug("---- Logging out user " + user.getUsername());
+        userManagement.logout(user);
+        while (getSession(user).isPresent()) {
+            post(new FetchUserContextInternalRequest(getSession(user).get(), new KillOldClientResponse()));
+            userSessions.remove(getSession(user).get());
         }
-        post(new UserLoggedOutMessage(userToLogOut.getUsername()));
-        NukeUsersSessionsResponse response = new NukeUsersSessionsResponse();
+        post(new UserLoggedOutMessage(user.getUsername()));
+        NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(user);
         response.initWithMessage(req);
         post(response);
+    }
+    
+    @Subscribe
+    private void onGetOldSessionsRequest(GetOldSessionsRequest req){
+        LOG.debug("Received GetOldSessionsRequest");
+        User user = req.getUser();
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            if (entry.getValue().getUserOrDummies().contains(user)) {
+                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(), entry.getValue());
+                System.err.println("JoinLobby Kram wird gesendet");
+                responseMessage.initWithMessage(req);
+                post(responseMessage);
+            }
+        }
     }
 
     /**

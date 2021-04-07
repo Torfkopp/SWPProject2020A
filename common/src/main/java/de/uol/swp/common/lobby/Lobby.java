@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby;
 
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -249,4 +250,8 @@ public interface Lobby extends Serializable {
      * @since 2019-10-08
      */
     void updateOwner(User user);
+    
+    void setConfiguration(IConfiguration configuration);
+    
+    IConfiguration getConfiguration();
 }

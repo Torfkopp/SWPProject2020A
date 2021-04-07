@@ -240,4 +240,6 @@ public interface ILobbyService {
      * @since 2021-03-23
      */
     void userReady(String lobbyName, User loggedInUser, boolean isReady);
+
+    void checkForGame(String lobbyName, User loggendInUser);
 }

@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
+import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
@@ -161,6 +162,57 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             startSession.setDisable(true);
             startSession.setVisible(false);
         }
+    }
+
+    @Subscribe
+    private void onStartSessionResponse(StartSessionResponse rsp) {
+        System.err.println("Spiel wird gebaut");
+        if (!rsp.getLobbyName().equals(lobbyName)) return;
+        LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
+        gameWon = false;
+        winner = null;
+        inGame = true;
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
+        Platform.runLater(() -> {
+            preGameSettingBox.setVisible(false);
+            preGameSettingBox.setPrefHeight(0);
+            preGameSettingBox.setMaxHeight(0);
+            preGameSettingBox.setMinHeight(0);
+            //This Line needs to be changed/ removed in the Future
+            gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
+            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
+            gameMap = new GameMap().createMapFromConfiguration(rsp.getConfiguration());
+           // if (!rsp.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
+            gameRendering.drawGameMap(gameMap);
+            setTurnIndicatorText(rsp.getUserOrDummy());
+            lobbyService.updateInventory(lobbyName, loggedInUser);
+            window.setWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
+            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
+            inventoryView.setMaxHeight(280);
+            inventoryView.setMinHeight(280);
+            inventoryView.setPrefHeight(280);
+            inventoryView.setVisible(true);
+            uniqueCardView.setMaxHeight(48);
+            uniqueCardView.setMinHeight(48);
+            uniqueCardView.setPrefHeight(48);
+            uniqueCardView.setVisible(true);
+            readyCheckBox.setVisible(false);
+            startSession.setVisible(false);
+            rollDice.setVisible(true);
+            endTurn.setVisible(true);
+            endTurn.setDisable(true);
+            tradeWithUserButton.setVisible(true);
+            tradeWithUserButton.setDisable(true);
+            tradeWithBankButton.setVisible(true);
+            tradeWithBankButton.setDisable(true);
+            setRollDiceButtonState(rsp.getUserOrDummy());
+            kickUserButton.setVisible(false);
+            playCard.setVisible(true);
+            playCard.setDisable(true);
+        });
     }
 
     /**

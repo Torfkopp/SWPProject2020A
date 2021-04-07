@@ -12,6 +12,8 @@ import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
+import de.uol.swp.server.lobby.ILobbyManagement;
+import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.message.ClientAuthorisedMessage;
 import de.uol.swp.server.message.ServerExceptionMessage;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
@@ -35,7 +37,8 @@ class AuthenticationServiceTest {
     final UserStore userStore = new MainMemoryBasedUserStore();
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(userStore);
-    final AuthenticationService authService = new AuthenticationService(bus, userManagement);
+    final ILobbyManagement lobbyManagement = new LobbyManagement();
+    final AuthenticationService authService = new AuthenticationService(bus, userManagement, lobbyManagement);
     private final CountDownLatch lock = new CountDownLatch(1);
     private Object event;
 

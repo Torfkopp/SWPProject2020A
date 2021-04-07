@@ -181,7 +181,7 @@ public class ClientConnection {
                  @Override
                  protected void initChannel(SocketChannel ch) {
                      // Add IdleStateHandler to handle timeouts
-                     ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
+                     //ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
                      // Add both Encoder and Decoder to send and receive serialisable objects
                      ch.pipeline().addLast(new ObjectEncoder());
                      ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));

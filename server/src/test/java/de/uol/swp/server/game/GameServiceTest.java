@@ -47,7 +47,7 @@ public class GameServiceTest {
     private final UserStore userStore = new MainMemoryBasedUserStore();
     private final UserManagement userManagement = new UserManagement(userStore);
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
-    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
+    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement, lobbyManagement);
     private final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
     private IGameManagement gameManagement;
     private GameService gameService;
