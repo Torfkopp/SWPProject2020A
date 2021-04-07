@@ -3,9 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.*;
-import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
@@ -15,7 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class that manages lobbies
+ * The LobbyService is responsible for posting requests and events regarding
+ * the state of a Lobby, like joining or Lobby setting updates.
  *
  * @author Marco Grawunder
  * @since 2019-11-20
@@ -23,8 +22,8 @@ import org.apache.logging.log4j.Logger;
 @SuppressWarnings("UnstableApiUsage")
 public class LobbyService implements ILobbyService {
 
+    private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final EventBus eventBus;
-    private final Logger LOG = LogManager.getLogger(LobbyService.class);
 
     /**
      * Constructor
@@ -42,23 +41,10 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkVictoryPoints(String lobbyName, User user) {
-        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
     public void createNewLobby(String name, User user, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
         eventBus.post(createLobbyRequest);
-    }
-
-    @Override
-    public void endTurn(User user, String lobbyName) {
-        LOG.debug("Sending EndTurnRequest");
-        Message endTurnRequest = new EndTurnRequest(user, lobbyName);
-        eventBus.post(endTurnRequest);
     }
 
     @Override
@@ -79,34 +65,6 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending LobbyLeaveUserRequest");
         Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
         eventBus.post(lobbyLeaveUserRequest);
-    }
-
-    @Override
-    public void playKnightCard(String lobbyName, User user) {
-        LOG.debug("Sending PlayKnightCardRequest");
-        Message msg = new PlayKnightCardRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void playMonopolyCard(String lobbyName, User user, Resources resource) {
-        LOG.debug("Sending PlayMonopolyCardRequest");
-        Message msg = new PlayMonopolyCardRequest(lobbyName, user, resource);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void playRoadBuildingCard(String lobbyName, User user) {
-        LOG.debug("Sending PlayRoadBuildingCardRequest");
-        Message msg = new PlayRoadBuildingCardRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2) {
-        LOG.debug("Sending PlayYearOfPlentyCardRequest");
-        Message msg = new PlayYearOfPlentyCardRequest(lobbyName, user, resource1, resource2);
-        eventBus.post(msg);
     }
 
     @Override
@@ -141,26 +99,6 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby " + lobbyName);
         Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
         eventBus.post(returnToPreGameLobbyRequest);
-    }
-
-    @Override
-    public void rollDice(String lobbyName, User user) {
-        LOG.debug("Sending RollDiceRequest for Lobby " + lobbyName);
-        Message rollDiceRequest = new RollDiceRequest(user, lobbyName);
-        eventBus.post(rollDiceRequest);
-    }
-
-    @Override
-    public void startSession(String lobbyName, User user) {
-        Message startSessionRequest = new StartSessionRequest(lobbyName, user);
-        eventBus.post(startSessionRequest);
-    }
-
-    @Override
-    public void updateInventory(String lobbyName, User user) {
-        LOG.debug("Sending UpdateInventoryRequest");
-        Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
-        eventBus.post(updateInventoryRequest);
     }
 
     @Override
