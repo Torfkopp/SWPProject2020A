@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
@@ -240,4 +241,6 @@ public interface ILobbyService {
      * @since 2021-03-23
      */
     void userReady(String lobbyName, User loggedInUser, boolean isReady);
+
+    void buildRequest(String lobbyName, User user, MapPoint mapPoint);
 }

@@ -344,6 +344,16 @@ public class GameMap implements IGameMap {
     }
 
     @Override
+    public boolean placeRoad(Player player, MapPoint mapPoint){
+        return placeRoad(player, getEdge(mapPoint));
+    }
+
+    @Override
+    public boolean roadPlaceable(Player player, MapPoint mapPoint){
+        return placeRoad(player, getEdge(mapPoint));
+    }
+
+    @Override
     public boolean placeSettlement(Player player, MapPoint position) {
         if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         if (settlementPlaceable(player, position)) {
@@ -389,14 +399,19 @@ public class GameMap implements IGameMap {
 
     @Override
     public boolean upgradeSettlement(Player player, MapPoint position) {
-        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
-        if (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
-                .getY()][position.getX()].getOwner() == player) {
+         if (settlementUpgradeable(player, position)){
             intersectionMap[position.getY()][position.getX()]
                     .setOwnerAndState(player, IIntersection.IntersectionState.CITY);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean settlementUpgradeable(Player player, MapPoint position){
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
+        return (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
+                .getY()][position.getX()].getOwner() == player);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {

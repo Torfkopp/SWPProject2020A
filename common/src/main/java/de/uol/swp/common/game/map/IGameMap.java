@@ -18,9 +18,7 @@ public interface IGameMap {
      * Creates an IGameMap from the provided configuration
      *
      * @param configuration The map configuration used in the current Game
-     *
      * @return The IGameMap with the configuration as provided
-     *
      * @author Finn Haase
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.game.map.configuration.IConfiguration
@@ -35,7 +33,6 @@ public interface IGameMap {
      * settlements or roads; those are created by {@link #makeBeginnerSettlementsAndRoads(int)}
      *
      * @return The beginner, read-only configuration
-     *
      * @author Finn Haase
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.game.map.configuration.IConfiguration
@@ -49,7 +46,6 @@ public interface IGameMap {
      * Gets the current configuration of the IGameMap
      *
      * @return The current, read-only configuration
-     *
      * @author Finn Haase
      * @author Phillip-André Suhr
      * @implNote Not used currently; could be used in future (e.g. rejoining a game)
@@ -62,9 +58,7 @@ public interface IGameMap {
      * Gets an edge that connects two intersections
      *
      * @param position The MapPoint of the Edge
-     *
      * @return The edge connecting the given intersections
-     *
      * @author Temmo Junkhoff
      * @since 2021-03-05
      */
@@ -74,9 +68,7 @@ public interface IGameMap {
      * Gets all the edges around the hex
      *
      * @param mapPoint The hex's mapPoint
-     *
      * @return Set of edges
-     *
      * @author Mario Fokken
      * @since 2021-03-15
      */
@@ -86,9 +78,7 @@ public interface IGameMap {
      * Gets the hex at a specified place
      *
      * @param position The hex's coordinates
-     *
      * @return The hex
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
@@ -98,9 +88,7 @@ public interface IGameMap {
      * Gets the resource hex with a specified token
      *
      * @param Token The hex's token
-     *
      * @return The ResourceHex
-     *
      * @author Mario Fokken
      * @since 2021-03-15
      */
@@ -110,7 +98,6 @@ public interface IGameMap {
      * Gets the hexes in a usable format for rendering them as a jagged array
      *
      * @return A jagged array containing the hexes
-     *
      * @author Temmo Junkhoff
      * @since 2021-01-21
      */
@@ -120,9 +107,7 @@ public interface IGameMap {
      * Gets the intersection object at a given position
      *
      * @param position The position of the intersection
-     *
      * @return An intersection object
-     *
      * @author Temmo Junkhoff
      * @since 2021-03-05
      */
@@ -132,7 +117,6 @@ public interface IGameMap {
      * Gets the intersections in a usable format for rendering them as a jagged array
      *
      * @return A jagged array containing the intersections
-     *
      * @author Temmo Junkhoff
      * @since 2021-01-31
      */
@@ -142,9 +126,7 @@ public interface IGameMap {
      * Gets all the intersections around the hex
      *
      * @param mapPoint The hex's mapPoint
-     *
      * @return Set of intersections
-     *
      * @author Mario Fokken
      * @since 2021-03-15
      */
@@ -155,7 +137,6 @@ public interface IGameMap {
      * settlements and cities.
      *
      * @return int The amount of points the player has
-     *
      * @author Mario Fokken
      * @since 2021-02-05
      */
@@ -165,7 +146,6 @@ public interface IGameMap {
      * Creates a randomised map with the standard tiles
      *
      * @return A randomised, read-only configuration
-     *
      * @author Finn Haase
      * @author Phillip-André Suhr
      * @see de.uol.swp.common.game.map.configuration.IConfiguration
@@ -177,7 +157,6 @@ public interface IGameMap {
      * Gets the robber's position
      *
      * @return A MapPoint containing the position of the robber
-     *
      * @author Temmo Junkhoff
      * @since 2021-03-05
      */
@@ -187,9 +166,7 @@ public interface IGameMap {
      * Gets the incident edges of a given intersection
      *
      * @param intersection The intersection of which the edges should be returned
-     *
      * @return A Set<> containing all edge objects
-     *
      * @author Temmo Junkhoff
      * @since 2021-03-05
      */
@@ -207,7 +184,6 @@ public interface IGameMap {
      * Moves the robber
      *
      * @param newPosition The hex the robber has moved to
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
@@ -218,22 +194,22 @@ public interface IGameMap {
      *
      * @param player The player wanting to build the road
      * @param edge   The edge to place a road on
-     *
      * @return True if placement was successful; false if not
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
     boolean placeRoad(Player player, IEdge edge);
+
+    boolean placeRoad(Player player, MapPoint mapPoint);
+
+    boolean roadPlaceable(Player player, MapPoint mapPoint);
 
     /**
      * Places a settlement
      *
      * @param player   The player wanting to build the settlement (1-4)
      * @param position The position of the intersection
-     *
      * @return True if placement was successful; false if not
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
@@ -244,9 +220,7 @@ public interface IGameMap {
      *
      * @param player The player wanting to place the street
      * @param edge   The edge to place a road on
-     *
      * @return True if placement is possible; false if not
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
@@ -257,9 +231,7 @@ public interface IGameMap {
      *
      * @param player   The player wanting to place the settlement
      * @param position The position of the intersection
-     *
      * @return True if placement is possible; false if not
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
@@ -270,11 +242,11 @@ public interface IGameMap {
      *
      * @param player   The player wanting to upgrade the settlement
      * @param position The position of the intersection
-     *
      * @return True if placement was successful; false if not
-     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
+
+    boolean settlementUpgradeable(Player player, MapPoint position);
 }

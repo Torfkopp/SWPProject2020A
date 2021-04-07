@@ -12,6 +12,8 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -52,6 +54,8 @@ public class GameService extends AbstractService {
 
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
+    //TODO: Set to false while trading
+    private boolean buildingCurrentlyAllowed;
 
     /**
      * Constructor
@@ -476,7 +480,7 @@ public class GameService extends AbstractService {
         }
         Game game = gameManagement.getGame(req.getOriginLobby());
         UserOrDummy nextPlayer = game.nextPlayer();
-
+        buildingCurrentlyAllowed = false;
         ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
         LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
@@ -485,6 +489,40 @@ public class GameService extends AbstractService {
         } else { //Dummy
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
+        }
+    }
+
+    @Subscribe
+    private void onBuildRequest(BuildRequest req){
+        //TODO: Check if building should be allowed currently
+        LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        IGameMap gameMap = game.getMap();
+        MapPoint mapPoint = req.getMapPoint();
+        UserOrDummy user = req.getUser();
+        Player player = game.getPlayer(user);
+        switch (mapPoint.getType()){
+            case INTERSECTION:
+                    if (gameMap.placeSettlement(player, mapPoint)){
+                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, BuildingSuccessfulMessage.Structure.SETTLEMENT));
+                    } else
+                    if (gameMap.upgradeSettlement(player, mapPoint)){
+                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, BuildingSuccessfulMessage.Structure.CITY));
+                    } else {
+                        post(new BuildingFailedResponse(req.getOriginLobby()));
+                    }
+                break;
+            case EDGE:
+                    if (gameMap.placeRoad(player, mapPoint)){
+                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, BuildingSuccessfulMessage.Structure.ROAD));
+                    } else {
+                        post(new BuildingFailedResponse(req.getOriginLobby()));
+                    }
+                break;
+            case HEX:
+            case INVALID:
+                post(new BuildingFailedResponse(req.getOriginLobby()));
+                break;
         }
     }
 
@@ -897,6 +935,7 @@ public class GameService extends AbstractService {
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
         Game game = gameManagement.getGame(req.getOriginLobby());
+        buildingCurrentlyAllowed = true;
         int[] result = Game.rollDice();
         int numberOfPips = result[0] + result[1];
         if (numberOfPips == 7) {

@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -52,6 +53,13 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
         eventBus.post(createLobbyRequest);
+    }
+
+    @Override
+    public void buildRequest(String lobbyName, User user, MapPoint mapPoint) {
+        LOG.debug("Sending BuildRequest");
+        Message buildRequest = new BuildRequest(lobbyName, user, mapPoint);
+        eventBus.post(buildRequest);
     }
 
     @Override

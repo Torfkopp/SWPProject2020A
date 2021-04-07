@@ -83,6 +83,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected UserOrDummy winner = null;
 
     private ObservableList<Pair<String, String>> resourceList;
+    private boolean buildingCurrentlyAllowed;
+
 
     @Override
     @FXML
@@ -179,6 +181,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         endTurn.setDisable(true);
         tradeWithUserButton.setDisable(true);
         playCard.setDisable(true);
+        buildingCurrentlyAllowed = false;
     }
 
     /**
@@ -271,7 +274,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
+        if (buildingCurrentlyAllowed) lobbyService.buildRequest(lobbyName, loggedInUser, mapPoint);
+
+
         if (mapPoint.getType() == INVALID) {
             System.out.println("INVALID");
         } else if (mapPoint.getType() == HEX) {
@@ -870,5 +875,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         endTurn.setDisable(!loggedInUser.equals(user));
         tradeWithUserButton.setDisable(!loggedInUser.equals(user));
         playCard.setDisable(!loggedInUser.equals(user));
+        buildingCurrentlyAllowed = !loggedInUser.equals(user);
     }
 }
