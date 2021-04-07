@@ -447,7 +447,7 @@ public class SceneManager {
                 context = resourceBundle.getString("error.context.full");
                 break;
             case "This lobby does not exist!":
-                context = resourceBundle.getString("error.context.noexistant");
+                context = resourceBundle.getString("error.context.nonexistant");
                 break;
             //Found in GameService
             case "Can not kick while a game is ongoing":
