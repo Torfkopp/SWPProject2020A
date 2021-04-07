@@ -35,6 +35,11 @@ public class HarborHex extends AbstractHex implements IHarborHex {
     public HarborSide getSide() { return side;}
 
     @Override
+    public GameHexWrapper getBelongingHex() {
+        return belongingHex;
+    }
+
+    @Override
     public HexType getType() {
         return HexType.HARBOR;
     }
