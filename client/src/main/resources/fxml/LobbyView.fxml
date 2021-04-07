@@ -118,6 +118,12 @@
                 text="%lobby.game.buttons.banktrade" visible="false"/>
         <Button fx:id="playCard" disable="true" mnemonicParsing="false" onAction="#onPlayCardButtonPressed"
                 prefHeight="30.0" prefWidth="230.0" text="%game.playcards.button" visible="false"/>
+        <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
+               prefWidth="230" wrapText="true" visible="false" text="%game.robber.position">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>

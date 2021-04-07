@@ -4,9 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
-import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
-import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
+import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
@@ -595,6 +593,7 @@ public class GameService extends AbstractService {
      * @param req The PlayKnightCardRequest found on the EventBus
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @see de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest
      * @since 2021-02-25
      */
@@ -895,6 +894,7 @@ public class GameService extends AbstractService {
      * @param msg The RobberChosenVictimRequest found on the EventBus
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @see de.uol.swp.common.game.message.robber.RobberChosenVictimRequest
      * @since 2021-04-05
      */
@@ -912,6 +912,7 @@ public class GameService extends AbstractService {
      * @param msg The RobberNewPositionChosenRequest found on the EventBus
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @see de.uol.swp.common.game.message.robber.RobberNewPositionChosenRequest
      * @since 2021-04-05
      */
@@ -922,16 +923,14 @@ public class GameService extends AbstractService {
         map.moveRobber(msg.getPosition());
         Set<Player> players = map.getPlayersAroundHex(msg.getPosition());
         Set<UserOrDummy> victims = new HashSet<>();
-        for (Player p : players) {
-            victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
-        }
+        for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
         if (players.size() > 1) {
             LOG.debug("Sending RobberChooseVictimResponse for Lobby " + msg.getLobby());
             ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
             rcvm.initWithMessage(msg);
             post(rcvm);
         } else if (players.size() == 1) {
-            robRandomResource(msg.getLobby(), msg.getPlayer(), (UserOrDummy) players.toArray()[0]);
+            robRandomResource(msg.getLobby(), msg.getPlayer(), new ArrayList<>(victims).get(0));
         }
     }
 
@@ -943,6 +942,7 @@ public class GameService extends AbstractService {
      * @param msg The RobberTaxChosenRequest found on the EventBus
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @see de.uol.swp.common.game.message.robber.RobberTaxChosenRequest
      * @since 2021-04-05
      */
@@ -1004,6 +1004,7 @@ public class GameService extends AbstractService {
                     if (p instanceof Dummy) {
                         Inventory inv = g.getInventory(p);
                         int i = inv.getResourceAmount() / 2;
+                        LOG.debug(p + " has to give up " + i + " of its " + inv.getResourceAmount() + " cards");
                         while (i > 0) {
                             if (inv.getBrick() > 0) {
                                 inv.increaseBrick(-1);
@@ -1292,6 +1293,7 @@ public class GameService extends AbstractService {
      * @param victim   Player to lose a card
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @since 2021-04-06
      */
     private void robRandomResource(String lobby, UserOrDummy receiver, UserOrDummy victim) {
@@ -1299,13 +1301,19 @@ public class GameService extends AbstractService {
         Inventory receiverInventory = gameManagement.getGame(lobby).getInventory(receiver);
         Inventory victimInventory = gameManagement.getGame(lobby).getInventory(victim);
         List<Resources> victimsResources = new ArrayList<>();
+        if (victimInventory.getResourceAmount() == 0) {
+            ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, null);
+            LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
+            LOG.debug("---- victim has no cards to rob");
+            lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
+        }
         if (victimInventory.getBrick() > 0) victimsResources.add(Resources.BRICK);
         if (victimInventory.getGrain() > 0) victimsResources.add(Resources.GRAIN);
         if (victimInventory.getLumber() > 0) victimsResources.add(Resources.LUMBER);
         if (victimInventory.getOre() > 0) victimsResources.add(Resources.ORE);
         if (victimInventory.getWool() > 0) victimsResources.add(Resources.WOOL);
 
-        switch (victimsResources.get((int) (Math.random() * victimsResources.size() - 1))) {
+        switch (victimsResources.get((int) (Math.random() * victimsResources.size()))) {
             case BRICK:
                 victimInventory.increaseLumber(-1);
                 receiverInventory.increaseLumber(1);
@@ -1327,6 +1335,9 @@ public class GameService extends AbstractService {
                 receiverInventory.increaseOre(1);
                 break;
         }
+        ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, victim);
+        LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
+        lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
     }
 
     /**
@@ -1334,6 +1345,7 @@ public class GameService extends AbstractService {
      * a dummy gets a seven.
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @since 2021-04-06
      */
     private void robberMovementDummy(Dummy dummy, String lobby) {
@@ -1365,6 +1377,7 @@ public class GameService extends AbstractService {
      * @param req AbstractGameRequest
      *
      * @author Mario Fokken
+     * @author Timo Gerken
      * @since 2021-04-05
      */
     private void robberMovementPlayer(AbstractGameRequest req, User player) {

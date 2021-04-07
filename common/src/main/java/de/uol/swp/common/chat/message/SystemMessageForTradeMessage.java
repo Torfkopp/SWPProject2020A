@@ -9,7 +9,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import java.util.Map;
 
 /**
- * Message sent by the server when a Trade between two Users was successfully.
+ * Message sent by the server when a trade between two Users was successful.
  *
  * @author Alwin Bossert
  * @author Sven Ahrens

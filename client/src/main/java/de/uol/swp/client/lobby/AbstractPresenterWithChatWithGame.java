@@ -70,6 +70,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label turnIndicator;
     @FXML
+    protected Label notice;
+    @FXML
     protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
 
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
@@ -282,6 +284,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (robberNewPosition) {
                 lobbyService.robberNewPosition(lobbyName, loggedInUser, mapPoint);
                 robberNewPosition = false;
+                notice.setVisible(false);
             }
             System.out.println("HEX");
             System.out.println("mapPoint.getY() = " + mapPoint.getY());
@@ -516,21 +519,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberChooseVictimResponse(RobberChooseVictimResponse rsp) {
         LOG.debug("Received RobberChooseVictimResponse");
         if (loggedInUser.equals(rsp.getPlayer())) {
-            List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
-            ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
-            dialogue.setTitle("Title");
-            dialogue.setHeaderText("Header");
-            dialogue.setContentText("Content");
-            DialogPane pane = new DialogPane();
-            pane.setContent(dialogue.getDialogPane().getContent());
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                               ButtonBar.ButtonData.CANCEL_CLOSE);
-            dialogue.setDialogPane(pane);
-            dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
-            Optional<UserOrDummy> rst = dialogue.showAndWait();
-            rst.ifPresent(userOrDummy -> lobbyService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
+            Platform.runLater(() -> {
+                List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
+                ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
+                dialogue.setTitle(resourceBundle.getString("game.robber.victim.title"));
+                dialogue.setHeaderText(resourceBundle.getString("game.robber.victim.header"));
+                dialogue.setContentText(resourceBundle.getString("game.robber.victim.content"));
+                DialogPane pane = new DialogPane();
+                pane.setContent(dialogue.getDialogPane().getContent());
+                ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                    ButtonBar.ButtonData.OK_DONE);
+                ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                                   ButtonBar.ButtonData.CANCEL_CLOSE);
+                dialogue.setDialogPane(pane);
+                dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+                Optional<UserOrDummy> rst = dialogue.showAndWait();
+                rst.ifPresent(userOrDummy -> {
+                    lobbyService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy);
+                });
+            });
         }
     }
 
@@ -546,6 +553,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
         LOG.debug("Received RobberNewPositionResponse");
+        notice.setVisible(true);
         robberNewPosition = true;
     }
 
@@ -562,7 +570,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberTaxMessage(RobberTaxMessage msg) {
         LOG.debug("Received RobberTaxMessage");
         if (msg.getPlayers().containsKey(loggedInUser)) {
-            //todo FXML View fürs Auswählen der Resourcenkarten
+            //todo FXML View fürs Auswählen der Resourcenkarten erstellen
         }
     }
 

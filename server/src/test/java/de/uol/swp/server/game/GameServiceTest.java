@@ -722,4 +722,6 @@ public class GameServiceTest {
         assertTrue(userManagement.isLoggedIn(userToLogin));
         userManagement.dropUser(userToLogin);
     }
+
+    //todo Robbermethoden testen
 }
