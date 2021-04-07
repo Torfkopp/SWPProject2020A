@@ -10,10 +10,7 @@ import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -245,6 +242,77 @@ public class GameService extends AbstractService {
             LOG.debug("Sending an InvalidTradeOfUsersResponse for Lobby " + req.getOriginLobby());
             returnMessage.initWithMessage(req);
             post(returnMessage);
+        }
+    }
+
+    @Subscribe
+    private void onBuildRequest(BuildRequest req) {
+        LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
+        if (!buildingCurrentlyAllowed) return;
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        IGameMap gameMap = game.getMap();
+        MapPoint mapPoint = req.getMapPoint();
+        UserOrDummy user = req.getUser();
+        Player player = game.getPlayer(user);
+        Inventory inv = game.getInventory(user);
+        switch (mapPoint.getType()) {
+            case INTERSECTION:
+                if (gameMap.settlementPlaceable(player, mapPoint)) {
+                    if (inv.getBrick() > 0 && inv.getLumber() > 0 && inv.getWool() > 0 && inv.getGrain() > 0) {
+                        inv.increaseBrick(-1);
+                        inv.increaseLumber(-1);
+                        inv.increaseWool(-1);
+                        inv.increaseGrain(-1);
+                        gameMap.placeSettlement(player, mapPoint);
+                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                           BuildingSuccessfulMessage.Structure.SETTLEMENT));
+                    } else {
+                        NotEnoughResourcesToBuildResponse msg = new NotEnoughResourcesToBuildResponse(
+                                req.getOriginLobby());
+                        msg.initWithMessage(req);
+                        post(msg);
+                    }
+                } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
+                    if (inv.getOre() > 3 && inv.getGrain() > 2) {
+                        inv.increaseOre(-3);
+                        inv.increaseGrain(-2);
+                        gameMap.upgradeSettlement(player, mapPoint);
+                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                           BuildingSuccessfulMessage.Structure.CITY));
+                    } else {
+                        NotEnoughResourcesToBuildResponse msg = new NotEnoughResourcesToBuildResponse(
+                                req.getOriginLobby());
+                        msg.initWithMessage(req);
+                        post(msg);
+                    }
+                } else {
+                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby());
+                    msg.initWithMessage(req);
+                    post(msg);
+                } break;
+            case EDGE:
+                if (gameMap.roadPlaceable(player, mapPoint)) {
+                    if (inv.getBrick() > 1 && inv.getLumber() > 1) {
+                        inv.increaseBrick(-1);
+                        inv.increaseLumber(-1);
+                        gameMap.placeRoad(player, mapPoint);
+                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                           BuildingSuccessfulMessage.Structure.ROAD));
+                    } else {
+                        NotEnoughResourcesToBuildResponse msg = new NotEnoughResourcesToBuildResponse(
+                                req.getOriginLobby());
+                        msg.initWithMessage(req);
+                        post(msg);
+                    }
+                } else {
+                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby());
+                    msg.initWithMessage(req);
+                    post(msg);
+                } break;
+            case HEX:
+            case INVALID:
+                post(new BuildingFailedResponse(req.getOriginLobby()));
+                break;
         }
     }
 
@@ -489,40 +557,6 @@ public class GameService extends AbstractService {
         } else { //Dummy
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
-        }
-    }
-
-    @Subscribe
-    private void onBuildRequest(BuildRequest req){
-        //TODO: Check if building should be allowed currently
-        LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        IGameMap gameMap = game.getMap();
-        MapPoint mapPoint = req.getMapPoint();
-        UserOrDummy user = req.getUser();
-        Player player = game.getPlayer(user);
-        switch (mapPoint.getType()){
-            case INTERSECTION:
-                    if (gameMap.placeSettlement(player, mapPoint)){
-                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, BuildingSuccessfulMessage.Structure.SETTLEMENT));
-                    } else
-                    if (gameMap.upgradeSettlement(player, mapPoint)){
-                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, BuildingSuccessfulMessage.Structure.CITY));
-                    } else {
-                        post(new BuildingFailedResponse(req.getOriginLobby()));
-                    }
-                break;
-            case EDGE:
-                    if (gameMap.placeRoad(player, mapPoint)){
-                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, BuildingSuccessfulMessage.Structure.ROAD));
-                    } else {
-                        post(new BuildingFailedResponse(req.getOriginLobby()));
-                    }
-                break;
-            case HEX:
-            case INVALID:
-                post(new BuildingFailedResponse(req.getOriginLobby()));
-                break;
         }
     }
 

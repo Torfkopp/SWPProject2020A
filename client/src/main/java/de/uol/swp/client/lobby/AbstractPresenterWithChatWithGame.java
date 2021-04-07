@@ -85,7 +85,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private ObservableList<Pair<String, String>> resourceList;
     private boolean buildingCurrentlyAllowed;
 
-
     @Override
     @FXML
     protected void initialize() {
@@ -274,8 +273,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if (buildingCurrentlyAllowed) lobbyService.buildRequest(lobbyName, loggedInUser, mapPoint);
-
+        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
+            lobbyService.buildRequest(lobbyName, loggedInUser, mapPoint);
 
         if (mapPoint.getType() == INVALID) {
             System.out.println("INVALID");
@@ -396,6 +395,28 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 alert.showAndWait();
             });
         }
+    }
+
+    @Subscribe
+    private void onNotEnoughResourcesToBuildResponse(NotEnoughResourcesToBuildResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received NotEnoughResourcesToBuildResponse");
+        gameRendering.drawGameMap(gameMap);
+        gameRendering.showText(resourceBundle.getString("game.building.notenoughresources"));
+    }
+
+    @Subscribe
+    private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
+        //TODO: do something
+    }
+
+
+    @Subscribe
+    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received NotEnoughResourcesToBuildResponse");
+        gameRendering.drawGameMap(gameMap);
+        gameRendering.showText(resourceBundle.getString("game.building.failed"));
     }
 
     /**
@@ -875,6 +896,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         endTurn.setDisable(!loggedInUser.equals(user));
         tradeWithUserButton.setDisable(!loggedInUser.equals(user));
         playCard.setDisable(!loggedInUser.equals(user));
-        buildingCurrentlyAllowed = !loggedInUser.equals(user);
+        buildingCurrentlyAllowed = loggedInUser.equals(user);
     }
 }

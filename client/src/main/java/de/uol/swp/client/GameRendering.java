@@ -183,6 +183,14 @@ public class GameRendering {
         gfxCtx.fillText(text, width / 2.0, height / 2.0);
     }
 
+    public void showText(String text) {
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.setFont(Font.font(20));
+        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
+    }
+
     /**
      * drawCity method
      * <p>

@@ -355,7 +355,6 @@ public class GameMap implements IGameMap {
 
     @Override
     public boolean placeSettlement(Player player, MapPoint position) {
-        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         if (settlementPlaceable(player, position)) {
             if (!playerSettlementsAndCities.containsKey(player))
                 playerSettlementsAndCities.put(player, new ArrayList<>());
