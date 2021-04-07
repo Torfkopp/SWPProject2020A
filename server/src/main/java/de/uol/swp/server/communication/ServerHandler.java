@@ -120,10 +120,6 @@ public class ServerHandler implements ServerHandlerDelegate {
         }
     }
 
-    // -------------------------------------------------------------------------------
-    // Handling of connected clients
-    // -------------------------------------------------------------------------------
-
     /**
      * Helper method checking if a message has the required authorisation
      *
@@ -157,10 +153,6 @@ public class ServerHandler implements ServerHandlerDelegate {
     private void onDeadEvent(DeadEvent deadEvent) {
         LOG.error("DeadEvent detected " + deadEvent);
     }
-
-    // -------------------------------------------------------------------------------
-    // User Management Events (from event bus)
-    // -------------------------------------------------------------------------------
 
     /**
      * Handles exceptions on the Server
@@ -235,10 +227,6 @@ public class ServerHandler implements ServerHandlerDelegate {
         ctx.ifPresent(messageContext -> sendToClient(messageContext, req.getReturnMessage()));
     }
 
-    // -------------------------------------------------------------------------------
-    // ResponseEvents
-    // -------------------------------------------------------------------------------
-
     /**
      * Handles an UserLoggedOutMessages found on the EventBus
      * <p>
@@ -257,10 +245,6 @@ public class ServerHandler implements ServerHandlerDelegate {
         ctx.ifPresent(sessionManagement::removeSession);
         sendMessage(msg);
     }
-
-    // -------------------------------------------------------------------------------
-    // ServerMessages
-    // -------------------------------------------------------------------------------
 
     /**
      * Handles a ResponseMessages found on the EventBus
@@ -353,10 +337,6 @@ public class ServerHandler implements ServerHandlerDelegate {
         }
     }
 
-    // -------------------------------------------------------------------------------
-    // MessageContext
-    // -------------------------------------------------------------------------------
-
     /**
      * Gets MessageContext from the message
      *
@@ -397,10 +377,6 @@ public class ServerHandler implements ServerHandlerDelegate {
         });
         return ctxs;
     }
-
-    // -------------------------------------------------------------------------------
-    // Help methods: Send only objects of type Message
-    // -------------------------------------------------------------------------------
 
     /**
      * Sends a ServerMessage either to a specified receiver or to all connected clients
