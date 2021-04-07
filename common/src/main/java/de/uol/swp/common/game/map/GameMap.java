@@ -37,7 +37,7 @@ public class GameMap implements IGameMap {
     public GameMap() {
         createHexEdgeNetwork();
         createIntersectionEdgeNetwork();
-        hexMap[robberPosition.getX()][robberPosition.getY()].get().setRobberOnField(false);
+        hexMap[robberPosition.getX()][robberPosition.getY()].get().setRobberOnField(true);
     }
 
     @Override
@@ -299,22 +299,17 @@ public class GameMap implements IGameMap {
 
     @Override
     public void makeBeginnerSettlementsAndRoads(int playerCount) {
+        createPlayerSettlementsAndCitiesMap(playerCount);
         //Create settlements
         intersectionMap[1][3].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
-        if (!playerSettlementsAndCities.containsKey("PLAYER_1"))
-            playerSettlementsAndCities.put(Player.PLAYER_1, new ArrayList<>());
-        playerSettlementsAndCities.get(Player.PLAYER_1).add(IntersectionMapPoint(1,3));
+        playerSettlementsAndCities.get(Player.PLAYER_1).add(IntersectionMapPoint(1, 3));
         intersectionMap[3][2].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
         playerSettlementsAndCities.get(Player.PLAYER_1).add(IntersectionMapPoint(3, 2));
         intersectionMap[1][6].setOwnerAndState(Player.PLAYER_2, SETTLEMENT);
-        if (!playerSettlementsAndCities.containsKey("PLAYER_2"))
-            playerSettlementsAndCities.put(Player.PLAYER_2, new ArrayList<>());
         playerSettlementsAndCities.get(Player.PLAYER_2).add(IntersectionMapPoint(1, 6));
         intersectionMap[4][4].setOwnerAndState(Player.PLAYER_2, SETTLEMENT);
         playerSettlementsAndCities.get(Player.PLAYER_2).add(IntersectionMapPoint(4, 4));
         intersectionMap[2][3].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
-        if (!playerSettlementsAndCities.containsKey("PLAYER_3"))
-            playerSettlementsAndCities.put(Player.PLAYER_3, new ArrayList<>());
         playerSettlementsAndCities.get(Player.PLAYER_3).add(IntersectionMapPoint(2, 3));
         intersectionMap[3][8].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
         playerSettlementsAndCities.get(Player.PLAYER_3).add(IntersectionMapPoint(3, 8));
@@ -330,8 +325,6 @@ public class GameMap implements IGameMap {
         // For 4 players, create more settlements and roads
         if (playerCount == 4) {
             intersectionMap[4][2].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
-            if (!playerSettlementsAndCities.containsKey("PLAYER_4"))
-                playerSettlementsAndCities.put(Player.PLAYER_4, new ArrayList<>());
             playerSettlementsAndCities.get(Player.PLAYER_4).add(IntersectionMapPoint(4, 2));
             intersectionMap[4][6].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
             playerSettlementsAndCities.get(Player.PLAYER_4).add(IntersectionMapPoint(4, 6));
@@ -430,6 +423,22 @@ public class GameMap implements IGameMap {
         if (position.getType() != MapPoint.Type.HEX)
             throw new IllegalArgumentException("MapPoint should point to a hex");
         hexMap[position.getY()][position.getX()].set(newHex);
+    }
+
+    /**
+     * Helper method to create the playerSettlementsAndCities Map according to
+     * the amount of players.
+     *
+     * @param playerCount amount of players in the according game
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    private void createPlayerSettlementsAndCitiesMap(int playerCount) {
+        for (int i = 1; i <= playerCount; i++) {
+            playerSettlementsAndCities.put(Player.values()[i], new ArrayList<>());
+        }
     }
 
     /**
