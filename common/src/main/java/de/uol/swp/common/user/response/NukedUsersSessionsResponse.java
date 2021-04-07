@@ -1,6 +1,7 @@
 package de.uol.swp.common.user.response;
 
 import de.uol.swp.common.message.AbstractResponseMessage;
+import de.uol.swp.common.user.User;
 
 /**
  * A response from server to client to confirm successful session removal
@@ -13,4 +14,15 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @since 2021-03-03
  */
-public class NukeUsersSessionsResponse extends AbstractResponseMessage {}
+public class NukedUsersSessionsResponse extends AbstractResponseMessage {
+
+    private final User user;
+
+    public NukedUsersSessionsResponse(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
+}

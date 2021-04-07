@@ -32,8 +32,9 @@ import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
+import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -670,11 +671,12 @@ public class SceneManager {
      *
      * @author Eric Vuong
      * @author Marvin Drees
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe
-    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
+    private void onNukeUsersSessionsResponse(NukedUsersSessionsResponse rsp) {
+        LOG.debug("Received NukedUsersSessionsResponse");
         eventBus.post(new RetryLoginEvent());
     }
 

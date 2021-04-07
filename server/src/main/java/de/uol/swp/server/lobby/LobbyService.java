@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
+import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
@@ -410,6 +411,20 @@ public class LobbyService extends AbstractService {
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
         post(msg);
     }
+
+    //@Subscribe
+    //private void onCheckForGameRequest(CheckForGameRequest req) {
+    //    Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+    //
+    //    if (lobby.get().isInGame()) {
+    //
+    //        System.err.println("Spiel wird wiederhergestellt");
+    //        ResponseMessage returnMessage = new StartSessionResponse(lobby.get().getName(), req.getUser(),
+    //                                                                 lobby.get().getConfiguration());
+    //        returnMessage.initWithMessage(req);
+    //        post(returnMessage);
+    //    }
+    //}
 
     /**
      * Handles a UserReadyRequest found on the EventBus

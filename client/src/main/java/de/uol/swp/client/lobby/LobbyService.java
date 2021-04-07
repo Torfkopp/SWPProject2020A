@@ -176,4 +176,8 @@ public class LobbyService implements ILobbyService {
         Message userReadyRequest = new UserReadyRequest(lobbyName, loggedInUser, isReady);
         eventBus.post(userReadyRequest);
     }
+@Override
+    public void checkForGame(String lobbyName, User loggendInUser){
+        eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
+    }
 }
