@@ -1,8 +1,10 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,18 +19,22 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
     private final Map<String, Integer> resourceMap;
+    private final List<IHarborHex.HarborResource> harborResourceList;
 
     /**
      * Constructor
      *
-     * @param user        The user wanting to update the inventory
-     * @param lobbyName   The lobby for which the update is supposed to happen in
-     * @param resourceMap The Map containing the name of a resource as key and the amount as value
+     * @param user               The user wanting to update the inventory
+     * @param lobbyName          The lobby for which the update is supposed to happen in
+     * @param resourceMap        The Map containing the name of a resource as key and the amount as value
+     * @param harborResourceList The List containing all the harbors of the Player
      */
-    public InventoryForTradeResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap) {
+    public InventoryForTradeResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
+                                     List<IHarborHex.HarborResource> harborResourceList) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
+        this.harborResourceList = harborResourceList;
     }
 
     /**
@@ -49,5 +55,18 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      */
     public UserOrDummy getUser() {
         return user;
+    }
+
+    /**
+     * Gets the List of the Harbors of the User
+     *
+     * @return List of Harbors
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    public List<IHarborHex.HarborResource> getHarborResourceList() {
+        return harborResourceList;
     }
 }
