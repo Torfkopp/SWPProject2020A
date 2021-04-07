@@ -1,7 +1,7 @@
 package de.uol.swp.server.message;
 
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 
 /**
  * This request is sent to the ServerHandler to get a

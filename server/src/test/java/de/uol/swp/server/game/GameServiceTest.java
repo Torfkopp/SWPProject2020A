@@ -20,7 +20,7 @@ import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
-import de.uol.swp.server.usermanagement.AuthenticationService;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
@@ -47,8 +47,8 @@ public class GameServiceTest {
     private final UserStore userStore = new MainMemoryBasedUserStore();
     private final UserManagement userManagement = new UserManagement(userStore);
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
-    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
-    private final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
+    private final SessionManagement sessionManagement = new SessionManagement();
+    private final LobbyService lobbyService = new LobbyService(lobbyManagement, sessionManagement, bus);
     private IGameManagement gameManagement;
     private GameService gameService;
 
@@ -718,8 +718,6 @@ public class GameServiceTest {
         userManagement.createUser(userToLogin);
         final Message loginRequest = new LoginRequest(userToLogin.getUsername(), userToLogin.getPassword());
         bus.post(loginRequest);
-
-        assertTrue(userManagement.isLoggedIn(userToLogin));
         userManagement.dropUser(userToLogin);
     }
 }
