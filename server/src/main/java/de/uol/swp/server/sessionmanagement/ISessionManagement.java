@@ -26,20 +26,11 @@ public interface ISessionManagement {
     Session createSession(User user);
 
     /**
-     * Removes a session
+     * Returns a collection of all users found in the store
      *
-     * @param session The Session to remove
+     * @return Collection of users
      */
-    void removeSession(Session session);
-
-    /**
-     * Gets a session from a provided User
-     *
-     * @param user The User of a Session
-     *
-     * @return The Session of the User
-     */
-    Optional<Session> getSession(UserOrDummy user);
+    Collection<User> getAllUsers();
 
     /**
      * Gets MessageContext for a specified Session
@@ -54,21 +45,13 @@ public interface ISessionManagement {
     Optional<MessageContext> getCtx(Session session);
 
     /**
-     * Gets a list of sessions from a set of users
+     * Gets a session from a provided User
      *
-     * @param users Set of users to return sessions of
+     * @param user The User of a Session
      *
-     * @return List of sessions from provided users
+     * @return The Session of the User
      */
-    List<Session> getSessions(Set<User> users);
-
-    /**
-     * Adds a new session to the active sessions
-     *
-     * @param ctx     The MessageContext belonging to the session
-     * @param Session The Session to add
-     */
-    void putSession(MessageContext ctx, Session session);
+    Optional<Session> getSession(UserOrDummy user);
 
     /**
      * Gets the session for a given MessageContext
@@ -81,6 +64,15 @@ public interface ISessionManagement {
      * @see de.uol.swp.common.message.MessageContext
      */
     Optional<Session> getSession(MessageContext ctx);
+
+    /**
+     * Gets a list of sessions from a set of users
+     *
+     * @param users Set of users to return sessions of
+     *
+     * @return List of sessions from provided users
+     */
+    List<Session> getSessions(Set<User> users);
 
     /**
      * Checks if a session is in the session store
@@ -101,11 +93,19 @@ public interface ISessionManagement {
     boolean hasSession(User user);
 
     /**
-     * Returns a collection of all users found in the store
+     * Adds a new session to the active sessions
      *
-     * @return Collection of users
+     * @param ctx     The MessageContext belonging to the session
+     * @param Session The Session to add
      */
-    Collection<User> getAllUsers();
+    void putSession(MessageContext ctx, Session session);
+
+    /**
+     * Removes a session
+     *
+     * @param session The Session to remove
+     */
+    void removeSession(Session session);
 
     /**
      * Removes a session for a given message context

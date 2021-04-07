@@ -27,22 +27,8 @@ public class SessionManagement implements ISessionManagement {
     }
 
     @Override
-    public void removeSession(Session session) throws SessionManagementException {
-        if (userSessions.containsKey(session))
-        userSessions.remove(session);
-        else throw new SessionManagementException("Session not found");
-    }
-
-    @Override
-    public void removeSession(MessageContext ctx) {
-        activeSessions.remove(ctx);
-    }
-
-    @Override
-    public Optional<Session> getSession(UserOrDummy user) {
-        Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
-                                                               .filter(e -> e.getValue().equals(user)).findFirst();
-        return entry.map(Map.Entry::getKey);
+    public Collection<User> getAllUsers() {
+        return userSessions.values();
     }
 
     @Override
@@ -56,6 +42,19 @@ public class SessionManagement implements ISessionManagement {
     }
 
     @Override
+    public Optional<Session> getSession(UserOrDummy user) {
+        Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
+                                                               .filter(e -> e.getValue().equals(user)).findFirst();
+        return entry.map(Map.Entry::getKey);
+    }
+
+    @Override
+    public Optional<Session> getSession(MessageContext ctx) {
+        Session session = activeSessions.get(ctx);
+        return session != null ? Optional.of(session) : Optional.empty();
+    }
+
+    @Override
     public List<Session> getSessions(Set<User> users) {
         List<Session> sessions = new ArrayList<>();
         users.forEach(u -> {
@@ -63,18 +62,6 @@ public class SessionManagement implements ISessionManagement {
             session.ifPresent(sessions::add);
         });
         return sessions;
-    }
-
-    @Override
-    public void putSession(MessageContext ctx, Session session) throws SessionManagementException {
-        if (!activeSessions.containsValue(session)) activeSessions.put(ctx, session);
-        else throw new SessionManagementException("Session already bound to connection!");
-    }
-
-    @Override
-    public Optional<Session> getSession(MessageContext ctx) {
-        Session session = activeSessions.get(ctx);
-        return session != null ? Optional.of(session) : Optional.empty();
     }
 
     @Override
@@ -88,7 +75,19 @@ public class SessionManagement implements ISessionManagement {
     }
 
     @Override
-    public Collection<User> getAllUsers() {
-        return userSessions.values();
+    public void putSession(MessageContext ctx, Session session) throws SessionManagementException {
+        if (!activeSessions.containsValue(session)) activeSessions.put(ctx, session);
+        else throw new SessionManagementException("Session already bound to connection!");
+    }
+
+    @Override
+    public void removeSession(Session session) throws SessionManagementException {
+        if (userSessions.containsKey(session)) userSessions.remove(session);
+        else throw new SessionManagementException("Session not found");
+    }
+
+    @Override
+    public void removeSession(MessageContext ctx) {
+        activeSessions.remove(ctx);
     }
 }

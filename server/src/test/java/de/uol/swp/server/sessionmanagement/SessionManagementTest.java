@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SessionManagementTest {
 
-    static SessionManagement sessionManagement;
-    static final User user = new UserDTO(69, "Joe Mama", "12345","epic@mail.gg");
+    static final User user = new UserDTO(69, "Joe Mama", "12345", "epic@mail.gg");
     static final User anotherUser = new UserDTO(420, "Dixie Normous", "54321", "mail@blaze.it");
+    static SessionManagement sessionManagement;
 
     @BeforeEach
     void cleanSessions() {
@@ -26,16 +26,6 @@ public class SessionManagementTest {
         Session session = sessionManagement.createSession(user);
         assertTrue(sessionManagement.hasSession(session));
         assertEquals(session.getUser(), user);
-    }
-
-    @Test
-    void removeSession() {
-        Session session = sessionManagement.createSession(user);
-        assertTrue(sessionManagement.hasSession(session));
-
-        sessionManagement.removeSession(session);
-        assertFalse(sessionManagement.hasSession(session));
-        assertFalse(sessionManagement.hasSession(user));
     }
 
     @Test
@@ -62,6 +52,16 @@ public class SessionManagementTest {
         sessions.add(s2);
 
         assertEquals(sessionManagement.getSessions(users), sessions);
+    }
+
+    @Test
+    void removeSession() {
+        Session session = sessionManagement.createSession(user);
+        assertTrue(sessionManagement.hasSession(session));
+
+        sessionManagement.removeSession(session);
+        assertFalse(sessionManagement.hasSession(session));
+        assertFalse(sessionManagement.hasSession(user));
     }
 
     //@Test
