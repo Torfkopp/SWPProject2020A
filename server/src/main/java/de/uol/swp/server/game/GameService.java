@@ -251,7 +251,11 @@ public class GameService extends AbstractService {
      * If a BuildRequest is found on the bus this method tries to build something
      * at the specified MapPoint
      *
-     * @param req
+     * @param req The Build Request
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-07
      */
     @Subscribe
     private void onBuildRequest(BuildRequest req) {
@@ -272,9 +276,13 @@ public class GameService extends AbstractService {
                         inv.increaseWool(-1);
                         inv.increaseGrain(-1);
                         gameMap.placeSettlement(player, mapPoint);
-                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                           BuildingSuccessfulMessage.Structure.SETTLEMENT));
+                        LOG.debug("Sending BuildingSuccessfulMessage");
+                        lobbyService.sendToAllInLobby(req.getOriginLobby(),
+                                                      new BuildingSuccessfulMessage(req.getOriginLobby(), user,
+                                                                                    mapPoint,
+                                                                                    BuildingSuccessfulMessage.Type.SETTLEMENT));
                     } else {
+                        LOG.debug("Sending BuildingFailedResponse");
                         BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
                                                                                 BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
                         msg.initWithMessage(req);
@@ -285,15 +293,20 @@ public class GameService extends AbstractService {
                         inv.increaseOre(-3);
                         inv.increaseGrain(-2);
                         gameMap.upgradeSettlement(player, mapPoint);
-                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                           BuildingSuccessfulMessage.Structure.CITY));
+                        LOG.debug("Sending BuildingSuccessfulMessage");
+                        lobbyService.sendToAllInLobby(req.getOriginLobby(),
+                                                      new BuildingSuccessfulMessage(req.getOriginLobby(), user,
+                                                                                    mapPoint,
+                                                                                    BuildingSuccessfulMessage.Type.CITY));
                     } else {
+                        LOG.debug("Sending BuildingFailedResponse");
                         BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
                                                                                 BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
                         msg.initWithMessage(req);
                         post(msg);
                     }
                 } else {
+                    LOG.debug("Sending BuildingFailedResponse");
                     BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
                                                                             BuildingFailedResponse.Reason.CANT_BUILD_HERE);
                     msg.initWithMessage(req);
@@ -306,15 +319,20 @@ public class GameService extends AbstractService {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
-                        post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                           BuildingSuccessfulMessage.Structure.ROAD));
+                        LOG.debug("Sending BuildingSuccessfulMessage");
+                        lobbyService.sendToAllInLobby(req.getOriginLobby(),
+                                                      new BuildingSuccessfulMessage(req.getOriginLobby(), user,
+                                                                                    mapPoint,
+                                                                                    BuildingSuccessfulMessage.Type.ROAD));
                     } else {
+                        LOG.debug("Sending BuildingFailedResponse");
                         BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
                                                                                 BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
                         msg.initWithMessage(req);
                         post(msg);
                     }
                 } else {
+                    LOG.debug("Sending BuildingFailedResponse");
                     BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
                                                                             BuildingFailedResponse.Reason.CANT_BUILD_HERE);
                     msg.initWithMessage(req);
@@ -323,7 +341,11 @@ public class GameService extends AbstractService {
                 break;
             case HEX:
             case INVALID:
-                post(new BuildingFailedResponse(req.getOriginLobby(), BuildingFailedResponse.Reason.CANT_BUILD_HERE));
+                LOG.debug("Sending BuildingFailedResponse");
+                BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                        BuildingFailedResponse.Reason.CANT_BUILD_HERE);
+                msg.initWithMessage(req);
+                post(msg);
                 break;
         }
     }
@@ -1098,11 +1120,23 @@ public class GameService extends AbstractService {
         post(returnMessage);
     }
 
+    /**
+     * Handles an UpdateGameMapRequest found on the bus
+     * <p>
+     * If an UpdateGameMapRequest is found on the bus this method responds with an UpdateGameMapResponse
+     *
+     * @param req The UpdateGameMapRequest
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-07
+     */
     @Subscribe
     private void onUpdateGameMapRequest(UpdateGameMapRequest req) {
         LOG.debug("Received UpdateGameMapRequest");
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (game == null) return;
+        LOG.debug("Sending UpdateGameMapresponse");
         UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO());
         rsp.initWithMessage(req);
         post(rsp);

@@ -201,6 +201,48 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a BuildingFailedResponse
+     * If a BuildingFailedResponse is found on the bus this method is called.
+     * It shows a small text on the gamemap indicating what went wrong.
+     *
+     * @param rsp The BuildingFailedMessage found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     */
+    @Subscribe
+    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received BuildingFailedResponse");
+        gameRendering.drawGameMap(gameMap);
+        switch (rsp.getReason()) {
+            case CANT_BUILD_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.cantbuildhere"));
+                break;
+            case NOT_ENOUGH_RESOURCES:
+                gameRendering.showText(resourceBundle.getString("game.building.notenoughresources"));
+        }
+    }
+
+    /**
+     * Handles a BuildingSuccessfulMessage
+     * If a BuildingSuccessfulMessage is found on the bus this method is called.
+     * It updates the gamemap and for the user that build something the inventory.
+     *
+     * @param msg The BuildingSuccessfulMessage found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     */
+    @Subscribe
+    private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
+        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received BuildingSuccessfullMessage");
+        lobbyService.updateGameMap(lobbyName);
+        if (Objects.equals(msg.getUser(), loggedInUser)) lobbyService.updateInventory(lobbyName, loggedInUser);
+    }
+
+    /**
      * If a BuyDevelopmentCardResponse is found on the EventBus,
      * this method calls 2 methods to reset the trade with bank button
      * and the trade with user button for the users in the response.
@@ -278,18 +320,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             lobbyService.buildRequest(lobbyName, loggedInUser, mapPoint);
     }
 
+    /**
+     * Handles a NextPlayerMessage
+     * <p>
+     * If a new NextPlayerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It changes the text of a textField to state whose turn it is.
+     *
+     * @param msg The NextPlayerMessage object seen on the EventBus
+     */
     @Subscribe
-    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuildingFailedResponse");
-        gameRendering.drawGameMap(gameMap);
-        switch (rsp.getReason()) {
-            case CANT_BUILD_HERE:
-                gameRendering.showText(resourceBundle.getString("game.building.cantbuildhere"));
-                break;
-            case NOT_ENOUGH_RESOURCES:
-                gameRendering.showText(resourceBundle.getString("game.building.notenoughresources"));
-        }
+    private void onNextPlayerMessage(NextPlayerMessage msg) {
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+        lobbyService.updateGameMap(lobbyName);
+        setTurnIndicatorText(msg.getActivePlayer());
+        setRollDiceButtonState(msg.getActivePlayer());
     }
 
     /**
@@ -375,32 +421,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
     }
 
-    @Subscribe
-    private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
-        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
-        LOG.debug("Received BuildingSuccessfullMessage");
-        lobbyService.updateGameMap(lobbyName);
-        if (Objects.equals(msg.getUser(), loggedInUser)) lobbyService.updateInventory(lobbyName, loggedInUser);
-    }
-
-    /**
-     * Handles a NextPlayerMessage
-     * <p>
-     * If a new NextPlayerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It changes the text of a textField to state whose turn it is.
-     *
-     * @param msg The NextPlayerMessage object seen on the EventBus
-     */
-    @Subscribe
-    private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
-        lobbyService.updateGameMap(lobbyName);
-        setTurnIndicatorText(msg.getActivePlayer());
-        setRollDiceButtonState(msg.getActivePlayer());
-    }
-
     /**
      * Handles a PlayCardSuccessResponse found on the EventBus
      *
@@ -445,15 +465,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             returnToLobby.setPrefWidth(250);
         }
         fitCanvasToSize();
-    }
-
-    @Subscribe
-    private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {
-        if (!Objects.equals(rsp.getLobbyName(), lobbyName)) return;
-        LOG.debug("Received UpdateGameMapResponse");
-        if (rsp.getGameMapDTO() == null) return;
-        gameMap = rsp.getGameMapDTO();
-        gameRendering.drawGameMap(gameMap);
     }
 
     /**
@@ -672,6 +683,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), loggedInUser, lobbyName, rsp));
+    }
+
+    /**
+     * Handles a UpdateGameMapResponse
+     * If a UpdateGameMapResponse is found on the bus this method is called.
+     * It updates the gamemap and redraws it.
+     *
+     * @param rsp The UpdateGameMapResponse found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     */
+    @Subscribe
+    private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {
+        if (!Objects.equals(rsp.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received UpdateGameMapResponse");
+        if (rsp.getGameMapDTO() == null) return;
+        gameMap = rsp.getGameMapDTO();
+        gameRendering.drawGameMap(gameMap);
     }
 
     /**

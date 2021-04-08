@@ -3,21 +3,57 @@ package de.uol.swp.common.game.message;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.user.UserOrDummy;
 
+/**
+ * Sent to all clients in the lobby on a successful building attempt
+ *
+ * @author Aldin Dervisi
+ * @author Temmo Junkhoff
+ * @see de.uol.swp.common.game.message.AbstractGameMessage
+ * @since 2021-04-07
+ */
 public class BuildingSuccessfulMessage extends AbstractGameMessage {
-    MapPoint mapPoint;
 
-    public enum Structure {
+    private final MapPoint mapPoint;
+    private final Type type;
+
+    /**
+     * An enum to indicate what was build
+     */
+    public enum Type {
         ROAD,
         SETTLEMENT,
         CITY
     }
 
-    public BuildingSuccessfulMessage(String lobbyName, UserOrDummy user, MapPoint mapPoint, Structure structure) {
+    /**
+     * Constructor
+     *
+     * @param lobbyName The lobbyname
+     * @param user      The user that build something
+     * @param mapPoint  The mappoint where something was build
+     * @param type      The type of structure that was build
+     */
+    public BuildingSuccessfulMessage(String lobbyName, UserOrDummy user, MapPoint mapPoint, Type type) {
         super(lobbyName, user);
         this.mapPoint = mapPoint;
+        this.type = type
     }
 
+    /**
+     * Gets the mappoint at which something was build
+     *
+     * @return The mappoint at which something was build
+     */
     public MapPoint getMapPoint() {
         return mapPoint;
+    }
+
+    /**
+     * Gets the type of structure that was build
+     *
+     * @return The type of structure that was build
+     */
+    public Type getType() {
+        return type;
     }
 }
