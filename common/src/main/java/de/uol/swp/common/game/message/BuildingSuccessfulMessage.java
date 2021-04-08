@@ -36,7 +36,7 @@ public class BuildingSuccessfulMessage extends AbstractGameMessage {
     public BuildingSuccessfulMessage(String lobbyName, UserOrDummy user, MapPoint mapPoint, Type type) {
         super(lobbyName, user);
         this.mapPoint = mapPoint;
-        this.type = type
+        this.type = type;
     }
 
     /**
