@@ -64,13 +64,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
         try {
-            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Wario
-            //Cool, thanks - Martin
             checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
             eventBus.post(msg);
         } catch (SecurityException e) {
             LOG.error("ServerException " + e.getClass().getName() + " " + e.getMessage());
-            //same as above
             sendToClient(msg.getMessageContext().get(), new ExceptionMessage(e.getMessage()));
         }
     }

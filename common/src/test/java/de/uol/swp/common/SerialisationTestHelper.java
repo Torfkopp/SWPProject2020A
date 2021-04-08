@@ -8,7 +8,6 @@ import java.io.*;
  * https://stackoverflow.com/questions/3840356/how-to-test-in-java-that-a-class-implements-serializable-correctly-not-just-is
  * 
  * @author Phillip-André Suhr
- * @since 2021-03-09
  */
 public class SerialisationTestHelper {
 
