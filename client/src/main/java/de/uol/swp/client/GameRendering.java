@@ -27,7 +27,7 @@ import static de.uol.swp.common.game.map.MapPoint.*;
  *
  * @author Timo Gerken
  * @author Temmo Junkhoff
- * @see de.uol.swp.common.game.map.GameMap
+ * @see de.uol.swp.common.game.map.GameMapManagement
  * @see javafx.scene.canvas.Canvas
  * @since 2021-01-31
  */
@@ -151,7 +151,7 @@ public class GameRendering {
      *
      * @param gameMap An IGameMap providing the game map to draw
      */
-    public void drawGameMap(IGameMapDTO gameMap) {
+    public void drawGameMap(IGameMap gameMap) {
         LOG.debug("Drawing Game map");
 
         //Get hexes, intersections, and edges in a usable format from the IGameMap

@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.game.map.IGameMapDTO;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
@@ -73,7 +73,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
     protected Integer dice1;
     protected Integer dice2;
-    protected IGameMapDTO gameMap;
+    protected IGameMap gameMap;
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean inGame;

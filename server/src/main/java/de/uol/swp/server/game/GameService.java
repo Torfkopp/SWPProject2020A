@@ -262,7 +262,7 @@ public class GameService extends AbstractService {
         LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
         if (!buildingCurrentlyAllowed) return;
         Game game = gameManagement.getGame(req.getOriginLobby());
-        IGameMap gameMap = game.getMap();
+        IGameMapManagement gameMap = game.getMap();
         MapPoint mapPoint = req.getMapPoint();
         UserOrDummy user = req.getUser();
         Player player = game.getPlayer(user);
@@ -435,7 +435,7 @@ public class GameService extends AbstractService {
         String lobbyName = msg.getLobby().getName();
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameInternalRequest for Lobby " + lobbyName);
         try {
-            IGameMap gameMap = new GameMap();
+            IGameMapManagement gameMap = new GameMapManagement();
             IConfiguration configuration;
             if (msg.getLobby().randomPlayfieldEnabled()) {
                 configuration = gameMap.getRandomisedConfiguration();

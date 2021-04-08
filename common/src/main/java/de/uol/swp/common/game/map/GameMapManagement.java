@@ -21,7 +21,7 @@ import static de.uol.swp.common.game.map.MapPoint.*;
  * @since 2021-01-16
  */
 @SuppressWarnings("UnstableApiUsage")
-public class GameMap implements IGameMap {
+public class GameMapManagement implements IGameMapManagement {
 
     //Map mapping the player and his settlements/cities
     private final Map<Player, List<MapPoint>> playerSettlementsAndCities = new HashMap<>();
@@ -35,14 +35,14 @@ public class GameMap implements IGameMap {
     /**
      * Constructor
      */
-    public GameMap() {
+    public GameMapManagement() {
         createHexEdgeNetwork();
         createIntersectionEdgeNetwork();
         hexMap[robberPosition.getX()][robberPosition.getY()].get().setRobberOnField(false);
     }
 
     @Override
-    public IGameMap createMapFromConfiguration(IConfiguration configuration) {
+    public IGameMapManagement createMapFromConfiguration(IConfiguration configuration) {
         this.configuration = configuration;
         // create new LinkedLists because lists are transmitted ordered and read-only in the IConfiguration
         List<IHarborHex.HarborResource> harborList = new LinkedList<>(configuration.getHarborList());
@@ -366,7 +366,7 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public IGameMapDTO getGameMapDTO() {
+    public IGameMap getGameMapDTO() {
         return new GameMapDTO(getHexesAsJaggedArray(), getIntersectionsWithEdges());
     }
 

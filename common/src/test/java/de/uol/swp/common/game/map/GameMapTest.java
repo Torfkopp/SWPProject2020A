@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class GameMapTest {
 
-    private static IGameMap map;
+    private static IGameMapManagement map;
 
     @BeforeEach
     protected void setUp() {
-        map = new GameMap();
+        map = new GameMapManagement();
         map = map.createMapFromConfiguration(map.getBeginnerConfiguration());
     }
 

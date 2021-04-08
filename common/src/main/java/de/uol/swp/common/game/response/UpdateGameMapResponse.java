@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.game.map.IGameMapDTO;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -13,7 +13,7 @@ import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
  */
 public class UpdateGameMapResponse extends AbstractLobbyResponse {
 
-    private final IGameMapDTO gameMapDTO;
+    private final IGameMap gameMapDTO;
 
     /**
      * Constructor
@@ -21,7 +21,7 @@ public class UpdateGameMapResponse extends AbstractLobbyResponse {
      * @param lobbyName  The lobbyname
      * @param gameMapDTO The new gamemap
      */
-    public UpdateGameMapResponse(String lobbyName, IGameMapDTO gameMapDTO) {
+    public UpdateGameMapResponse(String lobbyName, IGameMap gameMapDTO) {
         super(lobbyName);
         this.gameMapDTO = gameMapDTO;
     }
@@ -31,7 +31,7 @@ public class UpdateGameMapResponse extends AbstractLobbyResponse {
      *
      * @return
      */
-    public IGameMapDTO getGameMapDTO() {
+    public IGameMap getGameMapDTO() {
         return gameMapDTO;
     }
 }

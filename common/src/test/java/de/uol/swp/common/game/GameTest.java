@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
@@ -29,12 +29,12 @@ public class GameTest {
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
     static final Lobby lobby = new LobbyDTO("Read the Manga", user, true, 4, false, 60, false, false);
-    static IGameMap gameMap;
+    static IGameMapManagement gameMap;
     static Game game;
 
     @BeforeEach
     protected void setUp() {
-        gameMap = new GameMap();
+        gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameMap.makeBeginnerSettlementsAndRoads(4);
         lobby.joinUser(user2);
