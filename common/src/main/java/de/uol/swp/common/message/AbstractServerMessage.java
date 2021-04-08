@@ -1,6 +1,6 @@
 package de.uol.swp.common.message;
 
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 
 import java.util.ArrayList;
 import java.util.List;
