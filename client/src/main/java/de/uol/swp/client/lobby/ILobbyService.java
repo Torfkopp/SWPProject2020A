@@ -27,6 +27,8 @@ public interface ILobbyService {
      */
     void checkVictoryPoints(String lobbyName, User user);
 
+    void updateGameMap(String lobbyName);
+
     /**
      * Posts a request to create a lobby onto the EventBus
      *

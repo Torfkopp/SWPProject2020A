@@ -245,6 +245,14 @@ public class GameService extends AbstractService {
         }
     }
 
+    /**
+     * Handles a BuildRequest found on the bus
+     * <p>
+     * If a BuildRequest is found on the bus this method tries to build something
+     * at the specified MapPoint
+     *
+     * @param req
+     */
     @Subscribe
     private void onBuildRequest(BuildRequest req) {
         LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
@@ -258,7 +266,7 @@ public class GameService extends AbstractService {
         switch (mapPoint.getType()) {
             case INTERSECTION:
                 if (gameMap.settlementPlaceable(player, mapPoint)) {
-                    if (inv.getBrick() > 0 && inv.getLumber() > 0 && inv.getWool() > 0 && inv.getGrain() > 0) {
+                    if (inv.getBrick() >= 1 && inv.getLumber() >= 1 && inv.getWool() >= 1 && inv.getGrain() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         inv.increaseWool(-1);
@@ -267,51 +275,55 @@ public class GameService extends AbstractService {
                         post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                            BuildingSuccessfulMessage.Structure.SETTLEMENT));
                     } else {
-                        NotEnoughResourcesToBuildResponse msg = new NotEnoughResourcesToBuildResponse(
-                                req.getOriginLobby());
+                        BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                                BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
                         msg.initWithMessage(req);
                         post(msg);
                     }
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
-                    if (inv.getOre() > 3 && inv.getGrain() > 2) {
+                    if (inv.getOre() >= 3 && inv.getGrain() >= 2) {
                         inv.increaseOre(-3);
                         inv.increaseGrain(-2);
                         gameMap.upgradeSettlement(player, mapPoint);
                         post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                            BuildingSuccessfulMessage.Structure.CITY));
                     } else {
-                        NotEnoughResourcesToBuildResponse msg = new NotEnoughResourcesToBuildResponse(
-                                req.getOriginLobby());
+                        BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                                BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
                         msg.initWithMessage(req);
                         post(msg);
                     }
                 } else {
-                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby());
+                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                            BuildingFailedResponse.Reason.CANT_BUILD_HERE);
                     msg.initWithMessage(req);
                     post(msg);
-                } break;
+                }
+                break;
             case EDGE:
                 if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (inv.getBrick() > 1 && inv.getLumber() > 1) {
+                    if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
                         post(new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                            BuildingSuccessfulMessage.Structure.ROAD));
                     } else {
-                        NotEnoughResourcesToBuildResponse msg = new NotEnoughResourcesToBuildResponse(
-                                req.getOriginLobby());
+                        BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                                BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
                         msg.initWithMessage(req);
                         post(msg);
                     }
                 } else {
-                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby());
+                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                            BuildingFailedResponse.Reason.CANT_BUILD_HERE);
                     msg.initWithMessage(req);
                     post(msg);
-                } break;
+                }
+                break;
             case HEX:
             case INVALID:
-                post(new BuildingFailedResponse(req.getOriginLobby()));
+                post(new BuildingFailedResponse(req.getOriginLobby(), BuildingFailedResponse.Reason.CANT_BUILD_HERE));
                 break;
         }
     }
@@ -1084,6 +1096,16 @@ public class GameService extends AbstractService {
         LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);
+    }
+
+    @Subscribe
+    private void onUpdateGameMapRequest(UpdateGameMapRequest req) {
+        LOG.debug("Received UpdateGameMapRequest");
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (game == null) return;
+        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO());
+        rsp.initWithMessage(req);
+        post(rsp);
     }
 
     /**

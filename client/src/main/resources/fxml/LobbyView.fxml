@@ -121,5 +121,8 @@
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
+        <Label>Road: 1 Brick, 1 Lumber</Label>
+        <Label>Settlement: 1 Brick, 1 Lumber, 1 Wool, 1 Grain</Label>
+        <Label>City: 3 Ore, 2 Grain</Label>
     </VBox>
 </GridPane>

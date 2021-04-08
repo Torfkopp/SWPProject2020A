@@ -1,12 +1,14 @@
 package de.uol.swp.common.game.map;
 
+import java.io.Serializable;
+
 /**
  * Interface for an intersection
  *
  * @author Mario Fokken
  * @since 2021-01-17
  */
-public interface IIntersection {
+public interface IIntersection extends Serializable {
 
     /**
      * Enum for the states of the intersection

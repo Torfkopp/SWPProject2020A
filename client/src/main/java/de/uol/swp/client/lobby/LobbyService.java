@@ -49,6 +49,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void updateGameMap(String lobbyName) {
+        LOG.debug("Sending UpdateGameMapRequest");
+        Message msg = new UpdateGameMapRequest(lobbyName);
+        eventBus.post(msg);
+    }
+
+    @Override
     public void createNewLobby(String name, User user, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);

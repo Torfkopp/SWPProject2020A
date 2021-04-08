@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.IGameMapDTO;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
@@ -29,7 +29,8 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.MapPoint.Type.*;
+import static de.uol.swp.common.game.map.MapPoint.Type.EDGE;
+import static de.uol.swp.common.game.map.MapPoint.Type.INTERSECTION;
 
 /**
  * This class is the base for creating a new Presenter that uses the game.
@@ -72,7 +73,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
     protected Integer dice1;
     protected Integer dice2;
-    protected IGameMap gameMap;
+    protected IGameMapDTO gameMap;
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean inGame;
@@ -275,43 +276,20 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             lobbyService.buildRequest(lobbyName, loggedInUser, mapPoint);
-
-        if (mapPoint.getType() == INVALID) {
-            System.out.println("INVALID");
-        } else if (mapPoint.getType() == HEX) {
-            System.out.println("HEX");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == INTERSECTION) {
-            System.out.println("INTERSECTION");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == EDGE) {
-            System.out.println("EDGE");
-            System.out.println("left:");
-            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
-            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
-            System.out.println("right:");
-            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
-            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
-        }
     }
 
-    /**
-     * Handles a NextPlayerMessage
-     * <p>
-     * If a new NextPlayerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It changes the text of a textField to state whose turn it is.
-     *
-     * @param msg The NextPlayerMessage object seen on the EventBus
-     */
     @Subscribe
-    private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
-        setTurnIndicatorText(msg.getActivePlayer());
-        setRollDiceButtonState(msg.getActivePlayer());
+    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received BuildingFailedResponse");
+        gameRendering.drawGameMap(gameMap);
+        switch (rsp.getReason()) {
+            case CANT_BUILD_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.cantbuildhere"));
+                break;
+            case NOT_ENOUGH_RESOURCES:
+                gameRendering.showText(resourceBundle.getString("game.building.notenoughresources"));
+        }
     }
 
     /**
@@ -398,25 +376,29 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     @Subscribe
-    private void onNotEnoughResourcesToBuildResponse(NotEnoughResourcesToBuildResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received NotEnoughResourcesToBuildResponse");
-        gameRendering.drawGameMap(gameMap);
-        gameRendering.showText(resourceBundle.getString("game.building.notenoughresources"));
-    }
-
-    @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
-        //TODO: do something
+        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received BuildingSuccessfullMessage");
+        lobbyService.updateGameMap(lobbyName);
+        if (Objects.equals(msg.getUser(), loggedInUser)) lobbyService.updateInventory(lobbyName, loggedInUser);
     }
 
-
+    /**
+     * Handles a NextPlayerMessage
+     * <p>
+     * If a new NextPlayerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It changes the text of a textField to state whose turn it is.
+     *
+     * @param msg The NextPlayerMessage object seen on the EventBus
+     */
     @Subscribe
-    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received NotEnoughResourcesToBuildResponse");
-        gameRendering.drawGameMap(gameMap);
-        gameRendering.showText(resourceBundle.getString("game.building.failed"));
+    private void onNextPlayerMessage(NextPlayerMessage msg) {
+        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+        lobbyService.updateGameMap(lobbyName);
+        setTurnIndicatorText(msg.getActivePlayer());
+        setRollDiceButtonState(msg.getActivePlayer());
     }
 
     /**
@@ -463,6 +445,15 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             returnToLobby.setPrefWidth(250);
         }
         fitCanvasToSize();
+    }
+
+    @Subscribe
+    private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {
+        if (!Objects.equals(rsp.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received UpdateGameMapResponse");
+        if (rsp.getGameMapDTO() == null) return;
+        gameMap = rsp.getGameMapDTO();
+        gameRendering.drawGameMap(gameMap);
     }
 
     /**

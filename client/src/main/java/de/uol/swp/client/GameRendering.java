@@ -151,16 +151,16 @@ public class GameRendering {
      *
      * @param gameMap An IGameMap providing the game map to draw
      */
-    public void drawGameMap(IGameMap gameMap) {
+    public void drawGameMap(IGameMapDTO gameMap) {
         LOG.debug("Drawing Game map");
 
         //Get hexes, intersections, and edges in a usable format from the IGameMap
-        IGameHex[][] hexes = gameMap.getHexesAsJaggedArray();
-        IIntersection[][] intersections = gameMap.getIntersectionsAsJaggedArray();
+        IGameHex[][] hexes = gameMap.getHexes();
+        IIntersectionWithEdges[][] intersections = gameMap.getIntersections();
         clearGameMap();
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
-        drawIntersectionsAndEdges(intersections, gameMap);
+        drawIntersectionsAndEdges(intersections);
 
         if (drawHitboxGrid) drawHitboxGrid();
     }
@@ -366,11 +366,10 @@ public class GameRendering {
      * This Method draws the intersections and edges.
      *
      * @param intersections An array containing all intersections
-     * @param gameMap       An IGameMap providing the game map to draw
      */
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMap) {
-        goThroughHalfMap(true, intersections, gameMap);
-        goThroughHalfMap(false, intersections, gameMap);
+    private void drawIntersectionsAndEdges(IIntersectionWithEdges[][] intersections) {
+        goThroughHalfMap(true, intersections);
+        goThroughHalfMap(false, intersections);
     }
 
     /**
@@ -484,9 +483,8 @@ public class GameRendering {
      *
      * @param topHalf       A boolean indicating which half of the map needs to be drawn on
      * @param intersections An array containing all intersections
-     * @param gameMap       A IGameMap providing the game map to draw
      */
-    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMap) {
+    private void goThroughHalfMap(boolean topHalf, IIntersectionWithEdges[][] intersections) {
         //Sets currentY depending on topHalf
         double currentY = ((topHalf) ? (hexHeight * (3.0 / 4.0)) :
                            ((effectiveHeight / 2) + (hexHeight / 4))) + OFFSET_Y;
@@ -497,12 +495,12 @@ public class GameRendering {
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * hexWidth;
             double currentX = OFFSET_X + rowStartX + hexWidth;
             if (topHalf) currentX += hexWidth / 2.0;
-            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMap);
+            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y]);
 
             currentX = OFFSET_X + rowStartX + hexWidth;
             if (!topHalf) currentX += hexWidth / 2.0;
             currentY += (hexHeight / 4.0);
-            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMap);
+            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y]);
             currentY += hexHeight / 2.0;
         }
     }
@@ -518,15 +516,14 @@ public class GameRendering {
      * @param currentX      The current x-coordinate
      * @param currentY      The current y-coordinate
      * @param intersections An array containing all intersections in the current row
-     * @param gameMap       An IGameMap providing the game map to draw
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IGameMap gameMap) {
+                                 IIntersectionWithEdges[] intersections) {
         for (int x = firstSubRow ? 1 : 0; x < intersections.length; x = x + 2) {
             if (renderEdges) {
-                renderEdges(currentX, currentY, intersections[x], gameMap);
+                renderEdges(currentX, currentY, intersections[x]);
             }
-            renderIntersection(currentX, currentY, intersections[x]);
+            renderIntersection(currentX, currentY, intersections[x].getIntersection());
             currentX += hexWidth;
         }
     }
@@ -618,11 +615,10 @@ public class GameRendering {
      *
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
-     * @param gameMap  An IGameMap providing the game map to draw
      */
-    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMap) {
+    private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
         gfxCtx.setLineWidth(roadWidth);
-        for (IEdge edge : gameMap.incidentEdges(intersection)) {
+        for (IEdge edge : intersection.getEdges()) {
             //Northwest road
             if (edge.getOwner() == null) continue;
             if (edge.getOrientation() == IEdge.Orientation.WEST) {

@@ -344,13 +344,13 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public boolean placeRoad(Player player, MapPoint mapPoint){
+    public boolean placeRoad(Player player, MapPoint mapPoint) {
         return placeRoad(player, getEdge(mapPoint));
     }
 
     @Override
-    public boolean roadPlaceable(Player player, MapPoint mapPoint){
-        return placeRoad(player, getEdge(mapPoint));
+    public boolean roadPlaceable(Player player, MapPoint mapPoint) {
+        return roadPlaceable(player, getEdge(mapPoint));
     }
 
     @Override
@@ -363,6 +363,11 @@ public class GameMap implements IGameMap {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public IGameMapDTO getGameMapDTO() {
+        return new GameMapDTO(getHexesAsJaggedArray(), getIntersectionsWithEdges());
     }
 
     @Override
@@ -398,7 +403,7 @@ public class GameMap implements IGameMap {
 
     @Override
     public boolean upgradeSettlement(Player player, MapPoint position) {
-         if (settlementUpgradeable(player, position)){
+        if (settlementUpgradeable(player, position)) {
             intersectionMap[position.getY()][position.getX()]
                     .setOwnerAndState(player, IIntersection.IntersectionState.CITY);
             return true;
@@ -407,7 +412,7 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public boolean settlementUpgradeable(Player player, MapPoint position){
+    public boolean settlementUpgradeable(Player player, MapPoint position) {
         if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         return (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
                 .getY()][position.getX()].getOwner() == player);
@@ -575,5 +580,23 @@ public class GameMap implements IGameMap {
             }
         }
         return intersectionSet;
+    }
+
+    private IntersectionWithEdges[][] getIntersectionsWithEdges() {
+        IntersectionWithEdges[][] returnMap;
+        returnMap = new IntersectionWithEdges[6][];
+        returnMap[0] = new IntersectionWithEdges[7];
+        returnMap[1] = new IntersectionWithEdges[9];
+        returnMap[2] = new IntersectionWithEdges[11];
+        returnMap[3] = new IntersectionWithEdges[11];
+        returnMap[4] = new IntersectionWithEdges[9];
+        returnMap[5] = new IntersectionWithEdges[7];
+        for (int y = 0; y < intersectionMap.length; y++) {
+            for (int x = 0; x < intersectionMap[y].length; x++) {
+                returnMap[y][x] = new IntersectionWithEdges(intersectionMap[y][x],
+                                                            incidentEdges(intersectionMap[y][x]));
+            }
+        }
+        return returnMap;
     }
 }

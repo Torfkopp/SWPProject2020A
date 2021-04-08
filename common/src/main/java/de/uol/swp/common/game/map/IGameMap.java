@@ -215,12 +215,16 @@ public interface IGameMap {
      */
     boolean placeSettlement(Player player, MapPoint position);
 
+    IGameMapDTO getGameMapDTO();
+
     /**
      * Checks if a street is placeable
      *
      * @param player The player wanting to place the street
      * @param edge   The edge to place a road on
+     *
      * @return True if placement is possible; false if not
+     *
      * @author Mario Fokken
      * @since 2021-01-16
      */
