@@ -9,10 +9,14 @@ import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.message.AllLobbiesMessage;
+import de.uol.swp.common.lobby.message.AllowedAmountOfPlayersChangedMessage;
+import de.uol.swp.common.lobby.message.LobbyCreatedMessage;
+import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.lobby.response.CreateLobbyResponse;
 import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.lobby.response.JoinRandomLobbyFailedResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
@@ -54,6 +58,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
+    @FXML
+    private Label randomLobbyState;
     @FXML
     private ListView<Pair<String, String>> lobbyView;
     @FXML
@@ -112,7 +118,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * displayed in the Main Menu.
      *
      * @param msg The AllLobbiesMessage found on the EventBus
-     *
      * @author Eric Vuong
      * @author Steven Luong
      * @author Phillip-André Suhr
@@ -123,6 +128,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (this.loggedInUser == null) return;
         LOG.debug("Received AllLobbiesMessage");
         updateLobbyList(msg.getLobbies());
+        randomLobbyState.setVisible(false);
     }
 
     /**
@@ -132,7 +138,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * of all currently existing lobbies are put into the lobby list in the main menu.
      *
      * @param rsp The AllLobbiesResponse object seen on the EventBus
-     *
      * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-11-29
      */
@@ -140,6 +145,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(rsp.getLobbies());
+        randomLobbyState.setVisible(false);
     }
 
     /**
@@ -149,7 +155,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * of all currently logged in users are put onto the UserList in the main menu.
      *
      * @param rsp The AllOnlineUsersResponse object seen on the EventBus
-     *
      * @see de.uol.swp.common.user.response.AllOnlineUsersResponse
      * @since 2019-08-29
      */
@@ -167,7 +172,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * the lobby list.
      *
      * @param msg AllowedAmountOfPlayersMessage found on the EventBus
-     *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.message.AllowedAmountOfPlayersChangedMessage
@@ -239,7 +243,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+                ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
@@ -260,7 +264,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * display all members from the beginning.
      *
      * @param rsp The CreateLobbyResponse object found on the EventBus
-     *
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
      * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
@@ -307,7 +310,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * statuses are displayed correctly.
      *
      * @param msg The GameCreatedMessage found on the EventBus
-     *
      * @author Eric Vuong
      * @author Steven Luong
      * @author Phillip-André Suhr
@@ -342,6 +344,38 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the JoinRandomLobbyButton is pressed
+     * <p>
+     * If the JoinRandomLobbyButton is pressed, this method requests the LobbyService
+     * to join a random lobby. If there is no existing lobby or there is no fitting one,
+     * nothing will happen.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-04-08
+     */
+    @FXML
+    private void onJoinRandomLobbyButtonPressed() {
+        lobbyService.joinRandomLobby(loggedInUser);
+    }
+
+    /**
+     * Handles a JoinRandomLobbyFailedResponse found on the EventBus
+     * <p>
+     * If a new JoinRandomLobbyFailedResponse object is found on the EventBus,
+     * this method sets the state of the randomLobbyState label to true.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
+        randomLobbyState.setVisible(true);
+    }
+
+    /**
      * Handles a JoinLobbyResponse found on the EventBus
      * <p>
      * If a new JoinLobbyResponse object is found on the EventBus, this method
@@ -351,7 +385,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * able to display all members from the beginning.
      *
      * @param rsp The JoinLobbyResponse object found on the EventBus
-     *
      * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
      * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
@@ -377,7 +410,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * windows get closed as well.
      *
      * @param rsp TheKillOldClientResponse object fount on the EventBus
-     *
      * @author Eric Vuong
      * @author Marvin Drees
      * @see de.uol.swp.common.user.response.KillOldClientResponse
@@ -402,7 +434,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * so the SceneManager can properly keep track of the lobby scenes.
      *
      * @param msg the LobbyCreatedMessage object seen on the EventBus
-     *
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @see de.uol.swp.client.SceneManager
@@ -422,7 +453,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * of the deleted lobby is removed from the LobbyList in the main menu.
      *
      * @param msg The LobbyDeletedMessage object seen on the EventBus
-     *
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.LobbyDeletedMessage
      * @since 2020-12-17
@@ -446,7 +476,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * the window also clears the EventBus to avoid NullPointerExceptions.
      *
      * @param rsp The LoginSuccessfulResponse object seen on the EventBus
-     *
      * @see de.uol.swp.common.user.response.LoginSuccessfulResponse
      * @since 2021-01-07
      */
@@ -467,7 +496,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 ((Stage) event.getSource()).close();
                 clearEventBus();
             });
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     /**
@@ -504,7 +534,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <Username>} logged in." is displayed in the log.
      *
      * @param msg The UserLoggedInMessage object seen on the EventBus
-     *
      * @see de.uol.swp.common.user.message.UserLoggedInMessage
      * @since 2019-08-29
      */
@@ -528,7 +557,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <Username>} logged out." is displayed in the log.
      *
      * @param msg The UserLoggedOutMessage object seen on the EventBus
-     *
      * @see de.uol.swp.common.user.message.UserLoggedOutMessage
      * @since 2019-08-29
      */
@@ -549,7 +577,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @param lobbyList A list of LobbyDTO objects including all currently existing
      *                  lobbies
-     *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.lobby.dto.LobbyDTO
@@ -581,7 +608,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @param userList A list of UserDTO objects including all currently logged in
      *                 users
-     *
      * @implNote The code inside this method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.user.UserDTO
@@ -597,4 +623,5 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             userList.forEach(u -> users.add(u.getUsername()));
         });
     }
+
 }
