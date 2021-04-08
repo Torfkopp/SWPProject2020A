@@ -436,7 +436,7 @@ public class GameMap implements IGameMap {
      * @since 2021-04-07
      */
     private void createPlayerSettlementsAndCitiesMap(int playerCount) {
-        for (int i = 1; i <= playerCount; i++) {
+        for (int i = 0; i < playerCount; i++) {
             playerSettlementsAndCities.put(Player.values()[i], new ArrayList<>());
         }
     }
