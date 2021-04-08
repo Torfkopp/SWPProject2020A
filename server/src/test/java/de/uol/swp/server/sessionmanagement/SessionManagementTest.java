@@ -64,18 +64,17 @@ public class SessionManagementTest {
         assertFalse(sessionManagement.hasSession(user));
     }
 
-    //@Test
-    //@Disabled("Test works but type mismatch (HashSet/HashMap) and ordering")
-    //void getAllUsers() {
-    //    Collection<User> users = new HashSet<>();
-    //    users.add(user);
-    //    users.add(anotherUser);
-    //
-    //    Session s1 = sessionManagement.createSession(user);
-    //    assertTrue(sessionManagement.hasSession(s1));
-    //    Session s2 = sessionManagement.createSession(anotherUser);
-    //    assertTrue(sessionManagement.hasSession(s2));
-    //
-    //    assertEquals(sessionManagement.getAllUsers(), users);
-    //}
+    @Test
+    void getAllUsers() {
+        Collection<User> users = new HashSet<>();
+        users.add(user);
+        users.add(anotherUser);
+
+        Session s1 = sessionManagement.createSession(user);
+        assertTrue(sessionManagement.hasSession(s1));
+        Session s2 = sessionManagement.createSession(anotherUser);
+        assertTrue(sessionManagement.hasSession(s2));
+
+        assertTrue(users.containsAll(sessionManagement.getAllUsers()));
+    }
 }

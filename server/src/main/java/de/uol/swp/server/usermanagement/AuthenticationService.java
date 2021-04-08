@@ -12,7 +12,6 @@ import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.KillOldClientResponse;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
 import de.uol.swp.server.sessionmanagement.SessionManagement;
@@ -20,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
-import java.util.Optional;
 
 /**
  * Mapping authentication's EventBus calls to UserManagement calls
@@ -50,30 +48,6 @@ public class AuthenticationService extends AbstractService {
         super(bus);
         this.userManagement = userManagement;
         this.sessionManagement = sessionManagement;
-    }
-
-    /**
-     * Handles a ForwardToUserInternalRequest found on the EventBus
-     * <p>
-     * If a ForwardToUserInternalRequest is found on the EventBus this
-     * method gets the Session of the User contained in the ForwardToUserInternalRequest.
-     * Then it posts a FetchUserContextInternalRequest with the session of the
-     * User and .the ResponseMessage contained in the ForwardToUserInternalRequest,
-     * which will be handled by the ServerHandler.
-     *
-     * @param event ForwardToUserInternalRequest found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
-     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onForwardToUserInternalRequest(ForwardToUserInternalRequest event) {
-        Optional<Session> session = sessionManagement.getSession(event.getTargetUser());
-        if (session.isEmpty()) LOG.error(new RuntimeException("UserSession not found"));
-        else post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
     }
 
     /**
