@@ -33,12 +33,15 @@ import java.util.Map;
 public class TradeWithBankPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithBankView.fxml";
+    public static final int MIN_HEIGHT = 433;
+    public static final int MIN_WIDTH = 620;
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
     private String lobbyName;
     private Map<String, Integer> resourceMap;
     private ObservableList<Pair<String, Integer>> resourceList;
     private ObservableList<Pair<String, Integer>> bankResourceList;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
+
     @FXML
     private ListView<Pair<String, Integer>> ownInventoryView;
     @FXML

@@ -32,10 +32,10 @@ import java.util.*;
 public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGamePhase {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-    public static final int LOBBY_HEIGHT_PRE_GAME = 700;
-    public static final int LOBBY_WIDTH_PRE_GAME = 685;
-    public static final int LOBBY_HEIGHT_IN_GAME = 740;
-    public static final int LOBBY_WIDTH_IN_GAME = 1435;
+    public static final int MIN_HEIGHT_PRE_GAME = 700;
+    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int MIN_HEIGHT_IN_GAME = 740;
+    public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
@@ -100,7 +100,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         this.readyUsers.addAll(rsp.getReadyUsers());
         Platform.runLater(() -> {
             updateUsersList(rsp.getUsers());
-            if(!inGame) {
+            if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
             }

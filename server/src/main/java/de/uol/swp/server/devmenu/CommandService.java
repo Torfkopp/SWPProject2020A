@@ -24,7 +24,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
-import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
@@ -160,7 +160,7 @@ public class CommandService extends AbstractService {
             post(req);
             // try to send them a TurnSkippedResponse to disable their buttons, etc.
             UserOrDummy user = getUserOrDummy(args.get(0));
-            post(new GetUserSessionEvent(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
+            post(new ForwardToUserInternalRequest(user, new TurnSkippedResponse(originalMessage.getOriginLobby())));
         } catch (ReflectiveOperationException ignored) {}
     }
 

@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 public class RegistrationPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RegistrationView.fxml";
+    public static final int MIN_HEIGHT = 250;
+    public static final int MIN_WIDTH = 410;
     private static final RegistrationCanceledEvent registrationCanceledEvent = new RegistrationCanceledEvent();
     private final Logger LOG = LogManager.getLogger(RegistrationPresenter.class);
 

@@ -15,7 +15,7 @@ import de.uol.swp.server.message.AbstractServerInternalMessage;
  * @see de.uol.swp.server.message.AbstractServerInternalMessage
  * @since 2021-02-25
  */
-public class GetUserSessionEvent extends AbstractServerInternalMessage {
+public class ForwardToUserInternalRequest extends AbstractServerInternalMessage {
 
     private final UserOrDummy targetUser;
     private final ResponseMessage responseMessage;
@@ -26,7 +26,7 @@ public class GetUserSessionEvent extends AbstractServerInternalMessage {
      * @param targetUser      User object of the targetUser
      * @param responseMessage Stored ResponseMessage
      */
-    public GetUserSessionEvent(UserOrDummy targetUser, ResponseMessage responseMessage) {
+    public ForwardToUserInternalRequest(UserOrDummy targetUser, ResponseMessage responseMessage) {
         this.responseMessage = responseMessage;
         this.targetUser = targetUser;
     }

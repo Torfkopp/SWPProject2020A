@@ -53,13 +53,6 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkVictoryPoints(String lobbyName) {
-        LOG.debug("Sending CheckVictoryPointsRequest");
-        Message msg = new CheckVictoryPointsRequest(lobbyName, userService.getLoggedInUser());
-        eventBus.post(msg);
-    }
-
-    @Override
     public void createNewLobby(String name, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, userService.getLoggedInUser(), maxPlayers);

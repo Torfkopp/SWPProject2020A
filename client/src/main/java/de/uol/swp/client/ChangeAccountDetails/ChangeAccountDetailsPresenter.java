@@ -29,8 +29,11 @@ import java.util.regex.Pattern;
 public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangeAccountDetailsView.fxml";
+    public static final int MIN_HEIGHT = 230;
+    public static final int MIN_WIDTH = 395;
     private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
+
     @FXML
     private PasswordField newPasswordField;
     @FXML

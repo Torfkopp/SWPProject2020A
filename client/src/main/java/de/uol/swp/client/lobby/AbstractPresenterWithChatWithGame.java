@@ -121,7 +121,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (gameWon && Objects.equals(owner, userService.getLoggedInUser())) heightDiff = 40;
         double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
         double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-        double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.LOBBY_WIDTH_PRE_GAME;
+        double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.MIN_WIDTH_PRE_GAME;
         double dimension = Math.min(heightValue, widthValue);
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
@@ -687,12 +687,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
-        lobbyService.checkVictoryPoints(lobbyName);
     }
 
     /**
      * Helper Method to play a monopoly card
      *
+     * @author Mario Fokken
      * @author Temmo Junkhoff
      * @author Maximilian Lindner
      * @since 2021-03-29
@@ -728,6 +728,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper Method to play a year of plenty card.
      *
+     * @author Mario Fokken
      * @author Temmo Junkhoff
      * @author Maximilian Lindner
      * @since 2021-03-29
