@@ -63,10 +63,10 @@ public interface ILobbyService {
     /**
      * Posts a request to join a random lobby onto the EventBus
      *
-     * @author Finn Haase
-     * @author Sven Ahrens
      * @param user The user who wants to join a random lobby
      *
+     * @author Finn Haase
+     * @author Sven Ahrens
      * @see de.uol.swp.common.lobby.request.LobbyJoinRandomUserRequest
      * @since 2021-04-08
      */

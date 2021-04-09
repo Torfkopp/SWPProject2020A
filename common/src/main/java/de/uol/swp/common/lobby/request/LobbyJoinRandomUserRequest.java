@@ -1,6 +1,5 @@
 package de.uol.swp.common.lobby.request;
 
-
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -19,11 +18,8 @@ public class LobbyJoinRandomUserRequest extends AbstractLobbyRequest {
      *
      * @param lobbyName Name of the lobby
      * @param user      User who wants to join a random lobby
-     *
-     * @since 2021-04-08
      */
     public LobbyJoinRandomUserRequest(String lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
-
 }

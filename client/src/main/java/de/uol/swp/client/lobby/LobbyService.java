@@ -69,8 +69,8 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void joinRandomLobby(User user){
-        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null ,user);
+    public void joinRandomLobby(User user) {
+        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null, user);
         eventBus.post(joinRandomLobbyRequest);
     }
 

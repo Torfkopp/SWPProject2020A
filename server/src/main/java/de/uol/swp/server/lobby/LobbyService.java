@@ -9,10 +9,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.ExceptionMessage;
-import de.uol.swp.common.message.Message;
-import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
@@ -47,6 +44,7 @@ public class LobbyService extends AbstractService {
      *                          lobbies
      * @param sessionManagement The session management
      * @param eventBus          The server-wide EventBus
+     *
      * @since 2019-10-08
      */
     @Inject
@@ -63,6 +61,7 @@ public class LobbyService extends AbstractService {
      *
      * @param lobbyName Name of the lobby the players are in
      * @param msg       The message to be sent to the users
+     *
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-10-08
      */
@@ -85,6 +84,7 @@ public class LobbyService extends AbstractService {
      * the lobby members about the changes.
      *
      * @param req The ChangeLobbySettingsRequest found on the EventBus
+     *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.request.ChangeLobbySettingsRequest
@@ -101,7 +101,7 @@ public class LobbyService extends AbstractService {
         if (lobby.get().isInGame()) return;
         lobbyManagement
                 .updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.isCommandsAllowed(), req.getMoveTime(),
-                        req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled());
+                                     req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled());
         post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
         Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
         if (updatedLobby.isEmpty()) return;
@@ -117,6 +117,7 @@ public class LobbyService extends AbstractService {
      * request and sends a LobbyCreatedMessage to every connected user.
      *
      * @param req The CreateLobbyRequest found on the EventBus
+     *
      * @see de.uol.swp.server.lobby.ILobbyManagement#createLobby(String, de.uol.swp.common.user.User, int)
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2019-10-08
@@ -150,6 +151,7 @@ public class LobbyService extends AbstractService {
      * AllLobbiesMessage is posted onto the EventBus.
      *
      * @param event KickUserEvent found on the EventBus
+     *
      * @author Maximilian Lindner
      * @author Sven Ahrens
      * @see de.uol.swp.server.game.event.KickUserEvent
@@ -181,9 +183,10 @@ public class LobbyService extends AbstractService {
      * It adds a user to a random lobby stored in the LobbyManagement and
      * sends a UserJoinedLobbyMessage to every user in the lobby.
      *
+     * @param req The LobbyJoinRandomUserRequest found on the EventBus
+     *
      * @author Finn Haase
      * @author Sven Ahrens
-     * @param req The LobbyJoinRandomUserRequest found on the EventBus
      * @see de.uol.swp.common.lobby.Lobby
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2021-04-08
@@ -194,10 +197,11 @@ public class LobbyService extends AbstractService {
         List<Lobby> filteredLobbies = new ArrayList<>();
 
         lobbies.forEach((String, lobby) -> {
-            if (lobby.getUserOrDummies().size() < lobby.getMaxPlayers() && !lobby.getUserOrDummies().contains(req.getUser()) && !lobby.isInGame()) {
+            if (lobby.getUserOrDummies().size() < lobby.getMaxPlayers() && !lobby.getUserOrDummies()
+                                                                                 .contains(req.getUser()) && !lobby
+                    .isInGame()) {
                 filteredLobbies.add(lobby);
             }
-
         });
         if (!filteredLobbies.isEmpty()) {
             int i = (int) (Math.random() * filteredLobbies.size());
@@ -215,7 +219,6 @@ public class LobbyService extends AbstractService {
             responseMessage.initWithMessage(req);
             post(responseMessage);
         }
-
     }
 
     /**
@@ -226,6 +229,7 @@ public class LobbyService extends AbstractService {
      * sends a UserJoinedLobbyMessage to every user in the lobby.
      *
      * @param req The LobbyJoinUserRequest found on the EventBus
+     *
      * @see de.uol.swp.common.lobby.Lobby
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2020-12-19
@@ -280,6 +284,7 @@ public class LobbyService extends AbstractService {
      * LobbyManagement and sends a UserLeftLobbyMessage to every user in the lobby.
      *
      * @param req The LobbyJoinUserRequest found on the EventBus
+     *
      * @see de.uol.swp.common.lobby.Lobby
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2019-10-08
@@ -309,6 +314,7 @@ public class LobbyService extends AbstractService {
      * It posts a RemoveFromLobbiesResponse containing a Map of the Lobbies where the user is in.
      *
      * @param req The RemoveFromLobbiesRequest found on the EventBus
+     *
      * @author Finn Haase
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
@@ -348,6 +354,7 @@ public class LobbyService extends AbstractService {
      * It posts an AllLobbiesResponse containing a list of all lobby names
      *
      * @param req The RetrieveAllLobbiesRequest found on the EventBus
+     *
      * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
      * @since 2020-12-12
      */
@@ -367,6 +374,7 @@ public class LobbyService extends AbstractService {
      * current members onto the EventBus.
      *
      * @param req The RetrieveAllLobbyMembersRequest found on the EventBus
+     *
      * @see de.uol.swp.common.lobby.response.AllLobbyMembersResponse
      * @since 2020-12-20
      */
@@ -378,7 +386,7 @@ public class LobbyService extends AbstractService {
         if (lobby.isPresent()) {
             Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();
             Message response = new AllLobbyMembersResponse(lobby.get().getName(), lobbyMembers, lobby.get().getOwner(),
-                    lobby.get().getReadyUsers());
+                                                           lobby.get().getReadyUsers());
             response.initWithMessage(req);
             post(response);
         } else {
@@ -395,6 +403,7 @@ public class LobbyService extends AbstractService {
      * in the lobby onto the EventBus.
      *
      * @param req The ReturnToPreGameLobbyRequest found on the EventBus
+     *
      * @author Steven Luong
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest
@@ -412,7 +421,7 @@ public class LobbyService extends AbstractService {
                 post(new UserReadyRequest(req.getLobbyName(), user, false));
             }
             sendToAllInLobby(req.getLobbyName(),
-                    new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
+                             new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
             sendToAll(new AllLobbiesMessage(lobbyManagement.getLobbies()));
         }
     }
@@ -426,6 +435,7 @@ public class LobbyService extends AbstractService {
      * is ready.
      *
      * @param req The StartSessionMessage found on the EventBus
+     *
      * @author Eric Vuong
      * @author Maximilian Lindner
      * @see de.uol.swp.server.game.event.CreateGameInternalRequest
@@ -437,7 +447,7 @@ public class LobbyService extends AbstractService {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         if (lobby.get().getUserOrDummies().size() < 3 || (!lobby.get().getReadyUsers()
-                .equals(lobby.get().getUserOrDummies()))) return;
+                                                                .equals(lobby.get().getUserOrDummies()))) return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
         post(msg);
@@ -451,6 +461,7 @@ public class LobbyService extends AbstractService {
      * that are marked as ready onto the EventBus.
      *
      * @param req The UserReadyRequest found on the EventBus
+     *
      * @author Maxmilian Lindner
      * @author Eric Vuong
      * @see de.uol.swp.common.lobby.message.UserReadyMessage
