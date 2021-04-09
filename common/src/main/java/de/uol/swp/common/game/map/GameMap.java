@@ -38,7 +38,7 @@ public class GameMap implements IGameMap {
     public GameMap() {
         createHexEdgeNetwork();
         createIntersectionEdgeNetwork();
-        hexMap[robberPosition.getX()][robberPosition.getY()].get().setRobberOnField(false);
+        hexMap[robberPosition.getX()][robberPosition.getY()].get().setRobberOnField(true);
     }
 
     @Override
