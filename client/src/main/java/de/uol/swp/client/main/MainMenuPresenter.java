@@ -7,11 +7,6 @@ import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
-import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
-import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
-import de.uol.swp.common.chat.message.EditedChatMessageMessage;
-import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -51,17 +46,19 @@ import java.util.function.UnaryOperator;
 public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/MainMenuView.fxml";
-    private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
-    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+    public static final int MIN_HEIGHT = 550;
+    public static final int MIN_WIDTH = 820;
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
-    private ObservableList<String> users;
-    private ObservableList<Pair<String, String>> lobbies;
+    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
+    private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     @FXML
     private ListView<Pair<String, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
 
+    private ObservableList<Pair<String, String>> lobbies;
+    private ObservableList<String> users;
     private Window window;
 
     /**
@@ -89,42 +86,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 });
             }
         });
-    }
-
-    @Override
-    @Subscribe
-    protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
-        if (rsp.getLobbyName() == null) super.onAskLatestChatMessageResponse(rsp);
-    }
-
-    @Override
-    @Subscribe
-    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
-        super.onChangeAccountDetailsSuccessfulResponse(rsp);
-    }
-
-    @Override
-    @Subscribe
-    protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) super.onCreatedChatMessageMessage(msg);
-    }
-
-    @Override
-    @Subscribe
-    protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) super.onDeletedChatMessageMessage(msg);
-    }
-
-    @Override
-    @Subscribe
-    protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
-        if (!msg.isLobbyChatMessage()) super.onEditedChatMessageMessage(msg);
-    }
-
-    @Override
-    @Subscribe
-    protected void onSystemMessageResponse(SystemMessageResponse rsp) {
-        if (!rsp.isLobbyChatMessage()) super.onSystemMessageResponse(rsp);
     }
 
     /**
@@ -396,7 +357,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onJoinLobbyButtonPressed() {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
         if (lobbyView.getSelectionModel().isEmpty()) {
             eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
         } else {

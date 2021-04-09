@@ -51,6 +51,7 @@ public class GameRendering {
     private static final Color FIELDS_COLOUR = Color.rgb(240, 215, 103);
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
+
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
@@ -91,6 +92,16 @@ public class GameRendering {
         this.diceSize = effectiveHeight / 12.0;
         this.diceLineWidth = diceSize / 16.0;
         this.diceDotSize = diceSize / 4.0;
+    }
+
+    /**
+     * Helper method to clear the game map
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-03-29
+     */
+    public void clearGameMap() {
+        gfxCtx.clearRect(0, 0, width, height);
     }
 
     /**
@@ -155,16 +166,6 @@ public class GameRendering {
     }
 
     /**
-     * Helper method to clear the gamemap
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-03-29
-     */
-    public void clearGameMap() {
-        gfxCtx.clearRect(0, 0, width, height);
-    }
-
-    /**
      * Shows a winner notification on the canvas
      *
      * @param text The text to display
@@ -180,25 +181,6 @@ public class GameRendering {
         gfxCtx.setFill(Color.BLACK);
         gfxCtx.setFont(Font.font(25));
         gfxCtx.fillText(text, width / 2.0, height / 2.0);
-    }
-
-    /**
-     * Helper method to draw a hitbox grid
-     * <p>
-     * This method draws a grid showing the hitboxes on the playing field.
-     *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @since 2021-03-27
-     */
-    private void drawHitboxGrid() {
-        gfxCtx.setStroke(Color.RED);
-        gfxCtx.setLineWidth(1);
-        for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
-            gfxCtx.strokeLine(0, cy, width, cy);
-
-        for (double cx = OFFSET_X; cx < width; cx += hexWidth / 8)
-            gfxCtx.strokeLine(cx, 0, cx, height);
     }
 
     /**
@@ -349,6 +331,25 @@ public class GameRendering {
             }
             currentY += (hexHeight / 4) * 3;
         }
+    }
+
+    /**
+     * Helper method to draw a hitbox grid
+     * <p>
+     * This method draws a grid showing the hitboxes on the playing field.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2021-03-27
+     */
+    private void drawHitboxGrid() {
+        gfxCtx.setStroke(Color.RED);
+        gfxCtx.setLineWidth(1);
+        for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
+            gfxCtx.strokeLine(0, cy, width, cy);
+
+        for (double cx = OFFSET_X; cx < width; cx += hexWidth / 8)
+            gfxCtx.strokeLine(cx, 0, cx, height);
     }
 
     /**

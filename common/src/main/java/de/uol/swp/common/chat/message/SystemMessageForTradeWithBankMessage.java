@@ -18,7 +18,8 @@ public class SystemMessageForTradeWithBankMessage extends AbstractLobbyMessage {
 
     /**
      * Constructor
-     *  @param lobbyName The lobby name
+     *
+     * @param lobbyName The lobby name
      * @param user      The user that traded with the bank
      */
     public SystemMessageForTradeWithBankMessage(String lobbyName, UserOrDummy user) {

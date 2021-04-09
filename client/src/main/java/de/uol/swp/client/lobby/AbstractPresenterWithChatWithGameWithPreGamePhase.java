@@ -6,7 +6,6 @@ import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
-import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
@@ -36,8 +35,6 @@ import java.util.function.UnaryOperator;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends AbstractPresenterWithChatWithGame {
 
-    protected ObservableList<UserOrDummy> lobbyMembers;
-    protected Set<UserOrDummy> readyUsers;
     @FXML
     protected Button kickUserButton;
     @FXML
@@ -51,12 +48,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox commandsActivated;
 
+    protected ObservableList<UserOrDummy> lobbyMembers;
+    protected Set<UserOrDummy> readyUsers;
+
     @FXML
-    private CheckBox readyCheckBox;
+    private Button changeMoveTimeButton;
     @FXML
     private Button startSession;
     @FXML
-    private VBox preGameSettingBox;
+    private CheckBox readyCheckBox;
     @FXML
     private ToggleGroup maxPlayersToggleGroup;
     @FXML
@@ -64,7 +64,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private RadioButton fourPlayerRadioButton;
     @FXML
-    private Button changeMoveTimeButton;
+    private VBox preGameSettingBox;
 
     @FXML
     @Override
@@ -179,7 +179,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == loggedInUser) return;
-        eventBus.post(new KickUserRequest(lobbyName, loggedInUser, selectedUser));
+        lobbyService.kickUser(lobbyName, loggedInUser, selectedUser);
     }
 
     /**
@@ -204,17 +204,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Prepare the MoveTimeTextField
-     * <p>
-     * Lets the moveTimeTextField only accept numbers.
-     */
-    private void prepareMoveTimeTextField() {
-        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
-                s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
-        moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
-    }
-
-    /**
      * Handles the click on the ReadyCheckBox
      * <p>
      * Method called when the Ready Checkbox is clicked. It checks whether the
@@ -229,6 +218,58 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onReadyCheckBoxClicked() {
         boolean isReady = readyCheckBox.isSelected();
         lobbyService.userReady(lobbyName, loggedInUser, isReady);
+    }
+
+    /**
+     * Handles a ReturnToPreGameLobbyMessage
+     * <p>
+     * If a new ReturnToLobbyMessage is posted onto the EventBus the
+     * Settings and visibility of the Buttons will be set to their
+     * Pre-Game states.
+     *
+     * @param msg The ReturnToPreGameLobbyMessage seen on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @since 2021-03-2021
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        Platform.runLater(() -> {
+            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby " + lobbyName);
+            returnToLobby.setVisible(false);
+            returnToLobby.setPrefHeight(0);
+            returnToLobby.setPrefWidth(0);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            window.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+            preGameSettingBox.setVisible(true);
+            preGameSettingBox.setPrefHeight(190);
+            preGameSettingBox.setMaxHeight(190);
+            turnIndicator.setText("");
+            preGameSettingBox.setMinHeight(190);
+            uniqueCardView.setMaxHeight(0);
+            uniqueCardView.setMinHeight(0);
+            uniqueCardView.setPrefHeight(0);
+            uniqueCardView.setVisible(false);
+            inventoryView.setMaxHeight(0);
+            inventoryView.setMinHeight(0);
+            inventoryView.setPrefHeight(0);
+            inventoryView.setVisible(false);
+            readyCheckBox.setVisible(true);
+            readyCheckBox.setSelected(false);
+            lobbyService.retrieveAllLobbyMembers(this.lobbyName);
+            setStartSessionButtonState();
+            rollDice.setVisible(false);
+            endTurn.setVisible(false);
+            tradeWithUserButton.setVisible(false);
+            tradeWithUserButton.setDisable(false);
+            tradeWithBankButton.setVisible(false);
+            rollDice.setVisible(false);
+            kickUserButton.setVisible(true);
+            playCard.setVisible(false);
+        });
     }
 
     /**
@@ -282,15 +323,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
-            window.setWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
-            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
             inventoryView.setMaxHeight(280);
             inventoryView.setMinHeight(280);
             inventoryView.setPrefHeight(280);
             inventoryView.setVisible(true);
-
             uniqueCardView.setMaxHeight(48);
             uniqueCardView.setMinHeight(48);
             uniqueCardView.setPrefHeight(48);
@@ -354,53 +394,17 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Handles a ReturnToPreGameLobbyMessage
+     * Prepare the MoveTimeTextField
      * <p>
-     * If a new ReturnToLobbyMessage is posted onto the EventBus the
-     * Settings and visibility of the Buttons will be set to their
-     * Pre-Game states.
+     * Lets the moveTimeTextField only accept numbers.
      *
-     * @param msg The ReturnToPreGameLobbyMessage seen on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-2021
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-24
      */
-    @Subscribe
-    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
-        Platform.runLater(() -> {
-            returnToLobby.setVisible(false);
-            returnToLobby.setPrefHeight(0);
-            returnToLobby.setPrefWidth(0);
-            window.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-            preGameSettingBox.setVisible(true);
-            preGameSettingBox.setPrefHeight(190);
-            preGameSettingBox.setMaxHeight(190);
-            turnIndicator.setText("");
-            preGameSettingBox.setMinHeight(190);
-            uniqueCardView.setMaxHeight(0);
-            uniqueCardView.setMinHeight(0);
-            uniqueCardView.setPrefHeight(0);
-            uniqueCardView.setVisible(false);
-            inventoryView.setMaxHeight(0);
-            inventoryView.setMinHeight(0);
-            inventoryView.setPrefHeight(0);
-            inventoryView.setVisible(false);
-            readyCheckBox.setVisible(true);
-            readyCheckBox.setSelected(false);
-            lobbyService.retrieveAllLobbyMembers(this.lobbyName);
-            setStartSessionButtonState();
-            rollDice.setVisible(false);
-            endTurn.setVisible(false);
-            tradeWithUserButton.setVisible(false);
-            tradeWithUserButton.setDisable(false);
-            tradeWithBankButton.setVisible(false);
-            rollDice.setVisible(false);
-            kickUserButton.setVisible(true);
-            playCard.setVisible(false);
-        });
+    private void prepareMoveTimeTextField() {
+        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
+                s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
+        moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 }

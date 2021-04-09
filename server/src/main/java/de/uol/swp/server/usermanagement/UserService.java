@@ -73,8 +73,7 @@ public class UserService extends AbstractService {
         }
         ResponseMessage returnMessage;
         try {
-            Optional<User> optionalUser = userManagement
-                    .getUserWithPassword(req.getOldUsername(), req.getOldPassword());
+            Optional<User> optionalUser = userManagement.getUser(req.getOldUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
                 User user = userManagement.updateUser(req.getUser());
                 returnMessage = new ChangeAccountDetailsSuccessfulResponse(user);

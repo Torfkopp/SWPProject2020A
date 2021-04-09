@@ -11,6 +11,7 @@ import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
+import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,12 +49,6 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkVictoryPoints(String lobbyName, User user) {
-        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
     public void createNewLobby(String name, User user, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
@@ -72,6 +67,12 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending LobbyJoinUserRequest");
         Message joinUserRequest = new LobbyJoinUserRequest(name, user);
         eventBus.post(joinUserRequest);
+    }
+
+    @Override
+    public void kickUser(String lobbyName, User loggedInUser, UserOrDummy userToKick) {
+        Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick);
+        eventBus.post(kickUserRequest);
     }
 
     @Override
@@ -116,22 +117,10 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void startSession(String lobbyName, User user) {
-        Message startSessionRequest = new StartSessionRequest(lobbyName, user);
-        eventBus.post(startSessionRequest);
-    }
-
-    @Override
     public void removeFromLobbies(User user) {
         LOG.debug("Sending RemoveFromLobbiesRequest");
         Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
         eventBus.post(removeFromLobbiesRequest);
-    }
-
-    @Override
-    public void kickUser(String lobbyName, User loggedInUser, User userToKick) {
-        Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick);
-        eventBus.post(kickUserRequest);
     }
 
     @Override
@@ -163,11 +152,9 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
-                                    boolean commandsAllowed, int moveTime, boolean randomPlayfieldEnabled) {
-        LOG.debug("Sending a ChangeLobbySettingsRequest");
-        eventBus.post(new ChangeLobbySettingsRequest(lobbyName, user, maxPlayers, startUpPhaseEnabled, commandsAllowed,
-                                                     moveTime, randomPlayfieldEnabled));
+    public void startSession(String lobbyName, User user) {
+        Message startSessionRequest = new StartSessionRequest(lobbyName, user);
+        eventBus.post(startSessionRequest);
     }
 
     @Override
@@ -175,6 +162,14 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending UpdateInventoryRequest");
         Message updateInventoryRequest = new UpdateInventoryRequest(user, lobbyName);
         eventBus.post(updateInventoryRequest);
+    }
+
+    @Override
+    public void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
+                                    boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
+        LOG.debug("Sending a ChangeLobbySettingsRequest");
+        eventBus.post(new ChangeLobbySettingsRequest(lobbyName, user, maxPlayers, startUpPhaseEnabled, commandsAllowed,
+                                                     moveTime, randomPlayFieldEnabled));
     }
 
     @Override

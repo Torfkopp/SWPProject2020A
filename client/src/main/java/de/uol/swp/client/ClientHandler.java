@@ -37,6 +37,15 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object in) {
+        if (in instanceof Message) {
+            clientConnection.receivedMessage((Message) in);
+        } else {
+            LOG.error("Illegal Object read from channel. Ignored!");
+        }
+    }
+
+    @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object o) {
         if (o instanceof IdleStateEvent) {
             IdleStateEvent e = (IdleStateEvent) o;
@@ -45,15 +54,6 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
                 clientConnection.resetClient();
                 ctx.close();
             }
-        }
-    }
-
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object in) {
-        if (in instanceof Message) {
-            clientConnection.receivedMessage((Message) in);
-        } else {
-            LOG.error("Illegal Object read from channel. Ignored!");
         }
     }
 

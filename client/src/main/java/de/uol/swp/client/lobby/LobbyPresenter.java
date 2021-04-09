@@ -32,10 +32,11 @@ import java.util.*;
 public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGamePhase {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-    public static final int LOBBY_HEIGHT_PRE_GAME = 700;
-    public static final int LOBBY_WIDTH_PRE_GAME = 685;
-    public static final int LOBBY_HEIGHT_IN_GAME = 740;
-    public static final int LOBBY_WIDTH_IN_GAME = 1435;
+    public static final int MIN_HEIGHT_PRE_GAME = 700;
+    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int MIN_HEIGHT_IN_GAME = 740;
+    public static final int MIN_WIDTH_IN_GAME = 1435;
+
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
     /**
@@ -65,81 +66,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         super.initialize();
         prepareMembersView();
         LOG.debug("LobbyPresenter initialised");
-    }
-
-    /**
-     * Prepares the MembersView
-     * Adds listeners for the MembersView
-     *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-24
-     */
-    private void prepareMembersView() {
-        membersView.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(UserOrDummy user, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(user, empty);
-                    if (empty || user == null) setText("");
-                    else {
-                        String name = user.getUsername();
-                        if (readyUsers.contains(user))
-                            name = String.format(resourceBundle.getString("lobby.members.ready"), name);
-                        if (user.equals(owner))
-                            name = String.format(resourceBundle.getString("lobby.members.owner"), name);
-                        if (inGame) {
-                            if (cardAmountTripleList == null) {
-                                cardAmountTripleList = new ArrayList<>();
-                                // At the start of the game, nobody has any cards, so add 0s for each user
-                                for (UserOrDummy u : lobbyMembers) cardAmountTripleList.add(new Triple<>(u, 0, 0));
-                            }
-                            for (Triple<UserOrDummy, Integer, Integer> triple : cardAmountTripleList) {
-                                if (triple.getValue1().equals(user)) {
-                                    name = String.format(resourceBundle.getString("lobby.members.amount"), name,
-                                                         triple.getValue2(), triple.getValue3());
-                                    break;
-                                }
-                            }
-                        }
-                        setText(name);
-                        //if the background should be in colour you need to use setBackground
-                        int i = lobbyMembers.size();
-                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
-                            setTextFill(GameRendering.PLAYER_1_COLOUR);
-                        }
-                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
-                            setTextFill(GameRendering.PLAYER_2_COLOUR);
-                        }
-                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
-                            setTextFill(GameRendering.PLAYER_3_COLOUR);
-                        }
-                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
-                            setTextFill(GameRendering.PLAYER_4_COLOUR);
-                        }
-                    }
-                });
-            }
-        });
-
-        membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (newValue == null) {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-                return;
-            }
-            String name = newValue.getUsername();
-            boolean isSelf = newValue.equals(this.loggedInUser);
-            kickUserButton.setDisable(isSelf);
-            tradeWithUserButton.setDisable(isSelf);
-            if (isSelf) {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-                tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
-            } else {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
-                tradeWithUserButton
-                        .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
-            }
-        });
     }
 
     /**
@@ -174,8 +100,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         this.readyUsers.addAll(rsp.getReadyUsers());
         Platform.runLater(() -> {
             updateUsersList(rsp.getUsers());
-            setStartSessionButtonState();
-            setKickUserButtonState();
+            if (!inGame) {
+                setStartSessionButtonState();
+                setKickUserButtonState();
+            }
             setPreGameSettings();
         });
     }
@@ -359,6 +287,82 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             setPreGameSettings();
         });
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+    }
+
+    /**
+     * Prepares the MembersView
+     * <p>
+     * Adds listeners for the MembersView
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-24
+     */
+    private void prepareMembersView() {
+        membersView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(UserOrDummy user, boolean empty) {
+                Platform.runLater(() -> {
+                    super.updateItem(user, empty);
+                    if (empty || user == null) setText("");
+                    else {
+                        String name = user.getUsername();
+                        if (readyUsers.contains(user))
+                            name = String.format(resourceBundle.getString("lobby.members.ready"), name);
+                        if (user.equals(owner))
+                            name = String.format(resourceBundle.getString("lobby.members.owner"), name);
+                        if (inGame) {
+                            if (cardAmountTripleList == null) {
+                                cardAmountTripleList = new ArrayList<>();
+                                // At the start of the game nobody has any cards, so add 0s for each user
+                                for (UserOrDummy u : lobbyMembers) cardAmountTripleList.add(new Triple<>(u, 0, 0));
+                            }
+                            for (Triple<UserOrDummy, Integer, Integer> triple : cardAmountTripleList) {
+                                if (triple.getValue1().equals(user)) {
+                                    name = String.format(resourceBundle.getString("lobby.members.amount"), name,
+                                                         triple.getValue2(), triple.getValue3());
+                                    break;
+                                }
+                            }
+                        }
+                        setText(name);
+                        //if the background should be in colour you need to use setBackground
+                        int i = lobbyMembers.size();
+                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
+                            setTextFill(GameRendering.PLAYER_1_COLOUR);
+                        }
+                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
+                            setTextFill(GameRendering.PLAYER_2_COLOUR);
+                        }
+                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
+                            setTextFill(GameRendering.PLAYER_3_COLOUR);
+                        }
+                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
+                            setTextFill(GameRendering.PLAYER_4_COLOUR);
+                        }
+                    }
+                });
+            }
+        });
+
+        membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                return;
+            }
+            String name = newValue.getUsername();
+            boolean isSelf = newValue.equals(this.loggedInUser);
+            kickUserButton.setDisable(isSelf);
+            tradeWithUserButton.setDisable(isSelf);
+            if (isSelf) {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+            } else {
+                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
+                tradeWithUserButton
+                        .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
+            }
+        });
     }
 
     /**

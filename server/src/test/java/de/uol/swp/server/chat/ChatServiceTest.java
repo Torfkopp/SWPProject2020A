@@ -13,8 +13,7 @@ import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
-import de.uol.swp.server.usermanagement.AuthenticationService;
-import de.uol.swp.server.usermanagement.UserManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
 import org.junit.jupiter.api.AfterEach;
@@ -49,10 +48,9 @@ class ChatServiceTest {
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
     private final UserStore userStore = new MainMemoryBasedUserStore();
-    private final UserManagement userManagement = new UserManagement(userStore);
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
-    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
-    private final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
+    private final SessionManagement sessionManagement = new SessionManagement();
+    private final LobbyService lobbyService = new LobbyService(lobbyManagement, sessionManagement, bus);
     private ChatManagement chatManagement;
     private ChatService chatService;
 
@@ -63,7 +61,7 @@ class ChatServiceTest {
      * one test's ChatMessage objects don't interfere with another test's
      */
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         chatManagement = new ChatManagement(new MainMemoryBasedChatMessageStore());
         chatService = new ChatService(bus, chatManagement, lobbyManagement, lobbyService);
     }
@@ -74,7 +72,7 @@ class ChatServiceTest {
      * This method resets the chatManagement and chatService variables to null
      */
     @AfterEach
-    void tearDown() {
+    protected void tearDown() {
         chatManagement = null;
         chatService = null;
     }

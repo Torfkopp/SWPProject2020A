@@ -23,9 +23,9 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class LobbyUpdateEvent {
 
+    private final Lobby lobby;
     private final String lobbyName;
     private final UserOrDummy user;
-    private final Lobby lobby;
 
     /**
      * Constructor
@@ -38,6 +38,19 @@ public class LobbyUpdateEvent {
         this.lobbyName = lobbyName;
         this.user = user;
         this.lobby = lobby;
+    }
+
+    /**
+     * The Lobby-object of the lobby the user wants to join
+     *
+     * @return The lobby object
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    public Lobby getLobby() {
+        return lobby;
     }
 
     /**
@@ -56,18 +69,5 @@ public class LobbyUpdateEvent {
      */
     public UserOrDummy getUser() {
         return user;
-    }
-
-    /**
-     * The Lobby-object of the lobby the user wants to join
-     *
-     * @return The lobby object
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
-     */
-    public Lobby getLobby() {
-        return lobby;
     }
 }

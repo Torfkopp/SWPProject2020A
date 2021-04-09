@@ -18,6 +18,7 @@ import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
+import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
@@ -30,7 +31,6 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
@@ -60,30 +60,17 @@ public class SceneManager {
 
     private static final Logger LOG = LogManager.getLogger(SceneManager.class);
     private static final String styleSheet = "css/swp.css";
-    private static final int BANK_TRADING_HEIGHT = 400;
-    private static final int BANK_TRADING_WIDTH = 620;
-    private static final int CHANGEACCDETAILS_HEIGHT = 230;
-    private static final int CHANGEACCDETAILS_WIDTH = 395;
-    private static final int DEVMENU_HEIGHT = 450;
-    private static final int DEVMENU_WIDTH = 630;
-    private static final int LOGIN_HEIGHT = 220;
-    private static final int LOGIN_WIDTH = 400;
-    private static final int MAINMENU_HEIGHT = 550;
-    private static final int MAINMENU_WIDTH = 820;
-    private static final int REGISTRATION_HEIGHT = 250;
-    private static final int REGISTRATION_WIDTH = 410;
-    private static final int RESPONSE_TRADING_HEIGHT = 325;
-    private static final int RESPONSE_TRADING_WIDTH = 380;
-    private static final int TRADING_HEIGHT = 620;
-    private static final int TRADING_WIDTH = 520;
 
-    private final ResourceBundle resourceBundle;
+    @Inject
+    private static Injector injector;
+    @Inject
+    private static ResourceBundle resourceBundle;
+
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
     private final Map<String, Stage> tradingResponseStages = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
-    private final Injector injector;
     private final EventBus eventBus;
     private Scene loginScene;
     private String lastTitle;
@@ -98,16 +85,13 @@ public class SceneManager {
      * Constructor
      *
      * @param eventBus     The EventBus
-     * @param injected     The Guice injector module
      * @param primaryStage The primary Stage
      */
     @Inject
-    public SceneManager(EventBus eventBus, Injector injected, @Assisted Stage primaryStage) {
+    public SceneManager(EventBus eventBus, @Assisted Stage primaryStage) {
         eventBus.register(this);
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;
-        this.injector = injected;
-        this.resourceBundle = this.injector.getInstance(ResourceBundle.class);
         initViews();
     }
 
@@ -126,6 +110,17 @@ public class SceneManager {
     }
 
     /**
+     * Method used to close down the client
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-03-25
+     */
+    public void closeMainScreen() {
+        primaryStage.close();
+    }
+
+    /**
      * Shows the ChangeAccountDetailsScreen
      * <p>
      * Sets the scene's UserData to the current user.
@@ -139,7 +134,8 @@ public class SceneManager {
     public void showChangeAccountDetailsScreen(User user) {
         ChangeAccountDetailsScene.setUserData(user);
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
-                  CHANGEACCDETAILS_WIDTH, CHANGEACCDETAILS_HEIGHT);
+                  ChangeAccountDetailsPresenter.MIN_WIDTH,
+                  ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -208,24 +204,6 @@ public class SceneManager {
     }
 
     /**
-     * Method used to display a custom error for the
-     * connection timeout.
-     *
-     * @author Marvin Drees
-     * @since 2021-03-26
-     */
-    public void showTimeoutErrorScreen() {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
-            alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
-            alert.getButtonTypes().setAll(confirm);
-            alert.showAndWait();
-        });
-    }
-
-    /**
      * Shows the login error alert
      * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
@@ -252,7 +230,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
+        showScene(loginScene, resourceBundle.getString("login.window.title"), LoginPresenter.MIN_WIDTH,
+                  LoginPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -266,38 +245,7 @@ public class SceneManager {
     public void showMainScreen(User currentUser) {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
-                  MAINMENU_WIDTH, MAINMENU_HEIGHT);
-    }
-
-    /**
-     * Method used to close down the client
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-03-25
-     */
-    public void closeMainScreen() {
-        primaryStage.close();
-    }
-
-    /**
-     * Method used to close the client and show an error.
-     * <p>
-     * This method is called when a ClientDisconnectedFromServerEvent
-     * is found on the EventBus. It shows an error indicating that the
-     * connection timed out and closes the client.
-     *
-     * @param msg ClientDisconnectedFromServerEvent found on the EventBus
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @since 2021-03-25
-     */
-    @Subscribe
-    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
-        LOG.debug("Client disconnected from server");
-        showTimeoutErrorScreen();
-        Platform.runLater(this::closeMainScreen);
+                  MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -309,8 +257,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"), REGISTRATION_WIDTH,
-                  REGISTRATION_HEIGHT);
+        showScene(registrationScene, resourceBundle.getString("register.window.title"),
+                  RegistrationPresenter.MIN_WIDTH, RegistrationPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -325,101 +273,21 @@ public class SceneManager {
     }
 
     /**
-     * Internationalises a Message coming from the server
+     * Method used to display a custom error for the
+     * connection timeout.
      *
-     * @param e The original exception message
-     *
-     * @return The internationalised message
-     *
-     * @author Mario Fokken
      * @author Marvin Drees
-     * @since 2021-03-12
+     * @since 2021-03-26
      */
-    private String internationaliseServerMessage(String e) {
-        String context = e;
-        // @formatter:off
-        switch (e) {
-            //Found in ChatService
-            case "This lobby doesn't allow the use of commands!":
-                context = resourceBundle.getString("error.context.commandsforbidden");
-                break;
-            //Found in LobbyService
-            case "Game session started already!":
-                context = resourceBundle.getString("error.context.sessionstarted");
-                break;
-            case "You're already in this lobby!":
-                context = resourceBundle.getString("error.context.alreadyin");
-                break;
-            case "This lobby is full!":
-                context = resourceBundle.getString("error.context.full");
-                break;
-            case "This lobby does not exist!":
-                context = resourceBundle.getString("error.context.noexistant");
-                break;
-            //Found in GameService
-            case "Can not kick while a game is ongoing":
-                context = resourceBundle.getString("error.context.ongoing");
-                break;
-            //Found in ServerHandler
-            case "Authorisation required. Client not logged in!":
-                context = resourceBundle.getString("error.context.authneeded");
-                break;
-            //Found in UserManagement
-            case "Username already used!":
-            case "Username already taken":
-                context = resourceBundle.getString("error.context.nameused");
-                break;
-            case "Username unknown!":
-                context = resourceBundle.getString("error.context.unknown");
-                break;
-            case "User unknown!":
-                context = resourceBundle.getString("error.context.unknownuser");
-                break;
-            //Found in UserService
-            case "Old Passwords are not equal":
-                context = resourceBundle.getString("error.context.oldpw");
-                break;
-            case "Old Password was not correct":
-                context = resourceBundle.getString("error.context.oldpwincorrect");
-                break;
-        }
-        //found in UserManagement
-        if (e.contains("Cannot auth user ")) context =
-                resourceBundle.getString("error.context.cannotauth") +
-                e.substring(16);
-        //found in UserService
-        if (e.contains("Cannot delete user ")) context =
-                resourceBundle.getString("error.context.cannotdelete") + " " +
-                e.substring(e.indexOf('[')+1, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.unknown");
-        if (e.contains("Cannot create user ")) context =
-                resourceBundle.getString("error.context.cannotcreate") + " " +
-                e.substring(e.indexOf('[')+2-1, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.nameused");
-        if (e.contains("Cannot change Password of ")) context =
-                resourceBundle.getString("error.context.cannotchangepw") + " " +
-                e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.unknown");
-        //found in LobbyManagement
-        if (e.contains("Lobby") && e.contains(" already exists!")) context =
-                resourceBundle.getString("error.context.lobbyname") + " " +
-                e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains("Lobby") && e.contains(" not found!")) context =
-                resourceBundle.getString("error.context.lobbyname") + " " +
-                e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.notfound");
-        //found in GameManagement
-        if (e.contains("Game") && e.contains(" already exists!")) context =
-                resourceBundle.getString("error.context.gamelobby") + " " +
-                e.substring(e.indexOf('[')+6-5, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains("Game") && e.contains(" not found!")) context =
-                resourceBundle.getString("error.context.gamelobby") + " " +
-                e.substring(e.indexOf('[')+7-6, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.notfound");
-        // @formatter:on
-        return context;
+    public void showTimeoutErrorScreen() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
+            alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            alert.showAndWait();
+        });
     }
 
     /**
@@ -537,20 +405,118 @@ public class SceneManager {
     }
 
     /**
+     * Internationalises a Message coming from the server
+     *
+     * @param e The original exception message
+     *
+     * @return The internationalised message
+     *
+     * @author Mario Fokken
+     * @author Marvin Drees
+     * @since 2021-03-12
+     */
+    private String internationaliseServerMessage(String e) {
+        String context = e;
+        // @formatter:off
+        switch (e) {
+            //Found in ChatService
+            case "This lobby doesn't allow the use of commands!":
+                context = resourceBundle.getString("error.context.commandsforbidden");
+                break;
+            //Found in LobbyService
+            case "Game session started already!":
+                context = resourceBundle.getString("error.context.sessionstarted");
+                break;
+            case "You're already in this lobby!":
+                context = resourceBundle.getString("error.context.alreadyin");
+                break;
+            case "This lobby is full!":
+                context = resourceBundle.getString("error.context.full");
+                break;
+            case "This lobby does not exist!":
+                context = resourceBundle.getString("error.context.noexistant");
+                break;
+            //Found in GameService
+            case "Can not kick while a game is ongoing":
+                context = resourceBundle.getString("error.context.ongoing");
+                break;
+            //Found in ServerHandler
+            case "Authorisation required. Client not logged in!":
+                context = resourceBundle.getString("error.context.authneeded");
+                break;
+            //Found in UserManagement
+            case "Username already used!":
+            case "Username already taken":
+                context = resourceBundle.getString("error.context.nameused");
+                break;
+            case "Username unknown!":
+                context = resourceBundle.getString("error.context.unknown");
+                break;
+            case "User unknown!":
+                context = resourceBundle.getString("error.context.unknownuser");
+                break;
+            //Found in UserService
+            case "Old Passwords are not equal":
+                context = resourceBundle.getString("error.context.oldpw");
+                break;
+            case "Old Password was not correct":
+                context = resourceBundle.getString("error.context.oldpwincorrect");
+                break;
+        }
+        //found in UserManagement
+        if (e.contains("Cannot auth user ")) context =
+                resourceBundle.getString("error.context.cannotauth") +
+                e.substring(16);
+        //found in UserService
+        if (e.contains("Cannot delete user ")) context =
+                resourceBundle.getString("error.context.cannotdelete") + " " +
+                e.substring(e.indexOf('[')+1, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.unknown");
+        if (e.contains("Cannot create user ")) context =
+                resourceBundle.getString("error.context.cannotcreate") + " " +
+                e.substring(e.indexOf('[')+2-1, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.nameused");
+        if (e.contains("Cannot change Password of ")) context =
+                resourceBundle.getString("error.context.cannotchangepw") + " " +
+                e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
+                resourceBundle.getString("error.context.unknown");
+        //found in LobbyManagement
+        if (e.contains("Lobby") && e.contains(" already exists!")) context =
+                resourceBundle.getString("error.context.lobbyname") + " " +
+                e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.alreadyexists");
+        if (e.contains("Lobby") && e.contains(" not found!")) context =
+                resourceBundle.getString("error.context.lobbyname") + " " +
+                e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.notfound");
+        //found in GameManagement
+        if (e.contains("Game") && e.contains(" already exists!")) context =
+                resourceBundle.getString("error.context.gamelobby") + " " +
+                e.substring(e.indexOf('[')+6-5, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.alreadyexists");
+        if (e.contains("Game") && e.contains(" not found!")) context =
+                resourceBundle.getString("error.context.gamelobby") + " " +
+                e.substring(e.indexOf('[')+7-6, e.lastIndexOf(']')) + " " +
+                resourceBundle.getString("error.context.notfound");
+        // @formatter:on
+        return context;
+    }
+
+    /**
      * Handles an incoming LobbyListMessage
      * <p>
      * If a LobbyListMessage is detected, the lobbyScenes map
      * is updated to know the same lobbies as the server
      *
-     * @param allLobbiesResponse The LobbyListMessage detected on the EventBus
+     * @param rsp The LobbyListMessage detected on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.AllLobbiesResponse
      * @since 2020-12-12
      */
     @Subscribe
-    private void onAllLobbiesResponse(AllLobbiesResponse allLobbiesResponse) {
+    private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
-        for (String name : allLobbiesResponse.getLobbyNames()) {
+        for (String name : rsp.getLobbyNames()) {
             if (!lobbyScenes.containsKey(name)) lobbyScenes.put(name, null); //do not overwrite existing lobbyScene
         }
     }
@@ -567,7 +533,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onChangeAccountDetailsCanceledEvent(ChangeAccountDetailsCanceledEvent event) {
-        showScene(lastScene, lastTitle, MAINMENU_WIDTH, MAINMENU_HEIGHT);
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -586,6 +552,26 @@ public class SceneManager {
     }
 
     /**
+     * Method used to close the client and show an error.
+     * <p>
+     * This method is called when a ClientDisconnectedFromServerEvent
+     * is found on the EventBus. It shows an error indicating that the
+     * connection timed out and closes the client.
+     *
+     * @param msg ClientDisconnectedFromServerEvent found on the EventBus
+     *
+     * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @since 2021-03-25
+     */
+    @Subscribe
+    private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
+        LOG.debug("Client disconnected from server");
+        showTimeoutErrorScreen();
+        Platform.runLater(this::closeMainScreen);
+    }
+
+    /**
      * Handles the CloseLobbiesViewEvent detected on the EventBus
      * <p>
      * If a CloseLobbiesEvent is detected on the EventBus, this method gets called.
@@ -600,6 +586,24 @@ public class SceneManager {
     @Subscribe
     private void onCloseLobbiesViewEvent(CloseLobbiesViewEvent event) {
         closeLobbies();
+    }
+
+    /**
+     * Handles the CloseTradeResponseEvent detected on the EventBus
+     * <p>
+     * If a CloseTradeResponseEvent is detected on the EventBus, this method gets
+     * called. If there is a trading response stage in the according lobby, it gets closed.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.client.trade.event.CloseTradeResponseEvent
+     * @since 2021-03-19
+     */
+    @Subscribe
+    private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
+        if (!tradingResponseStages.containsKey(event.getLobbyName())) return;
+        tradingResponseStages.get(event.getLobbyName()).close();
+        tradingResponseStages.remove(event.getLobbyName());
     }
 
     /**
@@ -681,10 +685,10 @@ public class SceneManager {
             devMenuIsOpen = true;
             Stage devMenuStage = new Stage();
             devMenuStage.setTitle("Developer Access Board");
-            devMenuStage.setHeight(DEVMENU_HEIGHT);
-            devMenuStage.setMinHeight(DEVMENU_HEIGHT);
-            devMenuStage.setWidth(DEVMENU_WIDTH);
-            devMenuStage.setMinWidth(DEVMENU_WIDTH);
+            devMenuStage.setHeight(DevMenuPresenter.MIN_HEIGHT);
+            devMenuStage.setMinHeight(DevMenuPresenter.MIN_HEIGHT);
+            devMenuStage.setWidth(DevMenuPresenter.MIN_WIDTH);
+            devMenuStage.setMinWidth(DevMenuPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(DevMenuPresenter.fxml);
             Scene devMenuScene = new Scene(rootPane);
             devMenuScene.getStylesheets().add(styleSheet);
@@ -710,7 +714,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
-        showScene(lastScene, lastTitle, LOGIN_WIDTH, LOGIN_HEIGHT);
+        showScene(lastScene, lastTitle, LoginPresenter.MIN_WIDTH, LoginPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -763,10 +767,10 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
-        lobbyStage.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-        lobbyStage.setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-        lobbyStage.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-        lobbyStage.setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+        lobbyStage.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+        lobbyStage.setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);
@@ -839,10 +843,10 @@ public class SceneManager {
         //New window (Stage)
         Stage bankStage = new Stage();
         bankStage.setTitle(resourceBundle.getString("game.trade.window.bank.title"));
-        bankStage.setHeight(BANK_TRADING_HEIGHT);
-        bankStage.setMinHeight(BANK_TRADING_HEIGHT);
-        bankStage.setWidth(BANK_TRADING_WIDTH);
-        bankStage.setMinWidth(BANK_TRADING_WIDTH);
+        bankStage.setHeight(TradeWithBankPresenter.MIN_HEIGHT);
+        bankStage.setMinHeight(TradeWithBankPresenter.MIN_HEIGHT);
+        bankStage.setWidth(TradeWithBankPresenter.MIN_WIDTH);
+        bankStage.setMinWidth(TradeWithBankPresenter.MIN_WIDTH);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
         Scene bankScene = new Scene(rootPane);
@@ -885,10 +889,10 @@ public class SceneManager {
             Stage tradingResponseStage = new Stage();
             tradingResponseStage.setTitle(String.format(resourceBundle.getString("game.trade.window.receiving.title"),
                                                         event.getOfferingUser()));
-            tradingResponseStage.setHeight(RESPONSE_TRADING_HEIGHT);
-            tradingResponseStage.setMinHeight(RESPONSE_TRADING_HEIGHT);
-            tradingResponseStage.setWidth(RESPONSE_TRADING_WIDTH);
-            tradingResponseStage.setMinWidth(RESPONSE_TRADING_WIDTH);
+            tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
+            tradingResponseStage.setMinHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
+            tradingResponseStage.setWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
+            tradingResponseStage.setMinWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
             Scene tradeScene = new Scene(rootPane);
             tradeScene.getStylesheets().add(styleSheet);
@@ -924,10 +928,10 @@ public class SceneManager {
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
-        tradingStage.setHeight(TRADING_HEIGHT);
-        tradingStage.setMinHeight(TRADING_HEIGHT);
-        tradingStage.setWidth(TRADING_WIDTH);
-        tradingStage.setMinWidth(TRADING_WIDTH);
+        tradingStage.setHeight(TradeWithUserPresenter.MIN_HEIGHT);
+        tradingStage.setMinHeight(TradeWithUserPresenter.MIN_HEIGHT);
+        tradingStage.setWidth(TradeWithUserPresenter.MIN_WIDTH);
+        tradingStage.setMinWidth(TradeWithUserPresenter.MIN_WIDTH);
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
         Scene tradeScene = new Scene(rootPane);
         tradeScene.getStylesheets().add(styleSheet);
@@ -998,24 +1002,6 @@ public class SceneManager {
             tradingStages.get(lobby).close();
             tradingStages.remove(lobby);
         }
-    }
-
-    /**
-     * Handles the CloseTradeResponseEvent detected on the EventBus
-     * <p>
-     * If a CloseTradeResponseEvent is detected on the EventBus, this method gets
-     * called. If there is a trading response stage in the according lobby, it gets closed.
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @see de.uol.swp.client.trade.event.CloseTradeResponseEvent
-     * @since 2021-03-19
-     */
-    @Subscribe
-    private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
-        if (!tradingResponseStages.containsKey(event.getLobbyName())) return;
-        tradingResponseStages.get(event.getLobbyName()).close();
-        tradingResponseStages.remove(event.getLobbyName());
     }
 
     /**

@@ -10,7 +10,6 @@ import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -25,11 +24,12 @@ import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
-import de.uol.swp.server.game.event.GetUserSessionEvent;
+import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
@@ -96,6 +96,28 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to handle ending the game if the last change to the
+     * inventory pushed the player over the edge in terms of Victory Points
+     *
+     * @param game        The game in which the player might have won
+     * @param originLobby The lobby in which the game is taking place
+     * @param user        The use who might have won
+     *
+     * @author Phillip-André Suhr
+     * @author Steven Luong
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-04-07
+     */
+    private void endGameIfPlayerWon(Game game, String originLobby, UserOrDummy user) {
+        int vicPoints = game.calculateVictoryPoints(game.getPlayer(user));
+        if (vicPoints >= 10) {
+            ServerMessage message = new PlayerWonGameMessage(originLobby, user);
+            lobbyService.sendToAllInLobby(originLobby, message);
+            gameManagement.dropGame(originLobby);
+        }
+    }
+
+    /**
      * Helper method to make a resourceMap from a provided inventory
      *
      * @param inventory The inventory to make a resourceMap from
@@ -123,7 +145,7 @@ public class GameService extends AbstractService {
      * checks if there are enough resources available in the inventories
      * to make a trade between the 2 users.
      * If there are enough resources this method creates a
-     * TradeOfUsersAcceptedResponse and sends it with a GetUserSessionEvent
+     * TradeOfUsersAcceptedResponse and sends it with a ForwardToUserInternalRequest
      * to direct the Response to the right client.
      * Otherwise a InvalidTradeOfUsersResponse is posted onto the EventBus.
      *
@@ -134,7 +156,7 @@ public class GameService extends AbstractService {
      * @see de.uol.swp.common.game.request.AcceptUserTradeRequest
      * @see de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse
      * @see de.uol.swp.common.game.response.InvalidTradeOfUsersResponse
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
      * @since 2021-02-24
      */
     @Subscribe
@@ -228,7 +250,7 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
             LOG.debug("Preparing a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
-            post(new GetUserSessionEvent(req.getOfferingUser(), returnMessage));
+            post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
             returnMessage.initWithMessage(req);
             LOG.debug("Sending a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
             post(returnMessage);
@@ -282,8 +304,9 @@ public class GameService extends AbstractService {
                                                                  game.getCardAmounts());
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
-                                                                                        .getUsername() + "couldnt buy a development Card");
+                                                                                        .getUsername() + "couldn't buy a development Card");
         }
     }
 
@@ -316,7 +339,9 @@ public class GameService extends AbstractService {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             } // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
+            LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
+            LOG.debug("Sending StartSessionMessage for Lobby " + lobbyName);
             StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
                                                                   msg.getLobby().startUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
@@ -422,11 +447,12 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     Collections.unmodifiableMap(resourceMap),
                                                                     Collections.unmodifiableMap(armyAndRoadMap));
-        LOG.debug("Sending GetUserSessionEvent containing UpdateInventoryResponse");
-        post(new GetUserSessionEvent(req.getUser(), returnMessage));
+        LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
+        post(new ForwardToUserInternalRequest(req.getUser(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -454,8 +480,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
 
-        if (nextPlayer instanceof User) {
-        } else { //Dummy
+        if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
         }
@@ -523,7 +548,7 @@ public class GameService extends AbstractService {
      * Handles an OfferingTradeWithUserRequest found on the EventBus
      * <p>
      * If an OfferingTradeWithUserRequest is found on the EventBus,
-     * a new GetUserSessionEvent is posted onto the EventBus containing
+     * a new ForwardToUserInternalRequest is posted onto the EventBus containing
      * the respondingUser and a new TradeWithUserOfferResponse which in turn
      * contains both users, the lobby, the resourceMap of the respondingUser,
      * and the two maps containing information of the trade.
@@ -534,7 +559,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
      * @see de.uol.swp.common.game.response.TradeWithUserOfferResponse
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
      * @since 2021-02-24
      */
     @Subscribe
@@ -554,7 +579,7 @@ public class GameService extends AbstractService {
                                                                        resourceMap, req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
-        post(new GetUserSessionEvent(req.getRespondingUser(), offerResponse));
+        post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
     }
 
     /**
@@ -603,6 +628,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -738,6 +764,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -828,7 +855,7 @@ public class GameService extends AbstractService {
      * Handles a ResetOfferTradeButtonRequest found on the EventBus
      * <p>
      * If a ResetOfferTradeButtonRequest is found on the EventBus,
-     * a new GetUserSessionEvent is posted onto the EventBus containing
+     * a new ForwardToUserInternalRequest is posted onto the EventBus containing
      * the user and a new ResetOfferTradeButtonResponse which contains
      * the lobby name.
      *
@@ -838,7 +865,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.ResetOfferTradeButtonRequest
      * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
      * @since 2021-02-25
      */
     @Subscribe
@@ -849,7 +876,7 @@ public class GameService extends AbstractService {
         if (offeringInventory == null) return;
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
         LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby " + req.getOriginLobby());
-        post(new GetUserSessionEvent(req.getOfferingUser(), returnMessage));
+        post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
     }
 
     /**
@@ -924,7 +951,7 @@ public class GameService extends AbstractService {
      * If a TradeWithUserCancelRequest is detected on the EventBus, this
      * method creates a TradeWithUserCancelResponse to close the responding
      * trade window of the responding user of the request.
-     * Therefore a GetUserSessionEvent is needed.
+     * Therefore a ForwardToUserInternalRequest is needed.
      *
      * @param req TradeWithUserCancelRequest found on the EventBus
      *
@@ -932,7 +959,7 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @see de.uol.swp.common.game.request.TradeWithUserCancelRequest
      * @see de.uol.swp.common.game.response.TradeWithUserCancelResponse
-     * @see de.uol.swp.server.game.event.GetUserSessionEvent
+     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
      * @since 2021-02-28
      */
     @Subscribe
@@ -950,7 +977,7 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
                                                                                          game.getActivePlayer());
         LOG.debug("Sending a TradeWithUserCancelResponse for Lobby " + req.getOriginLobby());
-        post(new GetUserSessionEvent(req.getRespondingUser(), returnMessageForRespondingUser));
+        post(new ForwardToUserInternalRequest(req.getRespondingUser(), returnMessageForRespondingUser));
     }
 
     /**
@@ -1062,8 +1089,7 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Received a SystemMessageForTradeMessage");
-        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
-                                                                       req.getUser(), "Bank",
+        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser(), "Bank",
                                                                        offeredResourcesWrapperMap,
                                                                        respondingResourcesWrapperMap);
         LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
@@ -1116,6 +1142,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -1161,36 +1188,10 @@ public class GameService extends AbstractService {
             }
             ResponseMessage serverMessage = new SystemMessageForTradeWithBankResponse(lobbyName, developmentCard);
             LOG.debug("Sending SystemMessageForTradeWithBankResponse for Lobby " + lobbyName);
-            post(new GetUserSessionEvent(user, serverMessage));
+            post(new ForwardToUserInternalRequest(user, serverMessage));
             LOG.debug("Sending SystemMessageForTradeWithBankMessage for Lobby " + lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
-    }
-
-    /**
-     * Handles a CheckVictoryPointsRequest found on the EventBus
-     * If a CheckVictoryPointsRequest is found on the EventBus, this method
-     * checks if the player has 10 or more victory points. If he has 10 ore more
-     * victory points, a new PlayerWonGameMessage is sent to all lobby members
-     * and the GameManagement drops the game.
-     *
-     * @param req The CheckVictoryPointsRequest found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.CheckVictoryPointsRequest
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req) {
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
-        if (vicPoints >= 10) {
-            ServerMessage message = new PlayerWonGameMessage(req.getOriginLobby(), req.getUser());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), message);
-            gameManagement.dropGame(req.getOriginLobby());
-        }
     }
 }

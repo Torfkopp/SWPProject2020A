@@ -38,7 +38,10 @@ import java.util.Map;
 public class TradeWithUserAcceptPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/TradeWithUserAcceptView.fxml";
+    public static final int MIN_HEIGHT = 340;
+    public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
+
     @FXML
     private Button acceptTradeButton;
     @FXML
@@ -86,28 +89,6 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     }
 
     /**
-     * Handles a click on the MakeCounterOfferButton
-     * <p>
-     * When the buttons gets pressed, this method calls the
-     * ShowTradeWithUserViewEvent to open up the trading window and
-     * a TradeWithUserRequest to get the needed information from the
-     * server for the trade.
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
-     * @see de.uol.swp.common.game.request.TradeWithUserRequest
-     * @since 2021-03-19
-     */
-    @FXML
-    private void onMakeCounterOfferButtonPressed() {
-        LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUser));
-        LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
-        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUser));
-    }
-
-    /**
      * Helper function
      * <p>
      * This method is called if a window should be closed.
@@ -145,6 +126,28 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             tradeNotPossibleLabel.setText(
                     String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
         });
+    }
+
+    /**
+     * Handles a click on the MakeCounterOfferButton
+     * <p>
+     * When the buttons gets pressed, this method calls the
+     * ShowTradeWithUserViewEvent to open up the trading window and
+     * a TradeWithUserRequest to get the needed information from the
+     * server for the trade.
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
+     * @see de.uol.swp.common.game.request.TradeWithUserRequest
+     * @since 2021-03-19
+     */
+    @FXML
+    private void onMakeCounterOfferButtonPressed() {
+        LOG.debug("Sending ShowTradeWithUserViewEvent");
+        eventBus.post(new ShowTradeWithUserViewEvent(respondingUser, this.lobbyName, offeringUser));
+        LOG.debug("Sending a TradeWithUserRequest for Lobby " + this.lobbyName);
+        eventBus.post(new TradeWithUserRequest(this.lobbyName, respondingUser, offeringUser));
     }
 
     /**
