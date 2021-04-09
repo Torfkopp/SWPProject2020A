@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.message.robber;
+package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.message.AbstractRequestMessage;
@@ -10,7 +10,7 @@ import de.uol.swp.common.user.User;
  *
  * @author Mario Fokken
  * @author Timo Gerken
- * @see de.uol.swp.common.game.message.robber.RobberNewPositionResponse
+ * @see de.uol.swp.common.game.robber.RobberNewPositionResponse
  * @since 2021-04-05
  */
 public class RobberNewPositionChosenRequest extends AbstractRequestMessage {

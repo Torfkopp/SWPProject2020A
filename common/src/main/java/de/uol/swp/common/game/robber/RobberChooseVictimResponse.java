@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.message.robber;
+package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.User;
@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * @author Mario Fokken
  * @author Timo Gerken
- * @see de.uol.swp.common.game.message.robber.RobberChosenVictimRequest
+ * @see de.uol.swp.common.game.robber.RobberChosenVictimRequest
  * @since 2021-04-06
  */
 public class RobberChooseVictimResponse extends AbstractResponseMessage {

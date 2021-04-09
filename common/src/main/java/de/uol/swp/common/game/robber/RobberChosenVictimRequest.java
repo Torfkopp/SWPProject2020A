@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.message.robber;
+package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
@@ -12,7 +12,7 @@ import de.uol.swp.common.user.UserOrDummy;
  *
  * @author Mario Fokken
  * @author Timo Gerken
- * @see de.uol.swp.common.game.message.robber.RobberChooseVictimResponse
+ * @see de.uol.swp.common.game.robber.RobberChooseVictimResponse
  * @since 2021-04-06
  */
 public class RobberChosenVictimRequest extends AbstractRequestMessage {

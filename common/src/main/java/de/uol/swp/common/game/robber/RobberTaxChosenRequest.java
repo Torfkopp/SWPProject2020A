@@ -1,7 +1,7 @@
-package de.uol.swp.common.game.message.robber;
+package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.message.AbstractResponseMessage;
+import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 
 import java.util.Map;
@@ -12,10 +12,10 @@ import java.util.Map;
  *
  * @author Mario Fokken
  * @author Timo Gerken
- * @see de.uol.swp.common.game.message.robber.RobberTaxMessage
+ * @see de.uol.swp.common.game.robber.RobberTaxMessage
  * @since 2021-04-05
  */
-public class RobberTaxChosenRequest extends AbstractResponseMessage {
+public class RobberTaxChosenRequest extends AbstractRequestMessage {
 
     private final User player;
     private final Map<Resources, Integer> resources;

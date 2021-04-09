@@ -1,10 +1,10 @@
-package de.uol.swp.common.game.message.robber;
+package de.uol.swp.common.game.robber;
 
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,17 +15,18 @@ import java.util.Map;
  *
  * @author Mario Fokken
  * @author Timo Gerken
- * @see de.uol.swp.common.game.message.robber.RobberTaxChosenRequest
+ * @see de.uol.swp.common.game.robber.RobberTaxChosenRequest
  * @since 2021-04-05
  */
 public class RobberTaxMessage extends AbstractGameMessage {
 
     private final Map<User, Integer> players;
-    private final Map<User, Map<String, Integer>> inventory;
+    private final Map<User, Map<Resources, Integer>> inventory;
 
-    public RobberTaxMessage(String lobbyName, UserOrDummy user, Map<User, Map<String, Integer>> inventory) {
+    public RobberTaxMessage(String lobbyName, UserOrDummy user, Map<User, Integer> players,
+                            Map<User, Map<Resources, Integer>> inventory) {
         super(lobbyName, user);
-        players = new HashMap<>();
+        this.players = players;
         this.inventory = inventory;
     }
 
@@ -33,7 +34,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
         players.put(player, amount);
     }
 
-    public Map<User, Map<String, Integer>> getInventory() {
+    public Map<User, Map<Resources, Integer>> getInventory() {
         return inventory;
     }
 
