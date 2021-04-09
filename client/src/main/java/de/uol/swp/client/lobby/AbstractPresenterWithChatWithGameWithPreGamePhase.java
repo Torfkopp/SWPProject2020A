@@ -5,8 +5,11 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
+import de.uol.swp.common.lobby.request.StartSessionRequest;
+import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
@@ -48,6 +51,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected CheckBox randomPlayFieldCheckbox;
     @FXML
     protected CheckBox commandsActivated;
+    @FXML
+    protected CheckBox readyCheckBox;
 
     protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
@@ -56,8 +61,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private Button changeMoveTimeButton;
     @FXML
     private Button startSession;
-    @FXML
-    private CheckBox readyCheckBox;
     @FXML
     private ToggleGroup maxPlayersToggleGroup;
     @FXML
@@ -164,56 +167,24 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         }
     }
 
-    @Subscribe
-    private void onStartSessionResponse(StartSessionResponse rsp) {
-        System.err.println("Spiel wird gebaut");
-        if (!rsp.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
-        gameWon = false;
-        winner = null;
-        inGame = true;
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
-        Platform.runLater(() -> {
-            preGameSettingBox.setVisible(false);
-            preGameSettingBox.setPrefHeight(0);
-            preGameSettingBox.setMaxHeight(0);
-            preGameSettingBox.setMinHeight(0);
-            //This Line needs to be changed/ removed in the Future
-            gameRendering = new GameRendering(gameMapCanvas);
-            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
-            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
-            gameMap = new GameMap().createMapFromConfiguration(rsp.getConfiguration());
-           // if (!rsp.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
-            gameRendering.drawGameMap(gameMap);
-            setTurnIndicatorText(rsp.getUserOrDummy());
-            lobbyService.updateInventory(lobbyName, loggedInUser);
-            window.setWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
-            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
-            inventoryView.setMaxHeight(280);
-            inventoryView.setMinHeight(280);
-            inventoryView.setPrefHeight(280);
-            inventoryView.setVisible(true);
-            uniqueCardView.setMaxHeight(48);
-            uniqueCardView.setMinHeight(48);
-            uniqueCardView.setPrefHeight(48);
-            uniqueCardView.setVisible(true);
-            readyCheckBox.setVisible(false);
-            startSession.setVisible(false);
-            rollDice.setVisible(true);
-            endTurn.setVisible(true);
-            endTurn.setDisable(true);
-            tradeWithUserButton.setVisible(true);
-            tradeWithUserButton.setDisable(true);
-            tradeWithBankButton.setVisible(true);
-            tradeWithBankButton.setDisable(true);
-            setRollDiceButtonState(rsp.getUserOrDummy());
-            kickUserButton.setVisible(false);
-            playCard.setVisible(true);
-            playCard.setDisable(true);
-        });
-    }
+    /**
+     * Handles a JoinLobbyResponse found on the EventBus
+     * <p>
+     * If a JoinLobbyResponse is found on the EventBus, this method
+     * is called. It restores the ready status of the current user
+     * and posts a StartSessionRequest on the EventBus.
+     *
+     * @param rsp The JoinLobbyResponse found on the EventBus
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    //@Subscribe
+    //private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
+    //    LOG.debug("JoinLobbyResponse received");
+    //    if (rsp.getLobby().getReadyUsers().contains(loggedInUser)) readyCheckBox.setSelected(true);
+    //    if (inGame) eventBus.post(new StartSessionRequest(lobbyName, loggedInUser));
+    //}
 
     /**
      * Method called when the KickUserButton is pressed
@@ -292,10 +263,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
-            window.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            window.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
             preGameSettingBox.setVisible(true);
             preGameSettingBox.setPrefHeight(190);
             preGameSettingBox.setMaxHeight(190);
@@ -375,10 +346,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             lobbyService.updateInventory(lobbyName, loggedInUser);
-            window.setWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
-            window.setHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.LOBBY_WIDTH_IN_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.LOBBY_HEIGHT_IN_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
             inventoryView.setMaxHeight(280);
             inventoryView.setMinHeight(280);
             inventoryView.setPrefHeight(280);
@@ -397,6 +368,75 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
             setRollDiceButtonState(msg.getUser());
+            kickUserButton.setVisible(false);
+            playCard.setVisible(true);
+            playCard.setDisable(true);
+        });
+    }
+
+    /**
+     * Handles a StartSessionResponse found on the EventBus
+     * <p>
+     * Sets the play field visible.
+     * The startSessionButton and every readyCheckbox are getting invisible for
+     * the user.
+     *
+     * @param rsp The StartSessionResponse found on the EventBus
+     *
+     * @author MarvinDrees
+     * @author Maximilian Lindner
+     * @since 2021-02-04
+     */
+    @Subscribe
+    private void onStartSessionResponse(StartSessionResponse rsp) {
+        if (!rsp.getLobby().getName().equals(lobbyName)) return;
+        LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
+        gameWon = false;
+        winner = null;
+        inGame = true;
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
+        Platform.runLater(() -> {
+            Lobby lobby = rsp.getLobby();
+            preGameSettingBox.setVisible(false);
+            preGameSettingBox.setPrefHeight(0);
+            preGameSettingBox.setMaxHeight(0);
+            preGameSettingBox.setMinHeight(0);
+            //This Line needs to be changed/ removed in the Future
+            gameRendering = new GameRendering(gameMapCanvas);
+            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
+            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
+            gameMap = new GameMap().createMapFromConfiguration(rsp.getConfiguration());
+            int[] dices = rsp.getDices();
+            dice1 = dices[0];
+            dice2 = dices[1];
+            gameRendering.drawDice(dices[0], dices[1]);
+            if (!lobby.isStartUpPhaseEnabled())
+            gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size()); //todo Draw all existing settlements method
+            gameRendering.drawGameMap(gameMap);
+            setTurnIndicatorText(rsp.getPlayer());
+            lobbyService.updateInventory(lobbyName, loggedInUser);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+            inventoryView.setMaxHeight(280);
+            inventoryView.setMinHeight(280);
+            inventoryView.setPrefHeight(280);
+            inventoryView.setVisible(true);
+            uniqueCardView.setMaxHeight(48);
+            uniqueCardView.setMinHeight(48);
+            uniqueCardView.setPrefHeight(48);
+            uniqueCardView.setVisible(true);
+            readyCheckBox.setVisible(false);
+            startSession.setVisible(false);
+            rollDice.setVisible(true);
+            endTurn.setVisible(true);
+            endTurn.setDisable(true);
+            tradeWithUserButton.setVisible(true);
+            tradeWithUserButton.setDisable(true);
+            tradeWithBankButton.setVisible(true);
+            tradeWithBankButton.setDisable(true);
+            setRollDiceButtonState(rsp.getPlayer());
             kickUserButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);

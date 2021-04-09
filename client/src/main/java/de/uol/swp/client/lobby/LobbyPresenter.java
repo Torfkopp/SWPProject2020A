@@ -32,10 +32,10 @@ import java.util.*;
 public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGamePhase {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-    public static final int LOBBY_HEIGHT_PRE_GAME = 700;
-    public static final int LOBBY_WIDTH_PRE_GAME = 685;
-    public static final int LOBBY_HEIGHT_IN_GAME = 740;
-    public static final int LOBBY_WIDTH_IN_GAME = 1435;
+    public static final int MIN_HEIGHT_PRE_GAME = 700;
+    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int MIN_HEIGHT_IN_GAME = 740;
+    public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
@@ -100,7 +100,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         this.readyUsers.addAll(rsp.getReadyUsers());
         Platform.runLater(() -> {
             updateUsersList(rsp.getUsers());
-            if(!inGame) {
+            if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
             }
@@ -154,6 +154,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (readyUsers == null) {
             readyUsers = new HashSet<>();
         }
+        if (event.getLobby().getReadyUsers().contains(loggedInUser)) readyCheckBox.setSelected(true);
+
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
@@ -170,7 +172,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
         setPreGameSettings();
-        lobbyService.checkForGame(lobbyName,loggedInUser);
+        lobbyService.checkForGame(lobbyName, loggedInUser);
     }
 
     /**
@@ -223,14 +225,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 .setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime)));
     }
 
-    @Subscribe
-    private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
-        System.err.println("Response erhalten");
-        if(inGame){
-            System.err.println("Spiel wird wieder hergestellt");
-            eventBus.post(new StartSessionRequest(lobbyName, loggedInUser));
-        }
-    }
     /**
      * Handles new joined users
      * <p>

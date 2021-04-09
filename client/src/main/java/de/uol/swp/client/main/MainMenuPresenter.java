@@ -49,6 +49,8 @@ import java.util.function.UnaryOperator;
 public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     public static final String fxml = "/fxml/MainMenuView.fxml";
+    public static final int MIN_HEIGHT = 550;
+    public static final int MIN_WIDTH = 820;
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
@@ -452,7 +454,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
         eventBus.post(new GetOldSessionsRequest(rsp.getUser()));
-        System.err.println("Gets sessions gesendet");
         this.loggedInUser = rsp.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();

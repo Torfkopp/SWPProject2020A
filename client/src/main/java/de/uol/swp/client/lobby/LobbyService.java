@@ -42,12 +42,6 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkVictoryPoints(String lobbyName, User user) {
-        Message msg = new CheckVictoryPointsRequest(lobbyName, user);
-        eventBus.post(msg);
-    }
-
-    @Override
     public void createNewLobby(String name, User user, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
@@ -176,7 +170,8 @@ public class LobbyService implements ILobbyService {
         Message userReadyRequest = new UserReadyRequest(lobbyName, loggedInUser, isReady);
         eventBus.post(userReadyRequest);
     }
-@Override
+
+    @Override
     public void checkForGame(String lobbyName, User loggendInUser){
         eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
     }

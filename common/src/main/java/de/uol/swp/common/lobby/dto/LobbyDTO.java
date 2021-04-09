@@ -185,6 +185,11 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public boolean isStartUpPhaseEnabled() {
+        return startUpPhaseEnabled;
+    }
+
+    @Override
     public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
         this.startUpPhaseEnabled = startUpPhaseEnabled;
     }
@@ -214,12 +219,12 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void setConfiguration(IConfiguration configuration){
+    public void setConfiguration(IConfiguration configuration) {
         this.configuration = configuration;
     }
 
     @Override
-    public IConfiguration getConfiguration(){
+    public IConfiguration getConfiguration() {
         return configuration;
     }
 }

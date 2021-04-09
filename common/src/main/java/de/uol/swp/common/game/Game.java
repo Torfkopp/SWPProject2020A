@@ -23,7 +23,7 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private UserOrDummy activePlayer;
-
+    private static int[] dices = new int[2];
     /**
      * Constructor
      *
@@ -54,7 +54,8 @@ public class Game {
     public static int[] rollDice() {
         int dice1 = (int) (Math.random() * 6 + 1);
         int dice2 = (int) (Math.random() * 6 + 1);
-
+        dices[0] = dice1;
+        dices[1] = dice2;
         return (new int[]{dice1, dice2});
     }
 
@@ -265,5 +266,9 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
+    }
+
+    public int[] getDices(){
+        return dices;
     }
 }

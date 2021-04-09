@@ -22,7 +22,6 @@ public class Configuration implements IConfiguration {
     private final List<IResourceHex.ResourceHexType> hexList;
     private final List<IHarborHex.HarborResource> harborList;
     private final List<Integer> tokenList;
-    private IIntersection[][] intersectionMap;
 
     /**
      * Constructor
@@ -32,11 +31,10 @@ public class Configuration implements IConfiguration {
      * @param tokenList  Unmodifiable, ordered List of Tokens to be placed on Hexes
      */
     public Configuration(List<IHarborHex.HarborResource> harborList, List<IResourceHex.ResourceHexType> hexList,
-                         List<Integer> tokenList, IIntersection[][] intersectionMap) {
+                         List<Integer> tokenList) {
         this.harborList = harborList;
         this.hexList = hexList;
         this.tokenList = tokenList;
-        this.intersectionMap = intersectionMap;
     }
 
     @Override

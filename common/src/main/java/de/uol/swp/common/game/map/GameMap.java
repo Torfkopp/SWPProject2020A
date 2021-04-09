@@ -143,8 +143,7 @@ public class GameMap implements IGameMap {
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
                                           Collections.unmodifiableList(hexList),
-                                          Collections.unmodifiableList(tokenList),
-                                          intersectionMap);
+                                          Collections.unmodifiableList(tokenList));
         return configuration;
     }
 
@@ -285,8 +284,7 @@ public class GameMap implements IGameMap {
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
                                           Collections.unmodifiableList(hexList),
-                                          Collections.unmodifiableList(tokenList),
-                                          intersectionMap);
+                                          Collections.unmodifiableList(tokenList));
         return configuration;
     }
 
