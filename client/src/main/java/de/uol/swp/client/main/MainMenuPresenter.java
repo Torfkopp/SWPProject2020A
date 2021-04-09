@@ -221,7 +221,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Method called when the ChangeAccountDetailsButton is pressed
      * <p>
      * This method is called when the ChangeAccountDetailsButton is pressed.
-     * It posts an instance of the ShowChangeAccountDetailsViewEvent to the EventBus the SceneManager is subscribed to.
+     * It calls the checkUserInLobby method of the LobbyService to check if
+     * the user is in a lobby.
      *
      * @author Eric Vuong
      * @author Alwin Bossert

@@ -10,6 +10,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

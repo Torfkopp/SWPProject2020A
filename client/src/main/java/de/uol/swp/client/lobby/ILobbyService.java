@@ -59,6 +59,19 @@ public interface ILobbyService {
     void joinLobby(String name, User user);
 
     /**
+     * Posts a request to kick a user
+     *
+     * @param lobbyName    The name of the lobby the user should be kicked out.
+     * @param loggedInUser The user who wants to kick another user.
+     * @param userToKick   The user who should be kicked.
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    void kickUser(String lobbyName, User loggedInUser, User userToKick);
+
+    /**
      * Posts a request to leave a specified lobby onto the EventBus
      *
      * @param lobbyName The name of the lobby the User wants to leave
@@ -118,18 +131,6 @@ public interface ILobbyService {
     void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby);
 
     /**
-     * Posts a request to start the game session
-     *
-     * @param lobbyName The name of the lobby where the session should be started.
-     * @param user      The user who wants to start the session.
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
-     */
-    void startSession(String lobbyName, User user);
-
-    /**
      * Posts a request to remove the user from all lobbies
      *
      * @param user The logged in user
@@ -138,19 +139,6 @@ public interface ILobbyService {
      * @since 2021-01-28
      */
     void removeFromLobbies(User user);
-
-    /**
-     * Posts a request to kick a user
-     *
-     * @param lobbyName    The name of the lobby the user should be kicked out.
-     * @param loggedInUser The user who wants to kick another user.
-     * @param userToKick   The user who should be kicked.
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
-     */
-    void kickUser(String lobbyName, User loggedInUser, User userToKick);
 
     /**
      * Posts a request to retrieve all lobby names
@@ -192,6 +180,31 @@ public interface ILobbyService {
     void rollDice(String lobbyName, User user);
 
     /**
+     * Posts a request to start the game session
+     *
+     * @param lobbyName The name of the lobby where the session should be started.
+     * @param user      The user who wants to start the session.
+     *
+     * @author Maximillian Lindner
+     * @author Temmo Junkhoff
+     * @since 2021-03-23
+     */
+    void startSession(String lobbyName, User user);
+
+    /**
+     * Posts a request to update ones Inventory
+     *
+     * @param lobbyName The name of the lobby the user wants to update his Inventory in
+     * @param user      The user who wants to update his Inventory.
+     *
+     * @author Sven Ahrens
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
+     * @since 2021-01-25
+     */
+    void updateInventory(String lobbyName, User user);
+
+    /**
      * This method is used to update the pre-game settings of a specific lobby.
      *
      * @param lobbyName              The name of the lobby
@@ -208,19 +221,6 @@ public interface ILobbyService {
      */
     void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
                              boolean commandsAllowed, int moveTime, boolean randomPlayfieldEnabled);
-
-    /**
-     * Posts a request to update ones Inventory
-     *
-     * @param lobbyName The name of the lobby the user wants to update his Inventory in
-     * @param user      The user who wants to update his Inventory.
-     *
-     * @author Sven Ahrens
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
-     * @since 2021-01-25
-     */
-    void updateInventory(String lobbyName, User user);
 
     /**
      * Posts a request to change the ready status of a user
