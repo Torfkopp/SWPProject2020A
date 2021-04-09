@@ -60,24 +60,6 @@ public class SceneManager {
 
     private static final Logger LOG = LogManager.getLogger(SceneManager.class);
     private static final String styleSheet = "css/swp.css";
-    private static final int BANK_TRADING_HEIGHT = 400;
-    private static final int BANK_TRADING_WIDTH = 620;
-    private static final int CHANGEACCDETAILS_HEIGHT = 230;
-    private static final int CHANGEACCDETAILS_WIDTH = 395;
-    private static final int DEVMENU_HEIGHT = 450;
-    private static final int DEVMENU_WIDTH = 630;
-    private static final int LOGIN_HEIGHT = 220;
-    private static final int LOGIN_WIDTH = 400;
-    private static final int MAINMENU_HEIGHT = 550;
-    private static final int MAINMENU_WIDTH = 820;
-    private static final int REGISTRATION_HEIGHT = 250;
-    private static final int REGISTRATION_WIDTH = 410;
-    private static final int RESPONSE_TRADING_HEIGHT = 325;
-    private static final int RESPONSE_TRADING_WIDTH = 380;
-    private static final int TRADING_HEIGHT = 620;
-    private static final int TRADING_WIDTH = 520;
-    private static final int ROBBERTAX_HEIGHT = 620;
-    private static final int ROBBERTAX_WIDTH = 550;
 
     @Inject
     private static Injector injector;
@@ -153,7 +135,8 @@ public class SceneManager {
     public void showChangeAccountDetailsScreen(User user) {
         ChangeAccountDetailsScene.setUserData(user);
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
-                  CHANGEACCDETAILS_WIDTH, CHANGEACCDETAILS_HEIGHT);
+                  ChangeAccountDetailsPresenter.MIN_WIDTH,
+                  ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -248,7 +231,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginScreen() {
-        showScene(loginScene, resourceBundle.getString("login.window.title"), LOGIN_WIDTH, LOGIN_HEIGHT);
+        showScene(loginScene, resourceBundle.getString("login.window.title"), LoginPresenter.MIN_WIDTH,
+                  LoginPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -262,7 +246,7 @@ public class SceneManager {
     public void showMainScreen(User currentUser) {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
-                  MAINMENU_WIDTH, MAINMENU_HEIGHT);
+                  MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -274,8 +258,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"), REGISTRATION_WIDTH,
-                  REGISTRATION_HEIGHT);
+        showScene(registrationScene, resourceBundle.getString("register.window.title"),
+                  RegistrationPresenter.MIN_WIDTH, RegistrationPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -550,7 +534,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onChangeAccountDetailsCanceledEvent(ChangeAccountDetailsCanceledEvent event) {
-        showScene(lastScene, lastTitle, MAINMENU_WIDTH, MAINMENU_HEIGHT);
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -702,10 +686,10 @@ public class SceneManager {
             devMenuIsOpen = true;
             Stage devMenuStage = new Stage();
             devMenuStage.setTitle("Developer Access Board");
-            devMenuStage.setHeight(DEVMENU_HEIGHT);
-            devMenuStage.setMinHeight(DEVMENU_HEIGHT);
-            devMenuStage.setWidth(DEVMENU_WIDTH);
-            devMenuStage.setMinWidth(DEVMENU_WIDTH);
+            devMenuStage.setHeight(DevMenuPresenter.MIN_HEIGHT);
+            devMenuStage.setMinHeight(DevMenuPresenter.MIN_HEIGHT);
+            devMenuStage.setWidth(DevMenuPresenter.MIN_WIDTH);
+            devMenuStage.setMinWidth(DevMenuPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(DevMenuPresenter.fxml);
             Scene devMenuScene = new Scene(rootPane);
             devMenuScene.getStylesheets().add(styleSheet);
@@ -731,7 +715,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onRegistrationCanceledEvent(RegistrationCanceledEvent event) {
-        showScene(lastScene, lastTitle, LOGIN_WIDTH, LOGIN_HEIGHT);
+        showScene(lastScene, lastTitle, LoginPresenter.MIN_WIDTH, LoginPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -784,10 +768,10 @@ public class SceneManager {
         //New window (Stage)
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
-        lobbyStage.setHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-        lobbyStage.setMinHeight(LobbyPresenter.LOBBY_HEIGHT_PRE_GAME);
-        lobbyStage.setWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
-        lobbyStage.setMinWidth(LobbyPresenter.LOBBY_WIDTH_PRE_GAME);
+        lobbyStage.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+        lobbyStage.setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(LobbyPresenter.fxml);
         Scene lobbyScene = new Scene(rootPane);
@@ -922,10 +906,10 @@ public class SceneManager {
         //New window (Stage)
         Stage bankStage = new Stage();
         bankStage.setTitle(resourceBundle.getString("game.trade.window.bank.title"));
-        bankStage.setHeight(BANK_TRADING_HEIGHT);
-        bankStage.setMinHeight(BANK_TRADING_HEIGHT);
-        bankStage.setWidth(BANK_TRADING_WIDTH);
-        bankStage.setMinWidth(BANK_TRADING_WIDTH);
+        bankStage.setHeight(TradeWithBankPresenter.MIN_HEIGHT);
+        bankStage.setMinHeight(TradeWithBankPresenter.MIN_HEIGHT);
+        bankStage.setWidth(TradeWithBankPresenter.MIN_WIDTH);
+        bankStage.setMinWidth(TradeWithBankPresenter.MIN_WIDTH);
         //Initialises a new lobbyScene
         Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
         Scene bankScene = new Scene(rootPane);
@@ -968,10 +952,10 @@ public class SceneManager {
             Stage tradingResponseStage = new Stage();
             tradingResponseStage.setTitle(String.format(resourceBundle.getString("game.trade.window.receiving.title"),
                                                         event.getOfferingUser()));
-            tradingResponseStage.setHeight(RESPONSE_TRADING_HEIGHT);
-            tradingResponseStage.setMinHeight(RESPONSE_TRADING_HEIGHT);
-            tradingResponseStage.setWidth(RESPONSE_TRADING_WIDTH);
-            tradingResponseStage.setMinWidth(RESPONSE_TRADING_WIDTH);
+            tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
+            tradingResponseStage.setMinHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
+            tradingResponseStage.setWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
+            tradingResponseStage.setMinWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(TradeWithUserAcceptPresenter.fxml);
             Scene tradeScene = new Scene(rootPane);
             tradeScene.getStylesheets().add(styleSheet);
@@ -1007,10 +991,10 @@ public class SceneManager {
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
-        tradingStage.setHeight(TRADING_HEIGHT);
-        tradingStage.setMinHeight(TRADING_HEIGHT);
-        tradingStage.setWidth(TRADING_WIDTH);
-        tradingStage.setMinWidth(TRADING_WIDTH);
+        tradingStage.setHeight(TradeWithUserPresenter.MIN_HEIGHT);
+        tradingStage.setMinHeight(TradeWithUserPresenter.MIN_HEIGHT);
+        tradingStage.setWidth(TradeWithUserPresenter.MIN_WIDTH);
+        tradingStage.setMinWidth(TradeWithUserPresenter.MIN_WIDTH);
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
         Scene tradeScene = new Scene(rootPane);
         tradeScene.getStylesheets().add(styleSheet);

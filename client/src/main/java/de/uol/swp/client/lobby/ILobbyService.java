@@ -16,18 +16,6 @@ import de.uol.swp.common.user.UserOrDummy;
 public interface ILobbyService {
 
     /**
-     * Posts a request to check the number of victory points from a player
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user whose VictoryPoints gets checked
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-23
-     */
-    void checkVictoryPoints(String lobbyName, User user);
-
-    /**
      * Posts a request to create a lobby onto the EventBus
      *
      * @param name      The name chosen for the new lobby

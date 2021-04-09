@@ -1,6 +1,6 @@
 package de.uol.swp.common.message;
 
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -52,7 +52,7 @@ public interface Message extends Serializable {
      *
      * @param session The current session
      *
-     * @see de.uol.swp.common.user.Session
+     * @see de.uol.swp.common.sessions.Session
      * @since 2019-08-13
      */
     void setSession(Session session);

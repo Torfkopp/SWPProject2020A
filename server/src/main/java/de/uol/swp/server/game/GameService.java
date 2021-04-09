@@ -96,6 +96,28 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to handle ending the game if the last change to the
+     * inventory pushed the player over the edge in terms of Victory Points
+     *
+     * @param game        The game in which the player might have won
+     * @param originLobby The lobby in which the game is taking place
+     * @param user        The use who might have won
+     *
+     * @author Phillip-André Suhr
+     * @author Steven Luong
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-04-07
+     */
+    private void endGameIfPlayerWon(Game game, String originLobby, UserOrDummy user) {
+        int vicPoints = game.calculateVictoryPoints(game.getPlayer(user));
+        if (vicPoints >= 10) {
+            ServerMessage message = new PlayerWonGameMessage(originLobby, user);
+            lobbyService.sendToAllInLobby(originLobby, message);
+            gameManagement.dropGame(originLobby);
+        }
+    }
+
+    /**
      * Helper method to make a resourceMap from a provided inventory
      *
      * @param inventory The inventory to make a resourceMap from
@@ -115,6 +137,7 @@ public class GameService extends AbstractService {
         offeringInventoryMap.put("grain", inventory.getGrain());
         return offeringInventoryMap;
     }
+
     /**
      * Handles an AcceptUserTradeRequest found on the EventBus
      * <p>
@@ -281,34 +304,9 @@ public class GameService extends AbstractService {
                                                                  game.getCardAmounts());
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
                                                                                         .getUsername() + "couldn't buy a development Card");
-        }
-    }
-
-    /**
-     * Handles a CheckVictoryPointsRequest found on the EventBus
-     * If a CheckVictoryPointsRequest is found on the EventBus, this method
-     * checks if the player has 10 or more victory points. If he has 10 ore more
-     * victory points, a new PlayerWonGameMessage is sent to all lobby members
-     * and the GameManagement drops the game.
-     *
-     * @param req The CheckVictoryPointsRequest found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.CheckVictoryPointsRequest
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req) {
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
-        if (vicPoints >= 10) {
-            ServerMessage message = new PlayerWonGameMessage(req.getOriginLobby(), req.getUser());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), message);
-            gameManagement.dropGame(req.getOriginLobby());
         }
     }
 
@@ -454,6 +452,40 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+    }
+
+    /**
+     * Handles a EndTurnRequest found on the EventBus
+     * <p>
+     * If a EndTurnRequest is detected on the EventBus, this method is called.
+     * It then sends a NextPlayerMessage to all members in the lobby.
+     *
+     * @param req The EndTurnRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.game.request.EndTurnRequest
+     * @see de.uol.swp.common.game.message.NextPlayerMessage
+     * @since 2021-01-15
+     */
+    @Subscribe
+    private void onEndTurnRequest(EndTurnRequest req) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received EndTurnRequest for Lobby " + req.getOriginLobby());
+            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to end his turn.");
+        }
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        UserOrDummy nextPlayer = game.nextPlayer();
+
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+        LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+        if (nextPlayer instanceof User) {
+        } else { //Dummy
+            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+            endTurnDummy(req.getOriginLobby());
+        }
     }
 
     /**
@@ -579,7 +611,6 @@ public class GameService extends AbstractService {
      * @param req The PlayKnightCardRequest found on the EventBus
      *
      * @author Mario Fokken
-     * @author Timo Gerken
      * @see de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest
      * @since 2021-02-25
      */
@@ -620,6 +651,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -757,6 +789,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -870,39 +903,6 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
         LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby " + req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
-    }
-
-    /**
-     * Handles a EndTurnRequest found on the EventBus
-     * <p>
-     * If a EndTurnRequest is detected on the EventBus, this method is called.
-     * It then sends a NextPlayerMessage to all members in the lobby.
-     *
-     * @param req The EndTurnRequest found on the EventBus
-     *
-     * @author Mario Fokken
-     * @see de.uol.swp.common.game.request.EndTurnRequest
-     * @see de.uol.swp.common.game.message.NextPlayerMessage
-     * @since 2021-01-15
-     */
-    @Subscribe
-    private void onEndTurnRequest(EndTurnRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received EndTurnRequest for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to end his turn.");
-        }
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        UserOrDummy nextPlayer = game.nextPlayer();
-
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
-        LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-
-        if (nextPlayer instanceof User) {
-        } else { //Dummy
-            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            endTurnDummy(req.getOriginLobby());
-        }
     }
 
     /**
@@ -1228,6 +1228,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**

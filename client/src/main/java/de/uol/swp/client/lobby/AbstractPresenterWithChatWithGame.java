@@ -128,7 +128,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (gameWon && Objects.equals(owner, loggedInUser)) heightDiff = 40;
         double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
         double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
-        double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.LOBBY_WIDTH_PRE_GAME;
+        double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.MIN_WIDTH_PRE_GAME;
         double dimension = Math.min(heightValue, widthValue);
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
@@ -795,7 +795,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
-        lobbyService.checkVictoryPoints(this.lobbyName, this.loggedInUser);
     }
 
     /**
