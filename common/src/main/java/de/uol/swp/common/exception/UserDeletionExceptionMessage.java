@@ -5,7 +5,7 @@ package de.uol.swp.common.exception;
  * e.g. the username doesn't exist.
  *
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @see de.uol.swp.common.exception.ExceptionMessage
  * @since 2020-11-02
  */
 public class UserDeletionExceptionMessage extends ExceptionMessage {

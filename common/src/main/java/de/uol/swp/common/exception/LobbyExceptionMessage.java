@@ -5,7 +5,7 @@ package de.uol.swp.common.exception;
  * various lobby related errors on the server's side.
  *
  * @author Marvin Drees
- * @see ExceptionMessage
+ * @see de.uol.swp.common.exception.ExceptionMessage
  * @since 2020-12-19
  */
 public class LobbyExceptionMessage extends ExceptionMessage {

@@ -6,7 +6,7 @@ package de.uol.swp.common.exception;
  *
  * @author Steven Luong
  * @author Eric Vuong
- * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @see de.uol.swp.common.exception.ExceptionMessage
  * @since 2020-12-03
  */
 public class ChangeAccountDetailsExceptionMessage extends ExceptionMessage {
