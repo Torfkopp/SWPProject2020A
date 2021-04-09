@@ -17,11 +17,9 @@ import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
-import de.uol.swp.common.lobby.request.CheckForGameRequest;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
@@ -360,11 +358,11 @@ public class GameService extends AbstractService {
 
     @Subscribe
     private void onCheckForGameRequest(CheckForGameRequest req){
-        Game game = gameManagement.getGame(req.getName());
+        Game game = gameManagement.getGame(req.getOriginLobby());
         if (game != null) {
 
             System.err.println("Spiel wird wiederhergestellt");
-            ResponseMessage returnMessage = new StartSessionResponse(req.getName(), game.getActivePlayer(),
+            ResponseMessage returnMessage = new StartSessionResponse(req.getOriginLobby(), game.getActivePlayer(),
                                                                     game.getMap().getCurrentConfiguration());
             returnMessage.initWithMessage(req);
             post(returnMessage);
