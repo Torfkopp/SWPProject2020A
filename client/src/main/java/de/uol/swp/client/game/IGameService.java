@@ -14,18 +14,6 @@ import de.uol.swp.common.user.User;
 public interface IGameService {
 
     /**
-     * Posts a request to check the number of victory points from a player
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user whose VictoryPoints gets checked
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-23
-     */
-    void checkVictoryPoints(String lobbyName, User user);
-
-    /**
      * Posts a request to end the turn onto the Event
      *
      * @param lobbyName The name of the lobby in which to end the turn
