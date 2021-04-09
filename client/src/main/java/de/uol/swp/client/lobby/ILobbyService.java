@@ -27,17 +27,6 @@ public interface ILobbyService {
     void buyDevelopmentCard(String lobbyName);
 
     /**
-     * Posts a request to check the number of victory points from a player
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @since 2021-03-23
-     */
-    void checkVictoryPoints(String lobbyName);
-
-    /**
      * Posts a request to create a lobby onto the EventBus
      *
      * @param name      The name chosen for the new lobby
