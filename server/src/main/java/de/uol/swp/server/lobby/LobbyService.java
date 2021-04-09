@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
+import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.Lobby;
@@ -13,12 +14,12 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.event.CreateGameInternalRequest;
-import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
-import de.uol.swp.server.game.event.KickUserEvent;
+import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.message.ServerInternalMessage;
-import de.uol.swp.server.usermanagement.AuthenticationService;
+import de.uol.swp.server.sessionmanagement.ISessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,25 +36,24 @@ public class LobbyService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final ILobbyManagement lobbyManagement;
-    private final AuthenticationService authenticationService;
+    private final ISessionManagement sessionManagement;
 
     /**
      * Constructor
      *
-     * @param lobbyManagement       The management class for creating, storing, and deleting
-     *                              lobbies
-     * @param authenticationService The user management
-     * @param eventBus              The server-wide EventBus
+     * @param lobbyManagement   The management class for creating, storing, and deleting
+     *                          lobbies
+     * @param sessionManagement The session management
+     * @param eventBus          The server-wide EventBus
      *
      * @since 2019-10-08
      */
     @Inject
-    public LobbyService(ILobbyManagement lobbyManagement, AuthenticationService authenticationService,
-                        EventBus eventBus) {
+    public LobbyService(ILobbyManagement lobbyManagement, SessionManagement sessionManagement, EventBus eventBus) {
         super(eventBus);
         if (LOG.isDebugEnabled()) LOG.debug("LobbyService started");
         this.lobbyManagement = lobbyManagement;
-        this.authenticationService = authenticationService;
+        this.sessionManagement = sessionManagement;
     }
 
     /**
@@ -68,9 +68,8 @@ public class LobbyService extends AbstractService {
      */
     public void sendToAllInLobby(String lobbyName, ServerMessage msg) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
-
         if (lobby.isPresent()) {
-            msg.setReceiver(authenticationService.getSessions(lobby.get().getRealUsers()));
+            msg.setReceiver(sessionManagement.getSessions(lobby.get().getRealUsers()));
             post(msg);
         }
     }
@@ -112,6 +111,25 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a CheckForGameRequest found on the EventBus
+     * <p>
+     * If the lobby contained in the request is ingame, an ActivePlayerEvent
+     * is posted onto the EventBus.
+     *
+     * @param req The CheckForGameRequest on the EventBus
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onCheckForGameRequest(CheckForGameRequest req) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
+        if (lobby.isPresent() && lobby.get().isInGame())
+            post(new ActivePlayerEvent(lobby.get(), req.getUser(), req.getMessageContext()));
+    }
+
+    /**
      * Handles a CreateLobbyRequest found on the EventBus
      * <p>
      * If a CreateLobbyRequest is detected on the EventBus, this method is called.
@@ -140,6 +158,34 @@ public class LobbyService extends AbstractService {
             exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(e.getMessage());
+        }
+    }
+
+    /**
+     * Handles a GetOldSessionRequest found on the EventBus
+     * <p>
+     * When a GetOldSessionRequest is found on the EventBus, this method
+     * is called. It checks the LobbyManagement for all the lobbies
+     * the requesting user is in and posts JoinLobbyResponses for each.
+     * This method is used to reopen lobby windows on a new client.
+     *
+     * @param req The GetOldSessionRequest on the EventBus
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onGetOldSessionsRequest(GetOldSessionsRequest req) {
+        LOG.debug("Received GetOldSessionsRequest");
+        User user = req.getUser();
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            if (entry.getValue().getUserOrDummies().contains(user)) {
+                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(), entry.getValue());
+                responseMessage.initWithMessage(req);
+                post(responseMessage);
+            }
         }
     }
 
@@ -195,7 +241,6 @@ public class LobbyService extends AbstractService {
     private void onLobbyJoinUserRequest(LobbyJoinUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received LobbyJoinUserRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-
         if (lobby.isPresent()) {
             if (lobby.get().getUserOrDummies().size() < lobby.get().getMaxPlayers()) {
                 if (!lobby.get().getUserOrDummies().contains(req.getUser())) {
@@ -251,7 +296,6 @@ public class LobbyService extends AbstractService {
     private void onLobbyLeaveUserRequest(LobbyLeaveUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received LobbyLeaveUserRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-
         if (lobby.isPresent()) {
             try {
                 lobby.get().leaveUser(req.getUser());
@@ -411,20 +455,6 @@ public class LobbyService extends AbstractService {
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
         post(msg);
     }
-
-    //@Subscribe
-    //private void onCheckForGameRequest(CheckForGameRequest req) {
-    //    Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-    //
-    //    if (lobby.get().isInGame()) {
-    //
-    //        System.err.println("Spiel wird wiederhergestellt");
-    //        ResponseMessage returnMessage = new StartSessionResponse(lobby.get().getName(), req.getUser(),
-    //                                                                 lobby.get().getConfiguration());
-    //        returnMessage.initWithMessage(req);
-    //        post(returnMessage);
-    //    }
-    //}
 
     /**
      * Handles a UserReadyRequest found on the EventBus

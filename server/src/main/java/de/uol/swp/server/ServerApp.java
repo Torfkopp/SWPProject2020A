@@ -11,6 +11,7 @@ import de.uol.swp.server.devmenu.CommandService;
 import de.uol.swp.server.di.ServerModule;
 import de.uol.swp.server.game.GameService;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.sessionmanagement.SessionService;
 import de.uol.swp.server.usermanagement.*;
 import io.netty.channel.ChannelHandler;
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +56,7 @@ class ServerApp {
         injector.getInstance(ChatService.class);
         injector.getInstance(CommandService.class);
         injector.getInstance(GameService.class);
+        injector.getInstance(SessionService.class);
     }
 
     /**

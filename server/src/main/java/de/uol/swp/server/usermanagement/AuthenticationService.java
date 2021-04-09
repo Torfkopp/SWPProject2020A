@@ -3,29 +3,22 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.KillOldClientResponse;
 import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.communication.UUIDSession;
-import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
-import de.uol.swp.server.lobby.ILobbyManagement;
-import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.message.*;
+import de.uol.swp.server.sessionmanagement.ISessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
-import java.util.*;
 
 /**
  * Mapping authentication's EventBus calls to UserManagement calls
@@ -38,15 +31,8 @@ import java.util.*;
 public class AuthenticationService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(AuthenticationService.class);
-
-    /**
-     * The list of all currently logged in users
-     */
-    private final Map<Session, User> userSessions = new HashMap<>();
-
     private final IUserManagement userManagement;
-    
-    private final ILobbyManagement lobbyManagement;
+    private final ISessionManagement sessionManagement;
 
     /**
      * Constructor
@@ -58,71 +44,10 @@ public class AuthenticationService extends AbstractService {
      * @since 2019-08-30
      */
     @Inject
-    public AuthenticationService(EventBus bus, UserManagement userManagement, ILobbyManagement lobbyManagement) {
+    public AuthenticationService(EventBus bus, UserManagement userManagement, SessionManagement sessionManagement) {
         super(bus);
         this.userManagement = userManagement;
-        this.lobbyManagement = lobbyManagement;
-    }
-
-    /**
-     * Searches the session for a given user
-     *
-     * @param user User whose session is to be searched
-     *
-     * @return Either an empty Optional or an Optional containing the session
-     *
-     * @see de.uol.swp.common.user.Session
-     * @see de.uol.swp.common.user.User
-     * @since 2019-09-04
-     */
-    public Optional<Session> getSession(UserOrDummy user) {
-        Optional<Map.Entry<Session, User>> entry = userSessions.entrySet().stream()
-                                                               .filter(e -> e.getValue().equals(user)).findFirst();
-        return entry.map(Map.Entry::getKey);
-    }
-
-    /**
-     * Searches the sessions for a set of given users
-     *
-     * @param users Set of users whose sessions are to be searched
-     *
-     * @return List containing the sessions that where found
-     *
-     * @see de.uol.swp.common.user.Session
-     * @see de.uol.swp.common.user.User
-     * @since 2019-10-08
-     */
-    public List<Session> getSessions(Set<User> users) {
-        List<Session> sessions = new ArrayList<>();
-        users.forEach(u -> {
-            Optional<Session> session = getSession(u);
-            session.ifPresent(sessions::add);
-        });
-        return sessions;
-    }
-
-    /**
-     * Handles a ForwardToUserInternalRequest found on the EventBus
-     * <p>
-     * If a ForwardToUserInternalRequest is found on the EventBus this
-     * method gets the Session of the User contained in the ForwardToUserInternalRequest.
-     * Then it posts a FetchUserContextInternalRequest with the session of the
-     * User and .the ResponseMessage contained in the ForwardToUserInternalRequest,
-     * which will be handled by the ServerHandler.
-     *
-     * @param event ForwardToUserInternalRequest found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.server.game.event.ForwardToUserInternalRequest
-     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onForwardToUserInternalRequest(ForwardToUserInternalRequest event) {
-        Optional<Session> session = getSession(event.getTargetUser());
-        if (session.isEmpty()) LOG.error(new RuntimeException("UserSession not found"));
-        else post(new FetchUserContextInternalRequest(session.get(), event.getResponseMessage()));
+        this.sessionManagement = sessionManagement;
     }
 
     /**
@@ -151,13 +76,12 @@ public class AuthenticationService extends AbstractService {
         ServerInternalMessage returnMessage;
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
-            if (userSessions.containsValue(newUser)) {
+            if (sessionManagement.hasSession(newUser)) {
                 returnMessage = new ClientAuthorisedMessage(newUser, true);
             } else {
                 returnMessage = new ClientAuthorisedMessage(newUser, false);
             }
-            Session newSession = UUIDSession.create(newUser);
-            userSessions.put(newSession, newUser);
+            Session newSession = sessionManagement.createSession(newUser);
             returnMessage.setSession(newSession);
         } catch (Exception e) {
             LOG.error(e);
@@ -186,14 +110,14 @@ public class AuthenticationService extends AbstractService {
         LOG.debug("Received LogoutRequest");
         if (msg.getSession().isPresent()) {
             Session session = msg.getSession().get();
-            User userToLogOut = userSessions.get(session);
+            User userToLogOut = session.getUser();
             // Could be already logged out
             if (userToLogOut != null) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("---- Logging out user " + userToLogOut.getUsername());
                 }
                 userManagement.logout(userToLogOut);
-                userSessions.remove(session);
+                sessionManagement.removeSession(session);
                 Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
                 post(returnMessage);
             }
@@ -222,32 +146,18 @@ public class AuthenticationService extends AbstractService {
     private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest req) {
         LOG.debug("Received NukeUsersSessionsRequest");
         if (req.getUser() == null) return;
-        User user = req.getUser();
-        LOG.debug("---- Logging out user " + user.getUsername());
-        userManagement.logout(user);
-        while (getSession(user).isPresent()) {
-            post(new FetchUserContextInternalRequest(getSession(user).get(), new KillOldClientResponse()));
-            userSessions.remove(getSession(user).get());
+        User userToLogOut = req.getUser();
+        LOG.debug("---- Logging out user " + userToLogOut.getUsername());
+        userManagement.logout(userToLogOut);
+        while (sessionManagement.getSession(userToLogOut).isPresent()) {
+            post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
+                                                     new KillOldClientResponse()));
+            sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
         }
-        post(new UserLoggedOutMessage(user.getUsername()));
-        NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(user);
+        post(new UserLoggedOutMessage(userToLogOut.getUsername()));
+        NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(userToLogOut);
         response.initWithMessage(req);
         post(response);
-    }
-    
-    @Subscribe
-    private void onGetOldSessionsRequest(GetOldSessionsRequest req){
-        LOG.debug("Received GetOldSessionsRequest");
-        User user = req.getUser();
-        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUserOrDummies().contains(user)) {
-                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(), entry.getValue());
-                System.err.println("JoinLobby Kram wird gesendet");
-                responseMessage.initWithMessage(req);
-                post(responseMessage);
-            }
-        }
     }
 
     /**
@@ -265,7 +175,7 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onRetrieveAllOnlineUsersRequest(RetrieveAllOnlineUsersRequest msg) {
-        Message response = new AllOnlineUsersResponse(userSessions.values());
+        Message response = new AllOnlineUsersResponse(sessionManagement.getAllUsers());
         response.initWithMessage(msg);
         post(response);
     }

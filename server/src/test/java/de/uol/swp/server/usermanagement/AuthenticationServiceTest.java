@@ -4,7 +4,7 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
@@ -12,10 +12,9 @@ import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.server.lobby.ILobbyManagement;
-import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.message.ClientAuthorisedMessage;
 import de.uol.swp.server.message.ServerExceptionMessage;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
 import de.uol.swp.server.usermanagement.store.UserStore;
 import org.junit.jupiter.api.AfterEach;
@@ -37,8 +36,8 @@ class AuthenticationServiceTest {
     final UserStore userStore = new MainMemoryBasedUserStore();
     final EventBus bus = new EventBus();
     final UserManagement userManagement = new UserManagement(userStore);
-    final ILobbyManagement lobbyManagement = new LobbyManagement();
-    final AuthenticationService authService = new AuthenticationService(bus, userManagement, lobbyManagement);
+    final SessionManagement sessionManagement = new SessionManagement();
+    final AuthenticationService authService = new AuthenticationService(bus, userManagement, sessionManagement);
     private final CountDownLatch lock = new CountDownLatch(1);
     private Object event;
 
@@ -63,15 +62,15 @@ class AuthenticationServiceTest {
         users.add(usr2);
         users.add(usr3);
 
-        Optional<Session> session1 = authService.getSession(usr1);
-        Optional<Session> session2 = authService.getSession(usr2);
-        Optional<Session> session3 = authService.getSession(usr2);
+        Optional<Session> session1 = sessionManagement.getSession(usr1);
+        Optional<Session> session2 = sessionManagement.getSession(usr2);
+        Optional<Session> session3 = sessionManagement.getSession(usr2);
 
         assertTrue(session1.isPresent());
         assertTrue(session2.isPresent());
         assertTrue(session3.isPresent());
 
-        List<Session> sessions = authService.getSessions(users);
+        List<Session> sessions = sessionManagement.getSessions(users);
 
         assertEquals(3, sessions.size());
         assertTrue(sessions.contains(session1.get()));
@@ -131,7 +130,7 @@ class AuthenticationServiceTest {
     @Test
     void logoutTest() throws InterruptedException {
         User usr = loginUser(user);
-        Optional<Session> session = authService.getSession(usr);
+        Optional<Session> session = sessionManagement.getSession(usr);
 
         assertTrue(session.isPresent());
         final Message logoutRequest = new LogoutRequest();
@@ -142,7 +141,7 @@ class AuthenticationServiceTest {
         lock.await(250, TimeUnit.MILLISECONDS);
 
         assertFalse(userManagement.isLoggedIn(user));
-        assertFalse(authService.getSession(user).isPresent());
+        assertFalse(sessionManagement.getSession(user).isPresent());
         assertTrue(event instanceof UserLoggedOutMessage);
     }
 
