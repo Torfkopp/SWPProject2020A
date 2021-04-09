@@ -32,6 +32,8 @@ import java.util.Map;
 public class RobberTaxPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RobberTaxPresenter.fxml";
+    public static final int MIN_HEIGHT = 650;
+    public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
     private final Map<Resources, Integer> selectedResources = new HashMap<>();
     @FXML

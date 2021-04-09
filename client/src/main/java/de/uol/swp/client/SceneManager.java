@@ -868,10 +868,10 @@ public class SceneManager {
             Stage robberTaxStage = new Stage();
             robberTaxStages.put(event.getLobbyName(), robberTaxStage);
             robberTaxStage.setTitle(resourceBundle.getString("game.robber.tax.title"));
-            robberTaxStage.setHeight(ROBBERTAX_HEIGHT);
-            robberTaxStage.setMinHeight(ROBBERTAX_HEIGHT);
-            robberTaxStage.setWidth(ROBBERTAX_WIDTH);
-            robberTaxStage.setMinWidth(ROBBERTAX_WIDTH);
+            robberTaxStage.setHeight(RobberTaxPresenter.MIN_HEIGHT);
+            robberTaxStage.setMinHeight(RobberTaxPresenter.MIN_HEIGHT);
+            robberTaxStage.setWidth(RobberTaxPresenter.MIN_WIDTH);
+            robberTaxStage.setMinWidth(RobberTaxPresenter.MIN_WIDTH);
             Parent rootPane = initPresenter(RobberTaxPresenter.fxml);
             Scene robberTaxScene = new Scene(rootPane);
             robberTaxScene.getStylesheets().add(styleSheet);
