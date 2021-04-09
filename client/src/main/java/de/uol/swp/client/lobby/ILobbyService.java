@@ -14,6 +14,17 @@ import de.uol.swp.common.user.User;
 public interface ILobbyService {
 
     /**
+     * Posts a request to check if the user is currently in a lobby
+     *
+     * @param user The logged in user
+     *
+     * @author Alwin Bossert
+     * @author Finn Haase
+     * @since 2021-04-09
+     */
+    void checkUserInLobby(User user);
+
+    /**
      * Posts a request to check the number of victory points from a player
      *
      * @param lobbyName The name of the lobby

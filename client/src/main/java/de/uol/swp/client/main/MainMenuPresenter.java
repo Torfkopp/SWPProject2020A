@@ -232,7 +232,32 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
+        lobbyService.checkUserInLobby(loggedInUser);
+    }
+
+    /**
+     * Handles a CheckUserInLobbyResponse found on the EventBus
+     * <p>
+     * If a new CheckUserInLobbyResponse object is found on the EventBus, this method
+     * gets called. If the user is not in a lobby, it posts a new ShowChangeAccountDetailsViewEvent
+     * onto the EventBus. Otherwise it posts a LobbyErrorEvent.
+     *
+     * @param rsp The CheckUserInLobbyResponse object found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Finn Haase
+     * @see de.uol.swp.common.user.response.CheckUserInLobbyResponse
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
+        LOG.debug("Received a CheckUserInLobbyResponse");
+        if (this.loggedInUser == null) return;
+        if (rsp.getIsInLobby() == false) {
+            eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
+        } else {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.in.lobby")));
+        }
     }
 
     /**

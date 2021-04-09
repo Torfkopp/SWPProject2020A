@@ -42,6 +42,12 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void checkUserInLobby(User user) {
+        Message msg = new CheckUserInLobbyRequest(user);
+        eventBus.post(msg);
+    }
+
+    @Override
     public void checkVictoryPoints(String lobbyName, User user) {
         Message msg = new CheckVictoryPointsRequest(lobbyName, user);
         eventBus.post(msg);

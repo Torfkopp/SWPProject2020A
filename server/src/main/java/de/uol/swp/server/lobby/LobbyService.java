@@ -13,6 +13,8 @@ import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
+import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
 import de.uol.swp.server.game.event.GetUserSessionEvent;
@@ -111,6 +113,36 @@ public class LobbyService extends AbstractService {
         if (updatedLobby.isEmpty()) return;
         ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(), updatedLobby.get());
         sendToAllInLobby(req.getName(), msg);
+    }
+
+    /**
+     * Handles a CheckUserInLobbyRequest found on the EventBus
+     * If a CheckUserInLobbyRequest is detected on the EventBus, this method is
+     * called. It checks if the logged in user is currently in a lobby.
+     *
+     * @param req The CheckUserInLobbyRequest on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Finn Haase
+     * @see de.uol.swp.common.user.request.CheckUserInLobbyRequest
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onCheckUserInLobbyRequest(CheckUserInLobbyRequest req) {
+        LOG.debug("Received a CheckUserInLobbyRequest");
+        Boolean isInLobby = false;
+        User user = req.getUser();
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            if (entry.getValue().getUserOrDummies().contains(user)) {
+                isInLobby = true;
+            } else {
+                isInLobby = false;
+            }
+        }
+        Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
+        responseMessage.initWithMessage(req);
+        post(responseMessage);
     }
 
     /**
