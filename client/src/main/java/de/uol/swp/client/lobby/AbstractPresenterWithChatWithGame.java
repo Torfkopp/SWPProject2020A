@@ -3,17 +3,16 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.message.robber.RobberChooseVictimResponse;
-import de.uol.swp.common.game.message.robber.RobberNewPositionResponse;
-import de.uol.swp.common.game.message.robber.RobberTaxMessage;
 import de.uol.swp.common.game.request.TradeWithBankRequest;
 import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
+import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
@@ -239,7 +238,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!this.lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
-        resetButtonStates(msg.getUser());
+        if ((msg.getDice1() + msg.getDice2()) != 7) {
+            resetButtonStates(msg.getUser());
+        }
         this.dice1 = msg.getDice1();
         this.dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
@@ -285,6 +286,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 lobbyService.robberNewPosition(lobbyName, loggedInUser, mapPoint);
                 robberNewPosition = false;
                 notice.setVisible(false);
+                resetButtonStates(loggedInUser);
             }
             System.out.println("HEX");
             System.out.println("mapPoint.getY() = " + mapPoint.getY());
@@ -534,9 +536,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
-                rst.ifPresent(userOrDummy -> {
-                    lobbyService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy);
-                });
+                rst.ifPresent(userOrDummy -> lobbyService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
             });
         }
     }
@@ -558,6 +558,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a RobberPositionMessage
+     *
+     * @param msg The RobberPositionMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onRobberPositionMessage(RobberPositionMessage msg) {
+        LOG.debug("Received RobberPositionMessage for Lobby " + msg.getLobbyName());
+        if (lobbyName.equals(msg.getLobbyName())) {
+            gameMap.moveRobber(msg.getPosition());
+            gameRendering.drawGameMap(gameMap);
+        }
+    }
+
+    /**
      * Handles a RobberTaxMessage
      *
      * @param msg The RobberTaxMessage found on the EventBus
@@ -570,7 +588,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberTaxMessage(RobberTaxMessage msg) {
         LOG.debug("Received RobberTaxMessage");
         if (msg.getPlayers().containsKey(loggedInUser)) {
-            //todo FXML View fürs Auswählen der Resourcenkarten erstellen
+            LOG.debug("Sending ShowRobberTaxViewEvent");
+            eventBus.post(
+                    new ShowRobberTaxViewEvent(msg.getLobbyName(), loggedInUser, msg.getPlayers().get(loggedInUser),
+                                               msg.getInventory().get(loggedInUser)));
         }
     }
 

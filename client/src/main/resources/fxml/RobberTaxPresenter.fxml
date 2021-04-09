@@ -1,9 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            xmlns="http://javafx.com/javafx"
-            fx:controller="de.uol.swp.client.lobby.RobberTaxPresenter"
-            prefHeight="400.0" prefWidth="600.0">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="600.0" spacing="25.0"
+      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.lobby.RobberTaxPresenter">
 
-</AnchorPane>
+    <Label alignment="CENTER" text="%game.robber.tax.header"/>
+    <HBox alignment="CENTER" prefHeight="254.0" prefWidth="529.0" spacing="40.0">
+        <VBox alignment="CENTER" spacing="15.0">
+            <VBox>
+                <Label text="%game.resources.brick"/>
+                <Slider fx:id="brickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+            </VBox>
+            <VBox>
+                <Label text="%game.resources.grain"/>
+                <Slider fx:id="grainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+            </VBox>
+            <VBox>
+                <Label text="%game.resources.lumber"/>
+                <Slider fx:id="lumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150.0" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+            </VBox>
+            <VBox>
+                <Label text="%game.resources.ore"/>
+                <Slider fx:id="oreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+            </VBox>
+            <VBox>
+                <Label text="%game.resources.wool"/>
+                <Slider fx:id="woolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
+                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+            </VBox>
+        </VBox>
+        <VBox prefHeight="335.0" prefWidth="335.0">
+            <HBox alignment="CENTER" prefHeight="115.0" prefWidth="335.0">
+                <VBox alignment="BOTTOM_LEFT" prefHeight="145.0" prefWidth="189.0">
+                    <Label alignment="TOP_LEFT" text="0"/>
+                </VBox>
+                <VBox alignment="BOTTOM_RIGHT" prefHeight="145.0" prefWidth="200.0">
+                    <Label fx:id="resourceAmount" alignment="CENTER_RIGHT" text="Label"/>
+                </VBox>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                <ProgressBar fx:id="progress" prefHeight="27.0" prefWidth="335.0" progress="0.0"/>
+            </HBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                <Button fx:id="taxPay" disable="true" mnemonicParsing="false" onAction="#onTaxPayButtonPressed"
+                        prefHeight="52.0" prefWidth="172.0" text="%game.robber.tax.pay"/>
+            </VBox>
+        </VBox>
+    </HBox>
+    <VBox alignment="CENTER" prefHeight="160.0" prefWidth="623.0">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0"/>
+        </VBox.margin>
+        <Label text="%game.trade.labels.owninventory"/>
+        <ListView fx:id="ownInventoryView" prefHeight="126.0" prefWidth="580.0"/>
+    </VBox>
+    <padding>
+        <Insets top="10.0"/>
+    </padding>
+</VBox>
