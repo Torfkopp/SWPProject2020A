@@ -636,7 +636,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                             resourceBundle.getString("game.property.hasnot")));
             }
         });
-        gameService.checkVictoryPoints(this.lobbyName, this.loggedInUser);
     }
 
     /**

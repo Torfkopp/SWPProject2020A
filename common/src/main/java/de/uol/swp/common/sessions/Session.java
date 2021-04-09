@@ -1,4 +1,6 @@
-package de.uol.swp.common.user;
+package de.uol.swp.common.sessions;
+
+import de.uol.swp.common.user.User;
 
 /**
  * Interface for different kinds of user objects.
