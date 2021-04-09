@@ -1,6 +1,6 @@
-package de.uol.swp.server.communication;
+package de.uol.swp.server.sessionmanagement;
 
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.User;
 
 import java.util.Objects;
@@ -11,7 +11,7 @@ import java.util.UUID;
  *
  * @author Marco Grawunder
  * @see de.uol.swp.server.usermanagement.AuthenticationService
- * @see de.uol.swp.common.user.Session
+ * @see de.uol.swp.common.sessions.Session
  * @since 2017-03-17
  */
 public class UUIDSession implements Session {

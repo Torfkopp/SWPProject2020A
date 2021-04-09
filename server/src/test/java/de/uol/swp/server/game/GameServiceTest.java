@@ -20,6 +20,7 @@ import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
@@ -47,8 +48,10 @@ public class GameServiceTest {
     private final UserStore userStore = new MainMemoryBasedUserStore();
     private final UserManagement userManagement = new UserManagement(userStore);
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
-    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
-    private final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
+    private final SessionManagement sessionManagement = new SessionManagement();
+    private final LobbyService lobbyService = new LobbyService(lobbyManagement, sessionManagement, bus);
+    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement,
+                                                                                          sessionManagement);
     private IGameManagement gameManagement;
     private GameService gameService;
 
