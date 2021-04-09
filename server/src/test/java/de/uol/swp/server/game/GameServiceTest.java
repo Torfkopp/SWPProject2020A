@@ -10,12 +10,14 @@ import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
 import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
+import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
+import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
+import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
@@ -30,8 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This is a test of the class used to handle the requests sent by the client regarding the game
@@ -477,6 +478,53 @@ public class GameServiceTest {
         //Methode noch nicht fertig
     }
 
+    @Test
+    void testRobberMethods() {
+        UserOrDummy[] user = new UserOrDummy[4];
+        user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        user[3] = new DummyDTO();
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        lobby.joinUser(user[3]);
+        IGameMap gameMap = new GameMap();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
+        Game game = gameManagement.getGame(lobby.getName());
+
+        //Tests robbing a resource
+        game.getInventory(user[1]).increaseBrick(1);
+        game.getInventory(user[3]).increaseOre(1);
+        bus.post(new RobberChosenVictimRequest(lobby.getName(), (User) user[0], user[1]));
+        bus.post(new RobberChosenVictimRequest(lobby.getName(), (User) user[0], user[3]));
+        assertEquals(1, game.getInventory(user[0]).getBrick());
+        assertEquals(0, game.getInventory(user[1]).getBrick());
+        assertEquals(1, game.getInventory(user[0]).getOre());
+        assertEquals(0, game.getInventory(user[3]).getOre());
+
+        //Tests robberTax
+        game.getInventory(user[2]).increaseOre(3);
+        game.getInventory(user[2]).increaseGrain(3);
+        game.getInventory(user[2]).increaseWool(4);
+        Map<Resources, Integer> map = new HashMap<>();
+        map.put(Resources.ORE, 1);
+        map.put(Resources.GRAIN, 2);
+        map.put(Resources.WOOL, 2);
+        bus.post(new RobberTaxChosenRequest(map, (User) user[2], lobby.getName()));
+        assertEquals(2, game.getInventory(user[2]).getOre());
+        assertEquals(1, game.getInventory(user[2]).getGrain());
+        assertEquals(2, game.getInventory(user[2]).getWool());
+
+        //Tests new robber position
+        MapPoint robPos = game.getMap().getRobberPosition();
+        MapPoint mp = MapPoint.HexMapPoint(2, 4);
+        bus.post(new RobberNewPositionChosenRequest(lobby.getName(), (User) user[2], mp));
+        assertNotEquals(robPos, game.getMap().getRobberPosition());
+        assertEquals(mp, game.getMap().getRobberPosition());
+    }
+
     /**
      * Tests if the gameManagement handles a UpdateInventoryAfterTradeWithBankRequest properly
      * <p>
@@ -722,6 +770,4 @@ public class GameServiceTest {
         assertTrue(userManagement.isLoggedIn(userToLogin));
         userManagement.dropUser(userToLogin);
     }
-
-    //todo Robbermethoden testen
 }
