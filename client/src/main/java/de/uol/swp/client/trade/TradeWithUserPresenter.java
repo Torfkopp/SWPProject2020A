@@ -4,8 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.trade.event.*;
-import de.uol.swp.common.game.request.TradeWithUserCancelRequest;
+import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
@@ -39,6 +38,9 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+
+    @Inject
+    private ITradeService tradeService;
 
     @FXML
     private Label statusLabel;
@@ -110,7 +112,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             selectedPartnersResourceMapCounter += entry.getValue();
         }
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
-            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.demandtoohigh")));
+            tradeService.showTradeError(resourceBundle.getString("game.trade.error.demandtoohigh"));
         }
         return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0) || (selectedPartnersResourceMapCounter > traderInventorySize));
     }
@@ -122,12 +124,12 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * trading window and a TradeWithUserCancelResponse to close the responding
      * trading window, if existent.
      *
-     * @see de.uol.swp.client.trade.event.TradeWithUserCancelEvent
+     * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
         Platform.runLater(() -> {
-            eventBus.post(new TradeWithUserCancelEvent(lobbyName));
-            eventBus.post(new TradeWithUserCancelRequest(lobbyName, respondingUser));
+            tradeService.closeUserTradeWindow(lobbyName);
+            tradeService.cancelTrade(lobbyName, respondingUser);
         });
     }
 
@@ -204,9 +206,9 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         }
         offerTradeButton.setDisable(true);
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        lobbyService.offerTrade(lobbyName, respondingUser, selectedOwnResourceMap, selectedPartnersResourceMap);
-        LOG.debug("Sending a CloseTradeResponseEvent");
-        eventBus.post(new CloseTradeResponseEvent(lobbyName));
+        tradeService.offerTrade(lobbyName, loggedInUser, respondingUser, selectedOwnResourceMap,
+                                selectedPartnersResourceMap);
+        tradeService.closeTradeResponseWindow(lobbyName);
     }
 
     /**

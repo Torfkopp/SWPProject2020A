@@ -4,11 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.trade.event.CloseTradeWithUserResponseEvent;
-import de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
-import de.uol.swp.common.game.request.AcceptUserTradeRequest;
-import de.uol.swp.common.game.request.ResetOfferTradeButtonRequest;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -40,6 +36,9 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 340;
     public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
+
+    @Inject
+    private ITradeService tradeService;
 
     @FXML
     private Button acceptTradeButton;
@@ -88,25 +87,14 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper function
-     * <p>
-     * This method is called if a window should be closed.
-     * It posts a CloseTradeWithUserResponseEvent onto
-     * the EventBus with the according lobby.
-     */
-    private void closeWindow() {
-        Platform.runLater(() -> eventBus.post(new CloseTradeWithUserResponseEvent(lobbyName)));
-    }
-
-    /**
      * Handles a click on the accept button
      * If the accept button is pressed a new AcceptUserTradeRequest is posted onto
      * the EventBus.
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        eventBus.post(new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, respondingResourceMap,
-                                                 offeringResourceMap));
+        tradeService
+                .acceptUserTrade(lobbyName, respondingUser, offeringUser, respondingResourceMap, offeringResourceMap);
     }
 
     /**
@@ -143,9 +131,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onMakeCounterOfferButtonPressed() {
-        LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(this.lobbyName, offeringUser));
-        lobbyService.tradeWithUser(lobbyName, offeringUser);
+        tradeService.showUserTradeWindow(lobbyName, respondingUser, offeringUser);
+        tradeService.tradeWithUser(lobbyName, respondingUser, offeringUser);
     }
 
     /**
@@ -158,8 +145,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRejectTradeButtonPressed() {
-        eventBus.post(new ResetOfferTradeButtonRequest(lobbyName, offeringUser));
-        closeWindow();
+        tradeService.resetOfferTradeButton(lobbyName, offeringUser);
+        tradeService.closeTradeResponseWindow(lobbyName);
     }
 
     /**
@@ -173,7 +160,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
-        closeWindow();
+        tradeService.closeTradeResponseWindow(lobbyName);
     }
 
     /**
@@ -201,7 +188,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         setTradingList();
         setOfferLabel();
         Window window = ownInventoryView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> closeWindow());
+        window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
     }
 
     /**

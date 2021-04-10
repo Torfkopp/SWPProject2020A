@@ -1,30 +1,16 @@
 package de.uol.swp.client.lobby;
 
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 
-import java.util.Map;
-
 /**
- * An interface for all methods of the clientLobbyService
+ * An interface for all methods of the LobbyService
  *
  * @author Steven Luong
  * @see de.uol.swp.client.lobby.LobbyService
  * @since 2021-02-12
  */
 public interface ILobbyService {
-
-    /**
-     * Posts a request to buy a Development Card onto the EventBus
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @author Phillip-André Suhr
-     * @author Steven Luong
-     * @since 2021-04-04
-     */
-    void buyDevelopmentCard(String lobbyName);
 
     /**
      * Posts a request to create a lobby onto the EventBus
@@ -36,16 +22,6 @@ public interface ILobbyService {
      * @since 2019-11-20
      */
     void createNewLobby(String name, int maxPlayer);
-
-    /**
-     * Posts a request to end the turn onto the Event
-     *
-     * @param lobbyName The name of the lobby in which to end the turn
-     *
-     * @see de.uol.swp.common.game.request.EndTurnRequest
-     * @since 2021-01-15
-     */
-    void endTurn(String lobbyName);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus
@@ -78,52 +54,6 @@ public interface ILobbyService {
      * @since 2020-12-05
      */
     void leaveLobby(String lobbyName);
-
-    /**
-     * Posts a request to offer a trade to a user onto the EventBus
-     *
-     * @param lobbyName           The name of the Lobby
-     * @param respondingUser      The user to whom the offer is made
-     * @param offeredResourceMap  Map of String and Integer of the resources offered
-     * @param demandedResourceMap Map of String and Integer of the resources demanded
-     *
-     * @author Phillip-André Suhr
-     * @author Steven Luong
-     * @since 2021-04-04
-     */
-    void offerTrade(String lobbyName, UserOrDummy respondingUser, Map<String, Integer> offeredResourceMap,
-                    Map<String, Integer> demandedResourceMap);
-
-    /**
-     * Posts a message to play a KnightCard
-     *
-     * @param lobbyName The name of the lobby
-     */
-    void playKnightCard(String lobbyName);
-
-    /**
-     * Posts a message to play a MonopolyCard
-     *
-     * @param lobbyName The name of the lobby
-     * @param resource  The resource the user wants
-     */
-    void playMonopolyCard(String lobbyName, Resources resource);
-
-    /**
-     * Posts a message to play a RoadBuildingCard
-     *
-     * @param lobbyName The name of the lobby
-     */
-    void playRoadBuildingCard(String lobbyName);
-
-    /**
-     * Posts a message to play a YearOfPlentyCard
-     *
-     * @param lobbyName The name of the lobby
-     * @param resource1 The resource the user wants
-     * @param resource2 The resource the user wants
-     */
-    void playYearOfPlentyCard(String lobbyName, Resources resource1, Resources resource2);
 
     /**
      * Posts a new instance of the LobbyUpdateEvent onto the Eventbus
@@ -175,76 +105,6 @@ public interface ILobbyService {
      * @since 2021-03-22
      */
     void returnToPreGameLobby(String lobbyName);
-
-    /**
-     * Posts a request to roll the dices
-     *
-     * @param lobbyName The Lobby in which to roll the dice
-     *
-     * @see de.uol.swp.common.game.request.RollDiceRequest
-     * @since 2021-02-22
-     */
-    void rollDice(String lobbyName);
-
-    /**
-     * Posts a request to start the game session
-     *
-     * @param lobbyName The name of the lobby where the session should be started.
-     *
-     * @author Maximillian Lindner
-     * @author Temmo Junkhoff
-     * @since 2021-03-23
-     */
-    void startSession(String lobbyName);
-
-    /**
-     * Posts a request to trade with the Bank onto the EventBus
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @author Phillip-André Suhr
-     * @author Steven Luong
-     * @since 2021-04-04
-     */
-    void tradeWithBank(String lobbyName);
-
-    /**
-     * Posts a request to trade with a user onto the EventBus
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user to offer a trade to
-     *
-     * @author Phillip-André Suhr
-     * @author Steven Luong
-     * @since 2021-04-04
-     */
-    void tradeWithUser(String lobbyName, UserOrDummy user);
-
-    /**
-     * Posts a request to update ones Inventory
-     *
-     * @param lobbyName The name of the lobby the user wants to update his Inventory in
-     *
-     * @author Sven Ahrens
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.UpdateInventoryRequest
-     * @since 2021-01-25
-     */
-    void updateInventory(String lobbyName);
-
-    /**
-     * Posts a request to update one's inventory after trading with the Bank
-     * onto the EventBus
-     *
-     * @param lobbyName    The name of the lobby
-     * @param getResource  The resource the user offered to the Bank
-     * @param giveResource The resource the user got from the Bank
-     *
-     * @author Phillip-André Suhr
-     * @author Steven Luong
-     * @since 2021-04-04
-     */
-    void updateInventoryAfterTradeWithBank(String lobbyName, String getResource, String giveResource);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.

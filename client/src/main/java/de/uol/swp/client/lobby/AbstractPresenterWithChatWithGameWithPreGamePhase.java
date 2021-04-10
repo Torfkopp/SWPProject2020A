@@ -285,7 +285,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onStartSessionButtonPressed() {
-        lobbyService.startSession(lobbyName);
+        gameService.startSession(lobbyName);
     }
 
     /**
@@ -322,7 +322,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             if (!msg.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
-            lobbyService.updateInventory(lobbyName);
+            gameService.updateInventory(lobbyName);
             window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
             window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
