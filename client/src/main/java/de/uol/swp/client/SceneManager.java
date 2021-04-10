@@ -134,8 +134,7 @@ public class SceneManager {
     public void showChangeAccountDetailsScreen(User user) {
         ChangeAccountDetailsScene.setUserData(user);
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
-                  ChangeAccountDetailsPresenter.MIN_WIDTH,
-                  ChangeAccountDetailsPresenter.MIN_HEIGHT);
+                  ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -257,8 +256,8 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showRegistrationScreen() {
-        showScene(registrationScene, resourceBundle.getString("register.window.title"),
-                  RegistrationPresenter.MIN_WIDTH, RegistrationPresenter.MIN_HEIGHT);
+        showScene(registrationScene, resourceBundle.getString("register.window.title"), RegistrationPresenter.MIN_WIDTH,
+                  RegistrationPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -595,37 +594,17 @@ public class SceneManager {
      * called. If there is a trading response stage in the according lobby, it gets closed.
      *
      * @author Maximilian Lindner
+     * @author Finn Haase
      * @author Aldin Dervisi
      * @see de.uol.swp.client.trade.event.CloseTradeResponseEvent
      * @since 2021-03-19
      */
     @Subscribe
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
-        if (!tradingResponseStages.containsKey(event.getLobbyName())) return;
-        tradingResponseStages.get(event.getLobbyName()).close();
-        tradingResponseStages.remove(event.getLobbyName());
-    }
-
-    /**
-     * Handles a CloseTradeWithUserResponseEvent found on the EventBus
-     * <p>
-     * If a CloseTradeWithUserResponseEvent is detected on the EventBus, this method gets called.
-     * Its closes the tradingResponseStage according to the lobbyName.
-     *
-     * @param event CloseTradeWithUserResponseEvent found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.client.trade.event.CloseTradeWithUserResponseEvent
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onCloseTradeWithUserResponseEvent(CloseTradeWithUserResponseEvent event) {
-        LOG.debug("Received CloseTradeWithUserResponseEvent");
-        String lobby = event.getLobbyName();
-        if (tradingResponseStages.containsKey(lobby)) {
-            tradingResponseStages.get(lobby).close();
-            tradingResponseStages.remove(lobby);
+        String lobbyName = event.getLobbyName();
+        if (tradingResponseStages.containsKey(lobbyName)) {
+            tradingResponseStages.get(lobbyName).close();
+            tradingResponseStages.remove(lobbyName);
         }
     }
 
@@ -945,6 +924,27 @@ public class SceneManager {
     }
 
     /**
+     * Handles the TradeCancelEvent detected on the EventBus
+     * <p>
+     * If a TradeCancelEvent is detected on the EventBus, this method gets
+     * called. If there is a trading stage in the according lobby, it gets closed.
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.client.trade.event.TradeCancelEvent
+     * @since 2021-02-23
+     */
+    @Subscribe
+    private void onTradeCancelEvent(TradeCancelEvent event) {
+        LOG.debug("Received TradeCancelEvent");
+        String lobby = event.getLobbyName();
+        if (tradingStages.containsKey(lobby)) {
+            tradingStages.get(lobby).close();
+            tradingStages.remove(lobby);
+        }
+    }
+
+    /**
      * Handles the TradeErrorEvent detected on the EventBus
      * <p>
      * If a TradeErrorEvent is detected on the EventBus, this method gets
@@ -960,48 +960,6 @@ public class SceneManager {
     @Subscribe
     private void onTradeErrorEvent(TradeErrorEvent event) {
         showError(event.getMessage());
-    }
-
-    /**
-     * Handles the TradeWithBankCancelEvent detected on the EventBus
-     * <p>
-     * If a TradeWithBankCancelEvent is detected on the EventBus, this method gets
-     * called. If there is a trading stage in the according lobby, it gets closed.
-     *
-     * @author Maximilian Lindner
-     * @author Alwin Bossert
-     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
-     * @since 2021-02-20
-     */
-    @Subscribe
-    private void onTradeWithBankCancelEvent(TradeWithBankCancelEvent event) {
-        LOG.debug("Received TradeWithBankCancelEvent");
-        String lobby = event.getLobbyName();
-        if (tradingStages.containsKey(lobby)) {
-            tradingStages.get(lobby).close();
-            tradingStages.remove(lobby);
-        }
-    }
-
-    /**
-     * Handles the TradeWithUserCancelEvent detected on the EventBus
-     * <p>
-     * If a TradeWithUserCancelEvent is detected on the EventBus, this method gets
-     * called. If there is a trading stage in the according lobby, it gets closed.
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.client.trade.event.TradeWithUserCancelEvent
-     * @since 2021-02-23
-     */
-    @Subscribe
-    private void onTradeWithUserCancelEvent(TradeWithUserCancelEvent event) {
-        LOG.debug("Received TradeWithUserCancelEvent");
-        String lobby = event.getLobbyName();
-        if (tradingStages.containsKey(lobby)) {
-            tradingStages.get(lobby).close();
-            tradingStages.remove(lobby);
-        }
     }
 
     /**

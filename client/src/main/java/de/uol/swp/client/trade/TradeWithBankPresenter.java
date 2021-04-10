@@ -4,16 +4,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
-import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.game.IGameService;
+import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
-import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
-import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -51,6 +47,11 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private ObservableList<Pair<String, Integer>> resourceList;
     private ObservableList<Pair<String, Integer>> bankResourceList;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
+
+    @Inject
+    private IGameService gameService;
+    @Inject
+    private ITradeService tradeService;
 
     @FXML
     private ListView<Pair<String, Integer>> ownInventoryView;
@@ -116,39 +117,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Helper function called if an unsuccessful trade happened.
-     * <p>
-     * Posts a TradeWithBankCancelEvent with its lobbyName to close the
-     * trading window and a TradeLobbyButtonUpdateEvent with the
-     * loggedInUser and the lobbyName on the eventBus to update the
-     * button statuses in the lobby.
-     */
-    private void closeWindowAfterNotSuccessfulTrade() {
-        Platform.runLater(() -> {
-            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-            eventBus.post(new ResetTradeWithBankButtonEvent(loggedInUser, lobbyName));
-        });
-    }
-
-    /**
-     * Helper function called if a successful trade happened.
-     * <p>
-     * Posts a TradeWithBankCancelEvent with its lobbyName to close the
-     * trading window and TradeLobbyButtonUpdateEvent with the
-     * loggedInUser and the lobbyName on the eventBus to update the
-     * button statuses in the lobby.
-     *
-     * @see de.uol.swp.client.trade.event.TradeWithBankCancelEvent
-     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
-     */
-    private void closeWindowAfterSuccessfulTrade() {
-        Platform.runLater(() -> {
-            eventBus.post(new TradeWithBankCancelEvent(lobbyName));
-            eventBus.post(new TradeLobbyButtonUpdateEvent(loggedInUser, lobbyName));
-        });
-    }
-
-    /**
      * Handles a click on the Buy Button
      * <p>
      * Method called when the BuyBankButton is pressed.
@@ -160,8 +128,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
         if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
-            Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(loggedInUser, lobbyName);
-            eventBus.post(buyDevelopmentCardRequest);
+            tradeService.buyDevelopmentCard(lobbyName, loggedInUser);
         }
     }
 
@@ -174,7 +141,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      *
      * @param rsp The BuyDevelopmentCardResponse found on the eventBus
      *
-     * @implNote the User has to check what card he got by looking at his inventory or check the log
      * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest
      */
@@ -182,11 +148,9 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
-        closeWindowAfterSuccessfulTrade();
         LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
-        LOG.debug("---- Sending UpdateInventoryRequest");
-        Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
-        eventBus.post(updateInventoryRequest);
+        tradeService.closeBankTradeWindow(lobbyName, loggedInUser);
+        gameService.updateInventory(lobbyName, loggedInUser);
         tradeResourceWithBankButton.setDisable(true);
     }
 
@@ -199,7 +163,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
-        closeWindowAfterNotSuccessfulTrade();
+        tradeService.closeBankTradeWindow(lobbyName, loggedInUser);
     }
 
     /**
@@ -233,11 +197,11 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * <p>
      * Method called when the TradeBankButton is pressed.
      * This method checks both lists for the selected item.
-     * If there is a selected item in both lists, it posts a UpdateInventoryAfterTradeWithBankRequest
-     * onto the EventBus.
+     * If there is a selected item in both lists, it posts an
+     * ExecuteTradeWithBankRequest onto the EventBus.
      *
-     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
-     * @see de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest
+     * @see de.uol.swp.client.trade.event.TradeErrorEvent
+     * @see de.uol.swp.common.game.request.ExecuteTradeWithBankRequest
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
@@ -245,14 +209,14 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         Pair<String, Integer> giveResource;
         ownResourceToTradeWithView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("game.error.trade.noplayerresource")));
+            tradeService.showTradeError(resourceBundle.getString("game.error.trade.noplayerresource"));
             return;
         } else {
             giveResource = ownResourceToTradeWithView.getSelectionModel().getSelectedItem();
         }
         bankResourceView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (bankResourceView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("game.error.trade.nobankresource")));
+            tradeService.showTradeError(resourceBundle.getString("game.error.trade.nobankresource"));
             return;
         } else {
             bankResource = bankResourceView.getSelectionModel().getSelectedItem();
@@ -261,10 +225,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             String userGetsResource = bankResource.getKey();
             String userLosesResource = giveResource.getKey();
             if (userGetsResource.equals(userLosesResource)) return;
-            LOG.debug("Sending a UpdateInventoryAfterTradeWithBankRequest for Lobby " + this.lobbyName);
-            Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(
-                    loggedInUser, lobbyName, userGetsResource, userLosesResource);
-            eventBus.post(updateInventoryAfterTradeWithBankRequest);
+            tradeService.executeTradeWithBank(lobbyName, loggedInUser, userGetsResource, userLosesResource);
         }
     }
 
@@ -287,9 +248,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             loggedInUser = event.getUser();
         }
         LOG.debug("Received TradeUpdateEvent for Lobby " + this.lobbyName);
-
         Window window = ownResourceToTradeWithView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> closeWindowAfterNotSuccessfulTrade());
+        window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName, loggedInUser));
     }
 
     /**
@@ -303,12 +263,10 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
-        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        closeWindowAfterSuccessfulTrade();
-        LOG.debug("Sending UpdateInventoryRequest");
-        Message updateInventoryRequest = new UpdateInventoryRequest(loggedInUser, lobbyName);
-        eventBus.post(updateInventoryRequest);
+        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
+        tradeService.closeBankTradeWindow(lobbyName, loggedInUser);
+        gameService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -319,7 +277,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * The same happens for the ownInventoryList and the bankResourceList.
      */
     private void setTradingLists() {
-        Map<IHarborHex.HarborResource, Integer>tradingRatio = new HashMap<>();
+        Map<IHarborHex.HarborResource, Integer> tradingRatio = new HashMap<>();
         if (resourceList == null) {
             resourceList = FXCollections.observableArrayList();
             ownInventoryList = FXCollections.observableArrayList();
@@ -329,24 +287,26 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         resourceList.clear();
         ownInventoryList.clear();
         int prepareTradingRatio = 4;
-        if(harborMap.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
+        if (harborMap.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
         tradingRatio.put(IHarborHex.HarborResource.BRICK, prepareTradingRatio);
         tradingRatio.put(IHarborHex.HarborResource.ORE, prepareTradingRatio);
         tradingRatio.put(IHarborHex.HarborResource.GRAIN, prepareTradingRatio);
         tradingRatio.put(IHarborHex.HarborResource.WOOL, prepareTradingRatio);
         tradingRatio.put(IHarborHex.HarborResource.LUMBER, prepareTradingRatio);
-        if(harborMap.contains(IHarborHex.HarborResource.BRICK)) tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
-        if(harborMap.contains(IHarborHex.HarborResource.ORE)) tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
-        if(harborMap.contains(IHarborHex.HarborResource.GRAIN)) tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
-        if(harborMap.contains(IHarborHex.HarborResource.WOOL)) tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
-        if(harborMap.contains(IHarborHex.HarborResource.LUMBER)) tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.BRICK))
+            tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.ORE)) tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.GRAIN))
+            tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.WOOL)) tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.LUMBER))
+            tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
 
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             ownInventoryList.add(new Pair<>(entry.getKey(), entry.getValue()));
             String resource = entry.getKey().toUpperCase();
             IHarborHex.HarborResource harborResource = IHarborHex.HarborResource.valueOf(resource);
             if (entry.getValue() < tradingRatio.get(harborResource)) continue;
-
 
             resourceList.add(new Pair<>(entry.getKey(), tradingRatio.get(harborResource)));
         }

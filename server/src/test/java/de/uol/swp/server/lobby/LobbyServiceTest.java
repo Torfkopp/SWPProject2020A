@@ -8,9 +8,7 @@ import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.server.usermanagement.AuthenticationService;
-import de.uol.swp.server.usermanagement.UserManagement;
-import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -30,10 +28,9 @@ class LobbyServiceTest {
     static final Lobby lobbyWithSameName = new LobbyDTO("Testlobby", user2, false, 4, false, 60, false, false);
 
     final EventBus bus = new EventBus();
-    final UserManagement userManagement = new UserManagement(new MainMemoryBasedUserStore());
-    final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
+    final SessionManagement sessionManagement = new SessionManagement();
     final ILobbyManagement lobbyManagement = new LobbyManagement();
-    final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
+    final LobbyService lobbyService = new LobbyService(lobbyManagement, sessionManagement, bus);
 
     @Test
     void createLobbyTest() {
