@@ -307,7 +307,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             String resource = entry.getKey().toUpperCase();
             IHarborHex.HarborResource harborResource = IHarborHex.HarborResource.valueOf(resource);
             if (entry.getValue() < tradingRatio.get(harborResource)) continue;
-
             resourceList.add(new Pair<>(entry.getKey(), tradingRatio.get(harborResource)));
         }
         if (resourceList.size() == 0) {
