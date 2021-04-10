@@ -6,15 +6,19 @@ import java.io.*;
  * Helper class to test if an object is serialisable
  * <p>
  * https://stackoverflow.com/questions/3840356/how-to-test-in-java-that-a-class-implements-serializable-correctly-not-just-is
+ * 
+ * @author Phillip-André Suhr
  */
 public class SerialisationTestHelper {
 
     public static <T extends Serializable> boolean checkSerialisableAndDeserialisable(T obj, Class<T> cl) {
         try {
             byte[] bytes = pickle(obj);
+            //I've come for your pickle
+            //https://youtu.be/0tr2o9-KVFI?t=3
             T obj2 = unpickle(bytes, cl);
             return obj.equals(obj2);
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

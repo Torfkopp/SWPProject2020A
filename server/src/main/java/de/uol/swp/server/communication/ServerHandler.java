@@ -4,6 +4,7 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.sessions.Session;
@@ -87,12 +88,10 @@ public class ServerHandler implements ServerHandlerDelegate {
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
         try {
-            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Wario
             checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
             eventBus.post(msg);
-        } catch (Exception e) {
+        } catch (SecurityException e) {
             LOG.error("ServerException " + e.getClass().getName() + " " + e.getMessage());
-            //same as above
             sendToClient(msg.getMessageContext().get(), new ExceptionMessage(e.getMessage()));
         }
     }
@@ -424,6 +423,7 @@ public class ServerHandler implements ServerHandlerDelegate {
             try {
                 client.writeAndFlush(msg);
             } catch (Exception e) {
+                // UwU what is thrown here?
                 // TODO: Handle exceptions for unreachable clients
                 e.printStackTrace();
             }
