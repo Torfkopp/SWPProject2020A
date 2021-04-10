@@ -52,7 +52,6 @@ public class GameService extends AbstractService {
 
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
-    //TODO: Set to false while trading
     private boolean buildingCurrentlyAllowed;
 
     /**

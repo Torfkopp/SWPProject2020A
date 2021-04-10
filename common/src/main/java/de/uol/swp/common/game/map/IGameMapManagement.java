@@ -84,7 +84,11 @@ public interface IGameMapManagement {
 
     /**
      * Gets a GameMapDTO which represents  the current state of the game map
+     *
      * @return A GameMapDTO
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-08
      */
     IGameMap getGameMapDTO();
 
@@ -232,12 +236,11 @@ public interface IGameMapManagement {
      */
     boolean placeRoad(Player player, IEdge edge);
 
-
     /**
      * Places a road for the given player on the given edge.
      *
-     * @param player The player wanting to build the road
-     * @param mapPoint   The mapPoint to place a road at
+     * @param player   The player wanting to build the road
+     * @param mapPoint The mapPoint to place a road at
      *
      * @return True if placement was successful; false if not
      *

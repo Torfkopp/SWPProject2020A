@@ -218,6 +218,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @author Aldin Dervisi
      * @author Temmo Junkhoff
+     * @since 2021-04-07
      */
     @Subscribe
     private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
@@ -231,7 +232,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             case NOT_ENOUGH_RESOURCES:
                 gameRendering.showText(resourceBundle.getString("game.building.failed.notenoughresources"));
                 break;
-            case ALREADY_BUILD_HERE:
+            case ALREADY_BUILT_HERE:
                 gameRendering.showText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
                 break;
             case BAD_GROUND:
@@ -252,6 +253,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @author Aldin Dervisi
      * @author Temmo Junkhoff
+     * @since 2021-04-07
      */
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
@@ -648,6 +650,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @author Aldin Dervisi
      * @author Temmo Junkhoff
+     * @since 2021-04-08
      */
     @Subscribe
     private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {

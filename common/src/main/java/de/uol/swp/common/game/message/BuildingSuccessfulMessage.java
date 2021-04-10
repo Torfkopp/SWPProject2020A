@@ -17,7 +17,7 @@ public class BuildingSuccessfulMessage extends AbstractGameMessage {
     private final Type type;
 
     /**
-     * An enum to indicate what was build
+     * An enum to indicate what was built
      */
     public enum Type {
         ROAD,
@@ -29,9 +29,9 @@ public class BuildingSuccessfulMessage extends AbstractGameMessage {
      * Constructor
      *
      * @param lobbyName The lobbyname
-     * @param user      The user that build something
-     * @param mapPoint  The mappoint where something was build
-     * @param type      The type of structure that was build
+     * @param user      The user that built something
+     * @param mapPoint  The mappoint where something was built
+     * @param type      The type of structure that was built
      */
     public BuildingSuccessfulMessage(String lobbyName, UserOrDummy user, MapPoint mapPoint, Type type) {
         super(lobbyName, user);
@@ -40,18 +40,18 @@ public class BuildingSuccessfulMessage extends AbstractGameMessage {
     }
 
     /**
-     * Gets the mappoint at which something was build
+     * Gets the mappoint at which something was built
      *
-     * @return The mappoint at which something was build
+     * @return The mappoint at which something was built
      */
     public MapPoint getMapPoint() {
         return mapPoint;
     }
 
     /**
-     * Gets the type of structure that was build
+     * Gets the type of structure that was built
      *
-     * @return The type of structure that was build
+     * @return The type of structure that was built
      */
     public Type getType() {
         return type;

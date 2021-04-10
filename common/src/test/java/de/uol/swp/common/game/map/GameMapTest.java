@@ -3,7 +3,9 @@ package de.uol.swp.common.game.map;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static de.uol.swp.common.game.map.MapPoint.*;
 import static de.uol.swp.common.game.map.Player.PLAYER_1;
@@ -68,55 +70,50 @@ public class GameMapTest {
     }
 
     @Test
-    @Disabled("This definitely works, trust me!")
     void roadAndSettlementTest() {
-        // TODO: make this work
         // Tests building a settlement
         map.makeBeginnerSettlementsAndRoads(4);
         assertTrue(map.placeRoad(PLAYER_1,
-                                 map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
-        assertTrue(map.placeSettlement(PLAYER_1, IntersectionMapPoint(1, 2)));
+                                 map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 3), IntersectionMapPoint(0, 2)))));
+        assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        assertTrue(map.placeRoad(PLAYER_1, EdgeMapPoint(IntersectionMapPoint(0, 2), IntersectionMapPoint(0, 3))));
         // Tests building another settlement on top
-        assertFalse(map.settlementPlaceable(PLAYER_1, IntersectionMapPoint(1, 2)));
-        assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(1, 2)));
-        assertFalse(map.settlementPlaceable(PLAYER_2, IntersectionMapPoint(1, 2)));
-        assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(1, 2)));
+        assertTrue(map.settlementPlaceable(PLAYER_1, IntersectionMapPoint(0, 3)));
+        assertTrue(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        assertFalse(map.settlementPlaceable(PLAYER_2, IntersectionMapPoint(0, 3)));
+        assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
         // Tests upgrading the settlement
-        assertFalse(map.upgradeSettlement(PLAYER_2, IntersectionMapPoint(1, 2)));
-        assertTrue(map.upgradeSettlement(PLAYER_1, IntersectionMapPoint(1, 2)));
-        assertFalse(map.upgradeSettlement(PLAYER_2, IntersectionMapPoint(1, 2)));
+        assertFalse(map.upgradeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
+        assertTrue(map.upgradeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        assertFalse(map.upgradeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
         // Tests building another settlement on top
-        assertFalse(map.settlementPlaceable(PLAYER_1, IntersectionMapPoint(1, 2)));
-        assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(1, 2)));
-        assertFalse(map.settlementPlaceable(PLAYER_2, IntersectionMapPoint(1, 2)));
-        assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(1, 2)));
+        assertFalse(map.settlementPlaceable(PLAYER_1, IntersectionMapPoint(0, 3)));
+        assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        assertFalse(map.settlementPlaceable(PLAYER_2, IntersectionMapPoint(0, 3)));
+        assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
 
         // Tests building a road next to a settlement
         assertFalse(map.roadPlaceable(PLAYER_2, map.getEdge(
-                EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         assertFalse(map.placeRoad(PLAYER_2,
-                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(2, 3)))));
+                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(1, 3)))));
         assertTrue(map.roadPlaceable(PLAYER_1, map.getEdge(
-                EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         assertTrue(map.placeRoad(PLAYER_1,
-                                 map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                                 map.getEdge(EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         // Tests building a road on top of another
         assertFalse(map.roadPlaceable(PLAYER_1, map.getEdge(
-                EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         assertFalse(map.roadPlaceable(PLAYER_2, map.getEdge(
-                EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         assertFalse(map.placeRoad(PLAYER_1,
-                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         assertFalse(map.placeRoad(PLAYER_2,
-                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         //Tests building a road next to a road
         assertFalse(map.roadPlaceable(PLAYER_2, map.getEdge(
-                EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
-        assertTrue(map.roadPlaceable(PLAYER_1, map.getEdge(
-                EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
         assertFalse(map.placeRoad(PLAYER_2,
-                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
-        assertTrue(map.placeRoad(PLAYER_1,
-                                 map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
+                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(0, 3), IntersectionMapPoint(0, 4)))));
     }
 }

@@ -16,8 +16,9 @@ public class IntersectionWithEdges implements IIntersectionWithEdges {
 
     /**
      * Constructor
+     *
      * @param intersection The intersection
-     * @param edges The surrounding edges
+     * @param edges        The surrounding edges
      */
     public IntersectionWithEdges(IIntersection intersection, Set<IEdge> edges) {
         this.intersection = intersection;
