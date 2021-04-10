@@ -630,11 +630,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
                 resourceList.add(new Pair<>(entry.getKey(), entry.getValue().toString()));
             }
-            for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
-                resourceList.add(new Pair<>(entry.getKey(),
-                                            entry.getValue() ? resourceBundle.getString("game.property.has") :
-                                            resourceBundle.getString("game.property.hasnot")));
-            }
         });
     }
 
@@ -805,7 +800,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 });
             }
         });
-        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
         if (uniqueCardList == null) {
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);

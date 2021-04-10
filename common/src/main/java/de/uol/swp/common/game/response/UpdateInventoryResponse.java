@@ -17,7 +17,6 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
     private final Map<String, Integer> resourceMap;
-    private final Map<String, Boolean> armyAndRoadMap;
 
     /**
      * Constructor
@@ -27,22 +26,10 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @param resourceMap    The Map containing the name of a resource as key and the amount as value
      * @param armyAndRoadMap The Map containing "Largest Army" and "Longest Road" with the appropriate boolean as the value
      */
-    public UpdateInventoryResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
-                                   Map<String, Boolean> armyAndRoadMap) {
+    public UpdateInventoryResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
-        this.armyAndRoadMap = armyAndRoadMap;
-    }
-
-    /**
-     * Gets the army and road map, containing mappings of "Largest Army" and
-     * "Longest Road" to their appropriate boolean values.
-     *
-     * @return The army and road map
-     */
-    public Map<String, Boolean> getArmyAndRoadMap() {
-        return armyAndRoadMap;
     }
 
     /**

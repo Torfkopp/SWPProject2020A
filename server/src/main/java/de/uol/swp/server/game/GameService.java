@@ -8,6 +8,8 @@ import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
+import de.uol.swp.common.exception.ExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.GameMap;
@@ -19,10 +21,8 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Dummy;
@@ -519,13 +519,8 @@ public class GameService extends AbstractService {
         resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
         resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
 
-        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("cards.unique.largestarmy", inventory.hasLargestArmy());
-        armyAndRoadMap.put("cards.unique.longestroad", inventory.hasLongestRoad());
-
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                    Collections.unmodifiableMap(resourceMap),
-                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+                                                                    Collections.unmodifiableMap(resourceMap));
         LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
         post(new ForwardToUserInternalRequest(req.getUser(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
@@ -1207,13 +1202,8 @@ public class GameService extends AbstractService {
         resourceMap.put("cards.yearofplenty", inventory.getYearOfPlentyCards());
         resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
 
-        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("cards.unique.largestarmy", inventory.hasLargestArmy());
-        armyAndRoadMap.put("cards.unique.longestroad", inventory.hasLongestRoad());
-
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                    Collections.unmodifiableMap(resourceMap),
-                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+                                                                    Collections.unmodifiableMap(resourceMap));
         returnMessage.initWithMessage(req);
         LOG.debug("Sending UpdateInventoryResponse for Lobby " + req.getOriginLobby());
         post(returnMessage);
