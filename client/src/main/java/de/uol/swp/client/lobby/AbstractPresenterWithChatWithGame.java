@@ -241,7 +241,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
-        gameService.endTurn(lobbyName, loggedInUser);
+        gameService.endTurn(lobbyName);
     }
 
     /**
@@ -529,8 +529,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onTradeWithBankButtonPressed() {
         disableButtonStates();
-        tradeService.showBankTradeWindow(lobbyName, loggedInUser);
-        tradeService.tradeWithBank(lobbyName, loggedInUser);
+        tradeService.showBankTradeWindow(lobbyName);
+        tradeService.tradeWithBank(lobbyName);
     }
 
     /**
@@ -554,8 +554,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            tradeService.showUserTradeWindow(lobbyName, loggedInUser, user);
-            tradeService.tradeWithUser(lobbyName, loggedInUser, user);
+            tradeService.showUserTradeWindow(lobbyName, user);
+            tradeService.tradeWithUser(lobbyName, user);
         }
     }
 

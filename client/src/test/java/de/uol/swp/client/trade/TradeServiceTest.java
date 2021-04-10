@@ -4,6 +4,8 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.User;
@@ -37,6 +39,7 @@ class TradeServiceTest {
     private final CountDownLatch lock = new CountDownLatch(1);
 
     private ITradeService tradeService;
+    private IUserService userService;
     private Object event;
 
     @BeforeAll
@@ -56,7 +59,9 @@ class TradeServiceTest {
 
     @BeforeEach
     protected void setUp() {
-        tradeService = new TradeService(eventBus);
+        userService = new UserService(eventBus);
+        userService.setLoggedInUser(defaultUser);
+        tradeService = new TradeService(eventBus, userService);
         eventBus.register(this);
     }
 
@@ -64,12 +69,13 @@ class TradeServiceTest {
     protected void tearDown() {
         event = null;
         tradeService = null;
+        userService = null;
         eventBus.unregister(this);
     }
 
     @Test
     void acceptUserTrade() throws InterruptedException {
-        tradeService.acceptUserTrade(defaultLobbyName, secondUser, defaultUser, defaultDemand, defaultOffer);
+        tradeService.acceptUserTrade(defaultLobbyName, secondUser, defaultDemand, defaultOffer);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -78,12 +84,12 @@ class TradeServiceTest {
         AcceptUserTradeRequest request = (AcceptUserTradeRequest) event;
 
         assertEquals(defaultLobbyName, request.getOriginLobby());
-        assertEquals(defaultUser, request.getOfferingUser());
-        assertEquals(defaultUser.getID(), request.getOfferingUser().getID());
-        assertEquals(defaultUser.getUsername(), request.getOfferingUser().getUsername());
-        assertEquals(secondUser, request.getRespondingUser());
-        assertEquals(secondUser.getID(), request.getRespondingUser().getID());
-        assertEquals(secondUser.getUsername(), request.getRespondingUser().getUsername());
+        assertEquals(secondUser, request.getOfferingUser());
+        assertEquals(secondUser.getID(), request.getOfferingUser().getID());
+        assertEquals(secondUser.getUsername(), request.getOfferingUser().getUsername());
+        assertEquals(defaultUser, request.getRespondingUser());
+        assertEquals(defaultUser.getID(), request.getRespondingUser().getID());
+        assertEquals(defaultUser.getUsername(), request.getRespondingUser().getUsername());
         assertEquals(defaultDemand, request.getRespondingResourceMap());
         assertEquals(defaultDemand.keySet(), request.getRespondingResourceMap().keySet());
         assertEquals(defaultDemand.values(), request.getRespondingResourceMap().values());
@@ -94,7 +100,7 @@ class TradeServiceTest {
 
     @Test
     void buyDevelopmentCard() throws InterruptedException {
-        tradeService.buyDevelopmentCard(defaultLobbyName, defaultUser);
+        tradeService.buyDevelopmentCard(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -152,7 +158,7 @@ class TradeServiceTest {
 
     @Test
     void executeTradeWithBank() throws InterruptedException {
-        tradeService.executeTradeWithBank(defaultLobbyName, defaultUser, defaultGainedResource, defaultLostResource);
+        tradeService.executeTradeWithBank(defaultLobbyName, defaultGainedResource, defaultLostResource);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -170,7 +176,7 @@ class TradeServiceTest {
 
     @Test
     void offerTrade() throws InterruptedException {
-        tradeService.offerTrade(defaultLobbyName, defaultUser, secondUser, defaultOffer, defaultDemand);
+        tradeService.offerTrade(defaultLobbyName, secondUser, defaultOffer, defaultDemand);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -211,7 +217,7 @@ class TradeServiceTest {
 
     @Test
     void showBankTradeWindow() throws InterruptedException {
-        tradeService.showBankTradeWindow(defaultLobbyName, defaultUser);
+        tradeService.showBankTradeWindow(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -220,9 +226,6 @@ class TradeServiceTest {
         ShowTradeWithBankViewEvent eve = (ShowTradeWithBankViewEvent) event;
 
         assertEquals(defaultLobbyName, eve.getLobbyName());
-        assertEquals(defaultUser, eve.getUser());
-        assertEquals(defaultUser.getID(), eve.getUser().getID());
-        assertEquals(defaultUser.getUsername(), eve.getUser().getUsername());
     }
 
     @Test
@@ -278,7 +281,7 @@ class TradeServiceTest {
 
     @Test
     void showUserTradeWindow() throws InterruptedException {
-        tradeService.showUserTradeWindow(defaultLobbyName, defaultUser, secondUser);
+        tradeService.showUserTradeWindow(defaultLobbyName, secondUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -287,9 +290,6 @@ class TradeServiceTest {
         ShowTradeWithUserViewEvent eve = (ShowTradeWithUserViewEvent) event;
 
         assertEquals(defaultLobbyName, eve.getLobbyName());
-        assertEquals(defaultUser, eve.getOfferingUser());
-        assertEquals(defaultUser.getID(), eve.getOfferingUser().getID());
-        assertEquals(defaultUser.getUsername(), eve.getOfferingUser().getUsername());
         assertEquals(secondUser, eve.getRespondingUser());
         assertEquals(secondUser.getID(), eve.getRespondingUser().getID());
         assertEquals(secondUser.getUsername(), eve.getRespondingUser().getUsername());
@@ -297,7 +297,7 @@ class TradeServiceTest {
 
     @Test
     void tradeWithBank() throws InterruptedException {
-        tradeService.tradeWithBank(defaultLobbyName, defaultUser);
+        tradeService.tradeWithBank(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -313,7 +313,7 @@ class TradeServiceTest {
 
     @Test
     void tradeWithUser() throws InterruptedException {
-        tradeService.tradeWithUser(defaultLobbyName, defaultUser, secondUser);
+        tradeService.tradeWithUser(defaultLobbyName, secondUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
