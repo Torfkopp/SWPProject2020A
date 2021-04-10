@@ -296,7 +296,7 @@ public class GameService extends AbstractService {
                 if (gameMap.getIntersection(mapPoint).getState() != IIntersection.IntersectionState.FREE) {
                     LOG.debug("Sending BuildingFailedResponse");
                     BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                            BuildingFailedResponse.Reason.ALREADY_BUILD_HERE);
+                                                                            BuildingFailedResponse.Reason.ALREADY_BUILT_HERE);
                     msg.initWithMessage(req);
                     post(msg);
                 } else if (gameMap.settlementPlaceable(player, mapPoint)) {
@@ -348,7 +348,7 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     LOG.debug("Sending BuildingFailedResponse");
                     BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                            BuildingFailedResponse.Reason.ALREADY_BUILD_HERE);
+                                                                            BuildingFailedResponse.Reason.ALREADY_BUILT_HERE);
                     msg.initWithMessage(req);
                     post(msg);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
