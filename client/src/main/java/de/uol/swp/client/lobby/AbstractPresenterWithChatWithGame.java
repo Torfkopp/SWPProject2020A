@@ -595,7 +595,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), loggedInUser, rsp);
+        tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
     }
 
     /**

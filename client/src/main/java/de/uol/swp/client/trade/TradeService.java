@@ -41,7 +41,7 @@ public class TradeService implements ITradeService {
     public TradeService(EventBus eventBus) {
         this.eventBus = eventBus;
         this.eventBus.register(this);
-        LOG.debug("GameService started");
+        LOG.debug("TradeService started");
     }
 
     @Override
@@ -117,10 +117,9 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showOfferWindow(String lobbyName, UserOrDummy offeringUser, User respondingUser,
-                                TradeWithUserOfferResponse rsp) {
+    public void showOfferWindow(String lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), respondingUser, lobbyName, rsp));
+        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
     }
 
     @Override
@@ -145,7 +144,7 @@ public class TradeService implements ITradeService {
     @Override
     public void tradeWithUser(String lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser) {
         LOG.debug("Sending a TradeWithUserRequest");
-        Message request = new TradeWithUserRequest(lobbyName, respondingUser, offeringUser);
+        Message request = new TradeWithUserRequest(lobbyName, offeringUser, respondingUser);
         eventBus.post(request);
     }
 }

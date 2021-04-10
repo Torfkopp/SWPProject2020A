@@ -109,14 +109,12 @@ public interface ITradeService {
      * Posts an event to show the Trade Offered window displaying a trade offer
      * from another user
      *
-     * @param lobbyName      The name of the lobby
-     * @param offeringUser   The user who offered a trade
-     * @param respondingUser The user receiving the trade offer
-     * @param rsp            The TradeWithUserOfferResponse containing the
-     *                       details of the offer
+     * @param lobbyName    The name of the lobby
+     * @param offeringUser The user who offered a trade
+     * @param rsp          The TradeWithUserOfferResponse containing the
+     *                     details of the offer
      */
-    void showOfferWindow(String lobbyName, UserOrDummy offeringUser, User respondingUser,
-                         TradeWithUserOfferResponse rsp);
+    void showOfferWindow(String lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp);
 
     /**
      * Posts an event to show a Trade Error alert with the provided message
