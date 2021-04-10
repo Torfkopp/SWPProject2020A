@@ -35,9 +35,9 @@ public class LobbyService implements ILobbyService {
      */
     @Inject
     public LobbyService(EventBus eventBus) {
-        LOG.debug("LobbyService started");
         this.eventBus = eventBus;
         this.eventBus.register(this);
+        LOG.debug("LobbyService started");
     }
 
     @Override
@@ -56,6 +56,7 @@ public class LobbyService implements ILobbyService {
 
     @Override
     public void kickUser(String lobbyName, User loggedInUser, UserOrDummy userToKick) {
+        LOG.debug("Sending KickUserRequest");
         Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick);
         eventBus.post(kickUserRequest);
     }
@@ -111,6 +112,7 @@ public class LobbyService implements ILobbyService {
 
     @Override
     public void userReady(String lobbyName, User loggedInUser, boolean isReady) {
+        LOG.debug("Sending UserReadyRequest");
         Message userReadyRequest = new UserReadyRequest(lobbyName, loggedInUser, isReady);
         eventBus.post(userReadyRequest);
     }
