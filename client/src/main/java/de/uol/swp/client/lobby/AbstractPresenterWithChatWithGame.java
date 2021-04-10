@@ -1,16 +1,18 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.game.IGameService;
+import de.uol.swp.client.trade.ITradeService;
+import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.request.TradeWithBankRequest;
-import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -73,6 +75,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
 
+    @Inject
+    protected IGameService gameService;
+
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
     protected Integer dice1;
     protected Integer dice2;
@@ -86,6 +91,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
+
+    @Inject
+    private ITradeService tradeService;
 
     private ObservableList<Pair<String, String>> resourceList;
 
@@ -199,25 +207,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void disableButtonsAfterTurn() {
         disableButtonStates();
         this.rollDice.setDisable(true);
-        lobbyService.updateInventory(lobbyName, loggedInUser);
-    }
-
-    /**
-     * If a BuyDevelopmentCardResponse is found on the EventBus,
-     * this method calls 2 methods to reset the trade with bank button
-     * and the trade with user button for the users in the response.
-     *
-     * @param rsp BuyDevelopmentCardResponse found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
-     * @since 2021-02-28
-     */
-    @Subscribe
-    private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        resetButtonStates(rsp.getUser());
+        gameService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -244,7 +234,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         this.dice1 = msg.getDice1();
         this.dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
-        lobbyService.updateInventory(lobbyName, loggedInUser);
+        gameService.updateInventory(lobbyName, loggedInUser);
     }
 
     /**
@@ -259,7 +249,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
-        lobbyService.endTurn(loggedInUser, lobbyName);
+        gameService.endTurn(lobbyName, loggedInUser);
     }
 
     /**
@@ -367,11 +357,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Result is the button the user has clicked on
         if (result.isEmpty()) return;
         if (result.get() == btnKnight) { //Play a Knight Card
-            lobbyService.playKnightCard(lobbyName, loggedInUser);
+            gameService.playKnightCard(lobbyName, loggedInUser);
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            lobbyService.playRoadBuildingCard(lobbyName, loggedInUser);
+            gameService.playRoadBuildingCard(lobbyName, loggedInUser);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -421,7 +411,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
-        lobbyService.updateInventory(rsp.getLobbyName(), rsp.getUser());
+        gameService.updateInventory(rsp.getLobbyName(), rsp.getUser());
     }
 
     /**
@@ -431,7 +421,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * with the Player that won is shown. For the owner of the Lobby appears a
      * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
      *
-     * @param msg The CheckVictoryPointsMessage found on the EventBus
+     * @param msg The PlayerWonGameMessage found on the EventBus
      *
      * @author Steven Luong
      * @author Finn Haase
@@ -608,29 +598,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onRollDiceButtonPressed() {
-        lobbyService.rollDice(lobbyName, loggedInUser);
+        gameService.rollDice(lobbyName, loggedInUser);
         this.rollDice.setDisable(true);
-    }
-
-    /**
-     * Handles an TradeLobbyButtonUpdateEvent found on the EventBus
-     * <p>
-     * If the TradeLobbyButtonUpdateEvent is intended for the current Lobby
-     * the trade With Bank button is disabled. The end turn button gets
-     * enabled again.
-     *
-     * @param event The TradeLobbyButtonUpdateEvent found on the event bus
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @see de.uol.swp.client.trade.event.TradeLobbyButtonUpdateEvent
-     * @since 2021-02-22
-     */
-    @Subscribe
-    private void onTradeLobbyButtonUpdateEvent(TradeLobbyButtonUpdateEvent event) {
-        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
-            endTurn.setDisable(false);
-        }
     }
 
     /**
@@ -646,61 +615,36 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        lobbyService.updateInventory(this.lobbyName, this.loggedInUser);
-    }
-
-    /**
-     * If a TradeWithBankAcceptedResponse is found on the EventBus,
-     * this method calls 2 methods to reset the trade with bank button
-     * and the trade with user button for the users in the response.
-     *
-     * @param rsp TradeWithBankButtonAcceptedResponse found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.response.TradeWithBankAcceptedResponse
-     * @since 2021-02-28
-     */
-    @Subscribe
-    private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
-        if (!lobbyName.equals(rsp.getLobbyName())) return;
-        resetButtonStates(rsp.getUser());
+        gameService.updateInventory(this.lobbyName, this.loggedInUser);
     }
 
     /**
      * Handles a click on the TradeWithBank Button
      * <p>
-     * Method called when the TradeWithBankButton is pressed. It posts a
-     * ShowTradeWithViewEvent and a TradeWithBankRequest onto the event bus.
+     * Method called when the TradeWithBankButton is pressed. It calls on
+     * the TradeService to show the Trade with Bank window and request the
+     * Bank's inventory.
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
-     * @see de.uol.swp.client.trade.event.ShowTradeWithBankViewEvent
-     * @see de.uol.swp.common.game.request.TradeWithBankRequest
      * @since 2021-02-20
      */
     @FXML
     private void onTradeWithBankButtonPressed() {
         disableButtonStates();
-        eventBus.post(new ShowTradeWithBankViewEvent(this.loggedInUser, this.lobbyName));
-        LOG.debug("Sending a ShowTradeWithBankViewEvent for Lobby " + this.lobbyName);
-        eventBus.post(new TradeWithBankRequest(lobbyName, loggedInUser));
-        LOG.debug("Sending a TradeWithBankRequest for Lobby " + this.lobbyName);
+        tradeService.showBankTradeWindow(lobbyName, loggedInUser);
+        tradeService.tradeWithBank(lobbyName, loggedInUser);
     }
 
     /**
      * Handles a Click on the TradeWithUserButton
      * <p>
      * If another player of the lobby-member-list is selected and the button gets pressed,
-     * this button gets disabled, a new ShowTradeWithUserViewEvent is posted onto the
-     * EventBus to show the trading window and a TradeWithUserRequest is posted
-     * onto the EventBus to get the necessary inventory information.
+     * this button gets disabled, this method calls on the TradeService to show the Trade
+     * with User window and request the inventory overview for the selected user.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
-     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
-     * @see de.uol.swp.common.game.request.TradeWithUserRequest
-     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
      * @since 2021-02-23
      */
     @FXML
@@ -708,15 +652,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
-            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.noplayer")));
+            tradeService.showTradeError(resourceBundle.getString("game.trade.error.noplayer"));
         } else if (Objects.equals(user, loggedInUser)) {
-            eventBus.post(new TradeErrorEvent(resourceBundle.getString("game.trade.error.selfplayer")));
+            tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            LOG.debug("Sending ShowTradeWithUserViewEvent");
-            eventBus.post(new ShowTradeWithUserViewEvent(loggedInUser, lobbyName, user));
-            LOG.debug("Sending a TradeWithUserRequest for Lobby " + lobbyName);
-            eventBus.post(new TradeWithUserRequest(lobbyName, loggedInUser, user));
+            tradeService.showUserTradeWindow(lobbyName, loggedInUser, user);
+            tradeService.tradeWithUser(lobbyName, loggedInUser, user);
         }
     }
 
@@ -740,8 +682,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Handles the TradeWithUserOfferResponse found on the EventBus
-     * If a user gets a trading offer a new ShowTradeWithUserRespondViewEvent is posted onto
-     * the  EventBus to show the AcceptView.
+     * If a user gets a trading offer, this method calls the TradeService
+     * to display the Accept Offer window.
      *
      * @param rsp The TradeWithUserOfferResponse found on the EventBus
      *
@@ -754,7 +696,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), loggedInUser, lobbyName, rsp));
+        tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
     }
 
     /**
@@ -827,7 +769,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             else if (rst.get().equals(grain)) resource = Resources.GRAIN;
             else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
             else if (rst.get().equals(wool)) resource = Resources.WOOL;
-            lobbyService.playMonopolyCard(lobbyName, loggedInUser, resource);
+            gameService.playMonopolyCard(lobbyName, loggedInUser, resource);
         }
     }
 
@@ -889,7 +831,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
             else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
             //Send Request
-            lobbyService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+            gameService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
         }
     }
 
