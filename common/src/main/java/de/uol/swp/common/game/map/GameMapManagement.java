@@ -170,6 +170,11 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public IGameMap getGameMapDTO() {
+        return new GameMapDTO(getHexesAsJaggedArray(), getIntersectionsWithEdges());
+    }
+
+    @Override
     public IGameHex getHex(MapPoint position) {
         GameHexWrapper returnValue = getHexWrapper(position);
         return returnValue == null ? null : returnValue.get();
@@ -349,11 +354,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public boolean roadPlaceable(Player player, MapPoint mapPoint) {
-        return roadPlaceable(player, getEdge(mapPoint));
-    }
-
-    @Override
     public boolean placeSettlement(Player player, MapPoint position) {
         if (settlementPlaceable(player, position)) {
             if (!playerSettlementsAndCities.containsKey(player))
@@ -366,8 +366,8 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public IGameMap getGameMapDTO() {
-        return new GameMapDTO(getHexesAsJaggedArray(), getIntersectionsWithEdges());
+    public boolean roadPlaceable(Player player, MapPoint mapPoint) {
+        return roadPlaceable(player, getEdge(mapPoint));
     }
 
     @Override
@@ -402,6 +402,13 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public boolean settlementUpgradeable(Player player, MapPoint position) {
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
+        return (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
+                .getY()][position.getX()].getOwner() == player);
+    }
+
+    @Override
     public boolean upgradeSettlement(Player player, MapPoint position) {
         if (settlementUpgradeable(player, position)) {
             intersectionMap[position.getY()][position.getX()]
@@ -409,13 +416,6 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean settlementUpgradeable(Player player, MapPoint position) {
-        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
-        return (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
-                .getY()][position.getX()].getOwner() == player);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {
@@ -582,6 +582,14 @@ public class GameMapManagement implements IGameMapManagement {
         return intersectionSet;
     }
 
+    /**
+     * Helper method to return an jagged array of IntersectionWithEdges
+     *
+     * @return An jagged array of IntersectionWithEdges
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-08
+     */
     private IntersectionWithEdges[][] getIntersectionsWithEdges() {
         IntersectionWithEdges[][] returnMap;
         returnMap = new IntersectionWithEdges[6][];

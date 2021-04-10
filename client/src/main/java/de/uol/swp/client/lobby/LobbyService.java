@@ -4,10 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.*;
-import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
@@ -45,24 +41,10 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateGameMap(String lobbyName) {
-        LOG.debug("Sending UpdateGameMapRequest");
-        Message msg = new UpdateGameMapRequest(lobbyName);
-        eventBus.post(msg);
-    }
-
-    @Override
     public void createNewLobby(String name, User user, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
         Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
         eventBus.post(createLobbyRequest);
-    }
-
-    @Override
-    public void buildRequest(String lobbyName, User user, MapPoint mapPoint) {
-        LOG.debug("Sending BuildRequest");
-        Message buildRequest = new BuildRequest(lobbyName, user, mapPoint);
-        eventBus.post(buildRequest);
     }
 
     @Override

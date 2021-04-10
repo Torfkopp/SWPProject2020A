@@ -72,6 +72,7 @@ public class GameMapTest {
     void roadAndSettlementTest() {
         // TODO: make this work
         // Tests building a settlement
+        map.makeBeginnerSettlementsAndRoads(4);
         assertTrue(map.placeRoad(PLAYER_1,
                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 2), IntersectionMapPoint(1, 3)))));
         assertTrue(map.placeSettlement(PLAYER_1, IntersectionMapPoint(1, 2)));

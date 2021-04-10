@@ -1,7 +1,5 @@
 package de.uol.swp.client.lobby;
 
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -14,8 +12,6 @@ import de.uol.swp.common.user.UserOrDummy;
  * @since 2021-02-12
  */
 public interface ILobbyService {
-
-    void updateGameMap(String lobbyName);
 
     /**
      * Posts a request to create a lobby onto the EventBus
@@ -149,6 +145,4 @@ public interface ILobbyService {
      * @since 2021-03-23
      */
     void userReady(String lobbyName, User loggedInUser, boolean isReady);
-
-    void buildRequest(String lobbyName, User user, MapPoint mapPoint);
 }

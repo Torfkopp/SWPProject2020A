@@ -82,6 +82,10 @@ public interface IGameMapManagement {
      */
     Set<IEdge> getEdgesFromHex(MapPoint mapPoint);
 
+    /**
+     * Gets a GameMapDTO which represents  the current state of the game map
+     * @return A GameMapDTO
+     */
     IGameMap getGameMapDTO();
 
     /**
@@ -228,6 +232,19 @@ public interface IGameMapManagement {
      */
     boolean placeRoad(Player player, IEdge edge);
 
+
+    /**
+     * Places a road for the given player on the given edge.
+     *
+     * @param player The player wanting to build the road
+     * @param mapPoint   The mapPoint to place a road at
+     *
+     * @return True if placement was successful; false if not
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-07
+     */
     boolean placeRoad(Player player, MapPoint mapPoint);
 
     /**
@@ -243,6 +260,18 @@ public interface IGameMapManagement {
      */
     boolean placeSettlement(Player player, MapPoint position);
 
+    /**
+     * Checks if a street is placeable
+     *
+     * @param player   The player wanting to place the street
+     * @param mapPoint The mapPoint at which to place a road
+     *
+     * @return True if placement is possible; false if not
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-07
+     */
     boolean roadPlaceable(Player player, MapPoint mapPoint);
 
     /**
@@ -271,6 +300,18 @@ public interface IGameMapManagement {
      */
     boolean settlementPlaceable(Player player, MapPoint position);
 
+    /**
+     * Checks if a settlement is upgradeable
+     *
+     * @param player   The player wanting to upgrade the settlement
+     * @param position The position of the intersection
+     *
+     * @return True if placement is possible; false if not
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-07
+     */
     boolean settlementUpgradeable(Player player, MapPoint position);
 
     /**

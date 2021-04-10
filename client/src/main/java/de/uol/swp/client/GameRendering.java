@@ -183,6 +183,15 @@ public class GameRendering {
         gfxCtx.fillText(text, width / 2.0, height / 2.0);
     }
 
+    /**
+     * Shows a text notification on the canvas
+     *
+     * @param text The text to display
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-08
+     */
     public void showText(String text) {
         gfxCtx.setTextAlign(TextAlignment.CENTER);
         gfxCtx.setTextBaseline(VPos.CENTER);

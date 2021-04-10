@@ -70,6 +70,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label turnIndicator;
     @FXML
     protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
+    @FXML
+    protected Label buildingCosts;
 
     @Inject
     protected IGameService gameService;
@@ -208,6 +210,58 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a BuildingFailedResponse
+     * If a BuildingFailedResponse is found on the bus this method is called.
+     * It shows a small text on the gamemap indicating what went wrong.
+     *
+     * @param rsp The BuildingFailedMessage found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     */
+    @Subscribe
+    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received BuildingFailedResponse");
+        gameRendering.drawGameMap(gameMap);
+        switch (rsp.getReason()) {
+            case CANT_BUILD_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.cantbuildhere"));
+                break;
+            case NOT_ENOUGH_RESOURCES:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.notenoughresources"));
+                break;
+            case ALREADY_BUILD_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
+                break;
+            case BAD_GROUND:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.badground"));
+                break;
+            case NOTHING_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.nothinghere"));
+                break;
+        }
+    }
+
+    /**
+     * Handles a BuildingSuccessfulMessage
+     * If a BuildingSuccessfulMessage is found on the bus this method is called.
+     * It updates the gamemap and for the user that build something the inventory.
+     *
+     * @param msg The BuildingSuccessfulMessage found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     */
+    @Subscribe
+    private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
+        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received BuildingSuccessfullMessage");
+        gameService.updateGameMap(lobbyName);
+        if (Objects.equals(msg.getUser(), loggedInUser)) gameService.updateInventory(lobbyName, loggedInUser);
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -264,7 +318,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-            lobbyService.buildRequest(lobbyName, loggedInUser, mapPoint);
+            gameService.buildRequest(lobbyName, loggedInUser, mapPoint);
     }
 
     /**
@@ -280,7 +334,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onNextPlayerMessage(NextPlayerMessage msg) {
         if (!msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
-        lobbyService.updateGameMap(lobbyName);
+        gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
     }
@@ -466,6 +520,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onReturnToLobbyButtonPressed() {
+        buildingCosts.setVisible(false);
         inGame = false;
         lobbyService.returnToPreGameLobby(this.lobbyName);
     }

@@ -8,6 +8,8 @@ import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
+import de.uol.swp.common.exception.ExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.*;
@@ -17,10 +19,8 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Dummy;
@@ -115,6 +115,7 @@ public class GameService extends AbstractService {
             ServerMessage message = new PlayerWonGameMessage(originLobby, user);
             lobbyService.sendToAllInLobby(originLobby, message);
             gameManagement.dropGame(originLobby);
+            buildingCurrentlyAllowed = false;
         }
     }
 
@@ -162,7 +163,8 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserRequest for Lobby " + req.getOriginLobby());
+        if (LOG.isDebugEnabled()) LOG.debug("Received AcceptUserTradeRequest for Lobby " + req.getOriginLobby());
+        buildingCurrentlyAllowed = false;
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
@@ -291,8 +293,14 @@ public class GameService extends AbstractService {
         Player player = game.getPlayer(user);
         Inventory inv = game.getInventory(user);
         switch (mapPoint.getType()) {
-            case INTERSECTION:
-                if (gameMap.settlementPlaceable(player, mapPoint)) {
+            case INTERSECTION: {
+                if (gameMap.getIntersection(mapPoint).getState() != IIntersection.IntersectionState.FREE) {
+                    LOG.debug("Sending BuildingFailedResponse");
+                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                            BuildingFailedResponse.Reason.ALREADY_BUILD_HERE);
+                    msg.initWithMessage(req);
+                    post(msg);
+                } else if (gameMap.settlementPlaceable(player, mapPoint)) {
                     if (inv.getBrick() >= 1 && inv.getLumber() >= 1 && inv.getWool() >= 1 && inv.getGrain() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
@@ -336,8 +344,15 @@ public class GameService extends AbstractService {
                     post(msg);
                 }
                 break;
-            case EDGE:
-                if (gameMap.roadPlaceable(player, mapPoint)) {
+            }
+            case EDGE: {
+                if (gameMap.getEdge(mapPoint).getOwner() != null) {
+                    LOG.debug("Sending BuildingFailedResponse");
+                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                            BuildingFailedResponse.Reason.ALREADY_BUILD_HERE);
+                    msg.initWithMessage(req);
+                    post(msg);
+                } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
@@ -362,14 +377,23 @@ public class GameService extends AbstractService {
                     post(msg);
                 }
                 break;
-            case HEX:
-            case INVALID:
+            }
+            case HEX: {
                 LOG.debug("Sending BuildingFailedResponse");
                 BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                        BuildingFailedResponse.Reason.CANT_BUILD_HERE);
+                                                                        BuildingFailedResponse.Reason.BAD_GROUND);
                 msg.initWithMessage(req);
                 post(msg);
                 break;
+            }
+            case INVALID: {
+                LOG.debug("Sending BuildingFailedResponse");
+                BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
+                                                                        BuildingFailedResponse.Reason.NOTHING_HERE);
+                msg.initWithMessage(req);
+                post(msg);
+                break;
+            }
         }
     }
 
@@ -760,6 +784,7 @@ public class GameService extends AbstractService {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
+        buildingCurrentlyAllowed = false;
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
@@ -1063,6 +1088,7 @@ public class GameService extends AbstractService {
     private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
+        buildingCurrentlyAllowed = true;
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         if (offeringInventory == null) return;
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
@@ -1157,6 +1183,7 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
+        buildingCurrentlyAllowed = true;
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
 
@@ -1192,6 +1219,7 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
         LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
+        buildingCurrentlyAllowed = false;
         Game game = gameManagement.getGame(req.getName());
         Inventory inventory = game.getInventory(req.getUser());
         Inventory traderInventory = game.getInventory(req.getRespondingUser());
@@ -1221,96 +1249,10 @@ public class GameService extends AbstractService {
         LOG.debug("Received UpdateGameMapRequest");
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (game == null) return;
-        LOG.debug("Sending UpdateGameMapresponse");
+        LOG.debug("Sending UpdateGameMapResponse");
         UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO());
         rsp.initWithMessage(req);
         post(rsp);
-    }
-
-    /**
-     * Handles a UpdateInventoryAfterTradeWithBankRequest found on the EventBus
-     * <p>
-     * If a UpdateInventoryAfterTradeWithBankRequest is found on the EventBus this method updates the inventory
-     * of the player who traded with the bank. If the User has enough resources, the resource he wants to trade gets -4
-     * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
-     *
-     * @param req The UpdateInventoryAfterTradeWithBankRequest found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @see de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest
-     * @see de.uol.swp.common.game.response.TradeWithBankAcceptedResponse
-     * @since 2021-02-21
-     */
-    @Subscribe
-    private void onUpdateInventoryAfterTradeWithBankRequest(UpdateInventoryAfterTradeWithBankRequest req) {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        Inventory inventory = game.getInventory(req.getUser());
-        if (inventory == null) return;
-        Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
-        Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
-        if (req.getGiveResource().equals("ore") && (inventory.getOre() < 4)) return;
-        if (req.getGiveResource().equals("brick") && (inventory.getBrick() < 4)) return;
-        if (req.getGiveResource().equals("grain") && (inventory.getGrain() < 4)) return;
-        if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < 4)) return;
-        if (req.getGiveResource().equals("wool") && (inventory.getWool() < 4)) return;
-
-        if (req.getGetResource().equals("ore")) {
-            inventory.setOre(inventory.getOre() + 1);
-            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 1);
-        }
-        if (req.getGetResource().equals("brick")) {
-            inventory.setBrick(inventory.getBrick() + 1);
-            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 1);
-        }
-        if (req.getGetResource().equals("grain")) {
-            inventory.setGrain(inventory.getGrain() + 1);
-            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 1);
-        }
-        if (req.getGetResource().equals("lumber")) {
-            inventory.setLumber(inventory.getLumber() + 1);
-            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 1);
-        }
-        if (req.getGetResource().equals("wool")) {
-            inventory.setWool(inventory.getWool() + 1);
-            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 1);
-        }
-
-        if (req.getGiveResource().equals("ore")) {
-            inventory.setOre(inventory.getOre() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 4);
-        }
-        if (req.getGiveResource().equals("brick")) {
-            inventory.setBrick(inventory.getBrick() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 4);
-        }
-        if (req.getGiveResource().equals("grain")) {
-            inventory.setGrain(inventory.getGrain() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 4);
-        }
-        if (req.getGiveResource().equals("lumber")) {
-            inventory.setLumber(inventory.getLumber() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 4);
-        }
-        if (req.getGiveResource().equals("wool")) {
-            inventory.setWool(inventory.getWool() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 4);
-        }
-
-        ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
-        returnMessage.initWithMessage(req);
-        post(returnMessage);
-        LOG.debug("Received a SystemMessageForTradeMessage");
-        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser(), "Bank",
-                                                                       offeredResourcesWrapperMap,
-                                                                       respondingResourcesWrapperMap);
-        LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
-        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**

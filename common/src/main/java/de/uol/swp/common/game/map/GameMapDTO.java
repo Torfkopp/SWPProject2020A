@@ -13,8 +13,8 @@ import java.io.Serializable;
  */
 public class GameMapDTO implements IGameMap, Serializable {
 
-    IGameHex[][] hexes;
-    IntersectionWithEdges[][] intersections;
+    private final IGameHex[][] hexes;
+    private final IntersectionWithEdges[][] intersections;
 
     /**
      * Constructor
@@ -27,10 +27,12 @@ public class GameMapDTO implements IGameMap, Serializable {
         this.intersections = intersections;
     }
 
+    @Override
     public IGameHex[][] getHexes() {
         return hexes;
     }
 
+    @Override
     public IntersectionWithEdges[][] getIntersections() {
         return intersections;
     }

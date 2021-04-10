@@ -11,8 +11,8 @@ import java.util.Set;
  */
 public class IntersectionWithEdges implements IIntersectionWithEdges {
 
-    IIntersection intersection;
-    Set<IEdge> edges;
+    private final IIntersection intersection;
+    private final Set<IEdge> edges;
 
     /**
      * Constructor

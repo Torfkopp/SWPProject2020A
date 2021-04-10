@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
- * Sent to the client to update the gamemap
+ * Sent to the client to update the game map
  *
  * @author Aldin Dervisi
  * @author Temmo Junkhoff
@@ -18,8 +18,8 @@ public class UpdateGameMapResponse extends AbstractLobbyResponse {
     /**
      * Constructor
      *
-     * @param lobbyName  The lobbyname
-     * @param gameMapDTO The new gamemap
+     * @param lobbyName  The name of the lobby
+     * @param gameMapDTO The new game map
      */
     public UpdateGameMapResponse(String lobbyName, IGameMap gameMapDTO) {
         super(lobbyName);
@@ -27,9 +27,9 @@ public class UpdateGameMapResponse extends AbstractLobbyResponse {
     }
 
     /**
-     * Gets the new gamemap
+     * Gets the new game map
      *
-     * @return
+     * @return The new game map
      */
     public IGameMap getGameMapDTO() {
         return gameMapDTO;
