@@ -24,7 +24,7 @@ public class ShowTradeWithUserViewEvent {
      *
      * @param offeringUser   User that wants to trade with another user
      * @param lobbyName      Lobby name of the lobby where the player wants to trade
-     * @param respondingUser Name of the user who the offer will be made to
+     * @param respondingUser User who the offer will be made to
      */
     public ShowTradeWithUserViewEvent(UserOrDummy offeringUser, String lobbyName, UserOrDummy respondingUser) {
         this.offeringUser = offeringUser;

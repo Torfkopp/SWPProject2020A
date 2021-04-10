@@ -192,10 +192,10 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * <p>
      * Method called when the TradeBankButton is pressed.
      * This method checks both lists for the selected item.
-     * If there is a selected item in both lists, it posts a ExecuteTradeWithBankRequest
-     * onto the EventBus.
+     * If there is a selected item in both lists, it posts an
+     * ExecuteTradeWithBankRequest onto the EventBus.
      *
-     * @see de.uol.swp.client.lobby.event.LobbyErrorEvent
+     * @see de.uol.swp.client.trade.event.TradeErrorEvent
      * @see de.uol.swp.common.game.request.ExecuteTradeWithBankRequest
      */
     @FXML

@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author Maximilian Lindner
  * @author Phillip-André Suhr
- * @see de.uol.swp.client.game.GameService
+ * @see de.uol.swp.client.trade.TradeService
  * @since 2021-04-07
  */
 public interface ITradeService {

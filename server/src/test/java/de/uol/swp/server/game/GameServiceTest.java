@@ -481,9 +481,9 @@ public class GameServiceTest {
     }
 
     /**
-     * Tests if the gameManagement handles a ExecuteTradeWithBankRequest properly
+     * Tests if the gameManagement handles an ExecuteTradeWithBankRequest properly
      * <p>
-     * A ExecuteTradeWithBankRequest is posted onto the event bus and the user
+     * An ExecuteTradeWithBankRequest is posted onto the event bus and the user
      * wants trade a resource with the bank.
      * <p>
      * This test fails if the users inventory is not updated properly or the User is able to
