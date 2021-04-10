@@ -1,4 +1,6 @@
-package de.uol.swp.common.message;
+package de.uol.swp.common.exception;
+
+import de.uol.swp.common.message.AbstractResponseMessage;
 
 /**
  * Encapsulates an exception in a message object
@@ -31,6 +33,11 @@ public class ExceptionMessage extends AbstractResponseMessage {
      * @since 2017-03-17
      */
     public String getException() {
+        return exception;
+    }
+
+    @Override
+    public String toString() {
         return exception;
     }
 }

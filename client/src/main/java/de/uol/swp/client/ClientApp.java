@@ -9,7 +9,7 @@ import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.exception.ChangeAccountDetailsExceptionMessage;
+import de.uol.swp.common.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.user.response.*;
 import io.netty.channel.Channel;
 import javafx.application.Application;
@@ -107,7 +107,7 @@ public class ClientApp extends Application implements ConnectionListener {
         Thread t = new Thread(() -> {
             try {
                 clientConnection.start();
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
                 exceptionOccurred(e.getMessage());
             }
         });
@@ -159,25 +159,6 @@ public class ClientApp extends Application implements ConnectionListener {
     private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
         LOG.debug("Received AlreadyLoggedInResponse for User " + rsp.getLoggedInUser());
         sceneManager.showLogOldSessionOutScreen(rsp.getLoggedInUser());
-    }
-
-    /**
-     * Handles an unsuccessful account detail changing process
-     * <p>
-     * If an ChangeAccountDetailsExceptionMessage object is detected on the EventBus, this
-     * method is called. It tells the SceneManager to show the sever error alert.
-     *
-     * @param msg The ChangeAccountDetailsExceptionMessage object detected on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-03
-     */
-    @Subscribe
-    private void onChangeAccountDetailsExceptionMessage(ChangeAccountDetailsExceptionMessage msg) {
-        sceneManager.showServerError(msg.toString());
-        LOG.error("Change Account Details error: " + msg);
     }
 
     /**
