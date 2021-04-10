@@ -8,6 +8,8 @@ import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
 import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
+import de.uol.swp.common.exception.ExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.GameMap;
@@ -19,11 +21,9 @@ import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.message.*;
-import de.uol.swp.common.exception.ExceptionMessage;
+import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Dummy;
@@ -276,6 +276,7 @@ public class GameService extends AbstractService {
      * and the previously rolled dice and posts it on the EventBus.
      *
      * @param event The TransferLobbyStateEvent found on the EventBus
+     *
      * @author Marvin Drees
      * @author Maximilian Lindner
      * @since 2021-04-09
@@ -287,7 +288,7 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
                                                                  lobby.getConfiguration(), game.getDices());
         Optional<MessageContext> ctx = event.getMessageContext();
-        if(ctx.isPresent()) {
+        if (ctx.isPresent()) {
             returnMessage.setMessageContext(ctx.get());
             post(returnMessage);
             LOG.debug("Sending a StartSessionResponse");
