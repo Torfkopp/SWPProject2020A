@@ -19,8 +19,7 @@ public interface IHarborHex extends IWaterHex {
         ORE,
         GRAIN,
         WOOL,
-        ANY,
-        NONE
+        ANY
     }
 
     /**

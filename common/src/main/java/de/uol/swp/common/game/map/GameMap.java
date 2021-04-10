@@ -415,7 +415,7 @@ public class GameMap implements IGameMap {
     @Override
     public IHarborHex.HarborResource getHarborResource(MapPoint point) {
         IIntersection intersection = getIntersection(point);
-        if (!harborResourceMap.containsKey(intersection)) return IHarborHex.HarborResource.NONE;
+        if (!harborResourceMap.containsKey(intersection)) return null;
         return harborResourceMap.get(intersection);
     }
 
@@ -445,7 +445,7 @@ public class GameMap implements IGameMap {
      * Helper method to fill the harborResourceMap
      * <p>
      * This method goes through the whole game map and gets all the
-     * harbors with the according intersection and puts them into a
+     * harbors with the according intersections and puts them into a
      * map
      *
      * @author Maximilian Lindner

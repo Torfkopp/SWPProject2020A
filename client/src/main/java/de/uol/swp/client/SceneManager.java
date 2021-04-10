@@ -939,8 +939,10 @@ public class SceneManager {
         LOG.debug("Received TradeCancelEvent");
         String lobby = event.getLobbyName();
         if (tradingStages.containsKey(lobby)) {
-            tradingStages.get(lobby).close();
-            tradingStages.remove(lobby);
+            Platform.runLater(() -> {
+                tradingStages.get(lobby).close();
+                tradingStages.remove(lobby);
+            });
         }
     }
 
