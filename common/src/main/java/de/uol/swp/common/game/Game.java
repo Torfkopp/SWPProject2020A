@@ -6,9 +6,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class for a game
@@ -72,9 +70,9 @@ public class Game {
         //Points made with victory point cards
         points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (players.get(player).isLongestRoad()) points += 2;
+        if (players.get(player).hasLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (players.get(player).isLargestArmy()) points += 2;
+        if (players.get(player).hasLargestArmy()) points += 2;
         return points;
     }
 
@@ -244,6 +242,27 @@ public class Game {
      */
     public UserOrDummy[] getPlayers() {
         return players.getUserOrDummyArray();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
+        Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
+        returnMap.put(false, new Triple<>("game.resources.whohas.longestRoad", null, 0));
+        returnMap.put(true, new Triple<>("game.resources.whohas.largestArmy", null, 0));
+        for (UserOrDummy u : players.getUserOrDummyArray()) {
+            if (players.get(u).hasLongestRoad()) returnMap.put(false ,new Triple<>("game.resources.whohas.longestRoad", u,
+                                                                             getMap().longestRoadsForEachPlayer()
+                                                                                     .get(players.getPlayerFromUserOrDummy(
+                                                                                             u))));
+            if (players.get(u).hasLargestArmy()) returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", u,
+                                                                             getMap().longestRoadsForEachPlayer()
+                                                                                     .get(players.getPlayerFromUserOrDummy(
+                                                                                             u))));
+        }
+        return new LinkedList<>(returnMap.values());
     }
 
     /**

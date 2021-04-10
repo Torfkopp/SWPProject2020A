@@ -12,6 +12,7 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -93,6 +94,80 @@ public class GameService extends AbstractService {
         else if (inventoryMap.get("wool") < neededInventoryMap.get("wool")) return false;
         else if (inventoryMap.get("brick") < neededInventoryMap.get("brick")) return false;
         else return inventoryMap.get("lumber") >= neededInventoryMap.get("lumber");
+    }
+
+    /**
+     * Handles the allocation of the largest Army
+     *
+     * @param lobbyName
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    private void checkLargestArmy(String lobbyName) {
+        Game game = gameManagement.getGame(lobbyName);
+        Inventory[] invs = game.getAllInventories();
+        Inventory largest = null;
+        Inventory currentlyLargest = null;
+        for (Inventory inv : invs) {
+            if (inv.hasLargestArmy()) largest = inv;
+        }
+        if (largest == null) {
+            largest = new Inventory();
+            largest.setKnights(2);
+        }
+
+        for (Inventory inv : invs) {
+            if (inv.getKnights() > largest.getKnights()) currentlyLargest = inv;
+        }
+
+        if (currentlyLargest != null) {
+            currentlyLargest.setLargestArmy(true);
+            largest.setLargestArmy(false);
+        }
+        lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+    }
+
+    /**
+     * Handles the allocation of the longest Road
+     *
+     * @param lobbyName
+     * @author Eric Vuong
+     * @auhtor Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    private void checkLongestRoad(String lobbyName) {
+        Game game = gameManagement.getGame(lobbyName);
+        Map<Player, Integer> roadLengths = game.getMap().longestRoadsForEachPlayer();
+        Map<Player, Inventory> invs = new HashMap<>();
+        for (Player player : roadLengths.keySet())
+            invs.put(player, game.getInventory(player));
+
+        Player longest = null;
+        Player newLongest = null;
+        for (Player p : invs.keySet()) {
+            if (invs.get(p).hasLongestRoad()) longest = p;
+        }
+        if (longest == null) {
+            for (Player p : invs.keySet()) {
+                if (roadLengths.get(p) > 4) {
+                    newLongest = p;
+                }
+            }
+        } else {
+            for (Player p : invs.keySet()) {
+                if (roadLengths.get(p) > roadLengths.get(longest)) {
+                    newLongest = p;
+                }
+            }
+        }
+        if (newLongest != null) {
+            invs.get(newLongest).setLongestRoad(true);
+            if (longest != null) invs.get(longest).setLongestRoad(false);
+        }
+
+        lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
     }
 
     /**
@@ -401,6 +476,7 @@ public class GameService extends AbstractService {
             case "knight":
             case "knights":
                 inventory.increaseKnights(req.getAmount());
+                checkLargestArmy(req.getOriginLobby());
                 break;
             case "monopolycard":
             case "mc":
@@ -425,11 +501,11 @@ public class GameService extends AbstractService {
                 break;
             case "largestarmy":
             case "la":
-                inventory.setLargestArmy(!inventory.isLargestArmy());
+                inventory.setLargestArmy(!inventory.hasLargestArmy());
                 break;
             case "longestroad":
             case "lr":
-                inventory.setLongestRoad(!inventory.isLongestRoad());
+                inventory.setLongestRoad(!inventory.hasLongestRoad());
                 break;
         }
         inventory = game.getInventory(req.getUser());
@@ -441,8 +517,8 @@ public class GameService extends AbstractService {
         resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
 
         Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
-        armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
+        armyAndRoadMap.put("cards.unique.largestarmy", inventory.hasLargestArmy());
+        armyAndRoadMap.put("cards.unique.longestroad", inventory.hasLongestRoad());
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     Collections.unmodifiableMap(resourceMap),
@@ -1129,8 +1205,8 @@ public class GameService extends AbstractService {
         resourceMap.put("cards.monopoly", inventory.getMonopolyCards());
 
         Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("cards.unique.largestarmy", inventory.isLargestArmy());
-        armyAndRoadMap.put("cards.unique.longestroad", inventory.isLongestRoad());
+        armyAndRoadMap.put("cards.unique.largestarmy", inventory.hasLargestArmy());
+        armyAndRoadMap.put("cards.unique.longestroad", inventory.hasLongestRoad());
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     Collections.unmodifiableMap(resourceMap),

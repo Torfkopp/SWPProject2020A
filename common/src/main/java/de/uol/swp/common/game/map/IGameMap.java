@@ -3,6 +3,7 @@ package de.uol.swp.common.game.map;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,6 +28,16 @@ public interface IGameMap {
      * @since 2021-03-18
      */
     IGameMap createMapFromConfiguration(IConfiguration configuration);
+
+    /**
+     * Returns a map with the length of the longest road for each player
+     *
+     * @return A map with the length of the longest road for each player
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    Map<Player, Integer> longestRoadsForEachPlayer();
 
     /**
      * Creates the beginner map configuration

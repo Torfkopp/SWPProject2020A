@@ -371,7 +371,7 @@ public class Inventory {
      *
      * @return true if the player has the "Largest Army" card, false if not
      */
-    public boolean isLargestArmy() {
+    public boolean hasLargestArmy() {
         return largestArmy;
     }
 
@@ -389,7 +389,7 @@ public class Inventory {
      *
      * @return true if the player has the "Longest Road" card, false if not
      */
-    public boolean isLongestRoad() {
+    public boolean hasLongestRoad() {
         return longestRoad;
     }
 
