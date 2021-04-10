@@ -10,7 +10,6 @@ import de.uol.swp.common.game.request.ExecuteTradeWithBankRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
-import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
