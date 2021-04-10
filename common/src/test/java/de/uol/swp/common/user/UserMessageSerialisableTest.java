@@ -1,7 +1,7 @@
 package de.uol.swp.common.user;
 
 import de.uol.swp.common.SerialisationTestHelper;
-import de.uol.swp.common.user.exception.RegistrationExceptionMessage;
+import de.uol.swp.common.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.message.UsersListMessage;

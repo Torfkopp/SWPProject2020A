@@ -1,13 +1,11 @@
-package de.uol.swp.common.user.exception;
-
-import de.uol.swp.common.message.ExceptionMessage;
+package de.uol.swp.common.exception;
 
 /**
  * This exception is thrown if something went wrong during the deletion process,
  * e.g. the username doesn't exist.
  *
  * @author Phillip-André Suhr
- * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @see de.uol.swp.common.exception.ExceptionMessage
  * @since 2020-11-02
  */
 public class UserDeletionExceptionMessage extends ExceptionMessage {

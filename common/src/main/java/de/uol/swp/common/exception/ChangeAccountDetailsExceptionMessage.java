@@ -1,6 +1,4 @@
-package de.uol.swp.common.user.exception;
-
-import de.uol.swp.common.message.AbstractResponseMessage;
+package de.uol.swp.common.exception;
 
 /**
  * This exception is thrown if something went wrong during the ChangeAccountDetails process,
@@ -8,12 +6,10 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  *
  * @author Steven Luong
  * @author Eric Vuong
- * @see de.uol.swp.common.message.AbstractResponseMessage
+ * @see de.uol.swp.common.exception.ExceptionMessage
  * @since 2020-12-03
  */
-public class ChangeAccountDetailsExceptionMessage extends AbstractResponseMessage {
-
-    private final String message;
+public class ChangeAccountDetailsExceptionMessage extends ExceptionMessage {
 
     /**
      * Constructor
@@ -23,11 +19,6 @@ public class ChangeAccountDetailsExceptionMessage extends AbstractResponseMessag
      * @since 2020-12-03
      */
     public ChangeAccountDetailsExceptionMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String toString() {
-        return message;
+        super(message);
     }
 }

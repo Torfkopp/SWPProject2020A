@@ -11,8 +11,8 @@ import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
-import de.uol.swp.common.message.ExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
+import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -135,7 +135,7 @@ public class ChatService extends AbstractService {
                 ServerMessage returnMessage = new DeletedChatMessageMessage(req.getId());
                 sendToAll(returnMessage);
             }
-        } catch (Exception e) {
+        } catch (ChatManagementException e) {
             LOG.error(e);
         }
     }
@@ -181,7 +181,7 @@ public class ChatService extends AbstractService {
                 ServerMessage returnMessage = new EditedChatMessageMessage(chatMessage);
                 sendToAll(returnMessage);
             }
-        } catch (Exception e) {
+        } catch (ChatManagementException e) {
             LOG.error(e);
         }
     }
@@ -230,7 +230,7 @@ public class ChatService extends AbstractService {
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
      * @see de.uol.swp.server.devmenu.CommandService
-     * @see de.uol.swp.common.lobby.message.LobbyExceptionMessage
+     * @see de.uol.swp.common.exception.LobbyExceptionMessage
      * @since 2020-12-17
      */
     @Subscribe
@@ -263,7 +263,7 @@ public class ChatService extends AbstractService {
                 ServerMessage returnMessage = new CreatedChatMessageMessage(chatMessage);
                 sendToAll(returnMessage);
             }
-        } catch (Exception e) {
+        } catch (ChatManagementException e) {
             LOG.error(e);
         }
     }
