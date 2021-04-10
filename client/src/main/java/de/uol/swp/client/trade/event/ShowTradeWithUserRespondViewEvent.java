@@ -16,22 +16,19 @@ import de.uol.swp.common.user.UserOrDummy;
 public class ShowTradeWithUserRespondViewEvent {
 
     private final UserOrDummy offeringUser;
-    private final UserOrDummy respondingUser;
     private final String lobbyName;
     private final TradeWithUserOfferResponse rsp;
 
     /**
      * Constructor
      *
-     * @param offeringUser   The User that sends the trading offer
-     * @param respondingUser The user that receives the trading offer
-     * @param lobbyName      The Name of the Lobby
-     * @param rsp            The Response found on the EventBus
+     * @param offeringUser The User that sends the trading offer
+     * @param lobbyName    The Name of the Lobby
+     * @param rsp          The Response found on the EventBus
      */
-    public ShowTradeWithUserRespondViewEvent(UserOrDummy offeringUser, UserOrDummy respondingUser, String lobbyName,
+    public ShowTradeWithUserRespondViewEvent(UserOrDummy offeringUser, String lobbyName,
                                              TradeWithUserOfferResponse rsp) {
         this.offeringUser = offeringUser;
-        this.respondingUser = respondingUser;
         this.lobbyName = lobbyName;
         this.rsp = rsp;
     }
@@ -53,15 +50,6 @@ public class ShowTradeWithUserRespondViewEvent {
      */
     public UserOrDummy getOfferingUser() {
         return offeringUser;
-    }
-
-    /**
-     * Gets the username of the user that receives the trading offer
-     *
-     * @return Username of the user that receives the trading offer
-     */
-    public UserOrDummy getRespondingUser() {
-        return respondingUser;
     }
 
     /**

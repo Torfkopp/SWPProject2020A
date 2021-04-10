@@ -8,8 +8,12 @@ import com.google.inject.name.Names;
 import de.uol.swp.client.*;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.client.game.GameService;
+import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.trade.ITradeService;
+import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.ClientUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
@@ -82,10 +86,10 @@ public class ClientModule extends AbstractModule {
         final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
 
         //DI stuff
-        install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class).
-                build(SceneManagerFactory.class));
-        install(new FactoryModuleBuilder().implement(ClientConnection.class, ClientConnection.class).
-                build(ClientConnectionFactory.class));
+        install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class)
+                                          .build(SceneManagerFactory.class));
+        install(new FactoryModuleBuilder().implement(ClientConnection.class, ClientConnection.class)
+                                          .build(ClientConnectionFactory.class));
         bind(FXMLLoader.class).toProvider(FXMLLoaderProvider.class);
         bind(EventBus.class).toInstance(eventBus);
         bind(Properties.class).toInstance(properties);
@@ -95,7 +99,9 @@ public class ClientModule extends AbstractModule {
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
+        bind(IGameService.class).to(GameService.class).in(Scopes.SINGLETON);
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
+        bind(ITradeService.class).to(TradeService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(ClientApp.class);
         requestStaticInjection(I18nWrapper.class);

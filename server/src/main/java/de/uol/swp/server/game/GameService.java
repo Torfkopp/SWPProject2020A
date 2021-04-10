@@ -17,12 +17,13 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.lobby.message.LobbyExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.message.ExceptionMessage;
+import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
@@ -93,6 +94,28 @@ public class GameService extends AbstractService {
         else if (inventoryMap.get("wool") < neededInventoryMap.get("wool")) return false;
         else if (inventoryMap.get("brick") < neededInventoryMap.get("brick")) return false;
         else return inventoryMap.get("lumber") >= neededInventoryMap.get("lumber");
+    }
+
+    /**
+     * Helper method to handle ending the game if the last change to the
+     * inventory pushed the player over the edge in terms of Victory Points
+     *
+     * @param game        The game in which the player might have won
+     * @param originLobby The lobby in which the game is taking place
+     * @param user        The use who might have won
+     *
+     * @author Phillip-André Suhr
+     * @author Steven Luong
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-04-07
+     */
+    private void endGameIfPlayerWon(Game game, String originLobby, UserOrDummy user) {
+        int vicPoints = game.calculateVictoryPoints(game.getPlayer(user));
+        if (vicPoints >= 10) {
+            ServerMessage message = new PlayerWonGameMessage(originLobby, user);
+            lobbyService.sendToAllInLobby(originLobby, message);
+            gameManagement.dropGame(originLobby);
+        }
     }
 
     /**
@@ -387,34 +410,9 @@ public class GameService extends AbstractService {
                                                                  game.getCardAmounts());
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
             } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
                                                                                         .getUsername() + "couldn't buy a development Card");
-        }
-    }
-
-    /**
-     * Handles a CheckVictoryPointsRequest found on the EventBus
-     * If a CheckVictoryPointsRequest is found on the EventBus, this method
-     * checks if the player has 10 or more victory points. If he has 10 ore more
-     * victory points, a new PlayerWonGameMessage is sent to all lobby members
-     * and the GameManagement drops the game.
-     *
-     * @param req The CheckVictoryPointsRequest found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.request.CheckVictoryPointsRequest
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onCheckVictoryPointsRequest(CheckVictoryPointsRequest req) {
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        int vicPoints = game.calculateVictoryPoints(game.getPlayer(req.getUser()));
-        if (vicPoints >= 10) {
-            ServerMessage message = new PlayerWonGameMessage(req.getOriginLobby(), req.getUser());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), message);
-            gameManagement.dropGame(req.getOriginLobby());
         }
     }
 
@@ -560,6 +558,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -587,11 +586,95 @@ public class GameService extends AbstractService {
         LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
 
-        if (nextPlayer instanceof User) {
-        } else { //Dummy
+        if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
         }
+    }
+
+    /**
+     * Handles a ExecuteTradeWithBankRequest found on the EventBus
+     * <p>
+     * If a ExecuteTradeWithBankRequest is found on the EventBus this method updates the inventory
+     * of the player who traded with the bank. If the User has enough resources, the resource he wants to trade gets -4
+     * and the resource he wants gets +1. It then posts a TradeWithBankAcceptedResponse onto the EventBus.
+     *
+     * @param req The ExecuteTradeWithBankRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.request.ExecuteTradeWithBankRequest
+     * @see de.uol.swp.common.game.response.TradeWithBankAcceptedResponse
+     * @since 2021-02-21
+     */
+    @Subscribe
+    private void onExecuteTradeWithBankRequest(ExecuteTradeWithBankRequest req) {
+        if (LOG.isDebugEnabled()) LOG.debug("Received ExecuteTradeWithBankRequest for Lobby " + req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Inventory inventory = game.getInventory(req.getUser());
+        if (inventory == null) return;
+        Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
+        Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
+        if (req.getGiveResource().equals("ore") && (inventory.getOre() < 4)) return;
+        if (req.getGiveResource().equals("brick") && (inventory.getBrick() < 4)) return;
+        if (req.getGiveResource().equals("grain") && (inventory.getGrain() < 4)) return;
+        if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < 4)) return;
+        if (req.getGiveResource().equals("wool") && (inventory.getWool() < 4)) return;
+
+        if (req.getGetResource().equals("ore")) {
+            inventory.setOre(inventory.getOre() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 1);
+        }
+        if (req.getGetResource().equals("brick")) {
+            inventory.setBrick(inventory.getBrick() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 1);
+        }
+        if (req.getGetResource().equals("grain")) {
+            inventory.setGrain(inventory.getGrain() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 1);
+        }
+        if (req.getGetResource().equals("lumber")) {
+            inventory.setLumber(inventory.getLumber() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 1);
+        }
+        if (req.getGetResource().equals("wool")) {
+            inventory.setWool(inventory.getWool() + 1);
+            respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 1);
+        }
+
+        if (req.getGiveResource().equals("ore")) {
+            inventory.setOre(inventory.getOre() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 4);
+        }
+        if (req.getGiveResource().equals("brick")) {
+            inventory.setBrick(inventory.getBrick() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 4);
+        }
+        if (req.getGiveResource().equals("grain")) {
+            inventory.setGrain(inventory.getGrain() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 4);
+        }
+        if (req.getGiveResource().equals("lumber")) {
+            inventory.setLumber(inventory.getLumber() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 4);
+        }
+        if (req.getGiveResource().equals("wool")) {
+            inventory.setWool(inventory.getWool() - 4);
+            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 4);
+        }
+
+        ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+        LOG.debug("Received a SystemMessageForTradeMessage");
+        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser(), "Bank",
+                                                                       offeredResourcesWrapperMap,
+                                                                       respondingResourcesWrapperMap);
+        LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -736,6 +819,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -871,6 +955,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**
@@ -1271,6 +1356,7 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+        endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
 
     /**

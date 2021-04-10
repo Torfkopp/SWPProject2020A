@@ -4,19 +4,24 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest;
 import de.uol.swp.common.message.*;
-import de.uol.swp.common.user.Session;
+import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.LogoutRequest;
 import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
+import de.uol.swp.server.sessionmanagement.ISessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -37,14 +42,14 @@ public class ServerHandler implements ServerHandlerDelegate {
     private final List<MessageContext> connectedClients = new CopyOnWriteArrayList<>();
 
     /**
-     * Clients with logged in sessions
-     */
-    private final Map<MessageContext, Session> activeSessions = new HashMap<>();
-
-    /**
      * Event bus (injected)
      */
     private final EventBus eventBus;
+
+    /**
+     * SessionManagement (injected)
+     */
+    private final ISessionManagement sessionManagement;
 
     /**
      * Constructor
@@ -54,22 +59,63 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @see com.google.common.eventbus.EventBus
      */
     @Inject
-    public ServerHandler(EventBus eventBus) {
+    public ServerHandler(EventBus eventBus, SessionManagement sessionManagement) {
         this.eventBus = eventBus;
         eventBus.register(this);
+        this.sessionManagement = sessionManagement;
+    }
+
+    @Override
+    public void clientDisconnected(MessageContext ctx) {
+        LOG.debug("Client disconnected");
+        if (sessionManagement.getSession(ctx).isPresent()) {
+            Session session = sessionManagement.getSession(ctx).get();
+            Message msg = new ClientDisconnectedMessage();
+            msg.setSession(session);
+            eventBus.post(msg);
+            sessionManagement.removeSession(ctx);
+        }
+        connectedClients.remove(ctx);
+    }
+
+    @Override
+    public void newClientConnected(MessageContext ctx) {
+        LOG.debug("New client " + ctx + " connected");
+        connectedClients.add(ctx);
     }
 
     @Override
     public void process(RequestMessage msg) {
         LOG.debug("Received new message from client " + msg);
         try {
-            //Code Analysis says: "'Optional.get()' without 'isPresent()' check" -Wario
             checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
             eventBus.post(msg);
-        } catch (Exception e) {
+        } catch (SecurityException e) {
             LOG.error("ServerException " + e.getClass().getName() + " " + e.getMessage());
-            //same as above
             sendToClient(msg.getMessageContext().get(), new ExceptionMessage(e.getMessage()));
+        }
+    }
+
+    /**
+     * Sends a PingMessage onto the Eventbus
+     * <p>
+     * This method is responsible for sending a PingMessage to the
+     * clients. It gets invoked by an IdleEventHandler.
+     *
+     * @param ctx Message context to determine the clients
+     *
+     * @author Marvin Drees
+     * @author Aldin Dervisi
+     * @since 2021-03-18
+     */
+    public void sendPingMessage(MessageContext ctx) {
+        if (sessionManagement.getSession(ctx).isPresent()) {
+            Session session = sessionManagement.getSession(ctx).get();
+            ResponseMessage msg = new PingMessage();
+            msg.setSession(null);
+            msg.setMessageContext(null);
+            LOG.debug("Send to client " + ctx + " message " + msg);
+            sendToClient(ctx, msg);
         }
     }
 
@@ -84,74 +130,53 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     private void checkIfMessageNeedsAuthorisation(MessageContext ctx, RequestMessage msg) {
         if (msg.authorisationNeeded()) {
-            if (getSession(ctx).isEmpty()) {
+            if (sessionManagement.getSession(ctx).isEmpty()) {
                 throw new SecurityException("Authorisation required. Client not logged in!");
             }
-            msg.setSession(getSession(ctx).get());
+            msg.setSession(sessionManagement.getSession(ctx).get());
         }
     }
 
     /**
-     * Handles errors produced by the EventBus
-     * <p>
-     * If an DeadEvent object is detected on the EventBus, this method is called.
-     * It writes "DeadEvent detected " and the error message of the detected DeadEvent
-     * object to the log if the loglevel is set to WARN or higher.
+     * Gets MessageContext from the message
      *
-     * @param deadEvent The DeadEvent object found on the EventBus
+     * @param message Message to get the MessageContext from
      *
+     * @return Optional Object containing the MessageContext if there is any
+     *
+     * @see de.uol.swp.common.message.Message
+     * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
      */
-    @Subscribe
-    private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.error("DeadEvent detected " + deadEvent);
+    private Optional<MessageContext> getCtx(Message message) {
+        if (message.getMessageContext().isPresent()) {
+            return message.getMessageContext();
+        }
+        if (message.getSession().isPresent()) {
+            return sessionManagement.getCtx(message.getSession().get());
+        }
+        return Optional.empty();
     }
 
     /**
-     * Handles exceptions on the Server
-     * <p>
-     * If a ServerExceptionMessage is detected on the EventBus, this method is called.
-     * It sends the ServerExceptionMessage to the affiliated client
-     * if a client is affiliated.
+     * Gets the MessageContexts for specified receivers
      *
-     * @param msg The ServerExceptionMessage found on the EventBus
+     * @param receiver A list containing the sessions of the users to search
      *
+     * @return List of MessageContexts for the given sessions
+     *
+     * @see de.uol.swp.common.sessions.Session
+     * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
      */
-    @Subscribe
-    private void onServerException(ServerExceptionMessage msg) {
-        Optional<MessageContext> ctx = getCtx(msg);
-        LOG.error(msg.getException());
-        ctx.ifPresent(channelHandlerContext -> sendToClient(channelHandlerContext,
-                                                            new ExceptionMessage(msg.getException().getMessage())));
+    private List<MessageContext> getCtx(Iterable<Session> receiver) {
+        List<MessageContext> ctxs = new ArrayList<>();
+        receiver.forEach(r -> {
+            Optional<MessageContext> s = sessionManagement.getCtx(r);
+            s.ifPresent(ctxs::add);
+        });
+        return ctxs;
     }
-
-    // -------------------------------------------------------------------------------
-    // Handling of connected clients
-    // -------------------------------------------------------------------------------
-
-    @Override
-    public void clientDisconnected(MessageContext ctx) {
-        LOG.debug("Client disconnected");
-        Session session = this.activeSessions.get(ctx);
-        if (session != null) {
-            Message msg = new ClientDisconnectedMessage();
-            msg.setSession(session);
-            eventBus.post(msg);
-            removeSession(ctx);
-        }
-        connectedClients.remove(ctx);
-    }
-
-    @Override
-    public void newClientConnected(MessageContext ctx) {
-        LOG.debug("New client " + ctx + " connected");
-        connectedClients.add(ctx);
-    }
-
-    // -------------------------------------------------------------------------------
-    // User Management Events (from event bus)
-    // -------------------------------------------------------------------------------
 
     /**
      * Handles ClientAuthorisedMessages found on the EventBus
@@ -176,126 +201,13 @@ public class ServerHandler implements ServerHandlerDelegate {
             if (msg.hasOldSession()) {
                 sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
             } else {
-                putSession(ctx.get(), msg.getSession().get());
+                sessionManagement.putSession(ctx.get(), msg.getSession().get());
                 sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
                 sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
             }
         } else {
             LOG.warn("No context for " + msg);
         }
-    }
-
-    /**
-     * Handles a FetchUserContextInternalRequest found on the EventBus
-     * <p>
-     * If a FetchUserContextInternalRequest is detected on the EventBus
-     * this method gets the MessageContext associated with the provided
-     * Session object and sends the Message contained in the
-     * FetchUserContextInternalRequest to the specified client.
-     *
-     * @param req FetchUserContextInternalRequest found on the EventBus
-     *
-     * @author Phillip-André Suhr
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
-     * @since 2021-02-25
-     */
-    @Subscribe
-    private void onFetchUserContextInternalRequest(FetchUserContextInternalRequest req) {
-        Optional<MessageContext> ctx = getCtx(req.getUserSession());
-        ctx.ifPresent(messageContext -> sendToClient(messageContext, req.getReturnMessage()));
-    }
-
-    /**
-     * Handles an UserLoggedOutMessages found on the EventBus
-     * <p>
-     * If an UserLoggedOutMessage is detected on the EventBus, this method is called.
-     * It gets the MessageContext and then gives the message to sendMessage
-     * in order to send it to the connected client.
-     *
-     * @param msg The UserLoggedOutMessage found on the EventBus
-     *
-     * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
-     * @since 2019-11-20
-     */
-    @Subscribe
-    private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
-        Optional<MessageContext> ctx = getCtx(msg);
-        ctx.ifPresent(this::removeSession);
-        sendMessage(msg);
-    }
-
-    // -------------------------------------------------------------------------------
-    // ResponseEvents
-    // -------------------------------------------------------------------------------
-
-    /**
-     * Handles a ResponseMessages found on the EventBus
-     * <p>
-     * If a ResponseMessage is detected on the EventBus, this method is called.
-     * It gets the MessageContext, then gives it and the ResponseMessage to sendToClient.
-     *
-     * @param msg The ResponseMessage found on the EventBus
-     *
-     * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
-     * @since 2019-11-20
-     */
-    @Subscribe
-    private void onResponseMessage(ResponseMessage msg) {
-        Optional<MessageContext> ctx = getCtx(msg);
-        if (ctx.isPresent()) {
-            msg.setSession(null);
-            msg.setMessageContext(null);
-            LOG.debug("Send to client " + ctx.get() + " message " + msg);
-            sendToClient(ctx.get(), msg);
-        }
-    }
-
-    // -------------------------------------------------------------------------------
-    // ServerMessages
-    // -------------------------------------------------------------------------------
-
-    /**
-     * Handles a ServerMessages found on the EventBus
-     * <p>
-     * If a ServerMessage is detected on the EventBus, this method is called.
-     * It sets the Session and MessageContext to null, then gives the message
-     * to sendMessage in order to send it to all connected clients.
-     *
-     * @param msg The ServerMessage found on the EventBus
-     *
-     * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
-     * @since 2019-11-20
-     */
-    @Subscribe
-    private void onServerMessage(ServerMessage msg) {
-        msg.setSession(null);
-        msg.setMessageContext(null);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Send " + msg + " to " + (msg.getReceiver().isEmpty() || msg.getReceiver() == null ? "all" :
-                                                msg.getReceiver()));
-        }
-        sendMessage(msg);
-    }
-
-    /**
-     * Handles a PongMessage found on the EventBus
-     * <p>
-     * If a PongMessage is detected on the EventBus, this method is called.
-     * It simply logs the fact that it received the message as this
-     * message is only used to keep the connection alive.
-     *
-     * @param msg The PongMessage found on the EventBus
-     *
-     * @author Aldin Dervisi
-     * @author Marvin Drees
-     * @see de.uol.swp.common.message.PongMessage
-     * @since 2021-03-18
-     */
-    @Subscribe
-    private void onPongMessage(PongMessage msg) {
-        if (msg.getSession().isPresent()) LOG.info("Client pong received from " + msg.getSession().get());
     }
 
     /**
@@ -321,141 +233,149 @@ public class ServerHandler implements ServerHandlerDelegate {
             req.setSession(msg.getSession().get());
             eventBus.post(req);
             Optional<MessageContext> ctx = getCtx(msg);
-            ctx.ifPresent(this::removeSession);
+            ctx.ifPresent(sessionManagement::removeSession);
         }
     }
 
     /**
-     * Sends a PingMessage onto the Eventbus
+     * Handles errors produced by the EventBus
      * <p>
-     * This method is responsible for sending a PingMessage to the
-     * clients. It gets invoked by an IdleEventHandler.
+     * If an DeadEvent object is detected on the EventBus, this method is called.
+     * It writes "DeadEvent detected " and the error message of the detected DeadEvent
+     * object to the log if the loglevel is set to WARN or higher.
      *
-     * @param ctx Message context to determine the clients
+     * @param deadEvent The DeadEvent object found on the EventBus
      *
-     * @author Marvin Drees
+     * @since 2019-11-20
+     */
+    @Subscribe
+    private void onDeadEvent(DeadEvent deadEvent) {
+        LOG.error("DeadEvent detected " + deadEvent);
+    }
+
+    /**
+     * Handles a FetchUserContextInternalRequest found on the EventBus
+     * <p>
+     * If a FetchUserContextInternalRequest is detected on the EventBus
+     * this method gets the MessageContext associated with the provided
+     * Session object and sends the Message contained in the
+     * FetchUserContextInternalRequest to the specified client.
+     *
+     * @param req FetchUserContextInternalRequest found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @see de.uol.swp.server.message.FetchUserContextInternalRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onFetchUserContextInternalRequest(FetchUserContextInternalRequest req) {
+        Optional<MessageContext> ctx = sessionManagement.getCtx(req.getUserSession());
+        ctx.ifPresent(messageContext -> sendToClient(messageContext, req.getReturnMessage()));
+    }
+
+    /**
+     * Handles a PongMessage found on the EventBus
+     * <p>
+     * If a PongMessage is detected on the EventBus, this method is called.
+     * It simply logs the fact that it received the message as this
+     * message is only used to keep the connection alive.
+     *
+     * @param msg The PongMessage found on the EventBus
+     *
      * @author Aldin Dervisi
+     * @author Marvin Drees
+     * @see de.uol.swp.common.message.PongMessage
      * @since 2021-03-18
      */
-    public void sendPingMessage(MessageContext ctx) {
-        Session session = this.activeSessions.get(ctx);
-        if (session != null) {
-            ResponseMessage msg = new PingMessage();
+    @Subscribe
+    private void onPongMessage(PongMessage msg) {
+        if (msg.getSession().isPresent()) LOG.info("Client pong received from " + msg.getSession().get());
+    }
+
+    /**
+     * Handles a ResponseMessages found on the EventBus
+     * <p>
+     * If a ResponseMessage is detected on the EventBus, this method is called.
+     * It gets the MessageContext, then gives it and the ResponseMessage to sendToClient.
+     *
+     * @param msg The ResponseMessage found on the EventBus
+     *
+     * @see de.uol.swp.server.communication.ServerHandler#sendToClient(MessageContext, ResponseMessage)
+     * @since 2019-11-20
+     */
+    @Subscribe
+    private void onResponseMessage(ResponseMessage msg) {
+        Optional<MessageContext> ctx = getCtx(msg);
+        if (ctx.isPresent()) {
             msg.setSession(null);
             msg.setMessageContext(null);
-            LOG.debug("Send to client " + ctx + " message " + msg);
-            sendToClient(ctx, msg);
+            LOG.debug("Send to client " + ctx.get() + " message " + msg);
+            sendToClient(ctx.get(), msg);
         }
     }
 
-    // -------------------------------------------------------------------------------
-    // Session Management (helper methods)
-    // -------------------------------------------------------------------------------
-
     /**
-     * Gets MessageContext from the message
+     * Handles exceptions on the Server
+     * <p>
+     * If a ServerExceptionMessage is detected on the EventBus, this method is called.
+     * It sends the ServerExceptionMessage to the affiliated client
+     * if a client is affiliated.
      *
-     * @param message Message to get the MessageContext from
+     * @param msg The ServerExceptionMessage found on the EventBus
      *
-     * @return Optional Object containing the MessageContext if there is any
-     *
-     * @see de.uol.swp.common.message.Message
-     * @see de.uol.swp.common.message.MessageContext
      * @since 2019-11-20
      */
-    private Optional<MessageContext> getCtx(Message message) {
-        if (message.getMessageContext().isPresent()) {
-            return message.getMessageContext();
+    @Subscribe
+    private void onServerException(ServerExceptionMessage msg) {
+        Optional<MessageContext> ctx = getCtx(msg);
+        LOG.error(msg.getException());
+        ctx.ifPresent(channelHandlerContext -> sendToClient(channelHandlerContext,
+                                                            new ExceptionMessage(msg.getException().getMessage())));
+    }
+
+    /**
+     * Handles a ServerMessages found on the EventBus
+     * <p>
+     * If a ServerMessage is detected on the EventBus, this method is called.
+     * It sets the Session and MessageContext to null, then gives the message
+     * to sendMessage in order to send it to all connected clients.
+     *
+     * @param msg The ServerMessage found on the EventBus
+     *
+     * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
+     * @since 2019-11-20
+     */
+    @Subscribe
+    private void onServerMessage(ServerMessage msg) {
+        msg.setSession(null);
+        msg.setMessageContext(null);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Send " + msg + " to " + (msg.getReceiver().isEmpty() || msg.getReceiver() == null ? "all" :
+                                                msg.getReceiver()));
         }
-        if (message.getSession().isPresent()) {
-            return getCtx(message.getSession().get());
-        }
-        return Optional.empty();
+        sendMessage(msg);
     }
 
     /**
-     * Gets MessageContext for a specified receiver
+     * Handles an UserLoggedOutMessages found on the EventBus
+     * <p>
+     * If an UserLoggedOutMessage is detected on the EventBus, this method is called.
+     * It gets the MessageContext and then gives the message to sendMessage
+     * in order to send it to the connected client.
      *
-     * @param session Session of the user to search
+     * @param msg The UserLoggedOutMessage found on the EventBus
      *
-     * @return Optional Object containing the MessageContext if there is any
-     *
-     * @see de.uol.swp.common.user.Session
-     * @see de.uol.swp.common.message.MessageContext
+     * @see de.uol.swp.server.communication.ServerHandler#sendMessage(ServerMessage)
      * @since 2019-11-20
      */
-    private Optional<MessageContext> getCtx(Session session) {
-        for (Map.Entry<MessageContext, Session> e : activeSessions.entrySet()) {
-            if (e.getValue().equals(session)) {
-                return Optional.of(e.getKey());
-            }
-        }
-        return Optional.empty();
+    @Subscribe
+    private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
+        Optional<MessageContext> ctx = getCtx(msg);
+        ctx.ifPresent(sessionManagement::removeSession);
+        sendMessage(msg);
     }
-
-    /**
-     * Gets the MessageContexts for specified receivers
-     *
-     * @param receiver A list containing the sessions of the users to search
-     *
-     * @return List of MessageContexts for the given sessions
-     *
-     * @see de.uol.swp.common.user.Session
-     * @see de.uol.swp.common.message.MessageContext
-     * @since 2019-11-20
-     */
-    private List<MessageContext> getCtx(Iterable<Session> receiver) {
-        List<MessageContext> ctxs = new ArrayList<>();
-        receiver.forEach(r -> {
-            Optional<MessageContext> s = getCtx(r);
-            s.ifPresent(ctxs::add);
-        });
-        return ctxs;
-    }
-
-    /**
-     * Gets the session for a given MessageContext
-     *
-     * @param ctx The MessageContext
-     *
-     * @return Optional Object containing the session if found
-     *
-     * @see de.uol.swp.common.user.Session
-     * @see de.uol.swp.common.message.MessageContext
-     * @since 2019-11-20
-     */
-    private Optional<Session> getSession(MessageContext ctx) {
-        Session session = activeSessions.get(ctx);
-        return session != null ? Optional.of(session) : Optional.empty();
-    }
-
-    /**
-     * Adds a new session to the active sessions
-     *
-     * @param ctx        The MessageContext belonging to the session
-     * @param newSession The Session to add
-     *
-     * @since 2019-11-20
-     */
-    private void putSession(MessageContext ctx, Session newSession) {
-        // TODO: check if session is already bound to connection
-        activeSessions.put(ctx, newSession);
-    }
-
-    /**
-     * Removes a session specified by MessageContext from the active sessions
-     *
-     * @param ctx the MessageContext
-     *
-     * @since 2019-11-20
-     */
-    private void removeSession(MessageContext ctx) {
-        activeSessions.remove(ctx);
-    }
-
-    // -------------------------------------------------------------------------------
-    // Help methods: Send only objects of type Message
-    // -------------------------------------------------------------------------------
 
     /**
      * Sends a ServerMessage either to a specified receiver or to all connected clients
@@ -503,6 +423,7 @@ public class ServerHandler implements ServerHandlerDelegate {
             try {
                 client.writeAndFlush(msg);
             } catch (Exception e) {
+                // UwU what is thrown here?
                 // TODO: Handle exceptions for unreachable clients
                 e.printStackTrace();
             }

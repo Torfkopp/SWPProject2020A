@@ -20,8 +20,8 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      * Constructor
      *
      * @param name           The Name of the lobby
-     * @param user           The User who wants to start a game session
-     * @param tradingPartner The username of the trading partner
+     * @param user           The User who is making a trade offer
+     * @param tradingPartner The trading partner
      */
     public TradeWithUserRequest(String name, UserOrDummy user, UserOrDummy tradingPartner) {
         super(name, user);

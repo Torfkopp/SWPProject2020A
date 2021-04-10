@@ -39,7 +39,7 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public ChatMessage createChatMessage(User author, String content) {
+    public ChatMessage createChatMessage(User author, String content) throws ChatManagementException {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
         } else if (author == null) {
@@ -49,7 +49,8 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public ChatMessage createChatMessage(User author, String content, String originLobby) {
+    public ChatMessage createChatMessage(User author, String content,
+                                         String originLobby) throws ChatManagementException {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
         } else if (author == null) {
@@ -59,7 +60,7 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public void dropChatMessage(int id) {
+    public void dropChatMessage(int id) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");
@@ -68,7 +69,7 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public void dropChatMessage(int id, String originLobby) {
+    public void dropChatMessage(int id, String originLobby) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");
@@ -102,7 +103,8 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public ChatMessage updateChatMessage(int id, String updatedContent, String originLobby) {
+    public ChatMessage updateChatMessage(int id, String updatedContent,
+                                         String originLobby) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");
@@ -111,7 +113,7 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public ChatMessage updateChatMessage(int id, String updatedContent) {
+    public ChatMessage updateChatMessage(int id, String updatedContent) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");

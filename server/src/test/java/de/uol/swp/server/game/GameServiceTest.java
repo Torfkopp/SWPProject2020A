@@ -6,10 +6,10 @@ import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
+import de.uol.swp.common.game.request.ExecuteTradeWithBankRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
-import de.uol.swp.common.game.request.UpdateInventoryAfterTradeWithBankRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.request.KickUserRequest;
@@ -20,6 +20,7 @@ import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
 import de.uol.swp.server.usermanagement.AuthenticationService;
 import de.uol.swp.server.usermanagement.UserManagement;
 import de.uol.swp.server.usermanagement.store.MainMemoryBasedUserStore;
@@ -47,8 +48,10 @@ public class GameServiceTest {
     private final UserStore userStore = new MainMemoryBasedUserStore();
     private final UserManagement userManagement = new UserManagement(userStore);
     private final ILobbyManagement lobbyManagement = new LobbyManagement();
-    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement);
-    private final LobbyService lobbyService = new LobbyService(lobbyManagement, authenticationService, bus);
+    private final SessionManagement sessionManagement = new SessionManagement();
+    private final LobbyService lobbyService = new LobbyService(lobbyManagement, sessionManagement, bus);
+    private final AuthenticationService authenticationService = new AuthenticationService(bus, userManagement,
+                                                                                          sessionManagement);
     private IGameManagement gameManagement;
     private GameService gameService;
 
@@ -478,9 +481,9 @@ public class GameServiceTest {
     }
 
     /**
-     * Tests if the gameManagement handles a UpdateInventoryAfterTradeWithBankRequest properly
+     * Tests if the gameManagement handles an ExecuteTradeWithBankRequest properly
      * <p>
-     * A UpdateInventoryAfterTradeWithBankRequest is posted onto the event bus and the user
+     * An ExecuteTradeWithBankRequest is posted onto the event bus and the user
      * wants trade a resource with the bank.
      * <p>
      * This test fails if the users inventory is not updated properly or the User is able to
@@ -511,12 +514,9 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
 
-        Message updateInventoryAfterTradeWithBankRequest = new UpdateInventoryAfterTradeWithBankRequest(user[0],
-                                                                                                        "testlobby",
-                                                                                                        "wool",
-                                                                                                        "brick");
+        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby", "wool", "brick");
 
-        bus.post(updateInventoryAfterTradeWithBankRequest);
+        bus.post(executeTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getAllInventories();
         assertEquals(5, gameInventory1[0].getLumber());
@@ -525,7 +525,7 @@ public class GameServiceTest {
         assertEquals(5, gameInventory1[0].getGrain());
         assertEquals(5, gameInventory1[0].getLumber());
 
-        bus.post(updateInventoryAfterTradeWithBankRequest);
+        bus.post(executeTradeWithBankRequest);
         Game game2 = gameManagement.getGame("testlobby");
         //inventory doesnt change because user had not enough resources
         Inventory[] gameInventory2 = game2.getAllInventories();
