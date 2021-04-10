@@ -245,22 +245,30 @@ public class Game {
     }
 
     /**
+     * Gets a List of Triples with information about the unique cards
+     * (largest army and longest road)
      *
-     * @return
+     * @return A List of Triples with information about the unique cards
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
      */
     public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
         Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
         returnMap.put(false, new Triple<>("game.resources.whohas.longestRoad", null, 0));
         returnMap.put(true, new Triple<>("game.resources.whohas.largestArmy", null, 0));
         for (UserOrDummy u : players.getUserOrDummyArray()) {
-            if (players.get(u).hasLongestRoad()) returnMap.put(false ,new Triple<>("game.resources.whohas.longestRoad", u,
-                                                                             getMap().longestRoadsForEachPlayer()
-                                                                                     .get(players.getPlayerFromUserOrDummy(
-                                                                                             u))));
-            if (players.get(u).hasLargestArmy()) returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", u,
-                                                                             getMap().longestRoadsForEachPlayer()
-                                                                                     .get(players.getPlayerFromUserOrDummy(
-                                                                                             u))));
+            if (players.get(u).hasLongestRoad()) returnMap.put(false,
+                                                               new Triple<>("game.resources.whohas.longestRoad", u,
+                                                                            getMap().longestRoadsForEachPlayer()
+                                                                                    .get(players.getPlayerFromUserOrDummy(
+                                                                                            u))));
+            if (players.get(u).hasLargestArmy()) returnMap.put(true,
+                                                               new Triple<>("game.resources.whohas.largestarmy", u,
+                                                                            getMap().longestRoadsForEachPlayer()
+                                                                                    .get(players.getPlayerFromUserOrDummy(
+                                                                                            u))));
         }
         return new LinkedList<>(returnMap.values());
     }

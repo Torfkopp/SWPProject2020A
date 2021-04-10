@@ -91,6 +91,18 @@ public class GameMap implements IGameMap {
     }
 
     @Override
+    public Map<Player, Integer> longestRoadsForEachPlayer() {
+        Map<Player, Integer> returnMap = new HashMap<>();
+        for (MapPoint startingPoint : startingPoints.keySet()) {
+            int length = roadLength(1, getEdge(startingPoint));
+            if (!returnMap.containsKey(startingPoints.get(startingPoint)) || returnMap.get(startingPoints
+                                                                                                   .get(startingPoint)) < length)
+                returnMap.put(startingPoints.get(startingPoint), length);
+        }
+        return returnMap;
+    }
+
+    @Override
     public IConfiguration getBeginnerConfiguration() {
         List<IResourceHex.ResourceHexType> hexList = new LinkedList<>();
         hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
@@ -143,8 +155,8 @@ public class GameMap implements IGameMap {
         // wrapped as unmodifiable so it can be reliably retrieved.
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
-                Collections.unmodifiableList(hexList),
-                Collections.unmodifiableList(tokenList));
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList));
         return configuration;
     }
 
@@ -154,34 +166,10 @@ public class GameMap implements IGameMap {
     }
 
     @Override
-    public Map<Player, Integer> longestRoadsForEachPlayer() {
-        Map<Player, Integer> returnMap = new HashMap<>();
-        for (MapPoint startingPoint : startingPoints.keySet()) {
-            int length = roadLength(1, getEdge(startingPoint));
-            if (!returnMap.containsKey(startingPoints.get(startingPoint)) ||
-                    returnMap.get(startingPoints.get(startingPoint)) < length)
-                returnMap.put(startingPoints.get(startingPoint), length);
-        }
-        return returnMap;
-    }
-
-    private int roadLength(int length, IEdge edge) {
-        int returnLength = 1;
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            int nextEdgeLength = 1;
-            if (nextEdge.getOwner() == edge.getOwner())
-                nextEdgeLength = roadLength(length + 1, edge);
-            if (nextEdgeLength > returnLength)
-                returnLength = nextEdgeLength;
-        }
-        return returnLength;
-    }
-
-    @Override
     public IEdge getEdge(MapPoint position) {
         if (position.getType() != MapPoint.Type.EDGE) return null;
         if (position.getL().getType() == MapPoint.Type.INTERSECTION && position.getR()
-                .getType() == MapPoint.Type.INTERSECTION)
+                                                                               .getType() == MapPoint.Type.INTERSECTION)
             return intersectionEdgeNetwork
                     .edgeConnectingOrNull(getIntersection(position.getL()), getIntersection(position.getR()));
         else if (position.getL().getType() == MapPoint.Type.HEX && position.getR().getType() == MapPoint.Type.HEX)
@@ -247,7 +235,7 @@ public class GameMap implements IGameMap {
     @Override
     public IIntersection getIntersection(MapPoint position) {
         return position.getType() == MapPoint.Type.INTERSECTION ? intersectionMap[position.getY()][position.getX()] :
-                null;
+               null;
     }
 
     @Override
@@ -308,8 +296,8 @@ public class GameMap implements IGameMap {
         // wrapped as unmodifiable so it can be reliably retrieved.
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
-                Collections.unmodifiableList(hexList),
-                Collections.unmodifiableList(tokenList));
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList));
         return configuration;
     }
 
@@ -348,12 +336,6 @@ public class GameMap implements IGameMap {
             placeStartRoad(Player.PLAYER_4, EdgeMapPoint(IntersectionMapPoint(4, 2), IntersectionMapPoint(4, 3)));
             placeStartRoad(Player.PLAYER_4, EdgeMapPoint(IntersectionMapPoint(4, 6), IntersectionMapPoint(3, 7)));
         }
-    }
-
-    private void placeStartRoad(Player player, MapPoint edge) {
-        if (edge.getType() != Type.EDGE) return;
-        placeRoad(player, getEdge(edge));
-        startingPoints.put(edge, player);
     }
 
     @Override
@@ -415,7 +397,7 @@ public class GameMap implements IGameMap {
             if (intersection.getState() != IIntersection.IntersectionState.FREE) neighbouringIntersectionsFree = false;
 
         return intersectionMap[position.getY()][position.getX()].getState()
-                .equals(IIntersection.IntersectionState.FREE) && hasRoad && neighbouringIntersectionsFree;
+                                                                .equals(IIntersection.IntersectionState.FREE) && hasRoad && neighbouringIntersectionsFree;
     }
 
     @Override
@@ -492,8 +474,8 @@ public class GameMap implements IGameMap {
      */
     private void createIntersectionEdgeNetwork() {
         var intersectionEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
-                .nodeOrder(ElementOrder.insertion()).expectedNodeCount(54)
-                .expectedEdgeCount(72).<IIntersection, IEdge>immutable();
+                                                           .nodeOrder(ElementOrder.insertion()).expectedNodeCount(54)
+                                                           .expectedEdgeCount(72).<IIntersection, IEdge>immutable();
 
         intersectionMap = new IIntersection[6][];
         intersectionMap[0] = new IIntersection[7];
@@ -514,42 +496,42 @@ public class GameMap implements IGameMap {
                     //Connections to the top
                     if (x % 2 == 0 && y == 3) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], intersectionMap[y - 1][x],
-                                hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
-                                        hexMap[y][(x / 2) + 1]));
+                                                               hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
+                                                                                                   hexMap[y][(x / 2) + 1]));
                     } else if (x % 2 == 1 && y > 0 && y < 3) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], intersectionMap[y - 1][x - 1],
-                                hexEdgeNetwork
-                                        .edgeConnectingOrNull(hexMap[y][(x - 1) / 2],
-                                                hexMap[y][(x + 1) / 2]));
+                                                               hexEdgeNetwork
+                                                                       .edgeConnectingOrNull(hexMap[y][(x - 1) / 2],
+                                                                                             hexMap[y][(x + 1) / 2]));
                     } else if (x % 2 == 0 && y > 3) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], intersectionMap[y - 1][x + 1],
-                                hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
-                                        hexMap[y][(x / 2) + 1]));
+                                                               hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
+                                                                                                   hexMap[y][(x / 2) + 1]));
                     }
 
                     //connections from high point to low point to the left
                     if (x % 2 == 1 && y < 3) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], //
-                                intersectionMap[y][x - 1], //
-                                hexEdgeNetwork
-                                        .edgeConnectingOrNull(hexMap[y][(x - 1) / 2],
-                                                hexMap[y + 1][(x + 1) / 2]));
+                                                               intersectionMap[y][x - 1], //
+                                                               hexEdgeNetwork
+                                                                       .edgeConnectingOrNull(hexMap[y][(x - 1) / 2],
+                                                                                             hexMap[y + 1][(x + 1) / 2]));
                     } else if (y >= 3 && x % 2 == 0 && x > 1) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], intersectionMap[y][x - 1],
-                                hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
-                                        hexMap[y + 1][x / 2]));
+                                                               hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
+                                                                                                   hexMap[y + 1][x / 2]));
                     }
 
                     //connections from low point to high point to the left
                     if ((x % 2 == 0 && x > 0 && y < 3)) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], intersectionMap[y][x - 1],
-                                hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
-                                        hexMap[y + 1][x / 2]));
+                                                               hexEdgeNetwork.edgeConnectingOrNull(hexMap[y][x / 2],
+                                                                                                   hexMap[y + 1][x / 2]));
                     } else if ((x % 2 == 1 && y >= 3)) {
                         intersectionEdgeNetworkBuilder.addEdge(intersectionMap[y][x], intersectionMap[y][x - 1],
-                                hexEdgeNetwork
-                                        .edgeConnectingOrNull(hexMap[y][(x / 2) + 1],
-                                                hexMap[y + 1][x / 2]));
+                                                               hexEdgeNetwork
+                                                                       .edgeConnectingOrNull(hexMap[y][(x / 2) + 1],
+                                                                                             hexMap[y + 1][x / 2]));
                     }
                 } catch (NullPointerException ignored) {
                     System.err.println("Error, I guess.");
@@ -563,7 +545,9 @@ public class GameMap implements IGameMap {
      * Helper method to get the GameHexWrapper of a Hex instead of the IGameHex
      *
      * @param position The MapPoint of the Hex
+     *
      * @return GameHexWrapper containing the Hex, or null
+     *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @since 2021-03-23
@@ -576,7 +560,9 @@ public class GameMap implements IGameMap {
      * Helper method for getIntersectionFromHexes
      *
      * @param set Set of edges
+     *
      * @return Set of intersections
+     *
      * @author Mario Fokken
      * @since 2021-03-15
      */
@@ -588,5 +574,40 @@ public class GameMap implements IGameMap {
             }
         }
         return intersectionSet;
+    }
+
+    /**
+     * Helper method to place a starting road
+     * This method places a road and puts the position in the startingPoints map
+     *
+     * @param player The player who should own the road
+     * @param edge   The Point on which to place the road
+     */
+    private void placeStartRoad(Player player, MapPoint edge) {
+        if (edge.getType() != Type.EDGE) return;
+        placeRoad(player, getEdge(edge));
+        startingPoints.put(edge, player);
+    }
+
+    /**
+     * A helper method for the recursion of longestRoadsForEachPlayer
+     *
+     * @param length The road length at the current depth
+     * @param edge   The current edge
+     *
+     * @return The maximum road length found
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    private int roadLength(int length, IEdge edge) {
+        int returnLength = 1;
+        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+            int nextEdgeLength = 1;
+            if (nextEdge.getOwner() == edge.getOwner()) nextEdgeLength = roadLength(length + 1, edge);
+            if (nextEdgeLength > returnLength) returnLength = nextEdgeLength;
+        }
+        return returnLength;
     }
 }

@@ -99,7 +99,7 @@ public class GameService extends AbstractService {
     /**
      * Handles the allocation of the largest Army
      *
-     * @param lobbyName
+     * @param lobbyName The lobbyname
      *
      * @author Eric Vuong
      * @author Temmo Junkhoff
@@ -126,13 +126,15 @@ public class GameService extends AbstractService {
             currentlyLargest.setLargestArmy(true);
             largest.setLargestArmy(false);
         }
-        lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+        lobbyService
+                .sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
     }
 
     /**
      * Handles the allocation of the longest Road
      *
-     * @param lobbyName
+     * @param lobbyName The lobbyname
+     *
      * @author Eric Vuong
      * @auhtor Temmo Junkhoff
      * @since 2021-04-10
@@ -167,7 +169,8 @@ public class GameService extends AbstractService {
             if (longest != null) invs.get(longest).setLongestRoad(false);
         }
 
-        lobbyService.sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+        lobbyService
+                .sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
     }
 
     /**
