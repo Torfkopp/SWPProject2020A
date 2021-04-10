@@ -7,6 +7,8 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
@@ -260,7 +262,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         LOG.debug("Received BuildingSuccessfullMessage");
         gameService.updateGameMap(lobbyName);
-        if (Objects.equals(msg.getUser(), loggedInUser)) gameService.updateInventory(lobbyName, loggedInUser);
+        String attr = null;
+        switch (msg.getType()) {
+            case ROAD:
+                attr = "game.building.success.road";
+            case SETTLEMENT:
+                attr = "game.building.success.settlement";
+            case CITY:
+                attr = "game.building.success.city";
+        }
+        final String finalAttr = attr;
+        if (Objects.equals(msg.getUser(), loggedInUser)) {
+            gameService.updateInventory(lobbyName, loggedInUser);
+            if (finalAttr != null)
+                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + "you"))));
+        } else {
+            if (finalAttr != null) Platform.runLater(() -> chatMessages
+                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + "other", msg.getUser().toString()))));
+        }
     }
 
     /**
