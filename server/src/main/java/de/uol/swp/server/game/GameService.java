@@ -35,6 +35,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import static de.uol.swp.common.game.response.BuildingFailedResponse.Reason.*;
 
 /**
  * Mapping EventBus calls to GameManagement calls
@@ -291,14 +295,22 @@ public class GameService extends AbstractService {
         UserOrDummy user = req.getUser();
         Player player = game.getPlayer(user);
         Inventory inv = game.getInventory(user);
+
+        Consumer<BuildingFailedResponse.Reason> sendFailResponse = reason -> {
+            LOG.debug("Sending BuildingFailedResponse");
+            BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(), reason);
+            msg.initWithMessage(req);
+            post(msg);
+        };
+
+        BiConsumer<String, BuildingSuccessfulMessage> sendSuccess = (lobbyName, message) -> {
+            LOG.debug("Sending BuildingSuccessfulMessage");
+            lobbyService.sendToAllInLobby(lobbyName, message);
+        };
         switch (mapPoint.getType()) {
             case INTERSECTION: {
-                if (gameMap.getIntersection(mapPoint).getState() != IIntersection.IntersectionState.FREE) {
-                    LOG.debug("Sending BuildingFailedResponse");
-                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                            BuildingFailedResponse.Reason.ALREADY_BUILT_HERE);
-                    msg.initWithMessage(req);
-                    post(msg);
+                if (gameMap.getIntersection(mapPoint).getState() == IIntersection.IntersectionState.CITY) {
+                    sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.settlementPlaceable(player, mapPoint)) {
                     if (inv.getBrick() >= 1 && inv.getLumber() >= 1 && inv.getWool() >= 1 && inv.getGrain() >= 1) {
                         inv.increaseBrick(-1);
@@ -306,92 +318,52 @@ public class GameService extends AbstractService {
                         inv.increaseWool(-1);
                         inv.increaseGrain(-1);
                         gameMap.placeSettlement(player, mapPoint);
-                        LOG.debug("Sending BuildingSuccessfulMessage");
-                        lobbyService.sendToAllInLobby(req.getOriginLobby(),
-                                                      new BuildingSuccessfulMessage(req.getOriginLobby(), user,
-                                                                                    mapPoint,
-                                                                                    BuildingSuccessfulMessage.Type.SETTLEMENT));
+                        sendSuccess.accept(req.getOriginLobby(),
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                         BuildingSuccessfulMessage.Type.SETTLEMENT));
                     } else {
-                        LOG.debug("Sending BuildingFailedResponse");
-                        BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                                BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
-                        msg.initWithMessage(req);
-                        post(msg);
+                        sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
                     if (inv.getOre() >= 3 && inv.getGrain() >= 2) {
                         inv.increaseOre(-3);
                         inv.increaseGrain(-2);
                         gameMap.upgradeSettlement(player, mapPoint);
-                        LOG.debug("Sending BuildingSuccessfulMessage");
-                        lobbyService.sendToAllInLobby(req.getOriginLobby(),
-                                                      new BuildingSuccessfulMessage(req.getOriginLobby(), user,
-                                                                                    mapPoint,
-                                                                                    BuildingSuccessfulMessage.Type.CITY));
+                        sendSuccess.accept(req.getOriginLobby(),
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                         BuildingSuccessfulMessage.Type.CITY));
                     } else {
-                        LOG.debug("Sending BuildingFailedResponse");
-                        BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                                BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
-                        msg.initWithMessage(req);
-                        post(msg);
+                        sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else {
-                    LOG.debug("Sending BuildingFailedResponse");
-                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                            BuildingFailedResponse.Reason.CANT_BUILD_HERE);
-                    msg.initWithMessage(req);
-                    post(msg);
+                    sendFailResponse.accept(CANT_BUILD_HERE);
                 }
                 break;
             }
             case EDGE: {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
-                    LOG.debug("Sending BuildingFailedResponse");
-                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                            BuildingFailedResponse.Reason.ALREADY_BUILT_HERE);
-                    msg.initWithMessage(req);
-                    post(msg);
+                    sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
-                        LOG.debug("Sending BuildingSuccessfulMessage");
-                        lobbyService.sendToAllInLobby(req.getOriginLobby(),
-                                                      new BuildingSuccessfulMessage(req.getOriginLobby(), user,
-                                                                                    mapPoint,
-                                                                                    BuildingSuccessfulMessage.Type.ROAD));
+                        sendSuccess.accept(req.getOriginLobby(),
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                         BuildingSuccessfulMessage.Type.ROAD));
                     } else {
-                        LOG.debug("Sending BuildingFailedResponse");
-                        BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                                BuildingFailedResponse.Reason.NOT_ENOUGH_RESOURCES);
-                        msg.initWithMessage(req);
-                        post(msg);
+                        sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else {
-                    LOG.debug("Sending BuildingFailedResponse");
-                    BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                            BuildingFailedResponse.Reason.CANT_BUILD_HERE);
-                    msg.initWithMessage(req);
-                    post(msg);
+                    sendFailResponse.accept(CANT_BUILD_HERE);
                 }
                 break;
             }
             case HEX: {
-                LOG.debug("Sending BuildingFailedResponse");
-                BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                        BuildingFailedResponse.Reason.BAD_GROUND);
-                msg.initWithMessage(req);
-                post(msg);
-                break;
+                sendFailResponse.accept(BAD_GROUND);
             }
             case INVALID: {
-                LOG.debug("Sending BuildingFailedResponse");
-                BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(),
-                                                                        BuildingFailedResponse.Reason.NOTHING_HERE);
-                msg.initWithMessage(req);
-                post(msg);
-                break;
+                sendFailResponse.accept(NOTHING_HERE);
             }
         }
     }
