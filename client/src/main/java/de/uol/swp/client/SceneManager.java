@@ -938,12 +938,12 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         String lobby = event.getLobbyName();
-        if (tradingStages.containsKey(lobby)) {
             Platform.runLater(() -> {
+                if (tradingStages.containsKey(lobby)) {
                 tradingStages.get(lobby).close();
                 tradingStages.remove(lobby);
+                }
             });
-        }
     }
 
     /**
