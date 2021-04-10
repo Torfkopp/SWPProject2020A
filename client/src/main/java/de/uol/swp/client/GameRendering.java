@@ -51,6 +51,7 @@ public class GameRendering {
     private static final Color FIELDS_COLOUR = Color.rgb(240, 215, 103);
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
+    private static final double TOKEN_SIZE = 16;
 
     @Inject
     private static ResourceBundle resourceBundle;
@@ -300,8 +301,11 @@ public class GameRendering {
                 text = resourceBundle.getString("game.resources.any");
                 break;
         }
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
         gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.fillText(text, currentX + hexWidth / 8.0, currentY + hexHeight * (4.0 / 8.0), hexWidth * (6.0 / 8.0));
+        gfxCtx.setFont(Font.font(TOKEN_SIZE));
+        gfxCtx.fillText(text, currentX + hexWidth / 2.0, currentY + hexHeight / 2.0, hexWidth * (6.0 / 8.0));
     }
 
     /**
@@ -427,8 +431,11 @@ public class GameRendering {
         double yPos = currentY + (hexHeight - tokenSize) / 2.0;
         gfxCtx.fillOval(xPos, yPos, tokenSize, tokenSize);
         gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.fillText(resourceBundle.getString("game.token." + token), xPos + tokenSize * (1.0 / 4.0),
-                        yPos + tokenSize * (3.0 / 4.0), tokenSize / 2.0);
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFont(Font.font(TOKEN_SIZE));
+        gfxCtx.fillText(resourceBundle.getString("game.token." + token), currentX + hexWidth / 2.0,
+                        currentY + hexWidth / 2.0, tokenSize * ( 7.0/ 8.0));
     }
 
     /**
