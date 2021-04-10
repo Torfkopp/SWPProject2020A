@@ -75,8 +75,8 @@ class ServerApp {
         if (args.length == 1) {
             try {
                 port = Integer.parseInt(args[0]);
-            } catch (Exception e) {
-                // Ignore and use default value
+            } catch (NumberFormatException e) {
+                port = 8889;
             }
         }
         if (port < 0) {

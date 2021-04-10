@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.common.MyObjectDecoder;
+import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -168,15 +169,15 @@ public class ClientConnection {
      * pipeline.addLast()} method. Things usually added are encoders, decoders, and
      * the ChannelHandler.
      *
-     * @throws Exception Connection failed
+     * @throws java.lang.InterruptedException Connection failed
      * @implNote If no ChannelHandler is added, communication will not be possible
      * @since 2017-03-17
      */
-    public void start() throws Exception {
+    public void start() throws InterruptedException {
         group = new NioEventLoopGroup();
         try {
-            Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port))
+            Bootstrap bill = new Bootstrap();
+            bill.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port))
              .handler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  protected void initChannel(SocketChannel ch) {
@@ -189,7 +190,7 @@ public class ClientConnection {
                      ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
                  }
              });
-            ChannelFuture f = b.connect().sync();
+            ChannelFuture f = bill.connect().sync();
             f.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
@@ -237,7 +238,7 @@ public class ClientConnection {
      *
      * @param message The ExceptionMessage object found on the EventBus
      *
-     * @see de.uol.swp.common.message.ExceptionMessage
+     * @see de.uol.swp.common.exception.ExceptionMessage
      * @since 2017-03-17
      */
     @Subscribe

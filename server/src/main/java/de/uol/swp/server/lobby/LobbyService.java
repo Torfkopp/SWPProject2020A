@@ -3,6 +3,8 @@ package de.uol.swp.server.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.exception.ExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
