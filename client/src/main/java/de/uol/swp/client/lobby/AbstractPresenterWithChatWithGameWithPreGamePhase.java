@@ -395,7 +395,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size()); //todo Draw all existing settlements method
             gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(rsp.getPlayer());
-            lobbyService.updateInventory(lobbyName, loggedInUser);
+            gameService.updateInventory(lobbyName, loggedInUser);
             window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
             window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
