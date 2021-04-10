@@ -18,10 +18,20 @@ public class NukedUsersSessionsResponse extends AbstractResponseMessage {
 
     private final User user;
 
+    /**
+     * Constructor
+     *
+     * @param user The user whose old sessions have been nuked
+     */
     public NukedUsersSessionsResponse(User user) {
         this.user = user;
     }
 
+    /**
+     * Getter
+     *
+     * @return The stored user object
+     */
     public User getUser() {
         return user;
     }

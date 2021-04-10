@@ -265,20 +265,20 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles an ActivePlayerEvent found on the EventBus
+     * Handles an TransferLobbyStateEvent found on the EventBus
      * <p>
-     * If an ActivePlayerEvent is found on the EventBus, this method
+     * If an TransferLobbyStateEvent is found on the EventBus, this method
      * is called. It crafts a StartSessionResponse with the lobby
      * provided by the event, its active player, the game configuration
      * and the previously rolled dice and posts it on the EventBus.
      *
-     * @param event The ActivePlayerEvent found on the EventBus
+     * @param event The TransferLobbyStateEvent found on the EventBus
      * @author Marvin Drees
      * @author Maximilian Lindner
      * @since 2021-04-09
      */
     @Subscribe
-    private void onActivePlayerEvent(ActivePlayerEvent event) {
+    private void onTransferLobbyStateEvent(TransferLobbyStateEvent event) {
         Lobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
         ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),

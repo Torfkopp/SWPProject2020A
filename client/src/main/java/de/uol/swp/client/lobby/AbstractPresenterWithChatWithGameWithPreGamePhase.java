@@ -168,25 +168,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Handles a JoinLobbyResponse found on the EventBus
-     * <p>
-     * If a JoinLobbyResponse is found on the EventBus, this method
-     * is called. It restores the ready status of the current user
-     * and posts a StartSessionRequest on the EventBus.
-     *
-     * @param rsp The JoinLobbyResponse found on the EventBus
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-04-09
-     */
-    //@Subscribe
-    //private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
-    //    LOG.debug("JoinLobbyResponse received");
-    //    if (rsp.getLobby().getReadyUsers().contains(loggedInUser)) readyCheckBox.setSelected(true);
-    //    if (inGame) eventBus.post(new StartSessionRequest(lobbyName, loggedInUser));
-    //}
-
-    /**
      * Method called when the KickUserButton is pressed
      * <p>
      * If the EndTurnButton is pressed, this method requests to kick

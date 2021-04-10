@@ -18,12 +18,13 @@ import java.util.Set;
  */
 public class Game {
 
+    private static int[] dices = new int[2];
     private final Lobby lobby;
     private final IGameMap map;
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private UserOrDummy activePlayer;
-    private static int[] dices = new int[2];
+
     /**
      * Constructor
      *
@@ -178,6 +179,19 @@ public class Game {
     }
 
     /**
+     * Return the current state of the rolled dices as an array
+     *
+     * @return Current state of dices
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    public int[] getDices() {
+        return dices;
+    }
+
+    /**
      * Gets a specified player's inventory
      *
      * @param player The player whose inventory to get
@@ -266,9 +280,5 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
-    }
-
-    public int[] getDices(){
-        return dices;
     }
 }

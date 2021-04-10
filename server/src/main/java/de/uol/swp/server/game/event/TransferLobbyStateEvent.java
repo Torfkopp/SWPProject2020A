@@ -10,14 +10,14 @@ import java.util.Optional;
 /**
  * This event is sent to the game service.
  * <p>
- * The game service takes information about the specific game
- * to send it back to the client
+ * The GameService takes information about the specific lobby/game
+ * from the LobbyService to send it back to the client.
  *
  * @author Marvin Drees
  * @author Maximilian Lindner
  * @since 2021-04-09
  */
-public class ActivePlayerEvent extends AbstractServerInternalMessage {
+public class TransferLobbyStateEvent extends AbstractServerInternalMessage {
 
     private final Lobby lobby;
     private final UserOrDummy user;
@@ -30,7 +30,7 @@ public class ActivePlayerEvent extends AbstractServerInternalMessage {
      * @param user    The user that requested data
      * @param context The MessageContext from the previous message, which cause this event to be posted
      */
-    public ActivePlayerEvent(Lobby lobby, UserOrDummy user, Optional<MessageContext> context) {
+    public TransferLobbyStateEvent(Lobby lobby, UserOrDummy user, Optional<MessageContext> context) {
         this.lobby = lobby;
         this.user = user;
         this.context = context;

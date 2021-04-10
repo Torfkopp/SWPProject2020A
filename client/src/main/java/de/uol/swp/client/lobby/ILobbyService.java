@@ -15,6 +15,18 @@ import de.uol.swp.common.user.UserOrDummy;
 public interface ILobbyService {
 
     /**
+     * Checks if the lobby is in a game
+     *
+     * @param lobbyName     LobbyName to check
+     * @param loggendInUser Currently logged in user
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    void checkForGame(String lobbyName, User loggendInUser);
+
+    /**
      * Posts a request to create a lobby onto the EventBus
      *
      * @param name      The name chosen for the new lobby
@@ -228,6 +240,4 @@ public interface ILobbyService {
      * @since 2021-03-23
      */
     void userReady(String lobbyName, User loggedInUser, boolean isReady);
-
-    void checkForGame(String lobbyName, User loggendInUser);
 }

@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
@@ -126,7 +125,7 @@ public class LobbyService extends AbstractService {
     private void onCheckForGameRequest(CheckForGameRequest req) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
         if (lobby.isPresent() && lobby.get().isInGame())
-            post(new ActivePlayerEvent(lobby.get(), req.getUser(), req.getMessageContext()));
+            post(new TransferLobbyStateEvent(lobby.get(), req.getUser(), req.getMessageContext()));
     }
 
     /**
