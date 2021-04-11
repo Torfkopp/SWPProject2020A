@@ -121,6 +121,6 @@
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
-        <Label fx:id="buildingCosts" wrapText="true" text="%game.building.info.costs" visible="false"></Label>
+        <Label fx:id="buildingCosts" wrapText="true" text="%game.building.info.costs" visible="false"/>
     </VBox>
 </GridPane>
