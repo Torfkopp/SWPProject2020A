@@ -93,16 +93,6 @@ public interface IGameMapManagement {
      */
     IGameMap getGameMapDTO();
 
-
-    /**
-     * Returns a map with the length of the longest road for each player
-     *
-     * @return A map with the length of the longest road for each player
-     * @author Eric Vuong
-     * @author Temmo Junkhoff
-     * @since 2021-04-10
-     */
-    Map<Player, Integer> longestRoadsForEachPlayer();
     /**
      * Gets the hex at a specified place
      *
@@ -215,6 +205,26 @@ public interface IGameMapManagement {
      * @since 2021-03-05
      */
     Set<IEdge> incidentEdges(IIntersection intersection);
+
+    /**
+     * Gets the length of the longest road that includes a specified map point
+     *
+     * @param mapPoint The map point that should be in the road
+     *
+     * @return The length of the road
+     */
+    int longestRoadWith(MapPoint mapPoint);
+
+    /**
+     * Returns a map with the length of the longest road for each player
+     *
+     * @return A map with the length of the longest road for each player
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    Map<Player, Integer> longestRoadsForEachPlayer();
 
     /**
      * Places beginner settlements for 3 or 4 players, depending on the
@@ -340,6 +350,4 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
-
-    int longestRoadWith(MapPoint mapPoint);
 }

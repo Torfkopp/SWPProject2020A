@@ -138,7 +138,6 @@ public class GameService extends AbstractService {
 
         Game game = gameManagement.getGame(lobbyName);
         int length = game.getMap().longestRoadWith(mapPoint);
-        System.out.println("length = " + length);
         if (length > 4 && length > game.getLongestRoadLength()) {
             game.setLongestRoadLength(length);
             game.setPlayerWithLongestRoad(game.getMap().getEdge(mapPoint).getOwner());
@@ -397,7 +396,6 @@ public class GameService extends AbstractService {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
-                        System.out.println("AAAAAAAAAAAAA");
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);

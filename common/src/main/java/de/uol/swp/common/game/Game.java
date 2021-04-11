@@ -208,10 +208,18 @@ public class Game {
         return lobby;
     }
 
+    /**
+     * Gets the length of the longest road
+     * @return The length of the longest road
+     */
     public int getLongestRoadLength() {
         return longestRoadLength;
     }
 
+    /**
+     * Set the length of the longest road
+     * @param longestRoadLength The new length
+     */
     public void setLongestRoadLength(int longestRoadLength) {
         this.longestRoadLength = longestRoadLength;
     }
@@ -246,18 +254,34 @@ public class Game {
         return players.getPlayerFromUserOrDummy(user);
     }
 
+    /**
+     * Gets the player with the largest army
+     * @return The player with the largest army
+     */
     public Player getPlayerWithLargestArmy() {
         return playerWithLargestArmy;
     }
 
+    /**
+     * Sets the player with the largest army
+     * @param playerWithLargestArmy The player with the largest army
+     */
     public void setPlayerWithLargestArmy(Player playerWithLargestArmy) {
         this.playerWithLargestArmy = playerWithLargestArmy;
     }
 
+    /**
+     * Gets the player with the longest road
+     * @return The player with the longest road
+     */
     public Player getPlayerWithLongestRoad() {
         return playerWithLongestRoad;
     }
 
+    /**
+     * Sets the player with the longest road
+     * @param playerWithLongestRoad The player with the longest road
+     */
     public void setPlayerWithLongestRoad(Player playerWithLongestRoad) {
         this.playerWithLongestRoad = playerWithLongestRoad;
     }
@@ -283,8 +307,11 @@ public class Game {
      */
     public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
         Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
-        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad), longestRoadLength));
-        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy), playerWithLargestArmy == null ? 0 : getInventory(playerWithLargestArmy).getKnights()));
+        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad),
+                                          longestRoadLength));
+        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy),
+                                         playerWithLargestArmy == null ? 0 :
+                                         getInventory(playerWithLargestArmy).getKnights()));
         return new LinkedList<>(returnMap.values());
     }
 
