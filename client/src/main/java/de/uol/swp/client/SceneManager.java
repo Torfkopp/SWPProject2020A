@@ -27,6 +27,7 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
@@ -64,8 +65,6 @@ public class SceneManager {
     @Inject
     private static Injector injector;
     @Inject
-    private final IUserService userService;
-    @Inject
     private static ResourceBundle resourceBundle;
 
     private final Stage primaryStage;
@@ -74,6 +73,10 @@ public class SceneManager {
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
+
+    @Inject
+    private IUserService userService;
+
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
