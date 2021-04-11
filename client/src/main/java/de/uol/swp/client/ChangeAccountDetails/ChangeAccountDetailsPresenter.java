@@ -12,7 +12,6 @@ import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +33,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     public static final int MIN_WIDTH = 395;
     private static final ChangeAccountDetailsCanceledEvent ChangeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
-    private final KeyCombination keyComb = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
 
     @FXML
     private PasswordField NewPasswordField;
@@ -80,32 +78,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         Matcher matcher = pattern.matcher(eMail);
 
         return matcher.matches();
-    }
-
-    /**
-     * Method called when the keycombination AltF4 is pressed
-     * <p>
-     * This Method is called when the keycombination AltF4 is pressed. It posts an instance
-     * of the ChangeAccountDetailsCanceledEvent onto the EventBus the SceneManager is subscribed
-     * to.
-     *
-     * @author Sven Ahrens
-     * @author Timo Gerken
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent
-     * @since 2021-04-11
-     */
-    @FXML
-    private void onAltF4Pressed(KeyEvent keyEvent) {
-        if (keyComb.match(keyEvent)) {
-            eventBus.post(ChangeAccountDetailsCanceledEvent);
-        }
-        //Platform.setImplicitExit(false);
-        //.setOnCloseRequest(new EventHandler<WindowEvent>() {
-        //  @Override
-        //public void handle(WindowEvent event) {
-        //  event.consume();
-        //}
-        //});
     }
 
     /**
