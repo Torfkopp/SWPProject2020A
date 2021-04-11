@@ -3,6 +3,7 @@ package de.uol.swp.common;
 import com.google.inject.Inject;
 
 import java.io.Serializable;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -64,10 +65,19 @@ public class I18nWrapper implements Serializable {
 
     @Override
     public String toString() {
-        if (resourceBundle != null) {
-            if (insertString == null && insertStrings == null) return resourceBundle.getString(attributeName);
-            else if (insertStrings == null) return String.format(resourceBundle.getString(attributeName), insertString);
-            else return String.format(resourceBundle.getString(attributeName), insertStrings);
-        } else return null;
+        try {
+            if (resourceBundle != null) {
+                if (insertString == null && insertStrings == null) return resourceBundle.getString(attributeName);
+                else if (insertStrings == null)
+                    return String.format(resourceBundle.getString(attributeName), insertString);
+                else return String.format(resourceBundle.getString(attributeName), insertStrings);
+            } else return null;
+        } catch (MissingResourceException exception1) {
+            try {
+                return resourceBundle.getString("missingproperty");
+            } catch (MissingResourceException exception2) {
+                return "Missing language property";
+            }
+        }
     }
 }
