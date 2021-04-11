@@ -26,6 +26,17 @@ public interface ILobbyService {
     void checkForGame(String lobbyName, User loggendInUser);
 
     /**
+     * Posts a request to check if the user is currently in a lobby
+     *
+     * @param user The logged in user
+     *
+     * @author Alwin Bossert
+     * @author Finn Haase
+     * @since 2021-04-09
+     */
+    void checkUserInLobby(User user);
+
+    /**
      * Posts a request to create a lobby onto the EventBus
      *
      * @param name      The name chosen for the new lobby

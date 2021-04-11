@@ -9,6 +9,7 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +45,12 @@ public class LobbyService implements ILobbyService {
     @Override
     public void checkForGame(String lobbyName, User loggendInUser) {
         eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
+    }
+
+    @Override
+    public void checkUserInLobby(User user) {
+        Message msg = new CheckUserInLobbyRequest(user);
+        eventBus.post(msg);
     }
 
     @Override
