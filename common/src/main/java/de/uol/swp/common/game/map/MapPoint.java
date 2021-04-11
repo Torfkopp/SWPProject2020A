@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.map;
 
+import java.io.Serializable;
+
 /**
  * Represents a point on the game board distinguished by its type attribute.
  *
@@ -8,7 +10,7 @@ package de.uol.swp.common.game.map;
  * @author Phillip-André Suhr
  * @since 2021-03-05
  */
-public class MapPoint {
+public class MapPoint implements Serializable {
 
     private final Type type;
     private Integer x = null, y = null;

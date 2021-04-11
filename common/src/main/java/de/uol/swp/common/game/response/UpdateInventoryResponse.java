@@ -24,7 +24,6 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @param user           The user wanting to update the inventory
      * @param lobbyName      The lobby for which the update is supposed to happen in
      * @param resourceMap    The Map containing the name of a resource as key and the amount as value
-     * @param armyAndRoadMap The Map containing "Largest Army" and "Longest Road" with the appropriate boolean as the value
      */
     public UpdateInventoryResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap) {
         super(lobbyName);
