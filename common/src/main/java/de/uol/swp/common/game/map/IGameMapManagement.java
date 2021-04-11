@@ -172,6 +172,18 @@ public interface IGameMapManagement {
     int getPlayerPoints(Player player);
 
     /**
+     * Gets all the Players around a Hex
+     *
+     * @param mapPoint The hex
+     *
+     * @return Set of Players around said hex
+     *
+     * @author Mario Fokken
+     * @since 2021-04-07
+     */
+    Set<Player> getPlayersAroundHex(MapPoint mapPoint);
+
+    /**
      * Creates a randomised map with the standard tiles
      *
      * @return A randomised, read-only configuration

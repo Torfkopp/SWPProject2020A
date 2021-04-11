@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.lobby.event.ShowRobberTaxCloseEvent;
+import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
@@ -86,7 +86,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public void onTaxPayButtonPressed() {
         LOG.debug("Sending RobberTaxChosenRequest");
         eventBus.post(new RobberTaxChosenRequest(selectedResources, user, lobbyName));
-        eventBus.post(new ShowRobberTaxCloseEvent(lobbyName, user));
+        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, user));
         eventBus.post(new UpdateInventoryRequest(user, lobbyName));
     }
 

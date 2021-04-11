@@ -1130,7 +1130,7 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
         LOG.debug("Received RobberNewPositionChosenRequest for Lobby " + msg.getLobby());
-        IGameMap map = gameManagement.getGame(msg.getLobby()).getMap();
+        IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
         map.moveRobber(msg.getPosition());
         LOG.debug("Sending RobberPositionMessage for Lobby " + msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
@@ -1598,7 +1598,7 @@ public class GameService extends AbstractService {
      * @since 2021-04-06
      */
     private void robberMovementDummy(Dummy dummy, String lobby) {
-        IGameMap map = gameManagement.getGame(lobby).getMap();
+        IGameMapManagement map = gameManagement.getGame(lobby).getMap();
         int y = (int) (Math.random() * 4 + 1);
         int x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
                 ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));

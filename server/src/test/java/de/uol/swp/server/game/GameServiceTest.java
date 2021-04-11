@@ -492,7 +492,7 @@ public class GameServiceTest {
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         lobby.joinUser(user[3]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());

@@ -4,9 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
-import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.game.IGameService;
+import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
@@ -627,7 +626,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberPositionMessage(RobberPositionMessage msg) {
         LOG.debug("Received RobberPositionMessage for Lobby " + msg.getLobbyName());
         if (lobbyName.equals(msg.getLobbyName())) {
-            gameMap.moveRobber(msg.getPosition());
+            //gameMap.moveRobber(msg.getPosition());
             gameRendering.drawGameMap(gameMap);
         }
     }
