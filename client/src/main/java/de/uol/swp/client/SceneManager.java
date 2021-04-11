@@ -246,7 +246,10 @@ public class SceneManager {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
                   MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
-        primaryStage.setOnCloseRequest(event -> {closeLobbies();closeMainScreen();});
+        primaryStage.setOnCloseRequest(event -> {
+            closeLobbies();
+            closeMainScreen();
+        });
     }
 
     /**
@@ -729,7 +732,10 @@ public class SceneManager {
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
         showChangeAccountDetailsScreen(event.getUser());
-        primaryStage.setOnCloseRequest(windowEvent -> {windowEvent.consume();showMainScreen(event.getUser());});
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            windowEvent.consume();
+            showMainScreen(event.getUser());
+        });
     }
 
     /**
