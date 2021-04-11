@@ -658,10 +658,8 @@ public class GameMapManagement implements IGameMapManagement {
      */
     private EndpointPair<IIntersection> getIntersectionsBetweenHexes(GameHexWrapper point1, GameHexWrapper point2) {
         Optional<IEdge> edge = hexEdgeNetwork.edgeConnecting(point1, point2);
-        if (!edge.isPresent()) return null;
-        return intersectionEdgeNetwork.incidentNodes(edge.get());
+        return edge.map(iEdge -> intersectionEdgeNetwork.incidentNodes(iEdge)).orElse(null);
     }
-}
 
     /**
      * Helper method to return an jagged array of IntersectionWithEdges

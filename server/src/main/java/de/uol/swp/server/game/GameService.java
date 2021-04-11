@@ -14,7 +14,6 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -611,14 +610,14 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onExecuteTradeWithBankRequest(ExecuteTradeWithBankRequest req) {
         if (LOG.isDebugEnabled())
-        LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
+            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
         Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
         //getting the tradingRatios with the bank according to the harbors
-        IGameMap gameMap = game.getMap();
+        IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
         Player player = game.getPlayer(req.getUser());
         List<IHarborHex.HarborResource> harborTradingList = new ArrayList<>();
@@ -1177,7 +1176,7 @@ public class GameService extends AbstractService {
         if (inventory == null) return;
         Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
 
-        IGameMap gameMap = game.getMap();
+        IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
         Player player = game.getPlayer(req.getUser());
         List<IHarborHex.HarborResource> harborTradingList = new ArrayList<>();
