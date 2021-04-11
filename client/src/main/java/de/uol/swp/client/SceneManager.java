@@ -247,6 +247,10 @@ public class SceneManager {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
                   MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+        primaryStage.setOnCloseRequest(event -> {
+            closeLobbies();
+            closeMainScreen();
+        });
     }
 
     /**
@@ -720,6 +724,7 @@ public class SceneManager {
      * If a ShowChangeAccountDetailsViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the Change Account Details
      * screen.
+     * If the user wants to close this window, the user gets redirected to the Main Menu.
      *
      * @author Eric Vuong
      * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
@@ -728,6 +733,10 @@ public class SceneManager {
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
         showChangeAccountDetailsScreen(event.getUser());
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            windowEvent.consume();
+            showMainScreen(event.getUser());
+        });
     }
 
     /**

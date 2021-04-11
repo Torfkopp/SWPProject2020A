@@ -1,12 +1,14 @@
 package de.uol.swp.common.game.map.Hexes;
 
+import java.io.Serializable;
+
 /**
  * A wrapper class for IGameHex
  *
  * @author Marvin Drees
  * @author Temmo Junkhoff
  */
-public class GameHexWrapper {
+public class GameHexWrapper implements Serializable {
 
     private IGameHex hex;
 

@@ -97,7 +97,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
@@ -158,7 +158,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
@@ -248,7 +248,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
@@ -374,7 +374,7 @@ public class GameServiceTest {
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby.get(), user[0], gameMap);
 
@@ -424,7 +424,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
@@ -442,7 +442,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
@@ -465,7 +465,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
@@ -546,7 +546,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
@@ -606,7 +606,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
@@ -678,7 +678,7 @@ public class GameServiceTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame("testlobby");
