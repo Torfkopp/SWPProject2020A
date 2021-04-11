@@ -1,8 +1,9 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.game.map.GameMapDTO;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -21,6 +22,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final Lobby lobby;
     private final UserOrDummy player;
     private final IConfiguration configuration;
+    private final IGameMap gameMapDTO;
     private int[] dices = new int[2];
 
     /**
@@ -31,10 +33,12 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param configuration The game map configuration
      * @param dices         The last rolled dices
      */
-    public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, int[] dices) {
+    public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, IGameMap gameMapDTO,
+                                int[] dices) {
         this.lobby = lobby;
         this.player = player;
         this.configuration = configuration;
+        this.gameMapDTO = gameMapDTO;
         this.dices = dices;
     }
 
@@ -54,6 +58,15 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public int[] getDices() {
         return dices;
+    }
+
+    /**
+     * Gets the GameMapDTO
+     *
+     * @return The stored GameMapDTO object
+     */
+    public IGameMap getGameMapDTO() {
+        return gameMapDTO;
     }
 
     /**

@@ -12,9 +12,7 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.map.IIntersection;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -1230,7 +1228,7 @@ public class GameService extends AbstractService {
         Lobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
         ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
-                                                                 lobby.getConfiguration(), game.getDices());
+                                                                 lobby.getConfiguration(), game.getMap().getGameMapDTO(), game.getDices());
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
             returnMessage.setMessageContext(ctx.get());

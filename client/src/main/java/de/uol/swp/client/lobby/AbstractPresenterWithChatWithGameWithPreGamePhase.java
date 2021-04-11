@@ -7,8 +7,6 @@ import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
-import de.uol.swp.common.lobby.request.StartSessionRequest;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
@@ -380,18 +378,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setPrefHeight(0);
             preGameSettingBox.setMaxHeight(0);
             preGameSettingBox.setMinHeight(0);
-            //This Line needs to be changed/ removed in the Future
+            //This Line needs to be changed/removed in the Future
             gameRendering = new GameRendering(gameMapCanvas);
             gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
             gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
-            gameMap = new GameMap().createMapFromConfiguration(rsp.getConfiguration());
             int[] dices = rsp.getDices();
             dice1 = dices[0];
             dice2 = dices[1];
             gameRendering.drawDice(dices[0], dices[1]);
-            if (!lobby.isStartUpPhaseEnabled())
-            gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size()); //todo Draw all existing settlements method
-            gameRendering.drawGameMap(gameMap);
+            if (!lobby.isStartUpPhaseEnabled()) gameRendering.drawGameMap(rsp.getGameMapDTO());
             setTurnIndicatorText(rsp.getPlayer());
             gameService.updateInventory(lobbyName, loggedInUser);
             window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
