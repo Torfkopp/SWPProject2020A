@@ -67,6 +67,12 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void joinRandomLobby(User user) {
+        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null, user);
+        eventBus.post(joinRandomLobbyRequest);
+    }
+
+    @Override
     public void kickUser(String lobbyName, UserOrDummy userToKick) {
         LOG.debug("Sending KickUserRequest");
         Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
