@@ -347,7 +347,7 @@ public class GameMapManagement implements IGameMapManagement {
             throw new IllegalArgumentException("The robber can only move to a hex");
         hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
         robberPosition = newPosition;
-        hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
+        hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(true);
     }
 
     @Override

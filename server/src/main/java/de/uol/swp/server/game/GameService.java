@@ -57,8 +57,6 @@ public class GameService extends AbstractService {
     private final LobbyService lobbyService;
     private boolean buildingCurrentlyAllowed;
 
-    private final Set<User> taxPayers = new HashSet<>();
-
     /**
      * Constructor
      *
@@ -120,6 +118,25 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(originLobby, message);
             gameManagement.dropGame(originLobby);
             buildingCurrentlyAllowed = false;
+        }
+    }
+
+    /**
+     * Helper method to end a dummy's turn
+     * AFTER every player has chosen the resources
+     * to give up on.
+     *
+     * @param game The game
+     *
+     * @author Mario Fokken
+     * @since 2021-04-09
+     */
+    private void endTurnDummy(Game game) {
+        UserOrDummy activePlayer = game.getActivePlayer();
+        if (activePlayer instanceof User) {
+        } else {
+            if (game.getTaxPayers().isEmpty())
+                onEndTurnRequest(new EndTurnRequest(activePlayer, game.getLobby().getName()));
         }
     }
 
@@ -589,25 +606,7 @@ public class GameService extends AbstractService {
 
         if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            endTurnDummy(req.getOriginLobby());
-        }
-    }
-
-    /**
-     * Helper method to end a dummy's turn
-     * AFTER every player has chosen the resources
-     * to give up on.
-     *
-     * @param lobbyName The name of the lobby
-     *
-     * @author Mario Fokken
-     * @since 2021-04-09
-     */
-    private void endTurnDummy(String lobbyName) {
-        UserOrDummy activePlayer = gameManagement.getGame(lobbyName).getActivePlayer();
-        if (activePlayer instanceof User) {
-        } else {
-            if (taxPayers.isEmpty()) onEndTurnRequest(new EndTurnRequest(activePlayer, lobbyName));
+            endTurnDummy(game);
         }
     }
 
@@ -1188,8 +1187,9 @@ public class GameService extends AbstractService {
                                                          gameManagement.getGame(req.getLobby()).getCardAmounts());
         lobbyService.sendToAllInLobby(req.getLobby(), msg);
 
-        taxPayers.remove(req.getPlayer());
-        endTurnDummy(req.getLobby());
+        Game game = gameManagement.getGame(req.getLobby());
+        game.removeTaxPayer(req.getPlayer());
+        endTurnDummy(game);
     }
 
     /**
@@ -1270,7 +1270,7 @@ public class GameService extends AbstractService {
                 resourceMap.put(Resources.WOOL, inv.getWool());
                 inventory.put(user, resourceMap);
 
-                taxPayers.add(user);
+                game.addTaxPayer(user);
             }
             RobberTaxMessage rtm = new RobberTaxMessage(req.getOriginLobby(), req.getUser(), players, inventory);
             LOG.debug("Sending RobberTaxMessage for Lobby" + req.getOriginLobby());
@@ -1522,6 +1522,37 @@ public class GameService extends AbstractService {
 
     /**
      * Helper method to move the robber when
+     * a dummy gets a seven.
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    private void robberMovementDummy(Dummy dummy, String lobby) {
+        IGameMapManagement map = gameManagement.getGame(lobby).getMap();
+        int y = (int) (Math.random() * 4 + 1);
+        int x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
+                ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
+        MapPoint mapPoint = MapPoint.HexMapPoint(y, x);
+        map.moveRobber(mapPoint);
+        LOG.debug("Sending RobberPositionMessage for Lobby " + lobby);
+        AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
+        lobbyService.sendToAllInLobby(lobby, msg);
+        LOG.debug(dummy + " moves the robber to position: " + y + "|" + x);
+        Set<Player> players = map.getPlayersAroundHex(mapPoint);
+        Set<UserOrDummy> players2 = new HashSet<>();
+        for (Player p : players) {
+            players2.add(gameManagement.getGame(lobby).getUserFromPlayer(p));
+        }
+        if (players.size() > 0) {
+            int i = (int) (Math.random() * players.size());
+            UserOrDummy victim = (UserOrDummy) players2.toArray()[i];
+            robRandomResource(lobby, dummy, victim);
+        }
+    }
+
+    /**
+     * Helper method to move the robber when
      * a player gets a seven.
      * Sends a RobberNewPositionResponse to the lobby
      * after an onRollDiceRequest or an onPlayKnightCardRequest
@@ -1587,36 +1618,5 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
-    }
-
-    /**
-     * Helper method to move the robber when
-     * a dummy gets a seven.
-     *
-     * @author Mario Fokken
-     * @author Timo Gerken
-     * @since 2021-04-06
-     */
-    private void robberMovementDummy(Dummy dummy, String lobby) {
-        IGameMapManagement map = gameManagement.getGame(lobby).getMap();
-        int y = (int) (Math.random() * 4 + 1);
-        int x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
-                ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
-        MapPoint mapPoint = MapPoint.HexMapPoint(y, x);
-        map.moveRobber(mapPoint);
-        LOG.debug("Sending RobberPositionMessage for Lobby " + lobby);
-        AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
-        lobbyService.sendToAllInLobby(lobby, msg);
-        LOG.debug(dummy + " moves the robber to position: " + y + "|" + x);
-        Set<Player> players = map.getPlayersAroundHex(mapPoint);
-        Set<UserOrDummy> players2 = new HashSet<>();
-        for (Player p : players) {
-            players2.add(gameManagement.getGame(lobby).getUserFromPlayer(p));
-        }
-        if (players.size() > 0) {
-            int i = (int) (Math.random() * players.size());
-            UserOrDummy victim = (UserOrDummy) players2.toArray()[i];
-            robRandomResource(lobby, dummy, victim);
-        }
     }
 }
