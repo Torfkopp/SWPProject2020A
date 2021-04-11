@@ -814,19 +814,19 @@ public class SceneManager {
     }
 
     /**
-     * Handles a ShowRobberTaxCloseEvent detected on the EventBus.
+     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
      * <p>
      * It then proceeds to close the robberTax window.
      *
-     * @param event The ShowRobberTaxCloseEvent found on the EventBus
+     * @param event The CloseRobberTaxViewEvent found on the EventBus
      *
      * @author Mario Fokken
      * @author Timo Gerken
      * @since 2021-04-08
      */
     @Subscribe
-    private void onShowRobberTaxCloseEvent(ShowRobberTaxCloseEvent event) {
-        LOG.debug("Received ShowRobberTaxCloseEvent");
+    private void onShowRobberTaxCloseEvent(CloseRobberTaxViewEvent event) {
+        LOG.debug("Received CloseRobberTaxViewEvent");
         String lobby = event.getLobbyName();
         if (robberTaxStages.containsKey(lobby)) {
             robberTaxStages.get(lobby).close();

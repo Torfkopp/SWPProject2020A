@@ -9,12 +9,12 @@ import de.uol.swp.common.user.User;
  * @author Timo Gerken
  * @since 2021-04-08
  */
-public class ShowRobberTaxCloseEvent {
+public class CloseRobberTaxViewEvent {
 
     private final String lobbyName;
     private final User user;
 
-    public ShowRobberTaxCloseEvent(String lobbyName, User user) {
+    public CloseRobberTaxViewEvent(String lobbyName, User user) {
         this.lobbyName = lobbyName;
         this.user = user;
     }
