@@ -17,7 +17,7 @@ import java.util.*;
 public class Game {
 
     private final Lobby lobby;
-    private final IGameMap map;
+    private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private UserOrDummy activePlayer;
@@ -29,7 +29,7 @@ public class Game {
      * @param first   The first player
      * @param gameMap The IGameMap the game will be using
      */
-    public Game(Lobby lobby, UserOrDummy first, IGameMap gameMap) {
+    public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
         {
@@ -210,7 +210,7 @@ public class Game {
      *
      * @return The IGameMap this game is using
      */
-    public IGameMap getMap() {
+    public IGameMapManagement getMap() {
         return map;
     }
 

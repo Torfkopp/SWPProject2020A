@@ -2,7 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.common.game.map.GameMap;
+import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
@@ -317,11 +317,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setMinHeight(0);
             //This Line needs to be changed/ removed in the Future
             gameRendering = new GameRendering(gameMapCanvas);
-            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
-            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
-            gameMap = new GameMap().createMapFromConfiguration(msg.getConfiguration());
-            if (!msg.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
-            gameRendering.drawGameMap(gameMap);
+            gameService.updateGameMap(lobbyName);
+            buildingCurrentlyAllowed = true;
             setTurnIndicatorText(msg.getUser());
             gameService.updateInventory(lobbyName, loggedInUser);
             window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);

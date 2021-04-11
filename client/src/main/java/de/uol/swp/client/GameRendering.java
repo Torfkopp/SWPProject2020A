@@ -27,7 +27,7 @@ import static de.uol.swp.common.game.map.MapPoint.*;
  *
  * @author Timo Gerken
  * @author Temmo Junkhoff
- * @see de.uol.swp.common.game.map.GameMap
+ * @see de.uol.swp.common.game.map.IGameMap
  * @see javafx.scene.canvas.Canvas
  * @since 2021-01-31
  */
@@ -379,11 +379,10 @@ public class GameRendering {
      * This Method draws the intersections and edges.
      *
      * @param intersections An array containing all intersections
-     * @param gameMap       An IGameMap providing the game map to draw
      */
-    private void drawIntersectionsAndEdges(IIntersection[][] intersections, IGameMap gameMap) {
-        goThroughHalfMap(true, intersections, gameMap);
-        goThroughHalfMap(false, intersections, gameMap);
+    private void drawIntersectionsAndEdges(IIntersectionWithEdges[][] intersections) {
+        goThroughHalfMap(true, intersections);
+        goThroughHalfMap(false, intersections);
     }
 
     /**
@@ -500,7 +499,6 @@ public class GameRendering {
      *
      * @param topHalf       A boolean indicating which half of the map needs to be drawn on
      * @param intersections An array containing all intersections
-     * @param gameMap       A IGameMap providing the game map to draw
      */
     private void goThroughHalfMap(boolean topHalf, IIntersectionWithEdges[][] intersections) {
         //Sets currentY depending on topHalf
@@ -534,7 +532,6 @@ public class GameRendering {
      * @param currentX      The current x-coordinate
      * @param currentY      The current y-coordinate
      * @param intersections An array containing all intersections in the current row
-     * @param gameMap       An IGameMap providing the game map to draw
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
                                  IIntersectionWithEdges[] intersections) {

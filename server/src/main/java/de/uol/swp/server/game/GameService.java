@@ -12,9 +12,7 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -434,6 +432,7 @@ public class GameService extends AbstractService {
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                                          BuildingSuccessfulMessage.Type.ROAD));
+                        checkLongestRoad(req.getOriginLobby());
                     } else {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }

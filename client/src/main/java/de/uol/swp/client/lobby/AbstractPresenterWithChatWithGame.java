@@ -32,7 +32,8 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.MapPoint.Type.*;
+import static de.uol.swp.common.game.map.MapPoint.Type.EDGE;
+import static de.uol.swp.common.game.map.MapPoint.Type.INTERSECTION;
 
 /**
  * This class is the base for creating a new Presenter that uses the game.
@@ -89,7 +90,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
-
+    protected boolean buildingCurrentlyAllowed = false;
     @Inject
     private ITradeService tradeService;
 
@@ -308,6 +309,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         this.dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         gameService.updateInventory(lobbyName, loggedInUser);
+        if (msg.getUser() == loggedInUser) buildingCurrentlyAllowed = true;
     }
 
     /**
@@ -323,6 +325,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName, loggedInUser);
+        buildingCurrentlyAllowed = false;
     }
 
     /**
@@ -341,6 +344,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        buildingCurrentlyAllowed = true;
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, loggedInUser, mapPoint);
     }
@@ -680,7 +684,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received UpdateGameMapResponse");
         if (rsp.getGameMapDTO() == null) return;
         gameMap = rsp.getGameMapDTO();
-        gameRendering.drawGameMap(gameMap);
+        Platform.runLater(() -> gameRendering.drawGameMap(gameMap));
     }
 
     /**

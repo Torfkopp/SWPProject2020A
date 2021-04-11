@@ -91,18 +91,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public Map<Player, Integer> longestRoadsForEachPlayer() {
-        Map<Player, Integer> returnMap = new HashMap<>();
-        for (MapPoint startingPoint : startingPoints.keySet()) {
-            int length = roadLength(1, getEdge(startingPoint));
-            if (!returnMap.containsKey(startingPoints.get(startingPoint)) || returnMap.get(startingPoints
-                                                                                                   .get(startingPoint)) < length)
-                returnMap.put(startingPoints.get(startingPoint), length);
-        }
-        return returnMap;
-    }
-
-    @Override
     public IConfiguration getBeginnerConfiguration() {
         List<IResourceHex.ResourceHexType> hexList = new LinkedList<>();
         hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
@@ -367,11 +355,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public boolean roadPlaceable(Player player, MapPoint mapPoint) {
-        return roadPlaceable(player, getEdge(mapPoint));
-    }
-
-    @Override
     public boolean placeSettlement(Player player, MapPoint position) {
         if (position.getType() != MapPoint.Type.INTERSECTION) return false;
         if (settlementPlaceable(player, position)) {
@@ -382,6 +365,11 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean roadPlaceable(Player player, MapPoint mapPoint) {
+        return roadPlaceable(player, getEdge(mapPoint));
     }
 
     @Override
@@ -432,6 +420,18 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Map<Player, Integer> longestRoadsForEachPlayer() {
+        Map<Player, Integer> returnMap = new HashMap<>();
+        for (MapPoint startingPoint : startingPoints.keySet()) {
+            int length = roadLength(1, getEdge(startingPoint));
+            if (!returnMap.containsKey(startingPoints.get(startingPoint)) || returnMap.get(startingPoints
+                                                                                                   .get(startingPoint)) < length)
+                returnMap.put(startingPoints.get(startingPoint), length);
+        }
+        return returnMap;
     }
 
     void setHex(MapPoint position, IGameHex newHex) {
@@ -620,6 +620,10 @@ public class GameMapManagement implements IGameMapManagement {
                 returnMap[y][x] = new IntersectionWithEdges(intersectionMap[y][x],
                                                             incidentEdges(intersectionMap[y][x]));
             }
+        }
+        return returnMap;
+    }
+
     /**
      * Helper method to place a starting road
      * This method places a road and puts the position in the startingPoints map
