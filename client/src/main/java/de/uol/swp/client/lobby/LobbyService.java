@@ -4,18 +4,14 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.*;
-import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Map;
 
 /**
  * The LobbyService is responsible for posting requests and events regarding
@@ -46,6 +42,12 @@ public class LobbyService implements ILobbyService {
         this.eventBus.register(this);
         this.userService = userService;
         LOG.debug("LobbyService started");
+    }
+
+    @Override
+    public void checkUserInLobby(User user) {
+        Message msg = new CheckUserInLobbyRequest(user);
+        eventBus.post(msg);
     }
 
     @Override

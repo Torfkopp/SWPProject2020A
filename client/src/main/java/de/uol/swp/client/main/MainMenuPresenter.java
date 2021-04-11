@@ -16,9 +16,7 @@ import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -184,7 +182,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Method called when the ChangeAccountDetailsButton is pressed
      * <p>
      * This method is called when the ChangeAccountDetailsButton is pressed.
-     * It posts an instance of the ShowChangeAccountDetailsViewEvent to the EventBus the SceneManager is subscribed to.
+     * It calls the checkUserInLobby method of the LobbyService to check if
+     * the user is in a lobby.
      *
      * @author Eric Vuong
      * @author Alwin Bossert
@@ -194,7 +193,31 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        eventBus.post(new ShowChangeAccountDetailsViewEvent());
+        lobbyService.checkUserInLobby(loggedInUser);
+    }
+
+    /**
+     * Handles a CheckUserInLobbyResponse found on the EventBus
+     * <p>
+     * If a new CheckUserInLobbyResponse object is found on the EventBus, this method
+     * gets called. If the user is not in a lobby, it posts a new ShowChangeAccountDetailsViewEvent
+     * onto the EventBus. Otherwise it posts a LobbyErrorEvent.
+     *
+     * @param rsp The CheckUserInLobbyResponse object found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @author Finn Haase
+     * @see de.uol.swp.common.user.response.CheckUserInLobbyResponse
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
+        LOG.debug("Received a CheckUserInLobbyResponse");
+        if (rsp.getIsInLobby() == false) {
+            eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
+        } else {
+            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.in.lobby")));
+        }
     }
 
     /**
