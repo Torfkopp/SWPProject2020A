@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
@@ -45,8 +46,9 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkUserInLobby(User user) {
-        Message msg = new CheckUserInLobbyRequest(user);
+    public void checkUserInLobby() {
+        LOG.debug("Sending CheckUserInLobbyRequest");
+        Message msg = new CheckUserInLobbyRequest(userService.getLoggedInUser());
         eventBus.post(msg);
     }
 
@@ -110,6 +112,12 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby " + lobbyName);
         Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
         eventBus.post(returnToPreGameLobbyRequest);
+    }
+
+    @Override
+    public void showLobbyError(String message) {
+        LOG.debug("Sending LobbyErrorEvent");
+        eventBus.post(new LobbyErrorEvent(message));
     }
 
     @Override

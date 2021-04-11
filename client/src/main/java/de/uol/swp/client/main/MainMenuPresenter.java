@@ -5,7 +5,6 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
@@ -193,7 +192,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        lobbyService.checkUserInLobby(loggedInUser);
+        lobbyService.checkUserInLobby();
     }
 
     /**
@@ -213,10 +212,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
         LOG.debug("Received a CheckUserInLobbyResponse");
-        if (rsp.getIsInLobby() == false) {
-            eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
+        if (rsp.getIsInLobby()) {
+            lobbyService.showLobbyError(resourceBundle.getString("lobby.error.in.lobby"));
         } else {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.in.lobby")));
+            eventBus.post(new ShowChangeAccountDetailsViewEvent());
         }
     }
 
@@ -358,7 +357,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onJoinLobbyButtonPressed() {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (lobbyView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
         } else {
             String lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
             lobbyService.joinLobby(lobbyName);

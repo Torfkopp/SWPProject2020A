@@ -15,13 +15,11 @@ public interface ILobbyService {
     /**
      * Posts a request to check if the user is currently in a lobby
      *
-     * @param user The logged in user
-     *
      * @author Alwin Bossert
      * @author Finn Haase
      * @since 2021-04-09
      */
-    void checkUserInLobby(User user);
+    void checkUserInLobby();
 
     /**
      * Posts a request to create a lobby onto the EventBus
@@ -116,6 +114,13 @@ public interface ILobbyService {
      * @since 2021-03-22
      */
     void returnToPreGameLobby(String lobbyName);
+
+    /**
+     * Posts an event to show a Lobby Error alert with the provided message
+     *
+     * @param message The message to display
+     */
+    void showLobbyError(String message);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.
