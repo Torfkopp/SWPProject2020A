@@ -211,6 +211,51 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a LobbyJoinRandomUserRequest found on the EventBus
+     * <p>
+     * If a LobbyJoinRandomUserRequest is detected on the EventBus, this method is called.
+     * It adds a user to a random lobby stored in the LobbyManagement and
+     * sends a UserJoinedLobbyMessage to every user in the lobby.
+     *
+     * @param req The LobbyJoinRandomUserRequest found on the EventBus
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.Lobby
+     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onLobbyJoinRandomUserRequest(LobbyJoinRandomUserRequest req) {
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        List<Lobby> filteredLobbies = new ArrayList<>();
+
+        lobbies.forEach((String, lobby) -> {
+            if (lobby.getUserOrDummies().size() < lobby.getMaxPlayers() && !lobby.getUserOrDummies()
+                                                                                 .contains(req.getUser()) && !lobby
+                    .isInGame()) {
+                filteredLobbies.add(lobby);
+            }
+        });
+        if (!filteredLobbies.isEmpty()) {
+            int i = (int) (Math.random() * filteredLobbies.size());
+            Lobby randomLobby = filteredLobbies.get(i);
+
+            randomLobby.joinUser(req.getUser());
+
+            Message responseMessage = new JoinLobbyResponse(randomLobby.getName(), randomLobby);
+            responseMessage.initWithMessage(req);
+            post(responseMessage);
+            sendToAllInLobby(randomLobby.getName(), new UserJoinedLobbyMessage(randomLobby.getName(), req.getUser()));
+            post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        } else {
+            Message responseMessage = new JoinRandomLobbyFailedResponse();
+            responseMessage.initWithMessage(req);
+            post(responseMessage);
+        }
+    }
+
+    /**
      * Handles a LobbyJoinUserRequest found on the EventBus
      * <p>
      * If a LobbyJoinUserRequest is detected on the EventBus, this method is called.
