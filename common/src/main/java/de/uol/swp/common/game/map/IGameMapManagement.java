@@ -340,4 +340,6 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
+
+    int longestRoadWith(MapPoint mapPoint);
 }

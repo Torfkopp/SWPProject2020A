@@ -112,10 +112,10 @@ public class GameTest {
         game.getInventory(player).setVictoryPointCards(3);
         //Player has a city and 3 victory point cards
         assertEquals(5, game.calculateVictoryPoints(player));
-        game.getInventory(player).setLongestRoad(true);
+        game.setPlayerWithLongestRoad(player);
         //Player has a city, 3 victory point cards, and the longest road
         assertEquals(7, game.calculateVictoryPoints(player));
-        game.getInventory(player).setLargestArmy(true);
+        game.setPlayerWithLargestArmy(player);
         //Player has a city, 3 point cards, longest road, and the largest army
         assertEquals(9, game.calculateVictoryPoints(player));
         game.getMap().placeSettlement(player, IntersectionMapPoint(2, 5));

@@ -426,12 +426,28 @@ public class GameMapManagement implements IGameMapManagement {
     public Map<Player, Integer> longestRoadsForEachPlayer() {
         Map<Player, Integer> returnMap = new HashMap<>();
         for (MapPoint startingPoint : startingPoints.keySet()) {
-            int length = roadLength(1, getEdge(startingPoint));
+            int length = roadLength(getEdge(startingPoint), startingPoints.get(startingPoint), new LinkedList<>());
+            System.out.println(length);
             if (!returnMap.containsKey(startingPoints.get(startingPoint)) || returnMap.get(startingPoints
                                                                                                    .get(startingPoint)) < length)
                 returnMap.put(startingPoints.get(startingPoint), length);
         }
         return returnMap;
+    }
+
+    @Override
+    public int longestRoadWith(MapPoint mapPoint) {
+        List<Integer> lengths = new LinkedList<>();
+        List<IEdge> visited = new LinkedList();
+        visited.add(getEdge(mapPoint));
+        for (IEdge edge : intersectionEdgeNetwork.adjacentEdges(getEdge(mapPoint))){
+            lengths.add(roadLength(edge, getEdge(mapPoint).getOwner(), visited));
+        }
+        System.out.println("_______________________");
+        lengths.forEach(System.out::println);
+        System.out.println("_________________");
+        Collections.sort(lengths, Collections.reverseOrder());
+        return lengths.get(0) + lengths.get(1);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {
@@ -640,7 +656,6 @@ public class GameMapManagement implements IGameMapManagement {
     /**
      * A helper method for the recursion of longestRoadsForEachPlayer
      *
-     * @param length The road length at the current depth
      * @param edge   The current edge
      *
      * @return The maximum road length found
@@ -649,13 +664,19 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-10
      */
-    private int roadLength(int length, IEdge edge) {
-        int returnLength = 1;
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            int nextEdgeLength = 1;
-            if (nextEdge.getOwner() == edge.getOwner()) nextEdgeLength = roadLength(length + 1, edge);
-            if (nextEdgeLength > returnLength) returnLength = nextEdgeLength;
+    private int roadLength(IEdge edge, Player owner, List<IEdge> visited) {
+        if (!Objects.equals(edge.getOwner(),owner)) return 0;
+        if (visited.contains(edge)) return 0;
+        int c = 0;
+        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)){
+            if (visited.contains(nextEdge)) c++;
         }
-        return returnLength;
+        if (c > 1) return 0;
+        visited.add(edge);
+        List<Integer> lengths = new LinkedList<>();
+        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+            lengths.add(roadLength(nextEdge, owner, visited));
+        }
+        return Collections.max(lengths).intValue() + 1;
     }
 }

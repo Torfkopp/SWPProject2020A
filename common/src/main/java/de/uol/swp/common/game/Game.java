@@ -21,6 +21,9 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private UserOrDummy activePlayer;
+    private Player playerWithLongestRoad = null;
+    private Player playerWithLargestArmy = null;
+    private int longestRoadLength = 0;
 
     /**
      * Constructor
@@ -70,9 +73,9 @@ public class Game {
         //Points made with victory point cards
         points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (players.get(player).hasLongestRoad()) points += 2;
+        if (Objects.equals(playerWithLongestRoad, player)) points += 2;
         //2 Points if player has the largest army
-        if (players.get(player).hasLargestArmy()) points += 2;
+        if (Objects.equals(playerWithLargestArmy, player)) points += 2;
         return points;
     }
 
@@ -205,6 +208,14 @@ public class Game {
         return lobby;
     }
 
+    public int getLongestRoadLength() {
+        return longestRoadLength;
+    }
+
+    public void setLongestRoadLength(int longestRoadLength) {
+        this.longestRoadLength = longestRoadLength;
+    }
+
     /**
      * Gets this game's map
      *
@@ -235,6 +246,22 @@ public class Game {
         return players.getPlayerFromUserOrDummy(user);
     }
 
+    public Player getPlayerWithLargestArmy() {
+        return playerWithLargestArmy;
+    }
+
+    public void setPlayerWithLargestArmy(Player playerWithLargestArmy) {
+        this.playerWithLargestArmy = playerWithLargestArmy;
+    }
+
+    public Player getPlayerWithLongestRoad() {
+        return playerWithLongestRoad;
+    }
+
+    public void setPlayerWithLongestRoad(Player playerWithLongestRoad) {
+        this.playerWithLongestRoad = playerWithLongestRoad;
+    }
+
     /**
      * Gets an array of all participating players
      *
@@ -256,17 +283,8 @@ public class Game {
      */
     public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
         Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
-        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", null, 0));
-        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", null, 0));
-        for (UserOrDummy u : players.getUserOrDummyArray()) {
-            if (players.get(u).hasLongestRoad()) returnMap.put(false,
-                                                               new Triple<>("game.resources.whohas.longestRoad", u,
-                                                                            getMap().longestRoadsForEachPlayer()
-                                                                                    .get(players.getPlayerFromUserOrDummy(
-                                                                                            u))));
-            if (players.get(u).hasLargestArmy())
-                returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", u, getInventory(u).getKnights()));
-        }
+        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad), longestRoadLength));
+        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy), getInventory(playerWithLargestArmy).getKnights()));
         return new LinkedList<>(returnMap.values());
     }
 
