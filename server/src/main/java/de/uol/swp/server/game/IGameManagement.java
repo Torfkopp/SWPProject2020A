@@ -1,7 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.Game;
-import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -28,7 +28,7 @@ public interface IGameManagement {
      * only one game per lobby is possible
      * @since 2021-01-24
      */
-    void createGame(Lobby lobby, UserOrDummy first, IGameMap gameMap) throws IllegalArgumentException;
+    void createGame(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) throws IllegalArgumentException;
 
     /**
      * Deletes a game with its lobby's name

@@ -4,11 +4,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.EndTurnRequest;
+import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
-import de.uol.swp.common.game.request.RollDiceRequest;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.message.Message;
 import org.apache.logging.log4j.LogManager;
@@ -43,6 +42,13 @@ public class GameService implements IGameService {
         this.eventBus.register(this);
         this.userService = userService;
         LOG.debug("GameService started");
+    }
+
+    @Override
+    public void buildRequest(String lobbyName, User user, MapPoint mapPoint) {
+        LOG.debug("Sending BuildRequest");
+        Message request = new BuildRequest(lobbyName, user, mapPoint);
+        eventBus.post(request);
     }
 
     @Override
@@ -92,6 +98,13 @@ public class GameService implements IGameService {
     public void startSession(String lobbyName) {
         LOG.debug("Sending StartSessionRequest");
         Message request = new StartSessionRequest(lobbyName, userService.getLoggedInUser());
+        eventBus.post(request);
+    }
+
+    @Override
+    public void updateGameMap(String lobbyName) {
+        LOG.debug("Sending UpdateGameMapRequest");
+        Message request = new UpdateGameMapRequest(lobbyName);
         eventBus.post(request);
     }
 

@@ -1,5 +1,6 @@
 package de.uol.swp.client.game;
 
+import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 
 /**
@@ -11,6 +12,19 @@ import de.uol.swp.common.game.map.Resources;
  * @since 2021-04-07
  */
 public interface IGameService {
+
+    /**
+     * Posts a request to build something
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user wanting to build something
+     * @param mapPoint  The map point at which something should be build
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-08
+     */
+    void buildRequest(String lobbyName, User user, MapPoint mapPoint);
 
     /**
      * Posts a request to end the turn onto the Event
@@ -73,6 +87,17 @@ public interface IGameService {
      * @since 2021-03-23
      */
     void startSession(String lobbyName);
+
+    /**
+     * Posts a request to update the game map
+     *
+     * @param lobbyName The name of the lobby
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-08
+     */
+    void updateGameMap(String lobbyName);
 
     /**
      * Posts a request to update ones Inventory
