@@ -288,14 +288,6 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onBuildRequest(BuildRequest req) {
         LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
-        if (!buildingCurrentlyAllowed) return;
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        IGameMapManagement gameMap = game.getMap();
-        MapPoint mapPoint = req.getMapPoint();
-        UserOrDummy user = req.getUser();
-        Player player = game.getPlayer(user);
-        Inventory inv = game.getInventory(user);
-
         Consumer<BuildingFailedResponse.Reason> sendFailResponse = reason -> {
             LOG.debug("Sending BuildingFailedResponse");
             BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(), reason);
@@ -307,6 +299,18 @@ public class GameService extends AbstractService {
             LOG.debug("Sending BuildingSuccessfulMessage");
             lobbyService.sendToAllInLobby(lobbyName, message);
         };
+
+        if (!buildingCurrentlyAllowed) {
+            sendFailResponse.accept(NOT_THE_RIGHT_TIME);
+            return;
+        }
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        IGameMapManagement gameMap = game.getMap();
+        MapPoint mapPoint = req.getMapPoint();
+        UserOrDummy user = req.getUser();
+        Player player = game.getPlayer(user);
+        Inventory inv = game.getInventory(user);
+
         switch (mapPoint.getType()) {
             case INTERSECTION: {
                 if (gameMap.getIntersection(mapPoint).getState() == IIntersection.IntersectionState.CITY) {

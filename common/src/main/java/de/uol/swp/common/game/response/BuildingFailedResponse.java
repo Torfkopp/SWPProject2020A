@@ -18,11 +18,12 @@ public class BuildingFailedResponse extends AbstractLobbyResponse {
      * An enum of possible reasons
      */
     public enum Reason {
-        NOT_ENOUGH_RESOURCES,
-        CANT_BUILD_HERE,
         ALREADY_BUILT_HERE,
+        BAD_GROUND,
+        CANT_BUILD_HERE,
         NOTHING_HERE,
-        BAD_GROUND
+        NOT_ENOUGH_RESOURCES,
+        NOT_THE_RIGHT_TIME
     }
 
     /**

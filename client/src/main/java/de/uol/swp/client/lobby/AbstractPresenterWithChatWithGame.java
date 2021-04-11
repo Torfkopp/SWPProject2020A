@@ -228,20 +228,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received BuildingFailedResponse");
         gameRendering.drawGameMap(gameMap);
         switch (rsp.getReason()) {
-            case CANT_BUILD_HERE:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.cantbuildhere"));
-                break;
-            case NOT_ENOUGH_RESOURCES:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.notenoughresources"));
-                break;
             case ALREADY_BUILT_HERE:
                 gameRendering.showText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
                 break;
             case BAD_GROUND:
                 gameRendering.showText(resourceBundle.getString("game.building.failed.badground"));
                 break;
+            case CANT_BUILD_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.cantbuildhere"));
+                break;
             case NOTHING_HERE:
                 gameRendering.showText(resourceBundle.getString("game.building.failed.nothinghere"));
+                break;
+            case NOT_ENOUGH_RESOURCES:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.notenoughresources"));
+                break;
+            case NOT_THE_RIGHT_TIME:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.nottherighttime"));
                 break;
         }
     }
@@ -266,19 +269,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         switch (msg.getType()) {
             case ROAD:
                 attr = "game.building.success.road";
+                break;
             case SETTLEMENT:
                 attr = "game.building.success.settlement";
+                break;
             case CITY:
                 attr = "game.building.success.city";
+                break;
         }
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), loggedInUser)) {
             gameService.updateInventory(lobbyName, loggedInUser);
             if (finalAttr != null)
-                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + "you"))));
+                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
-                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + "other", msg.getUser().toString()))));
+                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
         }
     }
 
