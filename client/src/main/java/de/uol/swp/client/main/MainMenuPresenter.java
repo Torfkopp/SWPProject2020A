@@ -367,38 +367,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Method called when the JoinRandomLobbyButton is pressed
-     * <p>
-     * If the JoinRandomLobbyButton is pressed, this method requests the LobbyService
-     * to join a random lobby. If there is no existing lobby or there is no fitting one,
-     * nothing will happen.
-     *
-     * @author Finn Haase
-     * @author Sven Ahrens
-     * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2021-04-08
-     */
-    @FXML
-    private void onJoinRandomLobbyButtonPressed() {
-        lobbyService.joinRandomLobby(loggedInUser);
-    }
-
-    /**
-     * Handles a JoinRandomLobbyFailedResponse found on the EventBus
-     * <p>
-     * If a new JoinRandomLobbyFailedResponse object is found on the EventBus,
-     * this method sets the state of the randomLobbyState label to true.
-     *
-     * @author Finn Haase
-     * @author Sven Ahrens
-     * @since 2021-04-08
-     */
-    @Subscribe
-    private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
-        randomLobbyState.setVisible(true);
-    }
-
-    /**
      * Handles a JoinLobbyResponse found on the EventBus
      * <p>
      * If a new JoinLobbyResponse object is found on the EventBus, this method
@@ -421,6 +389,38 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
+    }
+
+    /**
+     * Method called when the JoinRandomLobbyButton is pressed
+     * <p>
+     * If the JoinRandomLobbyButton is pressed, this method requests the LobbyService
+     * to join a random lobby. If there is no existing lobby or there is no fitting one,
+     * nothing will happen.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-04-08
+     */
+    @FXML
+    private void onJoinRandomLobbyButtonPressed() {
+        lobbyService.joinRandomLobby();
+    }
+
+    /**
+     * Handles a JoinRandomLobbyFailedResponse found on the EventBus
+     * <p>
+     * If a new JoinRandomLobbyFailedResponse object is found on the EventBus,
+     * this method sets the state of the randomLobbyState label to true.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
+        randomLobbyState.setVisible(true);
     }
 
     /**
