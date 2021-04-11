@@ -108,7 +108,6 @@ class UserServiceTest {
      */
     @Test
     void dropUserTest() throws InterruptedException {
-
         userService.dropUser(defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
