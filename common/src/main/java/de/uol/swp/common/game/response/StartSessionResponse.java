@@ -1,6 +1,5 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.game.map.GameMapDTO;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.Lobby;
@@ -23,7 +22,8 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final UserOrDummy player;
     private final IConfiguration configuration;
     private final IGameMap gameMapDTO;
-    private int[] dices = new int[2];
+    private final int[] dices;
+    private final boolean rolledDiceAlready;
 
     /**
      * Constructor
@@ -34,12 +34,13 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param dices         The last rolled dices
      */
     public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, IGameMap gameMapDTO,
-                                int[] dices) {
+                                int[] dices, boolean rolledDiceAlready) {
         this.lobby = lobby;
         this.player = player;
         this.configuration = configuration;
         this.gameMapDTO = gameMapDTO;
         this.dices = dices;
+        this.rolledDiceAlready = rolledDiceAlready;
     }
 
     /**
@@ -85,5 +86,14 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public UserOrDummy getPlayer() {
         return player;
+    }
+
+    /**
+     * Gets the RolledDiceAlready attribute
+     *
+     * @return Whether the current turn rolled the dice or not
+     */
+    public boolean areDiceRolledAlready() {
+        return rolledDiceAlready;
     }
 }

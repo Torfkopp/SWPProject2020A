@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
@@ -14,8 +13,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.Set;
@@ -312,32 +309,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
-            preGameSettingBox.setVisible(false);
-            preGameSettingBox.setPrefHeight(0);
-            preGameSettingBox.setMaxHeight(0);
-            preGameSettingBox.setMinHeight(0);
-            //This Line needs to be changed/ removed in the Future
-            gameRendering = new GameRendering(gameMapCanvas);
-            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
-            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
             setTurnIndicatorText(msg.getUser());
-            gameService.updateInventory(lobbyName, loggedInUser);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-            inventoryView.setMaxHeight(280);
-            inventoryView.setMinHeight(280);
-            inventoryView.setPrefHeight(280);
-            inventoryView.setVisible(true);
-            uniqueCardView.setMaxHeight(48);
-            uniqueCardView.setMinHeight(48);
-            uniqueCardView.setPrefHeight(48);
-            uniqueCardView.setVisible(true);
-            readyCheckBox.setVisible(false);
-            startSession.setVisible(false);
-            rollDice.setVisible(true);
-            endTurn.setVisible(true);
+            prepareInGameArrangement();
             endTurn.setDisable(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
@@ -367,54 +340,60 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onStartSessionResponse(StartSessionResponse rsp) {
         if (!rsp.getLobby().getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
+        LOG.debug("Received StartSessionResponse for Lobby " + lobbyName);
         gameWon = false;
         winner = null;
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
-            Lobby lobby = rsp.getLobby();
-            preGameSettingBox.setVisible(false);
-            preGameSettingBox.setPrefHeight(0);
-            preGameSettingBox.setMaxHeight(0);
-            preGameSettingBox.setMinHeight(0);
-            //This Line needs to be changed/removed in the Future
-            gameRendering = new GameRendering(gameMapCanvas);
-            gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
-            gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
             int[] dices = rsp.getDices();
             dice1 = dices[0];
             dice2 = dices[1];
-            gameRendering.drawDice(dices[0], dices[1]);
-            if (!lobby.isStartUpPhaseEnabled()) gameRendering.drawGameMap(rsp.getGameMapDTO());
             setTurnIndicatorText(rsp.getPlayer());
-            gameService.updateInventory(lobbyName, loggedInUser);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-            inventoryView.setMaxHeight(280);
-            inventoryView.setMinHeight(280);
-            inventoryView.setPrefHeight(280);
-            inventoryView.setVisible(true);
-            uniqueCardView.setMaxHeight(48);
-            uniqueCardView.setMinHeight(48);
-            uniqueCardView.setPrefHeight(48);
-            uniqueCardView.setVisible(true);
-            readyCheckBox.setVisible(false);
-            startSession.setVisible(false);
-            rollDice.setVisible(true);
-            endTurn.setVisible(true);
-            endTurn.setDisable(true);
+            gameService.updateGameMap(lobbyName);
+            prepareInGameArrangement();
+            endTurn.setDisable(!rsp.areDiceRolledAlready());
             tradeWithUserButton.setVisible(true);
-            tradeWithUserButton.setDisable(true);
+            tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
-            tradeWithBankButton.setDisable(true);
-            setRollDiceButtonState(rsp.getPlayer());
+            tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
+            if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
             kickUserButton.setVisible(false);
             playCard.setVisible(true);
-            playCard.setDisable(true);
+            playCard.setDisable(!rsp.areDiceRolledAlready());
         });
+    }
+
+    /**
+     * Helper method to set the in-game Buttons and Lists
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-11
+     */
+    private void prepareInGameArrangement() {
+        preGameSettingBox.setVisible(false);
+        preGameSettingBox.setPrefHeight(0);
+        preGameSettingBox.setMaxHeight(0);
+        preGameSettingBox.setMinHeight(0);
+        gameRendering = new GameRendering(gameMapCanvas);
+        gameService.updateInventory(lobbyName, loggedInUser);
+        window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+        ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+        inventoryView.setMaxHeight(280);
+        inventoryView.setMinHeight(280);
+        inventoryView.setPrefHeight(280);
+        inventoryView.setVisible(true);
+        uniqueCardView.setMaxHeight(48);
+        uniqueCardView.setMinHeight(48);
+        uniqueCardView.setPrefHeight(48);
+        uniqueCardView.setVisible(true);
+        readyCheckBox.setVisible(false);
+        startSession.setVisible(false);
+        rollDice.setVisible(true);
+        endTurn.setVisible(true);
     }
 
     /**
