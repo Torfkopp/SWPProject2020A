@@ -82,6 +82,18 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         return matcher.matches();
     }
 
+    /**
+     * Method called when the keycombination AltF4 is pressed
+     * <p>
+     * This Method is called when the keycombination AltF4 is pressed. It posts an instance
+     * of the ChangeAccountDetailsCanceledEvent onto the EventBus the SceneManager is subscribed
+     * to.
+     *
+     * @author Sven Ahrens
+     * @author Timo Gerken
+     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent
+     * @since 2021-04-11
+     */
     @FXML
     private void onAltF4Pressed(KeyEvent keyEvent) {
         if (keyComb.match(keyEvent)) {
