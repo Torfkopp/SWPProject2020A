@@ -286,7 +286,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @author Alwin Bossert
      * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
+     * @see de.uol.swp.common.chat.message.SystemMessageMessage
      * @since 2021-03-23
      */
     @Subscribe

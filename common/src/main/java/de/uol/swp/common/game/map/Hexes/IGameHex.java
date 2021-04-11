@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.map.Hexes;
 
+import java.io.Serializable;
+
 /**
  * Interface for a hex
  *
@@ -7,7 +9,7 @@ package de.uol.swp.common.game.map.Hexes;
  * @author Steven Luong
  * @since 2021-01-16
  */
-public interface IGameHex {
+public interface IGameHex extends Serializable {
 
     /**
      * Enum for the type of the Hex

@@ -2,7 +2,6 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
-import de.uol.swp.common.game.map.GameMap;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.Lobby;
@@ -289,6 +288,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onStartSessionButtonPressed() {
+        buildingCosts.setVisible(true);
         gameService.startSession(lobbyName, loggedInUser);
     }
 
@@ -322,9 +322,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             gameRendering = new GameRendering(gameMapCanvas);
             gameMapCanvas.getGraphicsContext2D().setFont(Font.font(12));
             gameMapCanvas.getGraphicsContext2D().setTextAlign(TextAlignment.LEFT);
-            gameMap = new GameMap().createMapFromConfiguration(msg.getConfiguration());
-            if (!msg.isStartUpPhaseEnabled()) gameMap.makeBeginnerSettlementsAndRoads(lobbyMembers.size());
-            gameRendering.drawGameMap(gameMap);
             setTurnIndicatorText(msg.getUser());
             gameService.updateInventory(lobbyName, loggedInUser);
             window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
@@ -352,6 +349,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             kickUserButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
+            gameService.updateGameMap(lobbyName);
         });
     }
 
