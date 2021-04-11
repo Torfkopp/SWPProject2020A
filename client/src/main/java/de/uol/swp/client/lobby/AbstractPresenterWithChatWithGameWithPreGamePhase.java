@@ -285,6 +285,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onStartSessionButtonPressed() {
+        buildingCosts.setVisible(true);
         gameService.startSession(lobbyName, loggedInUser);
     }
 
@@ -348,6 +349,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             kickUserButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
+            gameService.updateGameMap(lobbyName);
         });
     }
 

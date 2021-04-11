@@ -51,6 +51,7 @@ public class GameRendering {
     private static final Color FIELDS_COLOUR = Color.rgb(240, 215, 103);
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
+    private static final double TOKEN_SIZE = 16;
 
     @Inject
     private static ResourceBundle resourceBundle;
@@ -155,12 +156,12 @@ public class GameRendering {
         LOG.debug("Drawing Game map");
 
         //Get hexes, intersections, and edges in a usable format from the IGameMap
-        IGameHex[][] hexes = gameMap.getHexesAsJaggedArray();
-        IIntersection[][] intersections = gameMap.getIntersectionsAsJaggedArray();
+        IGameHex[][] hexes = gameMap.getHexes();
+        IIntersectionWithEdges[][] intersections = gameMap.getIntersections();
         clearGameMap();
         //Call functions to draw hexes, intersections, and edges
         drawHexTiles(hexes);
-        drawIntersectionsAndEdges(intersections, gameMap);
+        drawIntersectionsAndEdges(intersections);
 
         if (drawHitboxGrid) drawHitboxGrid();
     }
@@ -181,6 +182,23 @@ public class GameRendering {
         gfxCtx.setFill(Color.BLACK);
         gfxCtx.setFont(Font.font(25));
         gfxCtx.fillText(text, width / 2.0, height / 2.0);
+    }
+
+    /**
+     * Shows a text notification on the canvas
+     *
+     * @param text The text to display
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-08
+     */
+    public void showText(String text) {
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.setFont(Font.font(20));
+        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
     }
 
     /**
@@ -283,8 +301,11 @@ public class GameRendering {
                 text = resourceBundle.getString("game.resources.any");
                 break;
         }
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
         gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.fillText(text, currentX + hexWidth / 8.0, currentY + hexHeight * (4.0 / 8.0), hexWidth * (6.0 / 8.0));
+        gfxCtx.setFont(Font.font(TOKEN_SIZE));
+        gfxCtx.fillText(text, currentX + hexWidth / 2.0, currentY + hexHeight / 2.0, hexWidth * (6.0 / 8.0));
     }
 
     /**
@@ -411,8 +432,11 @@ public class GameRendering {
         double yPos = currentY + (hexHeight - tokenSize) / 2.0;
         gfxCtx.fillOval(xPos, yPos, tokenSize, tokenSize);
         gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.fillText(resourceBundle.getString("game.token." + token), xPos + tokenSize * (1.0 / 4.0),
-                        yPos + tokenSize * (3.0 / 4.0), tokenSize / 2.0);
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFont(Font.font(TOKEN_SIZE));
+        gfxCtx.fillText(resourceBundle.getString("game.token." + token), currentX + hexWidth / 2.0,
+                        currentY + hexWidth / 2.0, tokenSize * ( 7.0/ 8.0));
     }
 
     /**
@@ -478,7 +502,7 @@ public class GameRendering {
      * @param intersections An array containing all intersections
      * @param gameMap       A IGameMap providing the game map to draw
      */
-    private void goThroughHalfMap(boolean topHalf, IIntersection[][] intersections, IGameMap gameMap) {
+    private void goThroughHalfMap(boolean topHalf, IIntersectionWithEdges[][] intersections) {
         //Sets currentY depending on topHalf
         double currentY = ((topHalf) ? (hexHeight * (3.0 / 4.0)) :
                            ((effectiveHeight / 2) + (hexHeight / 4))) + OFFSET_Y;
@@ -489,12 +513,12 @@ public class GameRendering {
             double rowStartX = ((intersections[intersections.length / 2].length - intersections[y].length) / 4.0) * hexWidth;
             double currentX = OFFSET_X + rowStartX + hexWidth;
             if (topHalf) currentX += hexWidth / 2.0;
-            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y], gameMap);
+            goThroughSubRow(topHalf, false, currentX, currentY, intersections[y]);
 
             currentX = OFFSET_X + rowStartX + hexWidth;
             if (!topHalf) currentX += hexWidth / 2.0;
             currentY += (hexHeight / 4.0);
-            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y], gameMap);
+            goThroughSubRow(!topHalf, true, currentX, currentY, intersections[y]);
             currentY += hexHeight / 2.0;
         }
     }
@@ -513,12 +537,12 @@ public class GameRendering {
      * @param gameMap       An IGameMap providing the game map to draw
      */
     private void goThroughSubRow(boolean firstSubRow, boolean renderEdges, double currentX, double currentY,
-                                 IIntersection[] intersections, IGameMap gameMap) {
+                                 IIntersectionWithEdges[] intersections) {
         for (int x = firstSubRow ? 1 : 0; x < intersections.length; x = x + 2) {
             if (renderEdges) {
-                renderEdges(currentX, currentY, intersections[x], gameMap);
+                renderEdges(currentX, currentY, intersections[x]);
             }
-            renderIntersection(currentX, currentY, intersections[x]);
+            renderIntersection(currentX, currentY, intersections[x].getIntersection());
             currentX += hexWidth;
         }
     }
@@ -610,11 +634,10 @@ public class GameRendering {
      *
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
-     * @param gameMap  An IGameMap providing the game map to draw
      */
-    private void renderEdges(double currentX, double currentY, IIntersection intersection, IGameMap gameMap) {
+    private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
         gfxCtx.setLineWidth(roadWidth);
-        for (IEdge edge : gameMap.incidentEdges(intersection)) {
+        for (IEdge edge : intersection.getEdges()) {
             //Northwest road
             if (edge.getOwner() == null) continue;
             if (edge.getOrientation() == IEdge.Orientation.WEST) {

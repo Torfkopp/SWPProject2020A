@@ -7,6 +7,8 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
@@ -69,6 +71,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label turnIndicator;
     @FXML
     protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
+    @FXML
+    protected Label buildingCosts;
 
     @Inject
     protected IGameService gameService;
@@ -205,6 +209,83 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a BuildingFailedResponse
+     * If a BuildingFailedResponse is found on the bus this method is called.
+     * It shows a small text on the gamemap indicating what went wrong.
+     *
+     * @param rsp The BuildingFailedMessage found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-07
+     */
+    @Subscribe
+    private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received BuildingFailedResponse");
+        gameRendering.drawGameMap(gameMap);
+        switch (rsp.getReason()) {
+            case ALREADY_BUILT_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
+                break;
+            case BAD_GROUND:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.badground"));
+                break;
+            case CANT_BUILD_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.cantbuildhere"));
+                break;
+            case NOTHING_HERE:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.nothinghere"));
+                break;
+            case NOT_ENOUGH_RESOURCES:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.notenoughresources"));
+                break;
+            case NOT_THE_RIGHT_TIME:
+                gameRendering.showText(resourceBundle.getString("game.building.failed.nottherighttime"));
+                break;
+        }
+    }
+
+    /**
+     * Handles a BuildingSuccessfulMessage
+     * If a BuildingSuccessfulMessage is found on the bus this method is called.
+     * It updates the gamemap and for the user that build something the inventory.
+     *
+     * @param msg The BuildingSuccessfulMessage found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-07
+     */
+    @Subscribe
+    private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
+        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received BuildingSuccessfullMessage");
+        gameService.updateGameMap(lobbyName);
+        String attr = null;
+        switch (msg.getType()) {
+            case ROAD:
+                attr = "game.building.success.road";
+                break;
+            case SETTLEMENT:
+                attr = "game.building.success.settlement";
+                break;
+            case CITY:
+                attr = "game.building.success.city";
+                break;
+        }
+        final String finalAttr = attr;
+        if (Objects.equals(msg.getUser(), loggedInUser)) {
+            gameService.updateInventory(lobbyName, loggedInUser);
+            if (finalAttr != null)
+                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+        } else {
+            if (finalAttr != null) Platform.runLater(() -> chatMessages
+                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
+        }
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -260,26 +341,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        // TODO: Replace this placeholder code with handling the results in context of e.g. building, info, etc
-        if (mapPoint.getType() == INVALID) {
-            System.out.println("INVALID");
-        } else if (mapPoint.getType() == HEX) {
-            System.out.println("HEX");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == INTERSECTION) {
-            System.out.println("INTERSECTION");
-            System.out.println("mapPoint.getY() = " + mapPoint.getY());
-            System.out.println("mapPoint.getX() = " + mapPoint.getX());
-        } else if (mapPoint.getType() == EDGE) {
-            System.out.println("EDGE");
-            System.out.println("left:");
-            System.out.println("mapPoint.getL().getY() = " + mapPoint.getL().getY());
-            System.out.println("mapPoint.getL().getX() = " + mapPoint.getL().getX());
-            System.out.println("right:");
-            System.out.println("mapPoint.getR().getY() = " + mapPoint.getR().getY());
-            System.out.println("mapPoint.getR().getX() = " + mapPoint.getR().getX());
-        }
+        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
+            gameService.buildRequest(lobbyName, loggedInUser, mapPoint);
     }
 
     /**
@@ -295,6 +358,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onNextPlayerMessage(NextPlayerMessage msg) {
         if (!msg.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+        gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
     }
@@ -480,6 +544,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onReturnToLobbyButtonPressed() {
+        buildingCosts.setVisible(false);
         inGame = false;
         lobbyService.returnToPreGameLobby(this.lobbyName);
     }
@@ -596,6 +661,26 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
+    }
+
+    /**
+     * Handles a UpdateGameMapResponse
+     * If a UpdateGameMapResponse is found on the bus this method is called.
+     * It updates the gamemap and redraws it.
+     *
+     * @param rsp The UpdateGameMapResponse found on the bus
+     *
+     * @author Aldin Dervisi
+     * @author Temmo Junkhoff
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {
+        if (!Objects.equals(rsp.getLobbyName(), lobbyName)) return;
+        LOG.debug("Received UpdateGameMapResponse");
+        if (rsp.getGameMapDTO() == null) return;
+        gameMap = rsp.getGameMapDTO();
+        gameRendering.drawGameMap(gameMap);
     }
 
     /**
