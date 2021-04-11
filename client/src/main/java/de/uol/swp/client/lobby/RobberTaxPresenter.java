@@ -64,41 +64,12 @@ public class RobberTaxPresenter extends AbstractPresenter {
         setEventBus(eventBus);
     }
 
+    /**
+     * Listener for the brickSlider
+     */
     @FXML
-    public void brickSliderListener() {
+    private void brickSliderListener() {
         selectedResources.put(Resources.BRICK, (int) brickSlider.getValue());
-        dragMethod();
-    }
-
-    @FXML
-    public void grainSliderListener() {
-        selectedResources.put(Resources.GRAIN, (int) grainSlider.getValue());
-        dragMethod();
-    }
-
-    @FXML
-    public void lumberSliderListener() {
-        selectedResources.put(Resources.LUMBER, (int) lumberSlider.getValue());
-        dragMethod();
-    }
-
-    @FXML
-    public void onTaxPayButtonPressed() {
-        LOG.debug("Sending RobberTaxChosenRequest");
-        eventBus.post(new RobberTaxChosenRequest(selectedResources, user, lobbyName));
-        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, user));
-        eventBus.post(new UpdateInventoryRequest(user, lobbyName));
-    }
-
-    @FXML
-    public void oreSliderListener() {
-        selectedResources.put(Resources.ORE, (int) oreSlider.getValue());
-        dragMethod();
-    }
-
-    @FXML
-    public void woolSliderListener() {
-        selectedResources.put(Resources.WOOL, (int) woolSlider.getValue());
         dragMethod();
     }
 
@@ -116,6 +87,15 @@ public class RobberTaxPresenter extends AbstractPresenter {
         if (selectedAmount <= taxAmount) progress.setProgress((double) selectedAmount / taxAmount);
         else progress.setProgress(1.0 - (selectedAmount % taxAmount) / (double) taxAmount);
         taxPay.setDisable(selectedAmount != taxAmount);
+    }
+
+    /**
+     * Listener for the grainSlider
+     */
+    @FXML
+    private void grainSliderListener() {
+        selectedResources.put(Resources.GRAIN, (int) grainSlider.getValue());
+        dragMethod();
     }
 
     /**
@@ -143,6 +123,15 @@ public class RobberTaxPresenter extends AbstractPresenter {
     }
 
     /**
+     * Listener for the lumberSlider
+     */
+    @FXML
+    private void lumberSliderListener() {
+        selectedResources.put(Resources.LUMBER, (int) lumberSlider.getValue());
+        dragMethod();
+    }
+
+    /**
      * Handles a ShowRobberTaxUpdateEvent
      * <p>
      * The event is sent when a new RobberTaxPresenter is created
@@ -161,6 +150,29 @@ public class RobberTaxPresenter extends AbstractPresenter {
         resourceAmount.setText(String.valueOf(taxAmount));
         setInventoryList();
         setSliders();
+    }
+
+    /**
+     * Method called when the TaxPayButton is pressed
+     * <p>
+     * Posts a request to reduce the resources, posts an event to close the window
+     * and then updates the inventory
+     */
+    @FXML
+    private void onTaxPayButtonPressed() {
+        LOG.debug("Sending RobberTaxChosenRequest");
+        eventBus.post(new RobberTaxChosenRequest(selectedResources, user, lobbyName));
+        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, user));
+        eventBus.post(new UpdateInventoryRequest(user, lobbyName));
+    }
+
+    /**
+     * Listener for the oreSlider
+     */
+    @FXML
+    private void oreSliderListener() {
+        selectedResources.put(Resources.ORE, (int) oreSlider.getValue());
+        dragMethod();
     }
 
     /**
@@ -191,5 +203,14 @@ public class RobberTaxPresenter extends AbstractPresenter {
         lumberSlider.setMax(inventory.get(Resources.LUMBER));
         oreSlider.setMax(inventory.get(Resources.ORE));
         woolSlider.setMax(inventory.get(Resources.WOOL));
+    }
+
+    /**
+     * Listener for the woolSlider
+     */
+    @FXML
+    private void woolSliderListener() {
+        selectedResources.put(Resources.WOOL, (int) woolSlider.getValue());
+        dragMethod();
     }
 }
