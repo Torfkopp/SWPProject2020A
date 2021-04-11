@@ -45,9 +45,9 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void buildRequest(String lobbyName, User user, MapPoint mapPoint) {
+    public void buildRequest(String lobbyName, MapPoint mapPoint) {
         LOG.debug("Sending BuildRequest");
-        Message request = new BuildRequest(lobbyName, user, mapPoint);
+        Message request = new BuildRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
         eventBus.post(request);
     }
 

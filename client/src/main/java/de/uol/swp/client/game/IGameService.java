@@ -17,14 +17,13 @@ public interface IGameService {
      * Posts a request to build something
      *
      * @param lobbyName The name of the lobby
-     * @param user      The user wanting to build something
      * @param mapPoint  The map point at which something should be build
      *
      * @author Aldin Dervisi
      * @author Temmo Junkhoff
      * @since 2021-04-08
      */
-    void buildRequest(String lobbyName, User user, MapPoint mapPoint);
+    void buildRequest(String lobbyName, MapPoint mapPoint);
 
     /**
      * Posts a request to end the turn onto the Event

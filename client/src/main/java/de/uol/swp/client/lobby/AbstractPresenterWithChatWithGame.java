@@ -278,8 +278,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 break;
         }
         final String finalAttr = attr;
-        if (Objects.equals(msg.getUser(), loggedInUser)) {
-            gameService.updateInventory(lobbyName, loggedInUser);
+        if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
+            gameService.updateInventory(lobbyName);
             if (finalAttr != null)
                 Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
         } else {
@@ -345,7 +345,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-            gameService.buildRequest(lobbyName, loggedInUser, mapPoint);
+            gameService.buildRequest(lobbyName, mapPoint);
     }
 
     /**
@@ -896,6 +896,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         endTurn.setDisable(!userService.getLoggedInUser().equals(user));
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(!userService.getLoggedInUser().equals(user));
-        buildingCurrentlyAllowed = loggedInUser.equals(user);
+        buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
