@@ -284,7 +284,7 @@ public class Game {
     public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
         Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
         returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad), longestRoadLength));
-        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy), getInventory(playerWithLargestArmy).getKnights()));
+        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy), playerWithLargestArmy == null ? 0 : getInventory(playerWithLargestArmy).getKnights()));
         return new LinkedList<>(returnMap.values());
     }
 
