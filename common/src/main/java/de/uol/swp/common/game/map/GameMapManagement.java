@@ -31,7 +31,6 @@ public class GameMapManagement implements IGameMapManagement {
     private ImmutableNetwork<GameHexWrapper, IEdge> hexEdgeNetwork;
     private ImmutableNetwork<IIntersection, IEdge> intersectionEdgeNetwork;
     private IConfiguration configuration;
-    private Map<MapPoint, Player> startingPoints = new HashMap<>();
 
     /**
      * Constructor
@@ -305,6 +304,18 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public int longestRoadWith(MapPoint mapPoint) {
+        List<Integer> lengths = new LinkedList<>();
+        List<IEdge> visited = new LinkedList();
+        visited.add(getEdge(mapPoint));
+        for (IEdge edge : intersectionEdgeNetwork.adjacentEdges(getEdge(mapPoint))) {
+            lengths.add(roadLength(edge, getEdge(mapPoint).getOwner(), visited));
+        }
+        Collections.sort(lengths, Collections.reverseOrder());
+        return lengths.get(0) + lengths.get(1);
+    }
+
+    @Override
     public void makeBeginnerSettlementsAndRoads(int playerCount) {
         //Create settlements
         intersectionMap[1][3].setOwnerAndState(Player.PLAYER_1, SETTLEMENT);
@@ -315,19 +326,19 @@ public class GameMapManagement implements IGameMapManagement {
         intersectionMap[3][8].setOwnerAndState(Player.PLAYER_3, SETTLEMENT);
 
         //Create roads
-        placeStartRoad(Player.PLAYER_1, EdgeMapPoint(IntersectionMapPoint(1, 3), IntersectionMapPoint(1, 4)));
-        placeStartRoad(Player.PLAYER_1, EdgeMapPoint(IntersectionMapPoint(3, 2), IntersectionMapPoint(3, 3)));
-        placeStartRoad(Player.PLAYER_2, EdgeMapPoint(IntersectionMapPoint(1, 5), IntersectionMapPoint(1, 6)));
-        placeStartRoad(Player.PLAYER_2, EdgeMapPoint(IntersectionMapPoint(4, 4), IntersectionMapPoint(4, 5)));
-        placeStartRoad(Player.PLAYER_3, EdgeMapPoint(IntersectionMapPoint(3, 8), IntersectionMapPoint(2, 8)));
-        placeStartRoad(Player.PLAYER_3, EdgeMapPoint(IntersectionMapPoint(2, 2), IntersectionMapPoint(2, 3)));
+        placeRoad(Player.PLAYER_1, EdgeMapPoint(IntersectionMapPoint(1, 3), IntersectionMapPoint(1, 4)));
+        placeRoad(Player.PLAYER_1, EdgeMapPoint(IntersectionMapPoint(3, 2), IntersectionMapPoint(3, 3)));
+        placeRoad(Player.PLAYER_2, EdgeMapPoint(IntersectionMapPoint(1, 5), IntersectionMapPoint(1, 6)));
+        placeRoad(Player.PLAYER_2, EdgeMapPoint(IntersectionMapPoint(4, 4), IntersectionMapPoint(4, 5)));
+        placeRoad(Player.PLAYER_3, EdgeMapPoint(IntersectionMapPoint(3, 8), IntersectionMapPoint(2, 8)));
+        placeRoad(Player.PLAYER_3, EdgeMapPoint(IntersectionMapPoint(2, 2), IntersectionMapPoint(2, 3)));
 
         // For 4 players, create more settlements and roads
         if (playerCount == 4) {
             intersectionMap[4][2].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
             intersectionMap[4][6].setOwnerAndState(Player.PLAYER_4, SETTLEMENT);
-            placeStartRoad(Player.PLAYER_4, EdgeMapPoint(IntersectionMapPoint(4, 2), IntersectionMapPoint(4, 3)));
-            placeStartRoad(Player.PLAYER_4, EdgeMapPoint(IntersectionMapPoint(4, 6), IntersectionMapPoint(3, 7)));
+            placeRoad(Player.PLAYER_4, EdgeMapPoint(IntersectionMapPoint(4, 2), IntersectionMapPoint(4, 3)));
+            placeRoad(Player.PLAYER_4, EdgeMapPoint(IntersectionMapPoint(4, 6), IntersectionMapPoint(3, 7)));
         }
     }
 
@@ -420,34 +431,6 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public Map<Player, Integer> longestRoadsForEachPlayer() {
-        Map<Player, Integer> returnMap = new HashMap<>();
-        for (MapPoint startingPoint : startingPoints.keySet()) {
-            int length = roadLength(getEdge(startingPoint), startingPoints.get(startingPoint), new LinkedList<>());
-            System.out.println(length);
-            if (!returnMap.containsKey(startingPoints.get(startingPoint)) || returnMap.get(startingPoints
-                                                                                                   .get(startingPoint)) < length)
-                returnMap.put(startingPoints.get(startingPoint), length);
-        }
-        return returnMap;
-    }
-
-    @Override
-    public int longestRoadWith(MapPoint mapPoint) {
-        List<Integer> lengths = new LinkedList<>();
-        List<IEdge> visited = new LinkedList();
-        visited.add(getEdge(mapPoint));
-        for (IEdge edge : intersectionEdgeNetwork.adjacentEdges(getEdge(mapPoint))){
-            lengths.add(roadLength(edge, getEdge(mapPoint).getOwner(), visited));
-        }
-        System.out.println("_______________________");
-        lengths.forEach(System.out::println);
-        System.out.println("_________________");
-        Collections.sort(lengths, Collections.reverseOrder());
-        return lengths.get(0) + lengths.get(1);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {
@@ -641,22 +624,9 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     /**
-     * Helper method to place a starting road
-     * This method places a road and puts the position in the startingPoints map
-     *
-     * @param player The player who should own the road
-     * @param edge   The Point on which to place the road
-     */
-    private void placeStartRoad(Player player, MapPoint edge) {
-        if (edge.getType() != Type.EDGE) return;
-        placeRoad(player, getEdge(edge));
-        startingPoints.put(edge, player);
-    }
-
-    /**
      * A helper method for the recursion of longestRoadsForEachPlayer
      *
-     * @param edge   The current edge
+     * @param edge The current edge
      *
      * @return The maximum road length found
      *
@@ -665,10 +635,10 @@ public class GameMapManagement implements IGameMapManagement {
      * @since 2021-04-10
      */
     private int roadLength(IEdge edge, Player owner, List<IEdge> visited) {
-        if (!Objects.equals(edge.getOwner(),owner)) return 0;
+        if (!Objects.equals(edge.getOwner(), owner)) return 0;
         if (visited.contains(edge)) return 0;
         int c = 0;
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)){
+        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
             if (visited.contains(nextEdge)) c++;
         }
         if (c > 1) return 0;
