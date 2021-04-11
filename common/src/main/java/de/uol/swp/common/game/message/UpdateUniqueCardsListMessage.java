@@ -20,7 +20,8 @@ public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
 
     /**
      * Constructor
-     * @param lobbyName The name of the lobby
+     *
+     * @param lobbyName       The name of the lobby
      * @param uniqueCardsList The list of unique cards
      */
     public UpdateUniqueCardsListMessage(String lobbyName, List<Triple<String, UserOrDummy, Integer>> uniqueCardsList) {
@@ -30,6 +31,7 @@ public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
 
     /**
      * Gets the lobbyname
+     *
      * @return The lobbyname
      */
     public String getLobbyName() {
@@ -38,6 +40,7 @@ public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
 
     /**
      * Gets the unique cards list
+     *
      * @return The list of unique cards
      */
     public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {

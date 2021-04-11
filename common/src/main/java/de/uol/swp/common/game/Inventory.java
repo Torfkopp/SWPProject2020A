@@ -363,5 +363,4 @@ public class Inventory {
     public void increaseYearOfPlentyCards(int i) {
         yearOfPlentyCards += i;
     }
-
 }

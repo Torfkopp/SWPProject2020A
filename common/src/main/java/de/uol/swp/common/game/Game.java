@@ -210,6 +210,7 @@ public class Game {
 
     /**
      * Gets the length of the longest road
+     *
      * @return The length of the longest road
      */
     public int getLongestRoadLength() {
@@ -218,6 +219,7 @@ public class Game {
 
     /**
      * Set the length of the longest road
+     *
      * @param longestRoadLength The new length
      */
     public void setLongestRoadLength(int longestRoadLength) {
@@ -256,6 +258,7 @@ public class Game {
 
     /**
      * Gets the player with the largest army
+     *
      * @return The player with the largest army
      */
     public Player getPlayerWithLargestArmy() {
@@ -264,6 +267,7 @@ public class Game {
 
     /**
      * Sets the player with the largest army
+     *
      * @param playerWithLargestArmy The player with the largest army
      */
     public void setPlayerWithLargestArmy(Player playerWithLargestArmy) {
@@ -272,6 +276,7 @@ public class Game {
 
     /**
      * Gets the player with the longest road
+     *
      * @return The player with the longest road
      */
     public Player getPlayerWithLongestRoad() {
@@ -280,6 +285,7 @@ public class Game {
 
     /**
      * Sets the player with the longest road
+     *
      * @param playerWithLongestRoad The player with the longest road
      */
     public void setPlayerWithLongestRoad(Player playerWithLongestRoad) {
