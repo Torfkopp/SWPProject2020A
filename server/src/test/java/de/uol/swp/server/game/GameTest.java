@@ -1,8 +1,8 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.Game;
-import de.uol.swp.common.game.map.GameMap;
-import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.GameMapManagement;
+import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
@@ -30,7 +30,7 @@ class GameTest {
         IGameManagement gm = new GameManagement(new LobbyManagement());
         User user = new UserDTO(99, "", "", "");
         Lobby lobby = new LobbyDTO("testLobby", user, false, 4, false, 60, true, true);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gm.createGame(lobby, user, gameMap);
         assertNotNull(gm.getGame("testLobby"));
@@ -50,7 +50,7 @@ class GameTest {
         Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        IGameMap gameMap = new GameMap();
+        IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         Game game = new Game(lobby, user[0], gameMap);
         //Lobby speichert Users alphabetisch. SMH mein Haupt
