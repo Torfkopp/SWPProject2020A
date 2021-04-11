@@ -1,12 +1,14 @@
 package de.uol.swp.common.game.map;
 
+import java.io.Serializable;
+
 /**
  * Interface for an edge
  *
  * @author Mario Fokken
  * @since 2021-01-17
  */
-public interface IEdge {
+public interface IEdge extends Serializable {
 
     /**
      * Enum for the orientation of the edge

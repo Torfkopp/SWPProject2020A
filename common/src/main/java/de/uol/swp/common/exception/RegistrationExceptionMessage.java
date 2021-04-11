@@ -1,6 +1,4 @@
-package de.uol.swp.common.user.exception;
-
-import de.uol.swp.common.message.ExceptionMessage;
+package de.uol.swp.common.exception;
 
 /**
  * This exception is thrown if something went wrong during the registration process,
