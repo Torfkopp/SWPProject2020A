@@ -353,7 +353,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, loggedInUser, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition) {
-            lobbyService.robberNewPosition(lobbyName, loggedInUser, mapPoint);
+            gameService.robberNewPosition(lobbyName, loggedInUser, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
             resetButtonStates(loggedInUser);
@@ -592,7 +592,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
-                rst.ifPresent(userOrDummy -> lobbyService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
+                rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
             });
         }
     }

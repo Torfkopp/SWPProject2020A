@@ -1,7 +1,5 @@
 package de.uol.swp.client.lobby;
 
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -151,32 +149,6 @@ public interface ILobbyService {
      * @since 2021-03-22
      */
     void returnToPreGameLobby(String lobbyName);
-
-    /**
-     * Posts a RobberChosenVictimRequest
-     *
-     * @param lobbyName The name of the lobby
-     * @param user      The user to receive the resource card
-     * @param victim    The user to lose the resource card
-     *
-     * @author Mario Fokken
-     * @author Timo Gerken
-     * @since 2021-04-06
-     */
-    void robberChooseVictim(String lobbyName, User user, UserOrDummy victim);
-
-    /**
-     * Posts a RobberNewPositionMessage
-     *
-     * @param lobby    The name of the lobby
-     * @param user     The user
-     * @param mapPoint The robber's new position
-     *
-     * @author Mario Fokken
-     * @author Timo Gerken
-     * @since 2021-04-06
-     */
-    void robberNewPosition(String lobby, User user, MapPoint mapPoint);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.
