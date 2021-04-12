@@ -38,6 +38,19 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
     }
 
     /**
+     * Gets the List of the Harbors of the User
+     *
+     * @return List of Harbors
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    public List<IHarborHex.HarborResource> getHarborResourceList() {
+        return harborResourceList;
+    }
+
+    /**
      * Gets the resource map, containing mappings of resource name to resource amount.
      * <p>
      * E.g. "Bricks", 1
@@ -55,18 +68,5 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      */
     public UserOrDummy getUser() {
         return user;
-    }
-
-    /**
-     * Gets the List of the Harbors of the User
-     *
-     * @return List of Harbors
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    public List<IHarborHex.HarborResource> getHarborResourceList() {
-        return harborResourceList;
     }
 }

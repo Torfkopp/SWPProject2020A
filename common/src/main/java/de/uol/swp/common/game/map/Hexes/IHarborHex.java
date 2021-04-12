@@ -35,6 +35,17 @@ public interface IHarborHex extends IWaterHex {
     }
 
     /**
+     * Gets the hex the harbor is belonging to
+     *
+     * @return The belonging hex
+     *
+     * @author Maximilian Lindner
+     * @author Steven Luong
+     * @since 2021-04-07
+     */
+    GameHexWrapper getBelongingHex();
+
+    /**
      * Gets the harbor's resource
      *
      * @return Resource
@@ -47,15 +58,4 @@ public interface IHarborHex extends IWaterHex {
      * @return Side
      */
     HarborSide getSide();
-
-    /**
-     * Gets the hex the harbor is belonging to
-     *
-     * @return The belonging hex
-     *
-     * @author Maximilian Lindner
-     * @author Steven Luong
-     * @since 2021-04-07
-     */
-    GameHexWrapper getBelongingHex();
 }
