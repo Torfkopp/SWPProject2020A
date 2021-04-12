@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
@@ -43,6 +44,11 @@ public class LobbyService implements ILobbyService {
         this.eventBus.register(this);
         this.userService = userService;
         LOG.debug("LobbyService started");
+    }
+
+    @Override
+    public void checkForGame(String lobbyName, User loggendInUser) {
+        eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
     }
 
     @Override

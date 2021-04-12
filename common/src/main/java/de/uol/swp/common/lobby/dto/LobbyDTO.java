@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.dto;
 
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
@@ -33,6 +34,7 @@ public class LobbyDTO implements Lobby {
     private int moveTime;
     private boolean startUpPhaseEnabled;
     private boolean randomPlayfieldEnabled;
+    private IConfiguration configuration;
 
     /**
      * Constructor
@@ -183,6 +185,11 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public boolean isStartUpPhaseEnabled() {
+        return startUpPhaseEnabled;
+    }
+
+    @Override
     public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
         this.startUpPhaseEnabled = startUpPhaseEnabled;
     }
@@ -209,5 +216,15 @@ public class LobbyDTO implements Lobby {
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");
         }
         this.owner = user;
+    }
+
+    @Override
+    public void setConfiguration(IConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    @Override
+    public IConfiguration getConfiguration() {
+        return configuration;
     }
 }

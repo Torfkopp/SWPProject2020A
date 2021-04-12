@@ -134,7 +134,8 @@ public class GameRendering {
      * @param die1 The first die
      * @param die2 The second die
      */
-    public void drawDice(int die1, int die2) {
+    public void drawDice(Integer die1, Integer die2) {
+        if (die1 == null || die2 == null || die1 == 0 || die2 == 0) return;
         gfxCtx.clearRect(OFFSET_X, OFFSET_Y, 2 * diceSize + diceSize / 8.0 + 2 * diceLineWidth,
                          diceSize + 2 * diceLineWidth);
         double startX = OFFSET_X;
