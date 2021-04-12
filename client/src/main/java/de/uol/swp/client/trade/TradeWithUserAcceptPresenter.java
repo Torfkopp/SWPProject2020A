@@ -93,8 +93,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
-        tradeService
-                .acceptUserTrade(lobbyName, respondingUser, offeringUser, respondingResourceMap, offeringResourceMap);
+        tradeService.acceptUserTrade(lobbyName, offeringUser, respondingResourceMap, offeringResourceMap);
     }
 
     /**
@@ -131,8 +130,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @FXML
     private void onMakeCounterOfferButtonPressed() {
-        tradeService.showUserTradeWindow(lobbyName, respondingUser, offeringUser);
-        tradeService.tradeWithUser(lobbyName, respondingUser, offeringUser);
+        tradeService.showUserTradeWindow(lobbyName, offeringUser);
+        tradeService.tradeWithUser(lobbyName, offeringUser);
     }
 
     /**
@@ -179,7 +178,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         TradeWithUserOfferResponse rsp = event.getRsp();
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
         respondingUser = rsp.getRespondingUser();
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();

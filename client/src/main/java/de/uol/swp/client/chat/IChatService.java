@@ -1,7 +1,5 @@
 package de.uol.swp.client.chat;
 
-import de.uol.swp.common.user.User;
-
 /**
  * An interface for all methods of the client's ChatService
  * <p>
@@ -37,59 +35,53 @@ public interface IChatService {
     /**
      * Method to delete a ChatMessage
      *
-     * @param id             The ID of the ChatMessage to delete
-     * @param requestingUser The User who wants to delete a ChatMessage
+     * @param id The ID of the ChatMessage to delete
      */
-    void deleteMessage(int id, User requestingUser);
+    void deleteMessage(int id);
 
     /**
      * Method to delete a ChatMessage in a lobbyChat
      *
-     * @param id             The ID of the ChatMessage to delete
-     * @param requestingUser The User who wants to delete a ChatMessage
-     * @param originLobby    The name of the Lobby where the ChatMessage was sent
+     * @param id          The ID of the ChatMessage to delete
+     * @param originLobby The name of the Lobby where the ChatMessage was sent
      *
      * @since 2020-12-30
      */
-    void deleteMessage(int id, User requestingUser, String originLobby);
+    void deleteMessage(int id, String originLobby);
 
     /**
      * Method to change the content of a ChatMessage
      *
-     * @param id             The ID of the ChatMessage to edit
-     * @param newContent     The new content of the ChatMessage
-     * @param requestingUser The User who wants to delete a ChatMessage
+     * @param id         The ID of the ChatMessage to edit
+     * @param newContent The new content of the ChatMessage
      */
-    void editMessage(int id, String newContent, User requestingUser);
+    void editMessage(int id, String newContent);
 
     /**
      * Method to change the content of a ChatMessage in a lobbyChat
      *
-     * @param id             The ID of the ChatMessage to edit
-     * @param newContent     The new content of the ChatMessage
-     * @param requestingUser The User who wants to delete a ChatMessage
-     * @param originLobby    The name of the Lobby where the ChatMessage was sent
+     * @param id          The ID of the ChatMessage to edit
+     * @param newContent  The new content of the ChatMessage
+     * @param originLobby The name of the Lobby where the ChatMessage was sent
      *
      * @since 2020-12-30
      */
-    void editMessage(int id, String newContent, User requestingUser, String originLobby);
+    void editMessage(int id, String newContent, String originLobby);
 
     /**
      * Method to create a new ChatMessage
      *
-     * @param author The User who authored the ChatMessage
-     * @param msg    The contents of the new ChatMessage
+     * @param msg The contents of the new ChatMessage
      */
-    void newMessage(User author, String msg);
+    void newMessage(String msg);
 
     /**
      * Method to create a new ChatMessage in a lobbyChat
      *
-     * @param author      The User who authored the ChatMessage
      * @param msg         The contents of the new ChatMessage
      * @param originLobby The name of the Lobby where the ChatMessage was sent
      *
      * @since 2020-12-30
      */
-    void newMessage(User author, String msg, String originLobby);
+    void newMessage(String msg, String originLobby);
 }

@@ -26,11 +26,11 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import javafx.application.Platform;
@@ -74,6 +74,10 @@ public class SceneManager {
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
+
+    @Inject
+    private IUserService userService;
+
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
@@ -133,8 +137,7 @@ public class SceneManager {
      * @author Mario Fokken
      * @since 2020-12-19
      */
-    public void showChangeAccountDetailsScreen(User user) {
-        ChangeAccountDetailsScene.setUserData(user);
+    public void showChangeAccountDetailsScreen() {
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
@@ -594,6 +597,27 @@ public class SceneManager {
     }
 
     /**
+     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
+     * <p>
+     * It then proceeds to close the robberTax window.
+     *
+     * @param event The CloseRobberTaxViewEvent found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
+        LOG.debug("Received CloseRobberTaxViewEvent");
+        String lobby = event.getLobbyName();
+        if (robberTaxStages.containsKey(lobby)) {
+            robberTaxStages.get(lobby).close();
+            robberTaxStages.remove(lobby);
+        }
+    }
+
+    /**
      * Handles the CloseTradeResponseEvent detected on the EventBus
      * <p>
      * If a CloseTradeResponseEvent is detected on the EventBus, this method gets
@@ -727,16 +751,18 @@ public class SceneManager {
      * screen.
      * If the user wants to close this window, the user gets redirected to the Main Menu.
      *
+     * @param event The ShowChangeAccountDetailsViewEvent detected on the EventBus
+     *
      * @author Eric Vuong
      * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @since 2020-12-19
      */
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
-        showChangeAccountDetailsScreen(event.getUser());
+        showChangeAccountDetailsScreen();
         primaryStage.setOnCloseRequest(windowEvent -> {
             windowEvent.consume();
-            showMainScreen(event.getUser());
+            showMainScreen(userService.getLoggedInUser());
         });
     }
 
@@ -815,27 +841,6 @@ public class SceneManager {
     }
 
     /**
-     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
-     * <p>
-     * It then proceeds to close the robberTax window.
-     *
-     * @param event The CloseRobberTaxViewEvent found on the EventBus
-     *
-     * @author Mario Fokken
-     * @author Timo Gerken
-     * @since 2021-04-08
-     */
-    @Subscribe
-    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
-        LOG.debug("Received CloseRobberTaxViewEvent");
-        String lobby = event.getLobbyName();
-        if (robberTaxStages.containsKey(lobby)) {
-            robberTaxStages.get(lobby).close();
-            robberTaxStages.remove(lobby);
-        }
-    }
-
-    /**
      * Handles the ShowRobberTaxViewEvent detected on the EventBus
      * <p>
      * If a ShowRobberTaxViewEvent is detected on the EventBus, this method gets
@@ -871,8 +876,8 @@ public class SceneManager {
             robberTaxStage.initStyle(StageStyle.UNDECORATED);
             robberTaxStage.show();
             LOG.debug("Sending a ShowRobberTaxUpdateEvent to lobby " + lobbyName);
-            eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getUser(), event.getTaxAmount(),
-                                                       event.getInventory()));
+            eventBus.post(
+                    new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
         });
     }
 
@@ -891,7 +896,6 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
         //gets the lobby's name
-        User user = event.getUser();
         String lobbyName = event.getLobbyName();
         //New window (Stage)
         Stage bankStage = new Stage();
@@ -913,7 +917,7 @@ public class SceneManager {
         //Shows the window
         bankStage.show();
         LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
-        eventBus.post(new TradeUpdateEvent(lobbyName, user));
+        eventBus.post(new TradeUpdateEvent(lobbyName));
     }
 
     /**
@@ -954,7 +958,7 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to Lobby " + lobbyName);
             eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
         });
     }
@@ -977,7 +981,6 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
         String lobbyName = event.getLobbyName();
-        UserOrDummy offeringUser = event.getOfferingUser();
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
@@ -993,7 +996,7 @@ public class SceneManager {
         tradingStage.initModality(Modality.NONE);
         tradingStage.initOwner(primaryStage);
         tradingStage.show();
-        eventBus.post(new TradeWithUserUpdateEvent(lobbyName, offeringUser));
+        eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
         LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
     }
 

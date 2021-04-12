@@ -3,6 +3,8 @@ package de.uol.swp.client.game;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -33,11 +35,14 @@ class GameServiceTest {
     private final CountDownLatch lock = new CountDownLatch(1);
 
     private IGameService gameService;
+    private IUserService userService;
     private Object event;
 
     @BeforeEach
     protected void setUp() {
-        gameService = new GameService(eventBus);
+        userService = new UserService(eventBus);
+        userService.setLoggedInUser(defaultUser);
+        gameService = new GameService(eventBus, userService);
         eventBus.register(this);
     }
 
@@ -45,12 +50,13 @@ class GameServiceTest {
     protected void tearDown() {
         event = null;
         gameService = null;
+        userService = null;
         eventBus.unregister(this);
     }
 
     @Test
     void endTurn() throws InterruptedException {
-        gameService.endTurn(defaultLobbyName, defaultUser);
+        gameService.endTurn(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -66,7 +72,7 @@ class GameServiceTest {
 
     @Test
     void playKnightCard() throws InterruptedException {
-        gameService.playKnightCard(defaultLobbyName, defaultUser);
+        gameService.playKnightCard(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -82,7 +88,7 @@ class GameServiceTest {
 
     @Test
     void playMonopolyCard() throws InterruptedException {
-        gameService.playMonopolyCard(defaultLobbyName, defaultUser, defaultResource);
+        gameService.playMonopolyCard(defaultLobbyName, defaultResource);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -99,7 +105,7 @@ class GameServiceTest {
 
     @Test
     void playRoadBuildingCard() throws InterruptedException {
-        gameService.playRoadBuildingCard(defaultLobbyName, defaultUser);
+        gameService.playRoadBuildingCard(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -115,7 +121,7 @@ class GameServiceTest {
 
     @Test
     void playYearOfPlentyCard() throws InterruptedException {
-        gameService.playYearOfPlentyCard(defaultLobbyName, defaultUser, defaultResource, secondResource);
+        gameService.playYearOfPlentyCard(defaultLobbyName, defaultResource, secondResource);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -133,7 +139,7 @@ class GameServiceTest {
 
     @Test
     void rollDice() throws InterruptedException {
-        gameService.rollDice(defaultLobbyName, defaultUser);
+        gameService.rollDice(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -149,7 +155,7 @@ class GameServiceTest {
 
     @Test
     void startSession() throws InterruptedException {
-        gameService.startSession(defaultLobbyName, defaultUser);
+        gameService.startSession(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -165,7 +171,7 @@ class GameServiceTest {
 
     @Test
     void updateInventory() throws InterruptedException {
-        gameService.updateInventory(defaultLobbyName, defaultUser);
+        gameService.updateInventory(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

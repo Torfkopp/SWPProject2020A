@@ -10,7 +10,6 @@ import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
-import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,7 +40,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     public static final int MIN_WIDTH = 620;
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
     private String lobbyName;
-    private User loggedInUser;
     private Map<String, Integer> resourceMap;
     private List<IHarborHex.HarborResource> harborMap;
     private ObservableList<Pair<String, Integer>> resourceList;
@@ -128,7 +126,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
         if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
-            tradeService.buyDevelopmentCard(lobbyName, loggedInUser);
+            tradeService.buyDevelopmentCard(lobbyName);
         }
     }
 
@@ -147,10 +145,10 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + lobbyName);
         LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
-        tradeService.closeBankTradeWindow(lobbyName, loggedInUser);
-        gameService.updateInventory(lobbyName, loggedInUser);
+        tradeService.closeBankTradeWindow(lobbyName);
+        gameService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
     }
 
@@ -163,7 +161,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
-        tradeService.closeBankTradeWindow(lobbyName, loggedInUser);
+        tradeService.closeBankTradeWindow(lobbyName);
     }
 
     /**
@@ -225,7 +223,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             String userGetsResource = bankResource.getKey();
             String userLosesResource = giveResource.getKey();
             if (userGetsResource.equals(userLosesResource)) return;
-            tradeService.executeTradeWithBank(lobbyName, loggedInUser, userGetsResource, userLosesResource);
+            tradeService.executeTradeWithBank(lobbyName, userGetsResource, userLosesResource);
         }
     }
 
@@ -243,13 +241,10 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onTradeUpdateEvent(TradeUpdateEvent event) {
-        if (lobbyName == null && loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = event.getUser();
-        }
+        if (lobbyName == null) lobbyName = event.getLobbyName();
         LOG.debug("Received TradeUpdateEvent for Lobby " + this.lobbyName);
         Window window = ownResourceToTradeWithView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName, loggedInUser));
+        window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName));
     }
 
     /**
@@ -265,8 +260,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
-        tradeService.closeBankTradeWindow(lobbyName, loggedInUser);
-        gameService.updateInventory(lobbyName, loggedInUser);
+        tradeService.closeBankTradeWindow(lobbyName);
+        gameService.updateInventory(lobbyName);
     }
 
     /**
