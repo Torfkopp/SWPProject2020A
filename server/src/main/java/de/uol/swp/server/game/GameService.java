@@ -135,7 +135,6 @@ public class GameService extends AbstractService {
      * @since 2021-04-10
      */
     private void checkLongestRoad(String lobbyName, MapPoint mapPoint) {
-
         Game game = gameManagement.getGame(lobbyName);
         int length = game.getMap().longestRoadWith(mapPoint);
         if (length > 4 && length > game.getLongestRoadLength()) {

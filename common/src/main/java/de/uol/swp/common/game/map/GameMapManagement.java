@@ -306,13 +306,15 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public int longestRoadWith(MapPoint mapPoint) {
         List<Integer> lengths = new LinkedList<>();
-        List<IEdge> visited = new LinkedList();
+        Set<IEdge> visited = new HashSet<>();
         visited.add(getEdge(mapPoint));
-        for (IEdge edge : intersectionEdgeNetwork.adjacentEdges(getEdge(mapPoint))) {
-            lengths.add(roadLength(edge, getEdge(mapPoint).getOwner(), visited));
+        var ends = findEnds(getEdge(mapPoint), getEdge(mapPoint).getOwner(), new HashSet<>());
+        for (IEdge edge : ends) {
+            int length = roadLength(edge, getEdge(mapPoint).getOwner(), new HashSet<>(visited));
+            lengths.add(length);
         }
         Collections.sort(lengths, Collections.reverseOrder());
-        return lengths.get(0) + lengths.get(1);
+        return Collections.max(lengths) + 1;
     }
 
     @Override
@@ -562,6 +564,18 @@ public class GameMapManagement implements IGameMapManagement {
         intersectionEdgeNetwork = intersectionEdgeNetworkBuilder.build();
     }
 
+    private Set<IEdge> findEnds(IEdge edge, Player owner, Set<IEdge> visited) {
+        if (!Objects.equals(edge.getOwner(), owner)) return new HashSet<>();
+        if (visited.contains(edge)) return new HashSet<>();
+        Set<IEdge> ends = new HashSet<>();
+        visited.add(edge);
+        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+            ends.addAll(findEnds(nextEdge, owner, new HashSet<>(visited)));
+        }
+        if (ends.isEmpty()) ends.add(edge);
+        return ends;
+    }
+
     /**
      * Helper method to get the GameHexWrapper of a Hex instead of the IGameHex
      *
@@ -634,19 +648,20 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-10
      */
-    private int roadLength(IEdge edge, Player owner, List<IEdge> visited) {
+    private int roadLength(IEdge edge, Player owner, Set<IEdge> visited) {
         if (!Objects.equals(edge.getOwner(), owner)) return 0;
         if (visited.contains(edge)) return 0;
         int c = 0;
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            if (visited.contains(nextEdge)) c++;
-        }
-        if (c > 1) return 0;
+        int returnvalue = 1;
+        //for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+        //    if (visited.contains(nextEdge)) c++;
+        //}
+        //if (c > 1) returnvalue = 0;
         visited.add(edge);
         List<Integer> lengths = new LinkedList<>();
         for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            lengths.add(roadLength(nextEdge, owner, visited));
+            lengths.add(roadLength(nextEdge, owner, new HashSet<>(visited)));
         }
-        return Collections.max(lengths).intValue() + 1;
+        return Collections.max(lengths).intValue() + returnvalue;
     }
 }
