@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby;
 
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -28,6 +29,26 @@ public interface Lobby extends Serializable {
      * @since 2021-03-15
      */
     boolean commandsAllowed();
+
+    /**
+     * Gets the configuration of the game Map
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-09
+     */
+    IConfiguration getConfiguration();
+
+    /**
+     * Sets the configuration of the game Map
+     *
+     * @param configuration The configuration of the game Map
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-09
+     */
+    void setConfiguration(IConfiguration configuration);
 
     /**
      * Gets the maximum amount of players for a lobby.
@@ -147,6 +168,28 @@ public interface Lobby extends Serializable {
     void setInGame(boolean inGame);
 
     /**
+     * Gets whether the startUpPhase is enabled or not
+     *
+     * @return Boolean whether the startup phase is enabled
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-09
+     */
+    boolean isStartUpPhaseEnabled();
+
+    /**
+     * Sets the start up phase attribute.
+     *
+     * @param startUpPhaseEnabled Whether the startUpPhase should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setStartUpPhaseEnabled(boolean startUpPhaseEnabled);
+
+    /**
      * Adds a new user to the lobby
      *
      * @param user The new user to add to the lobby
@@ -196,17 +239,6 @@ public interface Lobby extends Serializable {
      * @since 2021-03-15
      */
     void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled);
-
-    /**
-     * Sets the start up phase attribute.
-     *
-     * @param startUpPhaseEnabled Whether the startUpPhase should be enabled or not
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
-     */
-    void setStartUpPhaseEnabled(boolean startUpPhaseEnabled);
 
     /**
      * Sets a user as ready

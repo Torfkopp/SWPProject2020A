@@ -14,6 +14,7 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -99,7 +100,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void logout() {
         lobbyService.removeFromLobbies(loggedInUser);
         userService.logout(loggedInUser);
-        resetCharVars();
+        resetChatVars();
     }
 
     /**
@@ -311,7 +312,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * and finally calls the UserService to drop the user.
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
+     * @see de.uol.swp.client.AbstractPresenterWithChat#resetChatVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
@@ -320,7 +321,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onDeleteButtonPressed() {
         userService.logout(loggedInUser);
-        resetCharVars();
+        resetChatVars();
         eventBus.post(showLoginViewMessage);
         userService.dropUser(loggedInUser);
     }
@@ -445,8 +446,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        lobbyService.removeFromLobbies(loggedInUser);
-        resetCharVars();
+        resetChatVars();
         eventBus.post(showLoginViewMessage);
         Platform.runLater(() -> eventBus.post(closeLobbiesViewEvent));
     }
@@ -511,6 +511,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
+        eventBus.post(new GetOldSessionsRequest(rsp.getUser()));
         this.loggedInUser = rsp.getUser();
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
@@ -540,7 +541,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * EventBus the SceneManager is subscribed to.
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
+     * @see de.uol.swp.client.AbstractPresenterWithChat#resetChatVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
      * @see de.uol.swp.client.SceneManager

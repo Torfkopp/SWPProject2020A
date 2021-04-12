@@ -684,6 +684,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (rsp.getGameMapDTO() == null) return;
         gameMap = rsp.getGameMapDTO();
         gameRendering.drawGameMap(gameMap);
+        gameRendering.drawDice(dice1, dice2);
     }
 
     /**

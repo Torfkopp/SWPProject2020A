@@ -403,7 +403,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
      * @since 2020-12-26
      */
-    protected void resetCharVars() {
+    protected void resetChatVars() {
         chatMessages = null;
     }
 
