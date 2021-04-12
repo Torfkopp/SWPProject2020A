@@ -122,7 +122,10 @@ public class GameService implements IGameService {
 
     @Override
     public void taxPayed(String lobbyName, Map<Resources, Integer> selectedResources) {
-        eventBus.post(new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName));
+        LOG.debug("Sending RobberTaxChosenRequest");
+        Message request = new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName);
+        eventBus.post(request);
+        LOG.debug("Sending CloseRobberTaxViewEvent");
         eventBus.post(new CloseRobberTaxViewEvent(lobbyName));
     }
 
