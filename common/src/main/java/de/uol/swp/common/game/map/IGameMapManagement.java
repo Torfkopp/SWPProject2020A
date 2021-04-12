@@ -1,8 +1,11 @@
 package de.uol.swp.common.game.map;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -329,4 +332,30 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
+
+    /**
+     * Gets all the Settlements and Cities presented in a map
+     *
+     * @return Map of Players and their Settlements / Cities
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
+
+    /**
+     * Gets the HarborResourceType of a specific Intersection MapPoint
+     * <p>
+     * If the point does not have a harbor, NONE is returned
+     *
+     * @param point specific Intersection MapPoint
+     *
+     * @return HarborResourceType
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    IHarborHex.HarborResource getHarborResource(MapPoint point);
 }
