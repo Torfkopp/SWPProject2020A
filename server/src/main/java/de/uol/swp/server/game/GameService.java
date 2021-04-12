@@ -18,18 +18,18 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
+import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
+import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.event.CreateGameInternalRequest;
-import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
-import de.uol.swp.server.game.event.KickUserEvent;
+import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,7 +56,6 @@ public class GameService extends AbstractService {
 
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
-    private boolean buildingCurrentlyAllowed;
 
     /**
      * Constructor
@@ -118,7 +117,7 @@ public class GameService extends AbstractService {
             ServerMessage message = new PlayerWonGameMessage(originLobby, user);
             lobbyService.sendToAllInLobby(originLobby, message);
             gameManagement.dropGame(originLobby);
-            buildingCurrentlyAllowed = false;
+            game.setBuildingAllowed(false);
         }
     }
 
@@ -186,8 +185,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received AcceptUserTradeRequest for Lobby " + req.getOriginLobby());
-        buildingCurrentlyAllowed = false;
         Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setBuildingAllowed(false);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
         if (offeringInventory == null || respondingInventory == null) return;
@@ -319,11 +318,11 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, message);
         };
 
-        if (!buildingCurrentlyAllowed) {
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (!game.isBuildingAllowed()) {
             sendFailResponse.accept(NOT_THE_RIGHT_TIME);
             return;
         }
-        Game game = gameManagement.getGame(req.getOriginLobby());
         IGameMapManagement gameMap = game.getMap();
         MapPoint mapPoint = req.getMapPoint();
         UserOrDummy user = req.getUser();
@@ -458,6 +457,7 @@ public class GameService extends AbstractService {
             } else {
                 configuration = gameMap.getBeginnerConfiguration();
             }
+            msg.getLobby().setConfiguration(configuration);
             gameMap = gameMap.createMapFromConfiguration(configuration);
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
@@ -600,11 +600,11 @@ public class GameService extends AbstractService {
         }
         Game game = gameManagement.getGame(req.getOriginLobby());
         UserOrDummy nextPlayer = game.nextPlayer();
-        buildingCurrentlyAllowed = false;
+        game.setBuildingAllowed(false);
         ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
         LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-
+        game.setDiceRolledAlready(false);
         if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             endTurnDummy(game);
@@ -821,8 +821,8 @@ public class GameService extends AbstractService {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
-        buildingCurrentlyAllowed = false;
         Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setBuildingAllowed(false);
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
@@ -1131,7 +1131,7 @@ public class GameService extends AbstractService {
     private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        buildingCurrentlyAllowed = true;
+        game.setBuildingAllowed(true);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         if (offeringInventory == null) return;
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
@@ -1255,7 +1255,6 @@ public class GameService extends AbstractService {
             LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
         }
         Game game = gameManagement.getGame(req.getOriginLobby());
-        buildingCurrentlyAllowed = true;
         int[] result = Game.rollDice();
         int numberOfPips = result[0] + result[1];
         if (numberOfPips == 7) {
@@ -1327,6 +1326,8 @@ public class GameService extends AbstractService {
             LOG.debug("---- Distributing the resources for token " + numberOfPips);
             game.distributeResources(numberOfPips);
         }
+        game.setBuildingAllowed(true);
+        game.setDiceRolledAlready(true);
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
         LOG.debug("Sending DiceCastMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
@@ -1400,8 +1401,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
-        buildingCurrentlyAllowed = true;
         Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setBuildingAllowed(true);
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
 
         if (respondingInventory == null) return;
@@ -1436,8 +1437,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
         LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
-        buildingCurrentlyAllowed = false;
         Game game = gameManagement.getGame(req.getName());
+        game.setBuildingAllowed(false);
         Inventory inventory = game.getInventory(req.getUser());
         Inventory traderInventory = game.getInventory(req.getRespondingUser());
         if (inventory == null || traderInventory == null) return;
@@ -1448,6 +1449,36 @@ public class GameService extends AbstractService {
         LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);
+    }
+
+    /**
+     * Handles an TransferLobbyStateEvent found on the EventBus
+     * <p>
+     * If an TransferLobbyStateEvent is found on the EventBus, this method
+     * is called. It crafts a StartSessionResponse with the lobby
+     * provided by the event, its active player, the game configuration
+     * and the previously rolled dice and posts it on the EventBus.
+     *
+     * @param event The TransferLobbyStateEvent found on the EventBus
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onTransferLobbyStateEvent(TransferLobbyStateEvent event) {
+        Lobby lobby = event.getLobby();
+        Game game = gameManagement.getGame(lobby.getName());
+        ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
+                                                                 lobby.getConfiguration(),
+                                                                 game.getMap().getGameMapDTO(), game.getDices(),
+                                                                 game.isDiceRolledAlready());
+        Optional<MessageContext> ctx = event.getMessageContext();
+        if (ctx.isPresent()) {
+            returnMessage.setMessageContext(ctx.get());
+            LOG.debug("Sending StartSessionResponse");
+            post(returnMessage);
+        }
     }
 
     /**

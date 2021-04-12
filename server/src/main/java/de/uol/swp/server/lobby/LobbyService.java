@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
+import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -14,12 +15,11 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.event.CreateGameInternalRequest;
-import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
-import de.uol.swp.server.game.event.KickUserEvent;
+import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.message.ServerInternalMessage;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
 import de.uol.swp.server.sessionmanagement.SessionManagement;
@@ -114,6 +114,25 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a CheckForGameRequest found on the EventBus
+     * <p>
+     * If the lobby contained in the request is ingame, an ActivePlayerEvent
+     * is posted onto the EventBus.
+     *
+     * @param req The CheckForGameRequest on the EventBus
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onCheckForGameRequest(CheckForGameRequest req) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
+        if (lobby.isPresent() && lobby.get().isInGame())
+            post(new TransferLobbyStateEvent(lobby.get(), req.getUser(), req.getMessageContext()));
+    }
+
+    /**
      * Handles a CheckUserInLobbyRequest found on the EventBus
      * If a CheckUserInLobbyRequest is detected on the EventBus, this method is
      * called. It checks if the logged in user is currently in a lobby.
@@ -172,6 +191,34 @@ public class LobbyService extends AbstractService {
             exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(e.getMessage());
+        }
+    }
+
+    /**
+     * Handles a GetOldSessionRequest found on the EventBus
+     * <p>
+     * When a GetOldSessionRequest is found on the EventBus, this method
+     * is called. It checks the LobbyManagement for all the lobbies
+     * the requesting user is in and posts JoinLobbyResponses for each.
+     * This method is used to reopen lobby windows on a new client.
+     *
+     * @param req The GetOldSessionRequest on the EventBus
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    @Subscribe
+    private void onGetOldSessionsRequest(GetOldSessionsRequest req) {
+        LOG.debug("Received GetOldSessionsRequest");
+        User user = req.getUser();
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            if (entry.getValue().getUserOrDummies().contains(user)) {
+                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(), entry.getValue());
+                responseMessage.initWithMessage(req);
+                post(responseMessage);
+            }
         }
     }
 

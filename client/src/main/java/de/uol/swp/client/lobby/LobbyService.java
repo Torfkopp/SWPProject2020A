@@ -9,6 +9,7 @@ import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
+import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
@@ -45,6 +46,11 @@ public class LobbyService implements ILobbyService {
         this.eventBus = eventBus;
         this.eventBus.register(this);
         LOG.debug("LobbyService started");
+    }
+
+    @Override
+    public void checkForGame(String lobbyName, User loggendInUser) {
+        eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
     }
 
     @Override

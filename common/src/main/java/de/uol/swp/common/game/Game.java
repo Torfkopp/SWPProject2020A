@@ -17,12 +17,15 @@ import java.util.*;
  */
 public class Game {
 
+    private static final int[] dices = new int[2];
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private UserOrDummy activePlayer;
+    private boolean buildingAllowed = false;
+    private boolean diceRolledAlready = false;
 
     /**
      * Constructor
@@ -54,7 +57,8 @@ public class Game {
     public static int[] rollDice() {
         int dice1 = (int) (Math.random() * 6 + 1);
         int dice2 = (int) (Math.random() * 6 + 1);
-
+        dices[0] = dice1;
+        dices[1] = dice2;
         return (new int[]{dice1, dice2});
     }
 
@@ -188,6 +192,19 @@ public class Game {
     }
 
     /**
+     * Return the current state of the rolled dices as an array
+     *
+     * @return Current state of dices
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    public int[] getDices() {
+        return dices;
+    }
+
+    /**
      * Gets a specified player's inventory
      *
      * @param player The player whose inventory to get
@@ -298,5 +315,57 @@ public class Game {
      */
     public void removeTaxPayer(User user) {
         taxPayers.remove(user);
+    }
+
+    /**
+     * Gets whether building is currently allowed or not
+     *
+     * @return If Building is currently allowed
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public boolean isBuildingAllowed() {
+        return buildingAllowed;
+    }
+
+    /**
+     * Set the BuildingAllowed Attribute
+     *
+     * @param buildingAllowed The new buildingAllowed status
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public void setBuildingAllowed(boolean buildingAllowed) {
+        this.buildingAllowed = buildingAllowed;
+    }
+
+    /**
+     * Gets whether the player rolled the dice in the current turn or not
+     *
+     * @return If Player rolled the dice
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public boolean isDiceRolledAlready() {
+        return diceRolledAlready;
+    }
+
+    /**
+     * Set the diceRolledAlready Attribute
+     *
+     * @param diceRolledAlready The new diceRolledAlready status
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public void setDiceRolledAlready(boolean diceRolledAlready) {
+        this.diceRolledAlready = diceRolledAlready;
     }
 }

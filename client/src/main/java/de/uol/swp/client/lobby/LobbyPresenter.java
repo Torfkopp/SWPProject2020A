@@ -4,10 +4,10 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
-import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
-import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
+import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
+import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -154,6 +154,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (readyUsers == null) {
             readyUsers = new HashSet<>();
         }
+        if (event.getLobby().getReadyUsers().contains(loggedInUser)) readyCheckBox.setSelected(true);
+
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
@@ -170,6 +172,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
         setPreGameSettings();
+        lobbyService.checkForGame(lobbyName, loggedInUser);
     }
 
     /**
