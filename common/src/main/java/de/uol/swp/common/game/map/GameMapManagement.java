@@ -312,7 +312,7 @@ public class GameMapManagement implements IGameMapManagement {
         var ends = findEnds(getEdge(mapPoint), getEdge(mapPoint).getOwner(), new HashSet<>());
         for (IEdge edge : ends) {
             System.out.println("#######END#########");
-            int length = roadLength(edge, getEdge(mapPoint).getOwner(), new HashSet<>(visited));
+            int length = roadLength(edge, getEdge(mapPoint).getOwner(), new HashSet<>(visited), ends);
             System.out.println(length);
             System.out.println("#################END");
             lengths.add(length);
@@ -661,9 +661,10 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-10
      */
-    private int roadLength(IEdge edge, Player owner, Set<IEdge> visited) {
+    private int roadLength(IEdge edge, Player owner, Set<IEdge> visited, Set<IEdge> endPoint) {
         if (!Objects.equals(edge.getOwner(), owner)) return 0;
         if (visited.contains(edge)) return 0;
+        if (endPoint.contains(edge)) return 0;
         visited.add(edge);
         int returnvalue = 1;
         Map<IEdge, IEdge> f = new HashMap<>();
@@ -715,7 +716,7 @@ public class GameMapManagement implements IGameMapManagement {
             var k = new HashSet<>(visited);
             var x = f.get(nextEdge);
             if (x != null) k.add(x);
-            lengths.add(roadLength(nextEdge, owner, k));
+            lengths.add(roadLength(nextEdge, owner, k, endPoint));
         }
         System.out.println("-----------------");
         lengths.forEach(System.out::println);
