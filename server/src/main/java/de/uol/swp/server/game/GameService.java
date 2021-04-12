@@ -648,15 +648,15 @@ public class GameService extends AbstractService {
         if (harborTradingList.contains(IHarborHex.HarborResource.LUMBER))
             tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
         //check if user has enough resources
-        if (req.getGiveResource().equals("ore") && (inventory.getOre() < tradingRatio
+        if (req.getGiveResource().equals("game.resources.ore") && (inventory.getOre() < tradingRatio
                 .get(IHarborHex.HarborResource.ORE))) return;
-        if (req.getGiveResource().equals("brick") && (inventory.getBrick() < tradingRatio
+        if (req.getGiveResource().equals("game.resources.brick") && (inventory.getBrick() < tradingRatio
                 .get(IHarborHex.HarborResource.BRICK))) return;
-        if (req.getGiveResource().equals("grain") && (inventory.getGrain() < tradingRatio
+        if (req.getGiveResource().equals("game.resources.grain") && (inventory.getGrain() < tradingRatio
                 .get(IHarborHex.HarborResource.GRAIN))) return;
-        if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < tradingRatio
+        if (req.getGiveResource().equals("game.resources.lumber") && (inventory.getLumber() < tradingRatio
                 .get(IHarborHex.HarborResource.LUMBER))) return;
-        if (req.getGiveResource().equals("wool") && (inventory.getWool() < tradingRatio
+        if (req.getGiveResource().equals("game.resources.wool") && (inventory.getWool() < tradingRatio
                 .get(IHarborHex.HarborResource.WOOL))) return;
         //user gets the resource he demands
         if (req.getGetResource().equals("game.resources.ore")) {
@@ -680,27 +680,27 @@ public class GameService extends AbstractService {
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 1);
         }
         //user gives the resource he offers according to the harbors
-        if (req.getGiveResource().equals("ore")) {
+        if (req.getGiveResource().equals("game.resources.ore")) {
             inventory.setOre(inventory.getOre() - tradingRatio.get(IHarborHex.HarborResource.ORE));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.ore"), tradingRatio.get(IHarborHex.HarborResource.ORE));
         }
-        if (req.getGiveResource().equals("brick")) {
+        if (req.getGiveResource().equals("game.resources.brick")) {
             inventory.setBrick(inventory.getBrick() - tradingRatio.get(IHarborHex.HarborResource.BRICK));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.brick"), tradingRatio.get(IHarborHex.HarborResource.BRICK));
         }
-        if (req.getGiveResource().equals("grain")) {
+        if (req.getGiveResource().equals("game.resources.grain")) {
             inventory.setGrain(inventory.getGrain() - tradingRatio.get(IHarborHex.HarborResource.GRAIN));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.grain"), tradingRatio.get(IHarborHex.HarborResource.GRAIN));
         }
-        if (req.getGiveResource().equals("lumber")) {
+        if (req.getGiveResource().equals("game.resources.lumber")) {
             inventory.setLumber(inventory.getLumber() - tradingRatio.get(IHarborHex.HarborResource.LUMBER));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.lumber"), tradingRatio.get(IHarborHex.HarborResource.LUMBER));
         }
-        if (req.getGiveResource().equals("wool")) {
+        if (req.getGiveResource().equals("game.resources.wool")) {
             inventory.setWool(inventory.getWool() - tradingRatio.get(IHarborHex.HarborResource.WOOL));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.wool"), tradingRatio.get(IHarborHex.HarborResource.WOOL));
