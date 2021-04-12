@@ -78,8 +78,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey()));
+                    setText(empty || item == null ? "" :
+                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
                 });
             }
         });
@@ -197,36 +197,10 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     private void setOfferLabel() {
         LOG.debug("Setting the tradeResponseLabel");
-        boolean offer = false;
-        StringBuilder offerText = new StringBuilder(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser)).append("\n");
-
-        for (Map.Entry<String, Integer> entry : offeringResourceMap.entrySet()) {
-            int amount = entry.getValue();
-            if (amount > 0) {
-                offer = true;
-                offerText.append(entry.getValue()).append(" ")
-                         .append(resourceBundle.getString("game.resources." + entry.getKey())).append(", ");
-            }
-        }
-        if (offerText.substring(offerText.length() - 2, offerText.length()).equals(", "))
-            offerText.delete(offerText.length() - 2, offerText.length());
-        if (!offer) offerText.append(resourceBundle.getString("game.trade.offer.nothing"));
-        boolean demand = false;
-        offerText.append("\n").append(resourceBundle.getString("game.trade.offer.demand")).append("\n");
-
-        for (Map.Entry<String, Integer> entry : respondingResourceMap.entrySet()) {
-            int amount = entry.getValue();
-            if (amount > 0) {
-                demand = true;
-                offerText.append(entry.getValue()).append(" ")
-                         .append(resourceBundle.getString("game.resources." + entry.getKey())).append(", ");
-            }
-        }
-        if (offerText.substring(offerText.length() - 2, offerText.length()).equals(", "))
-            offerText.delete(offerText.length() - 2, offerText.length());
-        if (!demand) offerText.append(resourceBundle.getString("game.trade.offer.nothing"));
-        Platform.runLater(() -> tradeResponseLabel.setText(offerText.append(".").toString()));
+        String offered = tallyUpOfferOrDemand(offeringResourceMap);
+        String demanded = tallyUpOfferOrDemand(respondingResourceMap);
+        Platform.runLater(() -> tradeResponseLabel.setText(
+                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser, offered, demanded)));
     }
 
     /**
@@ -244,5 +218,35 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
             ownInventoryList.add(ownResource);
         }
+    }
+
+    /**
+     * Helper method to tally up the offered/demanded resources
+     * <p>
+     * Returns a String containing the offered and demanded resources.
+     *
+     * @param resourceMap The Map of resources to tally up
+     *
+     * @return String containing the offer
+     *
+     * @author Aldin Dervisi
+     * @author Phillip-André Suhr
+     * @since 2021-04-05
+     */
+    private String tallyUpOfferOrDemand(Map<String, Integer> resourceMap) {
+        boolean nothing = true;
+        StringBuilder content = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
+            int amount = entry.getValue();
+            if (amount > 0) {
+                nothing = false;
+                content.append(entry.getValue()).append(" ").append(resourceBundle.getString(entry.getKey()))
+                       .append(", ");
+            }
+        }
+        if (nothing) content.append(resourceBundle.getString("game.trade.offer.nothing"));
+        if (content.substring(content.length() - 2, content.length()).equals(", "))
+            content.delete(content.length() - 2, content.length());
+        return content.toString();
     }
 }

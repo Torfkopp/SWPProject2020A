@@ -425,7 +425,6 @@ public class SceneManager {
      */
     private String internationaliseServerMessage(String e) {
         String context = e;
-        // @formatter:off
         switch (e) {
             //Found in ChatService
             case "This lobby doesn't allow the use of commands!":
@@ -442,7 +441,7 @@ public class SceneManager {
                 context = resourceBundle.getString("error.context.full");
                 break;
             case "This lobby does not exist!":
-                context = resourceBundle.getString("error.context.noexistant");
+                context = resourceBundle.getString("error.context.nonexistant");
                 break;
             //Found in GameService
             case "Can not kick while a game is ongoing":
@@ -472,41 +471,42 @@ public class SceneManager {
                 break;
         }
         //found in UserManagement
-        if (e.contains("Cannot auth user ")) context =
-                resourceBundle.getString("error.context.cannotauth") +
-                e.substring(16);
+        if (e.contains("Cannot auth user "))
+            context = String.format(resourceBundle.getString("error.context.cannotauth"), e.substring(17));
         //found in UserService
-        if (e.contains("Cannot delete user ")) context =
-                resourceBundle.getString("error.context.cannotdelete") + " " +
-                e.substring(e.indexOf('[')+1, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.unknown");
-        if (e.contains("Cannot create user ")) context =
-                resourceBundle.getString("error.context.cannotcreate") + " " +
-                e.substring(e.indexOf('[')+2-1, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.nameused");
-        if (e.contains("Cannot change Password of ")) context =
-                resourceBundle.getString("error.context.cannotchangepw") + " " +
-                e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.unknown");
+        if (e.contains("Cannot delete user ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotdelete"),
+                                    e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.unknown"));
+        }
+        if (e.contains("Cannot create user ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotcreate"),
+                                    e.substring(e.indexOf('[') + 2 - 1, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.nameused"));
+        }
+        if (e.contains("Cannot change Password of ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotchangepw"),
+                                    e.substring(e.indexOf('[') + 3 - 2, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.unknown"));
+        }
         //found in LobbyManagement
-        if (e.contains("Lobby") && e.contains(" already exists!")) context =
-                resourceBundle.getString("error.context.lobbyname") + " " +
-                e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains("Lobby") && e.contains(" not found!")) context =
-                resourceBundle.getString("error.context.lobbyname") + " " +
-                e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.notfound");
+        if (e.contains("Lobby") && e.contains(" already exists!")) {
+            context = String.format(resourceBundle.getString("error.context.lobby.alreadyused"),
+                                    e.substring(e.indexOf('[') + 4 - 3, e.lastIndexOf(']')));
+        }
+        if (e.contains("Lobby") && e.contains(" not found!")) {
+            context = String.format(resourceBundle.getString("error.context.lobby.notfound"),
+                                    e.substring(e.indexOf('[') + 5 - 4, e.lastIndexOf(']')));
+        }
         //found in GameManagement
-        if (e.contains("Game") && e.contains(" already exists!")) context =
-                resourceBundle.getString("error.context.gamelobby") + " " +
-                e.substring(e.indexOf('[')+6-5, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains("Game") && e.contains(" not found!")) context =
-                resourceBundle.getString("error.context.gamelobby") + " " +
-                e.substring(e.indexOf('[')+7-6, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.notfound");
-        // @formatter:on
+        if (e.contains("Game") && e.contains(" already exists!")) {
+            context = String.format(resourceBundle.getString("error.context.game.alreadyexists"),
+                                    e.substring(e.indexOf('[') + 6 - 5, e.lastIndexOf(']')));
+        }
+        if (e.contains("Game") && e.contains(" not found!")) {
+            context = String.format(resourceBundle.getString("error.context.game.notfound"),
+                                    e.substring(e.indexOf('[') + 7 - 6, e.lastIndexOf(']')));
+        }
         return context;
     }
 
@@ -694,7 +694,7 @@ public class SceneManager {
         Platform.runLater(() -> {
             devMenuIsOpen = true;
             Stage devMenuStage = new Stage();
-            devMenuStage.setTitle("Developer Access Board");
+            devMenuStage.setTitle(resourceBundle.getString("devmenu.window.title"));
             devMenuStage.setHeight(DevMenuPresenter.MIN_HEIGHT);
             devMenuStage.setMinHeight(DevMenuPresenter.MIN_HEIGHT);
             devMenuStage.setWidth(DevMenuPresenter.MIN_WIDTH);

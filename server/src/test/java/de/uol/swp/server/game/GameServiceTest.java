@@ -562,7 +562,9 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
 
-        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby", "wool", "brick");
+        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby",
+                                                                              "game.resources.wool",
+                                                                              "game.resources.brick");
 
         bus.post(executeTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
@@ -625,17 +627,17 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getLumber());
 
         Map<String, Integer> offeringResourceMap = new HashMap<>();
-        offeringResourceMap.put("brick", 2);
-        offeringResourceMap.put("ore", 3);
-        offeringResourceMap.put("wool", 0);
-        offeringResourceMap.put("grain", 0);
-        offeringResourceMap.put("lumber", 0);
+        offeringResourceMap.put("game.resources.brick", 2);
+        offeringResourceMap.put("game.resources.ore", 3);
+        offeringResourceMap.put("game.resources.wool", 0);
+        offeringResourceMap.put("game.resources.grain", 0);
+        offeringResourceMap.put("game.resources.lumber", 0);
         Map<String, Integer> respondingResourceMap = new HashMap<>();
-        respondingResourceMap.put("brick", 0);
-        respondingResourceMap.put("ore", 0);
-        respondingResourceMap.put("wool", 1);
-        respondingResourceMap.put("grain", 0);
-        respondingResourceMap.put("lumber", 4);
+        respondingResourceMap.put("game.resources.brick", 0);
+        respondingResourceMap.put("game.resources.ore", 0);
+        respondingResourceMap.put("game.resources.wool", 1);
+        respondingResourceMap.put("game.resources.grain", 0);
+        respondingResourceMap.put("game.resources.lumber", 4);
 
         Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", respondingResourceMap,
                                                            offeringResourceMap);

@@ -46,7 +46,7 @@
         <VBox alignment="CENTER" spacing="20.0">
             <Button fx:id="offerTradeButton" mnemonicParsing="false" onAction="#onOfferTradeButtonPressed"
                     text="%game.trade.buttons.makeoffer"/>
-            <Button mnemonicParsing="false" onAction="#onCancelTradeButtonPressed" text="%game.trade.buttons.cancel"/>
+            <Button mnemonicParsing="false" onAction="#onCancelTradeButtonPressed" text="%button.cancel"/>
         </VBox>
 
         <VBox alignment="CENTER" spacing="15.0">

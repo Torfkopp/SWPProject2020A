@@ -88,8 +88,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey())); // looks like: "1 Brick"
+                    setText(empty || item == null ? "" :
+                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
                 });
             }
         });
@@ -97,8 +97,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey()));
+                    setText(empty || item == null ? "" :
+                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
                 });
             }
         });
@@ -106,8 +106,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             protected void updateItem(Pair<String, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey()));
+                    setText(empty || item == null ? "" :
+                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
                 });
             }
         });
@@ -125,7 +125,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
-        if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
+        if (resourceMap.get("game.resources.ore") >= 1 && resourceMap.get("game.resources.grain") >= 1 && resourceMap
+                                                                                                                  .get("game.resources.wool") >= 1) {
             tradeService.buyDevelopmentCard(lobbyName);
         }
     }
@@ -185,7 +186,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             resourceMap = rsp.getResourceMap();
             setTradingLists();
         }
-        if (resourceMap.get("ore") >= 1 && resourceMap.get("grain") >= 1 && resourceMap.get("wool") >= 1) {
+        if (resourceMap.get("game.resources.ore") >= 1 && resourceMap.get("game.resources.grain") >= 1 && resourceMap
+                                                                                                                  .get("game.resources.wool") >= 1) {
             buyDevelopmentButton.setDisable(false);
         }
     }
@@ -300,6 +302,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             ownInventoryList.add(new Pair<>(entry.getKey(), entry.getValue()));
             String resource = entry.getKey().toUpperCase();
+            resource = resource.replaceFirst("^GAME.RESOURCES.", "");
             IHarborHex.HarborResource harborResource = IHarborHex.HarborResource.valueOf(resource);
             if (entry.getValue() < tradingRatio.get(harborResource)) continue;
             resourceList.add(new Pair<>(entry.getKey(), tradingRatio.get(harborResource)));

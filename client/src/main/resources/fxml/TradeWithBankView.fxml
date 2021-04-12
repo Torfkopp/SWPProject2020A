@@ -17,7 +17,7 @@
                     onAction="#onBuyDevelopmentCardButtonPressed" prefHeight="50"
                     text="%game.trade.buttons.buydevcard"/>
             <Button fx:id="cancelButton" layoutX="356.0" layoutY="291.0" mnemonicParsing="false"
-                    onAction="#onCancelButtonPressed" prefHeight="25.0" text="%game.trade.buttons.cancel"/>
+                    onAction="#onCancelButtonPressed" prefHeight="25.0" text="%button.cancel"/>
 
             <ListView fx:id="ownResourceToTradeWithView" layoutY="30.0" prefHeight="140.0" prefWidth="200.0">
                 <placeholder>
