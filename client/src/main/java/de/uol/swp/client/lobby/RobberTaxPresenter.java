@@ -4,11 +4,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
+import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.request.UpdateInventoryRequest;
-import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -36,6 +34,9 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
     private final Map<Resources, Integer> selectedResources = new HashMap<>();
+    @Inject
+    protected IGameService gameService;
+
     @FXML
     private Label resourceAmount;
     @FXML
@@ -161,9 +162,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private void onTaxPayButtonPressed() {
         LOG.debug("Sending RobberTaxChosenRequest");
-        eventBus.post(new RobberTaxChosenRequest(selectedResources, user, lobbyName));
-        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, user));
-        eventBus.post(new UpdateInventoryRequest(user, lobbyName));
+        gameService.taxPayed(lobbyName, user, selectedResources);
+        gameService.updateInventory(lobbyName, user);
     }
 
     /**
