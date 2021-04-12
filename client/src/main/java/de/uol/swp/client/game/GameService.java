@@ -4,14 +4,21 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
+import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
+import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.message.Message;
+import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Map;
 
 /**
  * The GameService is responsible for posting requests and events regarding
@@ -88,6 +95,18 @@ public class GameService implements IGameService {
     }
 
     @Override
+    public void robberChooseVictim(String lobbyName, UserOrDummy victim) {
+        Message msg = new RobberChosenVictimRequest(lobbyName, userService.getLoggedInUser(), victim);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void robberNewPosition(String lobbyName, MapPoint mapPoint) {
+        Message msg = new RobberNewPositionChosenRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
+        eventBus.post(msg);
+    }
+
+    @Override
     public void rollDice(String lobbyName) {
         LOG.debug("Sending RollDiceRequest");
         Message request = new RollDiceRequest(userService.getLoggedInUser(), lobbyName);
@@ -99,6 +118,12 @@ public class GameService implements IGameService {
         LOG.debug("Sending StartSessionRequest");
         Message request = new StartSessionRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
+    }
+
+    @Override
+    public void taxPayed(String lobbyName, Map<Resources, Integer> selectedResources) {
+        eventBus.post(new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName));
+        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, userService.getLoggedInUser()));
     }
 
     @Override

@@ -2,6 +2,9 @@ package de.uol.swp.client.game;
 
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.user.UserOrDummy;
+
+import java.util.Map;
 
 /**
  * An interface for all methods of the GameService
@@ -67,6 +70,30 @@ public interface IGameService {
     void playYearOfPlentyCard(String lobbyName, Resources resource1, Resources resource2);
 
     /**
+     * Posts a RobberChosenVictimRequest
+     *
+     * @param lobbyName The name of the lobby
+     * @param victim    The user to lose the resource card
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    void robberChooseVictim(String lobbyName, UserOrDummy victim);
+
+    /**
+     * Posts a RobberNewPositionMessage
+     *
+     * @param lobby    The name of the lobby
+     * @param mapPoint The robber's new position
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    void robberNewPosition(String lobby, MapPoint mapPoint);
+
+    /**
      * Posts a request to roll the dices
      *
      * @param lobbyName The Lobby in which to roll the dice
@@ -86,6 +113,17 @@ public interface IGameService {
      * @since 2021-03-23
      */
     void startSession(String lobbyName);
+
+    /**
+     * Posts a RobberTaxChosenRequest and a CloseRobberTaxView
+     *
+     * @param lobbyName         The lobby's name
+     * @param selectedResources The user's selected resources
+     *
+     * @author Mario Fokken
+     * @since 2021-04-12
+     */
+    void taxPayed(String lobbyName, Map<Resources, Integer> selectedResources);
 
     /**
      * Posts a request to update the game map

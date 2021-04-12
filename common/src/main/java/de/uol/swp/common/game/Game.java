@@ -3,12 +3,11 @@ package de.uol.swp.common.game;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class for a game
@@ -23,6 +22,7 @@ public class Game {
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
+    private final Set<User> taxPayers = new HashSet<>();
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -60,6 +60,17 @@ public class Game {
         dices[0] = dice1;
         dices[1] = dice2;
         return (new int[]{dice1, dice2});
+    }
+
+    /**
+     * Adds a taxPayer to the set
+     *
+     * @param user The user to add
+     *
+     * @since 2021-04-11
+     */
+    public void addTaxPayer(User user) {
+        taxPayers.add(user);
     }
 
     /**
@@ -264,6 +275,17 @@ public class Game {
     }
 
     /**
+     * Gets the taxPayer Set
+     *
+     * @return Set of the taxPayer
+     *
+     * @since 2021-04-11
+     */
+    public Set<User> getTaxPayers() {
+        return taxPayers;
+    }
+
+    /**
      * Returns the user corresponding with the given player
      *
      * @param player The player whose User is required
@@ -282,6 +304,17 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
+    }
+
+    /**
+     * Removes a user from the taxPayers
+     *
+     * @param user User to remove
+     *
+     * @since 2021-04-11
+     */
+    public void removeTaxPayer(User user) {
+        taxPayers.remove(user);
     }
 
     /**
