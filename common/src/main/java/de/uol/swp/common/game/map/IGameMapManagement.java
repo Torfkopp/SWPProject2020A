@@ -332,6 +332,7 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
+
     /**
      * Gets all the Settlements and Cities presented in a map
      *

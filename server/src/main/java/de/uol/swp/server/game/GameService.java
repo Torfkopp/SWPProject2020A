@@ -609,8 +609,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onExecuteTradeWithBankRequest(ExecuteTradeWithBankRequest req) {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Received UpdateInventoryAfterTradeWithBankRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received ExecuteTradeWithBankRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
