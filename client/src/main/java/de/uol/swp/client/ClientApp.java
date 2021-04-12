@@ -7,8 +7,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
-import de.uol.swp.client.user.ClientUserService;
-import de.uol.swp.common.user.User;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.user.response.*;
 import io.netty.channel.Channel;
@@ -40,8 +39,7 @@ public class ClientApp extends Application implements ConnectionListener {
     private static ResourceBundle resourceBundle;
     private String host;
     private int port;
-    private ClientUserService userService;
-    private User user;
+    private IUserService userService;
     private ClientConnection clientConnection;
     private EventBus eventBus;
     private SceneManager sceneManager;
@@ -88,7 +86,7 @@ public class ClientApp extends Application implements ConnectionListener {
         Injector injector = Guice.createInjector(new ClientModule());
 
         // get user service from guice; is needed for logout
-        this.userService = injector.getInstance(ClientUserService.class);
+        this.userService = injector.getInstance(IUserService.class);
 
         // get event bus from guice
         eventBus = injector.getInstance(EventBus.class);
@@ -117,10 +115,7 @@ public class ClientApp extends Application implements ConnectionListener {
 
     @Override
     public void stop() {
-        if (userService != null && user != null) {
-            userService.logout(user);
-            user = null;
-        }
+        if (userService != null) userService.logout(userService.getLoggedInUser());
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
@@ -213,8 +208,7 @@ public class ClientApp extends Application implements ConnectionListener {
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse for User " + rsp.getUser().getUsername());
-        this.user = rsp.getUser();
-        sceneManager.showMainScreen(user);
+        sceneManager.showMainScreen(rsp.getUser());
     }
 
     /**

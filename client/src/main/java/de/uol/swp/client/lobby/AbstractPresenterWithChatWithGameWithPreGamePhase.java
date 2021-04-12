@@ -82,8 +82,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-06
      */
     protected void closeWindow(boolean kicked) {
-        if (lobbyName != null || loggedInUser != null || !kicked) {
-            lobbyService.leaveLobby(lobbyName, loggedInUser);
+        if (lobbyName != null || !kicked) {
+            lobbyService.leaveLobby(lobbyName);
         }
         ((Stage) window).close();
         clearEventBus();
@@ -117,8 +117,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     protected void setKickUserButtonState() {
         Platform.runLater(() -> {
-            kickUserButton.setVisible(loggedInUser.equals(owner));
-            kickUserButton.setDisable(loggedInUser.equals(owner));
+            kickUserButton.setVisible(userService.getLoggedInUser().equals(owner));
+            kickUserButton.setDisable(userService.getLoggedInUser().equals(owner));
         });
     }
 
@@ -131,13 +131,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-03-15
      */
     protected void setPreGameSettings() {
-        moveTimeTextField.setDisable(!loggedInUser.equals(owner));
-        changeMoveTimeButton.setDisable(!loggedInUser.equals(owner));
-        setStartUpPhaseCheckBox.setDisable(!loggedInUser.equals(owner));
-        commandsActivated.setDisable(!loggedInUser.equals(owner));
-        randomPlayFieldCheckbox.setDisable(!loggedInUser.equals(owner));
-        fourPlayerRadioButton.setDisable(!loggedInUser.equals(owner));
-        threePlayerRadioButton.setDisable(!loggedInUser.equals(owner) || lobbyMembers.size() == 4);
+        moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
+        commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
+        randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
+        fourPlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        threePlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner) || lobbyMembers.size() == 4);
     }
 
     /**
@@ -152,7 +152,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-20
      */
     protected void setStartSessionButtonState() {
-        if (loggedInUser.equals(owner)) {
+        if (userService.getLoggedInUser().equals(owner)) {
             startSession.setVisible(true);
             startSession.setDisable(readyUsers.size() < 3 || lobbyMembers.size() != readyUsers.size());
         } else {
@@ -176,8 +176,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onKickUserButtonPressed() {
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if (selectedUser == loggedInUser) return;
-        lobbyService.kickUser(lobbyName, loggedInUser, selectedUser);
+        if (selectedUser == userService.getLoggedInUser()) return;
+        lobbyService.kickUser(lobbyName, selectedUser);
     }
 
     /**
@@ -196,7 +196,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && loggedInUser.equals(rsp.getToBeKickedUser())) {
+        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
             Platform.runLater(() -> closeWindow(true));
         }
     }
@@ -215,7 +215,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void onReadyCheckBoxClicked() {
         boolean isReady = readyCheckBox.isSelected();
-        lobbyService.userReady(lobbyName, loggedInUser, isReady);
+        lobbyService.userReady(lobbyName, isReady);
     }
 
     /**
@@ -284,7 +284,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void onStartSessionButtonPressed() {
         buildingCosts.setVisible(true);
-        gameService.startSession(lobbyName, loggedInUser);
+        gameService.startSession(lobbyName);
     }
 
     /**
@@ -365,38 +365,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method to set the in-game Buttons and Lists
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-04-11
-     */
-    private void prepareInGameArrangement() {
-        preGameSettingBox.setVisible(false);
-        preGameSettingBox.setPrefHeight(0);
-        preGameSettingBox.setMaxHeight(0);
-        preGameSettingBox.setMinHeight(0);
-        gameRendering = new GameRendering(gameMapCanvas);
-        gameService.updateInventory(lobbyName, loggedInUser);
-        window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-        window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-        ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-        ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-        inventoryView.setMaxHeight(280);
-        inventoryView.setMinHeight(280);
-        inventoryView.setPrefHeight(280);
-        inventoryView.setVisible(true);
-        uniqueCardView.setMaxHeight(48);
-        uniqueCardView.setMinHeight(48);
-        uniqueCardView.setPrefHeight(48);
-        uniqueCardView.setVisible(true);
-        readyCheckBox.setVisible(false);
-        startSession.setVisible(false);
-        rollDice.setVisible(true);
-        endTurn.setVisible(true);
-    }
-
-    /**
      * Handles the UserReadyMessage
      * <p>
      * If the UserReadyMessage belongs to this lobby, it calls the LobbyService
@@ -417,6 +385,38 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Helper method to set the in-game Buttons and Lists
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-11
+     */
+    private void prepareInGameArrangement() {
+        preGameSettingBox.setVisible(false);
+        preGameSettingBox.setPrefHeight(0);
+        preGameSettingBox.setMaxHeight(0);
+        preGameSettingBox.setMinHeight(0);
+        gameRendering = new GameRendering(gameMapCanvas);
+        gameService.updateInventory(lobbyName);
+        window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+        ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
+        inventoryView.setMaxHeight(280);
+        inventoryView.setMinHeight(280);
+        inventoryView.setPrefHeight(280);
+        inventoryView.setVisible(true);
+        uniqueCardView.setMaxHeight(48);
+        uniqueCardView.setMinHeight(48);
+        uniqueCardView.setPrefHeight(48);
+        uniqueCardView.setVisible(true);
+        readyCheckBox.setVisible(false);
+        startSession.setVisible(false);
+        rollDice.setVisible(true);
+        endTurn.setVisible(true);
+    }
+
+    /**
      * Method to handle the overall update of the LobbySettings in the pre-game menu
      * <p>
      * This method takes the content of all the specific CheckBoxes, RadioButtons, and TextFields
@@ -429,11 +429,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void prepareLobbyUpdate() {
-        if (!loggedInUser.equals(owner)) return;
+        if (!userService.getLoggedInUser().equals(owner)) return;
         int moveTime =
                 !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
         int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-        lobbyService.updateLobbySettings(lobbyName, loggedInUser, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
+        lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
                                          commandsActivated.isSelected(), moveTime,
                                          randomPlayFieldCheckbox.isSelected());
     }

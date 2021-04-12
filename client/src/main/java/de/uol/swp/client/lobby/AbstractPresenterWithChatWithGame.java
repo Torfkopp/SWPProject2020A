@@ -137,7 +137,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     protected void fitCanvasToSize() {
         double heightDiff = 0;
-        if (gameWon && Objects.equals(owner, loggedInUser)) heightDiff = 40;
+        if (gameWon && Objects.equals(owner, userService.getLoggedInUser())) heightDiff = 40;
         double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
         double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
         double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.MIN_WIDTH_PRE_GAME;
@@ -147,7 +147,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameRendering = new GameRendering(gameMapCanvas);
 
         if (gameWon) {
-            gameRendering.showWinnerText(!Objects.equals(winner, loggedInUser) ?
+            gameRendering.showWinnerText(!Objects.equals(winner, userService.getLoggedInUser()) ?
                                          String.format(resourceBundle.getString("game.won.info"), winner) :
                                          resourceBundle.getString("game.won.you"));
         } else {
@@ -166,7 +166,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-02-22
      */
     protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(!loggedInUser.equals(user));
+        rollDice.setDisable(!userService.getLoggedInUser().equals(user));
     }
 
     /**
@@ -211,8 +211,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     private void disableButtonsAfterTurn() {
         disableButtonStates();
-        this.rollDice.setDisable(true);
-        gameService.updateInventory(lobbyName, loggedInUser);
+        rollDice.setDisable(true);
+        gameService.updateInventory(lobbyName);
     }
 
     /**
@@ -282,8 +282,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 break;
         }
         final String finalAttr = attr;
-        if (Objects.equals(msg.getUser(), loggedInUser)) {
-            gameService.updateInventory(lobbyName, loggedInUser);
+        if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
+            gameService.updateInventory(lobbyName);
             if (finalAttr != null)
                 Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
         } else {
@@ -307,16 +307,16 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onDiceCastMessage(DiceCastMessage msg) {
-        if (!this.lobbyName.equals(msg.getLobbyName())) return;
+        if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
         if ((msg.getDice1() + msg.getDice2()) != 7) {
             resetButtonStates(msg.getUser());
         }
-        this.dice1 = msg.getDice1();
-        this.dice2 = msg.getDice2();
+        dice1 = msg.getDice1();
+        dice2 = msg.getDice2();
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
-        gameService.updateInventory(lobbyName, loggedInUser);
+        gameService.updateInventory(lobbyName);
     }
 
     /**
@@ -331,7 +331,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
-        gameService.endTurn(lobbyName, loggedInUser);
+        gameService.endTurn(lobbyName);
     }
 
     /**
@@ -351,12 +351,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-            gameService.buildRequest(lobbyName, loggedInUser, mapPoint);
+            gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition) {
-            gameService.robberNewPosition(lobbyName, loggedInUser, mapPoint);
+            gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
-            resetButtonStates(loggedInUser);
+            resetButtonStates(userService.getLoggedInUser());
         }
     }
 
@@ -371,7 +371,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
@@ -422,11 +422,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Result is the button the user has clicked on
         if (result.isEmpty()) return;
         if (result.get() == btnKnight) { //Play a Knight Card
-            gameService.playKnightCard(lobbyName, loggedInUser);
+            gameService.playKnightCard(lobbyName);
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            gameService.playRoadBuildingCard(lobbyName, loggedInUser);
+            gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -446,19 +446,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onPlayCardFailureResponse(PlayCardFailureResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardFailureResponse");
-        if (loggedInUser.equals(rsp.getUser())) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
-                alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
-                ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                    ButtonBar.ButtonData.OK_DONE);
-                alert.getButtonTypes().setAll(confirm);
-                if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
-                    alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
-                alert.showAndWait();
-            });
-        }
+        if (!userService.getLoggedInUser().equals(rsp.getUser())) return;
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
+            alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(confirm);
+            if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
+                alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+            alert.showAndWait();
+        });
     }
 
     /**
@@ -476,7 +475,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
-        gameService.updateInventory(rsp.getLobbyName(), rsp.getUser());
+        gameService.updateInventory(rsp.getLobbyName());
     }
 
     /**
@@ -495,11 +494,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!msg.getLobbyName().equals(this.lobbyName)) return;
+        if (!lobbyName.equals(msg.getLobbyName())) return;
         gameMap = null;
         gameWon = true;
         winner = msg.getUser();
-        if (Objects.equals(owner, loggedInUser)) {
+        if (Objects.equals(owner, userService.getLoggedInUser())) {
             returnToLobby.setVisible(true);
             returnToLobby.setPrefHeight(30);
             returnToLobby.setPrefWidth(250);
@@ -545,9 +544,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
-        if (super.lobbyName.equals(event.getLobbyName()) && super.loggedInUser.equals(event.getUser())) {
-            resetButtonStates(event.getUser());
-        }
+        if (!lobbyName.equals(event.getLobbyName())) return;
+        resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -561,7 +559,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onReturnToLobbyButtonPressed() {
         buildingCosts.setVisible(false);
         inGame = false;
-        lobbyService.returnToPreGameLobby(this.lobbyName);
+        lobbyService.returnToPreGameLobby(lobbyName);
     }
 
     /**
@@ -576,7 +574,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberChooseVictimResponse(RobberChooseVictimResponse rsp) {
         LOG.debug("Received RobberChooseVictimResponse");
-        if (loggedInUser.equals(rsp.getPlayer())) {
+        if (userService.getLoggedInUser().equals(rsp.getPlayer())) {
             Platform.runLater(() -> {
                 List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
                 ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
@@ -592,7 +590,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
-                rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
+                rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
             });
         }
     }
@@ -642,11 +640,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberTaxMessage(RobberTaxMessage msg) {
         LOG.debug("Received RobberTaxMessage");
-        if (msg.getPlayers().containsKey(loggedInUser)) {
+        if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
             LOG.debug("Sending ShowRobberTaxViewEvent");
-            eventBus.post(
-                    new ShowRobberTaxViewEvent(msg.getLobbyName(), loggedInUser, msg.getPlayers().get(loggedInUser),
-                                               msg.getInventory().get(loggedInUser)));
+            User user = userService.getLoggedInUser();
+            eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                     msg.getInventory().get(user)));
         }
     }
 
@@ -663,8 +661,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onRollDiceButtonPressed() {
-        gameService.rollDice(lobbyName, loggedInUser);
-        this.rollDice.setDisable(true);
+        gameService.rollDice(lobbyName);
+        rollDice.setDisable(true);
     }
 
     /**
@@ -680,7 +678,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        gameService.updateInventory(this.lobbyName, this.loggedInUser);
+        gameService.updateInventory(lobbyName);
     }
 
     /**
@@ -697,8 +695,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onTradeWithBankButtonPressed() {
         disableButtonStates();
-        tradeService.showBankTradeWindow(lobbyName, loggedInUser);
-        tradeService.tradeWithBank(lobbyName, loggedInUser);
+        tradeService.showBankTradeWindow(lobbyName);
+        tradeService.tradeWithBank(lobbyName);
     }
 
     /**
@@ -718,12 +716,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
             tradeService.showTradeError(resourceBundle.getString("game.trade.error.noplayer"));
-        } else if (Objects.equals(user, loggedInUser)) {
+        } else if (Objects.equals(user, userService.getLoggedInUser())) {
             tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            tradeService.showUserTradeWindow(lobbyName, loggedInUser, user);
-            tradeService.tradeWithUser(lobbyName, loggedInUser, user);
+            tradeService.showUserTradeWindow(lobbyName, user);
+            tradeService.tradeWithUser(lobbyName, user);
         }
     }
 
@@ -741,8 +739,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        if (!rsp.getActivePlayer().equals(loggedInUser)) return;
-        resetButtonStates(loggedInUser);
+        if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
+        resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -855,7 +853,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             else if (rst.get().equals(grain)) resource = Resources.GRAIN;
             else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
             else if (rst.get().equals(wool)) resource = Resources.WOOL;
-            gameService.playMonopolyCard(lobbyName, loggedInUser, resource);
+            gameService.playMonopolyCard(lobbyName, resource);
         }
     }
 
@@ -917,7 +915,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
             else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
             //Send Request
-            gameService.playYearOfPlentyCard(lobbyName, loggedInUser, resource1, resource2);
+            gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
         }
     }
 
@@ -989,10 +987,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-03-23
      */
     private void resetButtonStates(UserOrDummy user) {
-        tradeWithBankButton.setDisable(!loggedInUser.equals(user));
-        endTurn.setDisable(!loggedInUser.equals(user));
-        tradeWithUserButton.setDisable(!loggedInUser.equals(user));
-        playCard.setDisable(!loggedInUser.equals(user));
-        buildingCurrentlyAllowed = loggedInUser.equals(user);
+        tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
+        endTurn.setDisable(!userService.getLoggedInUser().equals(user));
+        tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
+        playCard.setDisable(!userService.getLoggedInUser().equals(user));
+        buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }

@@ -5,6 +5,7 @@ import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Event used to show the accept window of a trade
+ * <p>
  * In order to show the previous window using this event, post an instance of it
  * onto the EventBus the SceneManager is subscribed to.
  *

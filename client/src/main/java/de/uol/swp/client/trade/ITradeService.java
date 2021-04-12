@@ -1,7 +1,6 @@
 package de.uol.swp.client.trade;
 
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
@@ -20,21 +19,19 @@ public interface ITradeService {
      * Posts a request to accept a proposed trade
      *
      * @param lobbyName         The name of the lobby
-     * @param respondingUser    The User who wants to accept the trade
      * @param offeringUser      The User who offered the trade
      * @param demandedResources The resources the offering User wants
      * @param offeredResources  The resources the offering User is offering
      */
-    void acceptUserTrade(String lobbyName, UserOrDummy respondingUser, UserOrDummy offeringUser,
-                         Map<String, Integer> demandedResources, Map<String, Integer> offeredResources);
+    void acceptUserTrade(String lobbyName, UserOrDummy offeringUser, Map<String, Integer> demandedResources,
+                         Map<String, Integer> offeredResources);
 
     /**
      * Posts a request to buy a Development Card
      *
      * @param lobbyName The name of the lobby
-     * @param user      The user who wants to buy a Development Card
      */
-    void buyDevelopmentCard(String lobbyName, User user);
+    void buyDevelopmentCard(String lobbyName);
 
     /**
      * Posts a request to close the Trade Accept window on the responding user's end
@@ -48,9 +45,8 @@ public interface ITradeService {
      * Posts an event to close the Bank trade window and re-enable the in-game buttons
      *
      * @param lobbyName The name of the lobby
-     * @param user      The User who wants to close the Bank trade window
      */
-    void closeBankTradeWindow(String lobbyName, User user);
+    void closeBankTradeWindow(String lobbyName);
 
     /**
      * Posts an event to close a Trade Response window
@@ -70,23 +66,21 @@ public interface ITradeService {
      * Posts a request to execute a resource trade with the Bank
      *
      * @param lobbyName      The name of the lobby
-     * @param user           The User who wants to trade with the Bank
      * @param gainedResource The resource the User wants from the Bank
      * @param lostResource   The resource the User is offering to the Bank
      */
-    void executeTradeWithBank(String lobbyName, User user, String gainedResource, String lostResource);
+    void executeTradeWithBank(String lobbyName, String gainedResource, String lostResource);
 
     /**
      * Posts a request to offer a trade to another user
      *
      * @param lobbyName         The name of the lobby
-     * @param user              The user offering the trade
      * @param respondingUser    The user to whom the trade offer is being made
      * @param offeredResources  Map of resources being offered to the responding user
      * @param demandedResources Map of resources being demanded from the responding user
      */
-    void offerTrade(String lobbyName, UserOrDummy user, UserOrDummy respondingUser,
-                    Map<String, Integer> offeredResources, Map<String, Integer> demandedResources);
+    void offerTrade(String lobbyName, UserOrDummy respondingUser, Map<String, Integer> offeredResources,
+                    Map<String, Integer> demandedResources);
 
     /**
      * Posts a request to reset the Offer Trade button for the user who proposed a trade
@@ -101,9 +95,8 @@ public interface ITradeService {
      * Posts an event to show the Bank trade window
      *
      * @param lobbyName The name of the lobby
-     * @param user      The user who wants to trade with the Bank
      */
-    void showBankTradeWindow(String lobbyName, User user);
+    void showBankTradeWindow(String lobbyName);
 
     /**
      * Posts an event to show the Trade Offered window displaying a trade offer
@@ -127,26 +120,23 @@ public interface ITradeService {
      * Posts an event to show the User trade window for making a trade offer
      *
      * @param lobbyName      The name of the lobby
-     * @param offeringUser   The user wanting to create a trade offer
      * @param respondingUser The user to whom the offer is being made
      */
-    void showUserTradeWindow(String lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser);
+    void showUserTradeWindow(String lobbyName, UserOrDummy respondingUser);
 
     /**
      * Posts a request for the Bank's inventory in order to trade with the Bank
      *
      * @param lobbyName The name of the lobby
-     * @param user      The user who wants to trade with the Bank
      */
-    void tradeWithBank(String lobbyName, User user);
+    void tradeWithBank(String lobbyName);
 
     /**
      * Posts a request for another User's inventory overview in order to make a
      * trade offer to them
      *
      * @param lobbyName      The name of the lobby
-     * @param offeringUser   The user who wants to make a trade offer
      * @param respondingUser The user to whom the offer is being made
      */
-    void tradeWithUser(String lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser);
+    void tradeWithUser(String lobbyName, UserOrDummy respondingUser);
 }

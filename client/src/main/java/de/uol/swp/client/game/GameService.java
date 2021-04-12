@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
@@ -13,7 +14,6 @@ import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +33,7 @@ public class GameService implements IGameService {
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final EventBus eventBus;
+    private final IUserService userService;
 
     /**
      * Constructor
@@ -43,66 +44,91 @@ public class GameService implements IGameService {
      * @since 2021-04-07
      */
     @Inject
-    public GameService(EventBus eventBus) {
+    public GameService(EventBus eventBus, IUserService userService) {
         this.eventBus = eventBus;
         this.eventBus.register(this);
+        this.userService = userService;
         LOG.debug("GameService started");
     }
 
     @Override
-    public void buildRequest(String lobbyName, User user, MapPoint mapPoint) {
+    public void buildRequest(String lobbyName, MapPoint mapPoint) {
         LOG.debug("Sending BuildRequest");
-        Message request = new BuildRequest(lobbyName, user, mapPoint);
+        Message request = new BuildRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
         eventBus.post(request);
     }
 
     @Override
-    public void endTurn(String lobbyName, User user) {
+    public void endTurn(String lobbyName) {
         LOG.debug("Sending EndTurnRequest");
-        Message request = new EndTurnRequest(user, lobbyName);
+        Message request = new EndTurnRequest(userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);
     }
 
     @Override
-    public void playKnightCard(String lobbyName, User user) {
+    public void playKnightCard(String lobbyName) {
         LOG.debug("Sending PlayKnightCardRequest");
-        Message request = new PlayKnightCardRequest(lobbyName, user);
+        Message request = new PlayKnightCardRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
     }
 
     @Override
-    public void playMonopolyCard(String lobbyName, User user, Resources resource) {
+    public void playMonopolyCard(String lobbyName, Resources resource) {
         LOG.debug("Sending PlayMonopolyCardRequest");
-        Message request = new PlayMonopolyCardRequest(lobbyName, user, resource);
+        Message request = new PlayMonopolyCardRequest(lobbyName, userService.getLoggedInUser(), resource);
         eventBus.post(request);
     }
 
     @Override
-    public void playRoadBuildingCard(String lobbyName, User user) {
+    public void playRoadBuildingCard(String lobbyName) {
         LOG.debug("Sending PlayRoadBuildingCardRequest");
-        Message request = new PlayRoadBuildingCardRequest(lobbyName, user);
+        Message request = new PlayRoadBuildingCardRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
     }
 
     @Override
-    public void playYearOfPlentyCard(String lobbyName, User user, Resources resource1, Resources resource2) {
+    public void playYearOfPlentyCard(String lobbyName, Resources resource1, Resources resource2) {
         LOG.debug("Sending PlayYearOfPlentyCardRequest");
-        Message request = new PlayYearOfPlentyCardRequest(lobbyName, user, resource1, resource2);
+        Message request = new PlayYearOfPlentyCardRequest(lobbyName, userService.getLoggedInUser(), resource1,
+                                                          resource2);
         eventBus.post(request);
     }
 
     @Override
-    public void rollDice(String lobbyName, User user) {
+    public void robberChooseVictim(String lobbyName, UserOrDummy victim) {
+        LOG.debug("Sending RobberChosenVictimRequest");
+        Message msg = new RobberChosenVictimRequest(lobbyName, userService.getLoggedInUser(), victim);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void robberNewPosition(String lobbyName, MapPoint mapPoint) {
+        LOG.debug("Sending RobberNewPositionChosenRequest");
+        Message msg = new RobberNewPositionChosenRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
+        eventBus.post(msg);
+    }
+
+    @Override
+    public void rollDice(String lobbyName) {
         LOG.debug("Sending RollDiceRequest");
-        Message request = new RollDiceRequest(user, lobbyName);
+        Message request = new RollDiceRequest(userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);
     }
 
     @Override
-    public void startSession(String lobbyName, User user) {
+    public void startSession(String lobbyName) {
         LOG.debug("Sending StartSessionRequest");
-        Message request = new StartSessionRequest(lobbyName, user);
+        Message request = new StartSessionRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
+    }
+
+    @Override
+    public void taxPayed(String lobbyName, Map<Resources, Integer> selectedResources) {
+        LOG.debug("Sending RobberTaxChosenRequest");
+        Message request = new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName);
+        eventBus.post(request);
+        LOG.debug("Sending CloseRobberTaxViewEvent");
+        eventBus.post(new CloseRobberTaxViewEvent(lobbyName));
     }
 
     @Override
@@ -113,27 +139,9 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void robberChooseVictim(String lobbyName, User user, UserOrDummy victim) {
-        Message msg = new RobberChosenVictimRequest(lobbyName, user, victim);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void robberNewPosition(String lobbyName, User user, MapPoint mapPoint) {
-        Message msg = new RobberNewPositionChosenRequest(lobbyName, user, mapPoint);
-        eventBus.post(msg);
-    }
-
-    @Override
-    public void taxPayed(String lobbyName, User user, Map<Resources, Integer> selectedResources) {
-        eventBus.post(new RobberTaxChosenRequest(selectedResources, user, lobbyName));
-        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, user));
-    }
-
-    @Override
-    public void updateInventory(String lobbyName, User user) {
+    public void updateInventory(String lobbyName) {
         LOG.debug("Sending UpdateInventoryRequest");
-        Message request = new UpdateInventoryRequest(user, lobbyName);
+        Message request = new UpdateInventoryRequest(userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);
     }
 }

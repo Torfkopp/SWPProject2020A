@@ -15,19 +15,16 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ShowTradeWithUserViewEvent {
 
-    private final UserOrDummy offeringUser;
     private final String lobbyName;
     private final UserOrDummy respondingUser;
 
     /**
      * Constructor
      *
-     * @param offeringUser   User that wants to trade with another user
      * @param lobbyName      Lobby name of the lobby where the player wants to trade
      * @param respondingUser User who the offer will be made to
      */
-    public ShowTradeWithUserViewEvent(UserOrDummy offeringUser, String lobbyName, UserOrDummy respondingUser) {
-        this.offeringUser = offeringUser;
+    public ShowTradeWithUserViewEvent(String lobbyName, UserOrDummy respondingUser) {
         this.lobbyName = lobbyName;
         this.respondingUser = respondingUser;
     }
@@ -40,15 +37,6 @@ public class ShowTradeWithUserViewEvent {
      */
     public String getLobbyName() {
         return lobbyName;
-    }
-
-    /**
-     * Gets the User who wants to trade with another User
-     *
-     * @return User who wants to trade with another User
-     */
-    public UserOrDummy getOfferingUser() {
-        return offeringUser;
     }
 
     /**

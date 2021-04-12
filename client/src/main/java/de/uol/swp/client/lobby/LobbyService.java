@@ -2,13 +2,14 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +26,9 @@ import org.apache.logging.log4j.Logger;
 public class LobbyService implements ILobbyService {
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+
     private final EventBus eventBus;
+    private final IUserService userService;
 
     /**
      * Constructor
@@ -36,67 +39,71 @@ public class LobbyService implements ILobbyService {
      * @since 2019-11-20
      */
     @Inject
-    public LobbyService(EventBus eventBus) {
+    public LobbyService(EventBus eventBus, IUserService userService) {
         this.eventBus = eventBus;
         this.eventBus.register(this);
+        this.userService = userService;
         LOG.debug("LobbyService started");
     }
 
     @Override
-    public void checkForGame(String lobbyName, User loggendInUser) {
-        eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
+    public void checkForGame(String lobbyName) {
+        LOG.debug("Sending CheckForGameRequest");
+        Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());
+        eventBus.post(request);
     }
 
     @Override
-    public void checkUserInLobby(User user) {
-        Message msg = new CheckUserInLobbyRequest(user);
+    public void checkUserInLobby() {
+        LOG.debug("Sending CheckUserInLobbyRequest");
+        Message msg = new CheckUserInLobbyRequest(userService.getLoggedInUser());
         eventBus.post(msg);
     }
 
     @Override
-    public void createNewLobby(String name, User user, int maxPlayers) {
+    public void createNewLobby(String name, int maxPlayers) {
         LOG.debug("Sending CreateLobbyRequest");
-        Message createLobbyRequest = new CreateLobbyRequest(name, user, maxPlayers);
+        Message createLobbyRequest = new CreateLobbyRequest(name, userService.getLoggedInUser(), maxPlayers);
         eventBus.post(createLobbyRequest);
     }
 
     @Override
-    public void joinLobby(String name, User user) {
+    public void joinLobby(String name) {
         LOG.debug("Sending LobbyJoinUserRequest");
-        Message joinUserRequest = new LobbyJoinUserRequest(name, user);
+        Message joinUserRequest = new LobbyJoinUserRequest(name, userService.getLoggedInUser());
         eventBus.post(joinUserRequest);
     }
 
     @Override
-    public void joinRandomLobby(User user) {
-        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null, user);
+    public void joinRandomLobby() {
+        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null, userService.getLoggedInUser());
         eventBus.post(joinRandomLobbyRequest);
     }
 
     @Override
-    public void kickUser(String lobbyName, User loggedInUser, UserOrDummy userToKick) {
+    public void kickUser(String lobbyName, UserOrDummy userToKick) {
         LOG.debug("Sending KickUserRequest");
-        Message kickUserRequest = new KickUserRequest(lobbyName, loggedInUser, userToKick);
+        Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
         eventBus.post(kickUserRequest);
     }
 
     @Override
-    public void leaveLobby(String lobbyName, User user) {
+    public void leaveLobby(String lobbyName) {
         LOG.debug("Sending LobbyLeaveUserRequest");
-        Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, user);
+        Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(lobbyLeaveUserRequest);
     }
 
     @Override
-    public void refreshLobbyPresenterFields(String lobbyName, User user, Lobby lobby) {
+    public void refreshLobbyPresenterFields(Lobby lobby) {
         LOG.debug("Sending LobbyUpdateEvent");
-        eventBus.post(new LobbyUpdateEvent(lobbyName, user, lobby));
+        eventBus.post(new LobbyUpdateEvent(lobby));
     }
 
     @Override
-    public void removeFromLobbies(User user) {
+    public void removeFromAllLobbies() {
         LOG.debug("Sending RemoveFromLobbiesRequest");
-        Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(user);
+        Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(userService.getLoggedInUser());
         eventBus.post(removeFromLobbiesRequest);
     }
 
@@ -122,17 +129,24 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateLobbySettings(String lobbyName, User user, int maxPlayers, boolean startUpPhaseEnabled,
-                                    boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
-        LOG.debug("Sending a ChangeLobbySettingsRequest");
-        eventBus.post(new ChangeLobbySettingsRequest(lobbyName, user, maxPlayers, startUpPhaseEnabled, commandsAllowed,
-                                                     moveTime, randomPlayFieldEnabled));
+    public void showLobbyError(String message) {
+        LOG.debug("Sending LobbyErrorEvent");
+        eventBus.post(new LobbyErrorEvent(message));
     }
 
     @Override
-    public void userReady(String lobbyName, User loggedInUser, boolean isReady) {
+    public void updateLobbySettings(String lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
+                                    boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
+        LOG.debug("Sending ChangeLobbySettingsRequest");
+        eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
+                                                     startUpPhaseEnabled, commandsAllowed, moveTime,
+                                                     randomPlayFieldEnabled));
+    }
+
+    @Override
+    public void userReady(String lobbyName, boolean isReady) {
         LOG.debug("Sending UserReadyRequest");
-        Message userReadyRequest = new UserReadyRequest(lobbyName, loggedInUser, isReady);
+        Message userReadyRequest = new UserReadyRequest(lobbyName, userService.getLoggedInUser(), isReady);
         eventBus.post(userReadyRequest);
     }
 }
