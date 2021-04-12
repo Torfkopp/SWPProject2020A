@@ -8,6 +8,7 @@ import de.uol.swp.common.game.map.configuration.Configuration;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.uol.swp.common.game.map.IIntersection.IntersectionState.CITY;
 import static de.uol.swp.common.game.map.IIntersection.IntersectionState.SETTLEMENT;
@@ -310,7 +311,10 @@ public class GameMapManagement implements IGameMapManagement {
         visited.add(getEdge(mapPoint));
         var ends = findEnds(getEdge(mapPoint), getEdge(mapPoint).getOwner(), new HashSet<>());
         for (IEdge edge : ends) {
+            System.out.println("#######END#########");
             int length = roadLength(edge, getEdge(mapPoint).getOwner(), new HashSet<>(visited));
+            System.out.println(length);
+            System.out.println("#################END");
             lengths.add(length);
         }
         Collections.sort(lengths, Collections.reverseOrder());
@@ -569,10 +573,19 @@ public class GameMapManagement implements IGameMapManagement {
         if (visited.contains(edge)) return new HashSet<>();
         Set<IEdge> ends = new HashSet<>();
         visited.add(edge);
+        List<List<IEdge>> a = new LinkedList<>();
+        for (var b : intersectionEdgeNetwork.incidentNodes(edge)) {
+            List<IEdge> x = new LinkedList<>(
+                    intersectionEdgeNetwork.incidentEdges(b).stream().filter((z) -> z.getOwner() == owner)
+                                           .collect(Collectors.toList()));
+            a.add(x);
+        }
+        if (a.get(0).size() > 1 && a.get(1).size() == 1) ends.add(edge);
+        if (a.get(1).size() > 1 && a.get(0).size() == 1) ends.add(edge);
+
         for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
             ends.addAll(findEnds(nextEdge, owner, new HashSet<>(visited)));
         }
-        if (ends.isEmpty()) ends.add(edge);
         return ends;
     }
 
@@ -651,17 +664,63 @@ public class GameMapManagement implements IGameMapManagement {
     private int roadLength(IEdge edge, Player owner, Set<IEdge> visited) {
         if (!Objects.equals(edge.getOwner(), owner)) return 0;
         if (visited.contains(edge)) return 0;
-        int c = 0;
-        int returnvalue = 1;
-        //for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-        //    if (visited.contains(nextEdge)) c++;
-        //}
-        //if (c > 1) returnvalue = 0;
         visited.add(edge);
-        List<Integer> lengths = new LinkedList<>();
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            lengths.add(roadLength(nextEdge, owner, new HashSet<>(visited)));
+        int returnvalue = 1;
+        Map<IEdge, IEdge> f = new HashMap<>();
+        intersectionEdgeNetwork.adjacentEdges(edge).forEach((x) -> f.put(x, null));
+        List<List<IEdge>> a = new LinkedList<>();
+        for (var b : intersectionEdgeNetwork.incidentNodes(edge)) {
+            List<IEdge> x = new LinkedList<>(intersectionEdgeNetwork.incidentEdges(b));
+            a.add(x);
         }
+        for (var b : a) {
+            b.retainAll(intersectionEdgeNetwork.adjacentEdges(edge));
+            if (b.size() == 2) {
+                f.put(b.get(0), b.get(1));
+                f.put(b.get(1), b.get(0));
+            }
+        }
+        //List<List<IEdge>> orientationIntegerMap = new LinkedList<>();
+        //for (int i = 0; i < 3; i++)
+        //    orientationIntegerMap.add(new LinkedList<>());
+        //List<List<IEdge>> secondMap = new LinkedList<>(); //
+        //for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+        //    if (nextEdge.getOwner() == owner) {
+        //        orientationIntegerMap.get(nextEdge.getOrientation().ordinal()).add(nextEdge);
+        //    }
+        //}
+        //for (List<IEdge> x : orientationIntegerMap) {
+        //    if (!x.isEmpty()) secondMap.add(x);
+        //}
+        //if (secondMap.size() == 2) {
+        //    for (IEdge i : secondMap.get(0)) {
+        //        var a = intersectionEdgeNetwork.incidentNodes(i);
+        //        var d = new HashSet<IIntersection>();
+        //        d.add(a.nodeU());
+        //        d.add(a.nodeV());
+        //        for (IEdge j : secondMap.get(1)) {
+        //            var b = intersectionEdgeNetwork.incidentNodes(j);
+        //            var e = new HashSet<IIntersection>();
+        //            e.add(b.nodeU());
+        //            e.add(b.nodeV());
+        //            if (!Collections.disjoint(d, e)) {
+        //                f.put(i, j);
+        //                f.put(j, i);
+        //            }
+        //        }
+        //    }
+        //}
+        List<Integer> lengths = new LinkedList<>();
+        for (IEdge nextEdge : f.keySet()) {
+            var k = new HashSet<>(visited);
+            var x = f.get(nextEdge);
+            if (x != null) k.add(x);
+            lengths.add(roadLength(nextEdge, owner, k));
+        }
+        System.out.println("-----------------");
+        lengths.forEach(System.out::println);
+        System.out.println("-----------------");
+
         return Collections.max(lengths).intValue() + returnvalue;
     }
 }
