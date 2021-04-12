@@ -23,6 +23,14 @@ public class RobberTaxMessage extends AbstractGameMessage {
     private final Map<User, Integer> players;
     private final Map<User, Map<Resources, Integer>> inventory;
 
+    /**
+     * Constructor
+     *
+     * @param lobbyName The lobby's name
+     * @param user      The UserOrDummy who triggered this message
+     * @param players   Map of User to pay the tax and the amount of card to pay
+     * @param inventory Map of user and the inventory as map with resources and its amount
+     */
     public RobberTaxMessage(String lobbyName, UserOrDummy user, Map<User, Integer> players,
                             Map<User, Map<Resources, Integer>> inventory) {
         super(lobbyName, user);
@@ -30,14 +38,30 @@ public class RobberTaxMessage extends AbstractGameMessage {
         this.inventory = inventory;
     }
 
+    /**
+     * Adds a user to the players
+     *
+     * @param player User to pay the tax
+     * @param amount Amount of cards to pay
+     */
     public void add(User player, int amount) {
         players.put(player, amount);
     }
 
+    /**
+     * Gets the inventory
+     *
+     * @return Map of user and a map of a resource and its amount
+     */
     public Map<User, Map<Resources, Integer>> getInventory() {
         return inventory;
     }
 
+    /**
+     * Gets the players
+     *
+     * @return Map of user and the amount to pay
+     */
     public Map<User, Integer> getPlayers() {
         return players;
     }

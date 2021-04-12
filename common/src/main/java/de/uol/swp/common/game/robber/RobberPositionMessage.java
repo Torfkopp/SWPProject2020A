@@ -18,7 +18,7 @@ public class RobberPositionMessage extends AbstractGameMessage {
     /**
      * Constructor
      *
-     * @param lobbyName The lobby name
+     * @param lobbyName The lobby's name
      * @param user      The user
      */
     public RobberPositionMessage(String lobbyName, UserOrDummy user, MapPoint position) {
@@ -26,6 +26,11 @@ public class RobberPositionMessage extends AbstractGameMessage {
         this.position = position;
     }
 
+    /**
+     * Gets the robber's position
+     *
+     * @return MapPoint position
+     */
     public MapPoint getPosition() {
         return position;
     }

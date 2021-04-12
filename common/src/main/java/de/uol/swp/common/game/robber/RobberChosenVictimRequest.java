@@ -21,20 +21,42 @@ public class RobberChosenVictimRequest extends AbstractRequestMessage {
     private final User player;
     private final UserOrDummy victim;
 
+    /**
+     * Constructor
+     *
+     * @param lobby  The lobby's name
+     * @param player The player who's chosen the victim
+     * @param victim The chosen victim
+     */
     public RobberChosenVictimRequest(String lobby, User player, UserOrDummy victim) {
         this.lobby = lobby;
         this.player = player;
         this.victim = victim;
     }
 
+    /**
+     * Gets the lobby's name
+     *
+     * @return String lobby
+     */
     public String getLobby() {
         return lobby;
     }
 
+    /**
+     * Gets the player
+     *
+     * @return User player
+     */
     public User getPlayer() {
         return player;
     }
 
+    /**
+     * Gets the victim
+     *
+     * @return UserOrDummy victim
+     */
     public UserOrDummy getVictim() {
         return victim;
     }

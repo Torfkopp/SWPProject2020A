@@ -16,6 +16,11 @@ public class RobberNewPositionResponse extends AbstractResponseMessage {
 
     private final User player;
 
+    /**
+     * Constructor
+     *
+     * @param player The player to choose the robber's new position
+     */
     public RobberNewPositionResponse(User player) {
         this.player = player;
     }

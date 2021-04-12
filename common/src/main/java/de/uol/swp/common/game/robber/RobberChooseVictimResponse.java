@@ -21,15 +21,31 @@ public class RobberChooseVictimResponse extends AbstractResponseMessage {
     private final User player;
     private final Set<UserOrDummy> victims;
 
+    /**
+     * Constructor
+     *
+     * @param player  The player choosing the victims
+     * @param victims The victims to choose from
+     */
     public RobberChooseVictimResponse(User player, Set<UserOrDummy> victims) {
         this.player = player;
         this.victims = victims;
     }
 
+    /**
+     * Gets the player
+     *
+     * @return User player
+     */
     public User getPlayer() {
         return player;
     }
 
+    /**
+     * Gets the victims
+     *
+     * @return Set of all victims
+     */
     public Set<UserOrDummy> getVictims() {
         return victims;
     }

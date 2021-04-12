@@ -22,6 +22,14 @@ public class ShowRobberTaxUpdateEvent {
     private final int taxAmount;
     private final Map<Resources, Integer> inventory;
 
+    /**
+     * Constructor
+     *
+     * @param lobbyName The lobby's name
+     * @param user      The user paying the tax
+     * @param taxAmount The amount of cards to pay
+     * @param inventory The inventory of the user
+     */
     public ShowRobberTaxUpdateEvent(String lobbyName, User user, int taxAmount, Map<Resources, Integer> inventory) {
         this.lobbyName = lobbyName;
         this.user = user;
@@ -29,18 +37,38 @@ public class ShowRobberTaxUpdateEvent {
         this.inventory = inventory;
     }
 
+    /**
+     * Gets the inventory
+     *
+     * @return Map with the resource and its amount as integer
+     */
     public Map<Resources, Integer> getInventory() {
         return inventory;
     }
 
+    /**
+     * Gets the lobby's name
+     *
+     * @return String lobbyName
+     */
     public String getLobbyName() {
         return lobbyName;
     }
 
+    /**
+     * Gets the amount of tax to pay
+     *
+     * @return int taxAmount
+     */
     public int getTaxAmount() {
         return taxAmount;
     }
 
+    /**
+     * Gets the user
+     *
+     * @return User user
+     */
     public User getUser() {
         return user;
     }
