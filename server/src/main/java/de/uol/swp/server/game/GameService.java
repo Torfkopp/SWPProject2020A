@@ -4,9 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage;
-import de.uol.swp.common.chat.message.SystemMessageForTradeMessage;
-import de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage;
+import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
@@ -19,6 +17,7 @@ import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.response.*;
+import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
@@ -119,6 +118,25 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(originLobby, message);
             gameManagement.dropGame(originLobby);
             game.setBuildingAllowed(false);
+        }
+    }
+
+    /**
+     * Helper method to end a dummy's turn
+     * AFTER every player has chosen the resources
+     * to give up on.
+     *
+     * @param game The game
+     *
+     * @author Mario Fokken
+     * @since 2021-04-09
+     */
+    private void endTurnDummy(Game game) {
+        UserOrDummy activePlayer = game.getActivePlayer();
+        if (activePlayer instanceof User) {
+        } else {
+            if (game.getTaxPayers().isEmpty())
+                onEndTurnRequest(new EndTurnRequest(activePlayer, game.getLobby().getName()));
         }
     }
 
@@ -569,6 +587,7 @@ public class GameService extends AbstractService {
      *
      * @param req The EndTurnRequest found on the EventBus
      *
+     * @author Mario Fokken
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @see de.uol.swp.common.game.message.NextPlayerMessage
      * @since 2021-01-15
@@ -588,7 +607,7 @@ public class GameService extends AbstractService {
         game.setDiceRolledAlready(false);
         if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            onEndTurnRequest(new EndTurnRequest(nextPlayer, req.getOriginLobby()));
+            endTurnDummy(game);
         }
     }
 
@@ -824,6 +843,7 @@ public class GameService extends AbstractService {
      *
      * @param req The PlayKnightCardRequest found on the EventBus
      *
+     * @author Mario Fokken
      * @see de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest
      * @since 2021-02-25
      */
@@ -849,6 +869,8 @@ public class GameService extends AbstractService {
         inv.setKnights(inv.getKnights() + 1);
         inv.increaseKnightCards(-1);
 
+        robberMovementPlayer(req, req.getUser());
+
         I18nWrapper knightCard = new I18nWrapper("game.resources.cards.knight");
         ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
                                                                                     knightCard);
@@ -873,6 +895,7 @@ public class GameService extends AbstractService {
      *
      * @param req The PlayMonopolyCardRequest found on the EventBus
      *
+     * @author Mario Fokken
      * @see de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest
      * @since 2021-02-25
      */
@@ -959,6 +982,7 @@ public class GameService extends AbstractService {
      *
      * @param req The PlayRoadBuildingCardRequest found on the EventBus
      *
+     * @author Mario Fokken
      * @see de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardRequest
      * @since 2021-02-25
      */
@@ -1009,6 +1033,7 @@ public class GameService extends AbstractService {
      *
      * @param req The PlayYearOfPlentyCardRequest found on the EventBus
      *
+     * @author Mario Fokken
      * @see de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest
      * @since 2021-02-25
      */
@@ -1115,14 +1140,112 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a RobberChosenVictimRequest found on the EventBus.
+     * If a RobberChosenVictimRequest is detected on the EventBus, this method is called.
+     * It then decreases the resources in the player's inventory
+     *
+     * @param msg The RobberChosenVictimRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.common.game.robber.RobberChosenVictimRequest
+     * @since 2021-04-05
+     */
+    @Subscribe
+    private void onRobberChosenVictimRequest(RobberChosenVictimRequest msg) {
+        LOG.debug("Received RobberChosenVictimRequest for Lobby " + msg.getLobby());
+        robRandomResource(msg.getLobby(), msg.getPlayer(), msg.getVictim());
+    }
+
+    /**
+     * Handles a RobberNewPositionChosenRequest found on the EventBus.
+     * If a RobberNewPositionChosenRequest is detected on the EventBus, this method is called.
+     * It then decreases the resources in the player's inventory
+     *
+     * @param msg The RobberNewPositionChosenRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.common.game.robber.RobberNewPositionChosenRequest
+     * @since 2021-04-05
+     */
+    @Subscribe
+    private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
+        LOG.debug("Received RobberNewPositionChosenRequest for Lobby " + msg.getLobby());
+        IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
+        map.moveRobber(msg.getPosition());
+        LOG.debug("Sending RobberPositionMessage for Lobby " + msg.getLobby());
+        AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
+        lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
+        Set<Player> players = map.getPlayersAroundHex(msg.getPosition());
+        Set<UserOrDummy> victims = new HashSet<>();
+        for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
+        if (players.size() > 1) {
+            LOG.debug("Sending RobberChooseVictimResponse for Lobby " + msg.getLobby());
+            ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
+            rcvm.initWithMessage(msg);
+            post(rcvm);
+        } else if (players.size() == 1) {
+            robRandomResource(msg.getLobby(), msg.getPlayer(), new ArrayList<>(victims).get(0));
+        }
+    }
+
+    /**
+     * Handles a RobberTaxChosenRequest found on the EventBus.
+     * If a RobberTaxChosenRequest is detected on the EventBus, this method is called.
+     * It then decreases the resources in the player's inventory
+     *
+     * @param req The RobberTaxChosenRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.common.game.robber.RobberTaxChosenRequest
+     * @since 2021-04-05
+     */
+    @Subscribe
+    private void onRobberTaxChosenRequest(RobberTaxChosenRequest req) {
+        LOG.debug("Received RobberTaxChosenRequest for Lobby " + req.getLobby());
+        Inventory i = gameManagement.getGame(req.getLobby()).getInventory(req.getPlayer());
+        for (Resources r : req.getResources().keySet()) {
+            switch (r) {
+                case ORE:
+                    i.increaseOre(req.getResources().get(r) * -1);
+                    break;
+                case WOOL:
+                    i.increaseWool(req.getResources().get(r) * -1);
+                    break;
+                case BRICK:
+                    i.increaseBrick(req.getResources().get(r) * -1);
+                    break;
+                case GRAIN:
+                    i.increaseGrain(req.getResources().get(r) * -1);
+                    break;
+                case LUMBER:
+                    i.increaseLumber(req.getResources().get(r) * -1);
+                    break;
+            }
+        }
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getLobby());
+        ServerMessage msg = new RefreshCardAmountMessage(req.getLobby(), req.getPlayer(),
+                                                         gameManagement.getGame(req.getLobby()).getCardAmounts());
+        lobbyService.sendToAllInLobby(req.getLobby(), msg);
+
+        Game game = gameManagement.getGame(req.getLobby());
+        game.removeTaxPayer(req.getPlayer());
+        endTurnDummy(game);
+    }
+
+    /**
      * Handles a RollDiceRequest found on the EventBus
      * If a RollDiceRequest is detected on the EventBus, this method is called.
      * It then sends a DiceCastMessage to all members in the lobby.
      *
      * @param req The RollDiceRequest found on the EventBus
      *
+     * @author Mario Fokken
      * @see de.uol.swp.common.game.request.RollDiceRequest
      * @see de.uol.swp.common.game.message.DiceCastMessage
+     * @see de.uol.swp.common.game.robber.RobberTaxMessage
      * @since 2021-02-22
      */
     @Subscribe
@@ -1137,6 +1260,68 @@ public class GameService extends AbstractService {
         if (numberOfPips == 7) {
             //Robber things
             LOG.debug("---- Robber things");
+            Map<User, Integer> players = new HashMap<>();
+            Game g = gameManagement.getGame(req.getOriginLobby());
+            for (UserOrDummy p : g.getPlayers()) {
+                if (g.getInventory(p).getResourceAmount() > 7) {
+                    //Takes a dummy's resources away
+                    if (p instanceof Dummy) {
+                        Inventory inv = g.getInventory(p);
+                        int i = inv.getResourceAmount() / 2;
+                        LOG.debug(p + " has to give up " + i + " of its " + inv.getResourceAmount() + " cards");
+                        while (i > 0) {
+                            if (inv.getBrick() > 0) {
+                                inv.increaseBrick(-1);
+                                i--;
+                                if (i == 0) break;
+                            }
+                            if (inv.getGrain() > 0) {
+                                inv.increaseGrain(-1);
+                                i--;
+                                if (i == 0) break;
+                            }
+                            if (inv.getLumber() > 0) {
+                                inv.increaseLumber(-1);
+                                i--;
+                                if (i == 0) break;
+                            }
+                            if (inv.getOre() > 0) {
+                                inv.increaseOre(-1);
+                                i--;
+                                if (i == 0) break;
+                            }
+                            if (inv.getWool() > 0) {
+                                inv.increaseWool(-1);
+                                i--;
+                                if (i == 0) break;
+                            }
+                        }
+                    } else {
+                        players.put((User) p, g.getInventory(p).getResourceAmount() / 2);
+                    }
+                }
+            }
+            Map<User, Map<Resources, Integer>> inventory = new HashMap<>();
+            for (User user : players.keySet()) {
+                Map<Resources, Integer> resourceMap = new LinkedHashMap<>();
+                Inventory inv = game.getInventory(user);
+                resourceMap.put(Resources.BRICK, inv.getBrick());
+                resourceMap.put(Resources.GRAIN, inv.getGrain());
+                resourceMap.put(Resources.LUMBER, inv.getLumber());
+                resourceMap.put(Resources.ORE, inv.getOre());
+                resourceMap.put(Resources.WOOL, inv.getWool());
+                inventory.put(user, resourceMap);
+
+                game.addTaxPayer(user);
+            }
+            RobberTaxMessage rtm = new RobberTaxMessage(req.getOriginLobby(), req.getUser(), players, inventory);
+            LOG.debug("Sending RobberTaxMessage for Lobby" + req.getOriginLobby());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), rtm);
+            if (req.getUser() instanceof Dummy) {
+                robberMovementDummy((Dummy) req.getUser(), req.getOriginLobby());
+            } else {
+                robberMovementPlayer(req, (User) req.getUser());
+            }
         } else {
             LOG.debug("---- Distributing the resources for token " + numberOfPips);
             game.distributeResources(numberOfPips);
@@ -1362,6 +1547,115 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+    }
+
+    /**
+     * Helper method to rob a player of a random resource card
+     *
+     * @param receiver Player to receive the card
+     * @param victim   Player to lose a card
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    private void robRandomResource(String lobby, UserOrDummy receiver, UserOrDummy victim) {
+        LOG.debug(receiver + " wants to rob from " + victim + " in lobby " + lobby);
+        Inventory receiverInventory = gameManagement.getGame(lobby).getInventory(receiver);
+        Inventory victimInventory = gameManagement.getGame(lobby).getInventory(victim);
+        List<Resources> victimsResources = new ArrayList<>();
+        if (victimInventory.getResourceAmount() == 0) {
+            ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, null);
+            LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
+            LOG.debug("---- victim has no cards to rob");
+            lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
+            return;
+        }
+        if (victimInventory.getBrick() > 0) victimsResources.add(Resources.BRICK);
+        if (victimInventory.getGrain() > 0) victimsResources.add(Resources.GRAIN);
+        if (victimInventory.getLumber() > 0) victimsResources.add(Resources.LUMBER);
+        if (victimInventory.getOre() > 0) victimsResources.add(Resources.ORE);
+        if (victimInventory.getWool() > 0) victimsResources.add(Resources.WOOL);
+
+        switch (victimsResources.get((int) (Math.random() * victimsResources.size()))) {
+            case BRICK:
+                victimInventory.increaseBrick(-1);
+                receiverInventory.increaseBrick(1);
+                break;
+            case GRAIN:
+                victimInventory.increaseGrain(-1);
+                receiverInventory.increaseGrain(1);
+                break;
+            case LUMBER:
+                victimInventory.increaseLumber(-1);
+                receiverInventory.increaseLumber(1);
+                break;
+            case ORE:
+                victimInventory.increaseOre(-1);
+                receiverInventory.increaseOre(1);
+                break;
+            case WOOL:
+                victimInventory.increaseWool(-1);
+                receiverInventory.increaseWool(1);
+                break;
+        }
+        ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, victim);
+        ServerMessage msg = new RefreshCardAmountMessage(lobby, receiver,
+                                                         gameManagement.getGame(lobby).getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + lobby);
+        lobbyService.sendToAllInLobby(lobby, msg);
+        LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
+        lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
+    }
+
+    /**
+     * Helper method to move the robber when
+     * a dummy gets a seven.
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    private void robberMovementDummy(Dummy dummy, String lobby) {
+        IGameMapManagement map = gameManagement.getGame(lobby).getMap();
+        int y = (int) (Math.random() * 4 + 1);
+        int x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
+                ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
+        MapPoint mapPoint = MapPoint.HexMapPoint(y, x);
+        map.moveRobber(mapPoint);
+        LOG.debug("Sending RobberPositionMessage for Lobby " + lobby);
+        AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
+        lobbyService.sendToAllInLobby(lobby, msg);
+        LOG.debug(dummy + " moves the robber to position: " + y + "|" + x);
+        Set<Player> players = map.getPlayersAroundHex(mapPoint);
+        Set<UserOrDummy> players2 = new HashSet<>();
+        for (Player p : players) {
+            players2.add(gameManagement.getGame(lobby).getUserFromPlayer(p));
+        }
+        if (players.size() > 0) {
+            int i = (int) (Math.random() * players.size());
+            UserOrDummy victim = (UserOrDummy) players2.toArray()[i];
+            robRandomResource(lobby, dummy, victim);
+        }
+    }
+
+    /**
+     * Helper method to move the robber when
+     * a player gets a seven.
+     * Sends a RobberNewPositionResponse to the lobby
+     * after an onRollDiceRequest or an onPlayKnightCardRequest
+     *
+     * @param req AbstractGameRequest
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-05
+     */
+    private void robberMovementPlayer(AbstractGameRequest req, User player) {
+        LOG.debug("Sending RobberNewPositionResponse for Lobby " + req.getOriginLobby());
+        RobberNewPositionResponse msg = new RobberNewPositionResponse(player);
+        msg.initWithMessage(req);
+        post(msg);
     }
 
     /**
