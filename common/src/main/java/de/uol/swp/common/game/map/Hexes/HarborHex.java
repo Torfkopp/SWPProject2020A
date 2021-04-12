@@ -27,6 +27,11 @@ public class HarborHex extends AbstractHex implements IHarborHex {
     }
 
     @Override
+    public GameHexWrapper getBelongingHex() {
+        return belongingHex;
+    }
+
+    @Override
     public HarborResource getResource() {
         return resource;
     }
