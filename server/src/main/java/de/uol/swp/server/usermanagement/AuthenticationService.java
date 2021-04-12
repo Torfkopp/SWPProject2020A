@@ -10,7 +10,7 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
+import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
@@ -139,7 +139,7 @@ public class AuthenticationService extends AbstractService {
      * @author Eric Vuong
      * @author Marvin Drees
      * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe
@@ -155,7 +155,7 @@ public class AuthenticationService extends AbstractService {
             sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
         }
         post(new UserLoggedOutMessage(userToLogOut.getUsername()));
-        NukeUsersSessionsResponse response = new NukeUsersSessionsResponse();
+        NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(userToLogOut);
         response.initWithMessage(req);
         post(response);
     }

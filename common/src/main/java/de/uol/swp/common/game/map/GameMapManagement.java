@@ -85,6 +85,7 @@ public class GameMapManagement implements IGameMapManagement {
         hexMap[6][2].set(new HarborHex(hexMap[5][2], IHarborHex.HarborSide.NORTHWEST, harborList.remove(0)));
         hexMap[6][3].set(new WaterHex());
         createHarborResourceMap();
+        moveRobber(configuration.getRobberPosition());
         return this;
     }
 
@@ -142,7 +143,7 @@ public class GameMapManagement implements IGameMapManagement {
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
                                           Collections.unmodifiableList(hexList),
-                                          Collections.unmodifiableList(tokenList));
+                                          Collections.unmodifiableList(tokenList), robberPosition);
         return configuration;
     }
 
@@ -256,6 +257,17 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public Set<Player> getPlayersAroundHex(MapPoint mapPoint) {
+        Set<Player> players = new HashSet<>();
+        for (IIntersection i : getIntersectionsFromHex(mapPoint)) {
+            if (i.getOwner() != null) {
+                players.add(i.getOwner());
+            }
+        }
+        return players;
+    }
+
+    @Override
     public IConfiguration getRandomisedConfiguration() {
         List<IHarborHex.HarborResource> harborList = new ArrayList<>();
         harborList.addAll(Collections.nCopies(4, IHarborHex.HarborResource.ANY));
@@ -288,7 +300,7 @@ public class GameMapManagement implements IGameMapManagement {
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
                                           Collections.unmodifiableList(hexList),
-                                          Collections.unmodifiableList(tokenList));
+                                          Collections.unmodifiableList(tokenList), robberPosition);
         return configuration;
     }
 
@@ -344,7 +356,7 @@ public class GameMapManagement implements IGameMapManagement {
             throw new IllegalArgumentException("The robber can only move to a hex");
         hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
         robberPosition = newPosition;
-        hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
+        hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(true);
     }
 
     @Override

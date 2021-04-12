@@ -14,9 +14,8 @@ import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
-import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
-import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.lobby.RobberTaxPresenter;
+import de.uol.swp.client.lobby.event.*;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.client.register.RegistrationPresenter;
@@ -33,7 +32,7 @@ import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
+import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -43,6 +42,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,6 +70,7 @@ public class SceneManager {
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
     private final Map<String, Stage> tradingResponseStages = new HashMap<>();
+    private final Map<String, Stage> robberTaxStages = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
@@ -640,11 +641,12 @@ public class SceneManager {
      *
      * @author Eric Vuong
      * @author Marvin Drees
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe
-    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
+    private void onNukedUsersSessionsResponse(NukedUsersSessionsResponse rsp) {
+        LOG.debug("Received NukedUsersSessionsResponse");
         eventBus.post(new RetryLoginEvent());
     }
 
@@ -813,11 +815,73 @@ public class SceneManager {
     }
 
     /**
+     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
+     * <p>
+     * It then proceeds to close the robberTax window.
+     *
+     * @param event The CloseRobberTaxViewEvent found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
+        LOG.debug("Received CloseRobberTaxViewEvent");
+        String lobby = event.getLobbyName();
+        if (robberTaxStages.containsKey(lobby)) {
+            robberTaxStages.get(lobby).close();
+            robberTaxStages.remove(lobby);
+        }
+    }
+
+    /**
+     * Handles the ShowRobberTaxViewEvent detected on the EventBus
+     * <p>
+     * If a ShowRobberTaxViewEvent is detected on the EventBus, this method gets
+     * called. It opens the window to choose which resources to give up on and
+     * a ShowRobberTaxUpdateEvent is posted onto the EventBus
+     *
+     * @param event The ShowRobberTaxViewEvent found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent
+     * @see de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onShowRobberTaxViewEvent(ShowRobberTaxViewEvent event) {
+        LOG.debug("Received ShowRobberTaxViewEvent");
+        String lobbyName = event.getLobbyName();
+        Platform.runLater(() -> {
+            Stage robberTaxStage = new Stage();
+            robberTaxStages.put(event.getLobbyName(), robberTaxStage);
+            robberTaxStage.setTitle(resourceBundle.getString("game.robber.tax.title"));
+            robberTaxStage.setHeight(RobberTaxPresenter.MIN_HEIGHT);
+            robberTaxStage.setMinHeight(RobberTaxPresenter.MIN_HEIGHT);
+            robberTaxStage.setWidth(RobberTaxPresenter.MIN_WIDTH);
+            robberTaxStage.setMinWidth(RobberTaxPresenter.MIN_WIDTH);
+            Parent rootPane = initPresenter(RobberTaxPresenter.fxml);
+            Scene robberTaxScene = new Scene(rootPane);
+            robberTaxScene.getStylesheets().add(styleSheet);
+            robberTaxStage.setScene(robberTaxScene);
+            robberTaxStage.initModality(Modality.NONE);
+            robberTaxStage.initOwner(primaryStage);
+            robberTaxStage.initStyle(StageStyle.UNDECORATED);
+            robberTaxStage.show();
+            LOG.debug("Sending a ShowRobberTaxUpdateEvent to lobby " + lobbyName);
+            eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getUser(), event.getTaxAmount(),
+                                                       event.getInventory()));
+        });
+    }
+
+    /**
      * Handles the ShowTradeWithBankViewEvent detected on the EventBus
      * <p>
      * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
      * called. It opens the trading with the bank window in a new window and a
-     * TradeUpdateEvent is sent onto teh eventBus.
+     * TradeUpdateEvent is sent onto the eventBus.
      *
      * @param event The ShowTradeWithBankViewEvent detected on the EventBus
      *

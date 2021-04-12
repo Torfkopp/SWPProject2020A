@@ -3,12 +3,11 @@ package de.uol.swp.common.game;
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class for a game
@@ -18,11 +17,15 @@ import java.util.Set;
  */
 public class Game {
 
+    private static final int[] dices = new int[2];
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
+    private final Set<User> taxPayers = new HashSet<>();
     private UserOrDummy activePlayer;
+    private boolean buildingAllowed = false;
+    private boolean diceRolledAlready = false;
 
     /**
      * Constructor
@@ -54,8 +57,20 @@ public class Game {
     public static int[] rollDice() {
         int dice1 = (int) (Math.random() * 6 + 1);
         int dice2 = (int) (Math.random() * 6 + 1);
-
+        dices[0] = dice1;
+        dices[1] = dice2;
         return (new int[]{dice1, dice2});
+    }
+
+    /**
+     * Adds a taxPayer to the set
+     *
+     * @param user The user to add
+     *
+     * @since 2021-04-11
+     */
+    public void addTaxPayer(User user) {
+        taxPayers.add(user);
     }
 
     /**
@@ -177,6 +192,19 @@ public class Game {
     }
 
     /**
+     * Return the current state of the rolled dices as an array
+     *
+     * @return Current state of dices
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    public int[] getDices() {
+        return dices;
+    }
+
+    /**
      * Gets a specified player's inventory
      *
      * @param player The player whose inventory to get
@@ -247,6 +275,17 @@ public class Game {
     }
 
     /**
+     * Gets the taxPayer Set
+     *
+     * @return Set of the taxPayer
+     *
+     * @since 2021-04-11
+     */
+    public Set<User> getTaxPayers() {
+        return taxPayers;
+    }
+
+    /**
      * Returns the user corresponding with the given player
      *
      * @param player The player whose User is required
@@ -265,5 +304,68 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
+    }
+
+    /**
+     * Removes a user from the taxPayers
+     *
+     * @param user User to remove
+     *
+     * @since 2021-04-11
+     */
+    public void removeTaxPayer(User user) {
+        taxPayers.remove(user);
+    }
+
+    /**
+     * Gets whether building is currently allowed or not
+     *
+     * @return If Building is currently allowed
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public boolean isBuildingAllowed() {
+        return buildingAllowed;
+    }
+
+    /**
+     * Set the BuildingAllowed Attribute
+     *
+     * @param buildingAllowed The new buildingAllowed status
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public void setBuildingAllowed(boolean buildingAllowed) {
+        this.buildingAllowed = buildingAllowed;
+    }
+
+    /**
+     * Gets whether the player rolled the dice in the current turn or not
+     *
+     * @return If Player rolled the dice
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public boolean isDiceRolledAlready() {
+        return diceRolledAlready;
+    }
+
+    /**
+     * Set the diceRolledAlready Attribute
+     *
+     * @param diceRolledAlready The new diceRolledAlready status
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public void setDiceRolledAlready(boolean diceRolledAlready) {
+        this.diceRolledAlready = diceRolledAlready;
     }
 }

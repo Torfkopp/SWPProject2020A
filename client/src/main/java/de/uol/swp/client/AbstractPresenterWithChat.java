@@ -16,9 +16,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.apache.logging.log4j.Logger;
@@ -298,6 +296,44 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
+     * Handles new incoming SystemMessageForRobbingMessage
+     * <p>
+     * If a SystemMessageForRobbingMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageForRobbingMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the massage "Received SystemMessageForRobbingMessage
+     * for Lobby {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param msg The SystemMessageForRobbingMessage foung on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.common.chat.message.SystemMessageForRobbingMessage
+     * @since 2021-04-07
+     */
+    @Subscribe
+    protected void onSystemMessageForRobbingMessage(SystemMessageForRobbingMessage msg) {
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForRobbingMessage for Lobby " + msg.getName());
+            if (msg.getVictim() == null) {
+                if (msg.getUser().equals(loggedInUser)) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle(resourceBundle.getString("error.title"));
+                        alert.setHeaderText(resourceBundle.getString("error.header"));
+                        alert.setContentText(resourceBundle.getString("game.robber.error"));
+                        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                            ButtonBar.ButtonData.OK_DONE);
+                        alert.getButtonTypes().setAll(confirm);
+                        alert.showAndWait();
+                    });
+                }
+            } else {
+                Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+            }
+        }
+    }
+
+    /**
      * Handles new incoming SystemMessageForTradeMessage
      * <p>
      * If a SystemMessageForTradeMessage is posted onto the EventBus, this method
@@ -403,7 +439,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
      * @since 2020-12-26
      */
-    protected void resetCharVars() {
+    protected void resetChatVars() {
         chatMessages = null;
     }
 

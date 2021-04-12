@@ -2,6 +2,7 @@ package de.uol.swp.common.game.map.configuration;
 
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.MapPoint;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class Configuration implements IConfiguration {
     private final List<IResourceHex.ResourceHexType> hexList;
     private final List<IHarborHex.HarborResource> harborList;
     private final List<Integer> tokenList;
+    private final MapPoint robberPosition;
 
     /**
      * Constructor
@@ -30,10 +32,11 @@ public class Configuration implements IConfiguration {
      * @param tokenList  Unmodifiable, ordered List of Tokens to be placed on Hexes
      */
     public Configuration(List<IHarborHex.HarborResource> harborList, List<IResourceHex.ResourceHexType> hexList,
-                         List<Integer> tokenList) {
+                         List<Integer> tokenList, MapPoint robberPosition) {
         this.harborList = harborList;
         this.hexList = hexList;
         this.tokenList = tokenList;
+        this.robberPosition = robberPosition;
     }
 
     @Override
@@ -49,5 +52,10 @@ public class Configuration implements IConfiguration {
     @Override
     public List<Integer> getTokenList() {
         return tokenList;
+    }
+
+    @Override
+    public MapPoint getRobberPosition() {
+        return robberPosition;
     }
 }

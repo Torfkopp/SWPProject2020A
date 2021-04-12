@@ -3,6 +3,9 @@ package de.uol.swp.client.game;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserOrDummy;
+
+import java.util.Map;
 
 /**
  * An interface for all methods of the GameService
@@ -106,6 +109,44 @@ public interface IGameService {
      * @since 2021-04-08
      */
     void updateGameMap(String lobbyName);
+
+    /**
+     * Posts a RobberChosenVictimRequest
+     *
+     * @param lobbyName The name of the lobby
+     * @param user      The user to receive the resource card
+     * @param victim    The user to lose the resource card
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    void robberChooseVictim(String lobbyName, User user, UserOrDummy victim);
+
+    /**
+     * Posts a RobberNewPositionMessage
+     *
+     * @param lobby    The name of the lobby
+     * @param user     The user
+     * @param mapPoint The robber's new position
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-06
+     */
+    void robberNewPosition(String lobby, User user, MapPoint mapPoint);
+
+    /**
+     * Posts a RobberTaxChosenRequest and a CloseRobberTaxView
+     *
+     * @param lobbyName         The lobby's name
+     * @param user              The user
+     * @param selectedResources The user's selected resources
+     *
+     * @author Mario Fokken
+     * @since 2021-04-12
+     */
+    void taxPayed(String lobbyName, User user, Map<Resources, Integer> selectedResources);
 
     /**
      * Posts a request to update ones Inventory
