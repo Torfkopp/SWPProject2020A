@@ -128,7 +128,6 @@ public class GameService implements IGameService {
     public void taxPayed(String lobbyName, User user, Map<Resources, Integer> selectedResources) {
         eventBus.post(new RobberTaxChosenRequest(selectedResources, user, lobbyName));
         eventBus.post(new CloseRobberTaxViewEvent(lobbyName, user));
-        eventBus.post(new UpdateInventoryRequest(user, lobbyName));
     }
 
     @Override
