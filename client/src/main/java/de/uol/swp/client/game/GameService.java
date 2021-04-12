@@ -96,12 +96,14 @@ public class GameService implements IGameService {
 
     @Override
     public void robberChooseVictim(String lobbyName, UserOrDummy victim) {
+        LOG.debug("Sending RobberChosenVictimRequest");
         Message msg = new RobberChosenVictimRequest(lobbyName, userService.getLoggedInUser(), victim);
         eventBus.post(msg);
     }
 
     @Override
     public void robberNewPosition(String lobbyName, MapPoint mapPoint) {
+        LOG.debug("Sending RobberNewPositionChosenRequest");
         Message msg = new RobberNewPositionChosenRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
         eventBus.post(msg);
     }
