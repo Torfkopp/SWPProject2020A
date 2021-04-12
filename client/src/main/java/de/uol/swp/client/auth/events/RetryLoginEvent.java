@@ -9,5 +9,4 @@ package de.uol.swp.client.auth.events;
  * @author Marvin Dress
  * @since 2021-03-03
  */
-
 public class RetryLoginEvent {}

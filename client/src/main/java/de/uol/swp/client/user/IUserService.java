@@ -11,7 +11,7 @@ import de.uol.swp.common.user.User;
  * @author Marco Grawunder
  * @since 2017-03-17
  */
-public interface ClientUserService {
+public interface IUserService {
 
     /**
      * Create a new permanent user
@@ -38,6 +38,28 @@ public interface ClientUserService {
      * @since 2019-10-10
      */
     void dropUser(User user);
+
+    /**
+     * Get the currently logged in user
+     *
+     * @return The user that is currently logged in
+     *
+     * @author Phillip-André Suhr
+     * @author Steven Luong
+     * @since 2021-04-04
+     */
+    User getLoggedInUser();
+
+    /**
+     * Set the currently logged in user
+     *
+     * @param loggedInUser The user that is now logged in
+     *
+     * @author Phillip-André Suhr
+     * @author Steven Luong
+     * @since 2021-04-04
+     */
+    void setLoggedInUser(User loggedInUser);
 
     /**
      * Login with a username and a password

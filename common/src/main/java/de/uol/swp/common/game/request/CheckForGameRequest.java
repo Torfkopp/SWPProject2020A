@@ -19,6 +19,7 @@ public class CheckForGameRequest extends AbstractGameRequest {
      * Constructor
      *
      * @param originLobby The Lobby from which a request originated from
+     * @param user        The User who is checking for a game in the lobby
      */
     public CheckForGameRequest(String originLobby, UserOrDummy user) {
         super(originLobby);

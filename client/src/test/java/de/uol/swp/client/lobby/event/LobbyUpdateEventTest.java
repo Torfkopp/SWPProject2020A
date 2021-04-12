@@ -31,13 +31,10 @@ class LobbyUpdateEventTest {
      */
     @Test
     void createLobbyUpdateEventTest() {
-        LobbyUpdateEvent event = new LobbyUpdateEvent("Am I a lobby?", defaultUser, defaultLobby);
+        LobbyUpdateEvent event = new LobbyUpdateEvent(defaultLobby);
 
-        assertEquals("Am I a lobby?", event.getLobbyName());
-        assertEquals(defaultUser, event.getUser());
-        assertEquals(defaultUser.getID(), event.getUser().getID());
-        assertEquals(defaultUser.getUsername(), event.getUser().getUsername());
         assertEquals(defaultLobby, event.getLobby());
+        assertEquals(defaultLobby.getName(), event.getLobby().getName());
         assertEquals(defaultLobby.isInGame(), event.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), event.getLobby().getMaxPlayers());
         assertEquals(defaultLobby.commandsAllowed(), event.getLobby().commandsAllowed());

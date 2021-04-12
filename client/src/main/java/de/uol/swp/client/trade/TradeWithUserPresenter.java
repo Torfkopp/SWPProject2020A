@@ -56,7 +56,6 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private Button offerTradeButton;
 
     private String lobbyName;
-    private UserOrDummy loggedInUser;
     private UserOrDummy respondingUser;
     private int traderInventorySize;
     private Map<String, Integer> selectedOwnResourceMap;
@@ -207,8 +206,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         }
         offerTradeButton.setDisable(true);
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        tradeService.offerTrade(lobbyName, loggedInUser, respondingUser, selectedOwnResourceMap,
-                                selectedPartnersResourceMap);
+        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceMap, selectedPartnersResourceMap);
         tradeService.closeTradeResponseWindow(lobbyName);
     }
 
@@ -263,10 +261,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @Subscribe
     private void onTradeWithUserUpdateEvent(TradeWithUserUpdateEvent event) {
         LOG.debug("Received TradeWithUserUpdateEvent for Lobby " + event.getLobbyName());
-        if (lobbyName == null || loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = event.getUser();
-        }
+        if (lobbyName == null) lobbyName = event.getLobbyName();
         Window window = ownInventoryView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }

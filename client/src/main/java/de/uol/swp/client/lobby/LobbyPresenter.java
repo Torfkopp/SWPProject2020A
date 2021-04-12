@@ -4,10 +4,10 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.request.StartSessionRequest;
+import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
+import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
+import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
 import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -142,10 +142,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent event) {
-        LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobbyName());
-        if (lobbyName == null || loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = (User) event.getUser();
+        LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobby().getName());
+        if (lobbyName == null) {
+            lobbyName = event.getLobby().getName();
             chatService.askLatestMessages(10, lobbyName);
         }
         if (window == null) {
@@ -154,7 +153,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (readyUsers == null) {
             readyUsers = new HashSet<>();
         }
-        if (event.getLobby().getReadyUsers().contains(loggedInUser)) readyCheckBox.setSelected(true);
+        if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
@@ -172,7 +171,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
         setPreGameSettings();
-        lobbyService.checkForGame(lobbyName, loggedInUser);
+        lobbyService.checkForGame(lobbyName);
     }
 
     /**
@@ -193,7 +192,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse rsp) {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
-            lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+            lobbyService.leaveLobby(entry.getKey());
         }
     }
 
@@ -246,7 +245,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         UserOrDummy user = msg.getUser();
         LOG.debug("---- User " + user.getUsername() + " joined");
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+            if (lobbyMembers != null && userService.getLoggedInUser() != user && !lobbyMembers.contains(user))
                 lobbyMembers.add(user);
             setStartSessionButtonState();
             setPreGameSettings();
@@ -354,7 +353,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 return;
             }
             String name = newValue.getUsername();
-            boolean isSelf = newValue.equals(this.loggedInUser);
+            boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {

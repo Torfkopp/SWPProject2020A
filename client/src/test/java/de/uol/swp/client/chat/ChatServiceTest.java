@@ -3,6 +3,8 @@ package de.uol.swp.client.chat;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -31,19 +33,11 @@ class ChatServiceTest {
     private static final int defaultAmount = 37;
     private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
     private static final String defaultLobby = "I am an intelligent lobby";
+    private static IChatService chatService;
+    private static IUserService userService;
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);
     Object event;
-
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method only unregisters the object of this class from the EventBus.
-     */
-    @AfterEach
-    protected void deregisterBus() {
-        bus.unregister(this);
-    }
 
     /**
      * Helper method run before each test case
@@ -52,9 +46,24 @@ class ChatServiceTest {
      * this class to the EventBus.
      */
     @BeforeEach
-    protected void registerBus() {
+    protected void setUp() {
         event = null;
         bus.register(this);
+        userService = new UserService(bus);
+        userService.setLoggedInUser(defaultUser);
+        chatService = new ChatService(bus, userService);
+    }
+
+    /**
+     * Helper method run after each test case
+     * <p>
+     * This method only unregisters the object of this class from the EventBus.
+     */
+    @AfterEach
+    protected void tearDown() {
+        bus.unregister(this);
+        chatService = null;
+        userService = null;
     }
 
     /**
@@ -72,7 +81,6 @@ class ChatServiceTest {
      */
     @Test
     void askLatestMessagesTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -102,7 +110,6 @@ class ChatServiceTest {
      */
     @Test
     void askLatestMessagesWithOriginLobbyIsNullTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -131,7 +138,6 @@ class ChatServiceTest {
      */
     @Test
     void askLatestMessagesWithOriginLobbyTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
         chatService.askLatestMessages(defaultAmount, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -160,8 +166,7 @@ class ChatServiceTest {
      */
     @Test
     void deleteMessageTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId, defaultUser);
+        chatService.deleteMessage(defaultId);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -191,8 +196,7 @@ class ChatServiceTest {
      */
     @Test
     void deleteMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId, defaultUser, null);
+        chatService.deleteMessage(defaultId, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -222,8 +226,7 @@ class ChatServiceTest {
      */
     @Test
     void deleteMessageWithOriginLobbyTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.deleteMessage(defaultId, defaultUser, defaultLobby);
+        chatService.deleteMessage(defaultId, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -252,8 +255,7 @@ class ChatServiceTest {
      */
     @Test
     void editMessageTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent, defaultUser);
+        chatService.editMessage(defaultId, defaultContent);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -284,8 +286,7 @@ class ChatServiceTest {
      */
     @Test
     void editMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent, defaultUser);
+        chatService.editMessage(defaultId, defaultContent);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -316,8 +317,7 @@ class ChatServiceTest {
      */
     @Test
     void editMessageWithOriginLobbyTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.editMessage(defaultId, defaultContent, defaultUser, defaultLobby);
+        chatService.editMessage(defaultId, defaultContent, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -347,8 +347,7 @@ class ChatServiceTest {
      */
     @Test
     void newMessageTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.newMessage(defaultUser, defaultContent);
+        chatService.newMessage(defaultContent);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -378,8 +377,7 @@ class ChatServiceTest {
      */
     @Test
     void newMessageWithOriginLobbyIsNullTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.newMessage(defaultUser, defaultContent, null);
+        chatService.newMessage(defaultContent, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -409,8 +407,7 @@ class ChatServiceTest {
      */
     @Test
     void newMessageWithOriginLobbyTest() throws InterruptedException {
-        IChatService chatService = new ChatService(bus);
-        chatService.newMessage(defaultUser, defaultContent, defaultLobby);
+        chatService.newMessage(defaultContent, defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
