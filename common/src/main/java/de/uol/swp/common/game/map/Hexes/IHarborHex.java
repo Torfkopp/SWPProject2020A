@@ -19,7 +19,7 @@ public interface IHarborHex extends IWaterHex {
         ORE,
         GRAIN,
         WOOL,
-        ANY,
+        ANY
     }
 
     /**
@@ -33,6 +33,17 @@ public interface IHarborHex extends IWaterHex {
         SOUTHEAST,
         SOUTHWEST,
     }
+
+    /**
+     * Gets the hex the harbor is belonging to
+     *
+     * @return The belonging hex
+     *
+     * @author Maximilian Lindner
+     * @author Steven Luong
+     * @since 2021-04-07
+     */
+    GameHexWrapper getBelongingHex();
 
     /**
      * Gets the harbor's resource

@@ -10,9 +10,7 @@ import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.lobby.response.CreateLobbyResponse;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
@@ -52,6 +50,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
+    @FXML
+    private Label randomLobbyState;
     @FXML
     private ListView<Pair<String, String>> lobbyView;
     @FXML
@@ -121,6 +121,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (this.loggedInUser == null) return;
         LOG.debug("Received AllLobbiesMessage");
         updateLobbyList(msg.getLobbies());
+        randomLobbyState.setVisible(false);
     }
 
     /**
@@ -138,6 +139,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(rsp.getLobbies());
+        randomLobbyState.setVisible(false);
     }
 
     /**
@@ -366,6 +368,38 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the JoinRandomLobbyButton is pressed
+     * <p>
+     * If the JoinRandomLobbyButton is pressed, this method requests the LobbyService
+     * to join a random lobby. If there is no existing lobby or there is no fitting one,
+     * nothing will happen.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-04-08
+     */
+    @FXML
+    private void onJoinRandomLobbyButtonPressed() {
+        lobbyService.joinRandomLobby(loggedInUser);
+    }
+
+    /**
+     * Handles a JoinRandomLobbyFailedResponse found on the EventBus
+     * <p>
+     * If a new JoinRandomLobbyFailedResponse object is found on the EventBus,
+     * this method sets the state of the randomLobbyState label to true.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
+        randomLobbyState.setVisible(true);
+    }
+
+    /**
      * Handles a JoinLobbyResponse found on the EventBus
      * <p>
      * If a new JoinLobbyResponse object is found on the EventBus, this method
@@ -491,7 +525,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 ((Stage) event.getSource()).close();
                 clearEventBus();
             });
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     /**

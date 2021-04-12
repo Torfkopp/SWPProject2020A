@@ -50,6 +50,18 @@ public interface ILobbyService {
     void joinLobby(String name, User user);
 
     /**
+     * Posts a request to join a random lobby onto the EventBus
+     *
+     * @param user The user who wants to join a random lobby
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.LobbyJoinRandomUserRequest
+     * @since 2021-04-08
+     */
+    void joinRandomLobby(User user);
+
+    /**
      * Posts a request to kick a user
      *
      * @param lobbyName    The name of the lobby the user should be kicked out.

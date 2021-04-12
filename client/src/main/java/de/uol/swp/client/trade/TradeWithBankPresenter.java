@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
+import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
@@ -20,6 +21,8 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +43,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private String lobbyName;
     private User loggedInUser;
     private Map<String, Integer> resourceMap;
+    private List<IHarborHex.HarborResource> harborMap;
     private ObservableList<Pair<String, Integer>> resourceList;
     private ObservableList<Pair<String, Integer>> bankResourceList;
     private ObservableList<Pair<String, Integer>> ownInventoryList;
@@ -179,6 +183,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
         if (rsp.getLobbyName().equals(this.lobbyName)) {
             LOG.debug("Received InventoryForTradeResponse for Lobby " + this.lobbyName);
+            harborMap = rsp.getHarborResourceList();
             resourceMap = rsp.getResourceMap();
             setTradingLists();
         }
@@ -272,7 +277,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      * The same happens for the ownInventoryList and the bankResourceList.
      */
     private void setTradingLists() {
-        int tradingRatio = 4; //can be expanded by harbours
+        Map<IHarborHex.HarborResource, Integer> tradingRatio = new HashMap<>();
         if (resourceList == null) {
             resourceList = FXCollections.observableArrayList();
             ownInventoryList = FXCollections.observableArrayList();
@@ -281,10 +286,28 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         }
         resourceList.clear();
         ownInventoryList.clear();
+        int prepareTradingRatio = 4;
+        if (harborMap.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
+        tradingRatio.put(IHarborHex.HarborResource.BRICK, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.ORE, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.GRAIN, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.WOOL, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.LUMBER, prepareTradingRatio);
+        if (harborMap.contains(IHarborHex.HarborResource.BRICK))
+            tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.ORE)) tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.GRAIN))
+            tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.WOOL)) tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.LUMBER))
+            tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
+
         for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             ownInventoryList.add(new Pair<>(entry.getKey(), entry.getValue()));
-            if (entry.getValue() < tradingRatio) continue;
-            resourceList.add(new Pair<>(entry.getKey(), tradingRatio));
+            String resource = entry.getKey().toUpperCase();
+            IHarborHex.HarborResource harborResource = IHarborHex.HarborResource.valueOf(resource);
+            if (entry.getValue() < tradingRatio.get(harborResource)) continue;
+            resourceList.add(new Pair<>(entry.getKey(), tradingRatio.get(harborResource)));
         }
         if (resourceList.size() == 0) {
             tradeResourceWithBankButton.setDisable(true);
