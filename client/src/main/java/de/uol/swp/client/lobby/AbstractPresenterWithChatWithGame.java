@@ -353,7 +353,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition) {
-            gameService.robberNewPosition(lobbyName, userService.getLoggedInUser(), mapPoint);
+            gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
             resetButtonStates(userService.getLoggedInUser());
@@ -590,7 +590,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
-                rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, rsp.getPlayer(), userOrDummy));
+                rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
             });
         }
     }
@@ -642,9 +642,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received RobberTaxMessage");
         if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
             LOG.debug("Sending ShowRobberTaxViewEvent");
-            eventBus.post(
-                    new ShowRobberTaxViewEvent(msg.getLobbyName(), loggedInUser, msg.getPlayers().get(loggedInUser),
-                                               msg.getInventory().get(loggedInUser)));
+            User user = userService.getLoggedInUser();
+            eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                     msg.getInventory().get(user)));
         }
     }
 

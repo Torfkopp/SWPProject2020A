@@ -597,6 +597,27 @@ public class SceneManager {
     }
 
     /**
+     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
+     * <p>
+     * It then proceeds to close the robberTax window.
+     *
+     * @param event The CloseRobberTaxViewEvent found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
+        LOG.debug("Received CloseRobberTaxViewEvent");
+        String lobby = event.getLobbyName();
+        if (robberTaxStages.containsKey(lobby)) {
+            robberTaxStages.get(lobby).close();
+            robberTaxStages.remove(lobby);
+        }
+    }
+
+    /**
      * Handles the CloseTradeResponseEvent detected on the EventBus
      * <p>
      * If a CloseTradeResponseEvent is detected on the EventBus, this method gets
@@ -820,27 +841,6 @@ public class SceneManager {
     }
 
     /**
-     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
-     * <p>
-     * It then proceeds to close the robberTax window.
-     *
-     * @param event The CloseRobberTaxViewEvent found on the EventBus
-     *
-     * @author Mario Fokken
-     * @author Timo Gerken
-     * @since 2021-04-08
-     */
-    @Subscribe
-    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
-        LOG.debug("Received CloseRobberTaxViewEvent");
-        String lobby = event.getLobbyName();
-        if (robberTaxStages.containsKey(lobby)) {
-            robberTaxStages.get(lobby).close();
-            robberTaxStages.remove(lobby);
-        }
-    }
-
-    /**
      * Handles the ShowRobberTaxViewEvent detected on the EventBus
      * <p>
      * If a ShowRobberTaxViewEvent is detected on the EventBus, this method gets
@@ -876,8 +876,8 @@ public class SceneManager {
             robberTaxStage.initStyle(StageStyle.UNDECORATED);
             robberTaxStage.show();
             LOG.debug("Sending a ShowRobberTaxUpdateEvent to lobby " + lobbyName);
-            eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getUser(), event.getTaxAmount(),
-                                                       event.getInventory()));
+            eventBus.post(
+                    new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
         });
     }
 

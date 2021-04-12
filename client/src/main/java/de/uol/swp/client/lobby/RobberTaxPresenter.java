@@ -7,7 +7,6 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.user.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,6 +26,7 @@ import java.util.Map;
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2021-04-08
  */
+@SuppressWarnings("UnstableApiUsage")
 public class RobberTaxPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RobberTaxPresenter.fxml";
@@ -34,6 +34,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
     private final Map<Resources, Integer> selectedResources = new HashMap<>();
+
     @Inject
     protected IGameService gameService;
 
@@ -47,8 +48,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private Button taxPay;
     @FXML
     private ProgressBar progress;
+
     private String lobbyName;
-    private User user;
     private int taxAmount;
     private Map<Resources, Integer> inventory;
     private ObservableList<Pair<Resources, Integer>> ownInventoryList;
@@ -144,7 +145,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @Subscribe
     private void onShowRobberTaxUpdateEvent(ShowRobberTaxUpdateEvent event) {
         lobbyName = event.getLobbyName();
-        user = event.getUser();
         taxAmount = event.getTaxAmount();
         inventory = event.getInventory();
 
@@ -162,8 +162,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private void onTaxPayButtonPressed() {
         LOG.debug("Sending RobberTaxChosenRequest");
-        gameService.taxPayed(lobbyName, user, selectedResources);
-        gameService.updateInventory(lobbyName, user);
+        gameService.taxPayed(lobbyName, selectedResources);
+        gameService.updateInventory(lobbyName);
     }
 
     /**

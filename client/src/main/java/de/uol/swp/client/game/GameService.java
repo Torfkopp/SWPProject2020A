@@ -3,8 +3,8 @@ package de.uol.swp.client.game;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
-import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
@@ -123,7 +123,7 @@ public class GameService implements IGameService {
     @Override
     public void taxPayed(String lobbyName, Map<Resources, Integer> selectedResources) {
         eventBus.post(new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName));
-        eventBus.post(new CloseRobberTaxViewEvent(lobbyName, userService.getLoggedInUser()));
+        eventBus.post(new CloseRobberTaxViewEvent(lobbyName));
     }
 
     @Override

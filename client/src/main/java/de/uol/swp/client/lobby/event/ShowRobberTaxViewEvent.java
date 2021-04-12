@@ -1,7 +1,6 @@
 package de.uol.swp.client.lobby.event;
 
 import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.user.User;
 
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import java.util.Map;
 public class ShowRobberTaxViewEvent {
 
     private final String lobbyName;
-    private final User user;
     private final int taxAmount;
     private final Map<Resources, Integer> inventory;
 
@@ -28,13 +26,11 @@ public class ShowRobberTaxViewEvent {
      * Constructor
      *
      * @param lobbyName The lobby's name
-     * @param user      The user to pay the tax
      * @param taxAmount The amount of cards to pay
      * @param inventory The inventory
      */
-    public ShowRobberTaxViewEvent(String lobbyName, User user, int taxAmount, Map<Resources, Integer> inventory) {
+    public ShowRobberTaxViewEvent(String lobbyName, int taxAmount, Map<Resources, Integer> inventory) {
         this.lobbyName = lobbyName;
-        this.user = user;
         this.taxAmount = taxAmount;
         this.inventory = inventory;
     }
@@ -64,14 +60,5 @@ public class ShowRobberTaxViewEvent {
      */
     public int getTaxAmount() {
         return taxAmount;
-    }
-
-    /**
-     * Gets the user
-     *
-     * @return User user
-     */
-    public User getUser() {
-        return user;
     }
 }
