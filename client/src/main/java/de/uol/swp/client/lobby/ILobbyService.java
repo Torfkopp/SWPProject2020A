@@ -15,14 +15,13 @@ public interface ILobbyService {
     /**
      * Checks if the lobby is in a game
      *
-     * @param lobbyName     LobbyName to check
-     * @param loggendInUser Currently logged in user
+     * @param lobbyName LobbyName to check
      *
      * @author Marvin Drees
      * @author Maximilian Lindner
      * @since 2021-04-09
      */
-    void checkForGame(String lobbyName, User loggendInUser);
+    void checkForGame(String lobbyName);
 
     /**
      * Posts a request to check if the user is currently in a lobby

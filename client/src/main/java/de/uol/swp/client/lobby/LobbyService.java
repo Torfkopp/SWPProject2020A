@@ -47,8 +47,10 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkForGame(String lobbyName, User loggendInUser) {
-        eventBus.post(new CheckForGameRequest(lobbyName, loggendInUser));
+    public void checkForGame(String lobbyName) {
+        LOG.debug("Sending CheckForGameRequest");
+        Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());
+        eventBus.post(request);
     }
 
     @Override
