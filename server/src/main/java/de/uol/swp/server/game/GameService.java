@@ -13,6 +13,7 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
@@ -608,58 +609,100 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onExecuteTradeWithBankRequest(ExecuteTradeWithBankRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received ExecuteTradeWithBankRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received ExecuteTradeWithBankRequest for Lobby " + req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
         Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
-        if (req.getGiveResource().equals("ore") && (inventory.getOre() < 4)) return;
-        if (req.getGiveResource().equals("brick") && (inventory.getBrick() < 4)) return;
-        if (req.getGiveResource().equals("grain") && (inventory.getGrain() < 4)) return;
-        if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < 4)) return;
-        if (req.getGiveResource().equals("wool") && (inventory.getWool() < 4)) return;
-
+        //getting the tradingRatios with the bank according to the harbors
+        IGameMapManagement gameMap = game.getMap();
+        Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
+        Player player = game.getPlayer(req.getUser());
+        List<IHarborHex.HarborResource> harborTradingList = new ArrayList<>();
+        if (settlementsAndCities.containsKey(player)) {
+            List<MapPoint> ownSettlementsAndCities = settlementsAndCities.get(player);
+            for (MapPoint ownSettlementsAndCity : ownSettlementsAndCities) {
+                IHarborHex.HarborResource resource = gameMap.getHarborResource(ownSettlementsAndCity);
+                harborTradingList.add(resource);
+            }
+        }
+        //preparing a map with the tradingRatios according to the harbors
+        Map<IHarborHex.HarborResource, Integer> tradingRatio = new HashMap<>();
+        int prepareTradingRatio = 4;
+        if (harborTradingList.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
+        tradingRatio.put(IHarborHex.HarborResource.BRICK, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.ORE, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.GRAIN, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.WOOL, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.LUMBER, prepareTradingRatio);
+        if (harborTradingList.contains(IHarborHex.HarborResource.BRICK))
+            tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
+        if (harborTradingList.contains(IHarborHex.HarborResource.ORE))
+            tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
+        if (harborTradingList.contains(IHarborHex.HarborResource.GRAIN))
+            tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
+        if (harborTradingList.contains(IHarborHex.HarborResource.WOOL))
+            tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
+        if (harborTradingList.contains(IHarborHex.HarborResource.LUMBER))
+            tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
+        //check if user has enough resources
+        if (req.getGiveResource().equals("ore") && (inventory.getOre() < tradingRatio
+                .get(IHarborHex.HarborResource.ORE))) return;
+        if (req.getGiveResource().equals("brick") && (inventory.getBrick() < tradingRatio
+                .get(IHarborHex.HarborResource.BRICK))) return;
+        if (req.getGiveResource().equals("grain") && (inventory.getGrain() < tradingRatio
+                .get(IHarborHex.HarborResource.GRAIN))) return;
+        if (req.getGiveResource().equals("lumber") && (inventory.getLumber() < tradingRatio
+                .get(IHarborHex.HarborResource.LUMBER))) return;
+        if (req.getGiveResource().equals("wool") && (inventory.getWool() < tradingRatio
+                .get(IHarborHex.HarborResource.WOOL))) return;
+        //user gets the resource he demands
         if (req.getGetResource().equals("ore")) {
-            inventory.setOre(inventory.getOre() + 1);
+            inventory.increaseOre(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 1);
         }
         if (req.getGetResource().equals("brick")) {
-            inventory.setBrick(inventory.getBrick() + 1);
+            inventory.increaseBrick(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 1);
         }
         if (req.getGetResource().equals("grain")) {
-            inventory.setGrain(inventory.getGrain() + 1);
+            inventory.increaseGrain(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 1);
         }
         if (req.getGetResource().equals("lumber")) {
-            inventory.setLumber(inventory.getLumber() + 1);
+            inventory.increaseLumber(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 1);
         }
         if (req.getGetResource().equals("wool")) {
-            inventory.setWool(inventory.getWool() + 1);
+            inventory.increaseWool(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 1);
         }
-
+        //user gives the resource he offers according to the harbors
         if (req.getGiveResource().equals("ore")) {
-            inventory.setOre(inventory.getOre() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 4);
+            inventory.setOre(inventory.getOre() - tradingRatio.get(IHarborHex.HarborResource.ORE));
+            offeredResourcesWrapperMap
+                    .put(new I18nWrapper("game.resources.ore"), tradingRatio.get(IHarborHex.HarborResource.ORE));
         }
         if (req.getGiveResource().equals("brick")) {
-            inventory.setBrick(inventory.getBrick() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 4);
+            inventory.setBrick(inventory.getBrick() - tradingRatio.get(IHarborHex.HarborResource.BRICK));
+            offeredResourcesWrapperMap
+                    .put(new I18nWrapper("game.resources.brick"), tradingRatio.get(IHarborHex.HarborResource.BRICK));
         }
         if (req.getGiveResource().equals("grain")) {
-            inventory.setGrain(inventory.getGrain() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 4);
+            inventory.setGrain(inventory.getGrain() - tradingRatio.get(IHarborHex.HarborResource.GRAIN));
+            offeredResourcesWrapperMap
+                    .put(new I18nWrapper("game.resources.grain"), tradingRatio.get(IHarborHex.HarborResource.GRAIN));
         }
         if (req.getGiveResource().equals("lumber")) {
-            inventory.setLumber(inventory.getLumber() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 4);
+            inventory.setLumber(inventory.getLumber() - tradingRatio.get(IHarborHex.HarborResource.LUMBER));
+            offeredResourcesWrapperMap
+                    .put(new I18nWrapper("game.resources.lumber"), tradingRatio.get(IHarborHex.HarborResource.LUMBER));
         }
         if (req.getGiveResource().equals("wool")) {
-            inventory.setWool(inventory.getWool() - 4);
-            offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 4);
+            inventory.setWool(inventory.getWool() - tradingRatio.get(IHarborHex.HarborResource.WOOL));
+            offeredResourcesWrapperMap
+                    .put(new I18nWrapper("game.resources.wool"), tradingRatio.get(IHarborHex.HarborResource.WOOL));
         }
 
         ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
@@ -1113,26 +1156,40 @@ public class GameService extends AbstractService {
      * It searches the inventories in the current game for the one that belongs
      * to the player sending the request. It then posts an InventoryForTradeResponse
      * that contains all the user's resources, saved in a resourceMap for
-     * counted items (bricks, grain, etc.).
+     * counted items (bricks, grain, etc.) and all of the harbors of the user.
      *
      * @param req The TradeWithBankRequest found on the EventBus
      *
+     * @author Steven Luong
      * @author Maximilian Lindner
      * @author Alwin Bossert
      * @see de.uol.swp.common.game.request.TradeWithBankRequest
      * @see de.uol.swp.common.game.response.InventoryForTradeResponse
-     * @since 2021-02-21
+     * @since 2021-04-07
      */
     @Subscribe
     private void onTradeWithBankRequest(TradeWithBankRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
-        Inventory inventory = gameManagement.getGame(req.getName()).getInventory(req.getUser());
-
+        Game game = gameManagement.getGame(req.getName());
+        Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
 
+        IGameMapManagement gameMap = game.getMap();
+        Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
+        Player player = game.getPlayer(req.getUser());
+        List<IHarborHex.HarborResource> harborTradingList = new ArrayList<>();
+        if (settlementsAndCities.containsKey(player)) {
+            List<MapPoint> ownSettlementsAndCities = settlementsAndCities.get(player);
+            for (MapPoint ownSettlementsAndCity : ownSettlementsAndCities) {
+                IHarborHex.HarborResource resource = gameMap.getHarborResource(ownSettlementsAndCity);
+                harborTradingList.add(resource);
+            }
+        }
+
         ResponseMessage returnMessage = new InventoryForTradeResponse(req.getUser(), req.getName(),
-                                                                      Collections.unmodifiableMap(resourceMap));
+                                                                      Collections.unmodifiableMap(resourceMap),
+                                                                      harborTradingList);
         returnMessage.initWithMessage(req);
         LOG.debug("Sending InventoryForTradeResponse for Lobby " + req.getName());
         post(returnMessage);
