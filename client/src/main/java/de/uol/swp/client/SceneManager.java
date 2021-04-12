@@ -37,7 +37,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -824,7 +826,7 @@ public class SceneManager {
      * @since 2021-04-08
      */
     @Subscribe
-    private void onShowRobberTaxCloseEvent(CloseRobberTaxViewEvent event) {
+    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
         LOG.debug("Received CloseRobberTaxViewEvent");
         String lobby = event.getLobbyName();
         if (robberTaxStages.containsKey(lobby)) {
