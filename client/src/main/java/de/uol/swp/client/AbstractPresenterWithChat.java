@@ -262,7 +262,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @author Alwin Bossert
      * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageMessage
+     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
      * @since 2021-03-23
      */
     @Subscribe
@@ -293,7 +293,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForRobbingMessage for Lobby " + msg.getName());
             if (msg.getVictim() == null) {
-                if (msg.getUser().equals(loggedInUser)) {
+                if (msg.getUser().equals(userService.getLoggedInUser())) {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle(resourceBundle.getString("error.title"));
