@@ -483,15 +483,15 @@ public class GameServiceTest {
 
     @Test
     void testRobberMethods() {
-        UserOrDummy[] user = new UserOrDummy[4];
+        User[] user = new User[4];
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        user[3] = new DummyDTO();
+        UserOrDummy dummy = new DummyDTO();
         Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
-        lobby.joinUser(user[3]);
+        lobby.joinUser(dummy);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
@@ -499,13 +499,13 @@ public class GameServiceTest {
 
         //Tests robbing a resource
         game.getInventory(user[1]).increaseBrick(1);
-        game.getInventory(user[3]).increaseOre(1);
-        bus.post(new RobberChosenVictimRequest(lobby.getName(), (User) user[0], user[1]));
-        bus.post(new RobberChosenVictimRequest(lobby.getName(), (User) user[0], user[3]));
+        game.getInventory(dummy).increaseOre(1);
+        bus.post(new RobberChosenVictimRequest(lobby.getName(), user[0], user[1]));
+        bus.post(new RobberChosenVictimRequest(lobby.getName(), user[0], dummy));
         assertEquals(1, game.getInventory(user[0]).getBrick());
         assertEquals(0, game.getInventory(user[1]).getBrick());
         assertEquals(1, game.getInventory(user[0]).getOre());
-        assertEquals(0, game.getInventory(user[3]).getOre());
+        assertEquals(0, game.getInventory(dummy).getOre());
 
         //Tests robberTax
         game.getInventory(user[2]).increaseOre(3);
@@ -515,7 +515,7 @@ public class GameServiceTest {
         map.put(Resources.ORE, 1);
         map.put(Resources.GRAIN, 2);
         map.put(Resources.WOOL, 2);
-        bus.post(new RobberTaxChosenRequest(map, (User) user[2], lobby.getName()));
+        bus.post(new RobberTaxChosenRequest(map, user[2], lobby.getName()));
         assertEquals(2, game.getInventory(user[2]).getOre());
         assertEquals(1, game.getInventory(user[2]).getGrain());
         assertEquals(2, game.getInventory(user[2]).getWool());
@@ -523,7 +523,7 @@ public class GameServiceTest {
         //Tests new robber position
         MapPoint robPos = game.getMap().getRobberPosition();
         MapPoint mp = MapPoint.HexMapPoint(2, 4);
-        bus.post(new RobberNewPositionChosenRequest(lobby.getName(), (User) user[2], mp));
+        bus.post(new RobberNewPositionChosenRequest(lobby.getName(), user[2], mp));
         assertNotEquals(robPos, game.getMap().getRobberPosition());
         assertEquals(mp, game.getMap().getRobberPosition());
     }

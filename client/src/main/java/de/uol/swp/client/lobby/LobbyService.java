@@ -47,6 +47,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void changeOwner(String lobbyName, UserOrDummy newOwner) {
+        LOG.debug("Sending ChangeOwnerRequest");
+        Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
+        eventBus.post(req);
+    }
+
+    @Override
     public void checkForGame(String lobbyName) {
         LOG.debug("Sending CheckForGameRequest");
         Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());

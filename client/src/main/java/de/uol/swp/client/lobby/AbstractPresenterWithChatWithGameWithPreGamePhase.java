@@ -36,6 +36,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected Button kickUserButton;
     @FXML
+    protected Button changeOwnerButton;
+    @FXML
     protected Label moveTimeLabel;
     @FXML
     protected TextField moveTimeTextField;
@@ -105,6 +107,23 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Helper function that sets the disable and visible state of the changeOwnerButton.
+     * <p>
+     * The button is only enabled the lobby owner when a game
+     * has not started yet and if the logged in user is the
+     * owner
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-13
+     */
+    protected void setChangeOwnerButtonState() {
+        Platform.runLater(() -> {
+            changeOwnerButton.setVisible(userService.getLoggedInUser().equals(owner));
+            changeOwnerButton.setDisable(userService.getLoggedInUser().equals(owner));
+        });
+    }
+
+    /**
      * Helper function that sets the disable and visible state of the kickUserButton.
      * <p>
      * The button is only enabled the lobby owner when a game
@@ -159,6 +178,24 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             startSession.setDisable(true);
             startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Method called when the ChangeOwnerButtonPressed is pressed
+     * <p>
+     * If the ChangeOwnerButtonPressed is pressed, this method requests to change
+     * the owner status of the selected User of the members view .
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @since 2021-04-13
+     */
+    @FXML
+    private void onChangeOwnerButtonPressed() {
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == userService.getLoggedInUser()) return;
+        lobbyService.changeOwner(lobbyName, selectedUser);
     }
 
     /**
@@ -266,6 +303,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(false);
             rollDice.setVisible(false);
             kickUserButton.setVisible(true);
+            changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
         });
     }
@@ -318,6 +356,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setDisable(true);
             setRollDiceButtonState(msg.getUser());
             kickUserButton.setVisible(false);
+            changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
             gameService.updateGameMap(lobbyName);
@@ -359,6 +398,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
             kickUserButton.setVisible(false);
+            changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(!rsp.areDiceRolledAlready());
         });

@@ -12,11 +12,13 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.*;
+import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
@@ -114,6 +116,39 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a ChangeOwnerRequest found on the EventBus
+     * <p>
+     * If a ChangeOwnerRequest is detected on the EventBus, this
+     * method checks if the new owner is an user or not.
+     * Accordingly a LobbyExceptionMessage is posted onto the EventBus
+     * if the new owner should be dummy, otherwise the owner gets changed
+     * and a UpdateLobbyMessage is posted onto the EventBus
+     *
+     * @param req ChangeOwnerRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-15
+     */
+    @Subscribe
+    private void onChangeOwnerRequest(ChangeOwnerRequest req) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+        if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
+        if (!(req.getNewOwner() instanceof User)) {
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Just User can be Owner");
+            exceptionMessage.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage");
+            post(exceptionMessage);
+        } else {
+            User newOwner = (User) req.getNewOwner();
+            lobby.get().updateOwner(newOwner);
+            Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
+            if (updatedLobby.isEmpty()) return;
+            ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(), updatedLobby.get());
+            sendToAllInLobby(req.getName(), msg);
+        }
+    }
+
+    /**
      * Handles a CheckForGameRequest found on the EventBus
      * <p>
      * If the lobby contained in the request is ingame, an ActivePlayerEvent
@@ -151,11 +186,7 @@ public class LobbyService extends AbstractService {
         User user = req.getUser();
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
         for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUserOrDummies().contains(user)) {
-                isInLobby = true;
-            } else {
-                isInLobby = false;
-            }
+            isInLobby = entry.getValue().getUserOrDummies().contains(user);
         }
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);
