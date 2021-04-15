@@ -393,7 +393,7 @@ public class H2BasedUserStore extends AbstractUserStore {
      * registered ones.
      */
     @Override
-    public User updateUser(int id, String username, String password, String eMail) {
+    public User updateUser(int id, String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -445,7 +445,7 @@ public class H2BasedUserStore extends AbstractUserStore {
      * @since 2021-02-23
      */
     @Override
-    public User updateUser(String username, String password, String eMail) {
+    public User updateUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
