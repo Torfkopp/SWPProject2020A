@@ -67,8 +67,7 @@
                       mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.startupphase"/>
             <CheckBox fx:id="commandsActivated" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
-                      onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                      text="%lobby.checkboxes.commandsallowed"/>
+                      onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.commandsallowed"/>
             <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity"
                       mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.randomplayfield"/>
@@ -81,8 +80,8 @@
                     </toggleGroup>
                 </RadioButton>
                 <RadioButton fx:id="fourPlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                             mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                             selected="true" text="%lobby.radio.fourplayers">
+                             mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0" selected="true"
+                             text="%lobby.radio.fourplayers">
                     <toggleGroup>
                         <fx:reference source="maxPlayersToggleGroup"/>
                     </toggleGroup>
@@ -106,8 +105,12 @@
                 <Font size="18.0"/>
             </font>
         </Label>
-        <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
-                prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.rolldice" visible="false"/>
+        <HBox prefHeight="30.0" prefWidth="230.0">
+            <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
+                    prefHeight="30.0" prefWidth="115.0" text="%lobby.game.buttons.rolldice" visible="false"/>
+            <CheckBox fx:id="autoRoll" mnemonicParsing="false" onAction="#onAutoRollCheckBoxClicked"
+                      prefHeight="30.0" prefWidth="115.0" text="%lobby.game.autorollcheckbox" visible="false"/>
+        </HBox>
         <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
                 prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.endturn" visible="false"/>
         <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false"
@@ -119,14 +122,14 @@
         <Button fx:id="playCard" disable="true" mnemonicParsing="false" onAction="#onPlayCardButtonPressed"
                 prefHeight="30.0" prefWidth="230.0" text="%game.playcards.button" visible="false"/>
         <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
-               prefWidth="230" wrapText="true" visible="false" text="%game.robber.position">
+               prefWidth="230" text="%game.robber.position" visible="false" wrapText="true">
             <font>
                 <Font size="18.0"/>
             </font>
         </Label>
+        <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>
         <padding>
             <Insets topRightBottomLeft="10.0"/>
         </padding>
-        <Label fx:id="buildingCosts" wrapText="true" text="%game.building.info.costs" visible="false"/>
     </VBox>
 </GridPane>
