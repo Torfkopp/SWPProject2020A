@@ -18,7 +18,9 @@ import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The GameService is responsible for posting requests and events regarding
@@ -80,9 +82,10 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void playRoadBuildingCard(String lobbyName) {
+    public void playRoadBuildingCard(String lobbyName, Set<MapPoint> roads) {
         LOG.debug("Sending PlayRoadBuildingCardRequest");
-        Message request = new PlayRoadBuildingCardRequest(lobbyName, userService.getLoggedInUser());
+        Message request = new PlayRoadBuildingCardRequest(lobbyName, userService.getLoggedInUser(),
+                                                          new ArrayList<>(roads));
         eventBus.post(request);
     }
 

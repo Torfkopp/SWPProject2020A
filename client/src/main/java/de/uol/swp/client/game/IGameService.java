@@ -5,6 +5,7 @@ import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An interface for all methods of the GameService
@@ -57,8 +58,9 @@ public interface IGameService {
      * Posts a request to play a RoadBuildingCard
      *
      * @param lobbyName The name of the lobby
+     * @param roads     The roads the player choose
      */
-    void playRoadBuildingCard(String lobbyName);
+    void playRoadBuildingCard(String lobbyName, Set<MapPoint> roads);
 
     /**
      * Posts a request to play a YearOfPlentyCard

@@ -88,6 +88,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
+    protected boolean roadBuilding = false;
+    protected Set<MapPoint> roads = new HashSet<>();
     protected boolean inGame;
     protected int moveTime;
     protected User owner;
@@ -358,6 +360,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             notice.setVisible(false);
             resetButtonStates(userService.getLoggedInUser());
         }
+        if (mapPoint.getType() == EDGE && roadBuilding) {
+            roads.add(mapPoint);
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second"));
+            if (roads.size() == 2) {
+                gameService.playRoadBuildingCard(lobbyName, roads);
+                roadBuilding = false;
+                notice.setVisible(false);
+                roads.clear();
+                resetButtonStates(userService.getLoggedInUser());
+            }
+        }
     }
 
     /**
@@ -426,7 +439,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            gameService.playRoadBuildingCard(lobbyName);
+            roadBuildingCardPhase();
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -563,6 +576,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a RoadBuildingFailureResponse
+     *
+     * @param rsp The RoadBuildingFailureResponse found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-04-16
+     */
+    @Subscribe
+    private void onRoadBuildingFailureResponse(RoadBuildingFailureResponse rsp) {
+        roadBuildingCardPhase();
+    }
+
+    /**
      * Handles a RobberChooseVictimResponse
      *
      * @param rsp The RobberChooseVictimResponse found on the EventBus
@@ -607,6 +633,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
         LOG.debug("Received RobberNewPositionResponse");
+        notice.setText(resourceBundle.getString("game.robber.position"));
         notice.setVisible(true);
         robberNewPosition = true;
     }
@@ -992,5 +1019,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(!userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+    }
+
+    /**
+     * Helper Method for onRoadBuildingFailureResponse and
+     * onPlayButtonCardPressed
+     *
+     * @author Mario Fokken
+     * @since 2021-04-16
+     */
+    private void roadBuildingCardPhase() {
+        notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+        notice.setVisible(true);
+        disableButtonStates();
+        roadBuilding = true;
     }
 }

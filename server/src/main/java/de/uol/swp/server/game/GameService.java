@@ -1006,7 +1006,25 @@ public class GameService extends AbstractService {
             LOG.debug("---- Not enough RoadBuilding cards");
             return;
         }
-        //TODO: Implementierung
+
+        Player player = game.getPlayer(req.getUser());
+        List<MapPoint> points = req.getRoads();
+        MapPoint point1 = points.get(0);
+        MapPoint point2 = points.get(1);
+        IGameMapManagement map = game.getMap();
+
+        if (!map.roadPlaceable(player, point1) && !map.roadPlaceable(player, point2)) {
+            ResponseMessage returnMessage = new RoadBuildingFailureResponse(req.getOriginLobby());
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending a RoadBuildingFailureResponse");
+            LOG.debug("---- Roads not buildable");
+            return;
+        }
+        map.placeRoad(player, point1);
+        LOG.debug("----" + req.getUser() + " builds a road at: " + point1.getY() + "|" + point1.getX());
+        map.placeRoad(player, point2);
+        LOG.debug("----" + req.getUser() + " builds a road at: " + point2.getY() + "|" + point2.getX());
 
         inv.increaseRoadBuildingCards(-1);
 
