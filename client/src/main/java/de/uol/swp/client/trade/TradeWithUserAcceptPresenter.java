@@ -51,7 +51,6 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
 
     private String lobbyName;
     private UserOrDummy offeringUser;
-    private UserOrDummy respondingUser;
     private Map<String, Integer> offeringResourceMap;
     private Map<String, Integer> resourceMap;
     private Map<String, Integer> respondingResourceMap;
@@ -179,7 +178,6 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
-        respondingUser = rsp.getRespondingUser();
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();
         offeringResourceMap = rsp.getOfferingResourceMap();

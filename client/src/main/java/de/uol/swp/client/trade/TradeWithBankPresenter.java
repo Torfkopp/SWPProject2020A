@@ -60,8 +60,6 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     @FXML
     private Button buyDevelopmentButton;
     @FXML
-    private Button cancelButton;
-    @FXML
     private Button tradeResourceWithBankButton;
 
     /**
@@ -111,6 +109,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
                 });
             }
         });
+
         LOG.debug("TradeWithBankPresenter initialised");
     }
 
