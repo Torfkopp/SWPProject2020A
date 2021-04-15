@@ -33,9 +33,6 @@ class GameServiceTest {
     private static final String defaultLobbyName = "Test lobby";
     private static final Resources defaultResource = Resources.BRICK;
     private static final Resources secondResource = Resources.GRAIN;
-    private static final MapPoint firstPoint = MapPoint.HexMapPoint(3, 5);
-    private static final MapPoint secondPoint = MapPoint.HexMapPoint(5, 3);
-    private static final Set<MapPoint> mapPoints = new HashSet<>();
 
     private final EventBus eventBus = new EventBus();
     private final CountDownLatch lock = new CountDownLatch(1);
@@ -50,8 +47,6 @@ class GameServiceTest {
         userService.setLoggedInUser(defaultUser);
         gameService = new GameService(eventBus, userService);
         eventBus.register(this);
-        mapPoints.add(firstPoint);
-        mapPoints.add(secondPoint);
     }
 
     @AfterEach
@@ -113,6 +108,12 @@ class GameServiceTest {
 
     @Test
     void playRoadBuildingCard() throws InterruptedException {
+        MapPoint firstPoint = MapPoint.HexMapPoint(3, 5);
+        MapPoint secondPoint = MapPoint.HexMapPoint(5, 3);
+        Set<MapPoint> mapPoints = new HashSet<>();
+        mapPoints.add(firstPoint);
+        mapPoints.add(secondPoint);
+
         gameService.playRoadBuildingCard(defaultLobbyName, mapPoints);
 
         lock.await(250, TimeUnit.MILLISECONDS);
