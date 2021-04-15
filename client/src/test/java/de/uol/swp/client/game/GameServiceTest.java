@@ -126,8 +126,10 @@ class GameServiceTest {
         assertEquals(defaultUser.getID(), request.getUser().getID());
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
 
-        assertEquals(secondPoint, request.getRoads().get(1));
-        assertEquals(firstPoint, request.getRoads().get(0));
+        assertEquals(secondPoint.getX(), request.getRoads().get(1).getX());
+        assertEquals(secondPoint.getY(), request.getRoads().get(1).getY());
+        assertEquals(firstPoint.getX(), request.getRoads().get(0).getX());
+        assertEquals(firstPoint.getY(), request.getRoads().get(0).getY());
     }
 
     @Test
