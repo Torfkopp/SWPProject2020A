@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -20,7 +21,7 @@ public class LobbyLeaveUserRequest extends AbstractLobbyRequest {
      *
      * @since 2019-10-08
      */
-    public LobbyLeaveUserRequest(String lobbyName, User user) {
+    public LobbyLeaveUserRequest(LobbyName lobbyName, User user) {
         super(lobbyName, user);
     }
 }

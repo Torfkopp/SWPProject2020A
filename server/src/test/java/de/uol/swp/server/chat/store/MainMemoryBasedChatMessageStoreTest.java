@@ -1,5 +1,6 @@
 package de.uol.swp.server.chat.store;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.user.User;
@@ -31,7 +32,7 @@ class MainMemoryBasedChatMessageStoreTest {
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am more intelligent content";
     private static final String thirdContent = "I am the most intelligent content";
-    private static final String defaultLobbyName = "Am I a lobby?";
+    private static final LobbyName defaultLobbyName = new LobbyName("Am I a lobby?");
     private static final ChatMessage msgNotInStore = new ChatMessageDTO(42, defaultUser, defaultContent);
     private ChatMessageStore store;
 
@@ -272,7 +273,7 @@ class MainMemoryBasedChatMessageStoreTest {
     void findMessage_CreateWithOriginLobbyButProvideWrongLobbyNameToFindMessageTest() {
         ChatMessage msg = store.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
 
-        Optional<ChatMessage> result = store.findMessage(msg.getID(), "other lobby name");
+        Optional<ChatMessage> result = store.findMessage(msg.getID(), new LobbyName("other lobby name"));
 
         assertTrue(result.isEmpty());
     }
@@ -508,7 +509,7 @@ class MainMemoryBasedChatMessageStoreTest {
         list1.add(msg2);
         list1.add(msg3);
 
-        List<ChatMessage> list2 = store.getLatestMessages(3, "other lobby name");
+        List<ChatMessage> list2 = store.getLatestMessages(3, new LobbyName("other lobby name"));
 
         assertTrue(list2.isEmpty());
         assertNotEquals(list1, list2);
@@ -722,7 +723,7 @@ class MainMemoryBasedChatMessageStoreTest {
         Optional<ChatMessage> result = store.findMessage(msg.getID(), defaultLobbyName);
         assertFalse(result.isEmpty());
 
-        store.removeChatMessage(msg.getID(), "other lobby name");
+        store.removeChatMessage(msg.getID(), new LobbyName("other lobby name"));
 
         Optional<ChatMessage> result1 = store.findMessage(msg.getID(), defaultLobbyName);
         assertFalse(result1.isEmpty());
@@ -987,7 +988,7 @@ class MainMemoryBasedChatMessageStoreTest {
         ChatMessage msg = store.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
 
         assertThrows(IllegalArgumentException.class,
-                     () -> store.updateChatMessage(msg.getID(), secondContent, "other lobby name"));
+                     () -> store.updateChatMessage(msg.getID(), secondContent, new LobbyName("other lobby name")));
     }
 
     /**

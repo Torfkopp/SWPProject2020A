@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
@@ -21,7 +22,7 @@ public class UpdateGameMapResponse extends AbstractLobbyResponse {
      * @param lobbyName  The name of the lobby
      * @param gameMapDTO The new game map
      */
-    public UpdateGameMapResponse(String lobbyName, IGameMap gameMapDTO) {
+    public UpdateGameMapResponse(LobbyName lobbyName, IGameMap gameMapDTO) {
         super(lobbyName);
         this.gameMapDTO = gameMapDTO;
     }

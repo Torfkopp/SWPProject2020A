@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.dto;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.Dummy;
@@ -24,7 +25,7 @@ import java.util.TreeSet;
  */
 public class LobbyDTO implements Lobby {
 
-    private final String name;
+    private final LobbyName name;
     private final Set<UserOrDummy> users = new TreeSet<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private boolean inGame;
@@ -45,7 +46,7 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, UserOrDummy creator, boolean inGame, int maxPlayers, boolean commandsAllowed,
+    public LobbyDTO(LobbyName name, UserOrDummy creator, boolean inGame, int maxPlayers, boolean commandsAllowed,
                     int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
@@ -99,7 +100,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public String getName() {
+    public LobbyName getName() {
         return name;
     }
 

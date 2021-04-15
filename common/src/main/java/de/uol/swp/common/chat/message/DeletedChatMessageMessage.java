@@ -1,5 +1,7 @@
 package de.uol.swp.common.chat.message;
 
+import de.uol.swp.common.LobbyName;
+
 /**
  * Message sent by the server when a ChatMessage was deleted successfully.
  *
@@ -37,7 +39,7 @@ public class DeletedChatMessageMessage extends AbstractChatMessageMessage {
      *
      * @since 2020-12-30
      */
-    public DeletedChatMessageMessage(int id, String lobbyName) {
+    public DeletedChatMessageMessage(int id, LobbyName lobbyName) {
         super(lobbyName);
         this.id = id;
     }

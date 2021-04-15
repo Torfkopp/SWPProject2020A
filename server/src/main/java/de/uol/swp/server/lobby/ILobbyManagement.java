@@ -1,5 +1,6 @@
 package de.uol.swp.server.lobby;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 
@@ -28,7 +29,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException;
+    void createLobby(LobbyName name, User owner, int maxPlayer) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name
@@ -38,7 +39,7 @@ public interface ILobbyManagement {
      * @throws java.lang.IllegalArgumentException There is no lobby with the requested name
      * @since 2019-10-08
      */
-    void dropLobby(String name) throws IllegalArgumentException;
+    void dropLobby(LobbyName name) throws IllegalArgumentException;
 
     /**
      * Gets the map
@@ -47,7 +48,7 @@ public interface ILobbyManagement {
      *
      * @since 2020-12-12
      */
-    Map<String, Lobby> getLobbies();
+    Map<LobbyName, Lobby> getLobbies();
 
     /**
      * Searches for the lobby with the requested name
@@ -59,7 +60,7 @@ public interface ILobbyManagement {
      * @see java.util.Optional
      * @since 2019-10-08
      */
-    Optional<Lobby> getLobby(String name);
+    Optional<Lobby> getLobby(LobbyName name);
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided
@@ -72,7 +73,7 @@ public interface ILobbyManagement {
      * @author Phillip-André Suhr
      * @since 2021-03-01
      */
-    void setInGame(String lobbyName, boolean inGame);
+    void setInGame(LobbyName lobbyName, boolean inGame);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.
@@ -88,6 +89,6 @@ public interface ILobbyManagement {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
                              boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled);
 }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -22,7 +23,7 @@ public class UpdateLobbyMessage extends AbstractLobbyMessage {
      * @param user  The user who initiated the update
      * @param lobby The object of the lobby that was updated
      */
-    public UpdateLobbyMessage(String name, UserOrDummy user, Lobby lobby) {
+    public UpdateLobbyMessage(LobbyName name, UserOrDummy user, Lobby lobby) {
         super(name, user);
         this.lobby = lobby;
     }

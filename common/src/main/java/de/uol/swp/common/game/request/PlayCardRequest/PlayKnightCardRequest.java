@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -11,7 +12,7 @@ import de.uol.swp.common.user.User;
  */
 public class PlayKnightCardRequest extends PlayCardRequest {
 
-    public PlayKnightCardRequest(String originLobby, User user) {
+    public PlayKnightCardRequest(LobbyName originLobby, User user) {
         super(originLobby, user);
     }
 }

@@ -1,5 +1,6 @@
 package de.uol.swp.server.chat.store;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.user.User;
 
@@ -43,7 +44,7 @@ public interface ChatMessageStore {
      * @implSpec ID and Timestamp need to be added on creation
      * @since 2020-12-30
      */
-    ChatMessage createChatMessage(User author, String content, String originLobby);
+    ChatMessage createChatMessage(User author, String content, LobbyName originLobby);
 
     /**
      * Method to retrieve a ChatMessage from the global ChatStore through its ID
@@ -64,7 +65,7 @@ public interface ChatMessageStore {
      *
      * @since 2020-12-30
      */
-    Optional<ChatMessage> findMessage(int id, String originLobby);
+    Optional<ChatMessage> findMessage(int id, LobbyName originLobby);
 
     /**
      * Method to get the last {@literal <amount>} Messages
@@ -85,7 +86,7 @@ public interface ChatMessageStore {
      *
      * @since 2020-12-30
      */
-    List<ChatMessage> getLatestMessages(int amount, String originLobby);
+    List<ChatMessage> getLatestMessages(int amount, LobbyName originLobby);
 
     /**
      * Method to remove a ChatMessage from the global Chat Store
@@ -102,7 +103,7 @@ public interface ChatMessageStore {
      *
      * @since 2020-12-30
      */
-    void removeChatMessage(int id, String originLobby);
+    void removeChatMessage(int id, LobbyName originLobby);
 
     /**
      * Method to remove a Lobby's entire Chat Store
@@ -113,7 +114,7 @@ public interface ChatMessageStore {
      * @author Sven Ahrens
      * @since 2021-01-16
      */
-    void removeLobbyHistory(String originLobby);
+    void removeLobbyHistory(LobbyName originLobby);
 
     /**
      * Method to update contents of a ChatMessage in the global Chat Store
@@ -136,5 +137,5 @@ public interface ChatMessageStore {
      *
      * @since 2020-12-30
      */
-    ChatMessage updateChatMessage(int id, String updatedContent, String originLobby);
+    ChatMessage updateChatMessage(int id, String updatedContent, LobbyName originLobby);
 }

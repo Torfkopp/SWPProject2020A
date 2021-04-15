@@ -5,12 +5,15 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
+import de.uol.swp.common.game.DevelopmentCard;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
@@ -99,7 +102,7 @@ public class CommandService extends AbstractService {
         if (args.size() > 0) dummyAmount = Integer.parseInt(args.get(0));
         else dummyAmount = 1;
         if (originalMessage.isFromLobby()) {
-            String lobbyName = originalMessage.getOriginLobby();
+            LobbyName lobbyName = originalMessage.getOriginLobby();
             Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
                 Lobby lobby = optLobby.get();
@@ -149,7 +152,7 @@ public class CommandService extends AbstractService {
             return;
         }
         try {
-            args.add(originalMessage.getOriginLobby());
+            args.add(originalMessage.getOriginLobby().getLobbyName());
             // roll dice for the skipped player
             Message req = parseArguments(args, RollDiceRequest.class.getConstructors()[0],
                                          Optional.of(originalMessage.getAuthor()));
@@ -177,10 +180,57 @@ public class CommandService extends AbstractService {
      */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
-        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
+        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().getLobbyName());
         UserOrDummy user = getUserOrDummy(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
-        Message msg = new EditInventoryRequest(args.get(0), user, args.get(2), Integer.parseInt(args.get(3)));
+        LobbyName lobbyName = new LobbyName(args.get(0));
+        Resource resource = null;
+        DevelopmentCard developmentCard = null;
+        switch (args.get(2).toLowerCase()) {
+            case "bricks":
+            case "brick":
+                resource = Resource.BRICK;
+                break;
+            case "grains":
+            case "grain":
+                resource = Resource.GRAIN;
+                break;
+            case "ore":
+                resource = Resource.ORE;
+                break;
+            case "lumber":
+                resource = Resource.LUMBER;
+                break;
+            case "wool":
+                resource = Resource.WOOL;
+                break;
+            case "knightcard":
+            case "kc":
+                developmentCard = DevelopmentCard.KNIGHT_CARD;
+                break;
+            case "knight":
+            case "knights":
+                break;
+            case "monopolycard":
+            case "mc":
+                developmentCard = DevelopmentCard.MONOPOLY_CARD;
+                break;
+            case "roadbuildingcard":
+            case "rbc":
+                developmentCard = DevelopmentCard.ROAD_BUILDING_CARD;
+                break;
+            case "victorypointcard":
+            case "vpc":
+                developmentCard = DevelopmentCard.VICTORY_POINT_CARD;
+                break;
+            case "yearofplentycard":
+            case "yearofplenty":
+            case "yopc":
+                developmentCard = DevelopmentCard.YEAR_OF_PLENTY_CARD;
+                break;
+        }
+        Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,
+                                               Integer.parseInt(args.get(3)));
         post(msg);
     }
 
@@ -498,7 +548,7 @@ public class CommandService extends AbstractService {
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
-                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(args.get(i));
+                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(new LobbyName(args.get(i)));
                     if (foundLobby.isPresent()) argList.add(foundLobby.get());
                     break;
                 case "boolean":
@@ -629,7 +679,7 @@ public class CommandService extends AbstractService {
                         try {
                             valBuilder.replace(valueStr.lastIndexOf(","), valueStr.lastIndexOf(",") + 1, "");
                         } catch (Exception ignored) {}
-                        Optional<Lobby> foundLobby = lobbyManagement.getLobby(valBuilder.toString());
+                        Optional<Lobby> foundLobby = lobbyManagement.getLobby(new LobbyName(valBuilder.toString()));
                         if (foundLobby.isEmpty()) throw new RuntimeException("Lobby not found");
                         map.put(kvarr[0].trim(), foundLobby.get());
                     }

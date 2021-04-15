@@ -1,6 +1,7 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
@@ -25,7 +26,7 @@ public class SystemMessageForPlayingCardsMessage extends AbstractLobbyMessage {
      * @param user        The User who played the card
      * @param playingCard The card that is about to be played
      */
-    public SystemMessageForPlayingCardsMessage(String lobbyName, User user, I18nWrapper playingCard) {
+    public SystemMessageForPlayingCardsMessage(LobbyName lobbyName, User user, I18nWrapper playingCard) {
         super(lobbyName, user);
         this.msg = new SystemMessageDTO(new I18nWrapper("lobby.play.card.systemmessage", user, playingCard));
     }

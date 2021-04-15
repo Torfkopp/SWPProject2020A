@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -25,7 +26,7 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param configuration       The field configuration used in the game
      * @param startUpPhaseEnabled Whether the game has the startup phase enabled
      */
-    public StartSessionMessage(String name, UserOrDummy user, IConfiguration configuration,
+    public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
                                boolean startUpPhaseEnabled) {
         super(name, user);
         this.configuration = configuration;

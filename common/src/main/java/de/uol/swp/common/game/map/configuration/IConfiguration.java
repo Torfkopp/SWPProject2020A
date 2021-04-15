@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.map.configuration;
 
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
 import de.uol.swp.common.game.map.MapPoint;
@@ -35,9 +36,8 @@ public interface IConfiguration extends Serializable {
      * @return Unmodifiable, ordered List of Hex resource types
      *
      * @implSpec Create new LinkedList objects from this due to it being unmodifiable and ordered
-     * @see de.uol.swp.common.game.map.Hexes.IResourceHex.ResourceHexType
      */
-    List<IResourceHex.ResourceHexType> getHexList();
+    List<Resource> getHexList();
 
     /**
      * Gets the robberPosition

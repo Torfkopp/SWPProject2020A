@@ -201,7 +201,7 @@ public class ChatService extends AbstractService {
      *
      * @author Phillip-André Suhr
      * @author Sven Ahrens
-     * @see de.uol.swp.server.chat.IChatManagement#dropLobbyHistory(String)
+     * @see de.uol.swp.server.chat.IChatManagement#dropLobbyHistory(de.uol.swp.common.LobbyName)
      * @see de.uol.swp.common.lobby.message.LobbyDeletedMessage
      * @since 2021-01-16
      */

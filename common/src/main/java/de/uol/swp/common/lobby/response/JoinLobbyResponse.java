@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 
 /**
@@ -20,7 +21,7 @@ public class JoinLobbyResponse extends AbstractLobbyResponse {
      * @param lobbyName The name for the new lobby
      * @param lobby     The object of the joined lobby
      **/
-    public JoinLobbyResponse(String lobbyName, Lobby lobby) {
+    public JoinLobbyResponse(LobbyName lobbyName, Lobby lobby) {
         super(lobbyName);
         this.lobby = lobby;
     }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -17,7 +18,7 @@ public class LobbyCreatedMessage extends AbstractLobbyMessage {
      * @param name The name of the lobby that was created
      * @param user The user who created the lobby
      */
-    public LobbyCreatedMessage(String name, UserOrDummy user) {
+    public LobbyCreatedMessage(LobbyName name, UserOrDummy user) {
         super(name, user);
     }
 }

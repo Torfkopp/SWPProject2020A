@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.robber;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.user.UserOrDummy;
@@ -21,7 +22,7 @@ public class RobberPositionMessage extends AbstractGameMessage {
      * @param lobbyName The lobby's name
      * @param user      The user
      */
-    public RobberPositionMessage(String lobbyName, UserOrDummy user, MapPoint position) {
+    public RobberPositionMessage(LobbyName lobbyName, UserOrDummy user, MapPoint position) {
         super(lobbyName, user);
         this.position = position;
     }

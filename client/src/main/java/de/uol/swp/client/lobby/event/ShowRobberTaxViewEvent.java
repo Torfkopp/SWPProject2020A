@@ -1,7 +1,5 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.game.map.Resources;
-
 import java.util.Map;
 
 /**

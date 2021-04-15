@@ -2,6 +2,7 @@ package de.uol.swp.server.chat;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.chat.store.ChatMessageStore;
@@ -50,7 +51,7 @@ public class ChatManagement extends AbstractChatManagement {
 
     @Override
     public ChatMessage createChatMessage(User author, String content,
-                                         String originLobby) throws ChatManagementException {
+                                         LobbyName originLobby) throws ChatManagementException {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
         } else if (author == null) {
@@ -69,7 +70,7 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public void dropChatMessage(int id, String originLobby) throws ChatManagementException {
+    public void dropChatMessage(int id, LobbyName originLobby) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");
@@ -78,7 +79,7 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public void dropLobbyHistory(String originLobby) {
+    public void dropLobbyHistory(LobbyName originLobby) {
         chatMessageStore.removeLobbyHistory(originLobby);
     }
 
@@ -88,12 +89,12 @@ public class ChatManagement extends AbstractChatManagement {
     }
 
     @Override
-    public Optional<ChatMessage> findChatMessage(int id, String originLobby) {
+    public Optional<ChatMessage> findChatMessage(int id, LobbyName originLobby) {
         return chatMessageStore.findMessage(id, originLobby);
     }
 
     @Override
-    public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
+    public List<ChatMessage> getLatestMessages(int amount, LobbyName originLobby) {
         return chatMessageStore.getLatestMessages(amount, originLobby);
     }
 
@@ -104,7 +105,7 @@ public class ChatManagement extends AbstractChatManagement {
 
     @Override
     public ChatMessage updateChatMessage(int id, String updatedContent,
-                                         String originLobby) throws ChatManagementException {
+                                         LobbyName originLobby) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");

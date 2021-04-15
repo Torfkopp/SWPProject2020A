@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.map;
 
 import com.google.common.graph.*;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.map.Hexes.*;
 import de.uol.swp.common.game.map.configuration.Configuration;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -45,7 +46,7 @@ public class GameMapManagement implements IGameMapManagement {
         this.configuration = configuration;
         // create new LinkedLists because lists are transmitted ordered and read-only in the IConfiguration
         List<IHarborHex.HarborResource> harborList = new LinkedList<>(configuration.getHarborList());
-        List<IResourceHex.ResourceHexType> hexList = new LinkedList<>(configuration.getHexList());
+        List<Resource> hexList = new LinkedList<>(configuration.getHexList());
         List<Integer> tokenList = new LinkedList<>(configuration.getTokenList());
         hexMap[0][0].set(new HarborHex(hexMap[1][1], IHarborHex.HarborSide.SOUTHEAST, harborList.remove(0)));
         hexMap[0][1].set(new WaterHex());
@@ -91,25 +92,25 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public IConfiguration getBeginnerConfiguration() {
-        List<IResourceHex.ResourceHexType> hexList = new LinkedList<>();
-        hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
-        hexList.add(IResourceHex.ResourceHexType.PASTURE);
-        hexList.add(IResourceHex.ResourceHexType.FOREST);
-        hexList.add(IResourceHex.ResourceHexType.FIELDS);
-        hexList.add(IResourceHex.ResourceHexType.HILLS);
-        hexList.add(IResourceHex.ResourceHexType.PASTURE);
-        hexList.add(IResourceHex.ResourceHexType.HILLS);
-        hexList.add(IResourceHex.ResourceHexType.FIELDS);
-        hexList.add(IResourceHex.ResourceHexType.FOREST);
-        hexList.add(IResourceHex.ResourceHexType.FOREST);
-        hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
-        hexList.add(IResourceHex.ResourceHexType.FOREST);
-        hexList.add(IResourceHex.ResourceHexType.MOUNTAINS);
-        hexList.add(IResourceHex.ResourceHexType.FIELDS);
-        hexList.add(IResourceHex.ResourceHexType.PASTURE);
-        hexList.add(IResourceHex.ResourceHexType.HILLS);
-        hexList.add(IResourceHex.ResourceHexType.FIELDS);
-        hexList.add(IResourceHex.ResourceHexType.PASTURE);
+        List<Resource> hexList = new LinkedList<>();
+        hexList.add(Resource.ORE);
+        hexList.add(Resource.WOOL);
+        hexList.add(Resource.LUMBER);
+        hexList.add(Resource.GRAIN);
+        hexList.add(Resource.BRICK);
+        hexList.add(Resource.WOOL);
+        hexList.add(Resource.BRICK);
+        hexList.add(Resource.GRAIN);
+        hexList.add(Resource.LUMBER);
+        hexList.add(Resource.LUMBER);
+        hexList.add(Resource.ORE);
+        hexList.add(Resource.LUMBER);
+        hexList.add(Resource.ORE);
+        hexList.add(Resource.GRAIN);
+        hexList.add(Resource.WOOL);
+        hexList.add(Resource.BRICK);
+        hexList.add(Resource.GRAIN);
+        hexList.add(Resource.WOOL);
         List<IHarborHex.HarborResource> harborList = new LinkedList<>();
         harborList.add(IHarborHex.HarborResource.ANY);
         harborList.add(IHarborHex.HarborResource.GRAIN);
@@ -276,12 +277,12 @@ public class GameMapManagement implements IGameMapManagement {
         harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.LUMBER));
         harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.BRICK));
         harborList.addAll(Collections.nCopies(1, IHarborHex.HarborResource.WOOL));
-        List<IResourceHex.ResourceHexType> hexList = new ArrayList<>();
-        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FOREST));
-        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.FIELDS));
-        hexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.MOUNTAINS));
-        hexList.addAll(Collections.nCopies(4, IResourceHex.ResourceHexType.PASTURE));
-        hexList.addAll(Collections.nCopies(3, IResourceHex.ResourceHexType.HILLS));
+        List<Resource> hexList = new ArrayList<>();
+        hexList.addAll(Collections.nCopies(4, Resource.LUMBER));
+        hexList.addAll(Collections.nCopies(4, Resource.GRAIN));
+        hexList.addAll(Collections.nCopies(3, Resource.ORE));
+        hexList.addAll(Collections.nCopies(4, Resource.WOOL));
+        hexList.addAll(Collections.nCopies(3, Resource.BRICK));
         List<Integer> tokenList = new ArrayList<>();
         tokenList.addAll(Collections.nCopies(1, 2));
         tokenList.addAll(Collections.nCopies(1, 12));

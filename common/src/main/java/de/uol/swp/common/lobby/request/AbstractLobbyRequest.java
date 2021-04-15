@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
  */
 public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
 
-    private final String name;
+    private final LobbyName name;
     private final UserOrDummy user;
 
     /**
@@ -26,14 +27,14 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      *
      * @since 2019-10-08
      */
-    public AbstractLobbyRequest(String name, UserOrDummy user) {
+    public AbstractLobbyRequest(LobbyName name, UserOrDummy user) {
         this.name = name;
         this.user = user;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, user);
+        return Objects.hash(name.getLobbyName(), user);
     }
 
     @Override
@@ -51,7 +52,7 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
      *
      * @since 2019-10-08
      */
-    public String getName() {
+    public LobbyName getName() {
         return name;
     }
 

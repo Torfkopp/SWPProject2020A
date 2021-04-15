@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -21,7 +22,7 @@ public class TradeWithUserCancelResponse extends AbstractLobbyResponse {
      * @param lobbyName    The name of the Lobby
      * @param activePlayer The active player in the actual game
      */
-    public TradeWithUserCancelResponse(String lobbyName, UserOrDummy activePlayer) {
+    public TradeWithUserCancelResponse(LobbyName lobbyName, UserOrDummy activePlayer) {
         super(lobbyName);
         this.activePlayer = activePlayer;
     }

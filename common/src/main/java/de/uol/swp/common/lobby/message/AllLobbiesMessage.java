@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractServerMessage;
 
@@ -24,7 +25,7 @@ public class AllLobbiesMessage extends AbstractServerMessage {
      *
      * @param lobbies Map of lobby's name and the lobby itself
      */
-    public AllLobbiesMessage(Map<String, Lobby> lobbies) {
+    public AllLobbiesMessage(Map<LobbyName, Lobby> lobbies) {
         lobbies.forEach((lobbyName, lobby) -> this.lobbies.add(lobby));
     }
 

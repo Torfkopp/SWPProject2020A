@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -16,7 +17,7 @@ public class GameCreatedMessage extends AbstractGameMessage {
      * @param lobbyName Name of the lobby a game was started in
      * @param first     The first player
      */
-    public GameCreatedMessage(String lobbyName, UserOrDummy first) {
+    public GameCreatedMessage(LobbyName lobbyName, UserOrDummy first) {
         super(lobbyName, first);
     }
 

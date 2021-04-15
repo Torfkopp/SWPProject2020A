@@ -1,5 +1,6 @@
 package de.uol.swp.server.chat;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.user.User;
 
@@ -40,7 +41,7 @@ public interface IChatManagement {
      *
      * @since 2020-12-30
      */
-    ChatMessage createChatMessage(User author, String content, String originLobby);
+    ChatMessage createChatMessage(User author, String content, LobbyName originLobby);
 
     /**
      * Delete a ChatMessage from the global Chat Store
@@ -57,7 +58,7 @@ public interface IChatManagement {
      *
      * @since 2020-12-30
      */
-    void dropChatMessage(int id, String originLobby);
+    void dropChatMessage(int id, LobbyName originLobby);
 
     /**
      * Drop a Lobby's entire Chat History
@@ -68,7 +69,7 @@ public interface IChatManagement {
      * @author Sven Ahrens
      * @since 2021-01-16
      */
-    void dropLobbyHistory(String originLobby);
+    void dropLobbyHistory(LobbyName originLobby);
 
     /**
      * Find a message in the global Chat Store
@@ -87,7 +88,7 @@ public interface IChatManagement {
      *
      * @return Empty Optional or Optional containing a ChatMessage object
      */
-    Optional<ChatMessage> findChatMessage(int id, String originLobby);
+    Optional<ChatMessage> findChatMessage(int id, LobbyName originLobby);
 
     /**
      * Returns a List with ChatMessage objects of size {@literal <amount>} or smaller
@@ -100,7 +101,7 @@ public interface IChatManagement {
      *
      * @since 2020-12-30
      */
-    List<ChatMessage> getLatestMessages(int amount, String originLobby);
+    List<ChatMessage> getLatestMessages(int amount, LobbyName originLobby);
 
     /**
      * Returns a list with ChatMessage objects of size {@literal <amount>} or smaller
@@ -123,7 +124,7 @@ public interface IChatManagement {
      *
      * @since 2020-12-30
      */
-    ChatMessage updateChatMessage(int id, String updatedContent, String originLobby);
+    ChatMessage updateChatMessage(int id, String updatedContent, LobbyName originLobby);
 
     /**
      * Update content of ChatMessage in the global Chat Store

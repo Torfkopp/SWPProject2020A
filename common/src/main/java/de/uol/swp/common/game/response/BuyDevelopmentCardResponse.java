@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.DevelopmentCard;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -15,15 +17,15 @@ import de.uol.swp.common.user.UserOrDummy;
 public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final String developmentCard;
+    private final DevelopmentCard developmentCard;
 
     /**
      * Constructor
-     *
-     * @param user      user who bought a development card
+     *  @param user      user who bought a development card
      * @param lobbyName name of the lobby where the user bought the card
+     * @param developmentCard
      */
-    public BuyDevelopmentCardResponse(UserOrDummy user, String lobbyName, String developmentCard) {
+    public BuyDevelopmentCardResponse(UserOrDummy user, LobbyName lobbyName, DevelopmentCard developmentCard) {
         super(lobbyName);
         this.user = user;
         this.developmentCard = developmentCard;
@@ -34,7 +36,7 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
      *
      * @return String name of the bought development card
      */
-    public String getDevelopmentCard() {
+    public DevelopmentCard getDevelopmentCard() {
         return developmentCard;
     }
 

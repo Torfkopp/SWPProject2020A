@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -21,7 +22,7 @@ public class TradeWithUserCancelRequest extends AbstractGameRequest {
      * @param originLobby    The lobby where the trade was opened
      * @param respondingUser The user to whom the offer was made
      */
-    public TradeWithUserCancelRequest(String originLobby, UserOrDummy respondingUser) {
+    public TradeWithUserCancelRequest(LobbyName originLobby, UserOrDummy respondingUser) {
         super(originLobby);
         this.respondingUser = respondingUser;
     }

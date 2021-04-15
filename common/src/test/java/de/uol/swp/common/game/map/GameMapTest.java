@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.map;
 
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
@@ -59,7 +60,7 @@ public class GameMapTest {
         IGameHex hex = map.getHex(HexMapPoint(1, 3));
         assertEquals(IGameHex.HexType.RESOURCE, hex.getType());
         IResourceHex resourceHex = (IResourceHex) hex;
-        assertEquals(IResourceHex.ResourceHexType.FOREST, resourceHex.getResource());
+        assertEquals(Resource.LUMBER, resourceHex.getResource());
     }
 
     @Test

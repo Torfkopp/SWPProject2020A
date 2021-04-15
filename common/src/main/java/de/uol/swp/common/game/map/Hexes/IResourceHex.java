@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.map.Hexes;
 
+import de.uol.swp.common.game.Resource;
+
 /**
  * Interface for a resource hex
  *
@@ -10,22 +12,11 @@ package de.uol.swp.common.game.map.Hexes;
 public interface IResourceHex extends ILandHex {
 
     /**
-     * Enum for all five resource giving hex types
-     */
-    enum ResourceHexType {
-        HILLS,
-        FOREST,
-        MOUNTAINS,
-        FIELDS,
-        PASTURE,
-    }
-
-    /**
      * Gets the hex's resource
      *
      * @return Resource
      */
-    ResourceHexType getResource();
+    Resource getResource();
 
     /**
      * Gets the number of the hex's token

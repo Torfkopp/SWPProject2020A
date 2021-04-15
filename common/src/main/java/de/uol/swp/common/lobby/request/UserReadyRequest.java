@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -25,7 +26,7 @@ public class UserReadyRequest extends AbstractLobbyRequest {
      * @param user      The User who changed their ready status
      * @param isReady   true if the User is now ready, false if the user is now not ready (anymore)
      */
-    public UserReadyRequest(String lobbyName, User user, boolean isReady) {
+    public UserReadyRequest(LobbyName lobbyName, User user, boolean isReady) {
         super(lobbyName, user);
         this.isReady = isReady;
     }

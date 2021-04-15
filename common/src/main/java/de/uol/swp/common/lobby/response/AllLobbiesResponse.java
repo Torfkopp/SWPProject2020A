@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
@@ -21,7 +22,7 @@ import java.util.Map;
  */
 public class AllLobbiesResponse extends AbstractResponseMessage {
 
-    private final List<String> lobbyNames = new ArrayList<>();
+    private final List<LobbyName> lobbyNames = new ArrayList<>();
     private final List<Lobby> lobbies = new ArrayList<>();
 
     /**
@@ -31,7 +32,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      *
      * @since 2020-12-12
      */
-    public AllLobbiesResponse(Map<String, Lobby> lobbies) {
+    public AllLobbiesResponse(Map<LobbyName, Lobby> lobbies) {
         lobbies.forEach((lobbyName, lobby) -> {
             this.lobbyNames.add(lobbyName);
             this.lobbies.add(lobby);
@@ -57,7 +58,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
      *
      * @since 2020-12-12
      */
-    public List<String> getLobbyNames() {
+    public List<LobbyName> getLobbyNames() {
         return lobbyNames;
     }
 }

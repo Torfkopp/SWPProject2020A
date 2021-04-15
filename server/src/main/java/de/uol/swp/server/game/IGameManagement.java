@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.lobby.Lobby;
@@ -38,7 +39,7 @@ public interface IGameManagement {
      * @throws java.lang.IllegalArgumentException There is no game with the requested name
      * @since 2021-01-24
      */
-    void dropGame(String lobbyName) throws IllegalArgumentException;
+    void dropGame(LobbyName lobbyName) throws IllegalArgumentException;
 
     /**
      * Searches for the game with the requested name
@@ -49,7 +50,7 @@ public interface IGameManagement {
      *
      * @since 2021-01-24
      */
-    Game getGame(String lobbyName);
+    Game getGame(LobbyName lobbyName);
 
     /**
      * Gets the map
@@ -58,5 +59,5 @@ public interface IGameManagement {
      *
      * @since 2021-01-24
      */
-    Map<String, Game> getGames();
+    Map<LobbyName, Game> getGames();
 }

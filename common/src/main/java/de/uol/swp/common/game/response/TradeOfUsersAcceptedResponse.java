@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -18,7 +19,7 @@ public class TradeOfUsersAcceptedResponse extends AbstractLobbyResponse {
      *
      * @param lobbyName Name of the lobby
      */
-    public TradeOfUsersAcceptedResponse(String lobbyName) {
+    public TradeOfUsersAcceptedResponse(LobbyName lobbyName) {
         super(lobbyName);
     }
 }

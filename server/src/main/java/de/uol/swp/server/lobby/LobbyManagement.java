@@ -1,5 +1,6 @@
 package de.uol.swp.server.lobby;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
@@ -18,10 +19,10 @@ import java.util.Optional;
  */
 public class LobbyManagement implements ILobbyManagement {
 
-    private final Map<String, Lobby> lobbies = new HashMap<>();
+    private final Map<LobbyName, Lobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException {
+    public void createLobby(LobbyName name, User owner, int maxPlayer) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
@@ -29,7 +30,7 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public void dropLobby(String name) throws IllegalArgumentException {
+    public void dropLobby(LobbyName name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] not found!");
         }
@@ -37,13 +38,13 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public Map<String, Lobby> getLobbies() {
+    public Map<LobbyName, Lobby> getLobbies() {
         return lobbies;
     }
 
     @Override
-    public Optional<Lobby> getLobby(String name) {
-        Lobby lobby = lobbies.get(name);
+    public Optional<Lobby> getLobby(LobbyName lobbyName) {
+        Lobby lobby = lobbies.get(lobbyName);
         if (lobby != null) {
             return Optional.of(lobby);
         }
@@ -51,14 +52,14 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public void setInGame(String lobbyName, boolean inGame) {
+    public void setInGame(LobbyName lobbyName, boolean inGame) {
         Optional<Lobby> found = getLobby(lobbyName);
         if (found.isEmpty()) return;
         found.get().setInGame(inGame);
     }
 
     @Override
-    public void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
                                     boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         lobbies.get(lobbyName).setMaxPlayers(maxPlayers);
         lobbies.get(lobbyName).setCommandsAllowed(commandsAllowed);

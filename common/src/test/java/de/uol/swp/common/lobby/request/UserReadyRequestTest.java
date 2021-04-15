@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ class UserReadyRequestTest {
 
     private static final User defaultUser = new UserDTO(42, "chuck", "test", "chuck@norris.com");
 
+    private static final LobbyName defaultLobbyName = new LobbyName("Lobby");
+
     /**
      * Tests the userReadyRequest when isReady is false
      * <p>
@@ -25,9 +28,9 @@ class UserReadyRequestTest {
      */
     @Test
     void UserIsNotReadyTest() {
-        UserReadyRequest userReadyRequest = new UserReadyRequest("Lobby", defaultUser, false);
+        UserReadyRequest userReadyRequest = new UserReadyRequest(defaultLobbyName, defaultUser, false);
 
-        assertEquals("Lobby", userReadyRequest.getName());
+        assertEquals(defaultLobbyName, userReadyRequest.getName());
         assertEquals(defaultUser, userReadyRequest.getUser());
         assertEquals(defaultUser.getUsername(), userReadyRequest.getUser().getUsername());
         assertFalse(userReadyRequest.isReady());
@@ -40,9 +43,9 @@ class UserReadyRequestTest {
      */
     @Test
     void UserIsReadyTest() {
-        UserReadyRequest userReadyRequest = new UserReadyRequest("Lobby", defaultUser, true);
+        UserReadyRequest userReadyRequest = new UserReadyRequest(defaultLobbyName, defaultUser, true);
 
-        assertEquals("Lobby", userReadyRequest.getName());
+        assertEquals(defaultLobbyName, userReadyRequest.getName());
         assertEquals(defaultUser, userReadyRequest.getUser());
         assertEquals(defaultUser.getUsername(), userReadyRequest.getUser().getUsername());
         assertTrue(userReadyRequest.isReady());

@@ -1,5 +1,7 @@
 package de.uol.swp.client.trade.event;
 
+import de.uol.swp.common.LobbyName;
+
 /**
  * Event used to trigger close the trading window with the other user
  * when the cancel button got pressed
@@ -15,14 +17,14 @@ package de.uol.swp.client.trade.event;
  */
 public class TradeCancelEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the Lobby where the trading window should be closed
      */
-    public TradeCancelEvent(String lobbyName) {
+    public TradeCancelEvent(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -31,7 +33,7 @@ public class TradeCancelEvent {
      *
      * @return LobbyName object of the event
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

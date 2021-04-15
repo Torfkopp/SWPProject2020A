@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.User;
 
@@ -14,7 +15,7 @@ public class PlayCardSuccessResponse extends AbstractLobbyResponse {
 
     User user;
 
-    public PlayCardSuccessResponse(String lobbyName, User user) {
+    public PlayCardSuccessResponse(LobbyName lobbyName, User user) {
         super(lobbyName);
         this.user = user;
     }

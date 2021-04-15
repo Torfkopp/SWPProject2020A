@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
-import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.user.User;
 
 /**
@@ -12,14 +13,14 @@ import de.uol.swp.common.user.User;
  */
 public class PlayMonopolyCardRequest extends PlayCardRequest {
 
-    Resources resource;
+    Resource resource;
 
-    public PlayMonopolyCardRequest(String originLobby, User user, Resources resource) {
+    public PlayMonopolyCardRequest(LobbyName originLobby, User user, Resource resource) {
         super(originLobby, user);
         this.resource = resource;
     }
 
-    public Resources getResource() {
+    public Resource getResource() {
         return resource;
     }
 }

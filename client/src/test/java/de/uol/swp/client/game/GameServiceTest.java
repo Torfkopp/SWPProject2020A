@@ -5,7 +5,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.request.RollDiceRequest;

@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.User;
 
@@ -20,7 +21,7 @@ public class PlayCardFailureResponse extends AbstractLobbyResponse {
         TOO_MANY_RESOURCES
     }
 
-    public PlayCardFailureResponse(String lobbyName, User user, Reasons reason) {
+    public PlayCardFailureResponse(LobbyName lobbyName, User user, Reasons reason) {
         super(lobbyName);
         this.user = user;
         this.reason = reason;

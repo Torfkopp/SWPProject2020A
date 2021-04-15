@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -18,7 +19,7 @@ public class ReturnToPreGameLobbyMessage extends AbstractLobbyMessage {
      * @param lobbyName The lobby this game takes place in
      * @param user      The user in the lobby
      */
-    public ReturnToPreGameLobbyMessage(String lobbyName, UserOrDummy user) {
+    public ReturnToPreGameLobbyMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

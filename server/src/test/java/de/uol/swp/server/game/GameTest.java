@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
@@ -25,18 +26,20 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class GameTest {
 
+    private static final LobbyName defaultLobbyName = new LobbyName("testLobby");
+
     @Test
     void gameManagementTest() {
         IGameManagement gm = new GameManagement(new LobbyManagement());
         User user = new UserDTO(99, "", "", "");
-        Lobby lobby = new LobbyDTO("testLobby", user, false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO(defaultLobbyName, user, false, 4, false, 60, true, true);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gm.createGame(lobby, user, gameMap);
-        assertNotNull(gm.getGame("testLobby"));
-        Map<String, Game> map = gm.getGames();
+        assertNotNull(gm.getGame(defaultLobbyName));
+        Map<LobbyName, Game> map = gm.getGames();
         assertEquals(1, map.size());
-        gm.dropGame("testLobby");
+        gm.dropGame(defaultLobbyName);
         map = gm.getGames();
         assertTrue(map.isEmpty());
     }
@@ -47,7 +50,7 @@ class GameTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO(defaultLobbyName, user[0], false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();

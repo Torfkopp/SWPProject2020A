@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.request.AbstractGameRequest;
 import de.uol.swp.common.user.User;
 
@@ -13,7 +14,7 @@ abstract class PlayCardRequest extends AbstractGameRequest {
 
     User user;
 
-    public PlayCardRequest(String originLobby, User user) {
+    public PlayCardRequest(LobbyName originLobby, User user) {
         super(originLobby);
         this.user = user;
     }

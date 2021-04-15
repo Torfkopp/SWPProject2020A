@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -15,7 +16,7 @@ public class NextPlayerMessage extends AbstractGameMessage {
      * @param lobbyName    The lobby name
      * @param activePlayer The active player
      */
-    public NextPlayerMessage(String lobbyName, UserOrDummy activePlayer) {
+    public NextPlayerMessage(LobbyName lobbyName, UserOrDummy activePlayer) {
         super(lobbyName, activePlayer);
     }
 

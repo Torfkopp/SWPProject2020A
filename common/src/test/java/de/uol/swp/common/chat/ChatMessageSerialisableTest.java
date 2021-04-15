@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.SerialisationTestHelper;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -24,7 +25,7 @@ class ChatMessageSerialisableTest {
     private static final ChatMessageDTO defaultChatMessage = new ChatMessageDTO(1, defaultUser, defaultTimestamp,
                                                                                 "test message content");
     private static final List<ChatMessage> defaultLatestChatMessageList = new LinkedList<>();
-    private static final String defaultLobby = "I'm a lobby... full of TREES!!!";
+    private static final LobbyName defaultLobby = new LobbyName("I'm a lobby... full of TREES!!!");
 
     static {
         defaultLatestChatMessageList.add(defaultChatMessage);

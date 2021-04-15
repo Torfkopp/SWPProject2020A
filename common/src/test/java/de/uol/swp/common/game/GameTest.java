@@ -1,5 +1,6 @@
 package de.uol.swp.common.game;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.game.map.Player;
@@ -11,8 +12,6 @@ import de.uol.swp.common.user.UserOrDummy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static de.uol.swp.common.game.map.MapPoint.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +29,7 @@ public class GameTest {
     static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JohnnyJoestar@jojo.us");
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
-    static final Lobby lobby = new LobbyDTO("Read the Manga", user, true, 4, false, 60, false, false);
+    static final Lobby lobby = new LobbyDTO(new LobbyName("Read the Manga"), user, true, 4, false, 60, false, false);
     static IGameMapManagement gameMap;
     static Game game;
 
@@ -67,37 +66,13 @@ public class GameTest {
      */
     @Test
     void bankInventoryCheck() {
-        String knightCard = "game.resources.cards.knight";
-        String roadBuildingCard = "game.resources.cards.roadbuilding";
-        String yearOfPlentyCard = "game.resources.cards.yearofplenty";
-        String monopolyCard = "game.resources.cards.monopoly";
-        String victoryPointCard = "game.resources.cards.victorypoints";
-        int victoryPointCardAmount = 0;
-        int monopolyCardAmount = 0;
-        int yearOfPlentyCardAmount = 0;
-        int roadBuildingCardAmount = 0;
-        int knightCardAmount = 0;
-        List<String> bankInventory = game.getBankInventory();
-        for (String s : bankInventory) {
-            if (s.equals(knightCard)) knightCardAmount++;
-        }
-        for (String s : bankInventory) {
-            if (s.equals(yearOfPlentyCard)) yearOfPlentyCardAmount++;
-        }
-        for (String s : bankInventory) {
-            if (s.equals(roadBuildingCard)) roadBuildingCardAmount++;
-        }
-        for (String s : bankInventory) {
-            if (s.equals(monopolyCard)) monopolyCardAmount++;
-        }
-        for (String s : bankInventory) {
-            if (s.equals(victoryPointCard)) victoryPointCardAmount++;
-        }
-        assertEquals(5, victoryPointCardAmount);
-        assertEquals(2, monopolyCardAmount);
-        assertEquals(2, yearOfPlentyCardAmount);
-        assertEquals(2, roadBuildingCardAmount);
-        assertEquals(14, knightCardAmount);
+        BankInventory bankInventory = game.getBankInventory();
+
+        assertEquals(5, bankInventory.get(DevelopmentCard.VICTORY_POINT_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCard.MONOPOLY_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCard.YEAR_OF_PLENTY_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCard.ROAD_BUILDING_CARD));
+        assertEquals(14, bankInventory.get(DevelopmentCard.KNIGHT_CARD));
     }
 
     @Test
@@ -116,30 +91,23 @@ public class GameTest {
         map.upgradeSettlement(player, IntersectionMapPoint(0, 1));
         // Player has 2 settlements (1 VP), 1 city (2 VP) for 4 VP total
         assertEquals(4, game.calculateVictoryPoints(player));
-        game.getInventory(player).setVictoryPointCards(2);
+        game.getInventory(player).increase(DevelopmentCard.VICTORY_POINT_CARD,2);
         // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards for 6 VP total
         assertEquals(6, game.calculateVictoryPoints(player));
-        game.getInventory(player).setLongestRoad(true);
-        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road for 8 VP total
-        assertEquals(8, game.calculateVictoryPoints(player));
-        game.getInventory(player).setLargestArmy(true);
-        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road, Largest Army
-        // for 10 VP total
-        assertEquals(10, game.calculateVictoryPoints(player));
     }
 
     @Test
     void distributesResourceTest() {
         //Testing a hex
         game.distributeResources(6);
-        assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
-        assertEquals(1, game.getInventory(Player.PLAYER_3).getBrick());
-        assertEquals(1, game.getInventory(Player.PLAYER_2).getGrain());
+        assertEquals(1, game.getInventory(Player.PLAYER_1).get(Resource.BRICK));
+        assertEquals(1, game.getInventory(Player.PLAYER_3).get(Resource.BRICK));
+        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.GRAIN));
         //Testing another hex
         game.distributeResources(4);
-        assertEquals(1, game.getInventory(Player.PLAYER_2).getWool());
-        assertEquals(1, game.getInventory(Player.PLAYER_4).getGrain());
-        assertEquals(2, game.getInventory(Player.PLAYER_2).getGrain());
+        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.WOOL));
+        assertEquals(1, game.getInventory(Player.PLAYER_4).get(Resource.GRAIN));
+        assertEquals(2, game.getInventory(Player.PLAYER_2).get(Resource.GRAIN));
     }
 
     @Test

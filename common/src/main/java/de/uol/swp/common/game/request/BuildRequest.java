@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.user.User;
 
@@ -23,7 +24,7 @@ public class BuildRequest extends AbstractGameRequest {
      * @param user      The requesting user
      * @param mapPoint  The MapPoint at which should be build
      */
-    public BuildRequest(String lobbyName, User user, MapPoint mapPoint) {
+    public BuildRequest(LobbyName lobbyName, User user, MapPoint mapPoint) {
         super(lobbyName);
         this.user = user;
         this.mapPoint = mapPoint;

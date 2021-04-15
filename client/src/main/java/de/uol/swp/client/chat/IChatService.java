@@ -1,5 +1,7 @@
 package de.uol.swp.client.chat;
 
+import de.uol.swp.common.LobbyName;
+
 /**
  * An interface for all methods of the client's ChatService
  * <p>
@@ -30,7 +32,7 @@ public interface IChatService {
      *
      * @since 2020-12-30
      */
-    void askLatestMessages(int amount, String originLobby);
+    void askLatestMessages(int amount, LobbyName originLobby);
 
     /**
      * Method to delete a ChatMessage
@@ -47,7 +49,7 @@ public interface IChatService {
      *
      * @since 2020-12-30
      */
-    void deleteMessage(int id, String originLobby);
+    void deleteMessage(int id, LobbyName originLobby);
 
     /**
      * Method to change the content of a ChatMessage
@@ -66,7 +68,7 @@ public interface IChatService {
      *
      * @since 2020-12-30
      */
-    void editMessage(int id, String newContent, String originLobby);
+    void editMessage(int id, String newContent, LobbyName originLobby);
 
     /**
      * Method to create a new ChatMessage
@@ -83,5 +85,5 @@ public interface IChatService {
      *
      * @since 2020-12-30
      */
-    void newMessage(String msg, String originLobby);
+    void newMessage(String msg, LobbyName originLobby);
 }

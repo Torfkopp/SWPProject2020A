@@ -12,7 +12,6 @@ import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;

@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 
 /**
@@ -40,7 +41,7 @@ public class EditedChatMessageMessage extends AbstractChatMessageMessage {
      *
      * @since 2020-12-30
      */
-    public EditedChatMessageMessage(ChatMessage chatMsg, String lobbyName) {
+    public EditedChatMessageMessage(ChatMessage chatMsg, LobbyName lobbyName) {
         super(lobbyName);
         this.chatMsg = chatMsg;
     }

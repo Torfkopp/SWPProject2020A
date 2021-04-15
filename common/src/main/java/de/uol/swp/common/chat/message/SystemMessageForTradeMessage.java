@@ -1,8 +1,9 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -18,22 +19,21 @@ import java.util.Map;
  */
 public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
-    private final String respondingUser;
-    private final Map<I18nWrapper, Integer> respondingResourceMap;
-    private final Map<I18nWrapper, Integer> offeringResourceMap;
+    private final UserOrDummy respondingUser;
+    private final Map<Resource, Integer> respondingResourceMap;
+    private final Map<Resource, Integer> offeringResourceMap;
 
     /**
      * Constructor
-     *
-     * @param lobbyName             The lobby name
+     *  @param lobbyName             The lobby name
      * @param offeringUser          The offering User
      * @param respondingUser        The responding User
      * @param offeringResourceMap   The offered resources
      * @param respondingResourceMap The demanded resources
      */
-    public SystemMessageForTradeMessage(String lobbyName, UserOrDummy offeringUser, String respondingUser,
-                                        Map<I18nWrapper, Integer> offeringResourceMap,
-                                        Map<I18nWrapper, Integer> respondingResourceMap) {
+    public SystemMessageForTradeMessage(LobbyName lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser,
+                                        Map<Resource, Integer> offeringResourceMap,
+                                        Map<Resource, Integer> respondingResourceMap) {
         super(lobbyName, offeringUser);
         this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;
@@ -46,8 +46,9 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * @return The encapsulated SystemMessage
      */
     public SystemMessage getMsg() {
-        return new SystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
-                                                            this.respondingResourceMap));
+        return null;
+        //return new SystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
+        //                                                    this.respondingResourceMap));
     }
 
     /**
@@ -55,7 +56,7 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      *
      * @return The responding User
      */
-    public String getRespondingUser() {
+    public UserOrDummy getRespondingUser() {
         return respondingUser;
     }
 

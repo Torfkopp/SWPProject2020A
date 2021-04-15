@@ -3,6 +3,7 @@ package de.uol.swp.server.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
@@ -12,11 +13,13 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
-import de.uol.swp.common.message.*;
+import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
@@ -69,7 +72,7 @@ public class LobbyService extends AbstractService {
      * @see de.uol.swp.common.message.ServerMessage
      * @since 2019-10-08
      */
-    public void sendToAllInLobby(String lobbyName, ServerMessage msg) {
+    public void sendToAllInLobby(LobbyName lobbyName, ServerMessage msg) {
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             msg.setReceiver(sessionManagement.getSessions(lobby.get().getRealUsers()));
@@ -149,8 +152,8 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received a CheckUserInLobbyRequest");
         Boolean isInLobby = false;
         User user = req.getUser();
-        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+        Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<LobbyName, Lobby> entry : lobbies.entrySet()) {
             if (entry.getValue().getUserOrDummies().contains(user)) {
                 isInLobby = true;
             } else {
@@ -171,7 +174,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The CreateLobbyRequest found on the EventBus
      *
-     * @see de.uol.swp.server.lobby.ILobbyManagement#createLobby(String, de.uol.swp.common.user.User, int)
+     * @see de.uol.swp.server.lobby.ILobbyManagement#createLobby(LobbyName, de.uol.swp.common.user.User, int)
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2019-10-08
      */
@@ -212,8 +215,8 @@ public class LobbyService extends AbstractService {
     private void onGetOldSessionsRequest(GetOldSessionsRequest req) {
         LOG.debug("Received GetOldSessionsRequest");
         User user = req.getUser();
-        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+        Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<LobbyName, Lobby> entry : lobbies.entrySet()) {
             if (entry.getValue().getUserOrDummies().contains(user)) {
                 ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(), entry.getValue());
                 responseMessage.initWithMessage(req);
@@ -274,7 +277,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onLobbyJoinRandomUserRequest(LobbyJoinRandomUserRequest req) {
-        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
         List<Lobby> filteredLobbies = new ArrayList<>();
 
         lobbies.forEach((String, lobby) -> {
@@ -407,12 +410,12 @@ public class LobbyService extends AbstractService {
     private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received RemoveFromLobbiesRequest");
         User user = req.getUser();
-        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
-        Map<String, Lobby> lobbiesWithUser = new HashMap<>();
-        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+        Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
+        Map<LobbyName, Lobby> lobbiesWithUser = new HashMap<>();
+        for (Map.Entry<LobbyName, Lobby> entry : lobbies.entrySet()) {
             if (entry.getValue().getUserOrDummies().contains(user)) {
                 Lobby lobby = entry.getValue();
-                String lobbyName = entry.getKey();
+                LobbyName lobbyName = entry.getKey();
                 lobbiesWithUser.put(entry.getKey(), lobby);
                 try {
                     lobby.leaveUser(user);
@@ -462,7 +465,7 @@ public class LobbyService extends AbstractService {
     @Subscribe
     private void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received RetrieveAllLobbyMembersRequest for Lobby " + req.getLobbyName());
-        String lobbyName = req.getLobbyName();
+        LobbyName lobbyName = req.getLobbyName();
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();

@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -18,7 +20,7 @@ import java.util.Map;
 public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<String, Integer> resourceMap;
+    private final Map<Resource, Integer> resourceMap;
     private final int tradingUsersInventorySize;
     private final UserOrDummy tradingUser;
 
@@ -31,7 +33,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param tradingUsersInventorySize Amount of resource cards the other user has
      * @param tradingUser               The trading Users name
      */
-    public InventoryForTradeWithUserResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
+    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource, Integer> resourceMap,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
@@ -47,7 +49,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public Map<String, Integer> getResourceMap() {
+    public Map<Resource, Integer> getResourceMap() {
         return resourceMap;
     }
 

@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
-import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.user.User;
 
 /**
@@ -12,20 +13,20 @@ import de.uol.swp.common.user.User;
  */
 public class PlayYearOfPlentyCardRequest extends PlayCardRequest {
 
-    Resources resource1;
-    Resources resource2;
+    Resource resource1;
+    Resource resource2;
 
-    public PlayYearOfPlentyCardRequest(String originLobby, User user, Resources resource1, Resources resource2) {
+    public PlayYearOfPlentyCardRequest(LobbyName originLobby, User user, Resource resource1, Resource resource2) {
         super(originLobby, user);
         this.resource1 = resource1;
         this.resource2 = resource2;
     }
 
-    public Resources getResource1() {
+    public Resource getResource1() {
         return resource1;
     }
 
-    public Resources getResource2() {
+    public Resource getResource2() {
         return resource2;
     }
 }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -23,7 +24,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      *
      * @since 2019-10-08
      */
-    public CreateLobbyRequest(String name, User owner, int maxPlayers) {
+    public CreateLobbyRequest(LobbyName name, User owner, int maxPlayers) {
         super(name, owner);
         this.maxPlayers = maxPlayers;
     }

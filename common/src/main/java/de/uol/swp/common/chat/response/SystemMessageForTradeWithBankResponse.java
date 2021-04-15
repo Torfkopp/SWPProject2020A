@@ -1,8 +1,10 @@
 package de.uol.swp.common.chat.response;
 
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.game.DevelopmentCard;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -19,14 +21,14 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
 
     /**
      * Constructor
-     *
-     * @param lobbyName       The lobby name
+     *  @param lobbyName       The lobby name
      * @param developmentCard The developmentCard that the user bought
      */
-    public SystemMessageForTradeWithBankResponse(String lobbyName, String developmentCard) {
+    public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCard developmentCard) {
         super(lobbyName);
-        this.msg = new SystemMessageDTO(
-                new I18nWrapper("lobby.trade.withbank.systemresponse", new I18nWrapper(developmentCard)));
+        this.msg = null;
+        //this.msg = new SystemMessageDTO(
+        //        new I18nWrapper("lobby.trade.withbank.systemresponse", new I18nWrapper(developmentCard)));
     }
 
     /**

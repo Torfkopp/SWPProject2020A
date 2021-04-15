@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
 
@@ -27,7 +28,7 @@ public class RefreshCardAmountMessage extends AbstractGameMessage {
      *                          an Integer representing the amount of Development
      *                          Cards they have
      */
-    public RefreshCardAmountMessage(String lobbyName, UserOrDummy user,
+    public RefreshCardAmountMessage(LobbyName lobbyName, UserOrDummy user,
                                     List<Triple<UserOrDummy, Integer, Integer>> cardAmountTriples) {
         super(lobbyName, user);
         this.cardAmountTriples = cardAmountTriples;

@@ -6,7 +6,6 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;

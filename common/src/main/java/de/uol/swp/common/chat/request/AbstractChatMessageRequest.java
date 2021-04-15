@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
@@ -16,7 +17,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
 public abstract class AbstractChatMessageRequest extends AbstractRequestMessage {
 
     private final boolean fromLobby;
-    private final String originLobby;
+    private final LobbyName originLobby;
 
     /**
      * Constructor
@@ -28,7 +29,7 @@ public abstract class AbstractChatMessageRequest extends AbstractRequestMessage 
      * @param originLobby The Lobby the ChatMessage request originated from (null if
      *                    from global chat)
      */
-    public AbstractChatMessageRequest(String originLobby) {
+    public AbstractChatMessageRequest(LobbyName originLobby) {
         this.originLobby = originLobby;
         this.fromLobby = (originLobby != null);
     }
@@ -38,7 +39,7 @@ public abstract class AbstractChatMessageRequest extends AbstractRequestMessage 
      *
      * @return The name of the Lobby the ChatMessage request originated from (null if from global chat)
      */
-    public String getOriginLobby() {
+    public LobbyName getOriginLobby() {
         return originLobby;
     }
 

@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -47,7 +48,7 @@ public class EditChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @since 2020-12-30
      */
-    public EditChatMessageRequest(int id, String content, User requestingUser, String originLobby) {
+    public EditChatMessageRequest(int id, String content, User requestingUser, LobbyName originLobby) {
         super(originLobby);
         this.id = id;
         this.content = content;

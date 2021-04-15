@@ -3,6 +3,7 @@ package de.uol.swp.client.chat;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.message.Message;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +47,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void askLatestMessages(int amount, String originLobby) {
+    public void askLatestMessages(int amount, LobbyName originLobby) {
         LOG.debug("Sending AskLatestMessagesRequest for Lobby " + originLobby);
         Message request = new AskLatestChatMessageRequest(amount, originLobby);
         bus.post(request);
@@ -60,7 +61,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void deleteMessage(int id, String originLobby) {
+    public void deleteMessage(int id, LobbyName originLobby) {
         LOG.debug("Sending DeleteChatMessageRequest for Lobby " + originLobby);
         Message request = new DeleteChatMessageRequest(id, userService.getLoggedInUser(), originLobby);
         bus.post(request);
@@ -74,7 +75,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void editMessage(int id, String newContent, String originLobby) {
+    public void editMessage(int id, String newContent, LobbyName originLobby) {
         LOG.debug("Sending EditChatMessageRequest for Lobby " + originLobby);
         Message request = new EditChatMessageRequest(id, newContent, userService.getLoggedInUser(), originLobby);
         bus.post(request);
@@ -88,7 +89,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void newMessage(String msg, String originLobby) {
+    public void newMessage(String msg, LobbyName originLobby) {
         LOG.debug("Sending NewChatMessageRequest for Lobby " + originLobby);
         Message request = new NewChatMessageRequest(userService.getLoggedInUser(), msg, originLobby);
         bus.post(request);

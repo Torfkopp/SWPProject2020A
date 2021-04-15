@@ -1,5 +1,8 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.DevelopmentCard;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -16,33 +19,24 @@ import java.util.Map;
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<String, Integer> resourceMap;
-    private final Map<String, Boolean> armyAndRoadMap;
+    private final Map<Resource, Integer> resourceMap;
+    private final Map<DevelopmentCard, Integer> developmentCardMap;
 
-    /**
-     * Constructor
-     *
-     * @param user           The user wanting to update the inventory
-     * @param lobbyName      The lobby for which the update is supposed to happen in
-     * @param resourceMap    The Map containing the name of a resource as key and the amount as value
-     * @param armyAndRoadMap The Map containing "Largest Army" and "Longest Road" with the appropriate boolean as the value
-     */
-    public UpdateInventoryResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
-                                   Map<String, Boolean> armyAndRoadMap) {
-        super(lobbyName);
-        this.user = user;
-        this.resourceMap = resourceMap;
-        this.armyAndRoadMap = armyAndRoadMap;
+    public Map<DevelopmentCard, Integer> getDevelopmentCardMap() {
+        return developmentCardMap;
     }
 
     /**
-     * Gets the army and road map, containing mappings of "Largest Army" and
-     * "Longest Road" to their appropriate boolean values.
-     *
-     * @return The army and road map
+     * Constructor
+     *  @param user           The user wanting to update the inventory
+     * @param lobbyName      The lobby for which the update is supposed to happen in
+     * @param resourceMap    The Map containing the name of a resource as key and the amount as value
      */
-    public Map<String, Boolean> getArmyAndRoadMap() {
-        return armyAndRoadMap;
+    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource, Integer> resourceMap, Map<DevelopmentCard, Integer> developmentCardMap) {
+        super(lobbyName);
+        this.user = user;
+        this.resourceMap = resourceMap;
+        this.developmentCardMap = developmentCardMap;
     }
 
     /**
@@ -52,7 +46,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public Map<String, Integer> getResourceMap() {
+    public Map<Resource, Integer> getResourceMap() {
         return resourceMap;
     }
 

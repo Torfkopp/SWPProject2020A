@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Map;
@@ -16,8 +18,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
 
     private final UserOrDummy respondingUser;
     private final UserOrDummy offeringUser;
-    private final Map<String, Integer> respondingResourceMap;
-    private final Map<String, Integer> offeringResourceMap;
+    private final Map<Resource, Integer> respondingResourceMap;
+    private final Map<Resource, Integer> offeringResourceMap;
 
     /**
      * Constructor
@@ -28,9 +30,9 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @param respondingResourceMap The demanded resources
      * @param offeringResourceMap   The offered resources
      */
-    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, String lobbyName,
-                                  Map<String, Integer> respondingResourceMap,
-                                  Map<String, Integer> offeringResourceMap) {
+    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, LobbyName lobbyName,
+                                  Map<Resource, Integer> respondingResourceMap,
+                                  Map<Resource, Integer> offeringResourceMap) {
         super(lobbyName);
         this.respondingUser = respondingUser;
         this.offeringUser = offeringUser;
@@ -43,7 +45,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the offered resources
      */
-    public Map<String, Integer> getOfferingResourceMap() {
+    public Map<Resource, Integer> getOfferingResourceMap() {
         return offeringResourceMap;
     }
 
@@ -61,7 +63,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the demanded resources
      */
-    public Map<String, Integer> getRespondingResourceMap() {
+    public Map<Resource, Integer> getRespondingResourceMap() {
         return respondingResourceMap;
     }
 

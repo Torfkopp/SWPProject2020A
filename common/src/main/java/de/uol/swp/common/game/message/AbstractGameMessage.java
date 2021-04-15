@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -17,7 +18,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public abstract class AbstractGameMessage extends AbstractServerMessage {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
     private final UserOrDummy user;
 
     /**
@@ -26,7 +27,7 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
      * @param lobbyName The lobby name
      * @param user      The user
      */
-    public AbstractGameMessage(String lobbyName, UserOrDummy user) {
+    public AbstractGameMessage(LobbyName lobbyName, UserOrDummy user) {
         this.lobbyName = lobbyName;
         this.user = user;
     }
@@ -36,7 +37,7 @@ public abstract class AbstractGameMessage extends AbstractServerMessage {
      *
      * @return The lobbyName of the destination lobby
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 

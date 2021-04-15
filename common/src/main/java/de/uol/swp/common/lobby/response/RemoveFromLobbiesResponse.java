@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
@@ -16,14 +17,14 @@ import java.util.Map;
  */
 public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
 
-    private final Map<String, Lobby> lobbiesWithUser;
+    private final Map<LobbyName, Lobby> lobbiesWithUser;
 
     /**
      * Constructor
      *
      * @param lobbiesWithUser The Map with the Lobbies
      **/
-    public RemoveFromLobbiesResponse(Map<String, Lobby> lobbiesWithUser) {
+    public RemoveFromLobbiesResponse(Map<LobbyName, Lobby> lobbiesWithUser) {
         this.lobbiesWithUser = lobbiesWithUser;
     }
 
@@ -32,7 +33,7 @@ public class RemoveFromLobbiesResponse extends AbstractResponseMessage {
      *
      * @return Map getLobbiesWithUser
      */
-    public Map<String, Lobby> getLobbiesWithUser() {
+    public Map<LobbyName, Lobby> getLobbiesWithUser() {
         return lobbiesWithUser;
     }
 }

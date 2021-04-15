@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.map.Hexes;
 
+import de.uol.swp.common.game.Resource;
+
 /**
  * Interface for a harbor hex
  *
@@ -20,6 +22,23 @@ public interface IHarborHex extends IWaterHex {
         GRAIN,
         WOOL,
         ANY
+    }
+
+    static HarborResource getHarborResource(Resource resource){
+        switch (resource){
+
+            case LUMBER:
+                return HarborResource.LUMBER;
+            case BRICK:
+                return HarborResource.BRICK;
+            case ORE:
+                return HarborResource.ORE;
+            case GRAIN:
+                return HarborResource.GRAIN;
+            case WOOL:
+                return HarborResource.WOOL;
+        }
+        return null;
     }
 
     /**

@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -18,7 +19,7 @@ public class ResetOfferTradeButtonResponse extends AbstractLobbyResponse {
      *
      * @param lobbyName Name of the lobby
      */
-    public ResetOfferTradeButtonResponse(String lobbyName) {
+    public ResetOfferTradeButtonResponse(LobbyName lobbyName) {
         super(lobbyName);
     }
 }

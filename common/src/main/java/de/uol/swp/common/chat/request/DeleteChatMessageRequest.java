@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -43,7 +44,7 @@ public class DeleteChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @since 2020-12-30
      */
-    public DeleteChatMessageRequest(int id, User requestingUser, String originLobby) {
+    public DeleteChatMessageRequest(int id, User requestingUser, LobbyName originLobby) {
         super(originLobby);
         this.id = id;
         this.requestingUser = requestingUser;

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -20,7 +21,7 @@ public class LobbyJoinUserRequest extends AbstractLobbyRequest {
      *
      * @since 2019-10-08
      */
-    public LobbyJoinUserRequest(String lobbyName, UserOrDummy user) {
+    public LobbyJoinUserRequest(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

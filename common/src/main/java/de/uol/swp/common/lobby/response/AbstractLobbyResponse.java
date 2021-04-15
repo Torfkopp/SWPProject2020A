@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 /**
@@ -13,21 +14,21 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  */
 public abstract class AbstractLobbyResponse extends AbstractResponseMessage {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the Lobby which this Response is directed to
      */
-    public AbstractLobbyResponse(String lobbyName) {this.lobbyName = lobbyName;}
+    public AbstractLobbyResponse(LobbyName lobbyName) {this.lobbyName = lobbyName;}
 
     /**
      * Gets the name of the lobby
      *
      * @return Name of the Lobby
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

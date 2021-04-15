@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.map.Hexes;
 
+import de.uol.swp.common.game.Resource;
+
 /**
  * Class for the resource hex
  *
@@ -9,7 +11,7 @@ package de.uol.swp.common.game.map.Hexes;
  */
 public class ResourceHex extends AbstractHex implements IResourceHex {
 
-    private final ResourceHexType resource;
+    private final Resource resource;
     private final int token;
 
     /**
@@ -18,14 +20,14 @@ public class ResourceHex extends AbstractHex implements IResourceHex {
      * @param resource The hex's resource
      * @param token    The hex's token
      */
-    public ResourceHex(ResourceHexType resource, int token) {
+    public ResourceHex(Resource resource, int token) {
         this.resource = resource;
         this.token = token;
         setRobberOnField(false);
     }
 
     @Override
-    public ResourceHexType getResource() {
+    public Resource getResource() {
         return resource;
     }
 

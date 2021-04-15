@@ -1,5 +1,6 @@
 package de.uol.swp.server.chat;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -31,8 +32,8 @@ class ChatManagementTest {
     private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
     private static final String defaultContent = "I am intelligent content";
     private static final String secondContent = "I am new, more intelligent content";
-    private static final String defaultLobby = "I might be a lobby, or I might not be";
-    private static final String secondLobby = "I don't think I'm a lobby";
+    private static final LobbyName defaultLobbyName = new LobbyName("I might be a lobby, or I might not be");
+    private static final LobbyName secondLobbyName = new LobbyName("I don't think I'm a lobby");
     private static ChatManagement chatManagement;
     private static ChatMessageStore chatMessageStore;
 
@@ -73,10 +74,10 @@ class ChatManagementTest {
      */
     @Test
     void createChatMessageForLobbyTest() {
-        ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
 
-        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(1, defaultLobby);
-        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(1, secondLobby);
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(1, defaultLobbyName);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(1, secondLobbyName);
         List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(1);
 
         assertFalse(listFirstLobby.isEmpty());
@@ -96,7 +97,7 @@ class ChatManagementTest {
     @Test
     void createChatMessageForLobbyWithEmptyAuthorTest() {
         assertThrows(ChatManagementException.class,
-                     () -> chatManagement.createChatMessage(null, defaultContent, defaultLobby));
+                     () -> chatManagement.createChatMessage(null, defaultContent, defaultLobbyName));
     }
 
     /**
@@ -108,7 +109,7 @@ class ChatManagementTest {
     @Test
     void createChatMessageForLobbyWithEmptyContentTest() {
         assertThrows(ChatManagementException.class,
-                     () -> chatManagement.createChatMessage(defaultUser, null, defaultLobby));
+                     () -> chatManagement.createChatMessage(defaultUser, null, defaultLobbyName));
     }
 
     /**
@@ -120,7 +121,7 @@ class ChatManagementTest {
     @Test
     void createChatMessageForLobbyWithEmptyStringContentTest() {
         assertThrows(ChatManagementException.class,
-                     () -> chatManagement.createChatMessage(defaultUser, "", defaultLobby));
+                     () -> chatManagement.createChatMessage(defaultUser, "", defaultLobbyName));
     }
 
     /**
@@ -139,8 +140,8 @@ class ChatManagementTest {
     void createChatMessageTest() {
         ChatMessage msg = chatManagement.createChatMessage(defaultUser, defaultContent);
 
-        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(1, defaultLobby);
-        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(1, secondLobby);
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(1, defaultLobbyName);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(1, secondLobbyName);
         List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(1);
 
         assertTrue(listFirstLobby.isEmpty());
@@ -185,7 +186,7 @@ class ChatManagementTest {
      */
     @Test
     void deleteChatMessageForLobbyWithUnknownIdTest() {
-        assertThrows(ChatManagementException.class, () -> chatManagement.dropChatMessage(42, defaultLobby));
+        assertThrows(ChatManagementException.class, () -> chatManagement.dropChatMessage(42, defaultLobbyName));
     }
 
     /**
@@ -212,14 +213,14 @@ class ChatManagementTest {
      */
     @Test
     void dropChatMessageForLobbyTest() {
-        ChatMessage msg = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        List<ChatMessage> list = chatMessageStore.getLatestMessages(1, defaultLobby);
+        ChatMessage msg = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
+        List<ChatMessage> list = chatMessageStore.getLatestMessages(1, defaultLobbyName);
         assertFalse(list.isEmpty());
         assertTrue(list.contains(msg));
 
-        chatManagement.dropChatMessage(msg.getID(), defaultLobby);
+        chatManagement.dropChatMessage(msg.getID(), defaultLobbyName);
 
-        list = chatMessageStore.getLatestMessages(1, defaultLobby);
+        list = chatMessageStore.getLatestMessages(1, defaultLobbyName);
         assertFalse(list.contains(msg));
     }
 
@@ -264,13 +265,13 @@ class ChatManagementTest {
      */
     @Test
     void dropLobbyHistoryTest() {
-        chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        List<ChatMessage> list = chatMessageStore.getLatestMessages(1, defaultLobby);
+        chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
+        List<ChatMessage> list = chatMessageStore.getLatestMessages(1, defaultLobbyName);
         assertFalse(list.isEmpty());
 
-        chatMessageStore.removeLobbyHistory(defaultLobby);
+        chatMessageStore.removeLobbyHistory(defaultLobbyName);
 
-        List<ChatMessage> list1 = chatMessageStore.getLatestMessages(1, defaultLobby);
+        List<ChatMessage> list1 = chatMessageStore.getLatestMessages(1, defaultLobbyName);
         assertTrue(list1.isEmpty());
     }
 
@@ -290,9 +291,9 @@ class ChatManagementTest {
      */
     @Test
     void findChatMessageInLobbyTest() {
-        ChatMessage chatMessage = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
+        ChatMessage chatMessage = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
 
-        Optional<ChatMessage> foundMessage = chatManagement.findChatMessage(chatMessage.getID(), defaultLobby);
+        Optional<ChatMessage> foundMessage = chatManagement.findChatMessage(chatMessage.getID(), defaultLobbyName);
 
         assertTrue(foundMessage.isPresent());
         assertEquals(chatMessage.getID(), foundMessage.get().getID());
@@ -341,14 +342,14 @@ class ChatManagementTest {
      */
     @Test
     void getLatestMessagesForLobbyTest() {
-        ChatMessage msg1 = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, secondContent, defaultLobby);
+        ChatMessage msg1 = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
+        ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, secondContent, defaultLobbyName);
         List<ChatMessage> newMessages = new ArrayList<>();
         newMessages.add(msg1);
         newMessages.add(msg2);
 
-        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobby);
-        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(2, secondLobby);
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobbyName);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(2, secondLobbyName);
         List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(2);
 
         assertEquals(newMessages, listFirstLobby);
@@ -377,8 +378,8 @@ class ChatManagementTest {
         newMessages.add(msg1);
         newMessages.add(msg2);
 
-        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobby);
-        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(2, secondLobby);
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobbyName);
+        List<ChatMessage> listSecondLobby = chatManagement.getLatestMessages(2, secondLobbyName);
         List<ChatMessage> listMainMenu = chatManagement.getLatestMessages(2);
 
         assertNotEquals(newMessages, listFirstLobby);
@@ -399,11 +400,11 @@ class ChatManagementTest {
      */
     @Test
     void updateChatMessageForLobbyTest() {
-        chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobby);
-        chatManagement.updateChatMessage(msg2.getID(), secondContent, defaultLobby);
+        chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
+        ChatMessage msg2 = chatMessageStore.createChatMessage(defaultUser, defaultContent, defaultLobbyName);
+        chatManagement.updateChatMessage(msg2.getID(), secondContent, defaultLobbyName);
 
-        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobby);
+        List<ChatMessage> listFirstLobby = chatManagement.getLatestMessages(2, defaultLobbyName);
 
         assertFalse(listFirstLobby.isEmpty());
 
@@ -420,7 +421,7 @@ class ChatManagementTest {
     @Test
     void updateChatMessageForLobbyWithUnknownIdTest() {
         assertThrows(ChatManagementException.class,
-                     () -> chatManagement.updateChatMessage(1, secondContent, defaultLobby));
+                     () -> chatManagement.updateChatMessage(1, secondContent, defaultLobbyName));
     }
 
     /**

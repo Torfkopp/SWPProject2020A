@@ -1,6 +1,7 @@
 package de.uol.swp.server.game;
 
 import com.google.inject.Inject;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.lobby.Lobby;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class GameManagement implements IGameManagement {
 
     private final ILobbyManagement lobbyManagement;
-    private final Map<String, Game> games = new HashMap<>();
+    private final Map<LobbyName, Game> games = new HashMap<>();
 
     @Inject
     public GameManagement(ILobbyManagement lobbyManagement) {
@@ -38,7 +39,7 @@ public class GameManagement implements IGameManagement {
     }
 
     @Override
-    public void dropGame(String lobbyName) throws IllegalArgumentException {
+    public void dropGame(LobbyName lobbyName) throws IllegalArgumentException {
         if (!games.containsKey(lobbyName)) {
             throw new IllegalArgumentException("Game of lobby [" + lobbyName + "] not found!");
         }
@@ -47,12 +48,12 @@ public class GameManagement implements IGameManagement {
     }
 
     @Override
-    public Game getGame(String lobbyName) {
+    public Game getGame(LobbyName lobbyName) {
         return games.get(lobbyName);
     }
 
     @Override
-    public Map<String, Game> getGames() {
+    public Map<LobbyName, Game> getGames() {
         return games;
     }
 }

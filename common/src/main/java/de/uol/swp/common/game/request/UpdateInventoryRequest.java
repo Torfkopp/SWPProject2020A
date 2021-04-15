@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -24,7 +25,7 @@ public class UpdateInventoryRequest extends AbstractGameRequest {
      * @param user        The User wanting to update his Inventory
      * @param originLobby The Lobby from which a request originated from
      */
-    public UpdateInventoryRequest(UserOrDummy user, String originLobby) {
+    public UpdateInventoryRequest(UserOrDummy user, LobbyName originLobby) {
         super(originLobby);
         this.user = user;
     }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -21,7 +22,7 @@ public class BuyDevelopmentCardRequest extends AbstractGameRequest {
      * @param user        The User wanting to buy a developmentCard
      * @param originLobby The Lobby from which a request originated from
      */
-    public BuyDevelopmentCardRequest(UserOrDummy user, String originLobby) {
+    public BuyDevelopmentCardRequest(UserOrDummy user, LobbyName originLobby) {
         super(originLobby);
         this.user = user;
     }
