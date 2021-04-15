@@ -364,7 +364,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             roads.add(mapPoint);
             notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second"));
             if (roads.size() == 2) {
-                gameService.playRoadBuildingCard(lobbyName, roads);
+                gameService.playRoadBuildingCard(lobbyName, new ArrayList<>(roads));
                 roadBuilding = false;
                 notice.setVisible(false);
                 roads.clear();

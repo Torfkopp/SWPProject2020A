@@ -18,8 +18,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -110,7 +110,7 @@ class GameServiceTest {
     void playRoadBuildingCard() throws InterruptedException {
         MapPoint firstPoint = MapPoint.HexMapPoint(3, 5);
         MapPoint secondPoint = MapPoint.HexMapPoint(5, 3);
-        Set<MapPoint> mapPoints = new HashSet<>();
+        List<MapPoint> mapPoints = new ArrayList<>();
         mapPoints.add(firstPoint);
         mapPoints.add(secondPoint);
 
@@ -127,10 +127,10 @@ class GameServiceTest {
         assertEquals(defaultUser.getID(), request.getUser().getID());
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
 
-        assertEquals(secondPoint.getX(), request.getRoads().get(1).getX());
-        assertEquals(secondPoint.getY(), request.getRoads().get(1).getY());
-        assertEquals(firstPoint.getX(), request.getRoads().get(0).getX());
         assertEquals(firstPoint.getY(), request.getRoads().get(0).getY());
+        assertEquals(firstPoint.getX(), request.getRoads().get(0).getX());
+        assertEquals(secondPoint.getY(), request.getRoads().get(1).getY());
+        assertEquals(secondPoint.getX(), request.getRoads().get(1).getX());
     }
 
     @Test
