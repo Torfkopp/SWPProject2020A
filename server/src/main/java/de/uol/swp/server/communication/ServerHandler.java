@@ -291,7 +291,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onPongMessage(PongMessage msg) {
-        if (msg.getSession().isPresent()) LOG.info("Client pong received from " + msg.getSession().get());
+        if (msg.getSession().isPresent()) LOG.trace("Client pong received from " + msg.getSession().get());
     }
 
     /**

@@ -125,7 +125,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         }
 
         User user = userService.getLoggedInUser();
-        String newPassword = confirmPasswordField.getText();
+        String newPassword = userService.hash(confirmPasswordField.getText());
         String newUsername = user.getUsername();
         String newEMail = user.getEMail();
 
@@ -149,7 +149,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                     resourceBundle.getString("changeaccdetails.error.empty.newpasswordconfirm")));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
-                newPassword = newPasswordField.getText();
+                newPassword = userService.hash(newPasswordField.getText());
             }
             if (!Strings.isNullOrEmpty(newUsernameField.getText())) {
                 newUsername = newUsernameField.getText();
@@ -158,7 +158,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 newEMail = newEMailField.getText();
             }
             userService.updateAccountDetails(new UserDTO(user.getID(), newUsername, newPassword, newEMail),
-                                             confirmPasswordField.getText(), user.getUsername(), user.getEMail());
+                                             userService.hash(confirmPasswordField.getText()), user.getUsername(),
+                                             user.getEMail());
         }
     }
 }
