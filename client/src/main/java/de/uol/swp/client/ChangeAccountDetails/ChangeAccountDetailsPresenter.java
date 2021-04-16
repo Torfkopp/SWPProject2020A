@@ -126,6 +126,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
         User user = userService.getLoggedInUser();
         String newPassword = userService.hash(confirmPasswordField.getText());
+        String newHashedPassword = userService.hash(newPasswordField.getText());
+        String newConfirmHashedPassword = userService.hash(newPasswordField2.getText());
         String newUsername = user.getUsername();
         String newEMail = user.getEMail();
 
@@ -144,7 +146,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 .isNullOrEmpty(newPasswordField2.getText())) {
             eventBus.post(
                     new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
-        } else if (!newPasswordField.getText().equals(newPasswordField2.getText())) {
+        } else if (!newHashedPassword.equals(newConfirmHashedPassword)) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.newpasswordconfirm")));
         } else {
