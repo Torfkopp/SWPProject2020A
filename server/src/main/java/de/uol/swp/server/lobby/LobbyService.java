@@ -202,7 +202,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The CreateLobbyRequest found on the EventBus
      *
-     * @see de.uol.swp.server.lobby.ILobbyManagement#createLobby(String, de.uol.swp.common.user.User, int)
+     * @see de.uol.swp.server.lobby.ILobbyManagement#createLobby(String, de.uol.swp.common.user.User, int, String)
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
      * @since 2019-10-08
      */
@@ -210,13 +210,18 @@ public class LobbyService extends AbstractService {
     private void onCreateLobbyRequest(CreateLobbyRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received CreateLobbyRequest for Lobby " + req.getName());
         try {
-            lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayers());
+            lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayers(), req.getPassword());
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
+            LOG.debug("Ist angekommen");
+            if(req.getPassword() == null){
             Message responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
             responseMessage.initWithMessage(req);
             post(responseMessage);
-            sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
+            sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));}
+            else{
+                Message responseMessage = new CreateLobbyWithPasswordResponse(req.getName(), lobby.get(), req.getPassword());
+            }
         } catch (IllegalArgumentException e) {
             Message exceptionMessage = new LobbyExceptionMessage(e.getMessage());
             exceptionMessage.initWithMessage(req);

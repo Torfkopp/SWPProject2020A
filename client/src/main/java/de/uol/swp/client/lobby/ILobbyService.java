@@ -52,7 +52,7 @@ public interface ILobbyService {
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(String name, int maxPlayer);
+    void createNewLobby(String name, int maxPlayer, String password);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus

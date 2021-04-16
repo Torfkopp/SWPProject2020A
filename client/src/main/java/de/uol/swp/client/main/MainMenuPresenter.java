@@ -1,5 +1,6 @@
 package de.uol.swp.client.main;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
@@ -249,6 +250,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
         Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
+        Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password"));
         TextField lobbyName = new TextField(name);
         lobbyName.setTextFormatter(new TextFormatter<>(filter));
         HBox box1 = new HBox(10, lbl, lobbyName);
@@ -259,7 +261,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         threePlayerButton.setToggleGroup(grp);
         fourPlayerButton.setToggleGroup(grp);
         HBox box2 = new HBox(10, threePlayerButton, fourPlayerButton);
-        VBox box = new VBox(10, box1, box2);
+        PasswordField lobbyPassword = new PasswordField();
+        HBox box3 = new HBox(10, lbl1, lobbyPassword);
+        VBox box = new VBox(10, box1, box2, box3);
         dialogue.getDialogPane().setContent(box);
         //dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
 
@@ -273,7 +277,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers));
+        if(lobbyPassword.getText().isEmpty()){
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, null));}
+        else {result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, lobbyPassword.getText()));}
     }
 
     /**

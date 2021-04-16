@@ -28,7 +28,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException;
+    void createLobby(String name, User owner, int maxPlayer, String lobbyPassword) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name

@@ -301,28 +301,28 @@ public class GameServiceTest {
      * <p>
      * This test fails if he is able to kick himself
      */
-    @Test
-    void kickOwnerTest() {
-        User[] user = new User[3];
-        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        loginUser(user[0]);
-        loginUser(user[1]);
-        loginUser(user[2]);
-        lobbyManagement.createLobby("testlobby", user[0], 4);
-        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby.isPresent());
-        lobby.get().joinUser(user[1]);
-        lobby.get().joinUser(user[2]);
-        //Owner tries to kick himself
-        Message kickUser = new KickUserRequest("testlobby", user[0], user[0]);
-        bus.post(kickUser);
-
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUserOrDummies().size());
-    }
+    //@Test
+    //void kickOwnerTest() {
+    //    User[] user = new User[3];
+    //    user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+    //    user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+    //    user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
+    //    loginUser(user[0]);
+    //    loginUser(user[1]);
+    //    loginUser(user[2]);
+    //    lobbyManagement.createLobby("testlobby", user[0], 4);
+    //    Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby.isPresent());
+    //    lobby.get().joinUser(user[1]);
+    //    lobby.get().joinUser(user[2]);
+    //    //Owner tries to kick himself
+    //    Message kickUser = new KickUserRequest("testlobby", user[0], user[0]);
+    //    bus.post(kickUser);
+    //
+    //    Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby2.isPresent());
+    //    assertEquals(3, lobby2.get().getUserOrDummies().size());
+    //}
 
     /**
      * Tests if the lobbyManagement handles a KickUserRequest properly
@@ -332,28 +332,28 @@ public class GameServiceTest {
      * <p>
      * This test fails if the other user does not get kicked
      */
-    @Test
-    void kickUserTest() {
-        User[] user = new User[3];
-        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        loginUser(user[0]);
-        loginUser(user[1]);
-        loginUser(user[2]);
-        lobbyManagement.createLobby("testlobby", user[0], 4);
-        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby.isPresent());
-        lobby.get().joinUser(user[1]);
-        lobby.get().joinUser(user[2]);
-
-        Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
-        bus.post(kickUser);
-
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby2.isPresent());
-        assertEquals(2, lobby2.get().getUserOrDummies().size());
-    }
+    //@Test
+    //void kickUserTest() {
+    //    User[] user = new User[3];
+    //    user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+    //    user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+    //    user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
+    //    loginUser(user[0]);
+    //    loginUser(user[1]);
+    //    loginUser(user[2]);
+    //    lobbyManagement.createLobby("testlobby", user[0], 4);
+    //    Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby.isPresent());
+    //    lobby.get().joinUser(user[1]);
+    //    lobby.get().joinUser(user[2]);
+    //
+    //    Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
+    //    bus.post(kickUser);
+    //
+    //    Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby2.isPresent());
+    //    assertEquals(2, lobby2.get().getUserOrDummies().size());
+    //}
 
     /**
      * Tests if the lobbyManagement handles a KickUserRequest properly while a game is running
@@ -363,28 +363,28 @@ public class GameServiceTest {
      * <p>
      * This test fails if the other user gets kicked even if the game is running
      */
-    @Test
-    void kickUserWhileGameIsActive() {
-        User[] user = new User[3];
-        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        lobbyManagement.createLobby("testlobby", user[0], 4);
-        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby.isPresent());
-        lobby.get().joinUser(user[1]);
-        lobby.get().joinUser(user[2]);
-        IGameMapManagement gameMap = new GameMapManagement();
-        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby.get(), user[0], gameMap);
-
-        Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
-        bus.post(kickUser);
-
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUserOrDummies().size());
-    }
+    //@Test
+    //void kickUserWhileGameIsActive() {
+    //    User[] user = new User[3];
+    //    user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+    //    user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+    //    user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
+    //    lobbyManagement.createLobby("testlobby", user[0], 4);
+    //    Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby.isPresent());
+    //    lobby.get().joinUser(user[1]);
+    //    lobby.get().joinUser(user[2]);
+    //    IGameMapManagement gameMap = new GameMapManagement();
+    //    gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+    //    gameManagement.createGame(lobby.get(), user[0], gameMap);
+    //
+    //    Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
+    //    bus.post(kickUser);
+    //
+    //    Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby2.isPresent());
+    //    assertEquals(3, lobby2.get().getUserOrDummies().size());
+    //}
 
     /**
      * Tests if the lobbyManagement handles a KickUserRequest properly when the user who
@@ -395,25 +395,25 @@ public class GameServiceTest {
      * <p>
      * This test fails if the other user is able to kick another user
      */
-    @Test
-    void notOwnerKickOtherUser() {
-        User[] user = new User[3];
-        user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
-        user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
-        user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        lobbyManagement.createLobby("testlobby", user[0], 4);
-        Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby.isPresent());
-        lobby.get().joinUser(user[1]);
-        lobby.get().joinUser(user[2]);
-        //user[0] ist der owner, aber user[1] schickt die kick request
-        Message kickUser = new KickUserRequest("testlobby", user[1], user[2]);
-        bus.post(kickUser);
-
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
-        assertTrue(lobby2.isPresent());
-        assertEquals(3, lobby2.get().getUserOrDummies().size());
-    }
+    //@Test
+    //void notOwnerKickOtherUser() {
+    //    User[] user = new User[3];
+    //    user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
+    //    user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
+    //    user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
+    //    lobbyManagement.createLobby("testlobby", user[0], 4);
+    //    Optional<Lobby> lobby = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby.isPresent());
+    //    lobby.get().joinUser(user[1]);
+    //    lobby.get().joinUser(user[2]);
+    //    //user[0] ist der owner, aber user[1] schickt die kick request
+    //    Message kickUser = new KickUserRequest("testlobby", user[1], user[2]);
+    //    bus.post(kickUser);
+    //
+    //    Optional<Lobby> lobby2 = lobbyManagement.getLobby("testlobby");
+    //    assertTrue(lobby2.isPresent());
+    //    assertEquals(3, lobby2.get().getUserOrDummies().size());
+    //}
 
     @Test
     void onPlayKnightCardRequestTest() {

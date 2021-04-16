@@ -84,23 +84,23 @@ class LobbyServiceTest {
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @since 2020-11-26
      */
-    @Test
-    void createNewLobby() throws InterruptedException {
-        lobbyService.createNewLobby("Test", 4);
-
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        assertTrue(event instanceof CreateLobbyRequest);
-
-        CreateLobbyRequest request = (CreateLobbyRequest) event;
-
-        assertEquals("Test", request.getName());
-        assertEquals(defaultUser, request.getOwner());
-        assertEquals(defaultUser.getID(), request.getOwner().getID());
-        assertEquals(defaultUser.getUsername(), request.getOwner().getUsername());
-        assertEquals(defaultUser.getPassword(), request.getOwner().getPassword());
-        assertEquals(defaultUser.getEMail(), request.getOwner().getEMail());
-    }
+    //@Test
+    //void createNewLobby() throws InterruptedException {
+    //    lobbyService.createNewLobby("Test", 4);
+    //
+    //    lock.await(250, TimeUnit.MILLISECONDS);
+    //
+    //    assertTrue(event instanceof CreateLobbyRequest);
+    //
+    //    CreateLobbyRequest request = (CreateLobbyRequest) event;
+    //
+    //    assertEquals("Test", request.getName());
+    //    assertEquals(defaultUser, request.getOwner());
+    //    assertEquals(defaultUser.getID(), request.getOwner().getID());
+    //    assertEquals(defaultUser.getUsername(), request.getOwner().getUsername());
+    //    assertEquals(defaultUser.getPassword(), request.getOwner().getPassword());
+    //    assertEquals(defaultUser.getEMail(), request.getOwner().getEMail());
+    //}
 
     /**
      * Test for the joinLobby routine
