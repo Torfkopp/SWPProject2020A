@@ -34,7 +34,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
         int id;
         if (usersByName.containsKey(username)) id = usersByName.get(username).getID();
         else id = id_counter++;
-        User usr = new UserDTO(id, username, hash(password), eMail);
+        User usr = new UserDTO(id, username, password, eMail);
         usersById.put(id, usr);
         usersByName.put(username, usr);
         return usr.getWithoutPassword();
@@ -61,7 +61,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     @Override
     public Optional<User> findUser(String username, String password) {
         User usr = usersByName.get(username);
-        if (usr != null && Objects.equals(usr.getPassword(), hash(password))) {
+        if (usr != null && Objects.equals(usr.getPassword(), password)) {
             return Optional.of(usr.getWithoutPassword());
         }
         return Optional.empty();
@@ -105,7 +105,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
         if (!user.get().getUsername().equals(username) && findUser(username).isPresent())
             throw new IllegalArgumentException("Username already taken");
         removeUser(user.get().getUsername());
-        User usr = new UserDTO(id, username, hash(password), eMail);
+        User usr = new UserDTO(id, username, password, eMail);
         usersByName.put(username, usr);
         usersById.put(id, usr);
         return usr.getWithoutPassword();

@@ -122,8 +122,8 @@ public class RegistrationPresenter extends AbstractPresenter {
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
         } else {
-            userService
-                    .createUser(new UserDTO(-1, loginField.getText(), passwordField1.getText(), emailField.getText()));
+            userService.createUser(new UserDTO(-1, loginField.getText(), userService.hash(passwordField1.getText()),
+                                               emailField.getText()));
         }
     }
 }
