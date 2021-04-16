@@ -84,15 +84,15 @@ public class UserService implements IUserService {
     /**
      * Posts a LoginRequest onto the EventBus
      *
-     * @param username the user's name
-     * @param password the user's password
+     * @param username     the user's name
+     * @param passwordHash the user's hashed password
      *
      * @since 2017-03-17
      */
     @Override
-    public void login(String username, String password) {
+    public void login(String username, String passwordHash) {
         LOG.debug("Sending LoginRequest");
-        Message msg = new LoginRequest(username, password);
+        Message msg = new LoginRequest(username, passwordHash);
         bus.post(msg);
     }
 
@@ -125,33 +125,19 @@ public class UserService implements IUserService {
      * with the user, his oldPassword, oldUsername and oldEMail as parameter
      * and posts this instance onto the EventBus.
      *
-     * @param user        The user to update
-     * @param oldPassword The password to change and verified
-     * @param oldUsername The Username to change
-     * @param oldEMail    The EMail to change
+     * @param user              The user to update
+     * @param oldHashedPassword The hashed password to change and verified
+     * @param oldUsername       The Username to change
+     * @param oldEMail          The EMail to change
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17
      */
     @Override
-    public void updateAccountDetails(User user, String oldPassword, String oldUsername, String oldEMail) {
+    public void updateAccountDetails(User user, String oldHashedPassword, String oldUsername, String oldEMail) {
         LOG.debug("Sending UpdateAccountDetailsRequest");
-        Message request = new UpdateUserAccountDetailsRequest(user, oldPassword, oldUsername, oldEMail);
-        bus.post(request);
-    }
-
-    /**
-     * Posts a UpdateUserRequest onto the EventBus.
-     *
-     * @param user The User object containing all infos to update.
-     *             If some values are not set (e.g. password is ""),
-     *             these fields are not updated
-     */
-    @Override
-    public void updateUser(User user) {
-        LOG.debug("Sending UpdateUserRequest");
-        Message request = new UpdateUserRequest(user);
+        Message request = new UpdateUserAccountDetailsRequest(user, oldHashedPassword, oldUsername, oldEMail);
         bus.post(request);
     }
 

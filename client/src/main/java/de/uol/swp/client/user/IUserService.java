@@ -1,6 +1,9 @@
 package de.uol.swp.client.user;
 
+import com.google.common.hash.Hashing;
 import de.uol.swp.common.user.User;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * An interface for all methods of the client's UserService
@@ -11,6 +14,7 @@ import de.uol.swp.common.user.User;
  * @author Marco Grawunder
  * @since 2017-03-17
  */
+@SuppressWarnings("UnstableApiUsage")
 public interface IUserService {
 
     /**
@@ -20,8 +24,6 @@ public interface IUserService {
      *
      * @param user The user to create
      *
-     * @implNote The User object has to contain a unique identifier in order to
-     * remove the correct user
      * @since 2019-09-02
      */
     void createUser(User user);
@@ -62,16 +64,31 @@ public interface IUserService {
     void setLoggedInUser(User loggedInUser);
 
     /**
+     * Calculates the hash for a given String
+     *
+     * @param toHash The string to calculate the hash for
+     *
+     * @return String containing the calculated hash
+     *
+     * @implSpec The hash method used is sha256
+     * @author Phillip-André Suhr
+     * @since 2021-04-16
+     */
+    default String hash(String toHash) {
+        return Hashing.sha256().hashString(toHash, StandardCharsets.UTF_8).toString();
+    }
+
+    /**
      * Login with a username and a password
      * <p>
      * This method logs the user in.
      *
-     * @param username the user's name
-     * @param password the user's password
+     * @param username     the user's name
+     * @param passwordHash the user's hashed password
      *
      * @since 2017-03-17
      */
-    void login(String username, String password);
+    void login(String username, String passwordHash);
 
     /**
      * Log out from server
@@ -94,29 +111,14 @@ public interface IUserService {
     /**
      * Update a user's account details
      *
-     * @param user        The user changing the Account Details
-     * @param oldPassword The password that is to be changed
-     * @param oldUsername The Username that is to be changed
-     * @param oldEMail    The EMail that is to be changed
+     * @param user              The user changing the Account Details
+     * @param oldHashedPassword The hashed password that is to be changed
+     * @param oldUsername       The Username that is to be changed
+     * @param oldEMail          The EMail that is to be changed
      *
      * @author Eric Vuong
      * @author Steven Luong
      * @since 2020-12-17
      */
-    void updateAccountDetails(User user, String oldPassword, String oldUsername, String oldEMail);
-
-    /**
-     * Update a user
-     * <p>
-     * This method updates the user specified by the User object.
-     *
-     * @param user The User object containing all infos to update.
-     *             If some values are not set (e.g. password is ""),
-     *             these fields are not updated
-     *
-     * @implNote The User object has to contain a unique identifier in order to
-     * update the correct user
-     * @since 2019-09-02
-     */
-    void updateUser(User user);
+    void updateAccountDetails(User user, String oldHashedPassword, String oldUsername, String oldEMail);
 }
