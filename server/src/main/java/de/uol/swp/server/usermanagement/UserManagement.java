@@ -37,7 +37,12 @@ public class UserManagement extends AbstractUserManagement {
         if (user.isPresent()) {
             throw new UserManagementException("Username already used!");
         }
-        return userStore.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
+        try {
+            return userStore
+                    .createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
+        } catch (RuntimeException e) {
+            throw new UserManagementException(e.getMessage());
+        }
     }
 
     @Override
@@ -96,11 +101,15 @@ public class UserManagement extends AbstractUserManagement {
         if (user.isEmpty()) {
             throw new UserManagementException("User unknown!");
         }
-        // Only update if there are new values
-        String newUsername = firstNotNull(userToUpdate.getUsername(), user.get().getUsername());
-        String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
-        String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
-        return userStore.updateUser(user.get().getID(), newUsername, newPassword, newEMail);
+        try {
+            // Only update if there are new values
+            String newUsername = firstNotNull(userToUpdate.getUsername(), user.get().getUsername());
+            String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
+            String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
+            return userStore.updateUser(user.get().getID(), newUsername, newPassword, newEMail);
+        } catch (RuntimeException e) {
+            throw new UserManagementException(e.getMessage());
+        }
     }
 
     /**

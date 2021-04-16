@@ -27,7 +27,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     private int id_counter;
 
     @Override
-    public User createUser(String username, String password, String eMail) {
+    public User createUser(String username, String password, String eMail) throws IllegalArgumentException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -98,7 +98,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     }
 
     @Override
-    public User updateUser(int id, String username, String password, String eMail) {
+    public User updateUser(int id, String username, String password, String eMail) throws IllegalArgumentException {
         Optional<User> user = findUser(id);
         if (user.isEmpty()) throw new IllegalArgumentException("No user with this ID found");
         if (Strings.isNullOrEmpty(username)) throw new IllegalArgumentException("Username must not be null");
@@ -112,7 +112,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     }
 
     @Override
-    public User updateUser(String username, String password, String eMail) {
+    public User updateUser(String username, String password, String eMail) throws IllegalArgumentException {
         Optional<User> user = findUser(username);
         if (user.isEmpty()) throw new IllegalArgumentException("No user with this name found");
         else return createUser(username, password, eMail);

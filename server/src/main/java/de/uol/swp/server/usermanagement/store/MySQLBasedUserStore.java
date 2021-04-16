@@ -40,7 +40,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * @since 2021-02-10
      */
     @Override
-    public User createUser(String username, String password, String eMail) {
+    public User createUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -381,7 +381,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      * @since 2021-02-10
      */
     @Override
-    public User updateUser(int id, String username, String password, String eMail) {
+    public User updateUser(int id, String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -422,7 +422,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
     }
 
     @Override
-    public User updateUser(String username, String password, String eMail) {
+    public User updateUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
