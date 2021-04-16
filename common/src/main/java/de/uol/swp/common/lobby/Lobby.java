@@ -110,7 +110,7 @@ public interface Lobby extends Serializable {
      *
      * @since 2019-10-08
      */
-    UserOrDummy getOwner();
+    User getOwner();
 
     /**
      * Gets a set of all users marked as ready.

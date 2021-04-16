@@ -13,6 +13,17 @@ import de.uol.swp.common.user.UserOrDummy;
 public interface ILobbyService {
 
     /**
+     * Posts a request to change the owner status of a user in a lobby
+     *
+     * @param lobbyName The name of the lobby the user wants to change the owner
+     * @param newOwner  The new owner
+     *
+     * @author Maximillian Lindner
+     * @since 2021-04-15
+     */
+    void changeOwner(String lobbyName, UserOrDummy newOwner);
+
+    /**
      * Checks if the lobby is in a game
      *
      * @param lobbyName LobbyName to check
