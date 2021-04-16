@@ -108,8 +108,9 @@
         <HBox prefHeight="30.0" prefWidth="230.0">
             <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
                     prefHeight="30.0" prefWidth="115.0" text="%lobby.game.buttons.rolldice" visible="false"/>
-            <CheckBox fx:id="autoRoll" mnemonicParsing="false" onAction="#onAutoRollCheckBoxClicked"
-                      prefHeight="30.0" prefWidth="115.0" text="%lobby.game.autorollcheckbox" visible="false"/>
+            <CheckBox fx:id="autoRoll" nodeOrientation="RIGHT_TO_LEFT" mnemonicParsing="false"
+                      onAction="#onAutoRollCheckBoxClicked" prefHeight="30.0" prefWidth="115.0"
+                      text="%lobby.game.autorollcheckbox" visible="false"/>
         </HBox>
         <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
                 prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.endturn" visible="false"/>

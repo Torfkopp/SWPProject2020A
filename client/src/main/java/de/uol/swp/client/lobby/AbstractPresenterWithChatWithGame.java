@@ -393,7 +393,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
-        if (!rollDice.isDisabled() && autoRollEnabled) onEndTurnButtonPressed();
+        if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }
 
     /**
