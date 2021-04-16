@@ -32,9 +32,9 @@ import java.util.*;
 public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGamePhase {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-    public static final int MIN_HEIGHT_PRE_GAME = 700;
+    public static final int MIN_HEIGHT_PRE_GAME = 825;
     public static final int MIN_WIDTH_PRE_GAME = 685;
-    public static final int MIN_HEIGHT_IN_GAME = 740;
+    public static final int MIN_HEIGHT_IN_GAME = 825;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -103,6 +103,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
+                setChangeOwnerButtonState();
             }
             setPreGameSettings();
         });
@@ -157,6 +158,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+        changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
 
         addSizeChangeListener();
@@ -215,6 +217,14 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("Received a AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
+        if (owner != msg.getLobby().getOwner()) {
+            owner = msg.getLobby().getOwner();
+            prepareMembersView();
+            setStartSessionButtonState();
+            setKickUserButtonState();
+            setChangeOwnerButtonState();
+            setPreGameSettings();
+        }
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
         randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
         commandsActivated.setSelected(msg.getLobby().commandsAllowed());
@@ -350,17 +360,21 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
                 return;
             }
             String name = newValue.getUsername();
             boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
+            changeOwnerButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
                 tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
             } else {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
+                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), name));
                 tradeWithUserButton
                         .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
             }
