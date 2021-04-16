@@ -297,11 +297,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
             rollDice.setVisible(false);
+            autoRoll.setVisible(false);
             endTurn.setVisible(false);
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
-            rollDice.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
@@ -350,6 +350,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
             endTurn.setDisable(true);
+            autoRoll.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
