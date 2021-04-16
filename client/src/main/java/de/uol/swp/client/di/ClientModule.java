@@ -18,8 +18,10 @@ import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
 import javafx.fxml.FXMLLoader;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.*;
 import java.util.Locale;
@@ -47,6 +49,7 @@ public class ClientModule extends AbstractModule {
         //Default settings
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
+        defaultProps.setProperty("debug.loglevel", "DEBUG");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -58,6 +61,12 @@ public class ClientModule extends AbstractModule {
         } catch (IOException e) {
             System.out.println("Error reading config file");
         }
+
+        Level loglevel = Level.toLevel(properties.getProperty("debug.loglevel"));
+        LOG.info("Switching to selected LOG-Level in config File: " + loglevel);
+        Configurator.setAllLevels(LogManager.getRootLogger().getName(), loglevel);
+        // override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
+        Configurator.setLevel("io.netty", Level.WARN);
 
         LOG.debug("Selected Language in config File: " + properties.getProperty("lang"));
 
