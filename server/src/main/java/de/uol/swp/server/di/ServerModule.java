@@ -16,8 +16,10 @@ import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import de.uol.swp.server.usermanagement.*;
 import de.uol.swp.server.usermanagement.store.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.*;
 import java.util.Properties;
@@ -43,6 +45,7 @@ public class ServerModule extends AbstractModule {
 
         //Default language
         defaultProps.setProperty("db", "h2");
+        defaultProps.setProperty("debug.loglevel", "DEBUG");
 
         //Reading properties-file
         final Properties serverProperties = new Properties(defaultProps);
@@ -54,6 +57,12 @@ public class ServerModule extends AbstractModule {
         } catch (IOException e) {
             System.out.println("Error reading config file");
         }
+
+        Level loglevel = Level.toLevel(serverProperties.getProperty("debug.loglevel"));
+        LOG.info("Switching to selected LOG-Level: " + loglevel);
+        Configurator.setAllLevels(LogManager.getRootLogger().getName(), loglevel);
+        // override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
+        Configurator.setLevel("io.netty", Level.WARN);
 
         LOG.debug("Selected database backend: " + serverProperties.getProperty("db"));
         switch (serverProperties.getProperty("db")) {

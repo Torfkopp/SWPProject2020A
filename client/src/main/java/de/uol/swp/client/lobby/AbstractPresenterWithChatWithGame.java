@@ -77,6 +77,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
     @FXML
     protected Label buildingCosts;
+    @FXML
+    protected CheckBox autoRoll;
 
     @Inject
     protected IGameService gameService;
@@ -90,6 +92,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean robberNewPosition = false;
     protected boolean roadBuilding = false;
     protected Set<MapPoint> roads = new HashSet<>();
+    protected boolean autoRollEnabled = false;
     protected boolean inGame;
     protected int moveTime;
     protected User owner;
@@ -215,6 +218,20 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         disableButtonStates();
         rollDice.setDisable(true);
         gameService.updateInventory(lobbyName);
+    }
+
+    /**
+     * Handles the click on the autoRollCheckBox
+     * <p>
+     * Method called when the autoRollCheckBox is clicked.
+     * It enables and disables autoRoll.
+     *
+     * @author Mario Fokken
+     * @since 2021-04-15
+     */
+    @FXML
+    private void onAutoRollCheckBoxClicked() {
+        autoRollEnabled = autoRoll.isSelected();
     }
 
     /**
@@ -389,6 +406,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
+        if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }
 
     /**
