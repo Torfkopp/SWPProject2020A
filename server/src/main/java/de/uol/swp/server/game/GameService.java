@@ -142,6 +142,78 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to make a Map of Development Cards as required by
+     * MapValueFactories from a provided inventory.
+     *
+     * @param inventory The inventory to make a Map from
+     *
+     * @return List of Development Cards as Maps with keys "amount" and "card"
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-18
+     */
+    private List<Map<String, Object>> getDevelopmentCardListFromInventory(Inventory inventory) {
+        HashMap<String, Object> vpMap = new HashMap<>();
+        vpMap.put("amount", inventory.getVictoryPointCards());
+        vpMap.put("card", "game.resources.cards.victorypoints");
+        HashMap<String, Object> kMap = new HashMap<>();
+        kMap.put("amount", inventory.getKnightCards());
+        kMap.put("card", "game.resources.cards.knight");
+        HashMap<String, Object> rbMap = new HashMap<>();
+        rbMap.put("amount", inventory.getRoadBuildingCards());
+        rbMap.put("card", "game.resources.cards.roadbuilding");
+        HashMap<String, Object> yopMap = new HashMap<>();
+        yopMap.put("amount", inventory.getYearOfPlentyCards());
+        yopMap.put("card", "game.resources.cards.yearofplenty");
+        HashMap<String, Object> mMap = new HashMap<>();
+        mMap.put("amount", inventory.getMonopolyCards());
+        mMap.put("card", "game.resources.cards.monopoly");
+        List<Map<String, Object>> cardList = new ArrayList<>();
+        cardList.add(vpMap);
+        cardList.add(kMap);
+        cardList.add(rbMap);
+        cardList.add(yopMap);
+        cardList.add(mMap);
+        return cardList;
+    }
+
+    /**
+     * Helper method to make a Map of Resources as required by
+     * MapValueFactories from a provided inventory.
+     *
+     * @param inventory The inventory to make a Map from
+     *
+     * @return List of Resources Maps with keys "amount" and "resource"
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-18
+     */
+    private List<Map<String, Object>> getResourceListFromInventory(Inventory inventory) {
+        HashMap<String, Object> brickMap = new HashMap<>();
+        brickMap.put("amount", inventory.getBrick());
+        brickMap.put("resource", Resources.BRICK);
+        Map<String, Object> grainMap = new HashMap<>();
+        grainMap.put("amount", inventory.getGrain());
+        grainMap.put("resource", Resources.GRAIN);
+        Map<String, Object> lumberMap = new HashMap<>();
+        lumberMap.put("amount", inventory.getLumber());
+        lumberMap.put("resource", Resources.LUMBER);
+        Map<String, Object> oreMap = new HashMap<>();
+        oreMap.put("amount", inventory.getOre());
+        oreMap.put("resource", Resources.ORE);
+        Map<String, Object> woolMap = new HashMap<>();
+        woolMap.put("amount", inventory.getWool());
+        woolMap.put("resource", Resources.WOOL);
+        List<Map<String, Object>> resourceList = new ArrayList<>();
+        resourceList.add(brickMap);
+        resourceList.add(grainMap);
+        resourceList.add(lumberMap);
+        resourceList.add(oreMap);
+        resourceList.add(woolMap);
+        return resourceList;
+    }
+
+    /**
      * Helper method to make a resourceMap from a provided inventory
      *
      * @param inventory The inventory to make a resourceMap from
@@ -558,20 +630,10 @@ public class GameService extends AbstractService {
                 break;
         }
         inventory = game.getInventory(req.getUser());
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
-        resourceMap.put("game.resources.cards.victorypoints", inventory.getVictoryPointCards());
-        resourceMap.put("game.resources.cards.knight", inventory.getKnightCards());
-        resourceMap.put("game.resources.cards.roadbuilding", inventory.getRoadBuildingCards());
-        resourceMap.put("game.resources.cards.yearofplenty", inventory.getYearOfPlentyCards());
-        resourceMap.put("game.resources.cards.monopoly", inventory.getMonopolyCards());
-
-        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("game.resources.cards.unique.largestarmy", inventory.isLargestArmy());
-        armyAndRoadMap.put("game.resources.cards.unique.longestroad", inventory.isLongestRoad());
-
+        List<Map<String, Object>> developmentCardList = getDevelopmentCardListFromInventory(inventory);
+        List<Map<String, Object>> resourceList = getResourceListFromInventory(inventory);
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                    Collections.unmodifiableMap(resourceMap),
-                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+                                                                    developmentCardList, resourceList);
         LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
         post(new ForwardToUserInternalRequest(req.getUser(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
@@ -1527,20 +1589,10 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
-        resourceMap.put("game.resources.cards.victorypoints", inventory.getVictoryPointCards());
-        resourceMap.put("game.resources.cards.knight", inventory.getKnightCards());
-        resourceMap.put("game.resources.cards.roadbuilding", inventory.getRoadBuildingCards());
-        resourceMap.put("game.resources.cards.yearofplenty", inventory.getYearOfPlentyCards());
-        resourceMap.put("game.resources.cards.monopoly", inventory.getMonopolyCards());
-
-        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("game.resources.cards.unique.largestarmy", inventory.isLargestArmy());
-        armyAndRoadMap.put("game.resources.cards.unique.longestroad", inventory.isLongestRoad());
-
+        List<Map<String, Object>> developmentCardList = getDevelopmentCardListFromInventory(inventory);
+        List<Map<String, Object>> resourceList = getResourceListFromInventory(inventory);
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                    Collections.unmodifiableMap(resourceMap),
-                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+                                                                    developmentCardList, resourceList);
         returnMessage.initWithMessage(req);
         LOG.debug("Sending UpdateInventoryResponse for Lobby " + req.getOriginLobby());
         post(returnMessage);

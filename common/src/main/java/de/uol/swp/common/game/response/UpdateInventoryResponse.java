@@ -3,6 +3,7 @@ package de.uol.swp.common.game.response;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,44 +17,54 @@ import java.util.Map;
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<String, Integer> resourceMap;
-    private final Map<String, Boolean> armyAndRoadMap;
+    private final List<Map<String, Object>> resourceList;
+    private final List<Map<String, Object>> developmentCardList;
 
     /**
      * Constructor
      *
-     * @param user           The user wanting to update the inventory
-     * @param lobbyName      The lobby for which the update is supposed to happen in
-     * @param resourceMap    The Map containing the name of a resource as key and the amount as value
-     * @param armyAndRoadMap The Map containing "Largest Army" and "Longest Road" with the appropriate boolean as the value
+     * @param user                The user wanting to update the inventory
+     * @param lobbyName           The lobby for which the update is supposed to happen in
+     * @param developmentCardList List of the Resources in the user's inventory, containing Maps
+     *                            containing the following for each type of Resource:<p>
+     *                            {@literal {"amount": <Integer>, "resource", <Resource>}}
+     * @param resourceList        List of the Development Cards in the user's inventory, containing
+     *                            Maps containing the following for each type of Development Card:<p>
+     *                            {@literal {"amount": <Integer>, "card": "game.resources.cards.<Dev Card key>"}}
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-17
      */
-    public UpdateInventoryResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
-                                   Map<String, Boolean> armyAndRoadMap) {
+    public UpdateInventoryResponse(UserOrDummy user, String lobbyName, List<Map<String, Object>> developmentCardList,
+                                   List<Map<String, Object>> resourceList) {
         super(lobbyName);
         this.user = user;
-        this.resourceMap = resourceMap;
-        this.armyAndRoadMap = armyAndRoadMap;
+        this.resourceList = resourceList;
+        this.developmentCardList = developmentCardList;
     }
 
     /**
-     * Gets the army and road map, containing mappings of "Largest Army" and
-     * "Longest Road" to their appropriate boolean values.
+     * Gets the list of Development Card maps for the MapValueFactory
      *
-     * @return The army and road map
+     * @return List of Maps for MapValueFactory
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-17
      */
-    public Map<String, Boolean> getArmyAndRoadMap() {
-        return armyAndRoadMap;
+    public List<Map<String, Object>> getDevelopmentCardList() {
+        return developmentCardList;
     }
 
     /**
-     * Gets the resource map, containing mappings of resource name to resource amount.
-     * <p>
-     * E.g. "Bricks", 1
+     * Gets the list of Resource maps for the MapValueFactory
      *
-     * @return The resource map
+     * @return List of Maps for MapValueFactory
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-17
      */
-    public Map<String, Integer> getResourceMap() {
-        return resourceMap;
+    public List<Map<String, Object>> getResourceList() {
+        return resourceList;
     }
 
     /**
