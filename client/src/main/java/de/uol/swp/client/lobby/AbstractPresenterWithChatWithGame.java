@@ -175,7 +175,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper function that sets the text's text.
      * <p>
-     * The text states whose turn it is.
+     * The text states whose turn it is. It is colored in the color of the player whose turn it is.
      *
      * @author Alwin Bossert
      * @author Mario Fokken
@@ -183,8 +183,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
-        Platform.runLater(() -> turnIndicator
-                .setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername())));
+        Platform.runLater(() -> {
+            turnIndicator.setText(
+                    String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername()));
+
+            ObservableList<UserOrDummy> membersList = membersView.getItems();
+            if (user.equals(membersList.get(0))) {
+                turnIndicator.setTextFill(GameRendering.PLAYER_1_COLOUR);
+            }
+            if (user.equals(membersList.get(1))) {
+                turnIndicator.setTextFill(GameRendering.PLAYER_2_COLOUR);
+            }
+            if (user.equals(membersList.get(2))) {
+                turnIndicator.setTextFill(GameRendering.PLAYER_3_COLOUR);
+            }
+            if (user.equals(membersList.get(3))) {
+                turnIndicator.setTextFill(GameRendering.PLAYER_4_COLOUR);
+            }
+        });
     }
 
     /**
