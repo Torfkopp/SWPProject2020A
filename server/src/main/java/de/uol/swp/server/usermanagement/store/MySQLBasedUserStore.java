@@ -45,8 +45,6 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             throw new IllegalArgumentException("Username must not be null");
         }
 
-        String passwordHash = hash(password);
-
         if (findUser(username).isEmpty()) {
             try {
                 Class.forName(JDBC_DRIVER);
@@ -57,7 +55,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
-                pstmt.setString(3, passwordHash);
+                pstmt.setString(3, password);
                 pstmt.executeUpdate();
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
@@ -185,8 +183,6 @@ public class MySQLBasedUserStore extends AbstractUserStore {
      */
     @Override
     public Optional<User> findUser(String username, String password) {
-        String passwordHash = hash(password);
-
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -203,7 +199,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
-                if (user.equals(username) && pass.equals(passwordHash)) {
+                if (user.equals(username) && pass.equals(password)) {
                     User usr = new UserDTO(userId, user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
@@ -386,8 +382,6 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             throw new IllegalArgumentException("Username must not be null");
         }
 
-        String passwordHash = hash(password);
-
         Optional<User> user = findUser(username);
         if (user.isPresent() && user.get().getID() != id) throw new IllegalArgumentException("Username already taken");
 
@@ -399,7 +393,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             String sql = "UPDATE userdb SET username = ?, pass = ?, mail = ? WHERE id = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
-            pstmt.setString(2, passwordHash);
+            pstmt.setString(2, password);
             pstmt.setString(3, eMail);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
@@ -427,8 +421,6 @@ public class MySQLBasedUserStore extends AbstractUserStore {
             throw new IllegalArgumentException("Username must not be null");
         }
 
-        String passwordHash = hash(password);
-
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -436,7 +428,7 @@ public class MySQLBasedUserStore extends AbstractUserStore {
 
             String sql = "UPDATE userdb SET pass = ?, mail = ? WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, passwordHash);
+            pstmt.setString(1, password);
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();

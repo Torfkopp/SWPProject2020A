@@ -43,7 +43,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onLoginButtonPressed() {
-        userService.login(loginField.getText(), passwordField.getText());
+        userService.login(loginField.getText(), userService.hash(passwordField.getText()));
     }
 
     /**

@@ -23,8 +23,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,7 +58,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
     private ObservableList<Pair<String, String>> lobbies;
     private ObservableList<String> users;
-    private Window window;
 
     /**
      * Constructor
@@ -519,18 +516,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
-
-        if (this.window == null) {
-            this.window = this.usersView.getScene().getWindow();
-        }
-        try {
-            this.window.setOnCloseRequest(event -> {
-                logout();
-                ((Stage) event.getSource()).close();
-                clearEventBus();
-            });
-        } catch (Exception ignored) {
-        }
     }
 
     /**
