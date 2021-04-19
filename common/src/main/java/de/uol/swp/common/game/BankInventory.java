@@ -13,21 +13,21 @@ import java.util.*;
 public class BankInventory extends AbstractInventory {
 
     public BankInventory() {
-        for (Resource resource : Resource.values())
+        for (Resource.ResourceType resource : Resource.ResourceType.values())
             resources.put(resource, 100);
-        developmentCards.put(DevelopmentCard.KNIGHT_CARD, 14);
-        developmentCards.put(DevelopmentCard.ROAD_BUILDING_CARD, 2);
-        developmentCards.put(DevelopmentCard.YEAR_OF_PLENTY_CARD, 2);
-        developmentCards.put(DevelopmentCard.MONOPOLY_CARD, 2);
-        developmentCards.put(DevelopmentCard.VICTORY_POINT_CARD, 5);
+        developmentCards.put(DevelopmentCard.DevelopmentCardType.KNIGHT_CARD, 14);
+        developmentCards.put(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD, 2);
+        developmentCards.put(DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD, 2);
+        developmentCards.put(DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD, 2);
+        developmentCards.put(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD, 5);
     }
 
-    public DevelopmentCard getRandomDevelopmentCard(){
-        List<DevelopmentCard> temp = new LinkedList<>();
+    public DevelopmentCard.DevelopmentCardType getRandomDevelopmentCard(){
+        List<DevelopmentCard.DevelopmentCardType> temp = new LinkedList<>();
         for (var developmentCard : developmentCards.entrySet())
         temp.addAll(Collections.nCopies(developmentCard.getValue(), developmentCard.getKey()));
         Random random = new Random(); // new Random object, named random
-        DevelopmentCard returnCard = temp.get(random.nextInt(temp.size()));
+        DevelopmentCard.DevelopmentCardType returnCard = temp.get(random.nextInt(temp.size()));
         //decrease(returnCard);
         return returnCard;
     }

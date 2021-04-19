@@ -24,8 +24,8 @@ public interface ITradeService {
      * @param demandedResources The resources the offering User wants
      * @param offeredResources  The resources the offering User is offering
      */
-    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, Map<Resource, Integer> demandedResources,
-                         Map<Resource, Integer> offeredResources);
+    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, Map<Resource.ResourceType, Integer> demandedResources,
+                         Map<Resource.ResourceType, Integer> offeredResources);
 
     /**
      * Posts a request to buy a Development Card
@@ -70,7 +70,7 @@ public interface ITradeService {
      * @param gainedResource The resource the User wants from the Bank
      * @param lostResource   The resource the User is offering to the Bank
      */
-    void executeTradeWithBank(LobbyName lobbyName, Resource gainedResource, Resource lostResource);
+    void executeTradeWithBank(LobbyName lobbyName, Resource.ResourceType gainedResource, Resource.ResourceType lostResource);
 
     /**
      * Posts a request to offer a trade to another user
@@ -80,8 +80,8 @@ public interface ITradeService {
      * @param offeredResources  Map of resources being offered to the responding user
      * @param demandedResources Map of resources being demanded from the responding user
      */
-    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, Map<Resource, Integer> offeredResources,
-                    Map<Resource, Integer> demandedResources);
+    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, Map<Resource.ResourceType, Integer> offeredResources,
+                    Map<Resource.ResourceType, Integer> demandedResources);
 
     /**
      * Posts a request to reset the Offer Trade button for the user who proposed a trade

@@ -15,8 +15,8 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
 
-    private final Resource getResource;
-    private final Resource giveResource;
+    private final Resource.ResourceType getResource;
+    private final Resource.ResourceType giveResource;
 
     /**
      * Constructor
@@ -26,7 +26,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      * @param getResource  The name of the resource he gets from the bank
      * @param giveResource The name of the resource he has to give to the bank
      */
-    public ExecuteTradeWithBankRequest(UserOrDummy user, LobbyName originLobby, Resource getResource, Resource giveResource) {
+    public ExecuteTradeWithBankRequest(UserOrDummy user, LobbyName originLobby, Resource.ResourceType getResource, Resource.ResourceType giveResource) {
         super(user, originLobby);
         this.getResource = getResource;
         this.giveResource = giveResource;
@@ -37,7 +37,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      *
      * @return name of the resource
      */
-    public Resource getGetResource() {
+    public Resource.ResourceType getGetResource() {
         return getResource;
     }
 
@@ -46,7 +46,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      *
      * @return name of the resource
      */
-    public Resource getGiveResource() {
+    public Resource.ResourceType getGiveResource() {
         return giveResource;
     }
 }

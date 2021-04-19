@@ -6,22 +6,22 @@ import java.util.*;
 
 public abstract class AbstractInventory {
 
-    protected Map<Resource, Integer> resources = new HashMap<>();
-    protected Map<DevelopmentCard, Integer> developmentCards = new HashMap<>();
+    protected Map<Resource.ResourceType, Integer> resources = new HashMap<>();
+    protected Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCards = new HashMap<>();
 
-    public void decrease(Resource resource, int i) {
+    public void decrease(Resource.ResourceType resource, int i) {
         increase(resource, -i);
     }
 
-    public void decrease(DevelopmentCard developmentCard, int i) {
+    public void decrease(DevelopmentCard.DevelopmentCardType developmentCard, int i) {
         increase(developmentCard, -i);
     }
 
-    public void decrease(Resource resource) {
+    public void decrease(Resource.ResourceType resource) {
         increase(resource, -1);
     }
 
-    public void decrease(DevelopmentCard developmentCard) {
+    public void decrease(DevelopmentCard.DevelopmentCardType developmentCard) {
         increase(developmentCard, -1);
     }
 
@@ -30,7 +30,7 @@ public abstract class AbstractInventory {
      *
      * @return The amount of the resource
      */
-    public int get(Resource resource) {
+    public int get(Resource.ResourceType resource) {
         return resources.get(resource);
     }
 
@@ -39,45 +39,45 @@ public abstract class AbstractInventory {
      *
      * @return The amount of Knight Cards
      */
-    public int get(DevelopmentCard developmentCard) {
+    public int get(DevelopmentCard.DevelopmentCardType developmentCard) {
         return developmentCards.get(developmentCard);
     }
 
-    public List<Tuple<DevelopmentCard, Integer>> getDevelopCardsList() {
-        List<Tuple<DevelopmentCard, Integer>> returnList = new LinkedList<>();
-        for (DevelopmentCard developmentCard : developmentCards.keySet())
+    public List<Tuple<DevelopmentCard.DevelopmentCardType, Integer>> getDevelopCardsList() {
+        List<Tuple<DevelopmentCard.DevelopmentCardType, Integer>> returnList = new LinkedList<>();
+        for (DevelopmentCard.DevelopmentCardType developmentCard : developmentCards.keySet())
             returnList.add(new Tuple<>(developmentCard, developmentCards.get(developmentCard)));
         return returnList;
     }
 
-    public Map<DevelopmentCard, Integer> getDevelopmentCards() {
+    public Map<DevelopmentCard.DevelopmentCardType, Integer> getDevelopmentCards() {
         return developmentCards;
     }
 
-    public List<Tuple<Resource, Integer>> getResourceList() {
-        List<Tuple<Resource, Integer>> returnList = new LinkedList<>();
-        for (Resource resource : resources.keySet())
+    public List<Tuple<Resource.ResourceType, Integer>> getResourceList() {
+        List<Tuple<Resource.ResourceType, Integer>> returnList = new LinkedList<>();
+        for (Resource.ResourceType resource : resources.keySet())
             returnList.add(new Tuple<>(resource, resources.get(resource)));
         return returnList;
     }
 
-    public Map<Resource, Integer> getResources() {
+    public Map<Resource.ResourceType, Integer> getResources() {
         return resources;
     }
 
-    public void increase(Resource resource, int i) {
+    public void increase(Resource.ResourceType resource, int i) {
         resources.put(resource, resources.get(resource) + i);
     }
 
-    public void increase(DevelopmentCard developmentCard, int i) {
+    public void increase(DevelopmentCard.DevelopmentCardType developmentCard, int i) {
         developmentCards.put(developmentCard, developmentCards.get(developmentCard) + i);
     }
 
-    public void increase(Resource resource) {
+    public void increase(Resource.ResourceType resource) {
         increase(resource, 1);
     }
 
-    public void increase(DevelopmentCard developmentCard) {
+    public void increase(DevelopmentCard.DevelopmentCardType developmentCard) {
         increase(developmentCard, 1);
     }
 }

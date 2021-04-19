@@ -17,7 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
 public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final DevelopmentCard developmentCard;
+    private final DevelopmentCard.DevelopmentCardType developmentCard;
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
      * @param lobbyName name of the lobby where the user bought the card
      * @param developmentCard
      */
-    public BuyDevelopmentCardResponse(UserOrDummy user, LobbyName lobbyName, DevelopmentCard developmentCard) {
+    public BuyDevelopmentCardResponse(UserOrDummy user, LobbyName lobbyName, DevelopmentCard.DevelopmentCardType developmentCard) {
         super(lobbyName);
         this.user = user;
         this.developmentCard = developmentCard;
@@ -36,7 +36,7 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
      *
      * @return String name of the bought development card
      */
-    public DevelopmentCard getDevelopmentCard() {
+    public DevelopmentCard.DevelopmentCardType getDevelopmentCard() {
         return developmentCard;
     }
 

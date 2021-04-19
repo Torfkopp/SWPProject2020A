@@ -16,7 +16,7 @@ public interface IResourceHex extends ILandHex {
      *
      * @return Resource
      */
-    Resource getResource();
+    Resource.ResourceType getResource();
 
     /**
      * Gets the number of the hex's token

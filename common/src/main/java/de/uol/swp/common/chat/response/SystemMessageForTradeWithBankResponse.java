@@ -1,6 +1,5 @@
 package de.uol.swp.common.chat.response;
 
-import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -24,7 +23,7 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
      *  @param lobbyName       The lobby name
      * @param developmentCard The developmentCard that the user bought
      */
-    public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCard developmentCard) {
+    public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCard.DevelopmentCardType developmentCard) {
         super(lobbyName);
         this.msg = null;
         //this.msg = new SystemMessageDTO(

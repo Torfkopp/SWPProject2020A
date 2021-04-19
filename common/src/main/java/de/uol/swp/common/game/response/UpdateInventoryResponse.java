@@ -19,10 +19,10 @@ import java.util.Map;
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<Resource, Integer> resourceMap;
-    private final Map<DevelopmentCard, Integer> developmentCardMap;
+    private final Map<Resource.ResourceType, Integer> resourceMap;
+    private final Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCardMap;
 
-    public Map<DevelopmentCard, Integer> getDevelopmentCardMap() {
+    public Map<DevelopmentCard.DevelopmentCardType, Integer> getDevelopmentCardMap() {
         return developmentCardMap;
     }
 
@@ -32,7 +32,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @param lobbyName      The lobby for which the update is supposed to happen in
      * @param resourceMap    The Map containing the name of a resource as key and the amount as value
      */
-    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource, Integer> resourceMap, Map<DevelopmentCard, Integer> developmentCardMap) {
+    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource.ResourceType, Integer> resourceMap, Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCardMap) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
@@ -46,7 +46,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public Map<Resource, Integer> getResourceMap() {
+    public Map<Resource.ResourceType, Integer> getResourceMap() {
         return resourceMap;
     }
 

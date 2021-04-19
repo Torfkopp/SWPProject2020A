@@ -13,20 +13,20 @@ import de.uol.swp.common.user.User;
  */
 public class PlayYearOfPlentyCardRequest extends PlayCardRequest {
 
-    Resource resource1;
-    Resource resource2;
+    Resource.ResourceType resource1;
+    Resource.ResourceType resource2;
 
-    public PlayYearOfPlentyCardRequest(LobbyName originLobby, User user, Resource resource1, Resource resource2) {
+    public PlayYearOfPlentyCardRequest(LobbyName originLobby, User user, Resource.ResourceType resource1, Resource.ResourceType resource2) {
         super(originLobby, user);
         this.resource1 = resource1;
         this.resource2 = resource2;
     }
 
-    public Resource getResource1() {
+    public Resource.ResourceType getResource1() {
         return resource1;
     }
 
-    public Resource getResource2() {
+    public Resource.ResourceType getResource2() {
         return resource2;
     }
 }

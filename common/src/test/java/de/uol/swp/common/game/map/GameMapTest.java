@@ -60,7 +60,7 @@ public class GameMapTest {
         IGameHex hex = map.getHex(HexMapPoint(1, 3));
         assertEquals(IGameHex.HexType.RESOURCE, hex.getType());
         IResourceHex resourceHex = (IResourceHex) hex;
-        assertEquals(Resource.LUMBER, resourceHex.getResource());
+        assertEquals(Resource.ResourceType.LUMBER, resourceHex.getResource());
     }
 
     @Test

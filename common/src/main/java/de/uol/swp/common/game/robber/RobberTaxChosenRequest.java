@@ -19,7 +19,7 @@ import java.util.Map;
 public class RobberTaxChosenRequest extends AbstractRequestMessage {
 
     private final User player;
-    private final Map<Resource, Integer> resources;
+    private final Map<Resource.ResourceType, Integer> resources;
     private final LobbyName lobby;
 
     /**
@@ -29,7 +29,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
      * @param player    The player paying the tax
      * @param lobby     The lobby's name
      */
-    public RobberTaxChosenRequest(Map<Resource, Integer> resources, User player, LobbyName lobby) {
+    public RobberTaxChosenRequest(Map<Resource.ResourceType, Integer> resources, User player, LobbyName lobby) {
         this.resources = resources;
         this.player = player;
         this.lobby = lobby;
@@ -58,7 +58,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
      *
      * @return Map of a resource and its amount
      */
-    public Map<Resource, Integer> getResources() {
+    public Map<Resource.ResourceType, Integer> getResources() {
         return resources;
     }
 }

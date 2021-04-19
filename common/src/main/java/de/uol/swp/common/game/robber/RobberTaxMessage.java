@@ -22,7 +22,7 @@ import java.util.Map;
 public class RobberTaxMessage extends AbstractGameMessage {
 
     private final Map<User, Integer> players;
-    private final Map<User, Map<Resource, Integer>> inventory;
+    private final Map<User, Map<Resource.ResourceType, Integer>> inventory;
 
     /**
      * Constructor
@@ -33,7 +33,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      * @param inventory Map of user and the inventory as map with resources and its amount
      */
     public RobberTaxMessage(LobbyName lobbyName, UserOrDummy user, Map<User, Integer> players,
-                            Map<User, Map<Resource, Integer>> inventory) {
+                            Map<User, Map<Resource.ResourceType, Integer>> inventory) {
         super(lobbyName, user);
         this.players = players;
         this.inventory = inventory;
@@ -54,7 +54,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and a map of a resource and its amount
      */
-    public Map<User, Map<Resource, Integer>> getInventory() {
+    public Map<User, Map<Resource.ResourceType, Integer>> getInventory() {
         return inventory;
     }
 

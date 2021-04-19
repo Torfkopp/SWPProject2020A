@@ -21,9 +21,9 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
-    private final Map<Resource, Integer> resourceMap;
-    private final Map<Resource, Integer> offeringResourceMap;
-    private final Map<Resource, Integer> respondingResourceMap;
+    private final Map<Resource.ResourceType, Integer> resourceMap;
+    private final Map<Resource.ResourceType, Integer> offeringResourceMap;
+    private final Map<Resource.ResourceType, Integer> respondingResourceMap;
 
     /**
      * Constructor
@@ -36,8 +36,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      * @param lobbyName             The name of the lobby
      */
     public TradeWithUserOfferResponse(UserOrDummy offeringUser, UserOrDummy respondingUser,
-                                      Map<Resource, Integer> resourceMap, Map<Resource, Integer> offeringResourceMap,
-                                      Map<Resource, Integer> respondingResourceMap, LobbyName lobbyName) {
+                                      Map<Resource.ResourceType, Integer> resourceMap, Map<Resource.ResourceType, Integer> offeringResourceMap,
+                                      Map<Resource.ResourceType, Integer> respondingResourceMap, LobbyName lobbyName) {
         super(lobbyName);
         this.resourceMap = resourceMap;
         this.offeringResourceMap = offeringResourceMap;
@@ -51,7 +51,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of offered resources
      */
-    public Map<Resource, Integer> getOfferingResourceMap() {
+    public Map<Resource.ResourceType, Integer> getOfferingResourceMap() {
         return offeringResourceMap;
     }
 
@@ -69,7 +69,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of the inventory of the responding User
      */
-    public Map<Resource, Integer> getResourceMap() {
+    public Map<Resource.ResourceType, Integer> getResourceMap() {
         return resourceMap;
     }
 
@@ -78,7 +78,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of demanded resources
      */
-    public Map<Resource, Integer> getRespondingResourceMap() {
+    public Map<Resource.ResourceType, Integer> getRespondingResourceMap() {
         return respondingResourceMap;
     }
 

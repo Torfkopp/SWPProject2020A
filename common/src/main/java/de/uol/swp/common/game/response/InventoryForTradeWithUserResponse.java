@@ -20,7 +20,7 @@ import java.util.Map;
 public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<Resource, Integer> resourceMap;
+    private final Map<Resource.ResourceType, Integer> resourceMap;
     private final int tradingUsersInventorySize;
     private final UserOrDummy tradingUser;
 
@@ -33,7 +33,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param tradingUsersInventorySize Amount of resource cards the other user has
      * @param tradingUser               The trading Users name
      */
-    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource, Integer> resourceMap,
+    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource.ResourceType, Integer> resourceMap,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
@@ -49,7 +49,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public Map<Resource, Integer> getResourceMap() {
+    public Map<Resource.ResourceType, Integer> getResourceMap() {
         return resourceMap;
     }
 

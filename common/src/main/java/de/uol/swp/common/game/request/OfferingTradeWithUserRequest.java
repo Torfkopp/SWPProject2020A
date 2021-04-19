@@ -19,8 +19,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
     private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
-    private final Map<Resource, Integer> offeringResourceMap;
-    private final Map<Resource, Integer> respondingResourceMap;
+    private final Map<Resource.ResourceType, Integer> offeringResourceMap;
+    private final Map<Resource.ResourceType, Integer> respondingResourceMap;
 
     /**
      * Constructor
@@ -32,8 +32,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param respondingResourceMap The responded resources
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
-                                        Map<Resource, Integer> offeringResourceMap,
-                                        Map<Resource, Integer> respondingResourceMap) {
+                                        Map<Resource.ResourceType, Integer> offeringResourceMap,
+                                        Map<Resource.ResourceType, Integer> respondingResourceMap) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
@@ -46,7 +46,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the offering Resources as a Map
      */
-    public Map<Resource, Integer> getOfferingResourceMap() {
+    public Map<Resource.ResourceType, Integer> getOfferingResourceMap() {
         return offeringResourceMap;
     }
 
@@ -64,7 +64,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the demanded Resources as a Map
      */
-    public Map<Resource, Integer> getRespondingResourceMap() {
+    public Map<Resource.ResourceType, Integer> getRespondingResourceMap() {
         return respondingResourceMap;
     }
 

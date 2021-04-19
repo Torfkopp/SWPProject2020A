@@ -184,49 +184,49 @@ public class CommandService extends AbstractService {
         UserOrDummy user = getUserOrDummy(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));
-        Resource resource = null;
-        DevelopmentCard developmentCard = null;
+        Resource.ResourceType resource = null;
+        DevelopmentCard.DevelopmentCardType developmentCard = null;
         switch (args.get(2).toLowerCase()) {
             case "bricks":
             case "brick":
-                resource = Resource.BRICK;
+                resource = Resource.ResourceType.BRICK;
                 break;
             case "grains":
             case "grain":
-                resource = Resource.GRAIN;
+                resource = Resource.ResourceType.GRAIN;
                 break;
             case "ore":
-                resource = Resource.ORE;
+                resource = Resource.ResourceType.ORE;
                 break;
             case "lumber":
-                resource = Resource.LUMBER;
+                resource = Resource.ResourceType.LUMBER;
                 break;
             case "wool":
-                resource = Resource.WOOL;
+                resource = Resource.ResourceType.WOOL;
                 break;
             case "knightcard":
             case "kc":
-                developmentCard = DevelopmentCard.KNIGHT_CARD;
+                developmentCard = DevelopmentCard.DevelopmentCardType.KNIGHT_CARD;
                 break;
             case "knight":
             case "knights":
                 break;
             case "monopolycard":
             case "mc":
-                developmentCard = DevelopmentCard.MONOPOLY_CARD;
+                developmentCard = DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD;
                 break;
             case "roadbuildingcard":
             case "rbc":
-                developmentCard = DevelopmentCard.ROAD_BUILDING_CARD;
+                developmentCard = DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD;
                 break;
             case "victorypointcard":
             case "vpc":
-                developmentCard = DevelopmentCard.VICTORY_POINT_CARD;
+                developmentCard = DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD;
                 break;
             case "yearofplentycard":
             case "yearofplenty":
             case "yopc":
-                developmentCard = DevelopmentCard.YEAR_OF_PLENTY_CARD;
+                developmentCard = DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD;
                 break;
         }
         Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,

@@ -2,7 +2,6 @@ package de.uol.swp.common.game.map.configuration;
 
 import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
 import de.uol.swp.common.game.map.MapPoint;
 
 import java.io.Serializable;
@@ -37,7 +36,7 @@ public interface IConfiguration extends Serializable {
      *
      * @implSpec Create new LinkedList objects from this due to it being unmodifiable and ordered
      */
-    List<Resource> getHexList();
+    List<Resource.ResourceType> getHexList();
 
     /**
      * Gets the robberPosition

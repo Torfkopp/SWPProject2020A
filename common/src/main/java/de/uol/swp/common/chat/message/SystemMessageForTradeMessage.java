@@ -20,8 +20,8 @@ import java.util.Map;
 public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
     private final UserOrDummy respondingUser;
-    private final Map<Resource, Integer> respondingResourceMap;
-    private final Map<Resource, Integer> offeringResourceMap;
+    private final Map<Resource.ResourceType, Integer> respondingResourceMap;
+    private final Map<Resource.ResourceType, Integer> offeringResourceMap;
 
     /**
      * Constructor
@@ -32,8 +32,8 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * @param respondingResourceMap The demanded resources
      */
     public SystemMessageForTradeMessage(LobbyName lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser,
-                                        Map<Resource, Integer> offeringResourceMap,
-                                        Map<Resource, Integer> respondingResourceMap) {
+                                        Map<Resource.ResourceType, Integer> offeringResourceMap,
+                                        Map<Resource.ResourceType, Integer> respondingResourceMap) {
         super(lobbyName, offeringUser);
         this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;

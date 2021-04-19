@@ -11,7 +11,7 @@ import de.uol.swp.common.game.Resource;
  */
 public class ResourceHex extends AbstractHex implements IResourceHex {
 
-    private final Resource resource;
+    private final Resource.ResourceType resource;
     private final int token;
 
     /**
@@ -20,14 +20,14 @@ public class ResourceHex extends AbstractHex implements IResourceHex {
      * @param resource The hex's resource
      * @param token    The hex's token
      */
-    public ResourceHex(Resource resource, int token) {
+    public ResourceHex(Resource.ResourceType resource, int token) {
         this.resource = resource;
         this.token = token;
         setRobberOnField(false);
     }
 
     @Override
-    public Resource getResource() {
+    public Resource.ResourceType getResource() {
         return resource;
     }
 

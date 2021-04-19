@@ -24,7 +24,7 @@ public interface IHarborHex extends IWaterHex {
         ANY
     }
 
-    static HarborResource getHarborResource(Resource resource){
+    static HarborResource getHarborResource(Resource.ResourceType resource){
         switch (resource){
 
             case LUMBER:

@@ -68,11 +68,11 @@ public class GameTest {
     void bankInventoryCheck() {
         BankInventory bankInventory = game.getBankInventory();
 
-        assertEquals(5, bankInventory.get(DevelopmentCard.VICTORY_POINT_CARD));
-        assertEquals(2, bankInventory.get(DevelopmentCard.MONOPOLY_CARD));
-        assertEquals(2, bankInventory.get(DevelopmentCard.YEAR_OF_PLENTY_CARD));
-        assertEquals(2, bankInventory.get(DevelopmentCard.ROAD_BUILDING_CARD));
-        assertEquals(14, bankInventory.get(DevelopmentCard.KNIGHT_CARD));
+        assertEquals(5, bankInventory.get(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD));
+        assertEquals(14, bankInventory.get(DevelopmentCard.DevelopmentCardType.KNIGHT_CARD));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class GameTest {
         map.upgradeSettlement(player, IntersectionMapPoint(0, 1));
         // Player has 2 settlements (1 VP), 1 city (2 VP) for 4 VP total
         assertEquals(4, game.calculateVictoryPoints(player));
-        game.getInventory(player).increase(DevelopmentCard.VICTORY_POINT_CARD,2);
+        game.getInventory(player).increase(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD, 2);
         // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards for 6 VP total
         assertEquals(6, game.calculateVictoryPoints(player));
     }
@@ -100,14 +100,14 @@ public class GameTest {
     void distributesResourceTest() {
         //Testing a hex
         game.distributeResources(6);
-        assertEquals(1, game.getInventory(Player.PLAYER_1).get(Resource.BRICK));
-        assertEquals(1, game.getInventory(Player.PLAYER_3).get(Resource.BRICK));
-        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.GRAIN));
+        assertEquals(1, game.getInventory(Player.PLAYER_1).get(Resource.ResourceType.BRICK));
+        assertEquals(1, game.getInventory(Player.PLAYER_3).get(Resource.ResourceType.BRICK));
+        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.ResourceType.GRAIN));
         //Testing another hex
         game.distributeResources(4);
-        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.WOOL));
-        assertEquals(1, game.getInventory(Player.PLAYER_4).get(Resource.GRAIN));
-        assertEquals(2, game.getInventory(Player.PLAYER_2).get(Resource.GRAIN));
+        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.ResourceType.WOOL));
+        assertEquals(1, game.getInventory(Player.PLAYER_4).get(Resource.ResourceType.GRAIN));
+        assertEquals(2, game.getInventory(Player.PLAYER_2).get(Resource.ResourceType.GRAIN));
     }
 
     @Test

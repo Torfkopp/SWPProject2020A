@@ -13,14 +13,14 @@ import de.uol.swp.common.user.User;
  */
 public class PlayMonopolyCardRequest extends PlayCardRequest {
 
-    Resource resource;
+    Resource.ResourceType resource;
 
-    public PlayMonopolyCardRequest(LobbyName originLobby, User user, Resource resource) {
+    public PlayMonopolyCardRequest(LobbyName originLobby, User user, Resource.ResourceType resource) {
         super(originLobby, user);
         this.resource = resource;
     }
 
-    public Resource getResource() {
+    public Resource.ResourceType getResource() {
         return resource;
     }
 }

@@ -16,8 +16,8 @@ import de.uol.swp.common.user.UserOrDummy;
 public class EditInventoryRequest extends AbstractGameRequest {
 
     private final UserOrDummy user;
-    private final Resource resource;
-    private final DevelopmentCard developmentCard;
+    private final Resource.ResourceType resource;
+    private final DevelopmentCard.DevelopmentCardType developmentCard;
     private final int amount;
 
     /**
@@ -29,8 +29,8 @@ public class EditInventoryRequest extends AbstractGameRequest {
      * @param amount      The amount to be added (substracted if negative)
      *                    to/from the resource
      */
-    public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, Resource resource,
-                                DevelopmentCard developmentCard, int amount) {
+    public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, Resource.ResourceType resource,
+                                DevelopmentCard.DevelopmentCardType developmentCard, int amount) {
         super(originLobby);
         this.user = user;
         this.resource = resource;
@@ -48,7 +48,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
         return amount;
     }
 
-    public DevelopmentCard getDevelopmentCard() {
+    public DevelopmentCard.DevelopmentCardType getDevelopmentCard() {
         return developmentCard;
     }
 
@@ -57,7 +57,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *
      * @return The name of the resource
      */
-    public Resource getResource() {
+    public Resource.ResourceType getResource() {
         return resource;
     }
 
