@@ -51,7 +51,7 @@ class UserServiceTest {
         assertNotNull(loggedInUser);
 
         // Test deletion
-        final Message deletionRequest = new DeleteUserRequest(loggedInUser);
+        final Message deletionRequest = new DeleteUserRequest(loggedInUser,user.getPassword());
 
         // The post will lead to a call of a UserService function
         bus.post(deletionRequest);
