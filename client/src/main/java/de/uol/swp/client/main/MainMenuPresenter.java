@@ -1,6 +1,5 @@
 package de.uol.swp.client.main;
 
-import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
@@ -274,9 +273,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        if(lobbyPassword.getText().isEmpty()){
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, null));}
-        else {result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, lobbyPassword.getText()));}
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, lobbyPassword.getText()));
     }
 
     /**
@@ -298,6 +295,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
         LOG.debug("Received CreateLobbyResponse");
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
+        });
+    }
+
+    @Subscribe
+    private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
+        LOG.debug("Received CreateLobbyWithPasswordResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
@@ -389,6 +395,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
         LOG.debug("Received JoinLobbyResponse");
+        Platform.runLater(() -> {
+            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
+        });
+    }
+
+    @Subscribe
+    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse rsp){
+        LOG.debug("Received JoinLobbyWithPasswordResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
@@ -614,8 +629,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())
-                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
-                lobbies.add(new Pair<>(l.getName(), s));
+                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.isfull"), s);
+                else if (l.hasAPassword()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
+                    lobbies.add(new Pair<>(l.getName(), s));
             }
         });
     }

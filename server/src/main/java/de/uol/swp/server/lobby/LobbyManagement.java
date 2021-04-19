@@ -25,7 +25,7 @@ public class LobbyManagement implements ILobbyManagement {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, false, maxPlayer, true, 60, false, false));
+        lobbies.put(name, new LobbyDTO(name, owner, false,false,  maxPlayer, true, 60, false, false));
     }
 
     @Override
@@ -55,6 +55,13 @@ public class LobbyManagement implements ILobbyManagement {
         Optional<Lobby> found = getLobby(lobbyName);
         if (found.isEmpty()) return;
         found.get().setInGame(inGame);
+    }
+
+    @Override
+    public void setHasPassword(String lobbyName, boolean hasPassword){
+        Optional<Lobby> found = getLobby(lobbyName);
+        if(found.isEmpty()) return;
+        found.get().setHasPassword(hasPassword);
     }
 
     @Override

@@ -156,6 +156,14 @@ public interface Lobby extends Serializable {
     boolean isInGame();
 
     /**
+     * Gets whether the Lobby has a password or not
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-19
+     */
+    boolean hasAPassword();
+
+    /**
      * Sets whether the Lobby is currently in a game according to the boolean provided
      *
      * @param inGame Whether the Lobby is in a game or not
@@ -166,6 +174,8 @@ public interface Lobby extends Serializable {
      * @since 2021-03-01
      */
     void setInGame(boolean inGame);
+
+    void setHasPassword(boolean hasPassword);
 
     /**
      * Gets whether the startUpPhase is enabled or not

@@ -94,7 +94,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -155,7 +155,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -245,7 +245,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -421,7 +421,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -439,7 +439,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -462,7 +462,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -488,7 +488,7 @@ public class GameServiceTest {
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         UserOrDummy dummy = new DummyDTO();
-        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         lobby.joinUser(dummy);
@@ -543,7 +543,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -605,7 +605,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -677,7 +677,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO("testlobby", user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO("testlobby", user[0], false, false, 4, false, 60, true, true);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();

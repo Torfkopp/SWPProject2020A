@@ -1,5 +1,6 @@
 package de.uol.swp.server.lobby;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -213,15 +214,17 @@ public class LobbyService extends AbstractService {
             lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayers(), req.getPassword());
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
-            LOG.debug("Ist angekommen");
-            if(req.getPassword() == null){
-            Message responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
+            Message responseMessage;
+            if(Strings.isNullOrEmpty(req.getPassword())){
+                responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
+            }
+            else{
+                lobby.get().setHasPassword(true);
+                responseMessage = new CreateLobbyWithPasswordResponse(req.getName(), lobby.get(), req.getPassword());
+            }
             responseMessage.initWithMessage(req);
             post(responseMessage);
-            sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));}
-            else{
-                Message responseMessage = new CreateLobbyWithPasswordResponse(req.getName(), lobby.get(), req.getPassword());
-            }
+            sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
         } catch (IllegalArgumentException e) {
             Message exceptionMessage = new LobbyExceptionMessage(e.getMessage());
             exceptionMessage.initWithMessage(req);
@@ -362,11 +365,17 @@ public class LobbyService extends AbstractService {
                         lobby.get().joinUser(req.getUser());
                         lobby = lobbyManagement.getLobby(req.getName());
                         if (lobby.isEmpty()) return;
+                        if (lobby.get().hasAPassword() == false) {
                         Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
                         responseMessage.initWithMessage(req);
                         post(responseMessage);
                         sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
-                        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+                        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));}
+                        else {
+                            Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(), lobby.get());
+                            responseMessage.initWithMessage(req);
+                            post(responseMessage);
+                        }
                     } else {
                         ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
                         exceptionMessage.initWithMessage(req);

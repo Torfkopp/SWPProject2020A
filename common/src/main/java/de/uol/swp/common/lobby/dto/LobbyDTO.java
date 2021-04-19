@@ -28,6 +28,7 @@ public class LobbyDTO implements Lobby {
     private final Set<UserOrDummy> users = new TreeSet<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private boolean inGame;
+    private boolean hasPassword;
     private User owner;
     private boolean commandsAllowed;
     private int maxPlayers;
@@ -45,12 +46,13 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, User creator, boolean inGame, int maxPlayers, boolean commandsAllowed, int moveTime,
+    public LobbyDTO(String name, User creator, boolean inGame, boolean hasPassword, int maxPlayers, boolean commandsAllowed, int moveTime,
                     boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
         this.inGame = inGame;
+        this.hasPassword = hasPassword;
         this.maxPlayers = maxPlayers;
         this.commandsAllowed = commandsAllowed;
         this.moveTime = moveTime;
@@ -68,7 +70,7 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame(), lobby.getMaxPlayers(),
+        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame(), lobby.hasAPassword(), lobby.getMaxPlayers(),
                             lobby.commandsAllowed(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
                             lobby.randomPlayfieldEnabled());
     }
@@ -135,8 +137,18 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public boolean hasAPassword() {
+        return hasPassword;
+    }
+
+    @Override
     public void setInGame(boolean inGame) {
         this.inGame = inGame;
+    }
+
+    @Override
+    public void setHasPassword(boolean hasPassword) {
+        this.hasPassword = hasPassword;
     }
 
     @Override
