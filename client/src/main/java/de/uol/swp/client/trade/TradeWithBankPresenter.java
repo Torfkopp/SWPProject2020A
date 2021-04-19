@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
@@ -39,7 +40,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 433;
     public static final int MIN_WIDTH = 620;
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
-    private String lobbyName;
+    private LobbyName lobbyName;
     private Map<String, Integer> resourceMap;
     private List<IHarborHex.HarborResource> harborMap;
     private ObservableList<Pair<String, Integer>> resourceList;

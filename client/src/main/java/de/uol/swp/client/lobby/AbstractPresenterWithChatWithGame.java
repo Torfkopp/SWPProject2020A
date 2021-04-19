@@ -10,6 +10,7 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -55,7 +56,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected ListView<Pair<String, String>> inventoryView;
+    protected ListView<Pair<Resource.ResourceType, Integer>> inventoryView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -97,7 +98,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     private ITradeService tradeService;
 
-    private ObservableList<Pair<String, String>> resourceList;
+    private ObservableList<Pair<Resource.ResourceType, Integer>> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
@@ -811,13 +812,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 inventoryView.setItems(resourceList);
             }
             resourceList.clear();
-            for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
-                resourceList.add(new Pair<>(entry.getKey(), entry.getValue().toString()));
-            }
-            for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
-                resourceList.add(new Pair<>(entry.getKey(),
-                                            entry.getValue() ? resourceBundle.getString("game.property.has") :
-                                            resourceBundle.getString("game.property.hasnot")));
+            for (Map.Entry<Resource.ResourceType, Integer> entry : rsp.getResourceMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(), entry.getValue()));
             }
         });
     }
@@ -846,12 +842,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
-        Resources resource = Resources.BRICK;
+        Resource.ResourceType resource = Resource.ResourceType.BRICK;
         if (rst.isPresent()) {
-            if (rst.get().equals(ore)) resource = Resources.ORE;
-            else if (rst.get().equals(grain)) resource = Resources.GRAIN;
-            else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
-            else if (rst.get().equals(wool)) resource = Resources.WOOL;
+            if (rst.get().equals(ore)) resource = Resource.ResourceType.ORE;
+            else if (rst.get().equals(grain)) resource = Resource.ResourceType.GRAIN;
+            else if (rst.get().equals(lumber)) resource = Resource.ResourceType.LUMBER;
+            else if (rst.get().equals(wool)) resource = Resource.ResourceType.WOOL;
             gameService.playMonopolyCard(lobbyName, resource);
         }
     }
@@ -901,18 +897,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Checks if the pressed button is the same as the confirm button
         if (rst.toString().equals(button1.toString())) {
             //Create two resource variables
-            Resources resource1 = Resources.BRICK;
-            Resources resource2 = Resources.BRICK;
+            Resource.ResourceType resource1 = Resource.ResourceType.BRICK;
+            Resource.ResourceType resource2 = Resource.ResourceType.BRICK;
             //Convert String to Resource
-            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
-            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
-            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
-            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+            if (c1.getValue().equals(ore)) resource1 = Resource.ResourceType.ORE;
+            else if (c1.getValue().equals(grain)) resource1 = Resource.ResourceType.GRAIN;
+            else if (c1.getValue().equals(lumber)) resource1 = Resource.ResourceType.LUMBER;
+            else if (c1.getValue().equals(wool)) resource1 = Resource.ResourceType.WOOL;
             //Second ChoiceBox's conversion
-            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
-            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
-            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
-            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+            if (c2.getValue().equals(ore)) resource2 = Resource.ResourceType.ORE;
+            else if (c2.getValue().equals(grain)) resource2 = Resource.ResourceType.GRAIN;
+            else if (c2.getValue().equals(lumber)) resource2 = Resource.ResourceType.LUMBER;
+            else if (c2.getValue().equals(wool)) resource2 = Resource.ResourceType.WOOL;
             //Send Request
             gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
         }
@@ -930,11 +926,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareInventoryView() {
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
+            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :
-                            item.getValue() + " " + resourceBundle.getString(item.getKey()));
+                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey().toString()));
                 });
             }
         });

@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -21,7 +22,7 @@ public interface ILobbyService {
      * @author Maximilian Lindner
      * @since 2021-04-09
      */
-    void checkForGame(String lobbyName);
+    void checkForGame(LobbyName lobbyName);
 
     /**
      * Posts a request to check if the user is currently in a lobby
@@ -73,7 +74,7 @@ public interface ILobbyService {
      * @author Temmo Junkhoff
      * @since 2021-03-23
      */
-    void kickUser(String lobbyName, UserOrDummy userToKick);
+    void kickUser(LobbyName lobbyName, UserOrDummy userToKick);
 
     /**
      * Posts a request to leave a specified lobby onto the EventBus
@@ -83,7 +84,7 @@ public interface ILobbyService {
      * @see de.uol.swp.common.lobby.request.LobbyLeaveUserRequest
      * @since 2020-12-05
      */
-    void leaveLobby(String lobbyName);
+    void leaveLobby(LobbyName lobbyName);
 
     /**
      * Posts a new instance of the LobbyUpdateEvent onto the Eventbus
@@ -122,7 +123,7 @@ public interface ILobbyService {
      * @see de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest
      * @since 2020-12-20
      */
-    void retrieveAllLobbyMembers(String lobbyName);
+    void retrieveAllLobbyMembers(LobbyName lobbyName);
 
     /**
      * Posts a request to return to the Pre-Game Lobby.
@@ -134,7 +135,7 @@ public interface ILobbyService {
      * @see de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest
      * @since 2021-03-22
      */
-    void returnToPreGameLobby(String lobbyName);
+    void returnToPreGameLobby(LobbyName lobbyName);
 
     /**
      * Posts an event to show a Lobby Error alert with the provided message
@@ -157,7 +158,7 @@ public interface ILobbyService {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    void updateLobbySettings(String lobbyName, int maxPlayers, boolean startUpPhaseEnabled, boolean commandsAllowed,
+    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, boolean commandsAllowed,
                              int moveTime, boolean randomPlayFieldEnabled);
 
     /**
@@ -170,5 +171,5 @@ public interface ILobbyService {
      * @author Temmo Junkhoff
      * @since 2021-03-23
      */
-    void userReady(String lobbyName, boolean isReady);
+    void userReady(LobbyName lobbyName, boolean isReady);
 }

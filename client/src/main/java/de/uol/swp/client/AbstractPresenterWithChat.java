@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
@@ -49,7 +50,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected TextField messageField;
 
-    protected String lobbyName;
+    protected LobbyName lobbyName;
     protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     /**
