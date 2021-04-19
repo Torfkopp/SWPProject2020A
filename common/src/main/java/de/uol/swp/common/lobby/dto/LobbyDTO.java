@@ -29,7 +29,7 @@ public class LobbyDTO implements Lobby {
     private final Set<UserOrDummy> users = new TreeSet<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private boolean inGame;
-    private UserOrDummy owner;
+    private User owner;
     private boolean commandsAllowed;
     private int maxPlayers;
     private int moveTime;
@@ -46,8 +46,8 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(LobbyName name, UserOrDummy creator, boolean inGame, int maxPlayers, boolean commandsAllowed,
-                    int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public LobbyDTO(String name, User creator, boolean inGame, int maxPlayers, boolean commandsAllowed, int moveTime,
+                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
@@ -105,7 +105,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public UserOrDummy getOwner() {
+    public User getOwner() {
         return owner;
     }
 

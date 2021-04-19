@@ -558,7 +558,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onKickUserRequest(KickUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received KickUserRequest for Lobby " + req.getName());
+        LOG.debug("Received KickUserRequest for Lobby " + req.getName());
         if (gameManagement.getGames().containsKey(req.getName())) {
             ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Can not kick while a game is ongoing");
             exceptionMessage.initWithMessage(req);

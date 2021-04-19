@@ -24,7 +24,7 @@ public interface IUserManagement {
      * remove the correct user
      * @since 2019-09-02
      */
-    User createUser(User user);
+    User createUser(User user) throws UserManagementException;
 
     /**
      * Removes a user from the store
@@ -37,7 +37,7 @@ public interface IUserManagement {
      * remove the correct user
      * @since 2019-10-10
      */
-    void dropUser(User user);
+    void dropUser(User user) throws UserManagementException;
 
     /**
      * Gets a user from the store with only their ID
@@ -102,7 +102,7 @@ public interface IUserManagement {
      *
      * @return A new user object
      */
-    User login(String username, String password);
+    User login(String username, String password) throws SecurityException;
 
     /**
      * Log out from server

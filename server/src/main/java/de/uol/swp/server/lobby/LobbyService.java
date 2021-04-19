@@ -117,6 +117,39 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a ChangeOwnerRequest found on the EventBus
+     * <p>
+     * If a ChangeOwnerRequest is detected on the EventBus, this
+     * method checks if the new owner is an user or not.
+     * Accordingly a LobbyExceptionMessage is posted onto the EventBus
+     * if the new owner should be dummy, otherwise the owner gets changed
+     * and a UpdateLobbyMessage is posted onto the EventBus
+     *
+     * @param req ChangeOwnerRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-15
+     */
+    @Subscribe
+    private void onChangeOwnerRequest(ChangeOwnerRequest req) {
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
+        if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
+        if (!(req.getNewOwner() instanceof User)) {
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Just User can be Owner");
+            exceptionMessage.initWithMessage(req);
+            LOG.debug("Sending ExceptionMessage");
+            post(exceptionMessage);
+        } else {
+            User newOwner = (User) req.getNewOwner();
+            lobby.get().updateOwner(newOwner);
+            Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
+            if (updatedLobby.isEmpty()) return;
+            ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(), updatedLobby.get());
+            sendToAllInLobby(req.getName(), msg);
+        }
+    }
+
+    /**
      * Handles a CheckForGameRequest found on the EventBus
      * <p>
      * If the lobby contained in the request is ingame, an ActivePlayerEvent
@@ -152,13 +185,9 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received a CheckUserInLobbyRequest");
         Boolean isInLobby = false;
         User user = req.getUser();
-        Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<LobbyName, Lobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUserOrDummies().contains(user)) {
-                isInLobby = true;
-            } else {
-                isInLobby = false;
-            }
+        Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
+        for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
+            isInLobby = entry.getValue().getUserOrDummies().contains(user);
         }
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);

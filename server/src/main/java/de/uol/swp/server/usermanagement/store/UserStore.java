@@ -24,7 +24,7 @@ public interface UserStore {
      *
      * @return The user without password information
      */
-    User createUser(String username, String password, String eMail);
+    User createUser(String username, String password, String eMail) throws RuntimeException;
 
     /**
      * Find a user only by ID
@@ -110,7 +110,7 @@ public interface UserStore {
      * @author Phillip-André Suhr
      * @since 2021-02-23
      */
-    User updateUser(int id, String username, String password, String eMail);
+    User updateUser(int id, String username, String password, String eMail) throws RuntimeException;
 
     /**
      * Update a user. Updates only given fields.
@@ -122,5 +122,5 @@ public interface UserStore {
      *
      * @return The user without password information
      */
-    User updateUser(String username, String password, String eMail);
+    User updateUser(String username, String password, String eMail) throws RuntimeException;
 }
