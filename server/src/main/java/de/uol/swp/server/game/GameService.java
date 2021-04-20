@@ -1017,8 +1017,8 @@ public class GameService extends AbstractService {
             return;
         }
 
-        game.setRoadBuildingRoad(1);
         LOG.debug("---- RoadBuilding phase starts");
+        game.setRoadBuildingRoad(1);
 
         inv.increaseRoadBuildingCards(-1);
 
