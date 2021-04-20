@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
 /**
- * Enum for the RoadBuildingCardPhase
+ * Enum for the road building card phases
  *
  * @author Mario Fokken
  * @since 2021-04-20
