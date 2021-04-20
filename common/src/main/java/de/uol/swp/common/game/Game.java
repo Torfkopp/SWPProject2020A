@@ -26,7 +26,7 @@ public class Game {
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
-    private int roadBuildingRoad = 0;
+    private RoadBuilding roadBuildingRoad = RoadBuilding.NO_ROAD_BUILDING;
 
     /**
      * Constructor
@@ -278,28 +278,24 @@ public class Game {
     /**
      * Gets the roadBuildingRoad
      *
-     * @return 0, if no roadBuildingCard was played
-     * 1, if it's the first Road
-     * 2, if it's the second Road
+     * @return NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
      *
      * @author Mario Fokken
      * @since 2021-04-20
      */
-    public int getRoadBuildingRoad() {
+    public RoadBuilding getRoadBuildingRoad() {
         return roadBuildingRoad;
     }
 
     /**
      * Sets the roadBuildingRoad
      *
-     * @param roadBuildingRoad 0, if roadBuilding phase has ended
-     *                         1, if first road is to be built
-     *                         2, if second road is to be built
+     * @param roadBuildingRoad NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
      *
      * @author Mario Fokken
      * @since 2021-04-20
      */
-    public void setRoadBuildingRoad(int roadBuildingRoad) {
+    public void setRoadBuildingRoad(RoadBuilding roadBuildingRoad) {
         this.roadBuildingRoad = roadBuildingRoad;
     }
 

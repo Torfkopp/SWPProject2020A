@@ -10,6 +10,7 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
+import de.uol.swp.common.game.RoadBuilding;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -367,11 +368,12 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (game.getRoadBuildingRoad() > 0) {
-                        if (game.getRoadBuildingRoad() == 1) game.setRoadBuildingRoad(2);
-                        else if (game.getRoadBuildingRoad() == 2) {
+                    if (game.getRoadBuildingRoad() != RoadBuilding.NO_ROAD_BUILDING) {
+                        if (game.getRoadBuildingRoad() == RoadBuilding.FIRST_ROAD)
+                            game.setRoadBuildingRoad(RoadBuilding.SECOND_ROAD);
+                        else if (game.getRoadBuildingRoad() == RoadBuilding.SECOND_ROAD) {
                             LOG.debug("---- RoadBuilding phase ends");
-                            game.setRoadBuildingRoad(0);
+                            game.setRoadBuildingRoad(RoadBuilding.NO_ROAD_BUILDING);
                         }
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
@@ -1018,7 +1020,7 @@ public class GameService extends AbstractService {
         }
 
         LOG.debug("---- RoadBuilding phase starts");
-        game.setRoadBuildingRoad(1);
+        game.setRoadBuildingRoad(RoadBuilding.FIRST_ROAD);
 
         inv.increaseRoadBuildingCards(-1);
 
