@@ -8,6 +8,6 @@ package de.uol.swp.common.game;
  */
 public enum RoadBuildingCardPhase {
     NO_ROAD_BUILDING_CARD_PLAYED,
-    FIRST_ROAD,
+    WAITING_FOR_FIRST_ROAD,
     SECOND_ROAD
 }

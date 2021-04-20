@@ -288,7 +288,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         LOG.debug("Received BuildingSuccessfulMessage");
-        if (roadBuildingCardPhase == RoadBuildingCardPhase.FIRST_ROAD) {
+        if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.SECOND_ROAD;
             LOG.debug("---- First road successfully built");
             Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
@@ -381,7 +381,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if ((roadBuildingCardPhase == RoadBuildingCardPhase.FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) && mapPoint.getType() == EDGE) {
+        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) && mapPoint.getType() == EDGE) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
@@ -464,7 +464,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
             notice.setVisible(true);
             disableButtonStates();
-            roadBuildingCardPhase = RoadBuildingCardPhase.FIRST_ROAD;
+            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
             gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
