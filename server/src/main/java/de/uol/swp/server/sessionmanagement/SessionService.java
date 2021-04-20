@@ -34,11 +34,11 @@ public class SessionService extends AbstractService {
      * @param eventBus          The EventBus used throughout the entire server (injected)
      * @param sessionManagement Object of the SessionManagement to use
      *
-     * @see de.uol.swp.server.sessionmanagement.SessionManagement
+     * @see de.uol.swp.server.sessionmanagement.ISessionManagement
      * @since 2021-04-07
      */
     @Inject
-    public SessionService(EventBus eventBus, SessionManagement sessionManagement) {
+    public SessionService(EventBus eventBus, ISessionManagement sessionManagement) {
         super(eventBus);
         if (LOG.isDebugEnabled()) LOG.debug("SessionService started");
         this.sessionManagement = sessionManagement;
