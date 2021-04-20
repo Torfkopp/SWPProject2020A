@@ -91,7 +91,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
-    protected RoadBuilding roadBuilding = RoadBuilding.NO_ROAD_BUILDING;
+    protected RoadBuilding roadBuildingCardPhase = RoadBuilding.NO_ROAD_BUILDING;
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
@@ -288,12 +288,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         LOG.debug("Received BuildingSuccessfulMessage");
-        if (roadBuilding == RoadBuilding.FIRST_ROAD) {
-            roadBuilding = RoadBuilding.SECOND_ROAD;
+        if (roadBuildingCardPhase == RoadBuilding.FIRST_ROAD) {
+            roadBuildingCardPhase = RoadBuilding.SECOND_ROAD;
             LOG.debug("---- First road successfully built");
             Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
-        } else if (roadBuilding == RoadBuilding.SECOND_ROAD) {
-            roadBuilding = RoadBuilding.NO_ROAD_BUILDING;
+        } else if (roadBuildingCardPhase == RoadBuilding.SECOND_ROAD) {
+            roadBuildingCardPhase = RoadBuilding.NO_ROAD_BUILDING;
             LOG.debug("---- Second road successfully built");
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());
@@ -381,7 +381,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if ((roadBuilding == RoadBuilding.FIRST_ROAD || roadBuilding == RoadBuilding.SECOND_ROAD) && mapPoint.getType() == EDGE) {
+        if ((roadBuildingCardPhase == RoadBuilding.FIRST_ROAD || roadBuildingCardPhase == RoadBuilding.SECOND_ROAD) && mapPoint.getType() == EDGE) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
@@ -464,7 +464,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
             notice.setVisible(true);
             disableButtonStates();
-            roadBuilding = RoadBuilding.FIRST_ROAD;
+            roadBuildingCardPhase = RoadBuilding.FIRST_ROAD;
             gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
