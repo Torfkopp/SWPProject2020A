@@ -304,6 +304,7 @@ public class Game {
      *
      * @return Set of the taxPayer
      *
+     * @author Mario Fokken
      * @since 2021-04-11
      */
     public Set<User> getTaxPayers() {
