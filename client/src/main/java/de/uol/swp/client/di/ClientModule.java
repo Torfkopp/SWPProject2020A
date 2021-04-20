@@ -50,6 +50,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
+        defaultProps.setProperty("theme", "light");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -88,6 +89,11 @@ public class ClientModule extends AbstractModule {
                 locale = Locale.UK;
         }
 
+        LOG.debug("Selected theme in config file: " + properties.getProperty("theme"));
+        
+        //Setting the theme
+        final String theme = properties.getProperty("theme");
+
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
 
@@ -104,6 +110,7 @@ public class ClientModule extends AbstractModule {
         bind(Properties.class).toInstance(properties);
         bind(ResourceBundle.class).toInstance(resourceBundle);
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
+        bindConstant().annotatedWith(Names.named("theme")).to(theme);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);

@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
 import de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent;
@@ -60,12 +61,15 @@ import java.util.*;
 public class SceneManager {
 
     private static final Logger LOG = LogManager.getLogger(SceneManager.class);
-    private static final String styleSheet = "css/swp.css";
 
     @Inject
     private static Injector injector;
     @Inject
     private static ResourceBundle resourceBundle;
+    @Inject
+    @Named("theme")
+    private static String theme = "default";
+    private static final String styleSheet = "css/" + theme + ".css";
 
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
