@@ -1,5 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
+import de.uol.swp.common.LobbyName;
+
 /**
  * Event used to show a window of a specified lobby
  * <p>
@@ -12,14 +14,14 @@ package de.uol.swp.client.lobby.event;
  */
 public class ShowLobbyViewEvent {
 
-    private final String name;
+    private final LobbyName name;
 
     /**
      * Constructor
      *
      * @param name Name containing the lobby's name
      */
-    public ShowLobbyViewEvent(String name) {
+    public ShowLobbyViewEvent(LobbyName name) {
         this.name = name;
     }
 
@@ -28,7 +30,7 @@ public class ShowLobbyViewEvent {
      *
      * @return A String containing the lobby's name
      */
-    public String getName() {
+    public LobbyName getName() {
         return name;
     }
 }

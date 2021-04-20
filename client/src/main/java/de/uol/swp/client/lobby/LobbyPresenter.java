@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -193,7 +194,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @Subscribe
     private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse rsp) {
         LOG.debug("Received RemoveFromLobbiesResponse");
-        for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
+        for (Map.Entry<LobbyName, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey());
         }
     }

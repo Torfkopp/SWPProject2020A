@@ -34,7 +34,7 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.getLobbyName(), user);
+        return Objects.hash(name.toString(), user);
     }
 
     @Override

@@ -152,7 +152,7 @@ public class CommandService extends AbstractService {
             return;
         }
         try {
-            args.add(originalMessage.getOriginLobby().getLobbyName());
+            args.add(originalMessage.getOriginLobby().toString());
             // roll dice for the skipped player
             Message req = parseArguments(args, RollDiceRequest.class.getConstructors()[0],
                                          Optional.of(originalMessage.getAuthor()));
@@ -180,7 +180,7 @@ public class CommandService extends AbstractService {
      */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
-        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().getLobbyName());
+        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
         UserOrDummy user = getUserOrDummy(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));

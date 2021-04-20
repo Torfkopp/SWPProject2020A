@@ -1,6 +1,13 @@
 package de.uol.swp.common.game;
 
-public class DevelopmentCard {
+import javax.inject.Inject;
+import java.io.Serializable;
+import java.util.ResourceBundle;
+
+public class DevelopmentCard implements Serializable {
+
+    @Inject
+    private static ResourceBundle resourceBundle;
 
     private final DevelopmentCardType type;
     private int amount;
@@ -12,15 +19,24 @@ public class DevelopmentCard {
         MONOPOLY_CARD("game.resources.cards.monopoly"),
         VICTORY_POINT_CARD("game.resources.cards.victorypoints");
 
-        private String attribute;
+        private final String attribute;
 
         DevelopmentCardType(String attribute) {
             this.attribute = attribute;
         }
 
-        public String getAttribute() {
+        @Override
+        public String toString() {
+            return resourceBundle.getString(getAttributeName());
+        }
+
+        public String getAttributeName() {
             return attribute;
         }
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
     public DevelopmentCard(DevelopmentCardType type, int amount) {

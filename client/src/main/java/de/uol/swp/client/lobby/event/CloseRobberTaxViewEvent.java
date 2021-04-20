@@ -1,5 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
+import de.uol.swp.common.LobbyName;
+
 /**
  * This event is used to close a RobberTax window
  *
@@ -9,14 +11,14 @@ package de.uol.swp.client.lobby.event;
  */
 public class CloseRobberTaxViewEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName Name of the lobby
      */
-    public CloseRobberTaxViewEvent(String lobbyName) {
+    public CloseRobberTaxViewEvent(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -25,7 +27,7 @@ public class CloseRobberTaxViewEvent {
      *
      * @return String lobbyName
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

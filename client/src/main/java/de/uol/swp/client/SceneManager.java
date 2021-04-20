@@ -27,6 +27,7 @@ import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
@@ -68,10 +69,10 @@ public class SceneManager {
     private static ResourceBundle resourceBundle;
 
     private final Stage primaryStage;
-    private final Map<String, Stage> tradingStages = new HashMap<>();
-    private final Map<String, Stage> tradingResponseStages = new HashMap<>();
-    private final Map<String, Stage> robberTaxStages = new HashMap<>();
-    private final Map<String, Scene> lobbyScenes = new HashMap<>();
+    private final Map<LobbyName, Stage> tradingStages = new HashMap<>();
+    private final Map<LobbyName, Stage> tradingResponseStages = new HashMap<>();
+    private final Map<LobbyName, Stage> robberTaxStages = new HashMap<>();
+    private final Map<LobbyName, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
 
@@ -524,7 +525,7 @@ public class SceneManager {
     @Subscribe
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
-        for (String name : rsp.getLobbyNames()) {
+        for (LobbyName name : rsp.getLobbyNames()) {
             if (!lobbyScenes.containsKey(name)) lobbyScenes.put(name, null); //do not overwrite existing lobbyScene
         }
     }
@@ -610,7 +611,7 @@ public class SceneManager {
     @Subscribe
     private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
         LOG.debug("Received CloseRobberTaxViewEvent");
-        String lobby = event.getLobbyName();
+        LobbyName lobby = event.getLobbyName();
         if (robberTaxStages.containsKey(lobby)) {
             robberTaxStages.get(lobby).close();
             robberTaxStages.remove(lobby);
@@ -631,7 +632,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
-        String lobbyName = event.getLobbyName();
+        LobbyName lobbyName = event.getLobbyName();
         if (tradingResponseStages.containsKey(lobbyName)) {
             tradingResponseStages.get(lobbyName).close();
             tradingResponseStages.remove(lobbyName);
@@ -780,10 +781,10 @@ public class SceneManager {
     @Subscribe
     private void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
         //gets the lobby's name
-        String lobbyName = event.getName();
+        LobbyName lobbyName = event.getName();
         //New window (Stage)
         Stage lobbyStage = new Stage();
-        lobbyStage.setTitle(lobbyName);
+        lobbyStage.setTitle(lobbyName.toString());
         lobbyStage.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
         lobbyStage.setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
         lobbyStage.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
@@ -858,7 +859,7 @@ public class SceneManager {
     @Subscribe
     private void onShowRobberTaxViewEvent(ShowRobberTaxViewEvent event) {
         LOG.debug("Received ShowRobberTaxViewEvent");
-        String lobbyName = event.getLobbyName();
+        LobbyName lobbyName = event.getLobbyName();
         Platform.runLater(() -> {
             Stage robberTaxStage = new Stage();
             robberTaxStages.put(event.getLobbyName(), robberTaxStage);
@@ -896,7 +897,7 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
         //gets the lobby's name
-        String lobbyName = event.getLobbyName();
+        LobbyName lobbyName = event.getLobbyName();
         //New window (Stage)
         Stage bankStage = new Stage();
         bankStage.setTitle(resourceBundle.getString("game.trade.window.bank.title"));
@@ -937,7 +938,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onShowTradeWithUserRespondViewEvent(ShowTradeWithUserRespondViewEvent event) {
-        String lobbyName = event.getLobbyName();
+        LobbyName lobbyName = event.getLobbyName();
         Platform.runLater(() -> {
             if (tradingStages.containsKey(lobbyName)) {
                 tradingStages.get(lobbyName).close();
@@ -980,7 +981,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
-        String lobbyName = event.getLobbyName();
+        LobbyName lobbyName = event.getLobbyName();
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
@@ -1014,7 +1015,7 @@ public class SceneManager {
     @Subscribe
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
-        String lobby = event.getLobbyName();
+        LobbyName lobby = event.getLobbyName();
         Platform.runLater(() -> {
             if (tradingStages.containsKey(lobby)) {
                 tradingStages.get(lobby).close();
@@ -1055,7 +1056,7 @@ public class SceneManager {
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         LOG.debug("Received a TradeWithUserCancelResponse");
-        String lobby = rsp.getLobbyName();
+        LobbyName lobby = rsp.getLobbyName();
         if (tradingResponseStages.containsKey(lobby)) {
             Platform.runLater(() -> {
                 tradingResponseStages.get(lobby).close();

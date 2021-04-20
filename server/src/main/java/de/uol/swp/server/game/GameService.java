@@ -168,14 +168,14 @@ public class GameService extends AbstractService {
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
         if (offeringInventory == null || respondingInventory == null) return;
-        Map<Resource.ResourceType, Integer> offeringInventoryMap = offeringInventory.getResources();
-        Map<Resource.ResourceType, Integer> responseInventoryMap = respondingInventory.getResources();
+        ResourceListMap offeringInventoryMap = offeringInventory.getResources();
+        ResourceListMap responseInventoryMap = respondingInventory.getResources();
         if (checkEnoughResourcesInInventory(offeringInventoryMap,
                                             req.getOfferingResourceMap()) && checkEnoughResourcesInInventory(
                 responseInventoryMap, req.getRespondingResourceMap())) {
             //changes the inventories according to the offer
-            Map<Resource.ResourceType, Integer> offeredResourcesWrapperMap = new HashMap<>();
-            Map<Resource.ResourceType, Integer> respondingResourcesWrapperMap = new HashMap<>();
+            ResourceListMap offeredResourcesWrapperMap = new HashMap<>();
+            ResourceListMap respondingResourcesWrapperMap = new HashMap<>();
             for (var x : req.getOfferingResourceMap().entrySet()) {
                 offeredResourcesWrapperMap.put(x.getKey(), x.getValue());
                 offeringInventory.decrease(x.getKey(), x.getValue());
@@ -1277,8 +1277,8 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCardsMap = inventory.getDevelopmentCards();
-        Map<Resource.ResourceType, Integer> resourceMap = inventory.getResources();
+        DevelopmentCardListMap developmentCardsMap = inventory.getDevelopmentCards();
+        ResourceListMap resourceMap = inventory.getResources();
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     resourceMap, developmentCardsMap);

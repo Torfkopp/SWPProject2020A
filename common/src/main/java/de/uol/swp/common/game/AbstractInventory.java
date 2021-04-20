@@ -1,13 +1,11 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.util.Tuple;
+import java.io.Serializable;
 
-import java.util.*;
+public abstract class AbstractInventory implements Serializable {
 
-public abstract class AbstractInventory {
-
-    protected Map<Resource.ResourceType, Integer> resources = new HashMap<>();
-    protected Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCards = new HashMap<>();
+    protected ResourceListMap resources = new ResourceListMap();
+    protected DevelopmentCardListMap developmentCards = new DevelopmentCardListMap();
 
     public void decrease(Resource.ResourceType resource, int i) {
         increase(resource, -i);
@@ -31,7 +29,7 @@ public abstract class AbstractInventory {
      * @return The amount of the resource
      */
     public int get(Resource.ResourceType resource) {
-        return resources.get(resource);
+        return resources.getAmount(resource);
     }
 
     /**
@@ -40,37 +38,23 @@ public abstract class AbstractInventory {
      * @return The amount of Knight Cards
      */
     public int get(DevelopmentCard.DevelopmentCardType developmentCard) {
-        return developmentCards.get(developmentCard);
+        return developmentCards.getAmount(developmentCard);
     }
 
-    public List<Tuple<DevelopmentCard.DevelopmentCardType, Integer>> getDevelopCardsList() {
-        List<Tuple<DevelopmentCard.DevelopmentCardType, Integer>> returnList = new LinkedList<>();
-        for (DevelopmentCard.DevelopmentCardType developmentCard : developmentCards.keySet())
-            returnList.add(new Tuple<>(developmentCard, developmentCards.get(developmentCard)));
-        return returnList;
+    public DevelopmentCardListMap getDevelopmentCards() {
+        return developmentCards.create();
     }
 
-    public Map<DevelopmentCard.DevelopmentCardType, Integer> getDevelopmentCards() {
-        return developmentCards;
-    }
-
-    public List<Tuple<Resource.ResourceType, Integer>> getResourceList() {
-        List<Tuple<Resource.ResourceType, Integer>> returnList = new LinkedList<>();
-        for (Resource.ResourceType resource : resources.keySet())
-            returnList.add(new Tuple<>(resource, resources.get(resource)));
-        return returnList;
-    }
-
-    public Map<Resource.ResourceType, Integer> getResources() {
-        return resources;
+    public ResourceListMap getResources() {
+        return resources.create();
     }
 
     public void increase(Resource.ResourceType resource, int i) {
-        resources.put(resource, resources.get(resource) + i);
+        resources.get(resource).increase(i);
     }
 
     public void increase(DevelopmentCard.DevelopmentCardType developmentCard, int i) {
-        developmentCards.put(developmentCard, developmentCards.get(developmentCard) + i);
+        developmentCards.get(developmentCard).increase(i);
     }
 
     public void increase(Resource.ResourceType resource) {

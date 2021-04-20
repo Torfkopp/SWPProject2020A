@@ -6,6 +6,7 @@ import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -51,11 +52,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private Label randomLobbyState;
     @FXML
-    private ListView<Pair<String, String>> lobbyView;
+    private ListView<Pair<LobbyName, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
 
-    private ObservableList<Pair<String, String>> lobbies;
+    private ObservableList<Pair<LobbyName, String>> lobbies;
     private ObservableList<String> users;
 
     /**
@@ -76,7 +77,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         super.initialize();
         lobbyView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
+            protected void updateItem(Pair<LobbyName, String> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
@@ -270,7 +271,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers));
+        result.ifPresent(s -> lobbyService.createNewLobby(new LobbyName(lobbyName.getText()), maxPlayers));
     }
 
     /**
@@ -286,7 +287,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe
@@ -359,7 +360,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (lobbyView.getSelectionModel().isEmpty()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
         } else {
-            String lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
+            LobbyName lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
             lobbyService.joinLobby(lobbyName);
         }
     }
@@ -377,7 +378,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(LobbyName)
      * @since 2020-12-20
      */
     @Subscribe

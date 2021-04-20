@@ -5,6 +5,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
@@ -51,17 +53,17 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @FXML
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     @FXML
-    private ListView<Pair<String, Integer>> ownInventoryView;
+    private ListView<Pair<Resource.ResourceType, Integer>> ownInventoryView;
     @FXML
     private Button offerTradeButton;
 
-    private String lobbyName;
+    private LobbyName lobbyName;
     private UserOrDummy respondingUser;
     private int traderInventorySize;
-    private Map<String, Integer> selectedOwnResourceMap;
-    private Map<String, Integer> selectedPartnersResourceMap;
-    private ObservableList<Pair<String, Integer>> ownInventoryList;
-    private Map<String, Integer> resourceMap;
+    private Map<Resource.ResourceType, Integer> selectedOwnResourceMap;
+    private Map<Resource.ResourceType, Integer> selectedPartnersResourceMap;
+    private ObservableList<Pair<Resource.ResourceType, Integer>> ownInventoryList;
+    private Map<Resource.ResourceType, Integer> resourceMap;
 
     /**
      * Constructor
@@ -83,11 +85,11 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @FXML
     public void initialize() {
         ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<String, Integer> item, boolean empty) {
+            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
+                            resourceBundle.getString(item.getValue().toString()) + " " + item.getKey().toString());
                 });
             }
         });
@@ -105,10 +107,10 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     private boolean checkResources() {
         int selectedOwnResourceMapCounter = 0;
         int selectedPartnersResourceMapCounter = 0;
-        for (Map.Entry<String, Integer> entry : selectedOwnResourceMap.entrySet()) {
+        for (Map.Entry<Resource.ResourceType, Integer> entry : selectedOwnResourceMap.entrySet()) {
             selectedOwnResourceMapCounter += entry.getValue();
         }
-        for (Map.Entry<String, Integer> entry : selectedPartnersResourceMap.entrySet()) {
+        for (Map.Entry<Resource.ResourceType, Integer> entry : selectedPartnersResourceMap.entrySet()) {
             selectedPartnersResourceMapCounter += entry.getValue();
         }
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
@@ -169,7 +171,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         setTradingLists();
         traderInventorySize = rsp.getTradingUsersInventorySize();
         int ownInventorySize = 0;
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
+        for (Map.Entry<Resource.ResourceType, Integer> entry : resourceMap.entrySet()) {
             ownInventorySize += entry.getValue();
         }
         if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
@@ -275,18 +277,18 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     @FXML
     private void setResourceMaps() {
         selectedOwnResourceMap = new HashMap<>();
-        selectedOwnResourceMap.put("game.resources.brick", ((int) (ownBrickSlider.getValue())));
-        selectedOwnResourceMap.put("game.resources.ore", ((int) (ownOreSlider.getValue())));
-        selectedOwnResourceMap.put("game.resources.lumber", ((int) (ownLumberSlider.getValue())));
-        selectedOwnResourceMap.put("game.resources.grain", ((int) (ownGrainSlider.getValue())));
-        selectedOwnResourceMap.put("game.resources.wool", ((int) (ownWoolSlider.getValue())));
+        selectedOwnResourceMap.put(Resource.ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
+        selectedOwnResourceMap.put(Resource.ResourceType.ORE, ((int) (ownOreSlider.getValue())));
+        selectedOwnResourceMap.put(Resource.ResourceType.LUMBER, ((int) (ownLumberSlider.getValue())));
+        selectedOwnResourceMap.put(Resource.ResourceType.GRAIN, ((int) (ownGrainSlider.getValue())));
+        selectedOwnResourceMap.put(Resource.ResourceType.WOOL, ((int) (ownWoolSlider.getValue())));
 
         selectedPartnersResourceMap = new HashMap<>();
-        selectedPartnersResourceMap.put("game.resources.brick", ((int) (tradingPartnerBrickSlider.getValue())));
-        selectedPartnersResourceMap.put("game.resources.ore", ((int) (tradingPartnerOreSlider.getValue())));
-        selectedPartnersResourceMap.put("game.resources.wool", ((int) (tradingPartnerWoolSlider.getValue())));
-        selectedPartnersResourceMap.put("game.resources.lumber", ((int) (tradingPartnerLumberSlider.getValue())));
-        selectedPartnersResourceMap.put("game.resources.grain", ((int) (tradingPartnerGrainSlider.getValue())));
+        selectedPartnersResourceMap.put(Resource.ResourceType.BRICK, ((int) (tradingPartnerBrickSlider.getValue())));
+        selectedPartnersResourceMap.put(Resource.ResourceType.ORE, ((int) (tradingPartnerOreSlider.getValue())));
+        selectedPartnersResourceMap.put(Resource.ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
+        selectedPartnersResourceMap.put(Resource.ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
+        selectedPartnersResourceMap.put(Resource.ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
     }
 
     /**
@@ -300,11 +302,11 @@ public class TradeWithUserPresenter extends AbstractPresenter {
         tradingPartnerWoolSlider.setMax(traderInventorySize);
         tradingPartnerGrainSlider.setMax(traderInventorySize);
 
-        ownGrainSlider.setMax(resourceMap.get("game.resources.grain"));
-        ownOreSlider.setMax(resourceMap.get("game.resources.ore"));
-        ownLumberSlider.setMax(resourceMap.get("game.resources.lumber"));
-        ownWoolSlider.setMax(resourceMap.get("game.resources.wool"));
-        ownBrickSlider.setMax(resourceMap.get("game.resources.brick"));
+        ownGrainSlider.setMax(resourceMap.get(Resource.ResourceType.GRAIN));
+        ownOreSlider.setMax(resourceMap.get(Resource.ResourceType.ORE));
+        ownLumberSlider.setMax(resourceMap.get(Resource.ResourceType.LUMBER));
+        ownWoolSlider.setMax(resourceMap.get(Resource.ResourceType.WOOL));
+        ownBrickSlider.setMax(resourceMap.get(Resource.ResourceType.BRICK));
     }
 
     /**
@@ -319,8 +321,8 @@ public class TradeWithUserPresenter extends AbstractPresenter {
             ownInventoryView.setItems(ownInventoryList);
         }
         ownInventoryList.clear();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
+        for (Map.Entry<Resource.ResourceType, Integer> entry : resourceMap.entrySet()) {
+            Pair<Resource.ResourceType, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
             ownInventoryList.add(ownResource);
         }
     }

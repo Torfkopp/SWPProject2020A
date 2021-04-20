@@ -30,7 +30,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Window;
-import javafx.util.Pair;
 
 import java.util.*;
 
@@ -56,7 +55,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected ListView<Pair<Resource.ResourceType, Integer>> inventoryView;
+    protected ListView<Resource> inventoryView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -101,7 +100,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     private ITradeService tradeService;
 
-    private ObservableList<Pair<Resource.ResourceType, Integer>> resourceList;
+    private ObservableList<Resource> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
@@ -830,8 +829,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 inventoryView.setItems(resourceList);
             }
             resourceList.clear();
-            for (Map.Entry<Resource.ResourceType, Integer> entry : rsp.getResourceMap().entrySet()) {
-                resourceList.add(new Pair<>(entry.getKey(), entry.getValue()));
+            for (Resource entry : rsp.getResourceMap()) {
+                resourceList.add(entry.create());
             }
         });
     }
@@ -944,11 +943,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareInventoryView() {
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
+            protected void updateItem(Resource item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey().toString()));
+                            item.getAmount() + " " + item.getType().toString());
                 });
             }
         });

@@ -1,9 +1,11 @@
 package de.uol.swp.common.game.map;
 
+import java.io.Serializable;
+
 /**
  * Enum for the Players
  */
-public enum Player {
+public enum Player implements Serializable {
     PLAYER_1(0),
     PLAYER_2(1),
     PLAYER_3(2),

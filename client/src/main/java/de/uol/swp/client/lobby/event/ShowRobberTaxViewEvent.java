@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class ShowRobberTaxViewEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
     private final int taxAmount;
     private final Map<Resource.ResourceType, Integer> inventory;
 

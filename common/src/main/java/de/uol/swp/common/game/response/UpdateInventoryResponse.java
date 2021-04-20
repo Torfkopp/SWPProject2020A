@@ -1,12 +1,10 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.DevelopmentCard;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.DevelopmentCardListMap;
+import de.uol.swp.common.game.ResourceListMap;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.Map;
 
 /**
  * This Response has up-to-date info about what the inventory of a specified player contains
@@ -19,10 +17,10 @@ import java.util.Map;
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<Resource.ResourceType, Integer> resourceMap;
-    private final Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCardMap;
+    private final ResourceListMap resourceMap;
+    private final DevelopmentCardListMap developmentCardMap;
 
-    public Map<DevelopmentCard.DevelopmentCardType, Integer> getDevelopmentCardMap() {
+    public DevelopmentCardListMap getDevelopmentCardMap() {
         return developmentCardMap;
     }
 
@@ -32,7 +30,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @param lobbyName      The lobby for which the update is supposed to happen in
      * @param resourceMap    The Map containing the name of a resource as key and the amount as value
      */
-    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, Map<Resource.ResourceType, Integer> resourceMap, Map<DevelopmentCard.DevelopmentCardType, Integer> developmentCardMap) {
+    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, ResourceListMap resourceMap, DevelopmentCardListMap developmentCardMap) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
@@ -46,7 +44,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public Map<Resource.ResourceType, Integer> getResourceMap() {
+    public ResourceListMap getResourceMap() {
         return resourceMap;
     }
 

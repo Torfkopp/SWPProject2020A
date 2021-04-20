@@ -4,6 +4,7 @@ import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +15,7 @@ import java.util.Objects;
  * @author Temmo Junkhoff
  * @since 2021-03-19
  */
-public class InventoryMap {
+public class InventoryMap implements Serializable {
 
     private final List<Triple<UserOrDummy, Player, Inventory>> map = new LinkedList<>();
 

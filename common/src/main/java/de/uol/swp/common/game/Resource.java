@@ -1,20 +1,37 @@
 package de.uol.swp.common.game;
 
-public class Resource {
+import javax.inject.Inject;
+import java.io.Serializable;
+import java.util.ResourceBundle;
+
+public class Resource implements Serializable {
+
+    @Inject
+    private static ResourceBundle resourceBundle;
+
+    public Resource create(){
+        return new Resource(getType(), getAmount());
+    }
 
     private final ResourceType type;
     private int amount;
+
     public enum ResourceType {
-        LUMBER("game.resource.lumber"),
-        BRICK("game.resource.brick"),
-        ORE("game.resource.ore"),
-        GRAIN("game.resource.grain"),
-        WOOL("game.resource.wool");
+        LUMBER("game.resources.lumber"),
+        BRICK("game.resources.brick"),
+        ORE("game.resources.ore"),
+        GRAIN("game.resources.grain"),
+        WOOL("game.resources.wool");
 
         private final String attributeName;
 
         ResourceType(String attributeName) {
             this.attributeName = attributeName;
+        }
+
+        @Override
+        public String toString() {
+            return resourceBundle.getString(getAttributeName());
         }
 
         public String getAttributeName() {
@@ -37,6 +54,10 @@ public class Resource {
 
     public int getAmount() {
         return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
     public ResourceType getType() {

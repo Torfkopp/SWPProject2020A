@@ -13,19 +13,23 @@ import java.util.*;
 public class BankInventory extends AbstractInventory {
 
     public BankInventory() {
+        List<Resource> tempResourceList = new LinkedList<>();
+        List<DevelopmentCard> tempDevelopmentCardList = new LinkedList<>();
         for (Resource.ResourceType resource : Resource.ResourceType.values())
-            resources.put(resource, 100);
-        developmentCards.put(DevelopmentCard.DevelopmentCardType.KNIGHT_CARD, 14);
-        developmentCards.put(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD, 2);
-        developmentCards.put(DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD, 2);
-        developmentCards.put(DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD, 2);
-        developmentCards.put(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD, 5);
+            tempResourceList.add(new Resource(resource, 100));
+        tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.KNIGHT_CARD, 14));
+        tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD, 2));
+        tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD, 2));
+        tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD, 2));
+        tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD, 5));
+        resources = ResourceListMap.createResourceListMapFromList(tempResourceList);
+        developmentCards = DevelopmentCardListMap.createDevelopmentCardListMapFromList(tempDevelopmentCardList);
     }
 
     public DevelopmentCard.DevelopmentCardType getRandomDevelopmentCard(){
         List<DevelopmentCard.DevelopmentCardType> temp = new LinkedList<>();
-        for (var developmentCard : developmentCards.entrySet())
-        temp.addAll(Collections.nCopies(developmentCard.getValue(), developmentCard.getKey()));
+        for (DevelopmentCard developmentCard : developmentCards)
+        temp.addAll(Collections.nCopies(developmentCard.getAmount(), developmentCard.getType()));
         Random random = new Random(); // new Random object, named random
         DevelopmentCard.DevelopmentCardType returnCard = temp.get(random.nextInt(temp.size()));
         //decrease(returnCard);

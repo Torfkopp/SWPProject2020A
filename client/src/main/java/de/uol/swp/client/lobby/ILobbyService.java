@@ -22,7 +22,7 @@ public interface ILobbyService {
      * @author Maximillian Lindner
      * @since 2021-04-15
      */
-    void changeOwner(String lobbyName, UserOrDummy newOwner);
+    void changeOwner(LobbyName lobbyName, UserOrDummy newOwner);
 
     /**
      * Checks if the lobby is in a game
@@ -47,13 +47,13 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param name      The name chosen for the new lobby
+     * @param lobbyName      The name chosen for the new lobby
      * @param maxPlayer The maximum amount of players for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(String name, int maxPlayer);
+    void createNewLobby(LobbyName lobbyName, int maxPlayer);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus
@@ -63,7 +63,7 @@ public interface ILobbyService {
      * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
      * @since 2019-11-20
      */
-    void joinLobby(String name);
+    void joinLobby(LobbyName name);
 
     /**
      * Posts a request to join a random lobby onto the EventBus

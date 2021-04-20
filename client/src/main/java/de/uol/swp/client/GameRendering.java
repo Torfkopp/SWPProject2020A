@@ -907,19 +907,19 @@ public class GameRendering {
                 break;
             case RESOURCE:
                 switch (((IResourceHex) hex).getResource()) {
-                    case HILLS:
+                    case BRICK:
                         gfxCtx.setFill(HILLS_COLOUR);
                         break;
-                    case FOREST:
+                    case LUMBER:
                         gfxCtx.setFill(FOREST_COLOUR);
                         break;
-                    case MOUNTAINS:
+                    case ORE:
                         gfxCtx.setFill(MOUNTAINS_COLOUR);
                         break;
-                    case FIELDS:
+                    case GRAIN:
                         gfxCtx.setFill(FIELDS_COLOUR);
                         break;
-                    case PASTURE:
+                    case WOOL:
                         gfxCtx.setFill(PASTURE_COLOUR);
                         break;
                     default:

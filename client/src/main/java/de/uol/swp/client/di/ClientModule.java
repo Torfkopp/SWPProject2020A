@@ -17,6 +17,8 @@ import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.game.DevelopmentCard;
+import de.uol.swp.common.game.Resource;
 import javafx.fxml.FXMLLoader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -114,6 +116,8 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(ClientApp.class);
         requestStaticInjection(I18nWrapper.class);
+        requestStaticInjection(Resource.class);
+        requestStaticInjection(DevelopmentCard.class);
         requestStaticInjection(SceneManager.class);
     }
 }

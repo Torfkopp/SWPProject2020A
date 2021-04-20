@@ -5,6 +5,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -47,15 +49,15 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @FXML
     private Label tradeResponseLabel;
     @FXML
-    private ListView<Pair<String, Integer>> ownInventoryView;
+    private ListView<Pair<Resource.ResourceType, Integer>> ownInventoryView;
 
-    private String lobbyName;
+    private LobbyName lobbyName;
     private UserOrDummy offeringUser;
     private UserOrDummy respondingUser;
-    private Map<String, Integer> offeringResourceMap;
-    private Map<String, Integer> resourceMap;
-    private Map<String, Integer> respondingResourceMap;
-    private ObservableList<Pair<String, Integer>> ownInventoryList;
+    private Map<Resource.ResourceType, Integer> offeringResourceMap;
+    private Map<Resource.ResourceType, Integer> resourceMap;
+    private Map<Resource.ResourceType, Integer> respondingResourceMap;
+    private ObservableList<Pair<Resource.ResourceType, Integer>> ownInventoryList;
 
     /**
      * Constructor
@@ -75,11 +77,11 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     @FXML
     public void initialize() {
         ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<String, Integer> item, boolean empty) {
+            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
+                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey().toString()));
                 });
             }
         });
@@ -137,7 +139,7 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     /**
      * Handles a click on the reject button
      * <p>
-     * If the lobbyname or the logged in user of the TradeWithUserPresenter are
+     * If the lobby name or the logged in user of the TradeWithUserPresenter are
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithUserPresenter is created. If a window is closed using e.g.
      * X(top-right-Button), the closeWindowAfterNotSuccessfulTrade method is called.
@@ -214,8 +216,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
             ownInventoryView.setItems(ownInventoryList);
         }
         ownInventoryList.clear();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
+        for (Map.Entry<Resource.ResourceType, Integer> entry : resourceMap.entrySet()) {
+            Pair<Resource.ResourceType, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
             ownInventoryList.add(ownResource);
         }
     }
@@ -233,14 +235,14 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-05
      */
-    private String tallyUpOfferOrDemand(Map<String, Integer> resourceMap) {
+    private String tallyUpOfferOrDemand(Map<Resource.ResourceType, Integer> resourceMap) {
         boolean nothing = true;
         StringBuilder content = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
+        for (Map.Entry<Resource.ResourceType, Integer> entry : resourceMap.entrySet()) {
             int amount = entry.getValue();
             if (amount > 0) {
                 nothing = false;
-                content.append(entry.getValue()).append(" ").append(resourceBundle.getString(entry.getKey()))
+                content.append(entry.getValue()).append(" ").append(resourceBundle.getString(entry.getKey().getAttributeName()))
                        .append(", ");
             }
         }
