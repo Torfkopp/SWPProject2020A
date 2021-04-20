@@ -370,8 +370,8 @@ public class GameService extends AbstractService {
                     if (game.getRoadBuildingRoad() > 0) {
                         if (game.getRoadBuildingRoad() == 1) game.setRoadBuildingRoad(2);
                         else if (game.getRoadBuildingRoad() == 2) {
-                            game.setRoadBuildingRoad(0);
                             LOG.debug("---- RoadBuilding phase ends");
+                            game.setRoadBuildingRoad(0);
                         }
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
