@@ -91,7 +91,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
-    protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING;
+    protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
@@ -293,7 +293,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             LOG.debug("---- First road successfully built");
             Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
         } else if (roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) {
-            roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING;
+            roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
             LOG.debug("---- Second road successfully built");
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());

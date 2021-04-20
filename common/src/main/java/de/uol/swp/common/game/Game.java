@@ -26,7 +26,7 @@ public class Game {
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
-    private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING;
+    private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
 
     /**
      * Constructor

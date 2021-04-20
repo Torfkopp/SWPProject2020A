@@ -7,7 +7,7 @@ package de.uol.swp.common.game;
  * @since 2021-04-20
  */
 public enum RoadBuildingCardPhase {
-    NO_ROAD_BUILDING,
+    NO_ROAD_BUILDING_CARD_PLAYED,
     FIRST_ROAD,
     SECOND_ROAD
 }
