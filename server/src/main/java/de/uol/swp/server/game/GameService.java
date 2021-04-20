@@ -367,7 +367,17 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
+                    if (game.getRoadBuildingRoad() > 0) {
+                        if (game.getRoadBuildingRoad() == 1) game.setRoadBuildingRoad(2);
+                        else if (game.getRoadBuildingRoad() == 2) {
+                            game.setRoadBuildingRoad(0);
+                            LOG.debug("---- RoadBuilding phase ends");
+                        }
+                        gameMap.placeRoad(player, mapPoint);
+                        sendSuccess.accept(req.getOriginLobby(),
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                         BuildingSuccessfulMessage.Type.ROAD));
+                    } else if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
@@ -1007,24 +1017,8 @@ public class GameService extends AbstractService {
             return;
         }
 
-        Player player = game.getPlayer(req.getUser());
-        List<MapPoint> points = req.getRoads();
-        MapPoint point1 = points.get(0);
-        MapPoint point2 = points.get(1);
-        IGameMapManagement map = game.getMap();
-
-        if (!map.roadPlaceable(player, point1) && !map.roadPlaceable(player, point2)) {
-            ResponseMessage returnMessage = new RoadBuildingFailureResponse(req.getOriginLobby());
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending a RoadBuildingFailureResponse");
-            LOG.debug("---- Roads not buildable");
-            return;
-        }
-        map.placeRoad(player, point1);
-        LOG.debug("----" + req.getUser() + " builds a road at: " + point1.getY() + "|" + point1.getX());
-        map.placeRoad(player, point2);
-        LOG.debug("----" + req.getUser() + " builds a road at: " + point2.getY() + "|" + point2.getX());
+        game.setRoadBuildingRoad(1);
+        LOG.debug("---- RoadBuilding phase starts");
 
         inv.increaseRoadBuildingCards(-1);
 

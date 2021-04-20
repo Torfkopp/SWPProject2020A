@@ -5,7 +5,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -108,13 +105,7 @@ class GameServiceTest {
 
     @Test
     void playRoadBuildingCard() throws InterruptedException {
-        MapPoint firstPoint = MapPoint.HexMapPoint(3, 5);
-        MapPoint secondPoint = MapPoint.HexMapPoint(5, 3);
-        List<MapPoint> mapPoints = new ArrayList<>();
-        mapPoints.add(firstPoint);
-        mapPoints.add(secondPoint);
-
-        gameService.playRoadBuildingCard(defaultLobbyName, mapPoints);
+        gameService.playRoadBuildingCard(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -126,11 +117,6 @@ class GameServiceTest {
         assertEquals(defaultUser, request.getUser());
         assertEquals(defaultUser.getID(), request.getUser().getID());
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
-
-        assertEquals(firstPoint.getY(), request.getRoads().get(0).getY());
-        assertEquals(firstPoint.getX(), request.getRoads().get(0).getX());
-        assertEquals(secondPoint.getY(), request.getRoads().get(1).getY());
-        assertEquals(secondPoint.getX(), request.getRoads().get(1).getX());
     }
 
     @Test

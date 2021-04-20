@@ -18,8 +18,6 @@ import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,10 +80,9 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void playRoadBuildingCard(String lobbyName, List<MapPoint> roads) {
+    public void playRoadBuildingCard(String lobbyName) {
         LOG.debug("Sending PlayRoadBuildingCardRequest");
-        Message request = new PlayRoadBuildingCardRequest(lobbyName, userService.getLoggedInUser(),
-                                                          new ArrayList<>(roads));
+        Message request = new PlayRoadBuildingCardRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
     }
 

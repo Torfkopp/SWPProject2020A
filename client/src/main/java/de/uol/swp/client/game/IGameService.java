@@ -4,7 +4,6 @@ import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.UserOrDummy;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,9 +57,8 @@ public interface IGameService {
      * Posts a request to play a RoadBuildingCard
      *
      * @param lobbyName The name of the lobby
-     * @param roads     The roads the player choose
      */
-    void playRoadBuildingCard(String lobbyName, List<MapPoint> roads);
+    void playRoadBuildingCard(String lobbyName);
 
     /**
      * Posts a request to play a YearOfPlentyCard

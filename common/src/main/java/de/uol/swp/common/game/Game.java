@@ -26,6 +26,7 @@ public class Game {
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
+    private int roadBuildingRoad = 0;
 
     /**
      * Constructor
@@ -275,6 +276,34 @@ public class Game {
     }
 
     /**
+     * Gets the roadBuildingRoad
+     *
+     * @return 0, if no roadBuildingCard was played
+     * 1, if it's the first Road
+     * 2, if it's the second Road
+     *
+     * @author Mario Fokken
+     * @since 2021-04-20
+     */
+    public int getRoadBuildingRoad() {
+        return roadBuildingRoad;
+    }
+
+    /**
+     * Sets the roadBuildingRoad
+     *
+     * @param roadBuildingRoad 0, if roadBuilding phase has ended
+     *                         1, if first road is to be built
+     *                         2, if second road is to be built
+     *
+     * @author Mario Fokken
+     * @since 2021-04-20
+     */
+    public void setRoadBuildingRoad(int roadBuildingRoad) {
+        this.roadBuildingRoad = roadBuildingRoad;
+    }
+
+    /**
      * Gets the taxPayer Set
      *
      * @return Set of the taxPayer
@@ -294,27 +323,6 @@ public class Game {
      */
     public UserOrDummy getUserFromPlayer(Player player) {
         return players.getUserOrDummyFromPlayer(player);
-    }
-
-    /**
-     * Gets the next player and sets it as the new active player
-     *
-     * @return User object of the next player
-     */
-    public UserOrDummy nextPlayer() {
-        activePlayer = getNextPlayer();
-        return activePlayer;
-    }
-
-    /**
-     * Removes a user from the taxPayers
-     *
-     * @param user User to remove
-     *
-     * @since 2021-04-11
-     */
-    public void removeTaxPayer(User user) {
-        taxPayers.remove(user);
     }
 
     /**
@@ -367,5 +375,26 @@ public class Game {
      */
     public void setDiceRolledAlready(boolean diceRolledAlready) {
         this.diceRolledAlready = diceRolledAlready;
+    }
+
+    /**
+     * Gets the next player and sets it as the new active player
+     *
+     * @return User object of the next player
+     */
+    public UserOrDummy nextPlayer() {
+        activePlayer = getNextPlayer();
+        return activePlayer;
+    }
+
+    /**
+     * Removes a user from the taxPayers
+     *
+     * @param user User to remove
+     *
+     * @since 2021-04-11
+     */
+    public void removeTaxPayer(User user) {
+        taxPayers.remove(user);
     }
 }

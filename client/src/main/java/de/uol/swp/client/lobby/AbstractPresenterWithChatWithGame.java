@@ -90,9 +90,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
-    protected boolean roadBuilding = false;
-    protected Set<MapPoint> roads = new HashSet<>();
+    protected int roadBuilding = 0;
     protected boolean autoRollEnabled = false;
+    protected boolean playedCard = false;
     protected boolean inGame;
     protected int moveTime;
     protected User owner;
@@ -286,7 +286,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
-        LOG.debug("Received BuildingSuccessfullMessage");
+        LOG.debug("Received BuildingSuccessfulMessage");
+        if (roadBuilding == 1) {
+            roadBuilding++;
+            LOG.debug("---- First road successfully built");
+            Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
+        } else if (roadBuilding == 2) {
+            roadBuilding = 0;
+            LOG.debug("---- Second road successfully built");
+            Platform.runLater(() -> notice.setVisible(false));
+            resetButtonStates(userService.getLoggedInUser());
+        }
         gameService.updateGameMap(lobbyName);
         String attr = null;
         switch (msg.getType()) {
@@ -329,11 +339,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
-        if ((msg.getDice1() + msg.getDice2()) != 7) {
-            resetButtonStates(msg.getUser());
-        }
+        playedCard = false;
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
+        if ((dice1 + dice2) != 7) {
+            resetButtonStates(msg.getUser());
+        }
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         gameService.updateInventory(lobbyName);
     }
@@ -369,6 +380,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        if ((roadBuilding == 1 || roadBuilding == 2) && mapPoint.getType() == EDGE) {
+            gameService.buildRequest(lobbyName, mapPoint);
+        }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition) {
@@ -376,17 +390,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             robberNewPosition = false;
             notice.setVisible(false);
             resetButtonStates(userService.getLoggedInUser());
-        }
-        if (mapPoint.getType() == EDGE && roadBuilding) {
-            roads.add(mapPoint);
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second"));
-            if (roads.size() == 2) {
-                gameService.playRoadBuildingCard(lobbyName, new ArrayList<>(roads));
-                roadBuilding = false;
-                notice.setVisible(false);
-                roads.clear();
-                resetButtonStates(userService.getLoggedInUser());
-            }
         }
     }
 
@@ -457,7 +460,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            roadBuildingCardPhase();
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+            disableButtonStates();
+            roadBuilding = 1;
+            gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -506,6 +513,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
+        playedCard = true;
         gameService.updateInventory(rsp.getLobbyName());
     }
 
@@ -594,19 +602,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a RoadBuildingFailureResponse
-     *
-     * @param rsp The RoadBuildingFailureResponse found on the EventBus
-     *
-     * @author Mario Fokken
-     * @since 2021-04-16
-     */
-    @Subscribe
-    private void onRoadBuildingFailureResponse(RoadBuildingFailureResponse rsp) {
-        roadBuildingCardPhase();
-    }
-
-    /**
      * Handles a RobberChooseVictimResponse
      *
      * @param rsp The RobberChooseVictimResponse found on the EventBus
@@ -651,7 +646,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
         LOG.debug("Received RobberNewPositionResponse");
-        notice.setText(resourceBundle.getString("game.robber.position"));
+        Platform.runLater(() -> notice.setText(resourceBundle.getString("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
     }
@@ -1035,21 +1030,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
         endTurn.setDisable(!userService.getLoggedInUser().equals(user));
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        playCard.setDisable(!userService.getLoggedInUser().equals(user));
+        if (!playedCard) playCard.setDisable(!userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
-    }
-
-    /**
-     * Helper Method for onRoadBuildingFailureResponse and
-     * onPlayButtonCardPressed
-     *
-     * @author Mario Fokken
-     * @since 2021-04-16
-     */
-    private void roadBuildingCardPhase() {
-        notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
-        notice.setVisible(true);
-        disableButtonStates();
-        roadBuilding = true;
     }
 }
