@@ -368,12 +368,12 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (game.getRoadBuildingRoad() != RoadBuilding.NO_ROAD_BUILDING) {
-                        if (game.getRoadBuildingRoad() == RoadBuilding.FIRST_ROAD)
-                            game.setRoadBuildingRoad(RoadBuilding.SECOND_ROAD);
-                        else if (game.getRoadBuildingRoad() == RoadBuilding.SECOND_ROAD) {
+                    if (game.getRoadBuildingCardPhase() != RoadBuilding.NO_ROAD_BUILDING) {
+                        if (game.getRoadBuildingCardPhase() == RoadBuilding.FIRST_ROAD)
+                            game.setRoadBuildingCardPhase(RoadBuilding.SECOND_ROAD);
+                        else if (game.getRoadBuildingCardPhase() == RoadBuilding.SECOND_ROAD) {
                             LOG.debug("---- RoadBuilding phase ends");
-                            game.setRoadBuildingRoad(RoadBuilding.NO_ROAD_BUILDING);
+                            game.setRoadBuildingCardPhase(RoadBuilding.NO_ROAD_BUILDING);
                         }
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
@@ -1020,7 +1020,7 @@ public class GameService extends AbstractService {
         }
 
         LOG.debug("---- RoadBuilding phase starts");
-        game.setRoadBuildingRoad(RoadBuilding.FIRST_ROAD);
+        game.setRoadBuildingCardPhase(RoadBuilding.FIRST_ROAD);
 
         inv.increaseRoadBuildingCards(-1);
 
