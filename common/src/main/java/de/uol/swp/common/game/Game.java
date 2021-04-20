@@ -388,6 +388,7 @@ public class Game {
      *
      * @param user User to remove
      *
+     * @author Mario Fokken
      * @since 2021-04-11
      */
     public void removeTaxPayer(User user) {
