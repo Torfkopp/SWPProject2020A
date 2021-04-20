@@ -289,10 +289,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         LOG.debug("Received BuildingSuccessfulMessage");
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
-            roadBuildingCardPhase = RoadBuildingCardPhase.SECOND_ROAD;
+            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
             LOG.debug("---- First road successfully built");
             Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
-        } else if (roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) {
+        } else if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
             LOG.debug("---- Second road successfully built");
             Platform.runLater(() -> notice.setVisible(false));
@@ -381,7 +381,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) && mapPoint.getType() == EDGE) {
+        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))

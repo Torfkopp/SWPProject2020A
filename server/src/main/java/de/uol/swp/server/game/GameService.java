@@ -370,8 +370,8 @@ public class GameService extends AbstractService {
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (game.getRoadBuildingCardPhase() != RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED) {
                         if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD)
-                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.SECOND_ROAD);
-                        else if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.SECOND_ROAD) {
+                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD);
+                        else if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
                             LOG.debug("---- RoadBuildingCardPhase phase ends");
                             game.setRoadBuildingCardPhase(RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED);
                         }
