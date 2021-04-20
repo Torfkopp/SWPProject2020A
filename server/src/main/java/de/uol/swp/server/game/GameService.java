@@ -829,7 +829,7 @@ public class GameService extends AbstractService {
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), req.getRespondingUser(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
                                                                        resourceMap, req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
