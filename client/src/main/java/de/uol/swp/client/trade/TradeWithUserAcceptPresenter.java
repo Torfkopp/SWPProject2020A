@@ -9,17 +9,14 @@ import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.stage.Window;
-import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,24 +35,17 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
-    @Inject
-    private ITradeService tradeService;
-
     @FXML
     private Button acceptTradeButton;
     @FXML
     private Label tradeNotPossibleLabel;
     @FXML
     private Label tradeResponseLabel;
-    @FXML
-    private ListView<Pair<String, Integer>> ownInventoryView;
 
     private String lobbyName;
     private UserOrDummy offeringUser;
-    private Map<String, Integer> offeringResourceMap;
-    private Map<String, Integer> resourceMap;
-    private Map<String, Integer> respondingResourceMap;
-    private ObservableList<Pair<String, Integer>> ownInventoryList;
+    private List<Map<String, Object>> offeringResourceMap;
+    private List<Map<String, Object>> respondingResourceMap;
 
     /**
      * Constructor
@@ -160,8 +150,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * If a TradeWithUserResponseUpdateEvent is found on the EventBus
      * and it is directed to this lobby, this TradeWithUserAcceptPresenter
      * gets multiple Parameters and calls the setOfferLabel method to
-     * set the offer label according to the offer and the setTradingList
-     * to set the inventory according to the responding user´s inventory.
+     * set the offer label according to the offer and show the Users' own
+     * inventory.
      *
      * @param event TradeWithUserResponseUpdateEvent found on the EventBus
      */
@@ -172,12 +162,11 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
         offeringUser = rsp.getOfferingUser();
-        respondingResourceMap = rsp.getRespondingResourceMap();
-        offeringResourceMap = rsp.getOfferingResourceMap();
-        resourceMap = rsp.getResourceMap();
-        setTradingList();
+        respondingResourceMap = rsp.getDemandedResources();
+        offeringResourceMap = rsp.getOfferedResources();
+        ownResourceTableView.getItems().addAll(rsp.getResourceList());
         setOfferLabel();
-        Window window = ownInventoryView.getScene().getWindow();
+        Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
     }
 
@@ -187,7 +176,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * Sets the content of the tradeResponseLabel to the offers and demands
      */
     private void setOfferLabel() {
-        LOG.debug("Setting the tradeResponseLabel");
         String offered = tallyUpOfferOrDemand(offeringResourceMap);
         String demanded = tallyUpOfferOrDemand(respondingResourceMap);
         Platform.runLater(() -> tradeResponseLabel.setText(
@@ -195,28 +183,11 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     }
 
     /**
-     * Helper Function
-     * <p>
-     * Sets the content of the InventoryView
-     */
-    private void setTradingList() {
-        if (ownInventoryList == null) {
-            ownInventoryList = FXCollections.observableArrayList();
-            ownInventoryView.setItems(ownInventoryList);
-        }
-        ownInventoryList.clear();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
-            ownInventoryList.add(ownResource);
-        }
-    }
-
-    /**
      * Helper method to tally up the offered/demanded resources
      * <p>
      * Returns a String containing the offered and demanded resources.
      *
-     * @param resourceMap The Map of resources to tally up
+     * @param resourceList The List of resources to tally up
      *
      * @return String containing the offer
      *
@@ -224,15 +195,14 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-05
      */
-    private String tallyUpOfferOrDemand(Map<String, Integer> resourceMap) {
+    private String tallyUpOfferOrDemand(List<Map<String, Object>> resourceList) {
         boolean nothing = true;
         StringBuilder content = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            int amount = entry.getValue();
+        for (Map<String, Object> resourceMap : resourceList) {
+            int amount = (int) resourceMap.get("amount");
             if (amount > 0) {
                 nothing = false;
-                content.append(entry.getValue()).append(" ").append(resourceBundle.getString(entry.getKey()))
-                       .append(", ");
+                content.append(amount).append(" ").append(resourceMap.get("resource")).append(", ");
             }
         }
         if (nothing) content.append(resourceBundle.getString("game.trade.offer.nothing"));

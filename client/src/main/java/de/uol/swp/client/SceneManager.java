@@ -633,8 +633,10 @@ public class SceneManager {
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
         String lobbyName = event.getLobbyName();
         if (tradingResponseStages.containsKey(lobbyName)) {
-            tradingResponseStages.get(lobbyName).close();
-            tradingResponseStages.remove(lobbyName);
+            Platform.runLater(() -> {
+                tradingResponseStages.get(lobbyName).close();
+                tradingResponseStages.remove(lobbyName);
+            });
         }
     }
 

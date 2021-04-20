@@ -831,19 +831,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received UpdateInventoryResponse for Lobby " + lobbyName);
-        List<Map<String, Object>> updatedResourceMapList = rsp.getResourceList();
-        for (Map<String, Object> resourceMap : updatedResourceMapList) {
-            resourceMap.put("resource", resourceBundle.getString(
-                    String.format("game.resources.%s", resourceMap.get("resource").toString().toLowerCase())));
-        }
-        List<Map<String, Object>> updatedDevelopmentCardList = rsp.getDevelopmentCardList();
-        for (Map<String, Object> devCardMap : updatedDevelopmentCardList) {
-            devCardMap.put("card", resourceBundle.getString((String) devCardMap.get("card")));
-        }
         Platform.runLater(() -> {
-            resourceTableView.getItems().setAll(updatedResourceMapList);
+            resourceTableView.getItems().setAll(rsp.getResourceList());
             resourceTableView.sort();
-            developmentCardTableView.getItems().setAll(updatedDevelopmentCardList);
+            developmentCardTableView.getItems().setAll(rsp.getDevelopmentCardList());
             developmentCardTableView.sort();
         });
     }
@@ -967,8 +958,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private Map<String, Object> prepareEmptyResourceMap(String type, String item) {
         Map<String, Object> resourceMap = new HashMap<>();
         resourceMap.put("amount", 0);
-        String preFormat = type.equals("resource") ? "game.resources.%s" : "%s";
-        resourceMap.put(type, resourceBundle.getString(String.format(preFormat, item)));
+        String preFormat;
+        if (type.equals("resource")) { // Resource like Brick
+            preFormat = "game.resources.%s";
+            resourceMap.put("enumType", Resources.valueOf(item.toUpperCase()));
+        } else { // Development Card like Knight Card
+            preFormat = "%s";
+        }
+        resourceMap.put(type, new I18nWrapper(String.format(preFormat, item)));
         return resourceMap;
     }
 
@@ -990,7 +987,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
         List<Map<String, Object>> inventoryItems = new ArrayList<>();
         for (Resources resource : Resources.values()) {
-            inventoryItems.add(prepareEmptyResourceMap("resource", resource.toString().toLowerCase()));
+            inventoryItems.add(prepareEmptyResourceMap("resource", resource.name().toLowerCase()));
         }
         resourceTableView.getItems().addAll(inventoryItems);
 

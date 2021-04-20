@@ -18,7 +18,7 @@ import java.util.Map;
 public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final Map<String, Integer> resourceMap;
+    private final List<Map<String, Object>> resourceMap;
     private final List<IHarborHex.HarborResource> harborResourceList;
 
     /**
@@ -29,7 +29,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      * @param resourceMap        The Map containing the name of a resource as key and the amount as value
      * @param harborResourceList The List containing all the harbors of the Player
      */
-    public InventoryForTradeResponse(UserOrDummy user, String lobbyName, Map<String, Integer> resourceMap,
+    public InventoryForTradeResponse(UserOrDummy user, String lobbyName, List<Map<String, Object>> resourceMap,
                                      List<IHarborHex.HarborResource> harborResourceList) {
         super(lobbyName);
         this.user = user;
@@ -57,7 +57,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public Map<String, Integer> getResourceMap() {
+    public List<Map<String, Object>> getResourceMap() {
         return resourceMap;
     }
 
