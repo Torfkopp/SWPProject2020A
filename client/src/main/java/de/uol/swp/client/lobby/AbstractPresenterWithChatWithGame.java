@@ -10,7 +10,7 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.game.RoadBuilding;
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
@@ -91,7 +91,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
-    protected RoadBuilding roadBuildingCardPhase = RoadBuilding.NO_ROAD_BUILDING;
+    protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING;
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
@@ -288,12 +288,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         LOG.debug("Received BuildingSuccessfulMessage");
-        if (roadBuildingCardPhase == RoadBuilding.FIRST_ROAD) {
-            roadBuildingCardPhase = RoadBuilding.SECOND_ROAD;
+        if (roadBuildingCardPhase == RoadBuildingCardPhase.FIRST_ROAD) {
+            roadBuildingCardPhase = RoadBuildingCardPhase.SECOND_ROAD;
             LOG.debug("---- First road successfully built");
             Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
-        } else if (roadBuildingCardPhase == RoadBuilding.SECOND_ROAD) {
-            roadBuildingCardPhase = RoadBuilding.NO_ROAD_BUILDING;
+        } else if (roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) {
+            roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING;
             LOG.debug("---- Second road successfully built");
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());
@@ -381,7 +381,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if ((roadBuildingCardPhase == RoadBuilding.FIRST_ROAD || roadBuildingCardPhase == RoadBuilding.SECOND_ROAD) && mapPoint.getType() == EDGE) {
+        if ((roadBuildingCardPhase == RoadBuildingCardPhase.FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.SECOND_ROAD) && mapPoint.getType() == EDGE) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
@@ -464,7 +464,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
             notice.setVisible(true);
             disableButtonStates();
-            roadBuildingCardPhase = RoadBuilding.FIRST_ROAD;
+            roadBuildingCardPhase = RoadBuildingCardPhase.FIRST_ROAD;
             gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);

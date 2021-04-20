@@ -26,7 +26,7 @@ public class Game {
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
-    private RoadBuilding roadBuildingCardPhase = RoadBuilding.NO_ROAD_BUILDING;
+    private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING;
 
     /**
      * Constructor
@@ -283,7 +283,7 @@ public class Game {
      * @author Mario Fokken
      * @since 2021-04-20
      */
-    public RoadBuilding getRoadBuildingCardPhase() {
+    public RoadBuildingCardPhase getRoadBuildingCardPhase() {
         return roadBuildingCardPhase;
     }
 
@@ -295,7 +295,7 @@ public class Game {
      * @author Mario Fokken
      * @since 2021-04-20
      */
-    public void setRoadBuildingCardPhase(RoadBuilding roadBuildingCardPhase) {
+    public void setRoadBuildingCardPhase(RoadBuildingCardPhase roadBuildingCardPhase) {
         this.roadBuildingCardPhase = roadBuildingCardPhase;
     }
 
