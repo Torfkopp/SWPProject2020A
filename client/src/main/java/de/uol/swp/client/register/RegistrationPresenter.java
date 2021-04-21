@@ -55,6 +55,25 @@ public class RegistrationPresenter extends AbstractPresenter {
     }
 
     /**
+     * Check the loginField
+     * Lets the loginField only accept alphanumeric entries with the addition of underscore and hyphen
+     *
+     * @param username the username String provided by the loginField
+     *
+     * @author Sven Ahrens
+     * @since 2021-04-22
+     */
+    private boolean checkLoginFormat(String username) {
+
+        String regex = "[A-Za-z0-9_-]+";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(username);
+
+        return matcher.matches();
+    }
+
+    /**
      * Method called to compare the eMail string with valid regex
      * <p>
      * This helper method is called to compare whether a provided
@@ -115,6 +134,8 @@ public class RegistrationPresenter extends AbstractPresenter {
     private void onRegisterButtonPressed() {
         if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
+        } else if (!checkLoginFormat(loginField.getText())) {
+            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.username")));
         } else if (!checkMailFormat(emailField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
