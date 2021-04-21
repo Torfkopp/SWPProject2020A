@@ -7,15 +7,16 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
-import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,23 +60,9 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         setEventBus(eventBus);
     }
 
-    /**
-     * Check the newUsernameField
-     * Lets the newUsernameField only accept alphanumeric entries with the addition of underscore and hyphen
-     *
-     * @param username the username String provided by the newUsernameField
-     *
-     * @author Sven Ahrens
-     * @since 2021-04-22
-     */
-    private boolean checkLoginFormat(String username) {
-
-        String regex = "[A-Za-z0-9_-]+";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(username);
-
-        return matcher.matches();
+    @FXML
+    protected void initialize() {
+        preparenewUsernameField();
     }
 
     /**
@@ -153,8 +140,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                     resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails")));
         } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
-        } else if (!checkLoginFormat(newUsernameField.getText())) {
-            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.username")));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
                 newPassword = userService.hash(newPasswordField.getText());
@@ -169,5 +154,19 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                                              userService.hash(confirmPasswordField.getText()), user.getUsername(),
                                              user.getEMail());
         }
+    }
+
+    /**
+     * Prepares the newUsernameField
+     * Helper method, called when the ChangeAccountDetailspresenter is initialized in order to let the newUsernameField
+     * only accept alphanumeric entries with the addition of underscore and hyphen
+     *
+     * @author Sven Ahrens
+     * @since 2021-04-22
+     */
+    private void preparenewUsernameField() {
+        UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
+                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
+        newUsernameField.setTextFormatter(new TextFormatter<>(StringFilter));
     }
 }

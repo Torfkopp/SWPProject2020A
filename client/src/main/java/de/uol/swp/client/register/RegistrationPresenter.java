@@ -10,9 +10,11 @@ import de.uol.swp.common.user.UserDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,23 +56,9 @@ public class RegistrationPresenter extends AbstractPresenter {
         setEventBus(eventBus);
     }
 
-    /**
-     * Check the loginField
-     * Lets the loginField only accept alphanumeric entries with the addition of underscore and hyphen
-     *
-     * @param username the username String provided by the loginField
-     *
-     * @author Sven Ahrens
-     * @since 2021-04-22
-     */
-    private boolean checkLoginFormat(String username) {
-
-        String regex = "[A-Za-z0-9_-]+";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(username);
-
-        return matcher.matches();
+    @FXML
+    protected void initialize() {
+        prepareLoginFormat();
     }
 
     /**
@@ -134,8 +122,6 @@ public class RegistrationPresenter extends AbstractPresenter {
     private void onRegisterButtonPressed() {
         if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
-        } else if (!checkLoginFormat(loginField.getText())) {
-            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.username")));
         } else if (!checkMailFormat(emailField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
@@ -146,5 +132,20 @@ public class RegistrationPresenter extends AbstractPresenter {
             userService.createUser(new UserDTO(-1, loginField.getText(), userService.hash(passwordField1.getText()),
                                                emailField.getText()));
         }
+    }
+
+    /**
+     * Prepares the loginField
+     * Helper method, called when the Registrationpresenter is initialized in order to let the loginField
+     * only accept alphanumeric entries with the addition of underscore and hyphen
+     *
+     * @author Sven Ahrens
+     * @since 2021-04-21
+     */
+    private void prepareLoginFormat() {
+
+        UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
+                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
+        loginField.setTextFormatter(new TextFormatter<>(StringFilter));
     }
 }
