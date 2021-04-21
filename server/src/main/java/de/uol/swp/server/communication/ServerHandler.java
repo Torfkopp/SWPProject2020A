@@ -15,7 +15,6 @@ import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
-import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,12 +53,13 @@ public class ServerHandler implements ServerHandlerDelegate {
     /**
      * Constructor
      *
-     * @param eventBus The EventBus used throughout the entire server
+     * @param eventBus          The EventBus used throughout the entire server
+     * @param sessionManagement Object of the SessionManagement
      *
      * @see com.google.common.eventbus.EventBus
      */
     @Inject
-    public ServerHandler(EventBus eventBus, SessionManagement sessionManagement) {
+    public ServerHandler(EventBus eventBus, ISessionManagement sessionManagement) {
         this.eventBus = eventBus;
         eventBus.register(this);
         this.sessionManagement = sessionManagement;
