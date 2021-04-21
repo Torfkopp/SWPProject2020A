@@ -13,6 +13,7 @@ import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
+import de.uol.swp.client.lobby.ConfirmLobbyPasswordPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.RobberTaxPresenter;
 import de.uol.swp.client.lobby.event.*;
@@ -807,6 +808,34 @@ public class SceneManager {
         lobbyStages.add(lobbyStage);
     }
 
+    @Subscribe
+    private void onShowLobbyWithPasswordViewEvent(ShowLobbyWithPasswordViewEvent event){
+        String lobbyName = event.getName();
+        Stage lobbyStage = new Stage();
+        lobbyStage.setTitle(lobbyName);
+        lobbyStage.setHeight(ConfirmLobbyPasswordPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setMinHeight(ConfirmLobbyPasswordPresenter.MIN_HEIGHT_PRE_GAME);
+        lobbyStage.setWidth(ConfirmLobbyPasswordPresenter.MIN_WIDTH_PRE_GAME);
+        lobbyStage.setMinWidth(ConfirmLobbyPasswordPresenter.MIN_WIDTH_PRE_GAME);
+        Parent rootPane = initPresenter(ConfirmLobbyPasswordPresenter.fxml1);
+        Scene lobbyScene = new Scene(rootPane);
+        lobbyScene.getStylesheets().add(styleSheet);
+        lobbyScenes.put(lobbyName, lobbyScene);
+        //Sets the stage to the newly created scene
+        lobbyStage.setScene(lobbyScenes.get(lobbyName));
+        //Specifies the modality for new window
+        lobbyStage.initModality(Modality.NONE);
+        //Specifies the owner Window (parent) for new window
+        lobbyStage.initOwner(primaryStage);
+        //Set position of second window, related to primary window
+        lobbyStage.setX(primaryStage.getX() + 100);
+        lobbyStage.setY(10);
+        //Shows the window
+        lobbyStage.show();
+        lobbyStages.add(lobbyStage);
+        eventBus.post(new ConfirmLobbyPasswordEvent(lobbyName));
+        LOG.debug("Sending a ConfirmLobbyPasswordEvent to lobby " + lobbyName);
+    }
     /**
      * Handles the ShowLoginViewEvent detected on the EventBus
      * <p>

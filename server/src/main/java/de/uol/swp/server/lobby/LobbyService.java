@@ -402,6 +402,19 @@ public class LobbyService extends AbstractService {
         }
     }
 
+    @Subscribe
+    private void onJoinLobbyWithPasswordConfirmationRequest(JoinLobbyWithPasswordConfirmationRequest req){
+        if(LOG.isDebugEnabled()) LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby " + req.getName());
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName(), req.getPassword());
+        if(lobby.isPresent()) {
+            System.out.println(req.getPassword());
+            System.out.println("Ja");
+        }
+        else{
+            System.out.println("Nein");
+        }
+    }
+
     /**
      * Handles a LobbyLeaveUserRequest found on the EventBus
      * <p>

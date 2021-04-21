@@ -27,6 +27,7 @@ public class LobbyDTO implements Lobby {
     private final String name;
     private final Set<UserOrDummy> users = new TreeSet<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
+    private final String password;
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
@@ -36,7 +37,6 @@ public class LobbyDTO implements Lobby {
     private boolean startUpPhaseEnabled;
     private boolean randomPlayfieldEnabled;
     private IConfiguration configuration;
-
     /**
      * Constructor
      *
@@ -46,10 +46,12 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(String name, User creator, boolean inGame, boolean hasPassword, int maxPlayers, boolean commandsAllowed, int moveTime,
-                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public LobbyDTO(String name, User creator, String password, boolean inGame, boolean hasPassword, int maxPlayers,
+                    boolean commandsAllowed, int moveTime, boolean startUpPhaseEnabled,
+                    boolean randomPlayfieldEnabled) {
         this.name = name;
         this.owner = creator;
+        this.password = password;
         this.users.add(creator);
         this.inGame = inGame;
         this.hasPassword = hasPassword;
@@ -70,14 +72,24 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame(), lobby.hasAPassword(), lobby.getMaxPlayers(),
-                            lobby.commandsAllowed(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
-                            lobby.randomPlayfieldEnabled());
+        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.getPassword(), lobby.isInGame(),
+                            lobby.hasAPassword(), lobby.getMaxPlayers(), lobby.commandsAllowed(), lobby.getMoveTime(),
+                            lobby.startUpPhaseEnabled(), lobby.randomPlayfieldEnabled());
     }
 
     @Override
     public boolean commandsAllowed() {
         return commandsAllowed;
+    }
+
+    @Override
+    public IConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(IConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
@@ -152,6 +164,16 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public boolean isStartUpPhaseEnabled() {
+        return startUpPhaseEnabled;
+    }
+
+    @Override
+    public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
+        this.startUpPhaseEnabled = startUpPhaseEnabled;
+    }
+
+    @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
         if (user instanceof Dummy) {
@@ -197,16 +219,6 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public boolean isStartUpPhaseEnabled() {
-        return startUpPhaseEnabled;
-    }
-
-    @Override
-    public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
-        this.startUpPhaseEnabled = startUpPhaseEnabled;
-    }
-
-    @Override
     public void setUserReady(UserOrDummy user) {
         this.readyUsers.add(user);
     }
@@ -230,13 +242,7 @@ public class LobbyDTO implements Lobby {
         this.owner = user;
     }
 
-    @Override
-    public void setConfiguration(IConfiguration configuration) {
-        this.configuration = configuration;
-    }
-
-    @Override
-    public IConfiguration getConfiguration() {
-        return configuration;
+    public String getPassword() {
+        return password;
     }
 }

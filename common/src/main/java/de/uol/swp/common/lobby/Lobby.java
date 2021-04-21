@@ -112,6 +112,8 @@ public interface Lobby extends Serializable {
      */
     User getOwner();
 
+    String getPassword();
+
     /**
      * Gets a set of all users marked as ready.
      *

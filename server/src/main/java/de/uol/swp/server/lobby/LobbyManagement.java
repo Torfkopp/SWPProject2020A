@@ -21,11 +21,12 @@ public class LobbyManagement implements ILobbyManagement {
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(String name, User owner, int maxPlayer, String lobbyPassword) throws IllegalArgumentException {
+    public void createLobby(String name, User owner, int maxPlayer,
+                            String lobbyPassword) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, false,false,  maxPlayer, true, 60, false, false));
+        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword,false, false, maxPlayer, true, 60, false, false));
     }
 
     @Override
@@ -51,17 +52,26 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
+    public Optional<Lobby> getLobby(String name, String password) {
+        Lobby lobby = lobbies.get(name);
+        if (lobby != null) {
+            return Optional.of(lobby);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public void setHasPassword(String lobbyName, boolean hasPassword) {
+        Optional<Lobby> found = getLobby(lobbyName);
+        if (found.isEmpty()) return;
+        found.get().setHasPassword(hasPassword);
+    }
+
+    @Override
     public void setInGame(String lobbyName, boolean inGame) {
         Optional<Lobby> found = getLobby(lobbyName);
         if (found.isEmpty()) return;
         found.get().setInGame(inGame);
-    }
-
-    @Override
-    public void setHasPassword(String lobbyName, boolean hasPassword){
-        Optional<Lobby> found = getLobby(lobbyName);
-        if(found.isEmpty()) return;
-        found.get().setHasPassword(hasPassword);
     }
 
     @Override

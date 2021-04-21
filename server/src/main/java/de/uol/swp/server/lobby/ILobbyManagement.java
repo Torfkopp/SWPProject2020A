@@ -61,6 +61,19 @@ public interface ILobbyManagement {
      */
     Optional<Lobby> getLobby(String name);
 
+    Optional<Lobby> getLobby(String name, String password);
+
+    /**
+     * Sets the hasPassword attribute of a lobby according to the boolean provided
+     *
+     * @param lobbyName
+     * @param hasPassword
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-20
+     */
+    void setHasPassword(String lobbyName, boolean hasPassword);
+
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided
      *

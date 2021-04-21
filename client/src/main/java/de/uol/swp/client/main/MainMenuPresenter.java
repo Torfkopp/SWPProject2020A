@@ -6,6 +6,7 @@ import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.lobby.event.ShowLobbyWithPasswordViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -405,7 +406,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse rsp){
         LOG.debug("Received JoinLobbyWithPasswordResponse");
         Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
+            eventBus.post(new ShowLobbyWithPasswordViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
     }
