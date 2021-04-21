@@ -240,7 +240,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //create Dialogue, disallow any use of § in the name (used for command parsing)
         UnaryOperator<TextFormatter.Change> filter = (s) ->
-                !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
+                !s.getControlNewText().startsWith("§") && !s.getText().matches("[#+*`´?=)(/&%$!;:.<>|²³}{~]+") && !s
+                        .getControlNewText().contains("§") ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
