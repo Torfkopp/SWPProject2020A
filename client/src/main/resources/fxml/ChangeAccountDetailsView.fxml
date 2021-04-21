@@ -13,12 +13,14 @@
             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeaccdetails.labels.newemail"/>
             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" text="%changeaccdetails.labels.newpw"/>
+            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" text="%changeaccdetails.labels.newpwconfirm"/>
         </VBox>
         <VBox alignment="CENTER_RIGHT" spacing="10.0">
             <PasswordField fx:id="confirmPasswordField" promptText="%changeaccdetails.prompts.confirmpw"/>
             <TextField fx:id="newUsernameField" promptText="%changeaccdetails.prompts.newusername"/>
             <TextField fx:id="newEMailField" promptText="%changeaccdetails.prompts.newemail"/>
             <PasswordField fx:id="newPasswordField" promptText="%changeaccdetails.prompts.newpw"/>
+            <PasswordField fx:id="newPasswordField2" promptText="%changeaccdetails.prompts.newpw"/>
         </VBox>
     </HBox>
 
