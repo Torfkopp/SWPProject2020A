@@ -1015,7 +1015,8 @@ public class GameService extends AbstractService {
         }
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
+            return;
         Inventory inv = game.getInventory(req.getUser());
 
         if (inv.getRoadBuildingCards() == 0) {
