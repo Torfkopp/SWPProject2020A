@@ -103,6 +103,12 @@
                     mnemonicParsing="false" onAction="#onStartSessionButtonPressed" prefWidth="120.0"
                     text="%lobby.game.buttons.startsession"/>
         </HBox>
+        <Label fx:id="turnPlayerName" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+               wrapText="true">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
         <Label fx:id="turnIndicator" maxHeight="30.0" maxWidth="-Infinity" minHeight="30.0" minWidth="-Infinity"
                prefWidth="230.0" wrapText="true">
             <font>
@@ -116,11 +122,18 @@
                       onAction="#onAutoRollCheckBoxClicked" prefHeight="30.0" prefWidth="115.0"
                       text="%lobby.game.autorollcheckbox" visible="false"/>
         </HBox>
-        <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed" prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.endturn" visible="false" />
-        <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false" onAction="#onTradeWithUserButtonPressed" prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.playertrade" visible="false" />
-        <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false" onAction="#onTradeWithBankButtonPressed" prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.banktrade" visible="false" />
-        <Button fx:id="playCard" disable="true" mnemonicParsing="false" onAction="#onPlayCardButtonPressed" prefHeight="30.0" prefWidth="230.0" text="%game.playcards.button" visible="false" />
-        <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity" prefWidth="230" text="%game.robber.position" visible="false" wrapText="true">
+        <Button fx:id="endTurn" disable="true" mnemonicParsing="false" onAction="#onEndTurnButtonPressed"
+                prefHeight="30.0" prefWidth="230.0" text="%lobby.game.buttons.endturn" visible="false"/>
+        <Button fx:id="tradeWithUserButton" disable="true" mnemonicParsing="false"
+                onAction="#onTradeWithUserButtonPressed" prefHeight="30.0" prefWidth="230.0"
+                text="%lobby.game.buttons.playertrade" visible="false"/>
+        <Button fx:id="tradeWithBankButton" disable="true" mnemonicParsing="false"
+                onAction="#onTradeWithBankButtonPressed" prefHeight="30.0" prefWidth="230.0"
+                text="%lobby.game.buttons.banktrade" visible="false"/>
+        <Button fx:id="playCard" disable="true" mnemonicParsing="false" onAction="#onPlayCardButtonPressed"
+                prefHeight="30.0" prefWidth="230.0" text="%game.playcards.button" visible="false"/>
+        <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
+               prefWidth="230" text="%game.robber.position" visible="false" wrapText="true">
 
         </Label>
         <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>
