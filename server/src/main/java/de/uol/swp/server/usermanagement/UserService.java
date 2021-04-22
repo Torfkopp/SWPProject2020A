@@ -116,8 +116,14 @@ public class UserService extends AbstractService {
         }
         ResponseMessage returnMessage;
         try {
-            userManagement.dropUser(req.getUser());
-            returnMessage = new UserDeletionSuccessfulResponse();
+            Optional<User> user = userManagement.getUser(req.getUser().getUsername(), req.getPassword());
+            if (user.isPresent()){
+                userManagement.dropUser(req.getUser());
+                returnMessage = new UserDeletionSuccessfulResponse();
+            }else {
+                returnMessage = new UserDeletionExceptionMessage(
+                        "User deletion unsuccessful for user [" + req.getUser().getUsername() + "]");
+            }
         } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new UserDeletionExceptionMessage(

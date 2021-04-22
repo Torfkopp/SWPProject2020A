@@ -61,7 +61,7 @@ class UserServiceTest {
         assertTrue(usr.isPresent());
 
         // Test Deletion of User
-        Message deletionRequest = new DeleteUserRequest(usr.get());
+        Message deletionRequest = new DeleteUserRequest(usr.get(), user.getPassword());
 
         // The post will lead to a call of a UserService function
         bus.post(deletionRequest);
