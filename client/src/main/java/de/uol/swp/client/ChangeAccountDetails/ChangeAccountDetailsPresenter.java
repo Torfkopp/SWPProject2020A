@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.Callable;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,6 +92,38 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     }
 
     /**
+     * Helper method to manage the disableState of the "Change"-Button
+     * <p>
+     * This method returns a callable that will be used by the BooleanBinding
+     * bound to the disableProperty of the "Change"-Button. The Callable
+     * will check the contents of all fields and return true if the current
+     * contents will not lead to a successful request.
+     *
+     * @return Callable that will return true if the button should be disabled,
+     * false otherwise
+     *
+     * @implNote The user's password cannot be checked as the client will never
+     * have access to any password information. The Callable will only check
+     * that the user has typed in anything at all into the "Confirm Current
+     * Password"-Field.
+     * @author Sven Ahrens
+     * @since 2021-04-22
+     */
+    private Callable<Boolean> manageChangeButtonState() {
+        return () -> {
+            boolean newNameEmpty = newUsernameField.getText().isEmpty();
+            boolean newMailEmpty = newEMailField.getText().isEmpty();
+            boolean newPWEmpty = newPasswordField.getText().isEmpty() && newPasswordField2.getText().isEmpty();
+            boolean allEmpty = newNameEmpty && newMailEmpty && newPWEmpty;
+            boolean newNameValid = newUsernameField.getText().matches("[A-Za-z0-9_-]+");
+            boolean newMailValid = checkMailFormat(newEMailField.getText());
+            boolean newPWValid = newPasswordField.getText().equals(newPasswordField2.getText());
+            boolean oldPWEmpty = confirmPasswordField.getText().isEmpty();
+            return oldPWEmpty || allEmpty || !newNameEmpty && !newNameValid || !newMailEmpty && !newMailValid || !newPWEmpty && !newPWValid;
+        };
+    }
+
+    /**
      * Method called when the button to cancel the process is pressed
      * <p>
      * This Method is called when the CancelButton is pressed. It posts an instance
@@ -125,8 +158,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        //the UserData is set in the showChangePasswordScreen Method in the SceneManager
-
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changepw")));
@@ -175,7 +206,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     /**
      * Prepares the newUsernameField
-     * Helper method, called when the ChangeAccountDetailspresenter is initialised in order to let the newUsernameField
+     * <p>
+     * Helper method, called when the ChangeAccountDetailsPresenter is initialised in order to let the newUsernameField
      * only accept alphanumeric entries with the addition of underscore and hyphen
      *
      * @author Sven Ahrens
@@ -186,15 +218,10 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
         newUsernameField.setTextFormatter(new TextFormatter<>(StringFilter));
 
-        //@formatter:off
-        changeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-            boolean name = Strings.isNullOrEmpty(newUsernameField.getText())|| !newUsernameField.getText().matches("[A-Za-z0-9_-]+");
-            boolean mail = Strings.isNullOrEmpty(newEMailField.getText()) || !checkMailFormat(newEMailField.getText());
-            boolean newPassword = !newPasswordField.getText().equals(newPasswordField2.getText());
-            boolean oldPassword = Strings.isNullOrEmpty(confirmPasswordField.getText());
-        return !(name || mail || newPassword) || oldPassword;
-        }, newUsernameField.textProperty(), newEMailField.textProperty(), newPasswordField.textProperty(),
-                                                                          newPasswordField2.textProperty(),
-                                                                          confirmPasswordField.textProperty()));
-    }//@formatter:on
+        changeButton.disableProperty()
+                    .bind(Bindings.createBooleanBinding(manageChangeButtonState(), newPasswordField.textProperty(),
+                                                        newPasswordField2.textProperty(),
+                                                        confirmPasswordField.textProperty(),
+                                                        newUsernameField.textProperty(), newEMailField.textProperty()));
+    }
 }
