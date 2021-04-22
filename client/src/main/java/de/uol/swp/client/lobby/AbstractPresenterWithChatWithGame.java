@@ -199,8 +199,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (user.equals(membersList.get(2))) {
                 turnPlayerName.setTextFill(GameRendering.PLAYER_3_COLOUR);
             }
-            if (user.equals(membersList.get(3))) {
-                turnPlayerName.setTextFill(GameRendering.PLAYER_4_COLOUR);
+            if (membersList.size() == 4) {
+                if (user.equals(membersList.get(3))) {
+                    turnPlayerName.setTextFill(GameRendering.PLAYER_4_COLOUR);
+                }
             }
         });
     }
