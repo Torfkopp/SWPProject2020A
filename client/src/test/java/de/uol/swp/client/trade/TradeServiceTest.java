@@ -53,7 +53,7 @@ class TradeServiceTest {
         defaultInventoryMap.put("game.resources.ore", 10);
         defaultInventoryMap.put("game.resources.lumber", 10);
         defaultInventoryMap.put("game.resources.wool", 10);
-        defaultTradeOfferResp = new TradeWithUserOfferResponse(defaultUser, secondUser, defaultInventoryMap,
+        defaultTradeOfferResp = new TradeWithUserOfferResponse(defaultUser, defaultInventoryMap,
                                                                defaultOffer, defaultDemand, defaultLobbyName);
     }
 
@@ -260,10 +260,6 @@ class TradeServiceTest {
                      eve.getRsp().getRespondingResourceMap().keySet());
         assertEquals(defaultTradeOfferResp.getRespondingResourceMap().values(),
                      eve.getRsp().getRespondingResourceMap().values());
-        assertEquals(defaultTradeOfferResp.getRespondingUser(), eve.getRsp().getRespondingUser());
-        assertEquals(defaultTradeOfferResp.getRespondingUser().getID(), eve.getRsp().getRespondingUser().getID());
-        assertEquals(defaultTradeOfferResp.getRespondingUser().getUsername(),
-                     eve.getRsp().getRespondingUser().getUsername());
     }
 
     @Test

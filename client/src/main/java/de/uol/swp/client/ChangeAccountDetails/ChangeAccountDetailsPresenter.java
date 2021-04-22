@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangeAccountDetailsView.fxml";
-    public static final int MIN_HEIGHT = 230;
+    public static final int MIN_HEIGHT = 390;
     public static final int MIN_WIDTH = 395;
     private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
@@ -42,6 +42,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     private TextField newEMailField;
     @FXML
     private PasswordField confirmPasswordField;
+    @FXML
+    private PasswordField newPasswordField2;
 
     /**
      * Constructor
@@ -124,15 +126,29 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
         User user = userService.getLoggedInUser();
         String newPassword = userService.hash(confirmPasswordField.getText());
+        String newHashedPassword = userService.hash(newPasswordField.getText());
+        String newConfirmHashedPassword = userService.hash(newPasswordField2.getText());
         String newUsername = user.getUsername();
         String newEMail = user.getEMail();
 
         if (Strings.isNullOrEmpty(newUsernameField.getText()) && Strings
-                .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText())) {
+                .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
+                    .isNullOrEmpty(newPasswordField2.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails")));
         } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
+        } else if (Strings.isNullOrEmpty(newPasswordField.getText()) && !Strings
+                .isNullOrEmpty(newPasswordField2.getText())) {
+            eventBus.post(
+                    new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
+        } else if (!Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
+                .isNullOrEmpty(newPasswordField2.getText())) {
+            eventBus.post(
+                    new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
+        } else if (!newHashedPassword.equals(newConfirmHashedPassword)) {
+            eventBus.post(new ChangeAccountDetailsErrorEvent(
+                    resourceBundle.getString("changeaccdetails.error.empty.newpasswordconfirm")));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
                 newPassword = userService.hash(newPasswordField.getText());

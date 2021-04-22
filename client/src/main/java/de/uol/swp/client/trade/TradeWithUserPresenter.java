@@ -3,7 +3,6 @@ package de.uol.swp.client.trade;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
@@ -24,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages the Trading with the user window
+ * Manages the TradingWithUser window
  *
  * @author Finn Haase
  * @author Maximilian Lindner
@@ -32,7 +31,7 @@ import java.util.Map;
  * @since 2021-02-23
  */
 @SuppressWarnings("UnstableApiUsage")
-public class TradeWithUserPresenter extends AbstractPresenter {
+public class TradeWithUserPresenter extends AbstractTradePresenter {
 
     public static final String fxml = "/fxml/TradeWithUserView.fxml";
     public static final int MIN_HEIGHT = 650;
@@ -76,21 +75,13 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     }
 
     /**
-     * Initialises the Presenter by setting up the ownResourceView.
+     * Initialises the Presenter using its superclass
      *
      * @implNote Called automatically by JavaFX
      */
     @FXML
     public void initialize() {
-        ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<String, Integer> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
-                });
-            }
-        });
+        super.initialize();
         LOG.debug("TradeWithUserPresenter initialised");
     }
 
@@ -100,7 +91,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * Checks if there is no selected resource at all or if too
      * many resources were demanded by the offering player.
      *
-     * @return if any resource is selected
+     * @return true if any resource is selected
      */
     private boolean checkResources() {
         int selectedOwnResourceMapCounter = 0;
@@ -122,15 +113,13 @@ public class TradeWithUserPresenter extends AbstractPresenter {
      * <p>
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeWithUserCancelResponse to close the responding
-     * trading window, if existent.
+     * trading window if existent.
      *
      * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
-        Platform.runLater(() -> {
-            tradeService.closeUserTradeWindow(lobbyName);
-            tradeService.cancelTrade(lobbyName, respondingUser);
-        });
+        tradeService.closeUserTradeWindow(lobbyName);
+        tradeService.cancelTrade(lobbyName, respondingUser);
     }
 
     /**
@@ -249,7 +238,7 @@ public class TradeWithUserPresenter extends AbstractPresenter {
     /**
      * Handles a TradeWithUserUpdateEvent
      * <p>
-     * If the lobbyname or the logged in user of the TradeWithUserPresenter are
+     * If the lobbyName or the logged in user of the TradeWithUserPresenter are
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithUserPresenter is created. If a window is closed using e.g.
      * X(top-right-Button), the closeWindow method is called.
