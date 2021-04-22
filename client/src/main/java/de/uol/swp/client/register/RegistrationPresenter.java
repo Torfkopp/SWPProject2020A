@@ -7,10 +7,9 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.common.user.UserDTO;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,6 +41,8 @@ public class RegistrationPresenter extends AbstractPresenter {
     private PasswordField passwordField1;
     @FXML
     private PasswordField passwordField2;
+    @FXML
+    private Button registerButton;
 
     /**
      * Constructor
@@ -146,5 +147,15 @@ public class RegistrationPresenter extends AbstractPresenter {
         UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
         loginField.setTextFormatter(new TextFormatter<>(StringFilter));
+        //@formatter:off
+        registerButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            boolean name = loginField.getText().isBlank() || !loginField.getText().matches("[A-Za-z0-9_-]+");
+            boolean mail = emailField.getText().isBlank() || !checkMailFormat(emailField.getText());
+            boolean password = passwordField1.getText().isBlank()
+                               || !passwordField1.getText().equals(passwordField2.getText())
+                               || passwordField2.getText().isBlank();
+            return name || mail || password;
+            }, loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
+        //@formatter:on
     }
 }

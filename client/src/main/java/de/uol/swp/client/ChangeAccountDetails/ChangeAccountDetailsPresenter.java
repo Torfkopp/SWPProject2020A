@@ -9,10 +9,9 @@ import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEve
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,6 +35,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
 
+    @FXML
+    private Button changeButton;
     @FXML
     private PasswordField newPasswordField;
     @FXML
@@ -184,5 +185,16 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
         newUsernameField.setTextFormatter(new TextFormatter<>(StringFilter));
-    }
+
+        //@formatter:off
+        changeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            boolean name = Strings.isNullOrEmpty(newUsernameField.getText())|| !newUsernameField.getText().matches("[A-Za-z0-9_-]+");
+            boolean mail = Strings.isNullOrEmpty(newEMailField.getText()) || !checkMailFormat(newEMailField.getText());
+            boolean newPassword = !newPasswordField.getText().equals(newPasswordField2.getText());
+            boolean oldPassword = Strings.isNullOrEmpty(confirmPasswordField.getText());
+        return !(name || mail || newPassword) || oldPassword;
+        }, newUsernameField.textProperty(), newEMailField.textProperty(), newPasswordField.textProperty(),
+                                                                          newPasswordField2.textProperty(),
+                                                                          confirmPasswordField.textProperty()));
+    }//@formatter:on
 }

@@ -16,6 +16,7 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -239,9 +240,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                                     userService.getLoggedInUser().getUsername());
 
         //create Dialogue, disallow any use of § in the name (used for command parsing)
-        UnaryOperator<TextFormatter.Change> filter = (s) ->
-                !s.getControlNewText().startsWith("§") && !s.getText().matches("[#+*`´?=)(/&%$!;:.<>|²³}{~]+") && !s
-                        .getControlNewText().contains("§") ? s : null;
+        UnaryOperator<TextFormatter.Change> filter = s ->
+                s.getControlNewText().matches("[ A-Za-z0-9_',-]+") || s.isDeleted() ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
@@ -265,6 +265,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+        dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
+                () -> lobbyName.getText().isBlank() || !lobbyName.getText().matches("[ A-Za-z0-9_',-]+"),
+                lobbyName.textProperty()));
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
