@@ -17,16 +17,19 @@ public class DeleteUserRequest extends AbstractRequestMessage {
 
     private static final long serialVersionUID = 7375314481654981321L;
     private final User toDelete;
+    private final String password;
 
     /**
      * Constructor
      *
      * @param toDelete The user to delete
+     * @param password The logged in users password
      *
      * @since 2020-11-02
      */
-    public DeleteUserRequest(User toDelete) {
+    public DeleteUserRequest(User toDelete, String password) {
         this.toDelete = toDelete;
+        this.password = password;
     }
 
     @Override
@@ -45,6 +48,18 @@ public class DeleteUserRequest extends AbstractRequestMessage {
         if (o == null || getClass() != o.getClass()) return false;
         DeleteUserRequest that = (DeleteUserRequest) o;
         return Objects.equals(toDelete, that.toDelete);
+    }
+
+    /**
+     * Gets the users password
+     *
+     * @return The users password
+     *
+     * @author Timo Gerken
+     * @since 2021-04-19
+     */
+    public String getPassword() {
+        return password;
     }
 
     /**

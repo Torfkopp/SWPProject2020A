@@ -9,6 +9,9 @@ import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
+import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.Inventory;
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.*;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
@@ -293,9 +296,20 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (inv.get(Resource.ResourceType.BRICK) >= 1 && inv.get(Resource.ResourceType.LUMBER) >= 1) {
-                        inv.increase(Resource.ResourceType.BRICK, -1);
-                        inv.increase(Resource.ResourceType.LUMBER, -1);
+                    if (game.getRoadBuildingCardPhase() != RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED) {
+                        if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD)
+                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD);
+                        else if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
+                            LOG.debug("---- RoadBuildingCardPhase phase ends");
+                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED);
+                        }
+                        gameMap.placeRoad(player, mapPoint);
+                        sendSuccess.accept(req.getOriginLobby(),
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                         BuildingSuccessfulMessage.Type.ROAD));
+                    } else if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
+                        inv.increaseBrick(-1);
+                        inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
@@ -631,7 +645,7 @@ public class GameService extends AbstractService {
         ResourceListMap resourceMap = respondingInventory.getResources();
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), req.getRespondingUser(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
                                                                        resourceMap, req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
@@ -805,10 +819,12 @@ public class GameService extends AbstractService {
             returnMessage.initWithMessage(req);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
-            LOG.debug("---- Not enough RoadBuilding cards");
+            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
             return;
         }
-        //TODO: Implementierung
+
+        LOG.debug("---- RoadBuildingCardPhase phase starts");
+        game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD);
 
         inv.decrease(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD);
 

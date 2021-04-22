@@ -10,9 +10,10 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
@@ -30,6 +31,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Window;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -55,7 +57,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected ListView<Resource> inventoryView;
+    protected ListView<Pair<String, String>> inventoryView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -89,7 +91,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
+    protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     protected boolean autoRollEnabled = false;
+    protected boolean playedCard = false;
     protected boolean inGame;
     protected int moveTime;
     protected User owner;
@@ -100,7 +104,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     private ITradeService tradeService;
 
-    private ObservableList<Resource> resourceList;
+    private ObservableList<Pair<String, String>> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
@@ -283,7 +287,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
-        LOG.debug("Received BuildingSuccessfullMessage");
+        LOG.debug("Received BuildingSuccessfulMessage");
+        if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
+            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
+            LOG.debug("---- First road successfully built");
+            Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
+        } else if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
+            roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+            LOG.debug("---- Second road successfully built");
+            Platform.runLater(() -> notice.setVisible(false));
+            resetButtonStates(userService.getLoggedInUser());
+        }
         gameService.updateGameMap(lobbyName);
         String attr = null;
         switch (msg.getType()) {
@@ -326,11 +340,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
-        if ((msg.getDice1() + msg.getDice2()) != 7) {
-            resetButtonStates(msg.getUser());
-        }
+        playedCard = false;
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
+        if ((dice1 + dice2) != 7) {
+            resetButtonStates(msg.getUser());
+        }
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         gameService.updateInventory(lobbyName);
     }
@@ -366,6 +381,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
+            gameService.buildRequest(lobbyName, mapPoint);
+        }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition) {
@@ -443,6 +461,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+            disableButtonStates();
+            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
             gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
@@ -492,6 +514,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
+        playedCard = true;
         gameService.updateInventory(rsp.getLobbyName());
     }
 
@@ -624,6 +647,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
         LOG.debug("Received RobberNewPositionResponse");
+        Platform.runLater(() -> notice.setText(resourceBundle.getString("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
     }
@@ -829,8 +853,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 inventoryView.setItems(resourceList);
             }
             resourceList.clear();
-            for (Resource entry : rsp.getResourceMap()) {
-                resourceList.add(entry.create());
+            for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(), entry.getValue().toString()));
+            }
+            for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
+                resourceList.add(new Pair<>(entry.getKey(),
+                                            entry.getValue() ? resourceBundle.getString("game.property.has") :
+                                            resourceBundle.getString("game.property.hasnot")));
             }
         });
     }
@@ -859,12 +888,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
-        Resource.ResourceType resource = Resource.ResourceType.BRICK;
+        Resources resource = Resources.BRICK;
         if (rst.isPresent()) {
-            if (rst.get().equals(ore)) resource = Resource.ResourceType.ORE;
-            else if (rst.get().equals(grain)) resource = Resource.ResourceType.GRAIN;
-            else if (rst.get().equals(lumber)) resource = Resource.ResourceType.LUMBER;
-            else if (rst.get().equals(wool)) resource = Resource.ResourceType.WOOL;
+            if (rst.get().equals(ore)) resource = Resources.ORE;
+            else if (rst.get().equals(grain)) resource = Resources.GRAIN;
+            else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
+            else if (rst.get().equals(wool)) resource = Resources.WOOL;
             gameService.playMonopolyCard(lobbyName, resource);
         }
     }
@@ -914,18 +943,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Checks if the pressed button is the same as the confirm button
         if (rst.toString().equals(button1.toString())) {
             //Create two resource variables
-            Resource.ResourceType resource1 = Resource.ResourceType.BRICK;
-            Resource.ResourceType resource2 = Resource.ResourceType.BRICK;
+            Resources resource1 = Resources.BRICK;
+            Resources resource2 = Resources.BRICK;
             //Convert String to Resource
-            if (c1.getValue().equals(ore)) resource1 = Resource.ResourceType.ORE;
-            else if (c1.getValue().equals(grain)) resource1 = Resource.ResourceType.GRAIN;
-            else if (c1.getValue().equals(lumber)) resource1 = Resource.ResourceType.LUMBER;
-            else if (c1.getValue().equals(wool)) resource1 = Resource.ResourceType.WOOL;
+            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
+            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
+            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
+            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
             //Second ChoiceBox's conversion
-            if (c2.getValue().equals(ore)) resource2 = Resource.ResourceType.ORE;
-            else if (c2.getValue().equals(grain)) resource2 = Resource.ResourceType.GRAIN;
-            else if (c2.getValue().equals(lumber)) resource2 = Resource.ResourceType.LUMBER;
-            else if (c2.getValue().equals(wool)) resource2 = Resource.ResourceType.WOOL;
+            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
+            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
+            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
+            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
             //Send Request
             gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
         }
@@ -943,11 +972,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareInventoryView() {
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Resource item, boolean empty) {
+            protected void updateItem(Pair<String, String> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :
-                            item.getAmount() + " " + item.getType().toString());
+                            item.getValue() + " " + resourceBundle.getString(item.getKey()));
                 });
             }
         });
@@ -1002,7 +1031,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
         endTurn.setDisable(!userService.getLoggedInUser().equals(user));
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        playCard.setDisable(!userService.getLoggedInUser().equals(user));
+        if (!playedCard) playCard.setDisable(!userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }

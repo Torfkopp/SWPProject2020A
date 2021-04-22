@@ -25,7 +25,6 @@ import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.message.ServerInternalMessage;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
-import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,15 +46,14 @@ public class LobbyService extends AbstractService {
     /**
      * Constructor
      *
-     * @param lobbyManagement   The management class for creating, storing, and deleting
-     *                          lobbies
+     * @param lobbyManagement   The management class for creating, storing, and deleting lobbies
      * @param sessionManagement The session management
      * @param eventBus          The server-wide EventBus
      *
      * @since 2019-10-08
      */
     @Inject
-    public LobbyService(ILobbyManagement lobbyManagement, SessionManagement sessionManagement, EventBus eventBus) {
+    public LobbyService(ILobbyManagement lobbyManagement, ISessionManagement sessionManagement, EventBus eventBus) {
         super(eventBus);
         if (LOG.isDebugEnabled()) LOG.debug("LobbyService started");
         this.lobbyManagement = lobbyManagement;

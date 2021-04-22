@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.common.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.user.response.*;
 import io.netty.channel.Channel;
 import javafx.application.Application;
@@ -227,24 +226,6 @@ public class ClientApp extends Application implements ConnectionListener {
     @Subscribe
     private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
         LOG.info("Registration was successful.");
-        sceneManager.showLoginScreen();
-    }
-
-    /**
-     * Handles a successful User deletions
-     * <p>
-     * If a UserDeletionSuccessfulResponse object is detected on the EventBus, this method is called.
-     * It tells the SceneManager to show the login window. If the loglevel is set to INFO or higher,
-     * "Deletion of user successful." is written to the log.
-     *
-     * @param rsp The UserDeletionSuccessfulResponse object detected on the EventBus
-     *
-     * @see de.uol.swp.client.SceneManager
-     * @since 2020-12-17
-     */
-    @Subscribe
-    private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
-        LOG.info("Deletion of user was successful.");
         sceneManager.showLoginScreen();
     }
 }

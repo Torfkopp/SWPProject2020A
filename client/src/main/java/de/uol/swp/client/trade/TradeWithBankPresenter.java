@@ -3,21 +3,18 @@ package de.uol.swp.client.trade;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
-import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
-import de.uol.swp.common.game.ResourceListMap;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Manages the Trading with the bank window
+ * Manages the TradingWithBank window
  *
  * @author Alwin Bossert
  * @author Maximilian Lindner
@@ -36,18 +33,18 @@ import java.util.Map;
  * @since 2021-02-19
  */
 @SuppressWarnings("UnstableApiUsage")
-public class TradeWithBankPresenter extends AbstractPresenter {
+public class TradeWithBankPresenter extends AbstractTradePresenter {
 
     public static final String fxml = "/fxml/TradeWithBankView.fxml";
     public static final int MIN_HEIGHT = 433;
     public static final int MIN_WIDTH = 620;
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
-    private LobbyName lobbyName;
-    private ResourceListMap resourceMap;
+    private String lobbyName;
+    private Map<String, Integer> resourceMap;
     private List<IHarborHex.HarborResource> harborMap;
-    private ObservableList<Pair<Resource.ResourceType, Integer>> resourceList;
-    private ObservableList<Pair<Resource.ResourceType, Integer>> bankResourceList;
-    private ObservableList<Pair<Resource.ResourceType, Integer>> ownInventoryList;
+    private ObservableList<Pair<String, Integer>> resourceList;
+    private ObservableList<Pair<String, Integer>> bankResourceList;
+    private ObservableList<Pair<String, Integer>> ownInventoryList;
 
     @Inject
     private IGameService gameService;
@@ -55,15 +52,13 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private ITradeService tradeService;
 
     @FXML
-    private ListView<Resource> ownInventoryView;
+    private ListView<Pair<String, Integer>> ownInventoryView;
     @FXML
-    private ListView<Resource> ownResourceToTradeWithView;
+    private ListView<Pair<String, Integer>> ownResourceToTradeWithView;
     @FXML
-    private ListView<Resource> bankResourceView;
+    private ListView<Pair<String, Integer>> bankResourceView;
     @FXML
     private Button buyDevelopmentButton;
-    @FXML
-    private Button cancelButton;
     @FXML
     private Button tradeResourceWithBankButton;
 
@@ -80,40 +75,16 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     }
 
     /**
-     * Initialises the Presenter by setting up the ownResourceView, the bankResourceView
-     * and the ownInventoryView.
+     * Initialises the Presenter by setting up the ownResourceView and
+     * the bankResourceView.
      *
      * @implNote Called automatically by JavaFX
      */
     @FXML
     public void initialize() {
-        ownResourceToTradeWithView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey().getAttributeName()));
-                });
-            }
-        });
-        bankResourceView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey().getAttributeName()));
-                });
-            }
-        });
-        ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey().getAttributeName()));
-                });
-            }
-        });
+        super.initialize();
+        ownResourceToTradeWithView.setCellFactory(lv -> getListCell());
+        bankResourceView.setCellFactory(lv -> getListCell());
         LOG.debug("TradeWithBankPresenter initialised");
     }
 
@@ -128,10 +99,13 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
-        if (resourceMap.getAmount(Resource.ResourceType.ORE) >= 1 && resourceMap.getAmount(Resource.ResourceType.GRAIN) >= 1 && resourceMap
-                                                                                                                  .getAmount(Resource.ResourceType.WOOL) >= 1) {
+        //@formatter:off
+        if (resourceMap.get("game.resources.ore") >= 1 &&
+            resourceMap.get("game.resources.grain") >= 1 &&
+            resourceMap.get("game.resources.wool") >= 1) {
             tradeService.buyDevelopmentCard(lobbyName);
         }
+        //@formatter:on
     }
 
     /**
@@ -189,8 +163,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             resourceMap = rsp.getResourceMap();
             setTradingLists();
         }
-        if (resourceMap.getAmount(Resource.ResourceType.ORE) >= 1 && resourceMap.getAmount(Resource.ResourceType.GRAIN) >= 1 && resourceMap
-                                                                                                                  .getAmount(Resource.ResourceType.WOOL) >= 1) {
+        if (resourceMap.get("game.resources.ore") >= 1 && resourceMap.get("game.resources.grain") >= 1 && resourceMap
+                                                                                                                  .get("game.resources.wool") >= 1) {
             buyDevelopmentButton.setDisable(false);
         }
     }
@@ -208,8 +182,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
-        Resource bankResource;
-        Resource giveResource;
+        Pair<String, Integer> bankResource;
+        Pair<String, Integer> giveResource;
         ownResourceToTradeWithView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
             tradeService.showTradeError(resourceBundle.getString("game.error.trade.noplayerresource"));
@@ -225,8 +199,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             bankResource = bankResourceView.getSelectionModel().getSelectedItem();
         }
         if (bankResource != null && giveResource != null) {
-            Resource.ResourceType userGetsResource = bankResource.getKey();
-            Resource.ResourceType userLosesResource = giveResource.getKey();
+            String userGetsResource = bankResource.getKey();
+            String userLosesResource = giveResource.getKey();
             if (userGetsResource.equals(userLosesResource)) return;
             tradeService.executeTradeWithBank(lobbyName, userGetsResource, userLosesResource);
         }
@@ -235,7 +209,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     /**
      * Handles a TradeUpdateEvent
      * <p>
-     * If the lobbyname and the logged in user of the TradeWithBankPresenter are
+     * If the lobbyName and the logged in user of the TradeWithBankPresenter are
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithBankPresenter is created. If a window is closed using the
      * X(top-right-Button), the closeWindow method is called.
@@ -302,9 +276,11 @@ public class TradeWithBankPresenter extends AbstractPresenter {
         if (harborMap.contains(IHarborHex.HarborResource.LUMBER))
             tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
 
-        for (Map.Entry<Resource.ResourceType, Integer> entry : resourceMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             ownInventoryList.add(new Pair<>(entry.getKey(), entry.getValue()));
-            IHarborHex.HarborResource harborResource = IHarborHex.getHarborResource(entry.getKey());
+            String resource = entry.getKey().toUpperCase();
+            resource = resource.replaceFirst("^GAME.RESOURCES.", "");
+            IHarborHex.HarborResource harborResource = IHarborHex.HarborResource.valueOf(resource);
             if (entry.getValue() < tradingRatio.get(harborResource)) continue;
             resourceList.add(new Pair<>(entry.getKey(), tradingRatio.get(harborResource)));
         }
@@ -316,7 +292,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             bankResourceView.setItems(bankResourceList);
         }
         bankResourceList.clear();
-        for (Map.Entry<Resource.ResourceType, Integer> entry : resourceMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
             bankResourceList.add(new Pair<>(entry.getKey(), 1));
         }
     }

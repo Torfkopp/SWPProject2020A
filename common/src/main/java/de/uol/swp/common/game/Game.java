@@ -21,13 +21,12 @@ public class Game {
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
+    private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private UserOrDummy activePlayer;
-    private Player playerWithLongestRoad = null;
-    private Player playerWithLargestArmy = null;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
-    private BankInventory bankInvent = new BankInventory();
+    private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
 
     /**
      * Constructor
@@ -47,6 +46,8 @@ public class Game {
             }
         }
         activePlayer = first;
+        BankInventory bankInvent = new BankInventory();
+        bankInventory = bankInvent.getDevelopmentCards();
     }
 
     /**
@@ -85,11 +86,11 @@ public class Game {
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += players.get(player).get(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD);
+        points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (Objects.equals(playerWithLongestRoad, player)) points += 2;
+        if (players.get(player).isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (Objects.equals(playerWithLargestArmy, player)) points += 2;
+        if (players.get(player).isLargestArmy()) points += 2;
         return points;
     }
 
@@ -117,7 +118,23 @@ public class Game {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
                 if (i.getOwner() != null) {
-                    getInventory(i.getOwner()).increase(hex.getResource());
+                    switch (hex.getResource()) {
+                        case HILLS:
+                            getInventory(i.getOwner()).increaseBrick(amount);
+                            break;
+                        case FIELDS:
+                            getInventory(i.getOwner()).increaseGrain(amount);
+                            break;
+                        case FOREST:
+                            getInventory(i.getOwner()).increaseLumber(amount);
+                            break;
+                        case PASTURE:
+                            getInventory(i.getOwner()).increaseWool(amount);
+                            break;
+                        case MOUNTAINS:
+                            getInventory(i.getOwner()).increaseOre(amount);
+                            break;
+                    }
                 }
             }
         }
@@ -152,8 +169,8 @@ public class Game {
      *
      * @since 2021-02-21
      */
-    public BankInventory getBankInventory() {
-        return bankInvent;
+    public List<String> getBankInventory() {
+        return bankInventory;
     }
 
     /**
@@ -259,10 +276,35 @@ public class Game {
     }
 
     /**
+     * Gets the roadBuildingCardPhase
+     *
+     * @return NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
+     *
+     * @author Mario Fokken
+     * @since 2021-04-20
+     */
+    public RoadBuildingCardPhase getRoadBuildingCardPhase() {
+        return roadBuildingCardPhase;
+    }
+
+    /**
+     * Sets the roadBuildingCardPhase
+     *
+     * @param roadBuildingCardPhase NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
+     *
+     * @author Mario Fokken
+     * @since 2021-04-20
+     */
+    public void setRoadBuildingCardPhase(RoadBuildingCardPhase roadBuildingCardPhase) {
+        this.roadBuildingCardPhase = roadBuildingCardPhase;
+    }
+
+    /**
      * Gets the taxPayer Set
      *
      * @return Set of the taxPayer
      *
+     * @author Mario Fokken
      * @since 2021-04-11
      */
     public Set<User> getTaxPayers() {
@@ -278,27 +320,6 @@ public class Game {
      */
     public UserOrDummy getUserFromPlayer(Player player) {
         return players.getUserOrDummyFromPlayer(player);
-    }
-
-    /**
-     * Gets the next player and sets it as the new active player
-     *
-     * @return User object of the next player
-     */
-    public UserOrDummy nextPlayer() {
-        activePlayer = getNextPlayer();
-        return activePlayer;
-    }
-
-    /**
-     * Removes a user from the taxPayers
-     *
-     * @param user User to remove
-     *
-     * @since 2021-04-11
-     */
-    public void removeTaxPayer(User user) {
-        taxPayers.remove(user);
     }
 
     /**
@@ -351,5 +372,27 @@ public class Game {
      */
     public void setDiceRolledAlready(boolean diceRolledAlready) {
         this.diceRolledAlready = diceRolledAlready;
+    }
+
+    /**
+     * Gets the next player and sets it as the new active player
+     *
+     * @return User object of the next player
+     */
+    public UserOrDummy nextPlayer() {
+        activePlayer = getNextPlayer();
+        return activePlayer;
+    }
+
+    /**
+     * Removes a user from the taxPayers
+     *
+     * @param user User to remove
+     *
+     * @author Mario Fokken
+     * @since 2021-04-11
+     */
+    public void removeTaxPayer(User user) {
+        taxPayers.remove(user);
     }
 }
