@@ -175,7 +175,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     /**
      * Prepares the newUsernameField
-     * Helper method, called when the ChangeAccountDetailspresenter is initialized in order to let the newUsernameField
+     * Helper method, called when the ChangeAccountDetailspresenter is initialised in order to let the newUsernameField
      * only accept alphanumeric entries with the addition of underscore and hyphen
      *
      * @author Sven Ahrens

@@ -137,7 +137,7 @@ public class RegistrationPresenter extends AbstractPresenter {
 
     /**
      * Prepares the loginField
-     * Helper method, called when the Registrationpresenter is initialized in order to let the loginField
+     * Helper method, called when the Registrationpresenter is initialised in order to let the loginField
      * only accept alphanumeric entries with the addition of underscore and hyphen
      *
      * @author Sven Ahrens
