@@ -14,6 +14,9 @@ import de.uol.swp.server.game.IGameManagement;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.sessionmanagement.ISessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionService;
 import de.uol.swp.server.usermanagement.*;
 import de.uol.swp.server.usermanagement.store.*;
 import org.apache.logging.log4j.Level;
@@ -86,13 +89,15 @@ public class ServerModule extends AbstractModule {
         bind(UserStore.class).toInstance(store);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
-        bind(AuthenticationService.class).in(Scopes.SINGLETON);
-        bind(ChatService.class).in(Scopes.SINGLETON);
         bind(IChatManagement.class).to(ChatManagement.class).in(Scopes.SINGLETON);
         bind(IGameManagement.class).to(GameManagement.class).in(Scopes.SINGLETON);
+        bind(ISessionManagement.class).to(SessionManagement.class).in(Scopes.SINGLETON);
         bind(ILobbyManagement.class).to(LobbyManagement.class).in(Scopes.SINGLETON);
         bind(IUserManagement.class).to(UserManagement.class).in(Scopes.SINGLETON);
+        bind(AuthenticationService.class).in(Scopes.SINGLETON);
+        bind(ChatService.class).in(Scopes.SINGLETON);
         bind(GameService.class).in(Scopes.SINGLETON);
+        bind(SessionService.class).in(Scopes.SINGLETON);
         bind(LobbyService.class).in(Scopes.SINGLETON);
         bind(UserService.class).in(Scopes.SINGLETON);
     }

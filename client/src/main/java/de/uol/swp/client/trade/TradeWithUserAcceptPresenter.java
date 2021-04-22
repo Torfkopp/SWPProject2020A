@@ -3,7 +3,6 @@ package de.uol.swp.client.trade;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
@@ -13,7 +12,9 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -22,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 
 /**
- * Manages the trading accept menu
+ * Manages the tradingAccept menu
  *
  * @author Maximilian Lindner
  * @author Finn Haase
@@ -30,7 +31,7 @@ import java.util.Map;
  * @since 2021-02-25
  */
 @SuppressWarnings("UnstableApiUsage")
-public class TradeWithUserAcceptPresenter extends AbstractPresenter {
+public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
 
     public static final String fxml = "/fxml/TradeWithUserAcceptView.fxml";
     public static final int MIN_HEIGHT = 340;
@@ -51,7 +52,6 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
 
     private String lobbyName;
     private UserOrDummy offeringUser;
-    private UserOrDummy respondingUser;
     private Map<String, Integer> offeringResourceMap;
     private Map<String, Integer> resourceMap;
     private Map<String, Integer> respondingResourceMap;
@@ -68,21 +68,13 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     }
 
     /**
-     * Initialises the Presenter by setting up the ownInventoryView.
+     * Initialises the Presenter using the superclass.
      *
      * @implNote Called automatically by JavaFX
      */
     @FXML
     public void initialize() {
-        ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<String, Integer> item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" :
-                            item.getValue().toString() + " " + resourceBundle.getString(item.getKey()));
-                });
-            }
-        });
+        super.initialize();
         LOG.debug("TradeWithUserAcceptPresenter initialised");
     }
 
@@ -106,8 +98,8 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
+        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
         Platform.runLater(() -> {
-            LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
             acceptTradeButton.setDisable(true);
             tradeNotPossibleLabel.setText(
                     String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
@@ -137,9 +129,9 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
     /**
      * Handles a click on the reject button
      * <p>
-     * If the lobbyname or the logged in user of the TradeWithUserPresenter are
+     * If the lobbyName or the logged in user of the TradeWithUserPresenter are
      * null, they get the parameters of the event. This Event is sent when a new
-     * TradeWithUserPresenter is created. If a window is closed using e.g.
+     * TradeWithUserPresenter is created. If a window is closed using, e.g.
      * X(top-right-Button), the closeWindowAfterNotSuccessfulTrade method is called.
      */
     @FXML
@@ -179,7 +171,6 @@ public class TradeWithUserAcceptPresenter extends AbstractPresenter {
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
-        respondingUser = rsp.getRespondingUser();
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getRespondingResourceMap();
         offeringResourceMap = rsp.getOfferingResourceMap();

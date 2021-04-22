@@ -18,7 +18,6 @@ import java.util.Map;
 public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy offeringUser;
-    private final UserOrDummy respondingUser;
     private final Map<String, Integer> resourceMap;
     private final Map<String, Integer> offeringResourceMap;
     private final Map<String, Integer> respondingResourceMap;
@@ -27,13 +26,12 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      * Constructor
      *
      * @param offeringUser          The offering User
-     * @param respondingUser        The responding User
      * @param resourceMap           The inventory of the responding user
      * @param offeringResourceMap   The offered resources
      * @param respondingResourceMap The demanded resources
      * @param lobbyName             The name of the lobby
      */
-    public TradeWithUserOfferResponse(UserOrDummy offeringUser, UserOrDummy respondingUser,
+    public TradeWithUserOfferResponse(UserOrDummy offeringUser,
                                       Map<String, Integer> resourceMap, Map<String, Integer> offeringResourceMap,
                                       Map<String, Integer> respondingResourceMap, String lobbyName) {
         super(lobbyName);
@@ -41,7 +39,6 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
         this.offeringResourceMap = offeringResourceMap;
         this.respondingResourceMap = respondingResourceMap;
         this.offeringUser = offeringUser;
-        this.respondingUser = respondingUser;
     }
 
     /**
@@ -78,14 +75,5 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      */
     public Map<String, Integer> getRespondingResourceMap() {
         return respondingResourceMap;
-    }
-
-    /**
-     * Gets the responding User
-     *
-     * @return A User-Object of the responding User
-     */
-    public UserOrDummy getRespondingUser() {
-        return respondingUser;
     }
 }

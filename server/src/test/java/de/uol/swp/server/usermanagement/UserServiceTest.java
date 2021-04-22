@@ -8,76 +8,81 @@ import de.uol.swp.common.user.request.DeleteUserRequest;
 import de.uol.swp.common.user.request.RegisterUserRequest;
 import de.uol.swp.common.user.request.UpdateUserAccountDetailsRequest;
 import de.uol.swp.server.usermanagement.store.H2BasedUserStore;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
 
-    static final User user = new UserDTO(69, "Ramsi Hartman", "123456", "fourtwenty@blaze.it");
-
-    final EventBus bus = new EventBus();
-    final UserManagement userManagement = new UserManagement(new H2BasedUserStore());
-    final UserService userService = new UserService(bus, userManagement);
-
-    @BeforeEach
-    void registerUser() {
-        // Register user if not present, will have no effect on an already registered user
-        final Message registerRequest = new RegisterUserRequest(user);
-
-        // The post will lead to a call of a UserService function
-        bus.post(registerRequest);
-    }
-
-    @Test
-    void registerUserTest() {
-        // We can only test, if something in the state has changed
-        final User loggedInUser = userManagement.login(user.getUsername(), user.getPassword());
-        assertNotNull(loggedInUser);
-
-        // Cannot compare against the object or ID because RegisterUserRequest doesn't know which ID the user will get
-        assertEquals(user.getUsername(), loggedInUser.getUsername());
-        assertEquals(user.getEMail(), loggedInUser.getEMail());
-    }
-
-    @Test
-    void deleteUserTest() {
-        // We can only test, if something in the state has changed
-        final User loggedInUser = userManagement.login(user.getUsername(), user.getPassword());
-        assertNotNull(loggedInUser);
-
-        // Test deletion
-        final Message deletionRequest = new DeleteUserRequest(loggedInUser,user.getPassword());
-
-        // The post will lead to a call of a UserService function
-        bus.post(deletionRequest);
-
-        // Test if user is deleted again
-        assertFalse(userManagement.getUser(user.getID()).isPresent());
-    }
+    private static final User user = new UserDTO(69, "Ramsi Hartman", "123456", "fourtwenty@blaze.it");
+    private final EventBus bus = new EventBus();
+    private final UserManagement userManagement = new UserManagement(new H2BasedUserStore());
+    private final UserService userService = new UserService(bus, userManagement);
 
     @Test
     void changeUserDetailsTest() {
-        // We can only test, if something in the state has changed
-        final User loggedInUser = userManagement.login(user.getUsername(), user.getPassword());
-        assertNotNull(loggedInUser);
+        // Create basic user
+        userManagement.createUser(user);
+        Optional<User> usr = userManagement.getUser(user.getUsername(), user.getPassword());
+        assertTrue(usr.isPresent());
 
         // Test changing details
-        final User newUser = new UserDTO(loggedInUser.getID(), "Kakmir Indihos", "654321", "fourtwentytwo@blaze.it");
-        final Message changeAccountDetailsRequest = new UpdateUserAccountDetailsRequest(newUser, user.getPassword(),
-                                                                                        user.getUsername(),
-                                                                                        user.getEMail());
+        User newUser = new UserDTO(usr.get().getID(), "Kakmir Indihos", "654321", "fourtwentytwo@blaze.it");
+        Message changeAccountDetailsRequest = new UpdateUserAccountDetailsRequest(newUser, user.getPassword(),
+                                                                                  user.getUsername(), user.getEMail());
 
         // The post will lead to a call of a UserService function
         bus.post(changeAccountDetailsRequest);
 
         // Check the new details
-        final Optional<User> changedUser = userManagement.getUser(loggedInUser.getID());
+        Optional<User> changedUser = userManagement.getUser(newUser.getID());
+        assertTrue(changedUser.isPresent());
+        assertEquals(newUser.getID(), changedUser.get().getID());
         assertEquals(newUser.getUsername(), changedUser.get().getUsername());
+        assertEquals("", changedUser.get().getPassword());
         assertEquals(newUser.getEMail(), changedUser.get().getEMail());
+
+        // Check that the old username was overwritten
+        Optional<User> userOptional = userManagement.getUser(usr.get().getUsername());
+        assertTrue(userOptional.isEmpty());
+
+        userManagement.dropUser(changedUser.get());
+    }
+
+    @Test
+    void deleteUserTest() {
+        // Create basic user
+        userManagement.createUser(user);
+        Optional<User> usr = userManagement.getUser(user.getUsername(), user.getPassword());
+        assertTrue(usr.isPresent());
+
+        // Test Deletion of User
+        Message deletionRequest = new DeleteUserRequest(usr.get(), user.getPassword());
+
+        // The post will lead to a call of a UserService function
+        bus.post(deletionRequest);
+
+        // Test if user is deleted again
+        Optional<User> optional = userManagement.getUser(user.getUsername(), user.getPassword());
+        assertTrue(optional.isEmpty());
+    }
+
+    @Test
+    void registerUserTest() {
+        // Create entirely new user
+        UserDTO user = new UserDTO(-1, "Mike Oxlong", "64209", "mike@ox.long.com");
+
+        Message createUserRequest = new RegisterUserRequest(user);
+        bus.post(createUserRequest);
+
+        Optional<User> usr = userManagement.getUser(user.getUsername(), user.getPassword());
+        assertTrue(usr.isPresent());
+
+        // Drop the created user again
+        userManagement.dropUser(usr.get());
     }
 }
