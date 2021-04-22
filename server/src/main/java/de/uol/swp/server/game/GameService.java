@@ -34,6 +34,7 @@ import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import de.uol.swp.common.game.ResourceListMap;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -90,10 +91,10 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @since 2021-02-24
      */
-    private boolean checkEnoughResourcesInInventory(Map<Resource.ResourceType, Integer> inventoryMap,
-                                                    Map<Resource.ResourceType, Integer> neededInventoryMap) {
-        for (var resource : inventoryMap.keySet())
-            if (inventoryMap.get(resource) < neededInventoryMap.get(resource)) return false;
+    private boolean checkEnoughResourcesInInventory(ResourceListMap inventoryMap,
+                                                    ResourceListMap neededInventoryMap) {
+        for (Resource resource : inventoryMap)
+            if (resource.getAmount() < neededInventoryMap.getAmount(resource.getType())) return false;
         return true;
     }
 
@@ -174,19 +175,19 @@ public class GameService extends AbstractService {
                                             req.getOfferingResourceMap()) && checkEnoughResourcesInInventory(
                 responseInventoryMap, req.getRespondingResourceMap())) {
             //changes the inventories according to the offer
-            ResourceListMap offeredResourcesWrapperMap = new HashMap<>();
-            ResourceListMap respondingResourcesWrapperMap = new HashMap<>();
-            for (var x : req.getOfferingResourceMap().entrySet()) {
-                offeredResourcesWrapperMap.put(x.getKey(), x.getValue());
-                offeringInventory.decrease(x.getKey(), x.getValue());
-                respondingInventory.increase(x.getKey(), x.getValue());
+            ResourceListMap offeredResourcesWrapperMap = new ResourceListMap();
+            ResourceListMap respondingResourcesWrapperMap = new ResourceListMap();
+            for (Resource x : req.getOfferingResourceMap()) {
+                offeredResourcesWrapperMap.increase(x.getType(), x.getAmount());
+                offeringInventory.decrease(x.getType(), x.getAmount());
+                respondingInventory.increase(x.getType(), x.getAmount());
             }
             //changes the inventories according to the wanted resources
-            for (var resource : req.getRespondingResourceMap().entrySet()){
-            if (resource.getValue() > 0) {
-                respondingResourcesWrapperMap.put(resource.getKey(), resource.getValue());
-                offeringInventory.increase(resource.getKey(), resource.getValue());
-                respondingInventory.decrease(resource.getKey(), resource.getValue());
+            for (Resource resource : req.getRespondingResourceMap()){
+            if (resource.getAmount() > 0) {
+                respondingResourcesWrapperMap.increase(resource.getType(), resource.getAmount());
+                offeringInventory.increase(resource.getType(), resource.getAmount());
+                respondingInventory.decrease(resource.getType(), resource.getAmount());
             }}
 
             ServerMessage returnSystemMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
@@ -491,8 +492,8 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        Map<Resource.ResourceType, Integer> offeredResourcesWrapperMap = new HashMap<>();
-        Map<Resource.ResourceType, Integer> respondingResourcesWrapperMap = new HashMap<>();
+        ResourceListMap offeredResourcesWrapperMap = new ResourceListMap();
+        ResourceListMap respondingResourcesWrapperMap = new ResourceListMap();
         //getting the tradingRatios with the bank according to the harbors
         IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
@@ -521,9 +522,9 @@ public class GameService extends AbstractService {
                 .get(IHarborHex.getHarborResource(req.getGiveResource())))
             //user gets the resource he demands
             inventory.increase(req.getGetResource());
-        respondingResourcesWrapperMap.put(req.getGetResource(), 1);
+        respondingResourcesWrapperMap.set(req.getGetResource(), 1);
         offeredResourcesWrapperMap
-                .put(req.getGiveResource(), tradingRatio.get(IHarborHex.getHarborResource(req.getGiveResource())));
+                .set(req.getGiveResource(), tradingRatio.get(IHarborHex.getHarborResource(req.getGiveResource())));
         //user gives the resource he offers according to the harbors
 
         ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
@@ -627,7 +628,7 @@ public class GameService extends AbstractService {
         game.setBuildingAllowed(false);
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
-        Map<Resource.ResourceType, Integer> resourceMap = respondingInventory.getResources();
+        ResourceListMap resourceMap = respondingInventory.getResources();
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
         ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), req.getRespondingUser(),
@@ -1055,12 +1056,12 @@ public class GameService extends AbstractService {
                     }
                 }
             }
-            Map<User, Map<Resource.ResourceType, Integer>> inventory = new HashMap<>();
+            Map<User, ResourceListMap> inventory = new HashMap<>();
             for (User user : players.keySet()) {
-                Map<Resource.ResourceType, Integer> resourceMap = new LinkedHashMap<>();
+                ResourceListMap resourceMap = new ResourceListMap();
                 Inventory inv = game.getInventory(user);
                 for (Resource.ResourceType resource : Resource.ResourceType.values())
-                    resourceMap.put(resource, inv.get(resource));
+                    resourceMap.set(resource, inv.get(resource));
                 inventory.put(user, resourceMap);
 
                 game.addTaxPayer(user);
@@ -1110,7 +1111,7 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getName());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        Map<Resource.ResourceType, Integer> resourceMap = inventory.getResources();
+        ResourceListMap resourceMap = inventory.getResources();
 
         IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
@@ -1125,7 +1126,7 @@ public class GameService extends AbstractService {
         }
 
         ResponseMessage returnMessage = new InventoryForTradeResponse(req.getUser(), req.getName(),
-                                                                      Collections.unmodifiableMap(resourceMap),
+                                                                      resourceMap.create(),
                                                                       harborTradingList);
         returnMessage.initWithMessage(req);
         LOG.debug("Sending InventoryForTradeResponse for Lobby " + req.getName());
@@ -1194,9 +1195,8 @@ public class GameService extends AbstractService {
         Inventory traderInventory = game.getInventory(req.getRespondingUser());
         if (inventory == null || traderInventory == null) return;
         int traderInventorySize = traderInventory.getResourceAmount();
-        Map<Resource.ResourceType, Integer> offeringResourceMap = inventory.getResources();
-        ResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), Collections
-                .unmodifiableMap(offeringResourceMap), traderInventorySize, req.getRespondingUser());
+        ResourceListMap offeringResourceMap = inventory.getResources();
+        ResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), offeringResourceMap.create(), traderInventorySize, req.getRespondingUser());
         LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);

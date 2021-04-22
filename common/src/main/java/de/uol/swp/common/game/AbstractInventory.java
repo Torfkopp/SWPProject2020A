@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public abstract class AbstractInventory implements Serializable {
 
-    protected ResourceListMap resources = new ResourceListMap();
-    protected DevelopmentCardListMap developmentCards = new DevelopmentCardListMap();
+    protected ResourceListMap resources;
+    protected DevelopmentCardListMap developmentCards;
 
     public void decrease(Resource.ResourceType resource, int i) {
         increase(resource, -i);

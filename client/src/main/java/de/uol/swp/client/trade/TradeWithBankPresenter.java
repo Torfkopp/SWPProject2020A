@@ -8,6 +8,7 @@ import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.ResourceListMap;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
@@ -42,7 +43,7 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     public static final int MIN_WIDTH = 620;
     private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
     private LobbyName lobbyName;
-    private Map<Resource.ResourceType, Integer> resourceMap;
+    private ResourceListMap resourceMap;
     private List<IHarborHex.HarborResource> harborMap;
     private ObservableList<Pair<Resource.ResourceType, Integer>> resourceList;
     private ObservableList<Pair<Resource.ResourceType, Integer>> bankResourceList;
@@ -54,11 +55,11 @@ public class TradeWithBankPresenter extends AbstractPresenter {
     private ITradeService tradeService;
 
     @FXML
-    private ListView<Pair<Resource.ResourceType, Integer>> ownInventoryView;
+    private ListView<Resource> ownInventoryView;
     @FXML
-    private ListView<Pair<Resource.ResourceType, Integer>> ownResourceToTradeWithView;
+    private ListView<Resource> ownResourceToTradeWithView;
     @FXML
-    private ListView<Pair<Resource.ResourceType, Integer>> bankResourceView;
+    private ListView<Resource> bankResourceView;
     @FXML
     private Button buyDevelopmentButton;
     @FXML
@@ -127,8 +128,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
-        if (resourceMap.get(Resource.ResourceType.ORE) >= 1 && resourceMap.get(Resource.ResourceType.GRAIN) >= 1 && resourceMap
-                                                                                                                  .get(Resource.ResourceType.WOOL) >= 1) {
+        if (resourceMap.getAmount(Resource.ResourceType.ORE) >= 1 && resourceMap.getAmount(Resource.ResourceType.GRAIN) >= 1 && resourceMap
+                                                                                                                  .getAmount(Resource.ResourceType.WOOL) >= 1) {
             tradeService.buyDevelopmentCard(lobbyName);
         }
     }
@@ -188,8 +189,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
             resourceMap = rsp.getResourceMap();
             setTradingLists();
         }
-        if (resourceMap.get(Resource.ResourceType.ORE) >= 1 && resourceMap.get(Resource.ResourceType.GRAIN) >= 1 && resourceMap
-                                                                                                                  .get(Resource.ResourceType.WOOL) >= 1) {
+        if (resourceMap.getAmount(Resource.ResourceType.ORE) >= 1 && resourceMap.getAmount(Resource.ResourceType.GRAIN) >= 1 && resourceMap
+                                                                                                                  .getAmount(Resource.ResourceType.WOOL) >= 1) {
             buyDevelopmentButton.setDisable(false);
         }
     }
@@ -207,8 +208,8 @@ public class TradeWithBankPresenter extends AbstractPresenter {
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
-        Pair<Resource.ResourceType, Integer> bankResource;
-        Pair<Resource.ResourceType, Integer> giveResource;
+        Resource bankResource;
+        Resource giveResource;
         ownResourceToTradeWithView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
             tradeService.showTradeError(resourceBundle.getString("game.error.trade.noplayerresource"));

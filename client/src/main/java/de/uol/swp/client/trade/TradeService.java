@@ -7,14 +7,13 @@ import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.ResourceListMap;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Map;
 
 /**
  * The TradeService is responsible for posting requests and events regarding
@@ -49,8 +48,8 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, Map<Resource.ResourceType, Integer> demandedResources,
-                                Map<Resource.ResourceType, Integer> offeredResources) {
+    public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceListMap demandedResources,
+                                ResourceListMap offeredResources) {
         LOG.debug("Sending AcceptUserTradeRequest");
         Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
                                                      demandedResources, offeredResources);
@@ -100,8 +99,8 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, Map<Resource.ResourceType, Integer> offeredResources,
-                           Map<Resource.ResourceType, Integer> demandedResources) {
+    public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceListMap offeredResources,
+                           ResourceListMap demandedResources) {
         LOG.debug("Sending an OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
                                                            offeredResources, demandedResources);

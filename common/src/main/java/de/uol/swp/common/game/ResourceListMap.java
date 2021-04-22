@@ -32,9 +32,34 @@ public class ResourceListMap implements Iterable<Resource> {
 
     public Resource get(Resource.ResourceType resource) {
         for (Resource resource1 : list) {
-            if (Objects.equals(resource, resource1.getType())) return resource1;
+            if (Objects.equals(resource, resource1.getType())) return resource1.create();
         }
         return null;
+    }
+
+    public void increase(Resource.ResourceType resource){
+        increase(resource, 1);
+    }
+
+    public void increase(Resource.ResourceType resource, int amount){
+        for (Resource resource1 : list) {
+            if (Objects.equals(resource, resource1.getType())) resource1.increase(amount);
+        }
+    }
+
+    public void set(Resource.ResourceType resource, int amount){
+        for (Resource resource1 : list){
+            if (Objects.equals(resource, resource1.getType())) resource1.setAmount(amount);
+
+        }
+    }
+
+    public void decrease(Resource.ResourceType resource, int amount){
+        increase(resource,-amount);
+    }
+
+    public void decrease(Resource.ResourceType resource){
+        decrease(resource,1);
     }
 
     public int getAmount(Resource.ResourceType resource) {

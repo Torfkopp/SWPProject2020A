@@ -1,10 +1,8 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.ResourceListMap;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.Map;
 
 /**
  * This request contains the necessary information for a trade
@@ -19,8 +17,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
     private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
-    private final Map<Resource.ResourceType, Integer> offeringResourceMap;
-    private final Map<Resource.ResourceType, Integer> respondingResourceMap;
+    private final ResourceListMap offeringResourceMap;
+    private final ResourceListMap respondingResourceMap;
 
     /**
      * Constructor
@@ -32,8 +30,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param respondingResourceMap The responded resources
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
-                                        Map<Resource.ResourceType, Integer> offeringResourceMap,
-                                        Map<Resource.ResourceType, Integer> respondingResourceMap) {
+                                        ResourceListMap offeringResourceMap,
+                                        ResourceListMap respondingResourceMap) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
@@ -46,7 +44,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the offering Resources as a Map
      */
-    public Map<Resource.ResourceType, Integer> getOfferingResourceMap() {
+    public ResourceListMap getOfferingResourceMap() {
         return offeringResourceMap;
     }
 
@@ -64,7 +62,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the demanded Resources as a Map
      */
-    public Map<Resource.ResourceType, Integer> getRespondingResourceMap() {
+    public ResourceListMap getRespondingResourceMap() {
         return respondingResourceMap;
     }
 

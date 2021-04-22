@@ -12,12 +12,8 @@ public class Inventory extends AbstractInventory {
     private int knights = 0;
 
     public Inventory() {
-        for (Resource.ResourceType resource : Resource.ResourceType.values()) {
-            super.resources.put(resource, 0);
-        }
-        for (DevelopmentCard.DevelopmentCardType developmentCard : DevelopmentCard.DevelopmentCardType.values()) {
-            super.developmentCards.put(developmentCard, 0);
-        }
+        resources = new ResourceListMap();
+        developmentCards = new DevelopmentCardListMap();
     }
 
     public void decreaseKnights(int amount) {

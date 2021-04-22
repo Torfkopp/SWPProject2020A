@@ -37,6 +37,17 @@ public class DevelopmentCardListMap implements Iterable<DevelopmentCard> {
         return null;
     }
 
+    public void increase(DevelopmentCard.DevelopmentCardType resource){
+        for (DevelopmentCard resource1 : list) {
+            if (Objects.equals(resource, resource1.getType())) resource1.increase();
+        }
+    }
+    public void decrease(DevelopmentCard.DevelopmentCardType resource){
+        for (DevelopmentCard resource1 : list) {
+            if (Objects.equals(resource, resource1.getType())) resource1.decrease();
+        }
+    }
+
     public int getAmount(DevelopmentCard.DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) return resource1.getAmount();
