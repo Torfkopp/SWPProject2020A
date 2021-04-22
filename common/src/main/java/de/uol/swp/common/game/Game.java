@@ -2,6 +2,10 @@ package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
 import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.resourceThingies.BankInventory;
+import de.uol.swp.common.game.resourceThingies.Inventory;
+import de.uol.swp.common.game.resourceThingies.InventoryMap;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;

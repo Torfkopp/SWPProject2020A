@@ -6,10 +6,11 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
@@ -18,8 +19,6 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Map;
 
 /**
  * The GameService is responsible for posting requests and events regarding
@@ -74,7 +73,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void playMonopolyCard(LobbyName lobbyName, Resource.ResourceType resource) {
+    public void playMonopolyCard(LobbyName lobbyName, ResourceType resource) {
         LOG.debug("Sending PlayMonopolyCardRequest");
         Message request = new PlayMonopolyCardRequest(lobbyName, userService.getLoggedInUser(), resource);
         eventBus.post(request);
@@ -88,7 +87,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void playYearOfPlentyCard(LobbyName lobbyName, Resource.ResourceType resource1, Resource.ResourceType resource2) {
+    public void playYearOfPlentyCard(LobbyName lobbyName, ResourceType resource1, ResourceType resource2) {
         LOG.debug("Sending PlayYearOfPlentyCardRequest");
         Message request = new PlayYearOfPlentyCardRequest(lobbyName, userService.getLoggedInUser(), resource1,
                                                           resource2);
@@ -124,7 +123,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void taxPayed(LobbyName lobbyName, Map<Resource.ResourceType, Integer> selectedResources) {
+    public void taxPayed(LobbyName lobbyName, MutableResourceListMap selectedResources) {
         LOG.debug("Sending RobberTaxChosenRequest");
         Message request = new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);

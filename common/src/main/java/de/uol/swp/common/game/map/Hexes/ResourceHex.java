@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.Hexes;
 
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 /**
  * Class for the resource hex
@@ -11,7 +11,7 @@ import de.uol.swp.common.game.Resource;
  */
 public class ResourceHex extends AbstractHex implements IResourceHex {
 
-    private final Resource.ResourceType resource;
+    private final ResourceType resource;
     private final int token;
 
     /**
@@ -20,14 +20,14 @@ public class ResourceHex extends AbstractHex implements IResourceHex {
      * @param resource The hex's resource
      * @param token    The hex's token
      */
-    public ResourceHex(Resource.ResourceType resource, int token) {
+    public ResourceHex(ResourceType resource, int token) {
         this.resource = resource;
         this.token = token;
         setRobberOnField(false);
     }
 
     @Override
-    public Resource.ResourceType getResource() {
+    public ResourceType getResource() {
         return resource;
     }
 

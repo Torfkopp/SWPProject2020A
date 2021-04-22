@@ -2,7 +2,7 @@ package de.uol.swp.client.trade;
 
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -20,7 +20,7 @@ public class AbstractTradePresenter extends AbstractPresenter {
     protected ITradeService tradeService;
 
     @FXML
-    protected ListView<Resource> ownInventoryView;
+    protected ListView<MutableResource> ownInventoryView;
 
     /**
      * Initialises the Presenters by setting up the ownInventoryView
@@ -37,10 +37,10 @@ public class AbstractTradePresenter extends AbstractPresenter {
      *
      * @return A ListCell
      */
-    protected ListCell<Resource> getListCell() {
+    protected ListCell<MutableResource> getListCell() {
         return new ListCell<>() {
             @Override
-            protected void updateItem(Resource item, boolean empty) {
+            protected void updateItem(MutableResource item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :

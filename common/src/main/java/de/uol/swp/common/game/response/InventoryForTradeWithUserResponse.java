@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -18,7 +18,7 @@ import de.uol.swp.common.user.UserOrDummy;
 public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final ResourceListMap resourceMap;
+    private final MutableResourceListMap resourceMap;
     private final int tradingUsersInventorySize;
     private final UserOrDummy tradingUser;
 
@@ -31,7 +31,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param tradingUsersInventorySize Amount of resource cards the other user has
      * @param tradingUser               The trading Users name
      */
-    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, ResourceListMap resourceMap,
+    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, MutableResourceListMap resourceMap,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
@@ -47,7 +47,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public ResourceListMap getResourceMap() {
+    public MutableResourceListMap getResourceMap() {
         return resourceMap;
     }
 

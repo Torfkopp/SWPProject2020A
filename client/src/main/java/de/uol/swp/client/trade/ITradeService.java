@@ -1,8 +1,8 @@
 package de.uol.swp.client.trade;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -23,8 +23,8 @@ public interface ITradeService {
      * @param demandedResources The resources the offering User wants
      * @param offeredResources  The resources the offering User is offering
      */
-    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceListMap demandedResources,
-                         ResourceListMap offeredResources);
+    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, MutableResourceListMap demandedResources,
+                         MutableResourceListMap offeredResources);
 
     /**
      * Posts a request to buy a Development Card
@@ -69,7 +69,7 @@ public interface ITradeService {
      * @param gainedResource The resource the User wants from the Bank
      * @param lostResource   The resource the User is offering to the Bank
      */
-    void executeTradeWithBank(LobbyName lobbyName, Resource.ResourceType gainedResource, Resource.ResourceType lostResource);
+    void executeTradeWithBank(LobbyName lobbyName, ResourceType gainedResource, ResourceType lostResource);
 
     /**
      * Posts a request to offer a trade to another user
@@ -79,8 +79,8 @@ public interface ITradeService {
      * @param offeredResources  Map of resources being offered to the responding user
      * @param demandedResources Map of resources being demanded from the responding user
      */
-    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceListMap offeredResources,
-                    ResourceListMap demandedResources);
+    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, MutableResourceListMap offeredResources,
+                    MutableResourceListMap demandedResources);
 
     /**
      * Posts a request to reset the Offer Trade button for the user who proposed a trade

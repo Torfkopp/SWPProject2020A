@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.Hexes;
 
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 /**
  * Interface for a resource hex
@@ -16,7 +16,7 @@ public interface IResourceHex extends ILandHex {
      *
      * @return Resource
      */
-    Resource.ResourceType getResource();
+    ResourceType getResource();
 
     /**
      * Gets the number of the hex's token

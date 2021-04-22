@@ -12,11 +12,11 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.DevelopmentCard;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
@@ -184,25 +184,25 @@ public class CommandService extends AbstractService {
         UserOrDummy user = getUserOrDummy(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));
-        Resource.ResourceType resource = null;
+        ResourceType resource = null;
         DevelopmentCard.DevelopmentCardType developmentCard = null;
         switch (args.get(2).toLowerCase()) {
             case "bricks":
             case "brick":
-                resource = Resource.ResourceType.BRICK;
+                resource = ResourceType.BRICK;
                 break;
             case "grains":
             case "grain":
-                resource = Resource.ResourceType.GRAIN;
+                resource = ResourceType.GRAIN;
                 break;
             case "ore":
-                resource = Resource.ResourceType.ORE;
+                resource = ResourceType.ORE;
                 break;
             case "lumber":
-                resource = Resource.ResourceType.LUMBER;
+                resource = ResourceType.LUMBER;
                 break;
             case "wool":
-                resource = Resource.ResourceType.WOOL;
+                resource = ResourceType.WOOL;
                 break;
             case "knightcard":
             case "kc":

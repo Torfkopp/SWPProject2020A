@@ -1,4 +1,4 @@
-package de.uol.swp.common.game;
+package de.uol.swp.common.game.resourceThingies;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.UserOrDummy;

@@ -1,11 +1,10 @@
 package de.uol.swp.client.game;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.Map;
 
 /**
  * An interface for all methods of the GameService
@@ -52,7 +51,7 @@ public interface IGameService {
      * @param lobbyName The name of the lobby
      * @param resource  The resource the user wants
      */
-    void playMonopolyCard(LobbyName lobbyName, Resource.ResourceType resource);
+    void playMonopolyCard(LobbyName lobbyName, ResourceType resource);
 
     /**
      * Posts a request to play a RoadBuildingCard
@@ -68,7 +67,7 @@ public interface IGameService {
      * @param resource1 The resource the user wants
      * @param resource2 The resource the user wants
      */
-    void playYearOfPlentyCard(LobbyName lobbyName, Resource.ResourceType resource1, Resource.ResourceType resource2);
+    void playYearOfPlentyCard(LobbyName lobbyName, ResourceType resource1, ResourceType resource2);
 
     /**
      * Posts a RobberChosenVictimRequest
@@ -124,7 +123,7 @@ public interface IGameService {
      * @author Mario Fokken
      * @since 2021-04-12
      */
-    void taxPayed(LobbyName lobbyName, Map<Resource.ResourceType, Integer> selectedResources);
+    void taxPayed(LobbyName lobbyName, MutableResourceListMap selectedResources);
 
     /**
      * Posts a request to update the game map

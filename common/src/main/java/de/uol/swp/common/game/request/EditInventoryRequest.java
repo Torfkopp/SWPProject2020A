@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.DevelopmentCard;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -16,7 +16,7 @@ import de.uol.swp.common.user.UserOrDummy;
 public class EditInventoryRequest extends AbstractGameRequest {
 
     private final UserOrDummy user;
-    private final Resource.ResourceType resource;
+    private final ResourceType resource;
     private final DevelopmentCard.DevelopmentCardType developmentCard;
     private final int amount;
 
@@ -29,7 +29,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      * @param amount      The amount to be added (substracted if negative)
      *                    to/from the resource
      */
-    public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, Resource.ResourceType resource,
+    public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, ResourceType resource,
                                 DevelopmentCard.DevelopmentCardType developmentCard, int amount) {
         super(originLobby);
         this.user = user;
@@ -57,7 +57,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *
      * @return The name of the resource
      */
-    public Resource.ResourceType getResource() {
+    public ResourceType getResource() {
         return resource;
     }
 

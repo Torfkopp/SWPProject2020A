@@ -1,4 +1,9 @@
-package de.uol.swp.common.game;
+package de.uol.swp.common.game.resourceThingies;
+
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 /**
  * The player's inventory
@@ -12,7 +17,7 @@ public class Inventory extends AbstractInventory {
     private int knights = 0;
 
     public Inventory() {
-        resources = new ResourceListMap();
+        resources = new MutableResourceListMap();
         developmentCards = new DevelopmentCardListMap();
     }
 
@@ -56,7 +61,7 @@ public class Inventory extends AbstractInventory {
      */
     public int getResourceAmount() {
         int returnValue = 0;
-        for (Resource.ResourceType resource : Resource.ResourceType.values())
+        for (ResourceType resource : ResourceType.values())
             returnValue += get(resource);
         return returnValue;
     }

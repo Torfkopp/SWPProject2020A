@@ -2,7 +2,7 @@
 //
 //import com.google.common.eventbus.EventBus;
 //import de.uol.swp.common.game.Game;
-//import de.uol.swp.common.game.Inventory;
+//import de.uol.swp.common.game.resourceThingies.Inventory;
 //import de.uol.swp.common.game.map.*;
 //import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 //import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;

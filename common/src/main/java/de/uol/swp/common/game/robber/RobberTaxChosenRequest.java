@@ -1,11 +1,9 @@
 package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
-
-import java.util.Map;
 
 /**
  * Answer to the RobberTaxMessage containing
@@ -19,7 +17,7 @@ import java.util.Map;
 public class RobberTaxChosenRequest extends AbstractRequestMessage {
 
     private final User player;
-    private final Map<Resource.ResourceType, Integer> resources;
+    private final MutableResourceListMap resources;
     private final LobbyName lobby;
 
     /**
@@ -29,7 +27,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
      * @param player    The player paying the tax
      * @param lobby     The lobby's name
      */
-    public RobberTaxChosenRequest(Map<Resource.ResourceType, Integer> resources, User player, LobbyName lobby) {
+    public RobberTaxChosenRequest(MutableResourceListMap resources, User player, LobbyName lobby) {
         this.resources = resources;
         this.player = player;
         this.lobby = lobby;
@@ -58,7 +56,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
      *
      * @return Map of a resource and its amount
      */
-    public Map<Resource.ResourceType, Integer> getResources() {
+    public MutableResourceListMap getResources() {
         return resources;
     }
 }

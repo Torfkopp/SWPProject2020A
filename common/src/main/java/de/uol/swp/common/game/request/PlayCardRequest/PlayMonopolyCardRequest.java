@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.User;
 
 /**
@@ -13,14 +13,14 @@ import de.uol.swp.common.user.User;
  */
 public class PlayMonopolyCardRequest extends PlayCardRequest {
 
-    Resource.ResourceType resource;
+    ResourceType resource;
 
-    public PlayMonopolyCardRequest(LobbyName originLobby, User user, Resource.ResourceType resource) {
+    public PlayMonopolyCardRequest(LobbyName originLobby, User user, ResourceType resource) {
         super(originLobby, user);
         this.resource = resource;
     }
 
-    public Resource.ResourceType getResource() {
+    public ResourceType getResource() {
         return resource;
     }
 }

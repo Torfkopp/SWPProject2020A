@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.Hexes;
 
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 /**
  * Interface for a harbor hex
@@ -24,7 +24,7 @@ public interface IHarborHex extends IWaterHex {
         ANY
     }
 
-    static HarborResource getHarborResource(Resource.ResourceType resource){
+    static HarborResource getHarborResource(ResourceType resource){
         switch (resource){
 
             case LUMBER:

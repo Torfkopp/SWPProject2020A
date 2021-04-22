@@ -4,6 +4,9 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.resourceThingies.BankInventory;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
@@ -100,14 +103,14 @@ public class GameTest {
     void distributesResourceTest() {
         //Testing a hex
         game.distributeResources(6);
-        assertEquals(1, game.getInventory(Player.PLAYER_1).get(Resource.ResourceType.BRICK));
-        assertEquals(1, game.getInventory(Player.PLAYER_3).get(Resource.ResourceType.BRICK));
-        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.ResourceType.GRAIN));
+        assertEquals(1, game.getInventory(Player.PLAYER_1).get(ResourceType.BRICK));
+        assertEquals(1, game.getInventory(Player.PLAYER_3).get(ResourceType.BRICK));
+        assertEquals(1, game.getInventory(Player.PLAYER_2).get(ResourceType.GRAIN));
         //Testing another hex
         game.distributeResources(4);
-        assertEquals(1, game.getInventory(Player.PLAYER_2).get(Resource.ResourceType.WOOL));
-        assertEquals(1, game.getInventory(Player.PLAYER_4).get(Resource.ResourceType.GRAIN));
-        assertEquals(2, game.getInventory(Player.PLAYER_2).get(Resource.ResourceType.GRAIN));
+        assertEquals(1, game.getInventory(Player.PLAYER_2).get(ResourceType.WOOL));
+        assertEquals(1, game.getInventory(Player.PLAYER_4).get(ResourceType.GRAIN));
+        assertEquals(2, game.getInventory(Player.PLAYER_2).get(ResourceType.GRAIN));
     }
 
     @Test

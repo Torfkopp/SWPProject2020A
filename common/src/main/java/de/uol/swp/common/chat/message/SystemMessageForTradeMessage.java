@@ -3,7 +3,7 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -20,8 +20,8 @@ import java.util.Map;
 public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
     private final UserOrDummy respondingUser;
-    private final ResourceListMap respondingResourceMap;
-    private final ResourceListMap offeringResourceMap;
+    private final MutableResourceListMap respondingResourceMap;
+    private final MutableResourceListMap offeringResourceMap;
 
     /**
      * Constructor
@@ -32,8 +32,8 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * @param respondingResourceMap The demanded resources
      */
     public SystemMessageForTradeMessage(LobbyName lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser,
-                                        ResourceListMap offeringResourceMap,
-                                        ResourceListMap respondingResourceMap) {
+                                        MutableResourceListMap offeringResourceMap,
+                                        MutableResourceListMap respondingResourceMap) {
         super(lobbyName, offeringUser);
         this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;

@@ -10,11 +10,12 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -31,7 +32,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Window;
-import javafx.util.Pair;
 
 import java.util.*;
 
@@ -57,7 +57,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected ListView<Pair<String, String>> inventoryView;
+    protected ListView<MutableResource> inventoryView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -104,7 +104,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     private ITradeService tradeService;
 
-    private ObservableList<Pair<String, String>> resourceList;
+    private ObservableList<MutableResource> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
@@ -853,13 +853,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 inventoryView.setItems(resourceList);
             }
             resourceList.clear();
-            for (Map.Entry<String, Integer> entry : rsp.getResourceMap().entrySet()) {
-                resourceList.add(new Pair<>(entry.getKey(), entry.getValue().toString()));
-            }
-            for (Map.Entry<String, Boolean> entry : rsp.getArmyAndRoadMap().entrySet()) {
-                resourceList.add(new Pair<>(entry.getKey(),
-                                            entry.getValue() ? resourceBundle.getString("game.property.has") :
-                                            resourceBundle.getString("game.property.hasnot")));
+            for (MutableResource entry : rsp.getResourceMap()) {
+                resourceList.add(entry.create());
             }
         });
     }
@@ -888,12 +883,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
-        Resources resource = Resources.BRICK;
+        ResourceType resource = ResourceType.BRICK;
         if (rst.isPresent()) {
-            if (rst.get().equals(ore)) resource = Resources.ORE;
-            else if (rst.get().equals(grain)) resource = Resources.GRAIN;
-            else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
-            else if (rst.get().equals(wool)) resource = Resources.WOOL;
+            if (rst.get().equals(ore)) resource = ResourceType.ORE;
+            else if (rst.get().equals(grain)) resource = ResourceType.GRAIN;
+            else if (rst.get().equals(lumber)) resource = ResourceType.LUMBER;
+            else if (rst.get().equals(wool)) resource = ResourceType.WOOL;
             gameService.playMonopolyCard(lobbyName, resource);
         }
     }
@@ -943,18 +938,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Checks if the pressed button is the same as the confirm button
         if (rst.toString().equals(button1.toString())) {
             //Create two resource variables
-            Resources resource1 = Resources.BRICK;
-            Resources resource2 = Resources.BRICK;
+            ResourceType resource1 = ResourceType.BRICK;
+            ResourceType resource2 = ResourceType.BRICK;
             //Convert String to Resource
-            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
-            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
-            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
-            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+            if (c1.getValue().equals(ore)) resource1 = ResourceType.ORE;
+            else if (c1.getValue().equals(grain)) resource1 = ResourceType.GRAIN;
+            else if (c1.getValue().equals(lumber)) resource1 = ResourceType.LUMBER;
+            else if (c1.getValue().equals(wool)) resource1 = ResourceType.WOOL;
             //Second ChoiceBox's conversion
-            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
-            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
-            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
-            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+            if (c2.getValue().equals(ore)) resource2 = ResourceType.ORE;
+            else if (c2.getValue().equals(grain)) resource2 = ResourceType.GRAIN;
+            else if (c2.getValue().equals(lumber)) resource2 = ResourceType.LUMBER;
+            else if (c2.getValue().equals(wool)) resource2 = ResourceType.WOOL;
             //Send Request
             gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
         }
@@ -972,11 +967,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareInventoryView() {
         inventoryView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
+            protected void updateItem(MutableResource item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" :
-                            item.getValue() + " " + resourceBundle.getString(item.getKey()));
+                            item.getAmount() + " " + item.getType());
                 });
             }
         });

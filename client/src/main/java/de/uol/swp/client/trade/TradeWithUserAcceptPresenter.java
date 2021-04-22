@@ -5,8 +5,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -19,11 +19,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Window;
-import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Map;
 
 /**
  * Manages the tradingAccept menu
@@ -51,14 +48,14 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private Label tradeResponseLabel;
     @FXML
-    private ListView<Pair<String, Integer>> ownInventoryView;
+    private ListView<MutableResource> ownInventoryView;
 
     private LobbyName lobbyName;
     private UserOrDummy offeringUser;
-    private ResourceListMap offeringResourceMap;
-    private ResourceListMap resourceMap;
-    private ResourceListMap respondingResourceMap;
-    private ObservableList<Resource> ownInventoryList;
+    private MutableResourceListMap offeringResourceMap;
+    private MutableResourceListMap resourceMap;
+    private MutableResourceListMap respondingResourceMap;
+    private ObservableList<MutableResource> ownInventoryList;
 
     /**
      * Constructor
@@ -208,9 +205,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             ownInventoryView.setItems(ownInventoryList);
         }
         ownInventoryList.clear();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            Pair<String, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
-            ownInventoryList.add(ownResource);
+        for (MutableResource entry : resourceMap) {
+            ownInventoryList.add(entry.create());
         }
     }
 
@@ -227,14 +223,14 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-05
      */
-    private String tallyUpOfferOrDemand(Map<String, Integer> resourceMap) {
+    private String tallyUpOfferOrDemand(MutableResourceListMap resourceMap) {
         boolean nothing = true;
         StringBuilder content = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : resourceMap.entrySet()) {
-            int amount = entry.getValue();
+        for (MutableResource entry : resourceMap) {
+            int amount = entry.getAmount();
             if (amount > 0) {
                 nothing = false;
-                content.append(entry.getValue()).append(" ").append(resourceBundle.getString(entry.getKey()))
+                content.append(entry.getAmount()).append(" ").append(entry.getType())
                        .append(", ");
             }
         }

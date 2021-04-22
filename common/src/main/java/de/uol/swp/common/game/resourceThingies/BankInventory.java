@@ -1,4 +1,10 @@
-package de.uol.swp.common.game;
+package de.uol.swp.common.game.resourceThingies;
+
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 import java.util.*;
 
@@ -13,16 +19,16 @@ import java.util.*;
 public class BankInventory extends AbstractInventory {
 
     public BankInventory() {
-        List<Resource> tempResourceList = new LinkedList<>();
+        List<MutableResource> tempResourceList = new LinkedList<>();
         List<DevelopmentCard> tempDevelopmentCardList = new LinkedList<>();
-        for (Resource.ResourceType resource : Resource.ResourceType.values())
-            tempResourceList.add(new Resource(resource, 100));
+        for (ResourceType resource : ResourceType.values())
+            tempResourceList.add(new MutableResource(resource, 100));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.KNIGHT_CARD, 14));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD, 2));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD, 2));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD, 2));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD, 5));
-        resources = ResourceListMap.createResourceListMapFromList(tempResourceList);
+        resources = MutableResourceListMap.createResourceListMapFromList(tempResourceList);
         developmentCards = DevelopmentCardListMap.createDevelopmentCardListMapFromList(tempDevelopmentCardList);
     }
 

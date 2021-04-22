@@ -10,9 +10,9 @@ import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
-import de.uol.swp.common.game.Inventory;
+import de.uol.swp.common.game.resourceThingies.BankInventory;
+import de.uol.swp.common.game.resourceThingies.Inventory;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.*;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex.HarborResource;
@@ -20,6 +20,10 @@ import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.lobby.Lobby;
@@ -37,7 +41,7 @@ import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -94,9 +98,9 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @since 2021-02-24
      */
-    private boolean checkEnoughResourcesInInventory(ResourceListMap inventoryMap,
-                                                    ResourceListMap neededInventoryMap) {
-        for (Resource resource : inventoryMap)
+    private boolean checkEnoughResourcesInInventory(MutableResourceListMap inventoryMap,
+                                                    MutableResourceListMap neededInventoryMap) {
+        for (MutableResource resource : inventoryMap)
             if (resource.getAmount() < neededInventoryMap.getAmount(resource.getType())) return false;
         return true;
     }
@@ -172,21 +176,21 @@ public class GameService extends AbstractService {
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
         if (offeringInventory == null || respondingInventory == null) return;
-        ResourceListMap offeringInventoryMap = offeringInventory.getResources();
-        ResourceListMap responseInventoryMap = respondingInventory.getResources();
+        MutableResourceListMap offeringInventoryMap = offeringInventory.getResources();
+        MutableResourceListMap responseInventoryMap = respondingInventory.getResources();
         if (checkEnoughResourcesInInventory(offeringInventoryMap,
                                             req.getOfferingResourceMap()) && checkEnoughResourcesInInventory(
                 responseInventoryMap, req.getRespondingResourceMap())) {
             //changes the inventories according to the offer
-            ResourceListMap offeredResourcesWrapperMap = new ResourceListMap();
-            ResourceListMap respondingResourcesWrapperMap = new ResourceListMap();
-            for (Resource x : req.getOfferingResourceMap()) {
+            MutableResourceListMap offeredResourcesWrapperMap = new MutableResourceListMap();
+            MutableResourceListMap respondingResourcesWrapperMap = new MutableResourceListMap();
+            for (MutableResource x : req.getOfferingResourceMap()) {
                 offeredResourcesWrapperMap.increase(x.getType(), x.getAmount());
                 offeringInventory.decrease(x.getType(), x.getAmount());
                 respondingInventory.increase(x.getType(), x.getAmount());
             }
             //changes the inventories according to the wanted resources
-            for (Resource resource : req.getRespondingResourceMap()){
+            for (MutableResource resource : req.getRespondingResourceMap()){
             if (resource.getAmount() > 0) {
                 respondingResourcesWrapperMap.increase(resource.getType(), resource.getAmount());
                 offeringInventory.increase(resource.getType(), resource.getAmount());
@@ -262,13 +266,13 @@ public class GameService extends AbstractService {
                 if (gameMap.getIntersection(mapPoint).getState() == IIntersection.IntersectionState.CITY) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.settlementPlaceable(player, mapPoint)) {
-                    if (inv.get(Resource.ResourceType.BRICK) >= 1 && inv.get(
-                            Resource.ResourceType.LUMBER) >= 1 && inv.get(
-                            Resource.ResourceType.WOOL) >= 1 && inv.get(Resource.ResourceType.GRAIN) >= 1) {
-                        inv.increase(Resource.ResourceType.BRICK, -1);
-                        inv.increase(Resource.ResourceType.LUMBER, -1);
-                        inv.increase(Resource.ResourceType.WOOL, -1);
-                        inv.increase(Resource.ResourceType.GRAIN, -1);
+                    if (inv.get(ResourceType.BRICK) >= 1 && inv.get(
+                            ResourceType.LUMBER) >= 1 && inv.get(
+                            ResourceType.WOOL) >= 1 && inv.get(ResourceType.GRAIN) >= 1) {
+                        inv.increase(ResourceType.BRICK, -1);
+                        inv.increase(ResourceType.LUMBER, -1);
+                        inv.increase(ResourceType.WOOL, -1);
+                        inv.increase(ResourceType.GRAIN, -1);
                         gameMap.placeSettlement(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
@@ -277,9 +281,10 @@ public class GameService extends AbstractService {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
-                    if (inv.get(Resource.ResourceType.ORE) >= 3 && inv.get(Resource.ResourceType.GRAIN) >= 2) {
-                        inv.increase(Resource.ResourceType.ORE, -3);
-                        inv.increase(Resource.ResourceType.GRAIN, -2);
+                    if (inv.get(ResourceType.ORE) >= 3 && inv.get(
+                            ResourceType.GRAIN) >= 2) {
+                        inv.increase(ResourceType.ORE, -3);
+                        inv.increase(ResourceType.GRAIN, -2);
                         gameMap.upgradeSettlement(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
@@ -307,9 +312,10 @@ public class GameService extends AbstractService {
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                                          BuildingSuccessfulMessage.Type.ROAD));
-                    } else if (inv.get(Resource.ResourceType.BRICK) >= 1 && inv.get(Resource.ResourceType.LUMBER) >= 1) {
-                        inv.decrease(Resource.ResourceType.BRICK);
-                        inv.decrease(Resource.ResourceType.LUMBER);
+                    } else if (inv.get(ResourceType.BRICK) >= 1 && inv.get(
+                            ResourceType.LUMBER) >= 1) {
+                        inv.decrease(ResourceType.BRICK);
+                        inv.decrease(ResourceType.LUMBER);
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
@@ -506,8 +512,8 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        ResourceListMap offeredResourcesWrapperMap = new ResourceListMap();
-        ResourceListMap respondingResourcesWrapperMap = new ResourceListMap();
+        MutableResourceListMap offeredResourcesWrapperMap = new MutableResourceListMap();
+        MutableResourceListMap respondingResourcesWrapperMap = new MutableResourceListMap();
         //getting the tradingRatios with the bank according to the harbors
         IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
@@ -642,7 +648,7 @@ public class GameService extends AbstractService {
         game.setBuildingAllowed(false);
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
-        ResourceListMap resourceMap = respondingInventory.getResources();
+        MutableResourceListMap resourceMap = respondingInventory.getResources();
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
         ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
@@ -740,37 +746,37 @@ public class GameService extends AbstractService {
         switch (req.getResource()) {
             case ORE:
                 for (Inventory inv : inventories)
-                    if (inv.get(Resource.ResourceType.ORE) > 0) {
-                        inv.increase(Resource.ResourceType.ORE, -1);
-                        invMono.increase(Resource.ResourceType.ORE, 1);
+                    if (inv.get(ResourceType.ORE) > 0) {
+                        inv.increase(ResourceType.ORE, -1);
+                        invMono.increase(ResourceType.ORE, 1);
                     }
                 break;
             case WOOL:
                 for (Inventory inv : inventories)
-                    if (inv.get(Resource.ResourceType.WOOL) > 0) {
-                        inv.increase(Resource.ResourceType.WOOL, -1);
-                        invMono.increase(Resource.ResourceType.WOOL, 1);
+                    if (inv.get(ResourceType.WOOL) > 0) {
+                        inv.increase(ResourceType.WOOL, -1);
+                        invMono.increase(ResourceType.WOOL, 1);
                     }
                 break;
             case BRICK:
                 for (Inventory inv : inventories)
-                    if (inv.get(Resource.ResourceType.BRICK) > 0) {
-                        inv.increase(Resource.ResourceType.BRICK, -1);
-                        invMono.increase(Resource.ResourceType.BRICK, 1);
+                    if (inv.get(ResourceType.BRICK) > 0) {
+                        inv.increase(ResourceType.BRICK, -1);
+                        invMono.increase(ResourceType.BRICK, 1);
                     }
                 break;
             case GRAIN:
                 for (Inventory inv : inventories)
-                    if (inv.get(Resource.ResourceType.GRAIN) > 0) {
-                        inv.increase(Resource.ResourceType.GRAIN, -1);
-                        invMono.increase(Resource.ResourceType.GRAIN, 1);
+                    if (inv.get(ResourceType.GRAIN) > 0) {
+                        inv.increase(ResourceType.GRAIN, -1);
+                        invMono.increase(ResourceType.GRAIN, 1);
                     }
                 break;
             case LUMBER:
                 for (Inventory inv : inventories)
-                    if (inv.get(Resource.ResourceType.LUMBER) > 0) {
-                        inv.increase(Resource.ResourceType.LUMBER, -1);
-                        invMono.increase(Resource.ResourceType.LUMBER, 1);
+                    if (inv.get(ResourceType.LUMBER) > 0) {
+                        inv.increase(ResourceType.LUMBER, -1);
+                        invMono.increase(ResourceType.LUMBER, 1);
                     }
                 break;
         }
@@ -993,8 +999,8 @@ public class GameService extends AbstractService {
     private void onRobberTaxChosenRequest(RobberTaxChosenRequest req) {
         LOG.debug("Received RobberTaxChosenRequest for Lobby " + req.getLobby());
         Inventory i = gameManagement.getGame(req.getLobby()).getInventory(req.getPlayer());
-        for (Resource.ResourceType r : req.getResources().keySet()) {
-            i.decrease(r, req.getResources().get(r));
+        for (MutableResource r : req.getResources()) {
+            i.decrease(r.getType(), r.getAmount());
         }
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getLobby());
         ServerMessage msg = new RefreshCardAmountMessage(req.getLobby(), req.getPlayer(),
@@ -1041,28 +1047,28 @@ public class GameService extends AbstractService {
                         int i = inv.getResourceAmount() / 2;
                         LOG.debug(p + " has to give up " + i + " of its " + inv.getResourceAmount() + " cards");
                         while (i > 0) {
-                            if (inv.get(Resource.ResourceType.BRICK) > 0) {
-                                inv.increase(Resource.ResourceType.BRICK, -1);
+                            if (inv.get(ResourceType.BRICK) > 0) {
+                                inv.increase(ResourceType.BRICK, -1);
                                 i--;
                                 if (i == 0) break;
                             }
-                            if (inv.get(Resource.ResourceType.GRAIN) > 0) {
-                                inv.increase(Resource.ResourceType.GRAIN, -1);
+                            if (inv.get(ResourceType.GRAIN) > 0) {
+                                inv.increase(ResourceType.GRAIN, -1);
                                 i--;
                                 if (i == 0) break;
                             }
-                            if (inv.get(Resource.ResourceType.LUMBER) > 0) {
-                                inv.increase(Resource.ResourceType.LUMBER, -1);
+                            if (inv.get(ResourceType.LUMBER) > 0) {
+                                inv.increase(ResourceType.LUMBER, -1);
                                 i--;
                                 if (i == 0) break;
                             }
-                            if (inv.get(Resource.ResourceType.ORE) > 0) {
-                                inv.increase(Resource.ResourceType.ORE, -1);
+                            if (inv.get(ResourceType.ORE) > 0) {
+                                inv.increase(ResourceType.ORE, -1);
                                 i--;
                                 if (i == 0) break;
                             }
-                            if (inv.get(Resource.ResourceType.WOOL) > 0) {
-                                inv.increase(Resource.ResourceType.WOOL, -1);
+                            if (inv.get(ResourceType.WOOL) > 0) {
+                                inv.increase(ResourceType.WOOL, -1);
                                 i--;
                                 if (i == 0) break;
                             }
@@ -1072,11 +1078,11 @@ public class GameService extends AbstractService {
                     }
                 }
             }
-            Map<User, ResourceListMap> inventory = new HashMap<>();
+            Map<User, MutableResourceListMap> inventory = new HashMap<>();
             for (User user : players.keySet()) {
-                ResourceListMap resourceMap = new ResourceListMap();
+                MutableResourceListMap resourceMap = new MutableResourceListMap();
                 Inventory inv = game.getInventory(user);
-                for (Resource.ResourceType resource : Resource.ResourceType.values())
+                for (ResourceType resource : ResourceType.values())
                     resourceMap.set(resource, inv.get(resource));
                 inventory.put(user, resourceMap);
 
@@ -1127,7 +1133,7 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getName());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        ResourceListMap resourceMap = inventory.getResources();
+        MutableResourceListMap resourceMap = inventory.getResources();
 
         IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
@@ -1211,7 +1217,7 @@ public class GameService extends AbstractService {
         Inventory traderInventory = game.getInventory(req.getRespondingUser());
         if (inventory == null || traderInventory == null) return;
         int traderInventorySize = traderInventory.getResourceAmount();
-        ResourceListMap offeringResourceMap = inventory.getResources();
+        MutableResourceListMap offeringResourceMap = inventory.getResources();
         ResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), offeringResourceMap.create(), traderInventorySize, req.getRespondingUser());
         LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
@@ -1294,7 +1300,7 @@ public class GameService extends AbstractService {
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         DevelopmentCardListMap developmentCardsMap = inventory.getDevelopmentCards();
-        ResourceListMap resourceMap = inventory.getResources();
+        MutableResourceListMap resourceMap = inventory.getResources();
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     resourceMap, developmentCardsMap);
@@ -1321,7 +1327,7 @@ public class GameService extends AbstractService {
         LOG.debug(receiver + " wants to rob from " + victim + " in lobby " + lobby);
         Inventory receiverInventory = gameManagement.getGame(lobby).getInventory(receiver);
         Inventory victimInventory = gameManagement.getGame(lobby).getInventory(victim);
-        List<Resource.ResourceType> victimsResource = new ArrayList<>();
+        List<ResourceType> victimsResource = new ArrayList<>();
         if (victimInventory.getResourceAmount() == 0) {
             ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, null);
             LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
@@ -1329,12 +1335,17 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
             return;
         }
-        if (victimInventory.get(Resource.ResourceType.BRICK) > 0) victimsResource.add(Resource.ResourceType.BRICK);
-        if (victimInventory.get(Resource.ResourceType.GRAIN) > 0) victimsResource.add(Resource.ResourceType.GRAIN);
-        if (victimInventory.get(Resource.ResourceType.LUMBER) > 0) victimsResource.add(Resource.ResourceType.LUMBER);
-        if (victimInventory.get(Resource.ResourceType.ORE) > 0) victimsResource.add(Resource.ResourceType.ORE);
-        if (victimInventory.get(Resource.ResourceType.WOOL) > 0) victimsResource.add(Resource.ResourceType.WOOL);
-        Resource.ResourceType stolenResource = victimsResource.get((int) (Math.random() * victimsResource.size()));
+        if (victimInventory.get(ResourceType.BRICK) > 0) victimsResource.add(
+                ResourceType.BRICK);
+        if (victimInventory.get(ResourceType.GRAIN) > 0) victimsResource.add(
+                ResourceType.GRAIN);
+        if (victimInventory.get(ResourceType.LUMBER) > 0) victimsResource.add(
+                ResourceType.LUMBER);
+        if (victimInventory.get(ResourceType.ORE) > 0) victimsResource.add(
+                ResourceType.ORE);
+        if (victimInventory.get(ResourceType.WOOL) > 0) victimsResource.add(
+                ResourceType.WOOL);
+        ResourceType stolenResource = victimsResource.get((int) (Math.random() * victimsResource.size()));
         victimInventory.decrease(stolenResource);
         receiverInventory.increase(stolenResource);
 
@@ -1417,12 +1428,12 @@ public class GameService extends AbstractService {
                                                               LobbyName lobbyName) {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
         if (inventory == null) return false;
-        if (inventory.get(Resource.ResourceType.ORE) >= 1 && inventory.get(
-                Resource.ResourceType.GRAIN) >= 1 && inventory
-                                                                                              .get(Resource.ResourceType.WOOL) >= 1) {
-            inventory.decrease(Resource.ResourceType.ORE);
-            inventory.decrease(Resource.ResourceType.GRAIN);
-            inventory.decrease(Resource.ResourceType.WOOL);
+        if (inventory.get(ResourceType.ORE) >= 1 && inventory.get(
+                ResourceType.GRAIN) >= 1 && inventory
+                                                                                              .get(ResourceType.WOOL) >= 1) {
+            inventory.decrease(ResourceType.ORE);
+            inventory.decrease(ResourceType.GRAIN);
+            inventory.decrease(ResourceType.WOOL);
             inventory.increase(developmentCard);
             ResponseMessage serverMessage = new SystemMessageForTradeWithBankResponse(lobbyName, developmentCard);
             LOG.debug("Sending SystemMessageForTradeWithBankResponse for Lobby " + lobbyName);

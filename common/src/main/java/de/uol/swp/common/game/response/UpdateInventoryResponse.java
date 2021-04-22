@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.DevelopmentCardListMap;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -17,7 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
 public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final ResourceListMap resourceMap;
+    private final MutableResourceListMap resourceMap;
     private final DevelopmentCardListMap developmentCardMap;
 
     public DevelopmentCardListMap getDevelopmentCardMap() {
@@ -30,7 +30,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      * @param lobbyName      The lobby for which the update is supposed to happen in
      * @param resourceMap    The Map containing the name of a resource as key and the amount as value
      */
-    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, ResourceListMap resourceMap, DevelopmentCardListMap developmentCardMap) {
+    public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, MutableResourceListMap resourceMap, DevelopmentCardListMap developmentCardMap) {
         super(lobbyName);
         this.user = user;
         this.resourceMap = resourceMap;
@@ -44,7 +44,7 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public ResourceListMap getResourceMap() {
+    public MutableResourceListMap getResourceMap() {
         return resourceMap;
     }
 

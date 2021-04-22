@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
@@ -19,7 +19,7 @@ import java.util.List;
 public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final ResourceListMap resourceMap;
+    private final MutableResourceListMap resourceMap;
     private final List<IHarborHex.HarborResource> harborResourceList;
 
     /**
@@ -30,7 +30,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      * @param resourceMap        The Map containing the name of a resource as key and the amount as value
      * @param harborResourceList The List containing all the harbors of the Player
      */
-    public InventoryForTradeResponse(UserOrDummy user, LobbyName lobbyName, ResourceListMap resourceMap,
+    public InventoryForTradeResponse(UserOrDummy user, LobbyName lobbyName, MutableResourceListMap resourceMap,
                                      List<IHarborHex.HarborResource> harborResourceList) {
         super(lobbyName);
         this.user = user;
@@ -58,7 +58,7 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      *
      * @return The resource map
      */
-    public ResourceListMap getResourceMap() {
+    public MutableResourceListMap getResourceMap() {
         return resourceMap;
     }
 

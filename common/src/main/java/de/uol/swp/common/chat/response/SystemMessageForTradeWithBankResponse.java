@@ -3,7 +3,7 @@ package de.uol.swp.common.chat.response;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.game.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**

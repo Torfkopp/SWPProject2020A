@@ -7,18 +7,16 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Manages the RobberTax window
@@ -34,7 +32,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
-    private final Map<Resource.ResourceType, Integer> selectedResources = new HashMap<>();
+    private final MutableResourceListMap selectedResources = new MutableResourceListMap();
 
     @Inject
     protected IGameService gameService;
@@ -44,7 +42,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private Slider brickSlider, grainSlider, lumberSlider, oreSlider, woolSlider;
     @FXML
-    private ListView<Pair<Resource.ResourceType, Integer>> ownInventoryView;
+    private ListView<MutableResource> ownInventoryView;
     @FXML
     private Button taxPay;
     @FXML
@@ -52,8 +50,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
 
     private LobbyName lobbyName;
     private int taxAmount;
-    private Map<Resource.ResourceType, Integer> inventory;
-    private ObservableList<Pair<Resource.ResourceType, Integer>> ownInventoryList;
+    private MutableResourceListMap inventory;
+    private ObservableList<MutableResource> ownInventoryList;
 
     /**
      * Constructor
@@ -72,7 +70,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void brickSliderListener() {
-        selectedResources.put(Resource.ResourceType.BRICK, (int) brickSlider.getValue());
+        selectedResources.set(ResourceType.BRICK, (int) brickSlider.getValue());
         dragMethod();
     }
 
@@ -84,8 +82,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     private void dragMethod() {
         int selectedAmount = 0;
-        for (Integer i : selectedResources.values()) {
-            selectedAmount += i;
+        for (MutableResource resource : selectedResources) {
+            selectedAmount += resource.getAmount();
         }
         if (selectedAmount <= taxAmount) progress.setProgress((double) selectedAmount / taxAmount);
         else progress.setProgress(1.0 - (selectedAmount % taxAmount) / (double) taxAmount);
@@ -97,7 +95,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void grainSliderListener() {
-        selectedResources.put(Resource.ResourceType.GRAIN, (int) grainSlider.getValue());
+        selectedResources.set(ResourceType.GRAIN, (int) grainSlider.getValue());
         dragMethod();
     }
 
@@ -109,11 +107,10 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private void initialize() {
         ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(Pair<Resource.ResourceType, Integer> item, boolean empty) {
+            protected void updateItem(MutableResource item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : item.getValue().toString() + " " + resourceBundle
-                            .getString("game.resources." + item.getKey().toString().toLowerCase()));
+                    setText(empty || item == null ? "" : item.getAmount() + " " + item.getType());
                 });
             }
         });
@@ -130,7 +127,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void lumberSliderListener() {
-        selectedResources.put(Resource.ResourceType.LUMBER, (int) lumberSlider.getValue());
+        selectedResources.set(ResourceType.LUMBER, (int) lumberSlider.getValue());
         dragMethod();
     }
 
@@ -172,7 +169,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void oreSliderListener() {
-        selectedResources.put(Resource.ResourceType.ORE, (int) oreSlider.getValue());
+        selectedResources.set(ResourceType.ORE, (int) oreSlider.getValue());
         dragMethod();
     }
 
@@ -188,9 +185,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
             ownInventoryView.setItems(ownInventoryList);
         }
         ownInventoryList.clear();
-        for (Map.Entry<Resource.ResourceType, Integer> entry : inventory.entrySet()) {
-            Pair<Resource.ResourceType, Integer> ownResource = new Pair<>(entry.getKey(), entry.getValue());
-            ownInventoryList.add(ownResource);
+        for (MutableResource entry : inventory) {
+            ownInventoryList.add(entry.create());
         }
     }
 
@@ -199,11 +195,11 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void setSliders() {
-        brickSlider.setMax(inventory.get(Resource.ResourceType.BRICK));
-        grainSlider.setMax(inventory.get(Resource.ResourceType.GRAIN));
-        lumberSlider.setMax(inventory.get(Resource.ResourceType.LUMBER));
-        oreSlider.setMax(inventory.get(Resource.ResourceType.ORE));
-        woolSlider.setMax(inventory.get(Resource.ResourceType.WOOL));
+        brickSlider.setMax(inventory.getAmount(ResourceType.BRICK));
+        grainSlider.setMax(inventory.getAmount(ResourceType.GRAIN));
+        lumberSlider.setMax(inventory.getAmount(ResourceType.LUMBER));
+        oreSlider.setMax(inventory.getAmount(ResourceType.ORE));
+        woolSlider.setMax(inventory.getAmount(ResourceType.WOOL));
     }
 
     /**
@@ -211,7 +207,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void woolSliderListener() {
-        selectedResources.put(Resource.ResourceType.WOOL, (int) woolSlider.getValue());
+        selectedResources.set(ResourceType.WOOL, (int) woolSlider.getValue());
         dragMethod();
     }
 }

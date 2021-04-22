@@ -1,4 +1,4 @@
-package de.uol.swp.common.game;
+package de.uol.swp.common.game.resourceThingies.developmentCard;
 
 import javax.inject.Inject;
 import java.io.Serializable;

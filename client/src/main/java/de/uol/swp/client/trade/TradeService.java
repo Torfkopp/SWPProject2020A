@@ -6,9 +6,9 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.Resource;
-import de.uol.swp.common.game.ResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.request.*;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
@@ -48,8 +48,8 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceListMap demandedResources,
-                                ResourceListMap offeredResources) {
+    public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, MutableResourceListMap demandedResources,
+                                MutableResourceListMap offeredResources) {
         LOG.debug("Sending AcceptUserTradeRequest");
         Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
                                                      demandedResources, offeredResources);
@@ -91,7 +91,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void executeTradeWithBank(LobbyName lobbyName, Resource.ResourceType gainedResource, Resource.ResourceType lostResource) {
+    public void executeTradeWithBank(LobbyName lobbyName, ResourceType gainedResource, ResourceType lostResource) {
         LOG.debug("Sending ExecuteTradeWithBankRequest");
         Message request = new ExecuteTradeWithBankRequest(userService.getLoggedInUser(), lobbyName, gainedResource,
                                                           lostResource);
@@ -99,8 +99,8 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceListMap offeredResources,
-                           ResourceListMap demandedResources) {
+    public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, MutableResourceListMap offeredResources,
+                           MutableResourceListMap demandedResources) {
         LOG.debug("Sending an OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
                                                            offeredResources, demandedResources);
