@@ -451,9 +451,9 @@ public class GameServiceTest {
         inventories[2].increaseBrick(2);
         inventories[0].increaseMonopolyCards(1);
         bus.post(new PlayMonopolyCardRequest(lobby.getName(), user[0], Resources.BRICK));
-        assertEquals(2, inventories[0].getBrick());
+        assertEquals(3, inventories[0].getBrick());
         assertEquals(0, inventories[1].getBrick());
-        assertEquals(1, inventories[2].getBrick());
+        assertEquals(0, inventories[2].getBrick());
     }
 
     @Test
