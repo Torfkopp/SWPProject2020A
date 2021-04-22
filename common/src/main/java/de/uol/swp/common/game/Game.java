@@ -21,7 +21,7 @@ public class Game {
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
-    private final List<String> bankInventory;
+    private final BankInventory bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
@@ -46,8 +46,7 @@ public class Game {
             }
         }
         activePlayer = first;
-        BankInventory bankInvent = new BankInventory();
-        bankInventory = bankInvent.getDevelopmentCards();
+        bankInventory = new BankInventory();
     }
 
     /**
@@ -86,11 +85,11 @@ public class Game {
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += players.get(player).getVictoryPointCards();
+        points += players.get(player).get(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD);
         //2 Points if player has the longest road
-        if (players.get(player).isLongestRoad()) points += 2;
+        //if (players.get(player).isLongestRoad()) points += 2;
         //2 Points if player has the largest army
-        if (players.get(player).isLargestArmy()) points += 2;
+        //if (players.get(player).isLargestArmy()) points += 2;
         return points;
     }
 
@@ -118,23 +117,7 @@ public class Game {
                 if (i.getState().equals(IIntersection.IntersectionState.SETTLEMENT)) amount = 1;
                 else if (i.getState().equals(IIntersection.IntersectionState.CITY)) amount = 2;
                 if (i.getOwner() != null) {
-                    switch (hex.getResource()) {
-                        case HILLS:
-                            getInventory(i.getOwner()).increaseBrick(amount);
-                            break;
-                        case FIELDS:
-                            getInventory(i.getOwner()).increaseGrain(amount);
-                            break;
-                        case FOREST:
-                            getInventory(i.getOwner()).increaseLumber(amount);
-                            break;
-                        case PASTURE:
-                            getInventory(i.getOwner()).increaseWool(amount);
-                            break;
-                        case MOUNTAINS:
-                            getInventory(i.getOwner()).increaseOre(amount);
-                            break;
-                    }
+                    getInventory(i.getOwner()).increase(hex.getResource(), amount);
                 }
             }
         }
@@ -169,7 +152,7 @@ public class Game {
      *
      * @since 2021-02-21
      */
-    public List<String> getBankInventory() {
+    public BankInventory getBankInventory() {
         return bankInventory;
     }
 

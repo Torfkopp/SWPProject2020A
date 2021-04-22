@@ -307,9 +307,9 @@ public class GameService extends AbstractService {
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                                          BuildingSuccessfulMessage.Type.ROAD));
-                    } else if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
-                        inv.increaseBrick(-1);
-                        inv.increaseLumber(-1);
+                    } else if (inv.get(Resource.ResourceType.BRICK) >= 1 && inv.get(Resource.ResourceType.LUMBER) >= 1) {
+                        inv.decrease(Resource.ResourceType.BRICK);
+                        inv.decrease(Resource.ResourceType.LUMBER);
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,

@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**

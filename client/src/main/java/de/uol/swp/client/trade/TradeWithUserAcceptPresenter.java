@@ -4,6 +4,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.Resource;
+import de.uol.swp.common.game.ResourceListMap;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -50,12 +53,12 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private ListView<Pair<String, Integer>> ownInventoryView;
 
-    private String lobbyName;
+    private LobbyName lobbyName;
     private UserOrDummy offeringUser;
-    private Map<String, Integer> offeringResourceMap;
-    private Map<String, Integer> resourceMap;
-    private Map<String, Integer> respondingResourceMap;
-    private ObservableList<Pair<String, Integer>> ownInventoryList;
+    private ResourceListMap offeringResourceMap;
+    private ResourceListMap resourceMap;
+    private ResourceListMap respondingResourceMap;
+    private ObservableList<Resource> ownInventoryList;
 
     /**
      * Constructor
