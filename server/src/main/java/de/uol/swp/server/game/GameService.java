@@ -988,20 +988,12 @@ public class GameService extends AbstractService {
 
         for (UserOrDummy user : game.getPlayers()) {
             if (!(user instanceof Dummy)) {
-                post(new ForwardToUserInternalRequest(user, new UpdateInventoryResponse(user, req.getOriginLobby(),
-                                                                                        Collections.unmodifiableMap(
-                                                                                                getResourceMapFromInventory(
-                                                                                                        game.getInventory(
-                                                                                                                user))),
-                                                                                        Collections.unmodifiableMap(
-                                                                                                Map.of("game.resources.cards.unique.largestarmy",
-                                                                                                       game.getInventory(
-                                                                                                               user)
-                                                                                                           .isLargestArmy(),
-                                                                                                       "game.resources.cards.unique.longestroad",
-                                                                                                       game.getInventory(
-                                                                                                               user)
-                                                                                                           .isLongestRoad())))));
+                Map<String, Boolean> map = Map
+                        .of("game.resources.cards.unique.largestarmy", game.getInventory(user).isLargestArmy(),
+                            "game.resources.cards.unique.longestroad", game.getInventory(user).isLongestRoad());
+                ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), Collections
+                        .unmodifiableMap(getResourceMapFromInventory(game.getInventory(user))), map);
+                post(new ForwardToUserInternalRequest(user, responseMessage));
             }
         }
     }
