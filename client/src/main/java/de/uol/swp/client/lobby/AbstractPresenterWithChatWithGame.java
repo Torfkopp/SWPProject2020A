@@ -189,8 +189,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
         Platform.runLater(() -> {
-            turnIndicator.setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator")));
-            turnPlayerName.setText(String.format(user.getUsername()));
+            turnIndicator.setText(resourceBundle.getString("lobby.game.text.turnindicator"));
+            turnPlayerName.setText(user.getUsername());
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
             if (user.equals(membersList.get(0))) {
