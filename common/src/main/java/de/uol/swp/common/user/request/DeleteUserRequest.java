@@ -23,7 +23,7 @@ public class DeleteUserRequest extends AbstractRequestMessage {
      * Constructor
      *
      * @param toDelete The user to delete
-     * @param password
+     * @param password The logged in users password
      *
      * @since 2020-11-02
      */
