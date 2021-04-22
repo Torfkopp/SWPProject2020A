@@ -14,7 +14,6 @@ import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
-import de.uol.swp.server.sessionmanagement.SessionManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,14 +36,15 @@ public class AuthenticationService extends AbstractService {
     /**
      * Constructor
      *
-     * @param bus            The EventBus used throughout the entire server
-     * @param userManagement Object of the UserManagement to use
+     * @param bus               The EventBus used throughout the entire server
+     * @param userManagement    Object of the UserManagement to use
+     * @param sessionManagement Object of the SessionManagement to use
      *
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-30
      */
     @Inject
-    public AuthenticationService(EventBus bus, UserManagement userManagement, SessionManagement sessionManagement) {
+    public AuthenticationService(EventBus bus, IUserManagement userManagement, ISessionManagement sessionManagement) {
         super(bus);
         this.userManagement = userManagement;
         this.sessionManagement = sessionManagement;

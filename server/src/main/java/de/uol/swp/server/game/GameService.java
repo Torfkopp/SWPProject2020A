@@ -10,6 +10,7 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
@@ -367,7 +368,18 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
+                    if (game.getRoadBuildingCardPhase() != RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED) {
+                        if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD)
+                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD);
+                        else if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
+                            LOG.debug("---- RoadBuildingCardPhase phase ends");
+                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED);
+                        }
+                        gameMap.placeRoad(player, mapPoint);
+                        sendSuccess.accept(req.getOriginLobby(),
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                         BuildingSuccessfulMessage.Type.ROAD));
+                    } else if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
@@ -1003,10 +1015,12 @@ public class GameService extends AbstractService {
             returnMessage.initWithMessage(req);
             post(returnMessage);
             LOG.debug("Sending a PlayCardFailureResponse");
-            LOG.debug("---- Not enough RoadBuilding cards");
+            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
             return;
         }
-        //TODO: Implementierung
+
+        LOG.debug("---- RoadBuildingCardPhase phase starts");
+        game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD);
 
         inv.increaseRoadBuildingCards(-1);
 
