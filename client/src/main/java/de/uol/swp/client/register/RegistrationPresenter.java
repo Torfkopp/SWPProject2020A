@@ -143,7 +143,6 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @since 2021-04-21
      */
     private void prepareLoginFormat() {
-
         UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
         loginField.setTextFormatter(new TextFormatter<>(StringFilter));

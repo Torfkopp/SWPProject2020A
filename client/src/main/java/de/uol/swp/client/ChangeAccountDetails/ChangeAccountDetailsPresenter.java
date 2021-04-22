@@ -62,7 +62,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     @FXML
     protected void initialize() {
-        preparenewUsernameField();
+        prepareNewUsernameField();
     }
 
     /**
@@ -164,7 +164,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * @author Sven Ahrens
      * @since 2021-04-22
      */
-    private void preparenewUsernameField() {
+    private void prepareNewUsernameField() {
         UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
         newUsernameField.setTextFormatter(new TextFormatter<>(StringFilter));
