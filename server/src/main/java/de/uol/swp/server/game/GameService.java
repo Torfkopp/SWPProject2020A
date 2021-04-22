@@ -841,8 +841,8 @@ public class GameService extends AbstractService {
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
-                                                                       resourceMap, req.getOfferingResourceMap(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), resourceMap,
+                                                                       req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
@@ -985,6 +985,25 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+
+        for (UserOrDummy user : game.getPlayers()) {
+            if (!(user instanceof Dummy)) {
+                post(new ForwardToUserInternalRequest(user, new UpdateInventoryResponse(user, req.getOriginLobby(),
+                                                                                        Collections.unmodifiableMap(
+                                                                                                getResourceMapFromInventory(
+                                                                                                        game.getInventory(
+                                                                                                                user))),
+                                                                                        Collections.unmodifiableMap(
+                                                                                                Map.of("game.resources.cards.unique.largestarmy",
+                                                                                                       game.getInventory(
+                                                                                                               user)
+                                                                                                           .isLargestArmy(),
+                                                                                                       "game.resources.cards.unique.longestroad",
+                                                                                                       game.getInventory(
+                                                                                                               user)
+                                                                                                           .isLongestRoad())))));
+            }
+        }
     }
 
     /**

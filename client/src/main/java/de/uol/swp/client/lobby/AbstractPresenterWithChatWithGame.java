@@ -515,7 +515,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
         playedCard = true;
-        gameService.updateInventory(rsp.getLobbyName());
     }
 
     /**
