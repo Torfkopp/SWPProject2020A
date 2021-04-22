@@ -72,6 +72,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label turnIndicator;
     @FXML
+    protected Label turnPlayerName;
+    @FXML
     protected Label notice;
     @FXML
     protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
@@ -184,21 +186,21 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
         Platform.runLater(() -> {
-            turnIndicator.setText(
-                    String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername()));
+            turnIndicator.setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator")));
+            turnPlayerName.setText(String.format(user.getUsername()));
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
             if (user.equals(membersList.get(0))) {
-                turnIndicator.setTextFill(GameRendering.PLAYER_1_COLOUR);
+                turnPlayerName.setTextFill(GameRendering.PLAYER_1_COLOUR);
             }
             if (user.equals(membersList.get(1))) {
-                turnIndicator.setTextFill(GameRendering.PLAYER_2_COLOUR);
+                turnPlayerName.setTextFill(GameRendering.PLAYER_2_COLOUR);
             }
             if (user.equals(membersList.get(2))) {
-                turnIndicator.setTextFill(GameRendering.PLAYER_3_COLOUR);
+                turnPlayerName.setTextFill(GameRendering.PLAYER_3_COLOUR);
             }
             if (user.equals(membersList.get(3))) {
-                turnIndicator.setTextFill(GameRendering.PLAYER_4_COLOUR);
+                turnPlayerName.setTextFill(GameRendering.PLAYER_4_COLOUR);
             }
         });
     }
