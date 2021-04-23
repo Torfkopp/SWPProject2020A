@@ -17,6 +17,7 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -330,25 +331,36 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     /**
      * Method called when the DeleteUserButton is pressed
      * <p>
-     * This method is called when the DeleteUserButton is pressed. It first
-     * calls the UserService to log the user out, resets the variables used
-     * for storing the chat history, and then posts an instance of the
-     * ShowLoginViewEvent to the EventBus the SceneManager is subscribed to,
-     * and finally calls the UserService to drop the user.
+     * This method is called when the DeleteUserButton is pressed. It first asks
+     * the user to confirm that they want to delete the Account. It calls on the
+     * UserService to drop the user if and only if the user has a password and
+     * clicked the checkbox.
      *
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#resetChatVars()
-     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
-     * @see de.uol.swp.client.SceneManager
-     * @see de.uol.swp.client.user.UserService
-     * @since 2020-11-20
+     * @author Timo Gerken
+     * @since 2021-04-19
      */
     @FXML
     private void onDeleteButtonPressed() {
-        userService.logout(userService.getLoggedInUser());
-        resetChatVars();
-        eventBus.post(showLoginViewMessage);
-        userService.dropUser(userService.getLoggedInUser());
+        TextInputDialog dialogue = new TextInputDialog();
+        dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
+        dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
+        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
+        PasswordField confirmPasswordField = new PasswordField();
+        CheckBox userDeletionConfirmCheckBox = new CheckBox(
+                resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
+        HBox hbox = new HBox(10, lbl, confirmPasswordField);
+        VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
+        dialogue.getDialogPane().setContent(box);
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+        dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
+                () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
+                userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
+        Optional<String> result = dialogue.showAndWait();
+        result.ifPresent(s -> userService
+                .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
     }
 
     /**
@@ -585,6 +597,34 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         logout();
         eventBus.post(showLoginViewMessage);
         eventBus.post(closeLobbiesViewEvent);
+    }
+
+    /**
+     * Handles a UserDeletionSuccessfulResponse found on the EventBus
+     * <p>
+     * This method logs the currently logged in user out and returns them to the Login Screen.
+     * It also shows a Dialog Window to the user telling them the Account was deleted.
+     *
+     * @param rsp The UserDeletionSuccessfulResponse found on the EventBus
+     *
+     * @author Timo Gerken
+     * @since 2021-04-19
+     */
+    @Subscribe
+    private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
+        LOG.info("User deletion successful");
+        String username = userService.getLoggedInUser().getUsername();
+        eventBus.post(showLoginViewMessage);
+        logout();
+        ButtonType ok = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                                    String.format(resourceBundle.getString("mainmenu.settings.deleteaccount.success"),
+                                                  username), ok);
+            alert.setTitle(resourceBundle.getString("information.title"));
+            alert.setHeaderText(resourceBundle.getString("information.header"));
+            alert.show();
+        });
     }
 
     /**
