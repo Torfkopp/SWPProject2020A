@@ -181,8 +181,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper function that sets the text's text.
      * <p>
-     * The text states whose turn it is. The name of the player whose turn it is, is colored in his personal color.
-     * It also shortens the player's name, if its longer than 15 characters.
+     * The text states whose turn it is. The name of the player whose turn it is, is coloured in his personal colour.
+     * It also shortens the player's name, if it's longer than 15 characters.
      *
      * @author Sven Ahrens
      * @author Alwin Bossert
@@ -197,12 +197,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
             preUsernameText.setFont(Font.font(20.0));
 
-            String shortenedUsername = null;
-            if (user.getUsername().length() > 15) {
-                shortenedUsername = user.getUsername().substring(0, 15) + "...";
-                System.out.print(shortenedUsername);
-            }
-            Text username = new Text(shortenedUsername);
+            String name = user.getUsername();
+            if (name.length() > 15) name = name.substring(0, 15) + "...";
+            Text username = new Text(name);
             username.setFont(Font.font(20.0));
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
