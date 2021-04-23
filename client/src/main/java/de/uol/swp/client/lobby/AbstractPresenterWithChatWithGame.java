@@ -30,6 +30,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 import javafx.util.Pair;
 
@@ -71,9 +74,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Button tradeWithUserButton;
     @FXML
+    protected TextFlow turnIndicator;
+    /*
+    @FXML
     protected Label turnIndicator;
     @FXML
     protected Label turnPlayerName;
+    */
+
     @FXML
     protected Label notice;
     @FXML
@@ -180,33 +188,41 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper function that sets the text's text.
      * <p>
-     * The text states whose turn it is. It is colored in the color of the player whose turn it is.
+     * The text states whose turn it is. The name of the player whose turn it is, is colored in his personal color.
      *
+     * @author Sven Ahrens
      * @author Alwin Bossert
      * @author Mario Fokken
      * @author Marvin Drees
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
+
         Platform.runLater(() -> {
-            turnIndicator.setText(resourceBundle.getString("lobby.game.text.turnindicator"));
-            turnPlayerName.setText(user.getUsername());
+            turnIndicator.getChildren().clear();
+            Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
+            preUsernameText.setFont(Font.font(20.0));
+            Text username = new Text(user.getUsername());
+            username.setFont(Font.font(20.0));
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
             if (user.equals(membersList.get(0))) {
-                turnPlayerName.setTextFill(GameRendering.PLAYER_1_COLOUR);
+                username.setFill(GameRendering.PLAYER_1_COLOUR);
             }
             if (user.equals(membersList.get(1))) {
-                turnPlayerName.setTextFill(GameRendering.PLAYER_2_COLOUR);
+                username.setFill(GameRendering.PLAYER_2_COLOUR);
             }
             if (user.equals(membersList.get(2))) {
-                turnPlayerName.setTextFill(GameRendering.PLAYER_3_COLOUR);
+                username.setFill(GameRendering.PLAYER_3_COLOUR);
             }
             if (membersList.size() == 4) {
                 if (user.equals(membersList.get(3))) {
-                    turnPlayerName.setTextFill(GameRendering.PLAYER_4_COLOUR);
+                    username.setFill(GameRendering.PLAYER_4_COLOUR);
                 }
             }
+            Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
+            postUsernameText.setFont(Font.font(20.0));
+            turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
         });
     }
 
