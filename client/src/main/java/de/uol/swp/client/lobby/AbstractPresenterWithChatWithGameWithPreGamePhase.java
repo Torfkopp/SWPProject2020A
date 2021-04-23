@@ -282,7 +282,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setVisible(true);
             preGameSettingBox.setPrefHeight(190);
             preGameSettingBox.setMaxHeight(190);
-            turnIndicator.setText("");
+            turnIndicator.setAccessibleText("");
             preGameSettingBox.setMinHeight(190);
             uniqueCardView.setMaxHeight(0);
             uniqueCardView.setMinHeight(0);
