@@ -451,7 +451,8 @@ public class GameService extends AbstractService {
      * <p>
      * If a CreateGameInternalRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to create a game. Afterwards, it sets up
-     * the map of the game according to the settings of the lobby.
+     * the map of the game according to the settings of the lobby. It also randomly
+     * selects the first player.
      *
      * @param msg The CreateGameInternalRequest found on the EventBus
      *
@@ -474,12 +475,17 @@ public class GameService extends AbstractService {
             gameMap = gameMap.createMapFromConfiguration(configuration);
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
-            } // TODO: handle founder phase
-            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
+            }
+            Set<UserOrDummy> users = msg.getLobby().getUserOrDummies();
+            int randomNbr = (int) (Math.random() * users.size());
+            UserOrDummy[] playerArray = users.toArray(new UserOrDummy[users.size()]);
+            UserOrDummy firstPlayer = playerArray[randomNbr];
+            // TODO: handle founder phase
+            gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap);
             LOG.debug("Sending GameCreatedMessage");
-            post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
+            post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));
             LOG.debug("Sending StartSessionMessage for Lobby " + lobbyName);
-            StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
+            StartSessionMessage message = new StartSessionMessage(lobbyName, firstPlayer, configuration,
                                                                   msg.getLobby().startUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
@@ -841,8 +847,8 @@ public class GameService extends AbstractService {
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
-                                                                       resourceMap, req.getOfferingResourceMap(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), resourceMap,
+                                                                       req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
