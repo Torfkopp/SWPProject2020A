@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
@@ -101,12 +102,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     private ITradeService tradeService;
 
+    @Inject
+    @Named("theme")
+    private static String theme;
+    private static String styleSheet;
+
     private ObservableList<Pair<String, String>> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
     @FXML
     protected void initialize() {
+        styleSheet = "css/" + theme + ".css";
         super.initialize();
         prepareInventoryView();
         prepareUniqueCardView();
@@ -422,6 +429,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                               ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
+        alert.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<ButtonType> result = alert.showAndWait();
         //Create Strings based on the languages name for the resources

@@ -38,9 +38,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -68,8 +66,8 @@ public class SceneManager {
     private static ResourceBundle resourceBundle;
     @Inject
     @Named("theme")
-    private static String theme = "default";
-    private static final String styleSheet = "css/" + theme + ".css";
+    private static String theme;
+    private static String styleSheet;
 
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
@@ -99,6 +97,7 @@ public class SceneManager {
      */
     @Inject
     public SceneManager(EventBus eventBus, @Assisted Stage primaryStage) {
+        styleSheet = "css/" + theme + ".css";
         eventBus.register(this);
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;
@@ -166,6 +165,7 @@ public class SceneManager {
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }
@@ -204,6 +204,7 @@ public class SceneManager {
             ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
             alert.getButtonTypes().setAll(confirm, cancel);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == confirm) {
                 eventBus.post(new NukeUsersSessionsRequest(user));
@@ -224,6 +225,7 @@ public class SceneManager {
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
             showLoginScreen();
         });
@@ -298,6 +300,7 @@ public class SceneManager {
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }

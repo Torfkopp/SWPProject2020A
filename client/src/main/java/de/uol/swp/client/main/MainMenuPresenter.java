@@ -1,6 +1,8 @@
 package de.uol.swp.client.main;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
@@ -48,6 +50,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
+    @Inject
+    @Named("theme")
+    private static String theme;
+    private static String styleSheet;
+
     @FXML
     private Label randomLobbyState;
     @FXML
@@ -67,6 +74,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-02
      */
     public MainMenuPresenter() {
+        styleSheet = "css/" + theme + ".css";
         super.init(LogManager.getLogger(MainMenuPresenter.class));
     }
 
@@ -264,7 +272,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
-
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
         int maxPlayers;

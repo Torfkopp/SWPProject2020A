@@ -10,8 +10,10 @@ import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.game.GameService;
 import de.uol.swp.client.game.IGameService;
+import de.uol.swp.client.lobby.AbstractPresenterWithChatWithGame;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.IUserService;
@@ -50,7 +52,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
-        defaultProps.setProperty("theme", "light");
+        defaultProps.setProperty("theme", "default");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -122,5 +124,7 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(ClientApp.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(SceneManager.class);
+        requestStaticInjection(MainMenuPresenter.class);
+        requestStaticInjection(AbstractPresenterWithChatWithGame.class);
     }
 }
