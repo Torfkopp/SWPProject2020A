@@ -4,6 +4,12 @@ import de.uol.swp.common.game.resourceThingies.resource.resource.IImmutableResou
 
 import java.util.Iterator;
 
+/**
+ * The interface Immutable resource list map.
+ *
+ * @author Temmo Junkhoff
+ * @since 2021-04-23
+ */
 public interface IImmutableResourceListMap extends IResourceListMap, Iterable<IImmutableResource> {
 
     @Override

@@ -1,15 +1,26 @@
 package de.uol.swp.common.game.resourceThingies.resource.resourceListMap;
 
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
-import de.uol.swp.common.game.resourceThingies.resource.resource.IMutableResource;
-import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
+import de.uol.swp.common.game.resourceThingies.resource.resource.*;
 
 import java.util.*;
 
+/**
+ * The type Mutable resource list map.
+ *
+ * @author Temmo Junkhoff
+ * @since 2021-04-23
+ */
 public class MutableResourceListMap implements IMutableResourceListMap {
 
     private final List<IMutableResource> list;
 
+    /**
+     * Instantiates a new Mutable resource list map.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public MutableResourceListMap() {
         list = new LinkedList<>();
         for (ResourceType resource : ResourceType.values()) {
@@ -17,11 +28,31 @@ public class MutableResourceListMap implements IMutableResourceListMap {
         }
     }
 
-    private MutableResourceListMap(List<IMutableResource> list) {
-        this.list = list;
+    /**
+     * Instantiates a new Mutable resource list map.
+     *
+     * @param list the list
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
+    private MutableResourceListMap(List<IImmutableResource> list) {
+        this.list = new LinkedList<>();
+        for (IImmutableResource resource : list)
+            this.list.add(new MutableResource(resource.getType(), resource.getAmount()));
     }
 
-    public static MutableResourceListMap createResourceListMapFromList(List<IMutableResource> list) {
+    /**
+     * Create resource list map from a list of resources.
+     *
+     * @param list the list
+     *
+     * @return the list of resources
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
+    public static MutableResourceListMap createResourceListMapFromList(List<IImmutableResource> list) {
         return new MutableResourceListMap(list);
     }
 
@@ -80,10 +111,24 @@ public class MutableResourceListMap implements IMutableResourceListMap {
         return 0;
     }
 
+    /**
+     * The type Resource list map iterator.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public class ResourceListMapIterator implements Iterator<IMutableResource> {
 
         private final List<IMutableResource> list;
 
+        /**
+         * Instantiates a new Resource list map iterator.
+         *
+         * @param list the list
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-04-23
+         */
         public ResourceListMapIterator(List<IMutableResource> list) {
             this.list = list;
         }

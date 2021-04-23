@@ -2,9 +2,10 @@ package de.uol.swp.common.game.resourceThingies;
 
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourceThingies.resource.resource.IImmutableResource;
 import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ import java.util.*;
 public class BankInventory extends AbstractInventory {
 
     public BankInventory() {
-        List<MutableResource> tempResourceList = new LinkedList<>();
+        List<IImmutableResource> tempResourceList = new LinkedList<>();
         List<DevelopmentCard> tempDevelopmentCardList = new LinkedList<>();
         for (ResourceType resource : ResourceType.values())
             tempResourceList.add(new MutableResource(resource, 100));
