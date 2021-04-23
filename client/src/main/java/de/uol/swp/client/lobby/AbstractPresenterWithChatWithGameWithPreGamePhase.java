@@ -393,6 +393,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
+            autoRoll.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);

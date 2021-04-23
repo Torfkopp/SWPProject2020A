@@ -180,7 +180,7 @@ public class LobbyService extends AbstractService {
     @Subscribe
     private void onCheckUserInLobbyRequest(CheckUserInLobbyRequest req) {
         LOG.debug("Received a CheckUserInLobbyRequest");
-        Boolean isInLobby = false;
+        boolean isInLobby = false;
         User user = req.getUser();
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
         for (Map.Entry<String, Lobby> entry : lobbies.entrySet()) {
@@ -403,15 +403,14 @@ public class LobbyService extends AbstractService {
     private void onLobbyLeaveUserRequest(LobbyLeaveUserRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received LobbyLeaveUserRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-        if (lobby.isPresent()) {
-            try {
-                lobby.get().leaveUser(req.getUser());
-                sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getUser()));
-                post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
-            } catch (IllegalArgumentException exception) {
-                lobbyManagement.dropLobby(lobby.get().getName());
-                sendToAll(new LobbyDeletedMessage(req.getName()));
-            }
+        if (lobby.isEmpty()) return;
+        try {
+            lobby.get().leaveUser(req.getUser());
+            sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getUser()));
+            post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        } catch (IllegalArgumentException exception) {
+            lobbyManagement.dropLobby(lobby.get().getName());
+            sendToAll(new LobbyDeletedMessage(req.getName()));
         }
     }
 
@@ -525,15 +524,14 @@ public class LobbyService extends AbstractService {
     private void onReturnToPreGameLobbyRequest(ReturnToPreGameLobbyRequest req) {
         if (LOG.isDebugEnabled()) LOG.debug("Received ReturnToPreGameLobbyRequest for Lobby " + req.getLobbyName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getLobbyName());
-        if (lobby.isPresent()) {
-            lobbyManagement.setInGame(req.getLobbyName(), false);
-            for (User user : lobby.get().getRealUsers()) {
-                post(new UserReadyRequest(req.getLobbyName(), user, false));
-            }
-            sendToAllInLobby(req.getLobbyName(),
-                             new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
-            sendToAll(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        if (lobby.isEmpty()) return;
+        lobbyManagement.setInGame(req.getLobbyName(), false);
+        for (User user : lobby.get().getRealUsers()) {
+            post(new UserReadyRequest(req.getLobbyName(), user, false));
         }
+        sendToAllInLobby(req.getLobbyName(),
+                         new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
+        sendToAll(new AllLobbiesMessage(lobbyManagement.getLobbies()));
     }
 
     /**
@@ -556,6 +554,7 @@ public class LobbyService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug("Received StartSessionRequest for Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
+        if (!req.getUser().equals(lobby.get().getOwner())) return;
         if (lobby.get().getUserOrDummies().size() < 3 || (!lobby.get().getReadyUsers()
                                                                 .equals(lobby.get().getUserOrDummies()))) return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
@@ -582,14 +581,13 @@ public class LobbyService extends AbstractService {
         if (LOG.isDebugEnabled()) LOG.debug(
                 "Received UserReadyRequest for User " + req.getUser().getUsername() + " in Lobby " + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
-        if (lobby.isPresent()) {
-            if (req.isReady()) {
-                lobby.get().setUserReady(req.getUser());
-            } else {
-                lobby.get().unsetUserReady(req.getUser());
-            }
-            ServerMessage msg = new UserReadyMessage(req.getName(), req.getUser());
-            sendToAllInLobby(req.getName(), msg);
+        if (lobby.isEmpty()) return;
+        if (req.isReady()) {
+            lobby.get().setUserReady(req.getUser());
+        } else {
+            lobby.get().unsetUserReady(req.getUser());
         }
+        ServerMessage msg = new UserReadyMessage(req.getName(), req.getUser());
+        sendToAllInLobby(req.getName(), msg);
     }
 }
