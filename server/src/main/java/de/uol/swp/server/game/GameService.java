@@ -841,8 +841,8 @@ public class GameService extends AbstractService {
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
-                                                                       resourceMap, req.getOfferingResourceMap(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), resourceMap,
+                                                                       req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
@@ -1247,6 +1247,8 @@ public class GameService extends AbstractService {
 
         Game game = gameManagement.getGame(req.getLobby());
         game.removeTaxPayer(req.getPlayer());
+        if (game.getTaxPayers().isEmpty()) lobbyService
+                .sendToAllInLobby(req.getLobby(), new RobberAllTaxPayedMessage(req.getLobby(), game.getActivePlayer()));
         endTurnDummy(game);
     }
 
