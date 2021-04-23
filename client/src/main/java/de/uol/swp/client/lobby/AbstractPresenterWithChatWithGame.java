@@ -75,13 +75,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Button tradeWithUserButton;
     @FXML
     protected TextFlow turnIndicator;
-    /*
-    @FXML
-    protected Label turnIndicator;
-    @FXML
-    protected Label turnPlayerName;
-    */
-
     @FXML
     protected Label notice;
     @FXML
@@ -189,6 +182,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Helper function that sets the text's text.
      * <p>
      * The text states whose turn it is. The name of the player whose turn it is, is colored in his personal color.
+     * It also shortens the player's name, if its longer than 15 characters.
      *
      * @author Sven Ahrens
      * @author Alwin Bossert
@@ -202,7 +196,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             turnIndicator.getChildren().clear();
             Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
             preUsernameText.setFont(Font.font(20.0));
-            Text username = new Text(user.getUsername());
+
+            String shortenedUsername = null;
+            if (user.getUsername().length() > 15) {
+                shortenedUsername = user.getUsername().substring(0, 15) + "...";
+                System.out.print(shortenedUsername);
+            }
+            Text username = new Text(shortenedUsername);
             username.setFont(Font.font(20.0));
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
