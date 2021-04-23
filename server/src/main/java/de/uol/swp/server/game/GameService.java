@@ -841,8 +841,8 @@ public class GameService extends AbstractService {
         Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
-        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(),
-                                                                       resourceMap, req.getOfferingResourceMap(),
+        ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), resourceMap,
+                                                                       req.getOfferingResourceMap(),
                                                                        req.getRespondingResourceMap(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
@@ -937,36 +937,36 @@ public class GameService extends AbstractService {
             case ORE:
                 for (Inventory inv : inventories)
                     if (inv.getOre() > 0) {
-                        inv.increaseOre(-1);
-                        invMono.increaseOre(1);
+                        invMono.increaseOre(inv.getOre());
+                        inv.increaseOre(-inv.getOre());
                     }
                 break;
             case WOOL:
                 for (Inventory inv : inventories)
                     if (inv.getWool() > 0) {
-                        inv.increaseWool(-1);
-                        invMono.increaseWool(1);
+                        invMono.increaseWool(inv.getWool());
+                        inv.increaseWool(-inv.getWool());
                     }
                 break;
             case BRICK:
                 for (Inventory inv : inventories)
                     if (inv.getBrick() > 0) {
-                        inv.increaseBrick(-1);
-                        invMono.increaseBrick(1);
+                        invMono.increaseBrick(inv.getBrick());
+                        inv.increaseBrick(-inv.getBrick());
                     }
                 break;
             case GRAIN:
                 for (Inventory inv : inventories)
                     if (inv.getGrain() > 0) {
-                        inv.increaseGrain(-1);
-                        invMono.increaseGrain(1);
+                        invMono.increaseGrain(inv.getGrain());
+                        inv.increaseGrain(-inv.getGrain());
                     }
                 break;
             case LUMBER:
                 for (Inventory inv : inventories)
                     if (inv.getLumber() > 0) {
-                        inv.increaseLumber(-1);
-                        invMono.increaseLumber(1);
+                        invMono.increaseLumber(inv.getLumber());
+                        inv.increaseLumber(-inv.getLumber());
                     }
                 break;
         }
@@ -985,6 +985,17 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+
+        for (UserOrDummy user : game.getPlayers()) {
+            if (!(user instanceof Dummy)) {
+                Map<String, Boolean> map = Map
+                        .of("game.resources.cards.unique.largestarmy", game.getInventory(user).isLargestArmy(),
+                            "game.resources.cards.unique.longestroad", game.getInventory(user).isLongestRoad());
+                ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), Collections
+                        .unmodifiableMap(getResourceMapFromInventory(game.getInventory(user))), map);
+                post(new ForwardToUserInternalRequest(user, responseMessage));
+            }
+        }
     }
 
     /**
