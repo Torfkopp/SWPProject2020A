@@ -37,12 +37,15 @@ public class LobbyDTO implements Lobby {
     private boolean startUpPhaseEnabled;
     private boolean randomPlayfieldEnabled;
     private IConfiguration configuration;
+
     /**
      * Constructor
      *
-     * @param name    The requested name the lobby
-     * @param creator The user who created the lobby and therefore its owner
-     * @param inGame  Whether the lobby is currently in a game
+     * @param name        The requested name the lobby
+     * @param creator     The user who created the lobby and therefore its owner
+     * @param password    The requested password of the lobby
+     * @param inGame      Whether the lobby is currently in a game
+     * @param hasPassword Whether the lobby has a password or not
      *
      * @since 2019-10-08
      */
@@ -122,6 +125,10 @@ public class LobbyDTO implements Lobby {
         return owner;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     @Override
     public Set<UserOrDummy> getReadyUsers() {
         return readyUsers;
@@ -144,23 +151,18 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public boolean isInGame() {
-        return inGame;
-    }
-
-    @Override
     public boolean hasAPassword() {
         return hasPassword;
     }
 
     @Override
-    public void setInGame(boolean inGame) {
-        this.inGame = inGame;
+    public boolean isInGame() {
+        return inGame;
     }
 
     @Override
-    public void setHasPassword(boolean hasPassword) {
-        this.hasPassword = hasPassword;
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 
     @Override
@@ -214,6 +216,11 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public void setHasPassword(boolean hasPassword) {
+        this.hasPassword = hasPassword;
+    }
+
+    @Override
     public void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled) {
         this.randomPlayfieldEnabled = randomPlayfieldEnabled;
     }
@@ -240,9 +247,5 @@ public class LobbyDTO implements Lobby {
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");
         }
         this.owner = user;
-    }
-
-    public String getPassword() {
-        return password;
     }
 }

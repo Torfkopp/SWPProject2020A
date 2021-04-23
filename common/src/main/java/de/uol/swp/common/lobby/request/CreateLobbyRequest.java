@@ -21,6 +21,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      * @param name       Name of the lobby
      * @param owner      User trying to create the lobby
      * @param maxPlayers Maximum amount of players for the new lobby
+     * @param password   Password of the lobby
      *
      * @since 2019-10-08
      */
@@ -51,7 +52,14 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
         return null;
     }
 
-    public String getPassword(){
+    /**
+     * Gets the password of the lobby
+     *
+     * @return Password of the lobby
+     *
+     * @since 2021-04-22
+     */
+    public String getPassword() {
         return password;
     }
 }

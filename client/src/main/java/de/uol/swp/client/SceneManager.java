@@ -808,8 +808,19 @@ public class SceneManager {
         lobbyStages.add(lobbyStage);
     }
 
+    /**
+     * Handles the ShowLobbyWithPasswordViewEvent detected on the EventBus
+     * <p>
+     * If a ShowLobbyWithPasswordViewEvent is detected on the EventBus, this method gets
+     * called. It opens the password confirmation in a new window.
+     *
+     * @param event The ShowLobbyWithPasswordViewEvent detected on the EventBus
+     *
+     * @see de.uol.swp.client.lobby.event.ShowLobbyWithPasswordViewEvent
+     * @since 2021-04-22
+     */
     @Subscribe
-    private void onShowLobbyWithPasswordViewEvent(ShowLobbyWithPasswordViewEvent event){
+    private void onShowLobbyWithPasswordViewEvent(ShowLobbyWithPasswordViewEvent event) {
         String lobbyName = event.getName();
         Stage lobbyStage = new Stage();
         lobbyStage.setTitle(lobbyName);
@@ -836,6 +847,7 @@ public class SceneManager {
         eventBus.post(new ConfirmLobbyPasswordEvent(lobbyName));
         LOG.debug("Sending a ConfirmLobbyPasswordEvent to lobby " + lobbyName);
     }
+
     /**
      * Handles the ShowLoginViewEvent detected on the EventBus
      * <p>

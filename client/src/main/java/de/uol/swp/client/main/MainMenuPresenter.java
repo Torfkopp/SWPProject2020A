@@ -302,6 +302,22 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         });
     }
 
+    /**
+     * Handles a CreateLobbyWithPasswordResponse found on the EventBus
+     * <p>
+     * If a new CreateLobbyWithPasswordResponse object is found on the EventBus, this method
+     * posts a new ShowLobbyViewEvent onto the EventBus the SceneManager is
+     * subscribed to. Then it calls the LobbyService to retrieve
+     * all members of that new lobby enabling the lobby window to
+     * display all members from the beginning.
+     *
+     * @param rsp The CreateLobbyWithPasswordResponse object found on the EventBus
+     *
+     * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
+     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @since 2021-04-22
+     */
     @Subscribe
     private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
         LOG.debug("Received CreateLobbyWithPasswordResponse");
@@ -402,12 +418,24 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         });
     }
 
+    /**
+     * Handles a JoinLobbyWithPasswordResponse found on the EventBus
+     * <p>
+     * If a new JoinLobbyWithPasswordResponse object is found on the EventBus, this method
+     * posts a new ShowLobbyWithPasswordViewEvent onto the EventBus the SceneManager is
+     * subscribed to.
+     *
+     * @param rsp The JoinLobbyWithPasswordResponse object found on the EventBus
+     *
+     * @see de.uol.swp.common.lobby.response.JoinLobbyWithPasswordResponse
+     * @see de.uol.swp.client.lobby.event.ShowLobbyWithPasswordViewEvent
+     * @since 2021-04-22
+     */
     @Subscribe
     private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse rsp){
         LOG.debug("Received JoinLobbyWithPasswordResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyWithPasswordViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
     }
 
@@ -631,8 +659,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.isfull"), s);
-                else if (l.hasAPassword()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
-                    lobbies.add(new Pair<>(l.getName(), s));
+                else if (l.hasAPassword())
+                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
+                lobbies.add(new Pair<>(l.getName(), s));
             }
         });
     }

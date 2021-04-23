@@ -2,7 +2,15 @@ package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.lobby.Lobby;
 
-public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse{
+/**
+ * Response sent by the server when a user wants to join a lobby with a password
+ *
+ * @author Alwin Bossert
+ * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
+ * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
+ * @since 2021-04-22
+ */
+public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse {
 
     private final Lobby lobby;
 
@@ -22,9 +30,7 @@ public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse{
      *
      * @return The lobby the user joined
      *
-     * @author Maximilian Lindner
-     * @author AldinDervisi
-     * @since 2021-03-14
+     * @author Alwin Bossert
      */
     public Lobby getLobby() {
         return lobby;

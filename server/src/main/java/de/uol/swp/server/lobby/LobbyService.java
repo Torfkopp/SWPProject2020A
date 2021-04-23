@@ -215,10 +215,9 @@ public class LobbyService extends AbstractService {
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
             Message responseMessage;
-            if(Strings.isNullOrEmpty(req.getPassword())){
+            if (Strings.isNullOrEmpty(req.getPassword())) {
                 responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
-            }
-            else{
+            } else {
                 lobby.get().setHasPassword(true);
                 responseMessage = new CreateLobbyWithPasswordResponse(req.getName(), lobby.get(), req.getPassword());
             }
@@ -258,6 +257,41 @@ public class LobbyService extends AbstractService {
                 responseMessage.initWithMessage(req);
                 post(responseMessage);
             }
+        }
+    }
+
+    /**
+     * Handles a JoinLobbyWithPasswordConfirmationRequest found on the EventBus
+     * <p>
+     * When a JoinLobbyWihPasswordConfirmationRequest is found on the EventBus, this method
+     * is called. If the password is correct, it adds a user
+     * to a lobby stored in the LobbyManagement and
+     * sends a UserJoinedLobbyMessage to every user in the lobby.
+     *
+     * @param req The JoinLobbyWithPasswordConfirmationRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.lobby.Lobby
+     * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
+     * @since 2021-04-21
+     */
+    @Subscribe
+    private void onJoinLobbyWithPasswordConfirmationRequest(JoinLobbyWithPasswordConfirmationRequest req) {
+        if (LOG.isDebugEnabled())
+            LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby " + req.getName());
+        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName(), req.getPassword());
+        if (lobby.isPresent()) {
+            if (req.getPassword().equals(lobby.get().getPassword())) {
+                Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
+                responseMessage.initWithMessage(req);
+                post(responseMessage);
+                sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
+                post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+            } else {
+                System.out.println("Falsches PW");
+            }
+        } else {
+            System.out.println("Nein");
         }
     }
 
@@ -366,12 +400,12 @@ public class LobbyService extends AbstractService {
                         lobby = lobbyManagement.getLobby(req.getName());
                         if (lobby.isEmpty()) return;
                         if (lobby.get().hasAPassword() == false) {
-                        Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
-                        responseMessage.initWithMessage(req);
-                        post(responseMessage);
-                        sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
-                        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));}
-                        else {
+                            Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
+                            responseMessage.initWithMessage(req);
+                            post(responseMessage);
+                            sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
+                            post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+                        } else {
                             Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(), lobby.get());
                             responseMessage.initWithMessage(req);
                             post(responseMessage);
@@ -399,19 +433,6 @@ public class LobbyService extends AbstractService {
             exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(exceptionMessage.getException());
-        }
-    }
-
-    @Subscribe
-    private void onJoinLobbyWithPasswordConfirmationRequest(JoinLobbyWithPasswordConfirmationRequest req){
-        if(LOG.isDebugEnabled()) LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby " + req.getName());
-        Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName(), req.getPassword());
-        if(lobby.isPresent()) {
-            System.out.println(req.getPassword());
-            System.out.println("Ja");
-        }
-        else{
-            System.out.println("Nein");
         }
     }
 

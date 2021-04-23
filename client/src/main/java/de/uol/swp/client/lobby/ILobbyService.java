@@ -48,6 +48,7 @@ public interface ILobbyService {
      *
      * @param name      The name chosen for the new lobby
      * @param maxPlayer The maximum amount of players for the new lobby
+     * @param password  The password chosen for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
