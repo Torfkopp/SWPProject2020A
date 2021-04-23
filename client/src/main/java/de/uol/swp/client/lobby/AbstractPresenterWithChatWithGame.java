@@ -458,6 +458,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (result.isEmpty()) return;
         if (result.get() == btnKnight) { //Play a Knight Card
             gameService.playKnightCard(lobbyName);
+            disableButtonStates();
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
@@ -665,6 +666,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberPositionMessage(RobberPositionMessage msg) {
         LOG.debug("Received RobberPositionMessage for Lobby " + msg.getLobbyName());
         if (lobbyName.equals(msg.getLobbyName())) {
+            resetButtonStates(msg.getUser());
             gameService.updateGameMap(msg.getLobbyName());
         }
     }
@@ -1031,7 +1033,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
         endTurn.setDisable(!userService.getLoggedInUser().equals(user));
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        if (!playedCard) playCard.setDisable(!userService.getLoggedInUser().equals(user));
+        playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
