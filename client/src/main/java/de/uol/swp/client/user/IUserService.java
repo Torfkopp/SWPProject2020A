@@ -33,13 +33,14 @@ public interface IUserService {
      * <p>
      * This method removes the user specified by the User object.
      *
-     * @param user The user to remove
+     * @param user     The user to remove
+     * @param password The users password
      *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
      * @since 2019-10-10
      */
-    void dropUser(User user);
+    void dropUser(User user, String password);
 
     /**
      * Get the currently logged in user

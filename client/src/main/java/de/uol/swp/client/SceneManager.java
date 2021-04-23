@@ -486,6 +486,11 @@ public class SceneManager {
                                     e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
                                     resourceBundle.getString("error.context.unknown"));
         }
+        if (e.contains("User deletion unsuccessful for user ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotdelete"),
+                                    e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.wrongpw"));
+        }
         if (e.contains("Cannot create user ")) {
             context = String.format(resourceBundle.getString("error.context.cannotcreate"),
                                     e.substring(e.indexOf('[') + 2 - 1, e.lastIndexOf(']')),

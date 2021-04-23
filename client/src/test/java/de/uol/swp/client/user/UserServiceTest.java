@@ -115,7 +115,7 @@ class UserServiceTest {
     void dropUserTest() throws InterruptedException {
         User userToDrop = new UserDTO(defaultUser.getID(), defaultUser.getUsername(),
                                       userService.hash(defaultUser.getPassword()), defaultUser.getEMail());
-        userService.dropUser(userToDrop);
+        userService.dropUser(userToDrop, userService.hash(defaultUser.getPassword()));
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
