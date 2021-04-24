@@ -142,7 +142,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method to disable pre-game Buttons and Checkboxes
+     * Helper method that set the visible for the lobby owner and disable pre-game Buttons and Checkboxes
      * for everyone, expect the owner.
      *
      * @author Maximilian Lindner
@@ -151,7 +151,22 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        if (!userService.getLoggedInUser().equals(owner)) {
+            moveTimeTextField.setVisible(false);
+        } else {
+            moveTimeTextField.setVisible(true);
+        }
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        if (!userService.getLoggedInUser().equals(owner)) {
+            changeMoveTimeButton.setVisible(false);
+        } else {
+            changeMoveTimeButton.setVisible(true);
+        }
+        if (!userService.getLoggedInUser().equals(owner)){
+            moveTimeLabel.setVisible(false);
+        } else {
+            moveTimeLabel.setVisible(true);
+        }
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
         commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
