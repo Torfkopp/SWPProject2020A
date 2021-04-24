@@ -8,6 +8,7 @@ import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.UserOrDummy;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 /**
@@ -65,6 +67,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton fourPlayerRadioButton;
     @FXML
     private VBox preGameSettingBox;
+    @FXML
+    public AnimationTimer elapsedTimer;
+    @FXML
+    public Menu timerLabel = new Menu();
+
 
     @FXML
     @Override
@@ -361,6 +368,17 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             playCard.setVisible(true);
             playCard.setDisable(true);
             gameService.updateGameMap(lobbyName);
+            long startTime = System.currentTimeMillis();
+            this.elapsedTimer = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    long elapsedMillis = System.currentTimeMillis() - startTime;
+                    Platform.runLater(() -> timerLabel.setText(String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                            TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                            TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+                }
+            };
+            this.elapsedTimer.start();
         });
     }
 
