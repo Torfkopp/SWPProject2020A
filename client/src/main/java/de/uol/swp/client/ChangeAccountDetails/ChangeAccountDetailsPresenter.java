@@ -9,12 +9,14 @@ import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEve
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.Callable;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,8 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
 
+    @FXML
+    private Button changeButton;
     @FXML
     private PasswordField newPasswordField;
     @FXML
@@ -60,6 +64,11 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         setEventBus(eventBus);
     }
 
+    @FXML
+    protected void initialize() {
+        prepareNewUsernameField();
+    }
+
     /**
      * Method called to compare the eMail string with valid regex
      * <p>
@@ -80,6 +89,38 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         Matcher matcher = pattern.matcher(eMail);
 
         return matcher.matches();
+    }
+
+    /**
+     * Helper method to manage the disableState of the "Change"-Button
+     * <p>
+     * This method returns a callable that will be used by the BooleanBinding
+     * bound to the disableProperty of the "Change"-Button. The Callable
+     * will check the contents of all fields and return true if the current
+     * contents will not lead to a successful request.
+     *
+     * @return Callable that will return true if the button should be disabled,
+     * false otherwise
+     *
+     * @implNote The user's password cannot be checked as the client will never
+     * have access to any password information. The Callable will only check
+     * that the user has typed in anything at all into the "Confirm Current
+     * Password"-Field.
+     * @author Sven Ahrens
+     * @since 2021-04-22
+     */
+    private Callable<Boolean> manageChangeButtonState() {
+        return () -> {
+            boolean newNameEmpty = newUsernameField.getText().isEmpty();
+            boolean newMailEmpty = newEMailField.getText().isEmpty();
+            boolean newPWEmpty = newPasswordField.getText().isEmpty() && newPasswordField2.getText().isEmpty();
+            boolean allEmpty = newNameEmpty && newMailEmpty && newPWEmpty;
+            boolean newNameValid = newUsernameField.getText().matches("[A-Za-z0-9_-]+");
+            boolean newMailValid = checkMailFormat(newEMailField.getText());
+            boolean newPWValid = newPasswordField.getText().equals(newPasswordField2.getText());
+            boolean oldPWEmpty = confirmPasswordField.getText().isEmpty();
+            return oldPWEmpty || allEmpty || !newNameEmpty && !newNameValid || !newMailEmpty && !newMailValid || !newPWEmpty && !newPWValid;
+        };
     }
 
     /**
@@ -117,8 +158,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        //the UserData is set in the showChangePasswordScreen Method in the SceneManager
-
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changepw")));
@@ -163,5 +202,26 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
                                              userService.hash(confirmPasswordField.getText()), user.getUsername(),
                                              user.getEMail());
         }
+    }
+
+    /**
+     * Prepares the newUsernameField
+     * <p>
+     * Helper method, called when the ChangeAccountDetailsPresenter is initialised in order to let the newUsernameField
+     * only accept alphanumeric entries with the addition of underscore and hyphen
+     *
+     * @author Sven Ahrens
+     * @since 2021-04-22
+     */
+    private void prepareNewUsernameField() {
+        UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
+                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
+        newUsernameField.setTextFormatter(new TextFormatter<>(StringFilter));
+
+        changeButton.disableProperty()
+                    .bind(Bindings.createBooleanBinding(manageChangeButtonState(), newPasswordField.textProperty(),
+                                                        newPasswordField2.textProperty(),
+                                                        confirmPasswordField.textProperty(),
+                                                        newUsernameField.textProperty(), newEMailField.textProperty()));
     }
 }
