@@ -151,17 +151,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
-        if (!userService.getLoggedInUser().equals(owner)) {
-            moveTimeTextField.setVisible(false);
-        } else {
-            moveTimeTextField.setVisible(true);
-        }
+        moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
-        if (!userService.getLoggedInUser().equals(owner)) {
-            changeMoveTimeButton.setVisible(false);
-        } else {
-            changeMoveTimeButton.setVisible(true);
-        }
+        changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
         commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
