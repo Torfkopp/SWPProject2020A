@@ -162,11 +162,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         } else {
             changeMoveTimeButton.setVisible(true);
         }
-        if (!userService.getLoggedInUser().equals(owner)){
-            moveTimeLabel.setVisible(false);
-        } else {
-            moveTimeLabel.setVisible(true);
-        }
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
         commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
