@@ -220,7 +220,7 @@ public class GameRendering {
      * @param currentY The current y-coordinate
      */
     private void drawCity(Optional<Player> owner, double currentX, double currentY) {
-        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOR);
+        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOUR);
         else gfxCtx.setFill(getPlayerColour(owner.get()));
         gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
                              citySize / 2.0, citySize / 2.0);
@@ -422,7 +422,7 @@ public class GameRendering {
      * @param currentY The current y-coordinate
      */
     private void drawSettlement(Optional<Player> owner, double currentX, double currentY) {
-        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOR);
+        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOUR);
         else gfxCtx.setFill(getPlayerColour(owner.get()));
         gfxCtx.fillOval(currentX - (settlementSize / 2.0), currentY - (settlementSize / 2.0), settlementSize,
                         settlementSize);
@@ -647,7 +647,7 @@ public class GameRendering {
         gfxCtx.setLineWidth(roadWidth);
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
             if (edge.isBuildableBy(userService.getLoggedInUser())) {
-                gfxCtx.setStroke(BUILDABLE_COLOR);
+                gfxCtx.setStroke(BUILDABLE_COLOUR);
             } else if (edge.getOwner() == null) {
                 continue;
             } else {
