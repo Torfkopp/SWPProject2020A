@@ -4,9 +4,9 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
-          fx:controller="de.uol.swp.client.lobby.LobbyPresenter" vgap="10.0">
+<?import javafx.scene.text.TextFlow?>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1"
+          fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <columnConstraints>
         <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
@@ -34,7 +34,7 @@
             <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
                     text="%chat.buttons.editmessage"/>
         </VBox>
-        <VBox spacing="5.0" minHeight="110">
+        <VBox minHeight="110" spacing="5.0">
             <Button fx:id="kickUserButton" mnemonicParsing="false" onAction="#onKickUserButtonPressed" prefWidth="150.0"
                     text="%lobby.buttons.kickuser" visible="false"/>
             <Button fx:id="changeOwnerButton" mnemonicParsing="false" onAction="#onChangeOwnerButtonPressed"
@@ -94,6 +94,7 @@
         </VBox>
         <ListView fx:id="inventoryView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                   minWidth="-Infinity" prefHeight="0.0" prefWidth="230.0" visible="false"/>
+        <TextFlow fx:id="turnIndicator" maxHeight="30" minHeight="30" minWidth="-Infinity" prefWidth="230.0"/>
         <HBox maxHeight="25.0" maxWidth="-Infinity" minHeight="25.0" minWidth="-Infinity" prefWidth="230.0"
               spacing="10.0">
             <CheckBox fx:id="readyCheckBox" maxWidth="-Infinity" minHeight="25.0" minWidth="-Infinity"
@@ -103,16 +104,10 @@
                     mnemonicParsing="false" onAction="#onStartSessionButtonPressed" prefWidth="120.0"
                     text="%lobby.game.buttons.startsession"/>
         </HBox>
-        <Label fx:id="turnIndicator" maxHeight="30.0" maxWidth="-Infinity" minHeight="30.0" minWidth="-Infinity"
-               prefWidth="230.0" wrapText="true">
-            <font>
-                <Font size="18.0"/>
-            </font>
-        </Label>
         <HBox prefHeight="30.0" prefWidth="230.0">
             <Button fx:id="rollDice" disable="true" mnemonicParsing="false" onAction="#onRollDiceButtonPressed"
                     prefHeight="30.0" prefWidth="115.0" text="%lobby.game.buttons.rolldice" visible="false"/>
-            <CheckBox fx:id="autoRoll" nodeOrientation="RIGHT_TO_LEFT" mnemonicParsing="false"
+            <CheckBox fx:id="autoRoll" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT"
                       onAction="#onAutoRollCheckBoxClicked" prefHeight="30.0" prefWidth="115.0"
                       text="%lobby.game.autorollcheckbox" visible="false"/>
         </HBox>
@@ -128,6 +123,7 @@
                 prefHeight="30.0" prefWidth="230.0" text="%game.playcards.button" visible="false"/>
         <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
                prefWidth="230" text="%game.robber.position" visible="false" wrapText="true">
+
         </Label>
         <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>
         <padding>
