@@ -148,7 +148,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInventoryForTradeWithUserResponse(InventoryForTradeWithUserResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received InventoryForTradeResponse for Lobby " + rsp.getLobbyName());
+        LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
         List<Map<String, Object>> resourceList = Collections.unmodifiableList(rsp.getResourceList());
         ownResourceTableView.getItems().addAll(resourceList);
@@ -209,7 +209,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
-        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
             statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
@@ -227,7 +227,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         closeWindow();
     }
 
@@ -245,7 +245,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeWithUserUpdateEvent(TradeWithUserUpdateEvent event) {
-        LOG.debug("Received TradeWithUserUpdateEvent for Lobby " + event.getLobbyName());
+        LOG.debug("Received TradeWithUserUpdateEvent for Lobby {}", event.getLobbyName());
         if (lobbyName == null) lobbyName = event.getLobbyName();
         Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> closeWindow());

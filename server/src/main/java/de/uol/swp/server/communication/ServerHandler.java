@@ -80,19 +80,21 @@ public class ServerHandler implements ServerHandlerDelegate {
 
     @Override
     public void newClientConnected(MessageContext ctx) {
-        LOG.debug("New client " + ctx + " connected");
+        LOG.debug("New client {} connected", ctx);
         connectedClients.add(ctx);
     }
 
     @Override
     public void process(RequestMessage msg) {
-        LOG.debug("Received new message from client " + msg);
+        LOG.debug("Received new message from client {}", msg);
+        Optional<MessageContext> messageContext = msg.getMessageContext();
+        if (messageContext.isEmpty()) return;
         try {
-            checkIfMessageNeedsAuthorisation(msg.getMessageContext().get(), msg);
+            checkIfMessageNeedsAuthorisation(messageContext.get(), msg);
             eventBus.post(msg);
         } catch (SecurityException e) {
-            LOG.error("ServerException " + e.getClass().getName() + " " + e.getMessage());
-            sendToClient(msg.getMessageContext().get(), new ExceptionMessage(e.getMessage()));
+            LOG.error("ServerException {} {}", e.getClass().getName(), e.getMessage());
+            sendToClient(messageContext.get(), new ExceptionMessage(e.getMessage()));
         }
     }
 
@@ -114,7 +116,7 @@ public class ServerHandler implements ServerHandlerDelegate {
             ResponseMessage msg = new PingMessage();
             msg.setSession(null);
             msg.setMessageContext(null);
-            LOG.debug("Send to client " + ctx + " message " + msg);
+            LOG.debug("Send to client {} message {}", ctx, msg);
             sendToClient(ctx, msg);
         }
     }
@@ -206,7 +208,7 @@ public class ServerHandler implements ServerHandlerDelegate {
                 sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
             }
         } else {
-            LOG.warn("No context for " + msg);
+            LOG.warn("No context for {}", msg);
         }
     }
 
@@ -250,7 +252,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.error("DeadEvent detected " + deadEvent);
+        LOG.error("DeadEvent detected: {}", deadEvent);
     }
 
     /**
@@ -291,7 +293,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     @Subscribe
     private void onPongMessage(PongMessage msg) {
-        if (msg.getSession().isPresent()) LOG.trace("Client pong received from " + msg.getSession().get());
+        if (msg.getSession().isPresent()) LOG.trace("Client pong received from {}", msg.getSession().get());
     }
 
     /**
@@ -311,7 +313,7 @@ public class ServerHandler implements ServerHandlerDelegate {
         if (ctx.isPresent()) {
             msg.setSession(null);
             msg.setMessageContext(null);
-            LOG.debug("Send to client " + ctx.get() + " message " + msg);
+            LOG.debug("Send to client {} message {}", ctx.get(), msg);
             sendToClient(ctx.get(), msg);
         }
     }
@@ -351,10 +353,8 @@ public class ServerHandler implements ServerHandlerDelegate {
     private void onServerMessage(ServerMessage msg) {
         msg.setSession(null);
         msg.setMessageContext(null);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Send " + msg + " to " + (msg.getReceiver().isEmpty() || msg.getReceiver() == null ? "all" :
-                                                msg.getReceiver()));
-        }
+        LOG.debug("Send {} to {}", msg,
+                  (msg.getReceiver().isEmpty() || msg.getReceiver() == null ? "all" : msg.getReceiver()));
         sendMessage(msg);
     }
 
@@ -404,7 +404,7 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2019-11-20
      */
     private void sendToClient(MessageContext ctx, ResponseMessage message) {
-        LOG.trace("Trying to sendMessage to client: " + ctx + " " + message);
+        LOG.trace("Trying to sendMessage to client: {} {}", ctx, message);
         ctx.writeAndFlush(message);
     }
 

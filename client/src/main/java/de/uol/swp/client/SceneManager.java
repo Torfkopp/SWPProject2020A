@@ -371,7 +371,7 @@ public class SceneManager {
         FXMLLoader loader = injector.getInstance(FXMLLoader.class);
         try {
             URL url = getClass().getResource(fxmlFile);
-            LOG.debug("Loading FXML-File " + url);
+            LOG.debug("Loading FXML-File {}", url);
             loader.setLocation(url);
             rootPane = loader.load();
         } catch (IOException e) {
@@ -882,7 +882,7 @@ public class SceneManager {
             robberTaxStage.initOwner(primaryStage);
             robberTaxStage.initStyle(StageStyle.UNDECORATED);
             robberTaxStage.show();
-            LOG.debug("Sending a ShowRobberTaxUpdateEvent to lobby " + lobbyName);
+            LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(
                     new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
         });
@@ -923,7 +923,7 @@ public class SceneManager {
         bankStage.initOwner(primaryStage);
         //Shows the window
         bankStage.show();
-        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
+        LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
         eventBus.post(new TradeUpdateEvent(lobbyName));
     }
 
@@ -965,7 +965,7 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to Lobby " + lobbyName);
+            LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
         });
     }
@@ -1004,7 +1004,7 @@ public class SceneManager {
         tradingStage.initOwner(primaryStage);
         tradingStage.show();
         eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
-        LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
+        LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
     }
 
     /**
@@ -1061,7 +1061,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        LOG.debug("Received a TradeWithUserCancelResponse");
+        LOG.debug("Received TradeWithUserCancelResponse");
         String lobby = rsp.getLobbyName();
         if (tradingResponseStages.containsKey(lobby)) {
             Platform.runLater(() -> {

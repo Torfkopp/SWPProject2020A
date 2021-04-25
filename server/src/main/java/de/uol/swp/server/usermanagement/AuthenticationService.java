@@ -70,9 +70,7 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onLoginRequest(LoginRequest msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received LoginRequest for User " + msg.getUsername());
-        }
+        LOG.debug("Received LoginRequest for User {}", msg.getUsername());
         ServerInternalMessage returnMessage;
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
@@ -108,20 +106,16 @@ public class AuthenticationService extends AbstractService {
     @Subscribe
     private void onLogoutRequest(LogoutRequest msg) {
         LOG.debug("Received LogoutRequest");
-        if (msg.getSession().isPresent()) {
-            Session session = msg.getSession().get();
-            User userToLogOut = session.getUser();
-            // Could be already logged out
-            if (userToLogOut != null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("---- Logging out user " + userToLogOut.getUsername());
-                }
-                userManagement.logout(userToLogOut);
-                sessionManagement.removeSession(session);
-                Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
-                post(returnMessage);
-            }
-        }
+        if (msg.getSession().isEmpty()) return;
+        Session session = msg.getSession().get();
+        User userToLogOut = session.getUser();
+        // Could be already logged out
+        if (userToLogOut == null) return;
+        LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
+        userManagement.logout(userToLogOut);
+        sessionManagement.removeSession(session);
+        Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
+        post(returnMessage);
     }
 
     /**
@@ -147,7 +141,7 @@ public class AuthenticationService extends AbstractService {
         LOG.debug("Received NukeUsersSessionsRequest");
         if (req.getUser() == null) return;
         User userToLogOut = req.getUser();
-        LOG.debug("---- Logging out user " + userToLogOut.getUsername());
+        LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
         userManagement.logout(userToLogOut);
         while (sessionManagement.getSession(userToLogOut).isPresent()) {
             post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),

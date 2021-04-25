@@ -36,9 +36,9 @@ public class UserService implements IUserService {
      */
     @Inject
     public UserService(EventBus bus) {
-        LOG.debug("UserService started");
         this.bus = bus;
         bus.register(this);
+        LOG.debug("UserService started");
     }
 
     /**
