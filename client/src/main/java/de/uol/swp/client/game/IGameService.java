@@ -1,6 +1,6 @@
 package de.uol.swp.client.game;
 
-import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.UserOrDummy;
 

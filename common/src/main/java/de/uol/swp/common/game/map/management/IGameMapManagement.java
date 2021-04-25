@@ -1,8 +1,11 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.management;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
 import java.util.Map;
@@ -93,7 +96,7 @@ public interface IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-08
      */
-    IGameMap getGameMapDTO();
+    IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
 
     /**
      * Gets the hex at a specified place

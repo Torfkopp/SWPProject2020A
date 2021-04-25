@@ -2,10 +2,14 @@ package de.uol.swp.client;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.gamemapDTO.*;
+import de.uol.swp.common.game.map.management.IEdge;
+import de.uol.swp.common.game.map.management.MapPoint;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -15,9 +19,10 @@ import javafx.scene.text.TextAlignment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static de.uol.swp.common.game.map.MapPoint.*;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 
 /**
  * GameRendering Class
@@ -27,7 +32,7 @@ import static de.uol.swp.common.game.map.MapPoint.*;
  *
  * @author Timo Gerken
  * @author Temmo Junkhoff
- * @see de.uol.swp.common.game.map.GameMapManagement
+ * @see de.uol.swp.common.game.map.management.GameMapManagement
  * @see javafx.scene.canvas.Canvas
  * @since 2021-01-31
  */
@@ -52,9 +57,12 @@ public class GameRendering {
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final double TOKEN_SIZE = 16;
+    private static final Color BUILDABLE_COLOR = Color.rgb(150, 150, 150, 0.6);
 
     @Inject
     private static ResourceBundle resourceBundle;
+    @Inject
+    private static UserService userService;
     @Inject
     @Named("drawHitboxGrid")
     private static boolean drawHitboxGrid;
@@ -168,6 +176,23 @@ public class GameRendering {
     }
 
     /**
+     * Shows a text notification on the canvas
+     *
+     * @param text The text to display
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-08
+     */
+    public void showText(String text) {
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.setFont(Font.font(20));
+        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
+    }
+
+    /**
      * Shows a winner notification on the canvas
      *
      * @param text The text to display
@@ -186,23 +211,6 @@ public class GameRendering {
     }
 
     /**
-     * Shows a text notification on the canvas
-     *
-     * @param text The text to display
-     *
-     * @author Temmo Junkhoff
-     * @author Aldin Dervisi
-     * @since 2021-04-08
-     */
-    public void showText(String text) {
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(20));
-        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
-    }
-
-    /**
      * drawCity method
      * <p>
      * This method draws a city at the given coordinates.
@@ -211,8 +219,9 @@ public class GameRendering {
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
      */
-    private void drawCity(Player owner, double currentX, double currentY) {
-        gfxCtx.setFill(getPlayerColour(owner));
+    private void drawCity(Optional<Player> owner, double currentX, double currentY) {
+        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOR);
+        else gfxCtx.setFill(getPlayerColour(owner.get()));
         gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
                              citySize / 2.0, citySize / 2.0);
     }
@@ -412,8 +421,9 @@ public class GameRendering {
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
      */
-    private void drawSettlement(Player owner, double currentX, double currentY) {
-        gfxCtx.setFill(getPlayerColour(owner));
+    private void drawSettlement(Optional<Player> owner, double currentX, double currentY) {
+        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOR);
+        else gfxCtx.setFill(getPlayerColour(owner.get()));
         gfxCtx.fillOval(currentX - (settlementSize / 2.0), currentY - (settlementSize / 2.0), settlementSize,
                         settlementSize);
     }
@@ -436,7 +446,7 @@ public class GameRendering {
         gfxCtx.setTextBaseline(VPos.CENTER);
         gfxCtx.setFont(Font.font(TOKEN_SIZE));
         gfxCtx.fillText(resourceBundle.getString("game.token." + token), currentX + hexWidth / 2.0,
-                        currentY + hexWidth / 2.0, tokenSize * ( 7.0/ 8.0));
+                        currentY + hexWidth / 2.0, tokenSize * (7.0 / 8.0));
     }
 
     /**
@@ -635,23 +645,26 @@ public class GameRendering {
      */
     private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
         gfxCtx.setLineWidth(roadWidth);
-        for (IEdge edge : intersection.getEdges()) {
-            //Northwest road
-            if (edge.getOwner() == null) continue;
-            if (edge.getOrientation() == IEdge.Orientation.WEST) {
+        for (IEdgeWithBuildable edge : intersection.getEdges()) {
+            if (edge.isBuildableBy(userService.getLoggedInUser())) {
+                gfxCtx.setStroke(BUILDABLE_COLOR);
+            } else if (edge.getOwner() == null) {
+                continue;
+            } else {
                 gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
+            }
+            //Northwest road
+            if (edge.getOrientation() == IEdge.Orientation.WEST) {
                 gfxCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
             }
 
             //South road
             else if (edge.getOrientation() == IEdge.Orientation.SOUTH) {
-                gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
                 gfxCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
             }
 
             //Northeast road
             if (edge.getOrientation() == IEdge.Orientation.EAST) {
-                gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
                 gfxCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
             }
         }
@@ -687,19 +700,23 @@ public class GameRendering {
      * @param currentY     The current y-coordinate
      * @param intersection The intersection to draw
      */
-    private void renderIntersection(double currentX, double currentY, IIntersection intersection) {
+    private void renderIntersection(double currentX, double currentY, IIntersectionWithBuildable intersection) {
         switch (intersection.getState()) {
             case FREE:
+                if (intersection.isBuildableBy(userService.getLoggedInUser()))
+                    drawSettlement(Optional.empty(), currentX, currentY);
                 //Free intersections don't need to be marked, but it could easily be added here
                 break;
             case BLOCKED:
                 //Blocked intersections don't need to be marked, but it could easily be added here
                 break;
             case SETTLEMENT:
-                drawSettlement(intersection.getOwner(), currentX, currentY);
+                drawSettlement(Optional.of(intersection.getOwner()), currentX, currentY);
+                if (intersection.isBuildableBy(userService.getLoggedInUser()))
+                    drawCity(Optional.empty(), currentX, currentY);
                 break;
             case CITY:
-                drawCity(intersection.getOwner(), currentX, currentY);
+                drawCity(Optional.of(intersection.getOwner()), currentX, currentY);
                 break;
         }
     }

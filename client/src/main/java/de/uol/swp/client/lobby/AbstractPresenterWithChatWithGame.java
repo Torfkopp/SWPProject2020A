@@ -11,8 +11,8 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.response.*;
@@ -38,7 +38,7 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.MapPoint.Type.*;
+import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 
 /**
  * This class is the base for creating a new Presenter that uses the game.

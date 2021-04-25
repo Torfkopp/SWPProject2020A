@@ -14,6 +14,7 @@ import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -1512,9 +1513,10 @@ public class GameService extends AbstractService {
     private void onTransferLobbyStateEvent(TransferLobbyStateEvent event) {
         Lobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
+        Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
                                                                  lobby.getConfiguration(),
-                                                                 game.getMap().getGameMapDTO(), game.getDices(),
+                                                                 game.getMap().getGameMapDTO(playerUserOrDummyMap), game.getDices(),
                                                                  game.isDiceRolledAlready());
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
@@ -1539,9 +1541,10 @@ public class GameService extends AbstractService {
     private void onUpdateGameMapRequest(UpdateGameMapRequest req) {
         LOG.debug("Received UpdateGameMapRequest");
         Game game = gameManagement.getGame(req.getOriginLobby());
+        Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         if (game == null) return;
         LOG.debug("Sending UpdateGameMapResponse");
-        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO());
+        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO(playerUserOrDummyMap));
         rsp.initWithMessage(req);
         post(rsp);
     }

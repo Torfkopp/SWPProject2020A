@@ -1,15 +1,18 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.management;
 
 import com.google.common.graph.*;
 import de.uol.swp.common.game.map.Hexes.*;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.Configuration;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.gamemapDTO.*;
+import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.IIntersection.IntersectionState.CITY;
-import static de.uol.swp.common.game.map.IIntersection.IntersectionState.SETTLEMENT;
-import static de.uol.swp.common.game.map.MapPoint.*;
+import static de.uol.swp.common.game.map.management.IIntersection.IntersectionState.CITY;
+import static de.uol.swp.common.game.map.management.IIntersection.IntersectionState.SETTLEMENT;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 
 /**
  * Management of the gameMap
@@ -170,8 +173,8 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public IGameMap getGameMapDTO() {
-        return new GameMapDTO(getHexesAsJaggedArray(), getIntersectionsWithEdges());
+    public IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping) {
+        return new GameMapDTO(getHexesAsJaggedArray(), getIntersectionsWithEdges(playerUserMapping));
     }
 
     @Override
@@ -457,22 +460,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     /**
-     * Helper method to create the playerSettlementsAndCities Map according to
-     * the amount of players.
-     *
-     * @param playerCount amount of players in the according game
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    private void createPlayerSettlementsAndCitiesMap(int playerCount) {
-        for (int i = 0; i < playerCount; i++) {
-            playerSettlementsAndCities.put(Player.values()[i], new ArrayList<>());
-        }
-    }
-
-    /**
      * Helper method to fill the harborResourceMap
      * <p>
      * This method goes through the whole game map and gets all the
@@ -622,6 +609,22 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     /**
+     * Helper method to create the playerSettlementsAndCities Map according to
+     * the amount of players.
+     *
+     * @param playerCount amount of players in the according game
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    private void createPlayerSettlementsAndCitiesMap(int playerCount) {
+        for (int i = 0; i < playerCount; i++) {
+            playerSettlementsAndCities.put(Player.values()[i], new ArrayList<>());
+        }
+    }
+
+    /**
      * Helper method to get the GameHexWrapper of a Hex instead of the IGameHex
      *
      * @param position The MapPoint of the Hex
@@ -634,6 +637,23 @@ public class GameMapManagement implements IGameMapManagement {
      */
     private GameHexWrapper getHexWrapper(MapPoint position) {
         return position.getType() == MapPoint.Type.HEX ? hexMap[position.getY()][position.getX()] : null;
+    }
+
+    /**
+     * Helper method to get a Pair of Intersections between 2 Hexes
+     *
+     * @param point1 First Hex
+     * @param point2 Second Hex
+     *
+     * @return An EndpointPair of Intersections
+     *
+     * @author Maximilian Lindner
+     * @author Steven Luong
+     * @since 2021-04-07
+     */
+    private EndpointPair<IIntersection> getIntersectionsBetweenHexes(GameHexWrapper point1, GameHexWrapper point2) {
+        Optional<IEdge> edge = hexEdgeNetwork.edgeConnecting(point1, point2);
+        return edge.map(iEdge -> intersectionEdgeNetwork.incidentNodes(iEdge)).orElse(null);
     }
 
     /**
@@ -657,23 +677,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     /**
-     * Helper method to get a Pair of Intersections between 2 Hexes
-     *
-     * @param point1 First Hex
-     * @param point2 Second Hex
-     *
-     * @return An EndpointPair of Intersections
-     *
-     * @author Maximilian Lindner
-     * @author Steven Luong
-     * @since 2021-04-07
-     */
-    private EndpointPair<IIntersection> getIntersectionsBetweenHexes(GameHexWrapper point1, GameHexWrapper point2) {
-        Optional<IEdge> edge = hexEdgeNetwork.edgeConnecting(point1, point2);
-        return edge.map(iEdge -> intersectionEdgeNetwork.incidentNodes(iEdge)).orElse(null);
-    }
-
-    /**
      * Helper method to return an jagged array of IntersectionWithEdges
      *
      * @return An jagged array of IntersectionWithEdges
@@ -681,7 +684,7 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021-04-08
      */
-    private IntersectionWithEdges[][] getIntersectionsWithEdges() {
+    private IntersectionWithEdges[][] getIntersectionsWithEdges(Map<Player, UserOrDummy> playerUserMapping) {
         IntersectionWithEdges[][] returnMap;
         returnMap = new IntersectionWithEdges[6][];
         returnMap[0] = new IntersectionWithEdges[7];
@@ -692,10 +695,34 @@ public class GameMapManagement implements IGameMapManagement {
         returnMap[5] = new IntersectionWithEdges[7];
         for (int y = 0; y < intersectionMap.length; y++) {
             for (int x = 0; x < intersectionMap[y].length; x++) {
-                returnMap[y][x] = new IntersectionWithEdges(intersectionMap[y][x],
-                                                            incidentEdges(intersectionMap[y][x]));
+                var a = intersectionMap[y][x];
+                var b = incidentEdges(intersectionMap[y][x]);
+                Set<IEdgeWithBuildable> c = new HashSet<>();
+                for (var d : b) {
+                    c.add(new EdgeWithBuildable(d.getOrientation(), d.getOwner(),
+                                                getWhoCanBuildAt(d, playerUserMapping)));
+                }
+                returnMap[y][x] = new IntersectionWithEdges(new IntersectionWithBuildable(a.getOwner(), a.getState(),
+                                                                                          getWhoCanBuildAt(IntersectionMapPoint(y, x),
+                                                                                                           playerUserMapping)), c);
             }
+        } return returnMap;
+    }
+
+    private List<UserOrDummy> getWhoCanBuildAt(IEdge edge, Map<Player, UserOrDummy> playerUserMapping) {
+        var temp = new LinkedList<UserOrDummy>();
+        for (Player player : Player.values()) {
+            if (roadPlaceable(player, edge)) temp.add(playerUserMapping.get(player));
         }
-        return returnMap;
+        return temp;
+    }
+
+    private List<UserOrDummy> getWhoCanBuildAt(MapPoint mapPoint, Map<Player, UserOrDummy> playerUserMapping) {
+        var temp = new LinkedList<UserOrDummy>();
+        for (Player player : Player.values()) {
+            if (settlementPlaceable(player, mapPoint) || settlementUpgradeable(player, mapPoint))
+                temp.add(playerUserMapping.get(player));
+        }
+        return temp;
     }
 }
