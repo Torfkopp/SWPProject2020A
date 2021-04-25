@@ -25,7 +25,7 @@
     </HBox>
 
     <HBox alignment="CENTER" spacing="10.0">
-        <Button defaultButton="true" mnemonicParsing="false" onAction="#onRegisterButtonPressed"
+        <Button fx:id="registerButton" defaultButton="true" mnemonicParsing="false" onAction="#onRegisterButtonPressed"
                 text="%register.buttons.register"/>
         <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%button.cancel"/>
     </HBox>

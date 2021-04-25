@@ -1,7 +1,6 @@
 package de.uol.swp.common.game.request;
 
-import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -15,8 +14,8 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
 
-    private final ResourceType getResource;
-    private final ResourceType giveResource;
+    private final Resources getResource;
+    private final Resources giveResource;
 
     /**
      * Constructor
@@ -26,7 +25,8 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      * @param getResource  The name of the resource he gets from the bank
      * @param giveResource The name of the resource he has to give to the bank
      */
-    public ExecuteTradeWithBankRequest(UserOrDummy user, LobbyName originLobby, ResourceType getResource, ResourceType giveResource) {
+    public ExecuteTradeWithBankRequest(UserOrDummy user, String originLobby, Resources getResource,
+                                       Resources giveResource) {
         super(user, originLobby);
         this.getResource = getResource;
         this.giveResource = giveResource;
@@ -37,7 +37,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      *
      * @return name of the resource
      */
-    public ResourceType getGetResource() {
+    public Resources getGetResource() {
         return getResource;
     }
 
@@ -46,7 +46,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      *
      * @return name of the resource
      */
-    public ResourceType getGiveResource() {
+    public Resources getGiveResource() {
         return giveResource;
     }
 }

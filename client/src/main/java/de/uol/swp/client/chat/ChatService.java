@@ -34,9 +34,9 @@ public class ChatService implements IChatService {
      */
     @Inject
     public ChatService(EventBus bus, IUserService userService) {
-        LOG.debug("ChatService started");
         this.bus = bus;
         this.userService = userService;
+        LOG.debug("ChatService started");
     }
 
     @Override
@@ -47,8 +47,8 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void askLatestMessages(int amount, LobbyName originLobby) {
-        LOG.debug("Sending AskLatestMessagesRequest for Lobby " + originLobby);
+    public void askLatestMessages(int amount, String originLobby) {
+        LOG.debug("Sending AskLatestMessagesRequest for Lobby {}", originLobby);
         Message request = new AskLatestChatMessageRequest(amount, originLobby);
         bus.post(request);
     }
@@ -61,8 +61,8 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void deleteMessage(int id, LobbyName originLobby) {
-        LOG.debug("Sending DeleteChatMessageRequest for Lobby " + originLobby);
+    public void deleteMessage(int id, String originLobby) {
+        LOG.debug("Sending DeleteChatMessageRequest for Lobby {}", originLobby);
         Message request = new DeleteChatMessageRequest(id, userService.getLoggedInUser(), originLobby);
         bus.post(request);
     }
@@ -75,8 +75,8 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void editMessage(int id, String newContent, LobbyName originLobby) {
-        LOG.debug("Sending EditChatMessageRequest for Lobby " + originLobby);
+    public void editMessage(int id, String newContent, String originLobby) {
+        LOG.debug("Sending EditChatMessageRequest for Lobby {}", originLobby);
         Message request = new EditChatMessageRequest(id, newContent, userService.getLoggedInUser(), originLobby);
         bus.post(request);
     }
@@ -89,8 +89,8 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public void newMessage(String msg, LobbyName originLobby) {
-        LOG.debug("Sending NewChatMessageRequest for Lobby " + originLobby);
+    public void newMessage(String msg, String originLobby) {
+        LOG.debug("Sending NewChatMessageRequest for Lobby {}", originLobby);
         Message request = new NewChatMessageRequest(userService.getLoggedInUser(), msg, originLobby);
         bus.post(request);
     }

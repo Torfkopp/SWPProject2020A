@@ -12,15 +12,15 @@ import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manages the tradingAccept menu
@@ -38,24 +38,17 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
-    @Inject
-    private ITradeService tradeService;
-
     @FXML
     private Button acceptTradeButton;
     @FXML
     private Label tradeNotPossibleLabel;
     @FXML
     private Label tradeResponseLabel;
-    @FXML
-    private ListView<MutableResource> ownInventoryView;
 
     private LobbyName lobbyName;
     private UserOrDummy offeringUser;
-    private MutableResourceListMap offeringResourceMap;
-    private MutableResourceListMap resourceMap;
-    private MutableResourceListMap respondingResourceMap;
-    private ObservableList<MutableResource> ownInventoryList;
+    private List<Map<String, Object>> offeringResourceMap;
+    private List<Map<String, Object>> respondingResourceMap;
 
     /**
      * Constructor
@@ -98,7 +91,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
-        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
             tradeNotPossibleLabel.setText(
@@ -150,7 +143,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeTradeResponseWindow(lobbyName);
     }
 
@@ -160,8 +153,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * If a TradeWithUserResponseUpdateEvent is found on the EventBus
      * and it is directed to this lobby, this TradeWithUserAcceptPresenter
      * gets multiple Parameters and calls the setOfferLabel method to
-     * set the offer label according to the offer and the setTradingList
-     * to set the inventory according to the responding user´s inventory.
+     * set the offer label according to the offer and show the Users' own
+     * inventory.
      *
      * @param event TradeWithUserResponseUpdateEvent found on the EventBus
      */
@@ -170,14 +163,13 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         TradeWithUserOfferResponse rsp = event.getRsp();
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
+        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby {}", lobbyName);
         offeringUser = rsp.getOfferingUser();
-        respondingResourceMap = rsp.getRespondingResourceMap();
-        offeringResourceMap = rsp.getOfferingResourceMap();
-        resourceMap = rsp.getResourceMap();
-        setTradingList();
+        respondingResourceMap = rsp.getDemandedResources();
+        offeringResourceMap = rsp.getOfferedResources();
+        ownResourceTableView.getItems().addAll(rsp.getResourceList());
         setOfferLabel();
-        Window window = ownInventoryView.getScene().getWindow();
+        Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
     }
 
@@ -187,7 +179,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * Sets the content of the tradeResponseLabel to the offers and demands
      */
     private void setOfferLabel() {
-        LOG.debug("Setting the tradeResponseLabel");
         String offered = tallyUpOfferOrDemand(offeringResourceMap);
         String demanded = tallyUpOfferOrDemand(respondingResourceMap);
         Platform.runLater(() -> tradeResponseLabel.setText(
@@ -195,27 +186,11 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     }
 
     /**
-     * Helper Function
-     * <p>
-     * Sets the content of the InventoryView
-     */
-    private void setTradingList() {
-        if (ownInventoryList == null) {
-            ownInventoryList = FXCollections.observableArrayList();
-            ownInventoryView.setItems(ownInventoryList);
-        }
-        ownInventoryList.clear();
-        for (MutableResource entry : resourceMap) {
-            ownInventoryList.add(entry.create());
-        }
-    }
-
-    /**
      * Helper method to tally up the offered/demanded resources
      * <p>
      * Returns a String containing the offered and demanded resources.
      *
-     * @param resourceMap The Map of resources to tally up
+     * @param resourceList The List of resources to tally up
      *
      * @return String containing the offer
      *

@@ -29,8 +29,12 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 
 import java.util.*;
@@ -49,7 +53,7 @@ import static de.uol.swp.common.game.map.MapPoint.Type.*;
  * @see de.uol.swp.client.lobby.LobbyPresenter
  * @since 2021-03-23
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
     @FXML
@@ -57,7 +61,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected ListView<MutableResource> inventoryView;
+    protected TableView<Map<String, Object>> developmentCardTableView;
+    @FXML
+    protected TableView<Map<String, Object>> resourceTableView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -71,7 +77,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Button tradeWithUserButton;
     @FXML
-    protected Label turnIndicator;
+    protected TextFlow turnIndicator;
     @FXML
     protected Label notice;
     @FXML
@@ -101,17 +107,26 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Window window;
     protected UserOrDummy winner = null;
 
+    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
+    @FXML
+    private TableColumn<Map, Integer> developmentCardAmountCol;
+    @FXML
+    private TableColumn<Map, String> developmentCardNameCol;
+    @FXML
+    private TableColumn<Map, Integer> resourceAmountCol;
+    @FXML
+    private TableColumn<Map, String> resourceNameCol;
+
     @Inject
     private ITradeService tradeService;
 
-    private ObservableList<MutableResource> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
     @FXML
     protected void initialize() {
         super.initialize();
-        prepareInventoryView();
+        prepareInventoryTables();
         prepareUniqueCardView();
     }
 
@@ -178,16 +193,46 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper function that sets the text's text.
      * <p>
-     * The text states whose turn it is.
+     * The text states whose turn it is. The name of the player whose turn it is, is coloured in his personal colour.
+     * It also shortens the player's name, if it's longer than 15 characters.
      *
+     * @author Sven Ahrens
      * @author Alwin Bossert
      * @author Mario Fokken
      * @author Marvin Drees
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
-        Platform.runLater(() -> turnIndicator
-                .setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername())));
+
+        Platform.runLater(() -> {
+            turnIndicator.getChildren().clear();
+            Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
+            preUsernameText.setFont(Font.font(20.0));
+
+            String name = user.getUsername();
+            if (name.length() > 15) name = name.substring(0, 15) + "...";
+            Text username = new Text(name);
+            username.setFont(Font.font(20.0));
+
+            ObservableList<UserOrDummy> membersList = membersView.getItems();
+            if (user.equals(membersList.get(0))) {
+                username.setFill(GameRendering.PLAYER_1_COLOUR);
+            }
+            if (user.equals(membersList.get(1))) {
+                username.setFill(GameRendering.PLAYER_2_COLOUR);
+            }
+            if (user.equals(membersList.get(2))) {
+                username.setFill(GameRendering.PLAYER_3_COLOUR);
+            }
+            if (membersList.size() == 4) {
+                if (user.equals(membersList.get(3))) {
+                    username.setFill(GameRendering.PLAYER_4_COLOUR);
+                }
+            }
+            Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
+            postUsernameText.setFont(Font.font(20.0));
+            turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
+        });
     }
 
     /**
@@ -339,7 +384,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onDiceCastMessage(DiceCastMessage msg) {
         if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
-        LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
+        LOG.debug("---- The dices show: {} and {}", msg.getDice1(), msg.getDice2());
         playedCard = false;
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
@@ -406,7 +451,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
         if (!msg.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+        LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
@@ -458,6 +503,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (result.isEmpty()) return;
         if (result.get() == btnKnight) { //Play a Knight Card
             gameService.playKnightCard(lobbyName);
+            disableButtonStates();
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
@@ -515,7 +561,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
         playedCard = true;
-        gameService.updateInventory(rsp.getLobbyName());
     }
 
     /**
@@ -663,8 +708,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberPositionMessage(RobberPositionMessage msg) {
-        LOG.debug("Received RobberPositionMessage for Lobby " + msg.getLobbyName());
+        LOG.debug("Received RobberPositionMessage for Lobby {}", msg.getLobbyName());
         if (lobbyName.equals(msg.getLobbyName())) {
+            resetButtonStates(msg.getUser());
             gameService.updateGameMap(msg.getLobbyName());
         }
     }
@@ -828,34 +874,26 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Handles an UpdateInventoryResponse found on the EventBus
      * <p>
      * If the UpdateInventoryResponse is intended for the current Lobby, the
-     * resourceList linked to the inventoryView is cleared and updated with the
-     * items as listed in the maps contained in the UpdateInventoryResponse.
-     * The item names are localised with the ResourceBundle injected into the
-     * LobbyPresenter.
+     * contained lists of Maps are localised with the ResourceBundle injected
+     * into the LobbyPresenter and afterwards added into the respective
+     * TableView, where they are processed by the TableView columns'
+     * MapValueFactories.
      *
      * @param rsp The UpdateInventoryResponse found on the EventBus
      *
-     * @author Finn Haase
-     * @author Sven Ahrens
      * @author Phillip-André Suhr
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      * @see de.uol.swp.common.game.response.UpdateInventoryResponse
-     * @since 2021-01-27
+     * @since 2021-04-17
      */
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Received UpdateInventoryResponse for Lobby " + lobbyName);
+        LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
-            if (resourceList == null) {
-                resourceList = FXCollections.observableArrayList();
-                inventoryView.setItems(resourceList);
-            }
-            resourceList.clear();
-            for (MutableResource entry : rsp.getResourceMap()) {
-                resourceList.add(entry.create());
-            }
+            resourceTableView.getItems().setAll(rsp.getResourceList());
+            resourceTableView.sort();
+            developmentCardTableView.getItems().setAll(rsp.getDevelopmentCardList());
+            developmentCardTableView.sort();
         });
     }
 
@@ -956,25 +994,68 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Prepares the InventoryView
+     * Helper method to create the necessary Map structure
+     * required for MapValueFactories
      * <p>
-     * Prepares the inventoryView for proper formatting.
+     * This method creates a Map containing a key "amount" with value 0 and
+     * another key "resource" or "card", depending on the parameter {@literal <type>},
+     * with the internationalised name of the Resource or Development Card based
+     * on the parameter {@literal <item>}.
      *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
-     * @since 2021-03-29
+     * @param type Either "resource" for Resources or "card" for Development Cards
+     * @param item Lowercase Resource name for Resources or fully qualified i18n key
+     *             for Development Cards <p>
+     *             e.g. {@code prepareEmptyResourceMap("card", "game.resources.cards.knight")}
+     *             or {@code prepareEmptyResourceMap("resource", "brick")}
+     *
+     * @return A Map representing 0 of a resource
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-18
      */
-    private void prepareInventoryView() {
-        inventoryView.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(MutableResource item, boolean empty) {
-                Platform.runLater(() -> {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" :
-                            item.getAmount() + " " + item.getType());
-                });
-            }
-        });
+    private Map<String, Object> prepareEmptyResourceMap(String type, String item) {
+        Map<String, Object> resourceMap = new HashMap<>();
+        resourceMap.put("amount", 0);
+        String preFormat;
+        if (type.equals("resource")) { // Resource like Brick
+            preFormat = "game.resources.%s";
+            resourceMap.put("enumType", Resources.valueOf(item.toUpperCase()));
+        } else { // Development Card like Knight Card
+            preFormat = "%s";
+        }
+        resourceMap.put(type, new I18nWrapper(String.format(preFormat, item)));
+        return resourceMap;
+    }
+
+    /**
+     * Prepares the TableViews displaying the inventory
+     * <p>
+     * Prepares the TableView by setting the CellValueFactories of the
+     * different TableColumns to MapValueFactories. Also adds entries
+     * to each TableView displaying 0 of all resources and development cards.
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-18
+     */
+    private void prepareInventoryTables() {
+        resourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
+        resourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
+        developmentCardAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
+        developmentCardNameCol.setCellValueFactory(new MapValueFactory<>("card"));
+
+        List<Map<String, Object>> inventoryItems = new ArrayList<>();
+        for (Resources resource : Resources.values()) {
+            inventoryItems.add(prepareEmptyResourceMap("resource", resource.name().toLowerCase()));
+        }
+        resourceTableView.getItems().addAll(inventoryItems);
+
+        List<Map<String, Object>> developmentCards = new ArrayList<>();
+        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.victorypoints"));
+        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.knight"));
+        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.roadbuilding"));
+        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.yearofplenty"));
+        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.monopoly"));
+        developmentCardTableView.getItems().setAll(developmentCards);
     }
 
     /**
@@ -1026,7 +1107,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
         endTurn.setDisable(!userService.getLoggedInUser().equals(user));
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        if (!playedCard) playCard.setDisable(!userService.getLoggedInUser().equals(user));
+        playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }

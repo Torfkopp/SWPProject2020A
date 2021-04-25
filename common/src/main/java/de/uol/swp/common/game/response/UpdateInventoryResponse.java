@@ -6,6 +6,9 @@ import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableR
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This Response has up-to-date info about what the inventory of a specified player contains
  *
@@ -26,9 +29,18 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
 
     /**
      * Constructor
-     *  @param user           The user wanting to update the inventory
-     * @param lobbyName      The lobby for which the update is supposed to happen in
-     * @param resourceMap    The Map containing the name of a resource as key and the amount as value
+     *
+     * @param user                The user wanting to update the inventory
+     * @param lobbyName           The lobby for which the update is supposed to happen in
+     * @param developmentCardList List of the Resources in the user's inventory, containing Maps
+     *                            containing the following for each type of Resource:<p>
+     *                            {@literal {"amount": <Integer>, "resource", <Resource>}}
+     * @param resourceList        List of the Development Cards in the user's inventory, containing
+     *                            Maps containing the following for each type of Development Card:<p>
+     *                            {@literal {"amount": <Integer>, "card": "game.resources.cards.<Dev Card key>"}}
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-17
      */
     public UpdateInventoryResponse(UserOrDummy user, LobbyName lobbyName, MutableResourceListMap resourceMap, DevelopmentCardListMap developmentCardMap) {
         super(lobbyName);
@@ -38,11 +50,12 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
     }
 
     /**
-     * Gets the resource map, containing mappings of resource name to resource amount.
-     * <p>
-     * E.g. "Bricks", 1
+     * Gets the list of Resource maps for the MapValueFactory
      *
-     * @return The resource map
+     * @return List of Maps for MapValueFactory
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-17
      */
     public MutableResourceListMap getResourceMap() {
         return resourceMap;

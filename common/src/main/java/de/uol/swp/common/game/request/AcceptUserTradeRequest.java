@@ -4,6 +4,9 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Request sent to the server when the responding user wants to accept the trade offer.
  *
@@ -16,26 +19,35 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
 
     private final UserOrDummy respondingUser;
     private final UserOrDummy offeringUser;
-    private final MutableResourceListMap respondingResourceMap;
-    private final MutableResourceListMap offeringResourceMap;
+    private final List<Map<String, Object>> demandedResources;
+    private final List<Map<String, Object>> offeredResources;
 
     /**
      * Constructor
      *
-     * @param respondingUser        The responding user
-     * @param offeringUser          The offering user
-     * @param lobbyName             The lobby name
-     * @param respondingResourceMap The demanded resources
-     * @param offeringResourceMap   The offered resources
+     * @param respondingUser    The responding user
+     * @param offeringUser      The offering user
+     * @param lobbyName         The lobby name
+     * @param demandedResources The demanded resources
+     * @param offeredResources  The offered resources
      */
-    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, LobbyName lobbyName,
-                                  MutableResourceListMap respondingResourceMap,
-                                  MutableResourceListMap offeringResourceMap) {
+    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, String lobbyName,
+                                  List<Map<String, Object>> demandedResources,
+                                  List<Map<String, Object>> offeredResources) {
         super(lobbyName);
         this.respondingUser = respondingUser;
         this.offeringUser = offeringUser;
-        this.respondingResourceMap = respondingResourceMap;
-        this.offeringResourceMap = offeringResourceMap;
+        this.demandedResources = demandedResources;
+        this.offeredResources = offeredResources;
+    }
+
+    /**
+     * Gets responding user´s resource map.
+     *
+     * @return Map of the demanded resources
+     */
+    public List<Map<String, Object>> getDemandedResources() {
+        return demandedResources;
     }
 
     /**
@@ -43,8 +55,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the offered resources
      */
-    public MutableResourceListMap getOfferingResourceMap() {
-        return offeringResourceMap;
+    public List<Map<String, Object>> getOfferedResources() {
+        return offeredResources;
     }
 
     /**
@@ -54,15 +66,6 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      */
     public UserOrDummy getOfferingUser() {
         return offeringUser;
-    }
-
-    /**
-     * Gets responding user´s resource map.
-     *
-     * @return Map of the demanded resources
-     */
-    public MutableResourceListMap getRespondingResourceMap() {
-        return respondingResourceMap;
     }
 
     /**

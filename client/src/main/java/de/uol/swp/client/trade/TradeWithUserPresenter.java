@@ -8,19 +8,23 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.*;
 
 /**
  * Manages the TradingWithUser window
@@ -34,12 +38,9 @@ import org.apache.logging.log4j.Logger;
 public class TradeWithUserPresenter extends AbstractTradePresenter {
 
     public static final String fxml = "/fxml/TradeWithUserView.fxml";
-    public static final int MIN_HEIGHT = 650;
+    public static final int MIN_HEIGHT = 680;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
-
-    @Inject
-    private ITradeService tradeService;
 
     @FXML
     private Label statusLabel;
@@ -50,17 +51,13 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @FXML
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     @FXML
-    private ListView<MutableResource> ownInventoryView;
-    @FXML
     private Button offerTradeButton;
 
     private LobbyName lobbyName;
     private UserOrDummy respondingUser;
     private int traderInventorySize;
-    private MutableResourceListMap selectedOwnResourceMap;
-    private MutableResourceListMap selectedPartnersResourceMap;
-    private ObservableList<MutableResource> ownInventoryList;
-    private MutableResourceListMap resourceMap;
+    private List<Map<String, Object>> selectedOwnResourceList;
+    private List<Map<String, Object>> selectedPartnersResourceList;
 
     /**
      * Constructor
@@ -105,7 +102,10 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
             tradeService.showTradeError(resourceBundle.getString("game.trade.error.demandtoohigh"));
         }
-        return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0) || (selectedPartnersResourceMapCounter > traderInventorySize));
+        //@formatter:off
+        return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0)
+                || (selectedPartnersResourceMapCounter > traderInventorySize));
+        //@formatter:on
     }
 
     /**
@@ -152,17 +152,17 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInventoryForTradeWithUserResponse(InventoryForTradeWithUserResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received InventoryForTradeResponse for Lobby " + rsp.getLobbyName());
+        LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
-        resourceMap = rsp.getResourceMap();
-        setTradingLists();
+        List<Map<String, Object>> resourceList = Collections.unmodifiableList(rsp.getResourceList());
+        ownResourceTableView.getItems().addAll(resourceList);
         traderInventorySize = rsp.getTradingUsersInventorySize();
         int ownInventorySize = 0;
         for (MutableResource entry : resourceMap) {
             ownInventorySize += entry.getAmount();
         }
         if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
-            setSliders();
+            setSliders(resourceList);
             Platform.runLater(() -> statusLabel
                     .setText(String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser)));
         } else {
@@ -188,14 +188,14 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onOfferTradeButtonPressed() {
-        setResourceMaps();
+        setResourceLists();
         if (checkResources()) {
             LOG.debug("Failed sending the offer");
             return;
         }
         offerTradeButton.setDisable(true);
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceMap, selectedPartnersResourceMap);
+        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList);
         tradeService.closeTradeResponseWindow(lobbyName);
     }
 
@@ -213,7 +213,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
-        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
             statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
@@ -231,7 +231,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
-        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         closeWindow();
     }
 
@@ -249,17 +249,20 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeWithUserUpdateEvent(TradeWithUserUpdateEvent event) {
-        LOG.debug("Received TradeWithUserUpdateEvent for Lobby " + event.getLobbyName());
+        LOG.debug("Received TradeWithUserUpdateEvent for Lobby {}", event.getLobbyName());
         if (lobbyName == null) lobbyName = event.getLobbyName();
-        Window window = ownInventoryView.getScene().getWindow();
+        Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> closeWindow());
     }
 
     /**
-     * Helper function
+     * Helper function to handle the slider readout
      * <p>
-     * Sets the content of resource maps according to the selected resources
+     * Sets the content of resource lists according to the selected resources
      * and the amount of resources as selected with the sliders.
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-20
      */
     @FXML
     private void setResourceMaps() {
@@ -280,9 +283,11 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
 
     /**
      * Helper Function to handle the slider attributes
+     *
+     * @param resourceList List of resourceMaps to determine the Slider values
      */
     @FXML
-    private void setSliders() {
+    private void setSliders(List<Map<String, Object>> resourceList) {
         tradingPartnerBrickSlider.setMax(traderInventorySize);
         tradingPartnerOreSlider.setMax(traderInventorySize);
         tradingPartnerLumberSlider.setMax(traderInventorySize);

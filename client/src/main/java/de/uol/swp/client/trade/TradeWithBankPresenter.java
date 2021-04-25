@@ -8,17 +8,16 @@ import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.MapValueFactory;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,31 +34,31 @@ import java.util.Map;
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2021-02-19
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
 public class TradeWithBankPresenter extends AbstractTradePresenter {
 
     public static final String fxml = "/fxml/TradeWithBankView.fxml";
     public static final int MIN_HEIGHT = 433;
     public static final int MIN_WIDTH = 620;
-    private final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
-    private LobbyName lobbyName;
-    private MutableResourceListMap resourceMap;
-    private List<IHarborHex.HarborResource> harborMap;
-    private ObservableList<MutableResource> resourceList;
-    private ObservableList<MutableResource> bankResourceList;
-    private ObservableList<MutableResource> ownInventoryList;
+    private static final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
+    private String lobbyName;
 
     @Inject
     private IGameService gameService;
-    @Inject
-    private ITradeService tradeService;
 
     @FXML
-    private ListView<MutableResource> ownInventoryView;
+    private TableView<Map<String, Object>> ownResourcesToTradeWith;
     @FXML
-    private ListView<MutableResource> ownResourceToTradeWithView;
+    private TableView<Map<String, Object>> bankResourcesView;
+    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
-    private ListView<MutableResource> bankResourceView;
+    private TableColumn<Map, Integer> tradeResourceAmountCol;
+    @FXML
+    private TableColumn<Map, String> tradeResourceNameCol;
+    @FXML
+    private TableColumn<Map, Integer> bankResourceAmountCol;
+    @FXML
+    private TableColumn<Map, String> bankResourceNameCol;
     @FXML
     private Button buyDevelopmentButton;
     @FXML
@@ -78,25 +77,60 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     }
 
     /**
-     * Initialises the Presenter by setting up the ownResourceView and
-     * the bankResourceView.
+     * Helper method to set the tradingRatio Map according to the provided harborMap
+     * <p>
+     * This method checks for which harbors the User owns and sets the entry in the
+     * tradingRation Map accordingly.
+     *
+     * @param harborMap Map of HarborResource the User has access to
+     *
+     * @return Map of HarborResource to trading ratio
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-20
+     */
+    private static Map<IHarborHex.HarborResource, Integer> setupHarborRatios(
+            List<IHarborHex.HarborResource> harborMap) {
+        Map<IHarborHex.HarborResource, Integer> tradingRatio = new HashMap<>();
+        int prepareTradingRatio = 4;
+        if (harborMap.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
+        tradingRatio.put(IHarborHex.HarborResource.BRICK, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.ORE, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.GRAIN, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.WOOL, prepareTradingRatio);
+        tradingRatio.put(IHarborHex.HarborResource.LUMBER, prepareTradingRatio);
+        if (harborMap.contains(IHarborHex.HarborResource.BRICK))
+            tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.ORE)) tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.GRAIN))
+            tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.WOOL)) tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.LUMBER))
+            tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
+        return tradingRatio;
+    }
+
+    /**
+     * Initialises the Presenter by setting up the MapValueFactories for
+     * the Bank and Trading inventories.
      *
      * @implNote Called automatically by JavaFX
      */
     @FXML
     public void initialize() {
         super.initialize();
-        ownResourceToTradeWithView.setCellFactory(lv -> getListCell());
-        bankResourceView.setCellFactory(lv -> getListCell());
+        tradeResourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
+        tradeResourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
+        bankResourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
+        bankResourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
         LOG.debug("TradeWithBankPresenter initialised");
     }
 
     /**
-     * Handles a click on the Buy Button
+     * Handles a click on the Buy DevelopmentCard Button
      * <p>
-     * Method called when the BuyBankButton is pressed.
-     * The Method posts a BuyBankRequest including logged in user
-     * onto the EventBus.
+     * If the User has the right resources, this method calls on the
+     * TradeService to buy a development card
      *
      * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
      */
@@ -126,8 +160,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + lobbyName);
-        LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
+        LOG.debug("Received BuyDevelopmentCardResponse for Lobby {}", lobbyName);
+        LOG.debug("---- The user got a {}", rsp.getDevelopmentCard());
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
@@ -150,8 +184,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * <p>
      * If the InventoryForTradeResponse is directed to this lobby,
      * the TradeWithBankPresenter gets the inventory of the player
-     * as a Map. Calls a function to fill the inventory.
-     * If the user has enough resources, the buy the buyDevelopmentButton
+     * as a List of resourceMaps. Calls setupHarborRatios to calculate
+     * the harbor trading ratios and calls setInventories to fill the
+     * inventories of the Bank and the trading selection.
+     * If the user has enough resources, the buyDevelopmentButton
      * gets enabled.
      *
      * @param rsp InventoryForTradeResponse having the inventory
@@ -160,19 +196,18 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received InventoryForTradeResponse for Lobby " + this.lobbyName);
-            harborMap = rsp.getHarborResourceList();
-            resourceMap = rsp.getResourceMap();
-            setTradingLists();
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
+        LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
+        List<Map<String, Object>> resourceList = rsp.getResourceMap();
+        Map<IHarborHex.HarborResource, Integer> tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
+        setInventories(resourceList, tradingRatios);
+        boolean hasGrain = false, hasOre = false, hasWool = false;
+        for (Map<String, Object> item : resourceList) {
+            if (Resources.GRAIN.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasGrain = true;
+            if (Resources.ORE.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasOre = true;
+            if (Resources.WOOL.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasWool = true;
         }
-        if (resourceMap.getAmount(
-                ResourceType.ORE) >= 1 && resourceMap.getAmount(
-                ResourceType.GRAIN) >= 1 && resourceMap
-                                                                                                                  .getAmount(
-                                                                                                                          ResourceType.WOOL) >= 1) {
-            buyDevelopmentButton.setDisable(false);
-        }
+        buyDevelopmentButton.setDisable(!hasGrain || !hasOre || !hasWool);
     }
 
     /**
@@ -180,8 +215,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * <p>
      * Method called when the TradeBankButton is pressed.
      * This method checks both lists for the selected item.
-     * If there is a selected item in both lists, it posts an
-     * ExecuteTradeWithBankRequest onto the EventBus.
+     * If there is a selected item in both lists, it calls the
+     * TradeService to execute the trade with the Bank.
      *
      * @see de.uol.swp.client.trade.event.TradeErrorEvent
      * @see de.uol.swp.common.game.request.ExecuteTradeWithBankRequest
@@ -194,15 +229,12 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
             tradeService.showTradeError(resourceBundle.getString("game.error.trade.noplayerresource"));
             return;
-        } else {
-            giveResource = ownResourceToTradeWithView.getSelectionModel().getSelectedItem();
         }
-        bankResourceView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        if (bankResourceView.getSelectionModel().isEmpty()) {
+        Map<String, Object> giveResource = ownResourcesToTradeWith.getSelectionModel().getSelectedItem();
+        bankResourcesView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        if (bankResourcesView.getSelectionModel().isEmpty()) {
             tradeService.showTradeError(resourceBundle.getString("game.error.trade.nobankresource"));
             return;
-        } else {
-            bankResource = bankResourceView.getSelectionModel().getSelectedItem();
         }
         if (bankResource != null && giveResource != null) {
             ResourceType userGetsResource = bankResource.getType();
@@ -227,8 +259,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeUpdateEvent(TradeUpdateEvent event) {
         if (lobbyName == null) lobbyName = event.getLobbyName();
-        LOG.debug("Received TradeUpdateEvent for Lobby " + this.lobbyName);
-        Window window = ownResourceToTradeWithView.getScene().getWindow();
+        LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
+        Window window = ownResourcesToTradeWith.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName));
     }
 
@@ -244,43 +276,43 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
     }
 
     /**
-     * Helper Function
+     * Helper method to fill the three inventory TableViews
      * <p>
-     * If there is no resourceList it gets created and cleared. Then it gets
-     * updated with the items as listed in the resourceMap.
-     * The same happens for the ownInventoryList and the bankResourceList.
+     * This method takes the provided player inventory and trading ratios and
+     * fills the three inventories (Bank, Available Trades, Full Inventory)
+     * accordingly.
+     *
+     * @param ownInventory  The inventory of the User trading with the Bank
+     * @param tradingRatios Map of HarborResources to Integer expressing which harbors
+     *                      the User possesses and therefore to which trading ratios
+     *                      they are entitled
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-20
      */
-    private void setTradingLists() {
-        Map<IHarborHex.HarborResource, Integer> tradingRatio = new HashMap<>();
-        if (resourceList == null) {
-            resourceList = FXCollections.observableArrayList();
-            ownInventoryList = FXCollections.observableArrayList();
-            ownResourceToTradeWithView.setItems(resourceList);
-            ownInventoryView.setItems(ownInventoryList);
+    private void setInventories(List<Map<String, Object>> ownInventory,
+                                Map<IHarborHex.HarborResource, Integer> tradingRatios) {
+        for (Resources resource : Resources.values()) {
+            Map<String, Object> bankResourceMap = new HashMap<>();
+            bankResourceMap.put("amount", 1);
+            String resourceKey = String.format("game.resources.%s", resource.name().toLowerCase());
+            bankResourceMap.put("resource", new I18nWrapper(resourceKey));
+            bankResourceMap.put("enumType", resource);
+            bankResourcesView.getItems().add(bankResourceMap);
         }
-        resourceList.clear();
-        ownInventoryList.clear();
-        int prepareTradingRatio = 4;
-        if (harborMap.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
-        tradingRatio.put(IHarborHex.HarborResource.BRICK, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.ORE, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.GRAIN, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.WOOL, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.LUMBER, prepareTradingRatio);
-        if (harborMap.contains(IHarborHex.HarborResource.BRICK))
-            tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.ORE)) tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.GRAIN))
-            tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.WOOL)) tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.LUMBER))
-            tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
+        for (Map<String, Object> item : ownInventory) {
+            Resources resource = (Resources) item.get("enumType");
+            Map<String, Object> newResourceMap = new HashMap<>();
+            newResourceMap.put("amount", item.get("amount"));
+            newResourceMap.put("resource", item.get("resource"));
+            newResourceMap.put("enumType", resource);
+            ownResourceTableView.getItems().add(newResourceMap);
 
         for (MutableResource entry : resourceMap) {
             ownInventoryList.add(new MutableResource(entry.getType(), entry.getAmount()));

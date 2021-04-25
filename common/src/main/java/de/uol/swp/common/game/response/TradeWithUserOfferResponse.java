@@ -5,6 +5,9 @@ import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableR
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This response is sent when a user offers another user
  * a trade of resources. This response contains the necessary
@@ -25,20 +28,29 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
     /**
      * Constructor
      *
-     * @param offeringUser          The offering User
-     * @param resourceMap           The inventory of the responding user
-     * @param offeringResourceMap   The offered resources
-     * @param respondingResourceMap The demanded resources
-     * @param lobbyName             The name of the lobby
+     * @param offeringUser      The offering User
+     * @param resourceList      The inventory of the responding user
+     * @param offeredResources  The offered resources
+     * @param demandedResources The demanded resources
+     * @param lobbyName         The name of the lobby
      */
     public TradeWithUserOfferResponse(UserOrDummy offeringUser,
                                       MutableResourceListMap resourceMap, MutableResourceListMap offeringResourceMap,
                                       MutableResourceListMap respondingResourceMap, LobbyName lobbyName) {
         super(lobbyName);
-        this.resourceMap = resourceMap;
-        this.offeringResourceMap = offeringResourceMap;
-        this.respondingResourceMap = respondingResourceMap;
+        this.resourceList = resourceList;
+        this.offeredResources = offeredResources;
+        this.demandedResources = demandedResources;
         this.offeringUser = offeringUser;
+    }
+
+    /**
+     * Gets the demanded resources
+     *
+     * @return Map of demanded resources
+     */
+    public List<Map<String, Object>> getDemandedResources() {
+        return demandedResources;
     }
 
     /**

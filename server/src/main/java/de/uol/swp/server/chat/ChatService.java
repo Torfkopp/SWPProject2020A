@@ -9,10 +9,10 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.exception.ExceptionMessage;
+import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.exception.LobbyExceptionMessage;
-import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
@@ -57,10 +57,10 @@ public class ChatService extends AbstractService {
     public ChatService(EventBus bus, IChatManagement chatManagement, ILobbyManagement lobbyManagement,
                        LobbyService lobbyService) {
         super(bus);
-        LOG.debug("ChatService started");
         this.chatManagement = chatManagement;
         this.lobbyManagement = lobbyManagement;
         this.lobbyService = lobbyService;
+        LOG.debug("ChatService started");
     }
 
     /**
@@ -79,10 +79,8 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onAskLatestChatMessageRequest(AskLatestChatMessageRequest req) {
-        if (LOG.isDebugEnabled()) {
-            if (req.isFromLobby()) LOG.debug("Received AskLatestChatMessageRequest from Lobby " + req.getOriginLobby());
-            else LOG.debug("Received AskLatestChatMessageRequest");
-        }
+        if (req.isFromLobby()) LOG.debug("Received AskLatestChatMessageRequest from Lobby {}", req.getOriginLobby());
+        else LOG.debug("Received AskLatestChatMessageRequest");
         ResponseMessage returnMessage;
         if (req.isFromLobby()) {
             List<ChatMessage> latestMessages = chatManagement.getLatestMessages(req.getAmount(), req.getOriginLobby());
@@ -119,10 +117,8 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onDeleteChatMessageRequest(DeleteChatMessageRequest req) {
-        if (LOG.isDebugEnabled()) {
-            if (req.isFromLobby()) LOG.debug("Received DeleteChatMessageRequest from Lobby " + req.getOriginLobby());
-            else LOG.debug("Received DeleteChatMessageRequest");
-        }
+        if (req.isFromLobby()) LOG.debug("Received DeleteChatMessageRequest from Lobby {}", req.getOriginLobby());
+        else LOG.debug("Received DeleteChatMessageRequest");
         try {
             Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(req.getId(), req.getOriginLobby());
             if (storedMsg.isEmpty() || !storedMsg.get().getAuthor().equals(req.getRequestingUser())) return;
@@ -164,10 +160,8 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onEditChatMessageRequest(EditChatMessageRequest req) {
-        if (LOG.isDebugEnabled()) {
-            if (req.isFromLobby()) LOG.debug("Received EditChatMessageRequest from Lobby " + req.getOriginLobby());
-            else LOG.debug("Received EditChatMessageRequest");
-        }
+        if (req.isFromLobby()) LOG.debug("Received EditChatMessageRequest from Lobby {}", req.getOriginLobby());
+        else LOG.debug("Received EditChatMessageRequest");
         try {
             Optional<ChatMessage> storedMsg = chatManagement.findChatMessage(req.getId(), req.getOriginLobby());
             if (storedMsg.isEmpty() || !storedMsg.get().getAuthor().equals(req.getRequestingUser())) return;
@@ -207,7 +201,7 @@ public class ChatService extends AbstractService {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
-        LOG.debug("Received LobbyDeletedMessage for Lobby " + msg.getName());
+        LOG.debug("Received LobbyDeletedMessage for Lobby {}", msg.getName());
         LOG.debug("---- Deleting Messages for the Lobby");
         chatManagement.dropLobbyHistory(msg.getName());
     }
@@ -248,10 +242,8 @@ public class ChatService extends AbstractService {
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
             return;
         }
-        if (LOG.isDebugEnabled()) {
-            if (req.isFromLobby()) LOG.debug("Received NewChatMessageRequest from Lobby " + req.getOriginLobby());
-            else LOG.debug("Received NewChatMessageRequest");
-        }
+        if (req.isFromLobby()) LOG.debug("Received NewChatMessageRequest from Lobby {}", req.getOriginLobby());
+        else LOG.debug("Received NewChatMessageRequest");
         try {
             if (req.isFromLobby()) {
                 ChatMessage chatMessage = chatManagement

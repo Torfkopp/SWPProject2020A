@@ -4,6 +4,9 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This request contains the necessary information for a trade
  * between 2 users.
@@ -23,11 +26,11 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
     /**
      * Constructor
      *
-     * @param offeringUser          The offering User
-     * @param respondingUser        The responding User
-     * @param lobbyName             The name of the lobby
-     * @param offeringResourceMap   The offered resources
-     * @param respondingResourceMap The responded resources
+     * @param offeringUser      The offering User
+     * @param respondingUser    The responding User
+     * @param lobbyName         The name of the lobby
+     * @param offeredResources  The offered resources
+     * @param demandedResources The responded resources
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
                                         MutableResourceListMap offeringResourceMap,
@@ -35,8 +38,17 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
-        this.offeringResourceMap = offeringResourceMap;
-        this.respondingResourceMap = respondingResourceMap;
+        this.offeredResources = offeredResources;
+        this.demandedResources = demandedResources;
+    }
+
+    /**
+     * Gets the demanded Resources
+     *
+     * @return Gets the demanded Resources as a Map
+     */
+    public List<Map<String, Object>> getDemandedResources() {
+        return demandedResources;
     }
 
     /**

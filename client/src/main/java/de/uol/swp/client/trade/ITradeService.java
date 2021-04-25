@@ -3,8 +3,12 @@ package de.uol.swp.client.trade;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.UserOrDummy;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * An interface for all methods of the TradeService

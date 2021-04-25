@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
 import de.uol.swp.common.game.request.*;
@@ -14,6 +15,9 @@ import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * The TradeService is responsible for posting requests and events regarding
@@ -101,7 +105,7 @@ public class TradeService implements ITradeService {
     @Override
     public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, MutableResourceListMap offeredResources,
                            MutableResourceListMap demandedResources) {
-        LOG.debug("Sending an OfferingTradeWithUserRequest");
+        LOG.debug("Sending OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
                                                            offeredResources, demandedResources);
         eventBus.post(request);
@@ -147,7 +151,7 @@ public class TradeService implements ITradeService {
 
     @Override
     public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser) {
-        LOG.debug("Sending a TradeWithUserRequest");
+        LOG.debug("Sending TradeWithUserRequest");
         Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser);
         eventBus.post(request);
     }

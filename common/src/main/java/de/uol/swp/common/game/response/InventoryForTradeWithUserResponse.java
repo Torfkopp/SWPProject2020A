@@ -5,6 +5,9 @@ import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableR
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This Response has up-to-date info about the resources in the inventory
  * of the player who opened the trade window and the amount of resource cards the other
@@ -25,32 +28,40 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
     /**
      * Constructor
      *
-     * @param user                      The user wanting to update the inventory
-     * @param lobbyName                 The lobby for which the update is supposed to happen in
-     * @param resourceMap               The Map containing the name of a resource as key and the amount as value
-     * @param tradingUsersInventorySize Amount of resource cards the other user has
-     * @param tradingUser               The trading Users name
+     * @param user                      The User wanting to create a trade offer
+     * @param lobbyName                 The Lobby in which the trade is happening
+     * @param resourceList              List of the Resources in the offering User's inventory, containing Maps
+     *                                  containing the following for each type of Resource:<p>
+     *                                  {@literal {"amount": <Integer>, "resource", <Resource>}}
+     * @param tradingUsersInventorySize Amount of resource cards the other User has
+     * @param tradingUser               The User to whom an offer is going to be made
      */
     public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, MutableResourceListMap resourceMap,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
-        this.resourceMap = resourceMap;
+        this.resourceList = resourceList;
         this.tradingUsersInventorySize = tradingUsersInventorySize;
         this.tradingUser = tradingUser;
     }
 
     /**
-     * Gets the resource map, containing mappings of resource name to resource amount.
-     * <p>
-     * E.g. "Bricks", 1
+     * Gets the list of Resource maps for the MapValueFactory
      *
-     * @return The resource map
+     * @return List of Maps for MapValueFactory
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-19
      */
     public MutableResourceListMap getResourceMap() {
         return resourceMap;
     }
 
+    /**
+     * Gets the User to whom a trade offer is being made
+     *
+     * @return The User being traded with
+     */
     public UserOrDummy getTradingUser() {
         return tradingUser;
     }
@@ -65,9 +76,9 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
     }
 
     /**
-     * Gets the user who wants to get his inventory
+     * Gets the User wanting to create a trade offer
      *
-     * @return The User who wants to get his inventory
+     * @return The User wanting to create a trade offer
      */
     public UserOrDummy getUser() {
         return user;
