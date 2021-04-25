@@ -233,6 +233,14 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
         if (owner != msg.getLobby().getOwner()) {
+            if (userService.getLoggedInUser().equals(owner)) {
+                I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
+                                                      msg.getLobby().getOwner().getUsername());
+                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+            } else if (userService.getLoggedInUser().equals(msg.getLobby().getOwner())) {
+                I18nWrapper content = new I18nWrapper("lobby.owner.promoted", owner.getUsername());
+                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+            }
             owner = msg.getLobby().getOwner();
             prepareMembersView();
             setStartSessionButtonState();

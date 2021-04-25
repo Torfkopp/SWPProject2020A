@@ -212,7 +212,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * the owner status of the selected User of the members view .
      *
      * @author Maximilian Lindner
-     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
      * @since 2021-04-13
      */
     @FXML
