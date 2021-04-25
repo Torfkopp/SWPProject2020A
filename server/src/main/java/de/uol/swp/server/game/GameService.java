@@ -82,8 +82,8 @@ public class GameService extends AbstractService {
      * Checks if there are enough resources in the needed Inventory.
      * It compares the needed inventory with the actual inventory.
      *
-     * @param inventoryMap       Saved inventory in game
-     * @param neededInventoryMap Trading inventory
+     * @param inventoryList      Saved inventory in game
+     * @param neededResourceList Trading inventory
      *
      * @return true if there are enough resources in the neededInventoryMap, false if not
      *
@@ -91,14 +91,18 @@ public class GameService extends AbstractService {
      * @author Finn Haase
      * @since 2021-02-24
      */
-    private boolean checkEnoughResourcesInInventory(Map<String, Integer> inventoryMap,
-                                                    Map<String, Integer> neededInventoryMap) {
-        if (inventoryMap.get("game.resources.grain") < neededInventoryMap.get("game.resources.grain")) return false;
-        else if (inventoryMap.get("game.resources.ore") < neededInventoryMap.get("game.resources.ore")) return false;
-        else if (inventoryMap.get("game.resources.wool") < neededInventoryMap.get("game.resources.wool")) return false;
-        else if (inventoryMap.get("game.resources.brick") < neededInventoryMap.get("game.resources.brick"))
-            return false;
-        else return inventoryMap.get("game.resources.lumber") >= neededInventoryMap.get("game.resources.lumber");
+    private boolean checkEnoughResourcesInInventory(List<Map<String, Object>> inventoryList,
+                                                    List<Map<String, Object>> neededResourceList) {
+        for (Map<String, Object> resourceMap : inventoryList) {
+            for (Map<String, Object> neededResourceMap : neededResourceList) {
+                //@formatter:off
+                if (resourceMap.get("enumType").equals(neededResourceMap.get("enumType"))
+                    && ((int) resourceMap.get("amount")) < (int) neededResourceMap.get("amount"))
+                        return false;
+                //@formatter:on
+            }
+        }
+        return true;
     }
 
     /**
@@ -144,24 +148,80 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Helper method to make a resourceMap from a provided inventory
+     * Helper method to make a Map of Development Cards as required by
+     * MapValueFactories from a provided inventory.
      *
-     * @param inventory The inventory to make a resourceMap from
+     * @param inventory The inventory to make a Map from
      *
-     * @return The Map of resources
+     * @return List of Development Cards as Maps with keys "amount" and "card"
      *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @since 2021-02-25
+     * @author Phillip-André Suhr
+     * @since 2021-04-18
      */
-    private Map<String, Integer> getResourceMapFromInventory(Inventory inventory) {
-        Map<String, Integer> offeringInventoryMap = new HashMap<>();
-        offeringInventoryMap.put("game.resources.brick", inventory.getBrick());
-        offeringInventoryMap.put("game.resources.ore", inventory.getOre());
-        offeringInventoryMap.put("game.resources.lumber", inventory.getLumber());
-        offeringInventoryMap.put("game.resources.wool", inventory.getWool());
-        offeringInventoryMap.put("game.resources.grain", inventory.getGrain());
-        return offeringInventoryMap;
+    private List<Map<String, Object>> getDevelopmentCardListFromInventory(Inventory inventory) {
+        HashMap<String, Object> vpMap = new HashMap<>();
+        vpMap.put("amount", inventory.getVictoryPointCards());
+        vpMap.put("card", new I18nWrapper("game.resources.cards.victorypoints"));
+        HashMap<String, Object> kMap = new HashMap<>();
+        kMap.put("amount", inventory.getKnightCards());
+        kMap.put("card", new I18nWrapper("game.resources.cards.knight"));
+        HashMap<String, Object> rbMap = new HashMap<>();
+        rbMap.put("amount", inventory.getRoadBuildingCards());
+        rbMap.put("card", new I18nWrapper("game.resources.cards.roadbuilding"));
+        HashMap<String, Object> yopMap = new HashMap<>();
+        yopMap.put("amount", inventory.getYearOfPlentyCards());
+        yopMap.put("card", new I18nWrapper("game.resources.cards.yearofplenty"));
+        HashMap<String, Object> mMap = new HashMap<>();
+        mMap.put("amount", inventory.getMonopolyCards());
+        mMap.put("card", new I18nWrapper("game.resources.cards.monopoly"));
+        List<Map<String, Object>> cardList = new ArrayList<>();
+        cardList.add(vpMap);
+        cardList.add(kMap);
+        cardList.add(rbMap);
+        cardList.add(yopMap);
+        cardList.add(mMap);
+        return cardList;
+    }
+
+    /**
+     * Helper method to make a Map of Resources as required by
+     * MapValueFactories from a provided inventory.
+     *
+     * @param inventory The inventory to make a Map from
+     *
+     * @return List of Resources Maps with keys "amount" and "resource"
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-18
+     */
+    private List<Map<String, Object>> getResourceListFromInventory(Inventory inventory) {
+        HashMap<String, Object> brickMap = new HashMap<>();
+        brickMap.put("amount", inventory.getBrick());
+        brickMap.put("enumType", Resources.BRICK);
+        brickMap.put("resource", new I18nWrapper("game.resources.brick"));
+        Map<String, Object> grainMap = new HashMap<>();
+        grainMap.put("amount", inventory.getGrain());
+        grainMap.put("enumType", Resources.GRAIN);
+        grainMap.put("resource", new I18nWrapper("game.resources.grain"));
+        Map<String, Object> lumberMap = new HashMap<>();
+        lumberMap.put("amount", inventory.getLumber());
+        lumberMap.put("enumType", Resources.LUMBER);
+        lumberMap.put("resource", new I18nWrapper("game.resources.lumber"));
+        Map<String, Object> oreMap = new HashMap<>();
+        oreMap.put("amount", inventory.getOre());
+        oreMap.put("enumType", Resources.ORE);
+        oreMap.put("resource", new I18nWrapper("game.resources.ore"));
+        Map<String, Object> woolMap = new HashMap<>();
+        woolMap.put("amount", inventory.getWool());
+        woolMap.put("enumType", Resources.WOOL);
+        woolMap.put("resource", new I18nWrapper("game.resources.wool"));
+        List<Map<String, Object>> resourceList = new ArrayList<>();
+        resourceList.add(brickMap);
+        resourceList.add(grainMap);
+        resourceList.add(lumberMap);
+        resourceList.add(oreMap);
+        resourceList.add(woolMap);
+        return resourceList;
     }
 
     /**
@@ -194,86 +254,81 @@ public class GameService extends AbstractService {
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
         if (offeringInventory == null || respondingInventory == null) return;
-        Map<String, Integer> offeringInventoryMap = getResourceMapFromInventory(offeringInventory);
-        Map<String, Integer> responseInventoryMap = getResourceMapFromInventory(respondingInventory);
-        if (checkEnoughResourcesInInventory(offeringInventoryMap,
-                                            req.getOfferingResourceMap()) && checkEnoughResourcesInInventory(
-                responseInventoryMap, req.getRespondingResourceMap())) {
+        List<Map<String, Object>> offeringInventoryMap = getResourceListFromInventory(offeringInventory);
+        List<Map<String, Object>> responseInventoryMap = getResourceListFromInventory(respondingInventory);
+        boolean enoughToOffer = checkEnoughResourcesInInventory(offeringInventoryMap, req.getOfferedResources());
+        boolean enoughToDemand = checkEnoughResourcesInInventory(responseInventoryMap, req.getDemandedResources());
+        if (enoughToOffer && enoughToDemand) {
             //changes the inventories according to the offer
             Map<I18nWrapper, Integer> offeredResourcesWrapperMap = new HashMap<>();
-            Map<I18nWrapper, Integer> respondingResourcesWrapperMap = new HashMap<>();
-            if (req.getOfferingResourceMap().get("game.resources.grain") > 0) {
-                int amount = req.getOfferingResourceMap().get("game.resources.grain");
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), amount);
-                offeringInventory.increaseGrain(-amount);
-                respondingInventory.increaseGrain(amount);
-            }
-            if (req.getOfferingResourceMap().get("game.resources.ore") > 0) {
-                int amount = req.getOfferingResourceMap().get("game.resources.ore");
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), amount);
-                offeringInventory.increaseOre(-amount);
-                respondingInventory.increaseOre(amount);
-            }
-            if (req.getOfferingResourceMap().get("game.resources.lumber") > 0) {
-                int amount = req.getOfferingResourceMap().get("game.resources.lumber");
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), amount);
-                offeringInventory.increaseLumber(-amount);
-                respondingInventory.increaseLumber(amount);
-            }
-            if (req.getOfferingResourceMap().get("game.resources.wool") > 0) {
-                int amount = req.getOfferingResourceMap().get("game.resources.wool");
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), amount);
-                offeringInventory.increaseWool(-amount);
-                respondingInventory.increaseWool(amount);
-            }
-            if (req.getOfferingResourceMap().get("game.resources.brick") > 0) {
-                int amount = req.getOfferingResourceMap().get("game.resources.brick");
-                offeredResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), amount);
-                offeringInventory.increaseBrick(-amount);
-                respondingInventory.increaseBrick(amount);
+            Map<I18nWrapper, Integer> demandedResourcesWrapperMap = new HashMap<>();
+            for (Map<String, Object> resourceMap : req.getOfferedResources()) {
+                int amount = (int) resourceMap.get("amount");
+                if (amount <= 0) continue;
+                Resources resource = (Resources) resourceMap.get("enumType");
+                offeredResourcesWrapperMap.put((I18nWrapper) resourceMap.get("resource"), amount);
+                switch (resource) {
+                    case BRICK:
+                        offeringInventory.increaseBrick(-amount);
+                        respondingInventory.increaseBrick(amount);
+                        break;
+                    case GRAIN:
+                        offeringInventory.increaseGrain(-amount);
+                        respondingInventory.increaseGrain(amount);
+                        break;
+                    case LUMBER:
+                        offeringInventory.increaseLumber(-amount);
+                        respondingInventory.increaseLumber(amount);
+                        break;
+                    case ORE:
+                        offeringInventory.increaseOre(-amount);
+                        respondingInventory.increaseOre(amount);
+                        break;
+                    case WOOL:
+                        offeringInventory.increaseWool(-amount);
+                        respondingInventory.increaseWool(amount);
+                        break;
+                }
             }
             if (offeredResourcesWrapperMap.isEmpty())
                 offeredResourcesWrapperMap.put(new I18nWrapper("game.trade.offer.nothing"), 0);
 
-            //changes the inventories according to the wanted resources
-            if (req.getRespondingResourceMap().get("game.resources.grain") > 0) {
-                int amount = req.getRespondingResourceMap().get("game.resources.grain");
-                respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), amount);
-                offeringInventory.increaseGrain(amount);
-                respondingInventory.increaseGrain(-amount);
+            for (Map<String, Object> resourceMap : req.getDemandedResources()) {
+                int amount = (int) resourceMap.get("amount");
+                if (amount <= 0) continue;
+                Resources resource = (Resources) resourceMap.get("enumType");
+                demandedResourcesWrapperMap.put((I18nWrapper) resourceMap.get("resource"), amount);
+                switch (resource) {
+                    case BRICK:
+                        offeringInventory.increaseBrick(amount);
+                        respondingInventory.increaseBrick(-amount);
+                        break;
+                    case GRAIN:
+                        offeringInventory.increaseGrain(amount);
+                        respondingInventory.increaseGrain(-amount);
+                        break;
+                    case LUMBER:
+                        offeringInventory.increaseLumber(amount);
+                        respondingInventory.increaseLumber(-amount);
+                        break;
+                    case ORE:
+                        offeringInventory.increaseOre(amount);
+                        respondingInventory.increaseOre(-amount);
+                        break;
+                    case WOOL:
+                        offeringInventory.increaseWool(amount);
+                        respondingInventory.increaseWool(-amount);
+                        break;
+                }
             }
-            if (req.getRespondingResourceMap().get("game.resources.ore") > 0) {
-                int amount = req.getRespondingResourceMap().get("game.resources.ore");
-                respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), amount);
-                offeringInventory.increaseOre(amount);
-                respondingInventory.increaseOre(-amount);
-            }
-            if (req.getRespondingResourceMap().get("game.resources.lumber") > 0) {
-                int amount = req.getRespondingResourceMap().get("game.resources.lumber");
-                respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), amount);
-                offeringInventory.increaseLumber(amount);
-                respondingInventory.increaseLumber(-amount);
-            }
-            if (req.getRespondingResourceMap().get("game.resources.wool") > 0) {
-                int amount = req.getRespondingResourceMap().get("game.resources.wool");
-                respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), amount);
-                offeringInventory.increaseWool(amount);
-                respondingInventory.increaseWool(-amount);
-            }
-            if (req.getRespondingResourceMap().get("game.resources.brick") > 0) {
-                int amount = req.getRespondingResourceMap().get("game.resources.brick");
-                respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), amount);
-                offeringInventory.increaseBrick(amount);
-                respondingInventory.increaseBrick(-amount);
-            }
-            if (respondingResourcesWrapperMap.isEmpty())
-                respondingResourcesWrapperMap.put(new I18nWrapper("game.trade.offer.nothing"), 0);
+            if (demandedResourcesWrapperMap.isEmpty())
+                demandedResourcesWrapperMap.put(new I18nWrapper("game.trade.offer.nothing"), 0);
 
             ServerMessage returnSystemMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
                                                                                  req.getOfferingUser(),
                                                                                  req.getRespondingUser().getUsername(),
                                                                                  offeredResourcesWrapperMap,
-                                                                                 respondingResourcesWrapperMap);
+                                                                                 demandedResourcesWrapperMap);
             LOG.debug("Sending SystemMessageForTradeMessage for Lobby " + req.getOriginLobby());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
@@ -574,20 +629,10 @@ public class GameService extends AbstractService {
                 break;
         }
         inventory = game.getInventory(req.getUser());
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
-        resourceMap.put("game.resources.cards.victorypoints", inventory.getVictoryPointCards());
-        resourceMap.put("game.resources.cards.knight", inventory.getKnightCards());
-        resourceMap.put("game.resources.cards.roadbuilding", inventory.getRoadBuildingCards());
-        resourceMap.put("game.resources.cards.yearofplenty", inventory.getYearOfPlentyCards());
-        resourceMap.put("game.resources.cards.monopoly", inventory.getMonopolyCards());
-
-        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("game.resources.cards.unique.largestarmy", inventory.isLargestArmy());
-        armyAndRoadMap.put("game.resources.cards.unique.longestroad", inventory.isLongestRoad());
-
+        List<Map<String, Object>> developmentCardList = getDevelopmentCardListFromInventory(inventory);
+        List<Map<String, Object>> resourceList = getResourceListFromInventory(inventory);
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                    Collections.unmodifiableMap(resourceMap),
-                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+                                                                    developmentCardList, resourceList);
         LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
         post(new ForwardToUserInternalRequest(req.getUser(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
@@ -685,59 +730,59 @@ public class GameService extends AbstractService {
         if (harborTradingList.contains(IHarborHex.HarborResource.LUMBER))
             tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
         //check if user has enough resources
-        if (req.getGiveResource().equals("game.resources.ore") && (inventory.getOre() < tradingRatio
+        if (req.getGiveResource().equals(Resources.ORE) && (inventory.getOre() < tradingRatio
                 .get(IHarborHex.HarborResource.ORE))) return;
-        if (req.getGiveResource().equals("game.resources.brick") && (inventory.getBrick() < tradingRatio
+        if (req.getGiveResource().equals(Resources.BRICK) && (inventory.getBrick() < tradingRatio
                 .get(IHarborHex.HarborResource.BRICK))) return;
-        if (req.getGiveResource().equals("game.resources.grain") && (inventory.getGrain() < tradingRatio
+        if (req.getGiveResource().equals(Resources.GRAIN) && (inventory.getGrain() < tradingRatio
                 .get(IHarborHex.HarborResource.GRAIN))) return;
-        if (req.getGiveResource().equals("game.resources.lumber") && (inventory.getLumber() < tradingRatio
+        if (req.getGiveResource().equals(Resources.LUMBER) && (inventory.getLumber() < tradingRatio
                 .get(IHarborHex.HarborResource.LUMBER))) return;
-        if (req.getGiveResource().equals("game.resources.wool") && (inventory.getWool() < tradingRatio
+        if (req.getGiveResource().equals(Resources.WOOL) && (inventory.getWool() < tradingRatio
                 .get(IHarborHex.HarborResource.WOOL))) return;
         //user gets the resource he demands
-        if (req.getGetResource().equals("game.resources.ore")) {
+        if (req.getGetResource().equals(Resources.ORE)) {
             inventory.increaseOre(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.ore"), 1);
         }
-        if (req.getGetResource().equals("game.resources.brick")) {
+        if (req.getGetResource().equals(Resources.BRICK)) {
             inventory.increaseBrick(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.brick"), 1);
         }
-        if (req.getGetResource().equals("game.resources.grain")) {
+        if (req.getGetResource().equals(Resources.GRAIN)) {
             inventory.increaseGrain(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.grain"), 1);
         }
-        if (req.getGetResource().equals("game.resources.lumber")) {
+        if (req.getGetResource().equals(Resources.LUMBER)) {
             inventory.increaseLumber(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.lumber"), 1);
         }
-        if (req.getGetResource().equals("game.resources.wool")) {
+        if (req.getGetResource().equals(Resources.WOOL)) {
             inventory.increaseWool(1);
             respondingResourcesWrapperMap.put(new I18nWrapper("game.resources.wool"), 1);
         }
         //user gives the resource he offers according to the harbors
-        if (req.getGiveResource().equals("game.resources.ore")) {
+        if (req.getGiveResource().equals(Resources.ORE)) {
             inventory.setOre(inventory.getOre() - tradingRatio.get(IHarborHex.HarborResource.ORE));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.ore"), tradingRatio.get(IHarborHex.HarborResource.ORE));
         }
-        if (req.getGiveResource().equals("game.resources.brick")) {
+        if (req.getGiveResource().equals(Resources.BRICK)) {
             inventory.setBrick(inventory.getBrick() - tradingRatio.get(IHarborHex.HarborResource.BRICK));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.brick"), tradingRatio.get(IHarborHex.HarborResource.BRICK));
         }
-        if (req.getGiveResource().equals("game.resources.grain")) {
+        if (req.getGiveResource().equals(Resources.GRAIN)) {
             inventory.setGrain(inventory.getGrain() - tradingRatio.get(IHarborHex.HarborResource.GRAIN));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.grain"), tradingRatio.get(IHarborHex.HarborResource.GRAIN));
         }
-        if (req.getGiveResource().equals("game.resources.lumber")) {
+        if (req.getGiveResource().equals(Resources.LUMBER)) {
             inventory.setLumber(inventory.getLumber() - tradingRatio.get(IHarborHex.HarborResource.LUMBER));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.lumber"), tradingRatio.get(IHarborHex.HarborResource.LUMBER));
         }
-        if (req.getGiveResource().equals("game.resources.wool")) {
+        if (req.getGiveResource().equals(Resources.WOOL)) {
             inventory.setWool(inventory.getWool() - tradingRatio.get(IHarborHex.HarborResource.WOOL));
             offeredResourcesWrapperMap
                     .put(new I18nWrapper("game.resources.wool"), tradingRatio.get(IHarborHex.HarborResource.WOOL));
@@ -845,12 +890,12 @@ public class GameService extends AbstractService {
         game.setBuildingAllowed(false);
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(respondingInventory);
+        List<Map<String, Object>> resourceMap = getResourceListFromInventory(respondingInventory);
 
         LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
         ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), resourceMap,
-                                                                       req.getOfferingResourceMap(),
-                                                                       req.getRespondingResourceMap(),
+                                                                       req.getOfferedResources(),
+                                                                       req.getDemandedResources(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
     }
@@ -997,11 +1042,15 @@ public class GameService extends AbstractService {
 
         for (UserOrDummy user : game.getPlayers()) {
             if (!(user instanceof Dummy)) {
-                Map<String, Boolean> map = Map
-                        .of("game.resources.cards.unique.largestarmy", game.getInventory(user).isLargestArmy(),
-                            "game.resources.cards.unique.longestroad", game.getInventory(user).isLongestRoad());
-                ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), Collections
-                        .unmodifiableMap(getResourceMapFromInventory(game.getInventory(user))), map);
+                Inventory inventory = game.getInventory(user);
+                List<Map<String, Object>> developmentCardList = Collections
+                        .unmodifiableList(getDevelopmentCardListFromInventory(inventory));
+                List<Map<String, Object>> resourceList = Collections
+                        .unmodifiableList(getResourceListFromInventory(inventory));
+                ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(),
+                                                                              developmentCardList, resourceList);
+                LOG.debug("Sending ForwardToUserInternalRequest with UpdateInventoryResponse to User {} in Lobby {}",
+                          user, req.getOriginLobby());
                 post(new ForwardToUserInternalRequest(user, responseMessage));
             }
         }
@@ -1400,7 +1449,7 @@ public class GameService extends AbstractService {
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
+        List<Map<String, Object>> resourceList = getResourceListFromInventory(inventory);
 
         IGameMapManagement gameMap = game.getMap();
         Map<Player, List<MapPoint>> settlementsAndCities = gameMap.getPlayerSettlementsAndCities();
@@ -1415,7 +1464,7 @@ public class GameService extends AbstractService {
         }
 
         ResponseMessage returnMessage = new InventoryForTradeResponse(req.getUser(), req.getName(),
-                                                                      Collections.unmodifiableMap(resourceMap),
+                                                                      Collections.unmodifiableList(resourceList),
                                                                       harborTradingList);
         returnMessage.initWithMessage(req);
         LOG.debug("Sending InventoryForTradeResponse for Lobby " + req.getName());
@@ -1487,9 +1536,11 @@ public class GameService extends AbstractService {
         Inventory traderInventory = game.getInventory(req.getRespondingUser());
         if (inventory == null || traderInventory == null) return;
         int traderInventorySize = traderInventory.getResourceAmount();
-        Map<String, Integer> offeringResourceMap = getResourceMapFromInventory(inventory);
-        ResponseMessage returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), Collections
-                .unmodifiableMap(offeringResourceMap), traderInventorySize, req.getRespondingUser());
+        List<Map<String, Object>> offeringInventory = getResourceListFromInventory(inventory);
+        ResponseMessage returnMessage;
+        returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
+                                                              Collections.unmodifiableList(offeringInventory),
+                                                              traderInventorySize, req.getRespondingUser());
         LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);
@@ -1572,20 +1623,10 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
-        Map<String, Integer> resourceMap = getResourceMapFromInventory(inventory);
-        resourceMap.put("game.resources.cards.victorypoints", inventory.getVictoryPointCards());
-        resourceMap.put("game.resources.cards.knight", inventory.getKnightCards());
-        resourceMap.put("game.resources.cards.roadbuilding", inventory.getRoadBuildingCards());
-        resourceMap.put("game.resources.cards.yearofplenty", inventory.getYearOfPlentyCards());
-        resourceMap.put("game.resources.cards.monopoly", inventory.getMonopolyCards());
-
-        Map<String, Boolean> armyAndRoadMap = new HashMap<>();
-        armyAndRoadMap.put("game.resources.cards.unique.largestarmy", inventory.isLargestArmy());
-        armyAndRoadMap.put("game.resources.cards.unique.longestroad", inventory.isLongestRoad());
-
+        List<Map<String, Object>> developmentCardList = getDevelopmentCardListFromInventory(inventory);
+        List<Map<String, Object>> resourceList = getResourceListFromInventory(inventory);
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
-                                                                    Collections.unmodifiableMap(resourceMap),
-                                                                    Collections.unmodifiableMap(armyAndRoadMap));
+                                                                    developmentCardList, resourceList);
         returnMessage.initWithMessage(req);
         LOG.debug("Sending UpdateInventoryResponse for Lobby " + req.getOriginLobby());
         post(returnMessage);
