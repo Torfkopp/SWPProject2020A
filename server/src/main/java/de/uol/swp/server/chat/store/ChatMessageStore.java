@@ -12,7 +12,6 @@ import java.util.Optional;
  * enabling an easy exchange.
  *
  * @author Temmo Junkhoff
- * @see de.uol.swp.server.chat.store.AbstractChatMessageStore
  * @see de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage

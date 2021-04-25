@@ -9,7 +9,7 @@ import de.uol.swp.common.user.User;
  *
  * @author Maximilian Lindner
  * @author Marvin Drees
- * @see de.uol.swp.common.message.AbstractRequestMessagest
+ * @see de.uol.swp.common.message.AbstractRequestMessage
  * @since 2020-04-09
  */
 public class GetOldSessionsRequest extends AbstractRequestMessage {

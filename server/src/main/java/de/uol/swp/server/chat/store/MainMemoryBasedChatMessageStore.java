@@ -19,10 +19,9 @@ import java.util.stream.Collectors;
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
  * @see de.uol.swp.server.chat.store.ChatMessageStore
- * @see de.uol.swp.server.chat.store.AbstractChatMessageStore
  * @since 2020-12-16
  */
-public class MainMemoryBasedChatMessageStore extends AbstractChatMessageStore {
+public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
 
     private static final int MAX_HISTORY = 10000;
     private static final int MAX_LOBBY_HISTORY = 1000;

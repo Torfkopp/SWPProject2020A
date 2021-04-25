@@ -12,7 +12,6 @@ import java.util.Optional;
  *
  * @author Temmo Junkhoff
  * @author Phillip -André Suhr
- * @see de.uol.swp.server.chat.AbstractChatManagement
  * @see de.uol.swp.server.chat.ChatManagement
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage
