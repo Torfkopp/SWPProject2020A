@@ -1,11 +1,8 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.IImmutableResourceListMap;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Request sent to the server when the responding user wants to accept the trade offer.
@@ -19,8 +16,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
 
     private final UserOrDummy respondingUser;
     private final UserOrDummy offeringUser;
-    private final List<Map<String, Object>> demandedResources;
-    private final List<Map<String, Object>> offeredResources;
+    private final IImmutableResourceListMap demandedResources;
+    private final IImmutableResourceListMap offeredResources;
 
     /**
      * Constructor
@@ -31,9 +28,9 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @param demandedResources The demanded resources
      * @param offeredResources  The offered resources
      */
-    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, String lobbyName,
-                                  List<Map<String, Object>> demandedResources,
-                                  List<Map<String, Object>> offeredResources) {
+    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, LobbyName lobbyName,
+                                  IImmutableResourceListMap demandedResources,
+                                  IImmutableResourceListMap offeredResources) {
         super(lobbyName);
         this.respondingUser = respondingUser;
         this.offeringUser = offeringUser;
@@ -46,7 +43,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the demanded resources
      */
-    public List<Map<String, Object>> getDemandedResources() {
+    public IImmutableResourceListMap getDemandedResources() {
         return demandedResources;
     }
 
@@ -55,7 +52,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the offered resources
      */
-    public List<Map<String, Object>> getOfferedResources() {
+    public IImmutableResourceListMap getOfferedResources() {
         return offeredResources;
     }
 

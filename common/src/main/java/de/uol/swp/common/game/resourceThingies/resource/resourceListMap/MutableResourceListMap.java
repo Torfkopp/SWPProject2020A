@@ -36,7 +36,7 @@ public class MutableResourceListMap implements IMutableResourceListMap {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    private MutableResourceListMap(List<IImmutableResource> list) {
+    private MutableResourceListMap(List<IMutableResource> list) {
         this.list = new LinkedList<>();
         for (IImmutableResource resource : list)
             this.list.add(new MutableResource(resource.getType(), resource.getAmount()));
