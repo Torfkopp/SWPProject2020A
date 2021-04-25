@@ -560,8 +560,6 @@ public class LobbyService extends AbstractService {
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
         ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
         post(msg);
-        long startTime = System.currentTimeMillis();
-
     }
 
     /**
