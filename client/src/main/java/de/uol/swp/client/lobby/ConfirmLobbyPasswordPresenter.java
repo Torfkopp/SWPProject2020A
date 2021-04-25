@@ -61,6 +61,11 @@ public class ConfirmLobbyPasswordPresenter extends AbstractPresenter {
         eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(lobbyName, user, passwordField.getText()));
     }
 
+
+    @FXML
+    private void onCancelButtonPressed() {
+    }
+
     /**
      * Handles a ConfirmLobbyPasswordEvent
      * <p>
@@ -73,7 +78,6 @@ public class ConfirmLobbyPasswordPresenter extends AbstractPresenter {
      *
      * @see de.uol.swp.client.lobby.event.ConfirmLobbyPasswordEvent
      */
-
     @Subscribe
     private void onConfirmLobbyPasswordEvent(ConfirmLobbyPasswordEvent event) {
         LOG.debug("Received ConfirmLobbyPasswordEvent for Lobby " + event.getLobbyName());

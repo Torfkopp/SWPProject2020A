@@ -286,10 +286,16 @@ public class LobbyService extends AbstractService {
                 sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
                 post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
             } else {
-                System.out.println("Falsches PW");
+                ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Wrong Password!");
+                exceptionMessage.initWithMessage(req);
+                post(exceptionMessage);
+                LOG.debug(exceptionMessage.getException());
             }
         } else {
-            System.out.println("Nein");
+            ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Lobby not found!");
+            exceptionMessage.initWithMessage(req);
+            post(exceptionMessage);
+            LOG.debug(exceptionMessage.getException());
         }
     }
 
