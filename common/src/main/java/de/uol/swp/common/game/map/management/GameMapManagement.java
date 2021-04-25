@@ -18,7 +18,7 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  * Management of the gameMap
  *
  * @author Marvin Drees
- * @since 2021 -01-16
+ * @since 2021-01-16
  */
 @SuppressWarnings("UnstableApiUsage")
 public class GameMapManagement implements IGameMapManagement {
@@ -611,7 +611,7 @@ public class GameMapManagement implements IGameMapManagement {
      * Helper method to create the playerSettlementsAndCities Map according to
      * the amount of players.
      *
-     * @param playerCount amount of players in the according game
+     * @param playerCount Amount of players in the according game
      *
      * @author Steven Luong
      * @author Maximilian Lindner

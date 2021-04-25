@@ -17,7 +17,6 @@ public interface IGameMap extends Serializable {
      *
      * @return A jagged Array of hexes
      *
-     * @author Temmo Junkhoff
      */
     IGameHex[][] getHexes();
 
@@ -25,8 +24,6 @@ public interface IGameMap extends Serializable {
      * Gets the jagged array of intersections with their surrounding edges
      *
      * @return A jagged array of intersections with their surrounding edges
-     *
-     * @author Temmo Junkhoff
      */
     IntersectionWithEdges[][] getIntersections();
 }

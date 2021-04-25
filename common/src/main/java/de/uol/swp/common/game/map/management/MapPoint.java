@@ -139,7 +139,7 @@ public class MapPoint implements Serializable {
      *
      * @return Type of the MapPoint
      *
-     * @see MapPoint.Type
+     * @see de.uol.swp.common.game.map.management.MapPoint.Type
      */
     public Type getType() {
         //@formatter:off

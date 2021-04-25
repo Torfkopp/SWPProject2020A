@@ -14,7 +14,7 @@ public interface IEdgeWithBuildable extends IEdge {
     /**
      * Returns if the given user can build on this edge.
      *
-     * @param user the user
+     * @param user The user
      *
      * @return If the user can build on this edge.
      *

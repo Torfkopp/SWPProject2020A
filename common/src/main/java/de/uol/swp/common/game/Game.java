@@ -269,6 +269,10 @@ public class Game {
         return players.getPlayerFromUserOrDummy(user);
     }
 
+    /**
+     * Gets a mapping of Players to Users
+     * @return The player user mapping
+     */
     public Map<Player, UserOrDummy> getPlayerUserMapping() {
         Map<Player, UserOrDummy> temp = new HashMap<>();
         for (Player player : Player.values()){

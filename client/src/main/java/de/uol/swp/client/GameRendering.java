@@ -57,7 +57,7 @@ public class GameRendering {
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final double TOKEN_SIZE = 16;
-    private static final Color BUILDABLE_COLOR = Color.rgb(150, 150, 150, 0.6);
+    private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
 
     @Inject
     private static ResourceBundle resourceBundle;

@@ -14,7 +14,7 @@ public interface IIntersectionWithBuildable extends IIntersection {
     /**
      * Returns if the given user can build on this intersection.
      *
-     * @param user the user
+     * @param user The user
      *
      * @return If the user can build on this intersection.
      *

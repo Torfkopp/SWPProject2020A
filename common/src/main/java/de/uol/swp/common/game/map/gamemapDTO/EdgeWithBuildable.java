@@ -19,9 +19,9 @@ public class EdgeWithBuildable extends Edge implements IEdgeWithBuildable {
     /**
      * Instantiates a new Edge.
      *
-     * @param orientation the orientation
-     * @param owner       the owner
-     * @param buildable   the List of users that can build on this edge
+     * @param orientation The orientation
+     * @param owner       The owner
+     * @param buildable   The List of users that can build on this edge
      *
      * @author Temmo Junkhoff
      * @since 2021-04-25

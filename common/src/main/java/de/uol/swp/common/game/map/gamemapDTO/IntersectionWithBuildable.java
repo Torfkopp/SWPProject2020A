@@ -19,9 +19,9 @@ public class IntersectionWithBuildable extends Intersection implements IIntersec
     /**
      * Instantiates a new Intersection.
      *
-     * @param owner     the owner
-     * @param state     the state
-     * @param buildable the List of users that can build on this intersection
+     * @param owner     The owner
+     * @param state     The state
+     * @param buildable The List of users that can build on this intersection
      *
      * @author Temmo Junkhoff
      * @since 2021-04-25
