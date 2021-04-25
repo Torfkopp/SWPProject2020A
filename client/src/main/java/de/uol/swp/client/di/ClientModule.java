@@ -50,6 +50,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
+        defaultProps.setProperty("join_leave_msgs_on", "false");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -94,6 +95,9 @@ public class ClientModule extends AbstractModule {
         //Setting the drawHitboxGrid value
         final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
 
+        //Setting the join_leave_msgs_on value
+        final boolean joinLeaveMsgsOn = Boolean.parseBoolean(properties.getProperty("join_leave_msgs_on"));
+
         //DI stuff
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class)
                                           .build(SceneManagerFactory.class));
@@ -104,6 +108,7 @@ public class ClientModule extends AbstractModule {
         bind(Properties.class).toInstance(properties);
         bind(ResourceBundle.class).toInstance(resourceBundle);
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
+        bindConstant().annotatedWith(Names.named("joinLeaveMsgsOn")).to(joinLeaveMsgsOn);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
