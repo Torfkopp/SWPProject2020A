@@ -707,9 +707,6 @@ public class GameRendering {
                     drawSettlement(Optional.empty(), currentX, currentY);
                 //Free intersections don't need to be marked, but it could easily be added here
                 break;
-            case BLOCKED:
-                //Blocked intersections don't need to be marked, but it could easily be added here
-                break;
             case SETTLEMENT:
                 drawSettlement(Optional.of(intersection.getOwner()), currentX, currentY);
                 if (intersection.isBuildableBy(userService.getLoggedInUser()))

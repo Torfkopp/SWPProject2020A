@@ -17,7 +17,6 @@ public interface IIntersection extends Serializable {
      */
     enum IntersectionState {
         FREE,
-        BLOCKED,
         SETTLEMENT,
         CITY
     }

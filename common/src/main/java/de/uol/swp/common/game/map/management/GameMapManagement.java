@@ -18,8 +18,7 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  * Management of the gameMap
  *
  * @author Marvin Drees
- * @author Temmo Junkhoff
- * @since 2021-01-16
+ * @since 2021 -01-16
  */
 @SuppressWarnings("UnstableApiUsage")
 public class GameMapManagement implements IGameMapManagement {
@@ -703,12 +702,27 @@ public class GameMapManagement implements IGameMapManagement {
                                                 getWhoCanBuildAt(d, playerUserMapping)));
                 }
                 returnMap[y][x] = new IntersectionWithEdges(new IntersectionWithBuildable(a.getOwner(), a.getState(),
-                                                                                          getWhoCanBuildAt(IntersectionMapPoint(y, x),
-                                                                                                           playerUserMapping)), c);
+                                                                                          getWhoCanBuildAt(
+                                                                                                  IntersectionMapPoint(
+                                                                                                          y, x),
+                                                                                                  playerUserMapping)),
+                                                            c);
             }
-        } return returnMap;
+        }
+        return returnMap;
     }
 
+    /**
+     * Returns a list of users that can build on a given edge
+     *
+     * @param edge              The edge
+     * @param playerUserMapping A mapping of players to users
+     *
+     * @return A list of users that can build on the given edge.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-25
+     */
     private List<UserOrDummy> getWhoCanBuildAt(IEdge edge, Map<Player, UserOrDummy> playerUserMapping) {
         var temp = new LinkedList<UserOrDummy>();
         for (Player player : Player.values()) {
@@ -717,6 +731,17 @@ public class GameMapManagement implements IGameMapManagement {
         return temp;
     }
 
+    /**
+     * Returns a list of user that can build on a intersection given by a MapPoint
+     *
+     * @param mapPoint          The MapPoint
+     * @param playerUserMapping A mapping of players to users
+     *
+     * @return A list of users that can build on the given intersection
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-25
+     */
     private List<UserOrDummy> getWhoCanBuildAt(MapPoint mapPoint, Map<Player, UserOrDummy> playerUserMapping) {
         var temp = new LinkedList<UserOrDummy>();
         for (Player player : Player.values()) {

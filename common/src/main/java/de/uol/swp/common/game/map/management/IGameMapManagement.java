@@ -89,7 +89,7 @@ public interface IGameMapManagement {
     Set<IEdge> getEdgesFromHex(MapPoint mapPoint);
 
     /**
-     * Gets a GameMapDTO which represents  the current state of the game map
+     * Gets a GameMapDTO which represents the current state of the game map
      *
      * @return A GameMapDTO
      *
