@@ -1,5 +1,8 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.SystemMessage;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -21,6 +24,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
     private final List<UserOrDummy> users = new ArrayList<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private final UserOrDummy owner;
+    private final SystemMessage ownerNotice;
 
     /**
      * Constructor
@@ -52,6 +56,13 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
             if (user instanceof User) this.readyUsers.add(UserDTO.createWithoutPassword((User) user));
             else this.readyUsers.add(user);
         }
+        boolean areEqualSize = this.readyUsers.size() == this.users.size();
+        boolean ownerReady = this.readyUsers.contains(this.owner);
+        if (ownerReady && areEqualSize && this.users.size() >= 3) {
+            this.ownerNotice = new SystemMessageDTO(new I18nWrapper("lobby.ready.everyone"));
+        } else if (this.users.size() >= 3 && this.readyUsers.size() == this.users.size() - 1 && !ownerReady) {
+            this.ownerNotice = new SystemMessageDTO((new I18nWrapper("lobby.ready.everyoneelse")));
+        } else this.ownerNotice = null;
     }
 
     /**
@@ -63,6 +74,23 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      */
     public UserOrDummy getOwner() {
         return owner;
+    }
+
+    /**
+     * Gets the owner notice message
+     * <p>
+     * The owner notice message is a SystemMessage notifying the owner
+     * that either all or all users except the owner are ready and that
+     * the owner should use the Start Session button to start the game.
+     *
+     * @return null if not enough users are ready, SystemMessage if all or
+     * all users except the owner are marked as ready
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-26
+     */
+    public SystemMessage getOwnerNotice() {
+        return ownerNotice;
     }
 
     /**

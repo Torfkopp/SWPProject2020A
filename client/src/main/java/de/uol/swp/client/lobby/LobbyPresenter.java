@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -106,6 +107,12 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 setChangeOwnerButtonState();
             }
             setPreGameSettings();
+        });
+        SystemMessage ownerNotice = rsp.getOwnerNotice();
+        boolean isOwner = userService.getLoggedInUser().equals(owner);
+        cleanChatHistoryOfOldOwnerNotices();
+        Platform.runLater(() -> {
+            if (ownerNotice != null && isOwner && !inGame) chatMessages.add(ownerNotice);
         });
     }
 
