@@ -84,7 +84,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
         if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received AskLatestChatMessageResponse for Lobby " + rsp.getLobbyName());
+            LOG.debug("Received AskLatestChatMessageResponse for Lobby {}", rsp.getLobbyName());
             updateChatMessageList(rsp.getChatHistory());
         } else if (rsp.getLobbyName() == null && this.lobbyName == null) {
             LOG.debug("Received AskLatestChatMessageResponse");
@@ -110,7 +110,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received CreatedChatMessageMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("Received CreatedChatMessageMessage for Lobby {}", msg.getLobbyName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received CreatedChatMessageMessage");
@@ -162,7 +162,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received DeletedChatMessageMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("Received DeletedChatMessageMessage for Lobby {}", msg.getLobbyName());
             dropChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received DeletedChatMessageMessage");
@@ -221,7 +221,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received EditedChatMessageMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("Received EditedChatMessageMessage for Lobby {}", msg.getLobbyName());
             editChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received EditedChatMessageMessage");
@@ -268,7 +268,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());
+            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }
@@ -291,7 +291,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForRobbingMessage(SystemMessageForRobbingMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForRobbingMessage for Lobby " + msg.getName());
+            LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
             if (msg.getVictim() == null) {
                 if (msg.getUser().equals(userService.getLoggedInUser())) {
                     Platform.runLater(() -> {
@@ -329,7 +329,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getName());
+            LOG.debug("Received SystemMessageForTradeResponse for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }
@@ -352,7 +352,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
         if (msg.getName().equals(this.lobbyName) && !userService.getLoggedInUser().equals(msg.getUser())) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getName());
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }
@@ -375,7 +375,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
         if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + rsp.getLobbyName());
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby {}", rsp.getLobbyName());
             Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         }
     }
@@ -396,7 +396,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
         if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
+            LOG.debug("Received SystemMessageResponse for Lobby {}", rsp.getLobbyName());
             Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received SystemMessageResponse");

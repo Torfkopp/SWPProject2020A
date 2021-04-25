@@ -212,7 +212,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
-        LOG.debug("Received a CheckUserInLobbyResponse");
+        LOG.debug("Received CheckUserInLobbyResponse");
         if (rsp.getIsInLobby()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.in.lobby"));
         } else {
@@ -597,7 +597,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedInMessage");
-        LOG.debug("---- New user " + msg.getUsername() + " logged in");
+        LOG.debug("---- New user {} logged in", msg.getUsername());
         Platform.runLater(() -> {
             if (users != null && !userService.getLoggedInUser().getUsername().equals(msg.getUsername()))
                 users.add(msg.getUsername());
@@ -621,7 +621,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedOutMessage");
-        LOG.debug("---- User " + msg.getUsername() + " logged out");
+        LOG.debug("---- User {} logged out", msg.getUsername());
         Platform.runLater(() -> users.remove(msg.getUsername()));
     }
 

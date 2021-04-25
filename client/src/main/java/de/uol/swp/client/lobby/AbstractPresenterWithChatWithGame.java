@@ -383,7 +383,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onDiceCastMessage(DiceCastMessage msg) {
         if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
-        LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
+        LOG.debug("---- The dices show: {} and {}", msg.getDice1(), msg.getDice2());
         playedCard = false;
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
@@ -450,7 +450,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
         if (!msg.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Received NextPlayerMessage for Lobby " + msg.getLobbyName());
+        LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
@@ -707,7 +707,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberPositionMessage(RobberPositionMessage msg) {
-        LOG.debug("Received RobberPositionMessage for Lobby " + msg.getLobbyName());
+        LOG.debug("Received RobberPositionMessage for Lobby {}", msg.getLobbyName());
         if (lobbyName.equals(msg.getLobbyName())) {
             resetButtonStates(msg.getUser());
             gameService.updateGameMap(msg.getLobbyName());
@@ -887,7 +887,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Received UpdateInventoryResponse for Lobby " + lobbyName);
+        LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             resourceTableView.getItems().setAll(rsp.getResourceList());
             resourceTableView.sort();

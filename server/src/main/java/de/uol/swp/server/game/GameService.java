@@ -70,9 +70,9 @@ public class GameService extends AbstractService {
     @Inject
     public GameService(EventBus bus, IGameManagement gameManagement, LobbyService lobbyService) {
         super(bus);
-        LOG.debug("GameService started");
         this.gameManagement = gameManagement;
         this.lobbyService = lobbyService;
+        LOG.debug("GameService started");
     }
 
     /**
@@ -246,7 +246,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received AcceptUserTradeRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received AcceptUserTradeRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getOfferingUser()) || !game.isDiceRolledAlready()) return;
         game.setBuildingAllowed(false);
@@ -328,22 +328,22 @@ public class GameService extends AbstractService {
                                                                                  req.getRespondingUser().getUsername(),
                                                                                  offeredResourcesWrapperMap,
                                                                                  demandedResourcesWrapperMap);
-            LOG.debug("Sending SystemMessageForTradeMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("Sending SystemMessageForTradeMessage for Lobby {}", req.getOriginLobby());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
-            LOG.debug("Preparing a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
+            LOG.debug("Preparing a TradeOfUsersAcceptedResponse for Lobby {}", req.getOriginLobby());
             post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
             returnMessage.initWithMessage(req);
-            LOG.debug("Sending a TradeOfUsersAcceptedResponse for Lobby " + req.getOriginLobby());
+            LOG.debug("Sending TradeOfUsersAcceptedResponse for Lobby {}", req.getOriginLobby());
             post(returnMessage);
             ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getOfferingUser(),
                                                              game.getCardAmounts());
-            LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+            LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         } else {
             ResponseMessage returnMessage = new InvalidTradeOfUsersResponse(req.getOriginLobby(),
                                                                             req.getRespondingUser());
-            LOG.debug("Sending an InvalidTradeOfUsersResponse for Lobby " + req.getOriginLobby());
+            LOG.debug("Sending InvalidTradeOfUsersResponse for Lobby {}", req.getOriginLobby());
             returnMessage.initWithMessage(req);
             post(returnMessage);
         }
@@ -363,7 +363,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onBuildRequest(BuildRequest req) {
-        LOG.debug("Received BuildRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received BuildRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         Consumer<BuildingFailedResponse.Reason> sendFailResponse = reason -> {
@@ -479,7 +479,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received BuyDevelopmentCardRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         List<String> bankInventory = game.getBankInventory();
@@ -492,15 +492,15 @@ public class GameService extends AbstractService {
                 ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(), req.getOriginLobby(),
                                                                                developmentCard);
                 returnMessage.initWithMessage(req);
-                LOG.debug("Sending a BuyDevelopmentCardResponse for Lobby " + req.getOriginLobby());
+                LOG.debug("Sending BuyDevelopmentCardResponse for Lobby {}", req.getOriginLobby());
                 post(returnMessage);
                 ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(),
                                                                  game.getCardAmounts());
-                LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+                LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
                 endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
-            } else LOG.debug("In the lobby " + req.getOriginLobby() + " the User " + req.getUser()
-                                                                                        .getUsername() + "couldn't buy a development Card");
+            } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
+                             req.getUser().getUsername());
         }
     }
 
@@ -519,7 +519,7 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onCreateGameInternalRequest(CreateGameInternalRequest msg) {
         String lobbyName = msg.getLobby().getName();
-        if (LOG.isDebugEnabled()) LOG.debug("Received CreateGameInternalRequest for Lobby " + lobbyName);
+        LOG.debug("Received CreateGameInternalRequest for Lobby {}", lobbyName);
         try {
             IGameMapManagement gameMap = new GameMapManagement();
             IConfiguration configuration;
@@ -536,7 +536,7 @@ public class GameService extends AbstractService {
             gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
-            LOG.debug("Sending StartSessionMessage for Lobby " + lobbyName);
+            LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
             StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
                                                                   msg.getLobby().startUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
@@ -635,7 +635,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending ForwardToUserInternalRequest containing UpdateInventoryResponse");
         post(new ForwardToUserInternalRequest(req.getUser(), returnMessage));
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
@@ -655,16 +655,14 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onEndTurnRequest(EndTurnRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received EndTurnRequest for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to end his turn.");
-        }
+        LOG.debug("Received EndTurnRequest for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to end their turn.", req.getUser().getUsername());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         UserOrDummy nextPlayer = game.nextPlayer();
         game.setBuildingAllowed(false);
         ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
-        LOG.debug("Sending NextPlayerMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         game.setDiceRolledAlready(false);
         if (nextPlayer instanceof Dummy) {
@@ -690,7 +688,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onExecuteTradeWithBankRequest(ExecuteTradeWithBankRequest req) {
-        LOG.debug("Received ExecuteTradeWithBankRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received ExecuteTradeWithBankRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         Inventory inventory = game.getInventory(req.getUser());
@@ -790,14 +788,14 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
         returnMessage.initWithMessage(req);
         post(returnMessage);
-        LOG.debug("Received a SystemMessageForTradeMessage");
+        LOG.debug("Received SystemMessageForTradeMessage");
         ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser(), "Bank",
                                                                        offeredResourcesWrapperMap,
                                                                        respondingResourcesWrapperMap);
-        LOG.debug("Sending a TradeWithBankAcceptedResponse to lobby" + req.getOriginLobby());
+        LOG.debug("Sending TradeWithBankAcceptedResponse to Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
@@ -819,7 +817,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onKickUserRequest(KickUserRequest req) {
-        LOG.debug("Received KickUserRequest for Lobby " + req.getName());
+        LOG.debug("Received KickUserRequest for Lobby {}", req.getName());
         if (gameManagement.getGames().containsKey(req.getName())) {
             ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Can not kick while a game is ongoing");
             exceptionMessage.initWithMessage(req);
@@ -879,7 +877,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received OfferingTradeWithUserRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!(req.getRespondingUser() instanceof User && game.getActivePlayer().equals(req.getOfferingUser()) && game
                 .isDiceRolledAlready())) {
@@ -891,7 +889,7 @@ public class GameService extends AbstractService {
         if (respondingInventory == null) return;
         List<Map<String, Object>> resourceMap = getResourceListFromInventory(respondingInventory);
 
-        LOG.debug("Sending a TradeWithUserOfferMessage to lobby" + req.getOriginLobby());
+        LOG.debug("Sending TradeWithUserOfferMessage to Lobby {}", req.getOriginLobby());
         ResponseMessage offerResponse = new TradeWithUserOfferResponse(req.getOfferingUser(), resourceMap,
                                                                        req.getOfferedResources(),
                                                                        req.getDemandedResources(),
@@ -913,10 +911,8 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onPlayKnightCardRequest(PlayKnightCardRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received KnightCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + " wants to improve the army");
-        }
+        LOG.debug("Received KnightCardPlayedMessage for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to improve their army", req.getUser().getUsername());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
@@ -927,7 +923,7 @@ public class GameService extends AbstractService {
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
             post(returnMessage);
-            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("Sending PlayCardFailureResponse");
             LOG.debug("---- Not enough Knight cards");
             return;
         }
@@ -939,15 +935,15 @@ public class GameService extends AbstractService {
         I18nWrapper knightCard = new I18nWrapper("game.resources.cards.knight");
         ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
                                                                                     knightCard);
-        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
         ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
-        LOG.debug("Sending a PlayCardSuccessResponse");
+        LOG.debug("Sending PlayCardSuccessResponse");
         post(returnMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
@@ -966,10 +962,8 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onPlayMonopolyCardRequest(PlayMonopolyCardRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received MonopolyCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + " wants to monopolise " + req.getResource());
-        }
+        LOG.debug("Received MonopolyCardPlayedMessage for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to monopolise {}", req.getUser().getUsername(), req.getResource().name());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
@@ -980,7 +974,7 @@ public class GameService extends AbstractService {
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
             post(returnMessage);
-            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("Sending PlayCardFailureResponse");
             LOG.debug("---- Not enough Monopoly cards");
             return;
         }
@@ -1029,14 +1023,14 @@ public class GameService extends AbstractService {
         I18nWrapper monopolyCard = new I18nWrapper("game.resources.cards.monopoly");
         ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
                                                                                     monopolyCard);
-        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
         ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
-        LOG.debug("Sending a PlayCardSuccessResponse");
+        LOG.debug("Sending PlayCardSuccessResponse");
         post(returnMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
 
         for (UserOrDummy user : game.getPlayers()) {
@@ -1069,10 +1063,8 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onPlayRoadBuildingCardRequest(PlayRoadBuildingCardRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + " wants to build a road");
-        }
+        LOG.debug("Received RoadBuildingCardPlayedMessage for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to build a road", req.getUser().getUsername());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
@@ -1084,7 +1076,7 @@ public class GameService extends AbstractService {
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
             post(returnMessage);
-            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("Sending PlayCardFailureResponse");
             LOG.debug("---- Not enough RoadBuildingCardPhase cards");
             return;
         }
@@ -1097,15 +1089,15 @@ public class GameService extends AbstractService {
         I18nWrapper roadBuildingCard = new I18nWrapper("game.resources.cards.roadbuilding");
         ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
                                                                                     roadBuildingCard);
-        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
         ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
-        LOG.debug("Sending a PlayCardSuccessResponse");
+        LOG.debug("Sending PlayCardSuccessResponse");
         post(returnMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
@@ -1124,11 +1116,9 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onPlayYearOfPlentyCardRequest(PlayYearOfPlentyCardRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + req.getUser().getUsername() + " wants " + req.getResource1() + " and " + req
-                    .getResource2());
-        }
+        LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants {} and {}", req.getUser().getUsername(), req.getResource1().name(),
+                  req.getResource2().name());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
@@ -1139,7 +1129,7 @@ public class GameService extends AbstractService {
                                                                         PlayCardFailureResponse.Reasons.NO_CARDS);
             returnMessage.initWithMessage(req);
             post(returnMessage);
-            LOG.debug("Sending a PlayCardFailureResponse");
+            LOG.debug("Sending PlayCardFailureResponse");
             LOG.debug("---- Not enough YearOfPlenty cards");
             return;
         }
@@ -1184,15 +1174,15 @@ public class GameService extends AbstractService {
         I18nWrapper yearOfPlentyCard = new I18nWrapper("game.resources.cards.yearofplenty");
         ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
                                                                                     yearOfPlentyCard);
-        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
         ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
         returnMessage.initWithMessage(req);
-        LOG.debug("Sending a PlayCardSuccessResponse");
+        LOG.debug("Sending PlayCardSuccessResponse");
         post(returnMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
@@ -1215,14 +1205,14 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received ResetOfferTradeButtonRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received ResetOfferTradeButtonRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getOfferingUser()) || !game.isDiceRolledAlready()) return;
         game.setBuildingAllowed(true);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         if (offeringInventory == null) return;
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
-        LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby {}", req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
     }
 
@@ -1240,7 +1230,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onRobberChosenVictimRequest(RobberChosenVictimRequest msg) {
-        LOG.debug("Received RobberChosenVictimRequest for Lobby " + msg.getLobby());
+        LOG.debug("Received RobberChosenVictimRequest for Lobby {}", msg.getLobby());
         robRandomResource(msg.getLobby(), msg.getPlayer(), msg.getVictim());
     }
 
@@ -1258,17 +1248,17 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onRobberNewPositionChosenRequest(RobberNewPositionChosenRequest msg) {
-        LOG.debug("Received RobberNewPositionChosenRequest for Lobby " + msg.getLobby());
+        LOG.debug("Received RobberNewPositionChosenRequest for Lobby {}", msg.getLobby());
         IGameMapManagement map = gameManagement.getGame(msg.getLobby()).getMap();
         map.moveRobber(msg.getPosition());
-        LOG.debug("Sending RobberPositionMessage for Lobby " + msg.getLobby());
+        LOG.debug("Sending RobberPositionMessage for Lobby {}", msg.getLobby());
         AbstractGameMessage rpm = new RobberPositionMessage(msg.getLobby(), msg.getPlayer(), msg.getPosition());
         lobbyService.sendToAllInLobby(msg.getLobby(), rpm);
         Set<Player> players = map.getPlayersAroundHex(msg.getPosition());
         Set<UserOrDummy> victims = new HashSet<>();
         for (Player p : players) victims.add(gameManagement.getGame(msg.getLobby()).getUserFromPlayer(p));
         if (players.size() > 1) {
-            LOG.debug("Sending RobberChooseVictimResponse for Lobby " + msg.getLobby());
+            LOG.debug("Sending RobberChooseVictimResponse for Lobby {}", msg.getLobby());
             ResponseMessage rcvm = new RobberChooseVictimResponse(msg.getPlayer(), victims);
             rcvm.initWithMessage(msg);
             post(rcvm);
@@ -1291,7 +1281,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onRobberTaxChosenRequest(RobberTaxChosenRequest req) {
-        LOG.debug("Received RobberTaxChosenRequest for Lobby " + req.getLobby());
+        LOG.debug("Received RobberTaxChosenRequest for Lobby {}", req.getLobby());
         Inventory i = gameManagement.getGame(req.getLobby()).getInventory(req.getPlayer());
         for (Resources r : req.getResources().keySet()) {
             switch (r) {
@@ -1312,7 +1302,7 @@ public class GameService extends AbstractService {
                     break;
             }
         }
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getLobby());
         ServerMessage msg = new RefreshCardAmountMessage(req.getLobby(), req.getPlayer(),
                                                          gameManagement.getGame(req.getLobby()).getCardAmounts());
         lobbyService.sendToAllInLobby(req.getLobby(), msg);
@@ -1337,10 +1327,9 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onRollDiceRequest(RollDiceRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received RollDiceRequest for Lobby " + req.getOriginLobby());
-            LOG.debug("---- " + "User " + req.getUser().getUsername() + " wants to roll the dices.");
-        }
+        LOG.debug("Received RollDiceRequest for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to roll the dices.", req.getUser().getUsername());
+
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || game.isDiceRolledAlready()) return;
         int[] result = Game.rollDice();
@@ -1356,7 +1345,7 @@ public class GameService extends AbstractService {
                     if (p instanceof Dummy) {
                         Inventory inv = g.getInventory(p);
                         int i = inv.getResourceAmount() / 2;
-                        LOG.debug(p + " has to give up " + i + " of its " + inv.getResourceAmount() + " cards");
+                        LOG.debug("{} has to give up {} of their {} cards", p, i, inv.getResourceAmount());
                         while (i > 0) {
                             if (inv.getBrick() > 0) {
                                 inv.increaseBrick(-1);
@@ -1403,7 +1392,7 @@ public class GameService extends AbstractService {
                 game.addTaxPayer(user);
             }
             RobberTaxMessage rtm = new RobberTaxMessage(req.getOriginLobby(), req.getUser(), players, inventory);
-            LOG.debug("Sending RobberTaxMessage for Lobby" + req.getOriginLobby());
+            LOG.debug("Sending RobberTaxMessage for Lobby {}", req.getOriginLobby());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), rtm);
             if (req.getUser() instanceof Dummy) {
                 robberMovementDummy((Dummy) req.getUser(), req.getOriginLobby());
@@ -1411,16 +1400,16 @@ public class GameService extends AbstractService {
                 robberMovementPlayer(req, (User) req.getUser());
             }
         } else {
-            LOG.debug("---- Distributing the resources for token " + numberOfPips);
+            LOG.debug("---- Distributing the resources for token {}", numberOfPips);
             game.distributeResources(numberOfPips);
         }
         game.setBuildingAllowed(true);
         game.setDiceRolledAlready(true);
         ServerMessage returnMessage = new DiceCastMessage(req.getOriginLobby(), req.getUser(), result[0], result[1]);
-        LOG.debug("Sending DiceCastMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending DiceCastMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
@@ -1443,7 +1432,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onTradeWithBankRequest(TradeWithBankRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithBankRequest for Lobby " + req.getName());
+        LOG.debug("Received TradeWithBankRequest for Lobby {}", req.getName());
         Game game = gameManagement.getGame(req.getName());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         Inventory inventory = game.getInventory(req.getUser());
@@ -1466,7 +1455,7 @@ public class GameService extends AbstractService {
                                                                       Collections.unmodifiableList(resourceList),
                                                                       harborTradingList);
         returnMessage.initWithMessage(req);
-        LOG.debug("Sending InventoryForTradeResponse for Lobby " + req.getName());
+        LOG.debug("Sending InventoryForTradeResponse for Lobby {}", req.getName());
         post(returnMessage);
     }
 
@@ -1489,7 +1478,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received TradeWithUserCancelRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received TradeWithUserCancelRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (req.getSession().isEmpty()) return;
         if (!game.getActivePlayer().equals(req.getSession().get().getUser()) || !game.isDiceRolledAlready()) return;
@@ -1500,11 +1489,11 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessageForOfferingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
                                                                                        game.getActivePlayer());
         returnMessageForOfferingUser.initWithMessage(req);
-        LOG.debug("Sending a TradeWithUserCancelResponse for lobby" + req.getOriginLobby());
+        LOG.debug("Sending TradeWithUserCancelResponse for Lobby {}", req.getOriginLobby());
         post(returnMessageForOfferingUser);
         ResponseMessage returnMessageForRespondingUser = new TradeWithUserCancelResponse(req.getOriginLobby(),
                                                                                          game.getActivePlayer());
-        LOG.debug("Sending a TradeWithUserCancelResponse for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending TradeWithUserCancelResponse for Lobby {}", req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), returnMessageForRespondingUser));
     }
 
@@ -1527,7 +1516,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
-        LOG.debug("Received TradeWithUserRequest for Lobby " + req.getName());
+        LOG.debug("Received TradeWithUserRequest for Lobby {}", req.getName());
         Game game = gameManagement.getGame(req.getName());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         game.setBuildingAllowed(false);
@@ -1540,7 +1529,7 @@ public class GameService extends AbstractService {
         returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
                                                               Collections.unmodifiableList(offeringInventory),
                                                               traderInventorySize, req.getRespondingUser());
-        LOG.debug("Sending a InventoryForTradeWithUserResponse for Lobby " + req.getName());
+        LOG.debug("Sending InventoryForTradeWithUserResponse for Lobby {}", req.getName());
         returnMessage.initWithMessage(req);
         post(returnMessage);
     }
@@ -1616,7 +1605,7 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onUpdateInventoryRequest(UpdateInventoryRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received UpdateInventoryRequest for Lobby " + req.getOriginLobby());
+        LOG.debug("Received UpdateInventoryRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
@@ -1625,10 +1614,10 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     developmentCardList, resourceList);
         returnMessage.initWithMessage(req);
-        LOG.debug("Sending UpdateInventoryResponse for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending UpdateInventoryResponse for Lobby {}", req.getOriginLobby());
         post(returnMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
     }
@@ -1644,14 +1633,14 @@ public class GameService extends AbstractService {
      * @since 2021-04-06
      */
     private void robRandomResource(String lobby, UserOrDummy receiver, UserOrDummy victim) {
-        LOG.debug(receiver + " wants to rob from " + victim + " in lobby " + lobby);
+        LOG.debug("{} wants to rob from {} in Lobby {}", receiver, victim, lobby);
         Inventory receiverInventory = gameManagement.getGame(lobby).getInventory(receiver);
         Inventory victimInventory = gameManagement.getGame(lobby).getInventory(victim);
         List<Resources> victimsResources = new ArrayList<>();
         if (victimInventory.getResourceAmount() == 0) {
             ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, null);
-            LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
-            LOG.debug("---- victim has no cards to rob");
+            LOG.debug("Sending SystemMessageForRobbingMessage for Lobby {}", lobby);
+            LOG.debug("---- Victim has no cards to rob");
             lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
             return;
         }
@@ -1686,9 +1675,9 @@ public class GameService extends AbstractService {
         ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, victim);
         ServerMessage msg = new RefreshCardAmountMessage(lobby, receiver,
                                                          gameManagement.getGame(lobby).getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby " + lobby);
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, msg);
-        LOG.debug("Sending SystemMessageForRobbingMessage for Lobby " + lobby);
+        LOG.debug("Sending SystemMessageForRobbingMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
     }
 
@@ -1707,10 +1696,10 @@ public class GameService extends AbstractService {
                 ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
         MapPoint mapPoint = MapPoint.HexMapPoint(y, x);
         map.moveRobber(mapPoint);
-        LOG.debug("Sending RobberPositionMessage for Lobby " + lobby);
+        LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
         lobbyService.sendToAllInLobby(lobby, msg);
-        LOG.debug(dummy + " moves the robber to position: " + y + "|" + x);
+        LOG.debug("{} moves the robber to position: {}|{}", dummy, y, x);
         Set<Player> players = map.getPlayersAroundHex(mapPoint);
         Set<UserOrDummy> players2 = new HashSet<>();
         for (Player p : players) {
@@ -1736,7 +1725,7 @@ public class GameService extends AbstractService {
      * @since 2021-04-05
      */
     private void robberMovementPlayer(AbstractGameRequest req, User player) {
-        LOG.debug("Sending RobberNewPositionResponse for Lobby " + req.getOriginLobby());
+        LOG.debug("Sending RobberNewPositionResponse for Lobby {}", req.getOriginLobby());
         RobberNewPositionResponse msg = new RobberNewPositionResponse(player);
         msg.initWithMessage(req);
         post(msg);
@@ -1784,9 +1773,9 @@ public class GameService extends AbstractService {
                     break;
             }
             ResponseMessage serverMessage = new SystemMessageForTradeWithBankResponse(lobbyName, developmentCard);
-            LOG.debug("Sending SystemMessageForTradeWithBankResponse for Lobby " + lobbyName);
+            LOG.debug("Sending SystemMessageForTradeWithBankResponse for Lobby {}", lobbyName);
             post(new ForwardToUserInternalRequest(user, serverMessage));
-            LOG.debug("Sending SystemMessageForTradeWithBankMessage for Lobby " + lobbyName);
+            LOG.debug("Sending SystemMessageForTradeWithBankMessage for Lobby {}", lobbyName);
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;

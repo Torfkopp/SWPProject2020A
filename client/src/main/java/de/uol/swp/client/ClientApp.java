@@ -151,7 +151,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
-        LOG.debug("Received AlreadyLoggedInResponse for User " + rsp.getLoggedInUser());
+        LOG.debug("Received AlreadyLoggedInResponse for User {}", rsp.getLoggedInUser());
         sceneManager.showLogOldSessionOutScreen(rsp.getLoggedInUser());
     }
 
@@ -187,7 +187,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.error("DeadEvent detected: " + deadEvent);
+        LOG.error("DeadEvent detected: {}", deadEvent);
     }
 
     /**
@@ -206,7 +206,7 @@ public class ClientApp extends Application implements ConnectionListener {
      */
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
-        LOG.debug("Received LoginSuccessfulResponse for User " + rsp.getUser().getUsername());
+        LOG.debug("Received LoginSuccessfulResponse for User {}", rsp.getUser().getUsername());
         sceneManager.showMainScreen(rsp.getUser());
     }
 

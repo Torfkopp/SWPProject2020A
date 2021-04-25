@@ -155,8 +155,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onBuyDevelopmentCardResponse(BuyDevelopmentCardResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received BuyDevelopmentCardResponse for Lobby " + lobbyName);
-        LOG.debug("---- The user got a " + rsp.getDevelopmentCard());
+        LOG.debug("Received BuyDevelopmentCardResponse for Lobby {}", lobbyName);
+        LOG.debug("---- The user got a {}", rsp.getDevelopmentCard());
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
@@ -192,7 +192,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received InventoryForTradeResponse for Lobby " + lobbyName);
+        LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
         List<Map<String, Object>> resourceList = rsp.getResourceMap();
         Map<IHarborHex.HarborResource, Integer> tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
         setInventories(resourceList, tradingRatios);
@@ -252,7 +252,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeUpdateEvent(TradeUpdateEvent event) {
         if (lobbyName == null) lobbyName = event.getLobbyName();
-        LOG.debug("Received TradeUpdateEvent for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
         Window window = ownResourcesToTradeWith.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName));
     }
@@ -269,7 +269,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeWithBankAcceptedResponse(TradeWithBankAcceptedResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
     }

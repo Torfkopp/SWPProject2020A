@@ -271,7 +271,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
         Platform.runLater(() -> {
-            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby " + lobbyName);
+            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
@@ -345,7 +345,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
+        LOG.debug("Received StartSessionMessage for Lobby {}", lobbyName);
         gameWon = false;
         winner = null;
         inGame = true;
@@ -384,7 +384,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onStartSessionResponse(StartSessionResponse rsp) {
         if (!rsp.getLobby().getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionResponse for Lobby " + lobbyName);
+        LOG.debug("Received StartSessionResponse for Lobby {}", lobbyName);
         gameWon = false;
         winner = null;
         inGame = true;
@@ -426,7 +426,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onUserReadyMessage(UserReadyMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received UserReadyMessage for Lobby " + lobbyName);
+        LOG.debug("Received UserReadyMessage for Lobby {}", lobbyName);
         lobbyService.retrieveAllLobbyMembers(lobbyName); // for updateUserList
     }
 

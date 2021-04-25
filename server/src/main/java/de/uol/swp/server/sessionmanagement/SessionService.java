@@ -40,8 +40,8 @@ public class SessionService extends AbstractService {
     @Inject
     public SessionService(EventBus eventBus, ISessionManagement sessionManagement) {
         super(eventBus);
-        if (LOG.isDebugEnabled()) LOG.debug("SessionService started");
         this.sessionManagement = sessionManagement;
+        LOG.debug("SessionService started");
     }
 
     /**
