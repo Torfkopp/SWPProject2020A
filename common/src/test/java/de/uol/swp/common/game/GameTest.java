@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.GameMapManagement;
-import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.management.GameMapManagement;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static de.uol.swp.common.game.map.MapPoint.*;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
