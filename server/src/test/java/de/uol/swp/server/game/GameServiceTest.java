@@ -197,6 +197,7 @@ public class GameServiceTest {
             if (value.equals("game.resources.cards.monopoly")) monopolyCards++;
             if (value.equals("game.resources.cards.victorypoints")) victoryPointCards++;
         }
+        game.setDiceRolledAlready(true);
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
@@ -430,6 +431,7 @@ public class GameServiceTest {
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
         game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayKnightCardRequest(lobby.getName(), user[0]));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getKnights());
     }
@@ -451,10 +453,11 @@ public class GameServiceTest {
         inventories[1].increaseBrick(1);
         inventories[2].increaseBrick(2);
         inventories[0].increaseMonopolyCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayMonopolyCardRequest(lobby.getName(), user[0], Resources.BRICK));
-        assertEquals(2, inventories[0].getBrick());
+        assertEquals(3, inventories[0].getBrick());
         assertEquals(0, inventories[1].getBrick());
-        assertEquals(1, inventories[2].getBrick());
+        assertEquals(0, inventories[2].getBrick());
     }
 
     @Test
@@ -472,6 +475,7 @@ public class GameServiceTest {
         Game game = gameManagement.getGame(lobby.getName());
         assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
         game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayYearOfPlentyCardRequest(lobby.getName(), user[0], Resources.BRICK, Resources.GRAIN));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
         assertEquals(1, game.getInventory(Player.PLAYER_1).getGrain());
@@ -497,7 +501,7 @@ public class GameServiceTest {
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
-
+        game.setDiceRolledAlready(true);
         //Tests robbing a resource
         game.getInventory(user[1]).increaseBrick(1);
         game.getInventory(dummy).increaseOre(1);
@@ -562,7 +566,7 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getOre());
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
-
+        game.setDiceRolledAlready(true);
         Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby", Resources.WOOL,
                                                                               Resources.BRICK);
 
@@ -654,7 +658,7 @@ public class GameServiceTest {
         demandedResourceList.add(getEmptyResourceMap(Resources.BRICK));
         demandedResourceList.add(getEmptyResourceMap(Resources.GRAIN));
         demandedResourceList.add(getEmptyResourceMap(Resources.ORE));
-
+        game.setDiceRolledAlready(true);
         Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", demandedResourceList,
                                                            offeredResourceList);
         bus.post(tradeWithUser);

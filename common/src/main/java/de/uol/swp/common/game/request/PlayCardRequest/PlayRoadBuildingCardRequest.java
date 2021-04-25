@@ -11,6 +11,12 @@ import de.uol.swp.common.user.User;
  */
 public class PlayRoadBuildingCardRequest extends PlayCardRequest {
 
+    /**
+     * Constructor
+     *
+     * @param originLobby The lobby
+     * @param user        The user
+     */
     public PlayRoadBuildingCardRequest(String originLobby, User user) {
         super(originLobby, user);
     }

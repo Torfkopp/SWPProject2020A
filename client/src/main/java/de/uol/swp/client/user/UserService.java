@@ -59,15 +59,16 @@ public class UserService implements IUserService {
      * This method creates a new DeleteUserRequest object with the user as parameter,
      * and posts this instance onto the EventBus.
      *
-     * @param user The user to remove
+     * @param user     The user to remove
+     * @param password
      *
      * @see de.uol.swp.common.user.request.DeleteUserRequest
      * @since 2020-11-02
      */
     @Override
-    public void dropUser(User user) {
+    public void dropUser(User user, String password) {
         LOG.debug("Sending DeleteUserRequest");
-        Message request = new DeleteUserRequest(user);
+        Message request = new DeleteUserRequest(user, password);
         bus.post(request);
     }
 

@@ -10,6 +10,7 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.Resources;
@@ -30,6 +31,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 
 import java.util.*;
@@ -72,7 +76,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Button tradeWithUserButton;
     @FXML
-    protected Label turnIndicator;
+    protected TextFlow turnIndicator;
     @FXML
     protected Label notice;
     @FXML
@@ -92,7 +96,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering gameRendering;
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
+    protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     protected boolean autoRollEnabled = false;
+    protected boolean playedCard = false;
     protected boolean inGame;
     protected int moveTime;
     protected User owner;
@@ -186,16 +192,46 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper function that sets the text's text.
      * <p>
-     * The text states whose turn it is.
+     * The text states whose turn it is. The name of the player whose turn it is, is coloured in his personal colour.
+     * It also shortens the player's name, if it's longer than 15 characters.
      *
+     * @author Sven Ahrens
      * @author Alwin Bossert
      * @author Mario Fokken
      * @author Marvin Drees
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
-        Platform.runLater(() -> turnIndicator
-                .setText(String.format(resourceBundle.getString("lobby.game.text.turnindicator"), user.getUsername())));
+
+        Platform.runLater(() -> {
+            turnIndicator.getChildren().clear();
+            Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
+            preUsernameText.setFont(Font.font(20.0));
+
+            String name = user.getUsername();
+            if (name.length() > 15) name = name.substring(0, 15) + "...";
+            Text username = new Text(name);
+            username.setFont(Font.font(20.0));
+
+            ObservableList<UserOrDummy> membersList = membersView.getItems();
+            if (user.equals(membersList.get(0))) {
+                username.setFill(GameRendering.PLAYER_1_COLOUR);
+            }
+            if (user.equals(membersList.get(1))) {
+                username.setFill(GameRendering.PLAYER_2_COLOUR);
+            }
+            if (user.equals(membersList.get(2))) {
+                username.setFill(GameRendering.PLAYER_3_COLOUR);
+            }
+            if (membersList.size() == 4) {
+                if (user.equals(membersList.get(3))) {
+                    username.setFill(GameRendering.PLAYER_4_COLOUR);
+                }
+            }
+            Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
+            postUsernameText.setFont(Font.font(20.0));
+            turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
+        });
     }
 
     /**
@@ -295,7 +331,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
-        LOG.debug("Received BuildingSuccessfullMessage");
+        LOG.debug("Received BuildingSuccessfulMessage");
+        if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
+            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
+            LOG.debug("---- First road successfully built");
+            Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
+        } else if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
+            roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+            LOG.debug("---- Second road successfully built");
+            Platform.runLater(() -> notice.setVisible(false));
+            resetButtonStates(userService.getLoggedInUser());
+        }
         gameService.updateGameMap(lobbyName);
         String attr = null;
         switch (msg.getType()) {
@@ -338,11 +384,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(msg.getLobbyName())) return;
         LOG.debug("Received DiceCastMessage");
         LOG.debug("---- The dices show: " + msg.getDice1() + " and " + msg.getDice2());
-        if ((msg.getDice1() + msg.getDice2()) != 7) {
-            resetButtonStates(msg.getUser());
-        }
+        playedCard = false;
         dice1 = msg.getDice1();
         dice2 = msg.getDice2();
+        if ((dice1 + dice2) != 7) {
+            resetButtonStates(msg.getUser());
+        }
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         gameService.updateInventory(lobbyName);
     }
@@ -378,6 +425,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
+        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
+            gameService.buildRequest(lobbyName, mapPoint);
+        }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition) {
@@ -452,9 +502,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (result.isEmpty()) return;
         if (result.get() == btnKnight) { //Play a Knight Card
             gameService.playKnightCard(lobbyName);
+            disableButtonStates();
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+            disableButtonStates();
+            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
             gameService.playRoadBuildingCard(lobbyName);
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
@@ -504,7 +559,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
-        gameService.updateInventory(rsp.getLobbyName());
+        playedCard = true;
     }
 
     /**
@@ -636,6 +691,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
         LOG.debug("Received RobberNewPositionResponse");
+        Platform.runLater(() -> notice.setText(resourceBundle.getString("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
     }
@@ -653,6 +709,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberPositionMessage(RobberPositionMessage msg) {
         LOG.debug("Received RobberPositionMessage for Lobby " + msg.getLobbyName());
         if (lobbyName.equals(msg.getLobbyName())) {
+            resetButtonStates(msg.getUser());
             gameService.updateGameMap(msg.getLobbyName());
         }
     }
@@ -1049,7 +1106,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
         endTurn.setDisable(!userService.getLoggedInUser().equals(user));
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        playCard.setDisable(!userService.getLoggedInUser().equals(user));
+        playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
