@@ -102,7 +102,7 @@ public class TradeService implements ITradeService {
     @Override
     public void offerTrade(String lobbyName, UserOrDummy respondingUser, List<Map<String, Object>> offeredResources,
                            List<Map<String, Object>> demandedResources) {
-        LOG.debug("Sending an OfferingTradeWithUserRequest");
+        LOG.debug("Sending OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
                                                            offeredResources, demandedResources);
         eventBus.post(request);
@@ -148,7 +148,7 @@ public class TradeService implements ITradeService {
 
     @Override
     public void tradeWithUser(String lobbyName, UserOrDummy respondingUser) {
-        LOG.debug("Sending a TradeWithUserRequest");
+        LOG.debug("Sending TradeWithUserRequest");
         Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser);
         eventBus.post(request);
     }

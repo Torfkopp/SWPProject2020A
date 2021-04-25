@@ -97,15 +97,19 @@ public interface ISessionManagement {
      *
      * @param ctx     The MessageContext belonging to the session
      * @param session The Session to add
+     *
+     * @throws de.uol.swp.server.sessionmanagement.SessionManagementException Thrown when the Session is already bound to a connection
      */
-    void putSession(MessageContext ctx, Session session);
+    void putSession(MessageContext ctx, Session session) throws SessionManagementException;
 
     /**
      * Removes a session
      *
      * @param session The Session to remove
+     *
+     * @throws de.uol.swp.server.sessionmanagement.SessionManagementException Thrown when the Session couldn't be found
      */
-    void removeSession(Session session);
+    void removeSession(Session session) throws SessionManagementException;
 
     /**
      * Removes a session for a given message context

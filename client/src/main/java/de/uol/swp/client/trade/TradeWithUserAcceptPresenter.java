@@ -88,7 +88,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
-        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
             tradeNotPossibleLabel.setText(
@@ -140,7 +140,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
-        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby " + this.lobbyName);
+        LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeTradeResponseWindow(lobbyName);
     }
 
@@ -160,7 +160,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         TradeWithUserOfferResponse rsp = event.getRsp();
         lobbyName = rsp.getLobbyName();
         if (!lobbyName.equals(rsp.getLobbyName())) return;
-        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby " + lobbyName);
+        LOG.debug("Received TradeWithUserResponseUpdateEvent for Lobby {}", lobbyName);
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getDemandedResources();
         offeringResourceMap = rsp.getOfferedResources();

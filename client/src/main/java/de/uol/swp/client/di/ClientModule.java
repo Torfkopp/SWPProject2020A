@@ -63,12 +63,12 @@ public class ClientModule extends AbstractModule {
         }
 
         Level loglevel = Level.toLevel(properties.getProperty("debug.loglevel"));
-        LOG.info("Switching to selected LOG-Level in config File: " + loglevel);
+        LOG.info("Switching to selected LOG-Level in config File: {}", loglevel);
         Configurator.setAllLevels(LogManager.getRootLogger().getName(), loglevel);
         // override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
         Configurator.setLevel("io.netty", Level.WARN);
 
-        LOG.debug("Selected Language in config File: " + properties.getProperty("lang"));
+        LOG.debug("Selected Language in config File: {}", properties.getProperty("lang"));
 
         //Reading the language property into a locale
         String[] lang = properties.getProperty("lang").split("_");
