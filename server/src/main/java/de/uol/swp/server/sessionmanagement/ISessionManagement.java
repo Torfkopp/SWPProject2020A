@@ -96,7 +96,7 @@ public interface ISessionManagement {
      * Adds a new session to the active sessions
      *
      * @param ctx     The MessageContext belonging to the session
-     * @param Session The Session to add
+     * @param session The Session to add
      */
     void putSession(MessageContext ctx, Session session);
 

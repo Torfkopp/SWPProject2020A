@@ -60,7 +60,7 @@ public class UserService implements IUserService {
      * and posts this instance onto the EventBus.
      *
      * @param user     The user to remove
-     * @param password
+     * @param password The user's password
      *
      * @see de.uol.swp.common.user.request.DeleteUserRequest
      * @since 2020-11-02
