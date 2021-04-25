@@ -15,6 +15,7 @@ import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagementException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -112,7 +113,6 @@ public class ServerHandler implements ServerHandlerDelegate {
      */
     public void sendPingMessage(MessageContext ctx) {
         if (sessionManagement.getSession(ctx).isPresent()) {
-            Session session = sessionManagement.getSession(ctx).get();
             ResponseMessage msg = new PingMessage();
             msg.setSession(null);
             msg.setMessageContext(null);
@@ -203,9 +203,13 @@ public class ServerHandler implements ServerHandlerDelegate {
             if (msg.hasOldSession()) {
                 sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
             } else {
-                sessionManagement.putSession(ctx.get(), msg.getSession().get());
-                sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
-                sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
+                try {
+                    sessionManagement.putSession(ctx.get(), msg.getSession().get());
+                    sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
+                    sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
+                } catch (SessionManagementException e) {
+                    LOG.error(e);
+                }
             }
         } else {
             LOG.warn("No context for {}", msg);

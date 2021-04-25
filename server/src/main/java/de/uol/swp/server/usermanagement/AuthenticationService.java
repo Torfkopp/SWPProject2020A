@@ -14,6 +14,7 @@ import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagementException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -113,7 +114,11 @@ public class AuthenticationService extends AbstractService {
         if (userToLogOut == null) return;
         LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
         userManagement.logout(userToLogOut);
-        sessionManagement.removeSession(session);
+        try {
+            sessionManagement.removeSession(session);
+        } catch (SessionManagementException e) {
+            LOG.error(e);
+        }
         Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
         post(returnMessage);
     }
@@ -146,7 +151,11 @@ public class AuthenticationService extends AbstractService {
         while (sessionManagement.getSession(userToLogOut).isPresent()) {
             post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
                                                      new KillOldClientResponse()));
-            sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
+            try {
+                sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
+            } catch (SessionManagementException e) {
+                LOG.error(e);
+            }
         }
         post(new UserLoggedOutMessage(userToLogOut.getUsername()));
         NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(userToLogOut);
