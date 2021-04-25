@@ -1,7 +1,7 @@
 package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -271,11 +271,12 @@ public class Game {
 
     /**
      * Gets a mapping of Players to Users
+     *
      * @return The player user mapping
      */
     public Map<Player, UserOrDummy> getPlayerUserMapping() {
         Map<Player, UserOrDummy> temp = new HashMap<>();
-        for (Player player : Player.values()){
+        for (Player player : Player.values()) {
             temp.put(player, getUserFromPlayer(player));
         }
         return temp;

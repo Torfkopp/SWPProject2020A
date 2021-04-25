@@ -18,6 +18,7 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  * Management of the gameMap
  *
  * @author Marvin Drees
+ * @author Temmo Junkhoff
  * @since 2021-01-16
  */
 @SuppressWarnings("UnstableApiUsage")

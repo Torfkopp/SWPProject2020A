@@ -16,7 +16,6 @@ public interface IGameMap extends Serializable {
      * Gets the jagged array of hexes
      *
      * @return A jagged Array of hexes
-     *
      */
     IGameHex[][] getHexes();
 
