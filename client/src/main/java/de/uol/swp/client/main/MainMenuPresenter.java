@@ -447,7 +447,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-04-22
      */
     @Subscribe
-    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse rsp){
+    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse rsp) {
         LOG.debug("Received JoinLobbyWithPasswordResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyWithPasswordViewEvent(rsp.getLobbyName()));

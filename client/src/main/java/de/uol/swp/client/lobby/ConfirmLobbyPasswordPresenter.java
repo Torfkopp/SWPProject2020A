@@ -5,11 +5,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.lobby.event.ConfirmLobbyPasswordCanceledEvent;
 import de.uol.swp.client.lobby.event.ConfirmLobbyPasswordEvent;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
 import de.uol.swp.common.user.User;
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
+import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +25,7 @@ public class ConfirmLobbyPasswordPresenter extends AbstractPresenter {
 
     public static final String fxml1 = "/fxml/LobbyPasswordVerificationView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 300;
-    public static final int MIN_WIDTH_PRE_GAME = 200;
+    public static final int MIN_WIDTH_PRE_GAME = 400;
     private static final Logger LOG = LogManager.getLogger(ConfirmLobbyPasswordPresenter.class);
     private String lobbyName;
     @FXML
@@ -61,9 +62,9 @@ public class ConfirmLobbyPasswordPresenter extends AbstractPresenter {
         eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(lobbyName, user, passwordField.getText()));
     }
 
-
     @FXML
-    private void onCancelButtonPressed() {
+    public void onCancelButtonPressed(){
+        eventBus.post(new ConfirmLobbyPasswordCanceledEvent());
     }
 
     /**

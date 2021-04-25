@@ -550,6 +550,11 @@ public class SceneManager {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
+    @Subscribe
+    private void onConfirmLobbyPasswordCanceledEvent(ConfirmLobbyPasswordCanceledEvent event){
+        //TODO:Code
+    }
+
     /**
      * Handles the ChangeAccountDetailsErrorEvent detected on the EventBus
      * <p>
