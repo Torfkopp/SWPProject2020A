@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
@@ -68,10 +69,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private VBox preGameSettingBox;
     @FXML
-    public AnimationTimer elapsedTimer;
+    protected AnimationTimer elapsedTimer;
     @FXML
-    public Menu timerLabel = new Menu();
-
+    protected Menu timerLabel = new Menu();
 
     @FXML
     @Override
@@ -312,6 +312,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
+            timerLabel.setVisible(false);
         });
     }
 
@@ -330,6 +331,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onStartSessionButtonPressed() {
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName);
+        timerLabel.setVisible(true);
     }
 
     /**
@@ -511,5 +513,18 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
+    }
+
+    /**
+     * Stops the elapsedTimer
+     * <p>
+     * Stops the Timer if a player has won the game
+     * @param msg The PlayerWonGameMessage found on the EventBus
+     * @author Aldin Dervisi
+     * @since 2021-04-26
+     */
+    public void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+        super.onPlayerWonGameMessage(msg);
+        this.elapsedTimer.stop();
     }
 }

@@ -565,7 +565,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-03-22
      */
     @Subscribe
-    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+    public void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
         if (!lobbyName.equals(msg.getLobbyName())) return;
         gameMap = null;
         gameWon = true;
