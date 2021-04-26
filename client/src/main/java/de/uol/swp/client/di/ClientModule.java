@@ -51,6 +51,8 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
         defaultProps.setProperty("join_leave_msgs_on", "false");
+        defaultProps.setProperty("owner_ready_notifs_on", "false");
+        defaultProps.setProperty("owner_transfer_notifs_on", "false");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -98,6 +100,13 @@ public class ClientModule extends AbstractModule {
         //Setting the join_leave_msgs_on value
         final boolean joinLeaveMsgsOn = Boolean.parseBoolean(properties.getProperty("join_leave_msgs_on"));
 
+        //Setting the owner_ready_notifs_on value
+        final boolean ownerReadyNotificationsOn = Boolean.parseBoolean(properties.getProperty("owner_ready_notifs_on"));
+
+        //Setting the owner_transfer_notifs_on value
+        final boolean ownerTransferNotificationsOn;
+        ownerTransferNotificationsOn = Boolean.parseBoolean(properties.getProperty("owner_transfer_notifs_on"));
+
         //DI stuff
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class)
                                           .build(SceneManagerFactory.class));
@@ -109,6 +118,8 @@ public class ClientModule extends AbstractModule {
         bind(ResourceBundle.class).toInstance(resourceBundle);
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
         bindConstant().annotatedWith(Names.named("joinLeaveMsgsOn")).to(joinLeaveMsgsOn);
+        bindConstant().annotatedWith(Names.named("ownerReadyNotificationsOn")).to(ownerReadyNotificationsOn);
+        bindConstant().annotatedWith(Names.named("ownerTransferNotificationsOn")).to(ownerTransferNotificationsOn);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);

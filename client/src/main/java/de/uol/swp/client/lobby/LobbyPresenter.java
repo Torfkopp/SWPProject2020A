@@ -47,6 +47,12 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @Inject
     @Named("joinLeaveMsgsOn")
     private boolean joinLeaveMsgsOn;
+    @Inject
+    @Named("ownerReadyNotificationsOn")
+    private boolean ownerReadyNotificationsOn;
+    @Inject
+    @Named("ownerTransferNotificationsOn")
+    private boolean ownerTransferNotificationsOn;
 
     /**
      * Constructor
@@ -118,9 +124,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         });
         SystemMessage ownerNotice = rsp.getOwnerNotice();
         boolean isOwner = userService.getLoggedInUser().equals(owner);
-        Platform.runLater(() -> {
-            if (ownerNotice != null && isOwner && !inGame) chatMessages.add(ownerNotice);
-        });
+        if (!ownerReadyNotificationsOn || !isOwner || inGame || ownerNotice == null) return;
+        Platform.runLater(() -> chatMessages.add(ownerNotice));
     }
 
     /**
@@ -232,13 +237,15 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
         if (!owner.equals(msg.getLobby().getOwner())) {
-            if (userService.getLoggedInUser().equals(owner)) {
-                I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
-                                                      msg.getLobby().getOwner().getUsername());
-                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
-            } else if (userService.getLoggedInUser().equals(msg.getLobby().getOwner())) {
-                I18nWrapper content = new I18nWrapper("lobby.owner.promoted", owner.getUsername());
-                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+            if (ownerTransferNotificationsOn) {
+                if (userService.getLoggedInUser().equals(owner)) {
+                    I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
+                                                          msg.getLobby().getOwner().getUsername());
+                    Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+                } else if (userService.getLoggedInUser().equals(msg.getLobby().getOwner())) {
+                    I18nWrapper content = new I18nWrapper("lobby.owner.promoted", owner.getUsername());
+                    Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+                }
             }
             owner = msg.getLobby().getOwner();
             prepareMembersView();
