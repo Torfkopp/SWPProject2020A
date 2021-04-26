@@ -1,8 +1,12 @@
 package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
+import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
 
@@ -16,11 +20,16 @@ import java.util.*;
  */
 public class Game {
 
+    private static final int[] dices = new int[2];
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
+    private final Set<User> taxPayers = new HashSet<>();
     private UserOrDummy activePlayer;
+    private boolean buildingAllowed = false;
+    private boolean diceRolledAlready = false;
+    private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     private Player playerWithLongestRoad = null;
     private Player playerWithLargestArmy = null;
     private int longestRoadLength = 0;
@@ -55,8 +64,20 @@ public class Game {
     public static int[] rollDice() {
         int dice1 = (int) (Math.random() * 6 + 1);
         int dice2 = (int) (Math.random() * 6 + 1);
-
+        dices[0] = dice1;
+        dices[1] = dice2;
         return (new int[]{dice1, dice2});
+    }
+
+    /**
+     * Adds a taxPayer to the set
+     *
+     * @param user The user to add
+     *
+     * @since 2021-04-11
+     */
+    public void addTaxPayer(User user) {
+        taxPayers.add(user);
     }
 
     /**
@@ -178,6 +199,19 @@ public class Game {
     }
 
     /**
+     * Return the current state of the rolled dices as an array
+     *
+     * @return Current state of dices
+     *
+     * @author Marvin Drees
+     * @author Maximilian Lindner
+     * @since 2021-04-09
+     */
+    public int[] getDices() {
+        return dices;
+    }
+
+    /**
      * Gets a specified player's inventory
      *
      * @param player The player whose inventory to get
@@ -257,6 +291,19 @@ public class Game {
     }
 
     /**
+     * Gets a mapping of Players to Users
+     *
+     * @return The player user mapping
+     */
+    public Map<Player, UserOrDummy> getPlayerUserMapping() {
+        Map<Player, UserOrDummy> temp = new HashMap<>();
+        for (Player player : Player.values()) {
+            temp.put(player, getUserFromPlayer(player));
+        }
+        return temp;
+    }
+
+    /**
      * Gets the player with the largest army
      *
      * @return The player with the largest army
@@ -302,6 +349,42 @@ public class Game {
     }
 
     /**
+     * Gets the roadBuildingCardPhase
+     *
+     * @return NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
+     *
+     * @author Mario Fokken
+     * @since 2021-04-20
+     */
+    public RoadBuildingCardPhase getRoadBuildingCardPhase() {
+        return roadBuildingCardPhase;
+    }
+
+    /**
+     * Sets the roadBuildingCardPhase
+     *
+     * @param roadBuildingCardPhase NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
+     *
+     * @author Mario Fokken
+     * @since 2021-04-20
+     */
+    public void setRoadBuildingCardPhase(RoadBuildingCardPhase roadBuildingCardPhase) {
+        this.roadBuildingCardPhase = roadBuildingCardPhase;
+    }
+
+    /**
+     * Gets the taxPayer Set
+     *
+     * @return Set of the taxPayer
+     *
+     * @author Mario Fokken
+     * @since 2021-04-11
+     */
+    public Set<User> getTaxPayers() {
+        return taxPayers;
+    }
+
+    /**
      * Gets a List of Triples with information about the unique cards
      * (largest army and longest road)
      *
@@ -333,6 +416,58 @@ public class Game {
     }
 
     /**
+     * Gets whether building is currently allowed or not
+     *
+     * @return If Building is currently allowed
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public boolean isBuildingAllowed() {
+        return buildingAllowed;
+    }
+
+    /**
+     * Set the BuildingAllowed Attribute
+     *
+     * @param buildingAllowed The new buildingAllowed status
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public void setBuildingAllowed(boolean buildingAllowed) {
+        this.buildingAllowed = buildingAllowed;
+    }
+
+    /**
+     * Gets whether the player rolled the dice in the current turn or not
+     *
+     * @return If Player rolled the dice
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public boolean isDiceRolledAlready() {
+        return diceRolledAlready;
+    }
+
+    /**
+     * Set the diceRolledAlready Attribute
+     *
+     * @param diceRolledAlready The new diceRolledAlready status
+     *
+     * @author Maximilian Lindner
+     * @author Marvin Drees
+     * @since 2021-04-11
+     */
+    public void setDiceRolledAlready(boolean diceRolledAlready) {
+        this.diceRolledAlready = diceRolledAlready;
+    }
+
+    /**
      * Gets the next player and sets it as the new active player
      *
      * @return User object of the next player
@@ -340,5 +475,17 @@ public class Game {
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
         return activePlayer;
+    }
+
+    /**
+     * Removes a user from the taxPayers
+     *
+     * @param user User to remove
+     *
+     * @author Mario Fokken
+     * @since 2021-04-11
+     */
+    public void removeTaxPayer(User user) {
+        taxPayers.remove(user);
     }
 }

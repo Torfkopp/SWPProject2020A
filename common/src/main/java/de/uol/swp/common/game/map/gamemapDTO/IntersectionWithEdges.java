@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.gamemapDTO;
 
 import java.util.Set;
 
@@ -11,8 +11,8 @@ import java.util.Set;
  */
 public class IntersectionWithEdges implements IIntersectionWithEdges {
 
-    private final IIntersection intersection;
-    private final Set<IEdge> edges;
+    private final IIntersectionWithBuildable intersection;
+    private final Set<IEdgeWithBuildable> edges;
 
     /**
      * Constructor
@@ -20,18 +20,18 @@ public class IntersectionWithEdges implements IIntersectionWithEdges {
      * @param intersection The intersection
      * @param edges        The surrounding edges
      */
-    public IntersectionWithEdges(IIntersection intersection, Set<IEdge> edges) {
+    public IntersectionWithEdges(IIntersectionWithBuildable intersection, Set<IEdgeWithBuildable> edges) {
         this.intersection = intersection;
         this.edges = edges;
     }
 
     @Override
-    public Set<IEdge> getEdges() {
+    public Set<IEdgeWithBuildable> getEdges() {
         return edges;
     }
 
     @Override
-    public IIntersection getIntersection() {
+    public IIntersectionWithBuildable getIntersection() {
         return intersection;
     }
 }

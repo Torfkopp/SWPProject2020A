@@ -3,11 +3,11 @@ package de.uol.swp.server.usermanagement;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.exception.ChangeAccountDetailsExceptionMessage;
 import de.uol.swp.common.exception.RegistrationExceptionMessage;
 import de.uol.swp.common.exception.UserDeletionExceptionMessage;
+import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.DeleteUserRequest;
@@ -48,8 +48,8 @@ public class UserService extends AbstractService {
     @Inject
     public UserService(EventBus eventBus, UserManagement userManagement) {
         super(eventBus);
-        if (LOG.isDebugEnabled()) LOG.debug("UserService started");
         this.userManagement = userManagement;
+        LOG.debug("UserService started");
     }
 
     /**
@@ -68,16 +68,14 @@ public class UserService extends AbstractService {
      */
     @Subscribe
     private void onChangeAccountDetailsRequest(UpdateUserAccountDetailsRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received ChangeAccountDetailsRequest for User " + req.getOldUsername());
-        }
+        LOG.debug("Received ChangeAccountDetailsRequest for User {}", req.getOldUsername());
         ResponseMessage returnMessage;
         try {
             Optional<User> optionalUser = userManagement.getUser(req.getOldUsername(), req.getOldPassword());
             if (optionalUser.isPresent()) {
                 User user = userManagement.updateUser(req.getUser());
                 returnMessage = new ChangeAccountDetailsSuccessfulResponse(user);
-                LOG.debug("Account Details were changed for " + req.getUser().getUsername());
+                LOG.debug("Account Details were changed for {}", req.getUser().getUsername());
                 if (!req.getOldUsername().equals(req.getUser().getUsername())) {
                     post(new UserLoggedOutMessage(req.getOldUsername()));
                     post(new UserLoggedInMessage(req.getUser().getUsername()));
@@ -111,13 +109,17 @@ public class UserService extends AbstractService {
      */
     @Subscribe
     private void onDeleteUserRequest(DeleteUserRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received DeleteUserRequest for User " + req.getUser());
-        }
+        LOG.debug("Received DeleteUserRequest for User {}", req.getUser());
         ResponseMessage returnMessage;
         try {
-            userManagement.dropUser(req.getUser());
-            returnMessage = new UserDeletionSuccessfulResponse();
+            Optional<User> user = userManagement.getUser(req.getUser().getUsername(), req.getPassword());
+            if (user.isPresent()) {
+                userManagement.dropUser(req.getUser());
+                returnMessage = new UserDeletionSuccessfulResponse();
+            } else {
+                returnMessage = new UserDeletionExceptionMessage(
+                        "User deletion unsuccessful for user [" + req.getUser().getUsername() + "]");
+            }
         } catch (UserManagementException e) {
             LOG.error(e);
             returnMessage = new UserDeletionExceptionMessage(
@@ -145,9 +147,7 @@ public class UserService extends AbstractService {
      */
     @Subscribe
     private void onRegisterUserRequest(RegisterUserRequest req) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received RegisterUserRequest for User " + req.getUser());
-        }
+        LOG.debug("Received RegisterUserRequest for User {}", req.getUser());
         ResponseMessage returnMessage;
         try {
             userManagement.createUser(req.getUser());

@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.gamemapDTO;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -17,12 +17,12 @@ public interface IIntersectionWithEdges extends Serializable {
      *
      * @return The Set of edges surround the intersection
      */
-    Set<IEdge> getEdges();
+    Set<IEdgeWithBuildable> getEdges();
 
     /**
      * Gets The intersection
      *
      * @return The intersection
      */
-    IIntersection getIntersection();
+    IIntersectionWithBuildable getIntersection();
 }

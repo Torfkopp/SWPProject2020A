@@ -3,6 +3,7 @@ package de.uol.swp.common.game.response;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,30 +19,36 @@ import java.util.Map;
 public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy offeringUser;
-    private final UserOrDummy respondingUser;
-    private final Map<String, Integer> resourceMap;
-    private final Map<String, Integer> offeringResourceMap;
-    private final Map<String, Integer> respondingResourceMap;
+    private final List<Map<String, Object>> resourceList;
+    private final List<Map<String, Object>> offeredResources;
+    private final List<Map<String, Object>> demandedResources;
 
     /**
      * Constructor
      *
-     * @param offeringUser          The offering User
-     * @param respondingUser        The responding User
-     * @param resourceMap           The inventory of the responding user
-     * @param offeringResourceMap   The offered resources
-     * @param respondingResourceMap The demanded resources
-     * @param lobbyName             The name of the lobby
+     * @param offeringUser      The offering User
+     * @param resourceList      The inventory of the responding user
+     * @param offeredResources  The offered resources
+     * @param demandedResources The demanded resources
+     * @param lobbyName         The name of the lobby
      */
-    public TradeWithUserOfferResponse(UserOrDummy offeringUser, UserOrDummy respondingUser,
-                                      Map<String, Integer> resourceMap, Map<String, Integer> offeringResourceMap,
-                                      Map<String, Integer> respondingResourceMap, String lobbyName) {
+    public TradeWithUserOfferResponse(UserOrDummy offeringUser, List<Map<String, Object>> resourceList,
+                                      List<Map<String, Object>> offeredResources,
+                                      List<Map<String, Object>> demandedResources, String lobbyName) {
         super(lobbyName);
-        this.resourceMap = resourceMap;
-        this.offeringResourceMap = offeringResourceMap;
-        this.respondingResourceMap = respondingResourceMap;
+        this.resourceList = resourceList;
+        this.offeredResources = offeredResources;
+        this.demandedResources = demandedResources;
         this.offeringUser = offeringUser;
-        this.respondingUser = respondingUser;
+    }
+
+    /**
+     * Gets the demanded resources
+     *
+     * @return Map of demanded resources
+     */
+    public List<Map<String, Object>> getDemandedResources() {
+        return demandedResources;
     }
 
     /**
@@ -49,8 +56,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of offered resources
      */
-    public Map<String, Integer> getOfferingResourceMap() {
-        return offeringResourceMap;
+    public List<Map<String, Object>> getOfferedResources() {
+        return offeredResources;
     }
 
     /**
@@ -67,25 +74,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of the inventory of the responding User
      */
-    public Map<String, Integer> getResourceMap() {
-        return resourceMap;
-    }
-
-    /**
-     * Gets the demanded resources
-     *
-     * @return Map of demanded resources
-     */
-    public Map<String, Integer> getRespondingResourceMap() {
-        return respondingResourceMap;
-    }
-
-    /**
-     * Gets the responding User
-     *
-     * @return A User-Object of the responding User
-     */
-    public UserOrDummy getRespondingUser() {
-        return respondingUser;
+    public List<Map<String, Object>> getResourceList() {
+        return resourceList;
     }
 }

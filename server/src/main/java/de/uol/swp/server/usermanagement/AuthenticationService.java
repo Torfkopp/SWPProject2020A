@@ -10,11 +10,11 @@ import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
 import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
+import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
-import de.uol.swp.server.sessionmanagement.SessionManagement;
+import de.uol.swp.server.sessionmanagement.SessionManagementException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,14 +37,15 @@ public class AuthenticationService extends AbstractService {
     /**
      * Constructor
      *
-     * @param bus            The EventBus used throughout the entire server
-     * @param userManagement Object of the UserManagement to use
+     * @param bus               The EventBus used throughout the entire server
+     * @param userManagement    Object of the UserManagement to use
+     * @param sessionManagement Object of the SessionManagement to use
      *
      * @see de.uol.swp.server.usermanagement.UserManagement
      * @since 2019-08-30
      */
     @Inject
-    public AuthenticationService(EventBus bus, UserManagement userManagement, SessionManagement sessionManagement) {
+    public AuthenticationService(EventBus bus, IUserManagement userManagement, ISessionManagement sessionManagement) {
         super(bus);
         this.userManagement = userManagement;
         this.sessionManagement = sessionManagement;
@@ -70,9 +71,7 @@ public class AuthenticationService extends AbstractService {
      */
     @Subscribe
     private void onLoginRequest(LoginRequest msg) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received LoginRequest for User " + msg.getUsername());
-        }
+        LOG.debug("Received LoginRequest for User {}", msg.getUsername());
         ServerInternalMessage returnMessage;
         try {
             User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
@@ -108,20 +107,20 @@ public class AuthenticationService extends AbstractService {
     @Subscribe
     private void onLogoutRequest(LogoutRequest msg) {
         LOG.debug("Received LogoutRequest");
-        if (msg.getSession().isPresent()) {
-            Session session = msg.getSession().get();
-            User userToLogOut = session.getUser();
-            // Could be already logged out
-            if (userToLogOut != null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("---- Logging out user " + userToLogOut.getUsername());
-                }
-                userManagement.logout(userToLogOut);
-                sessionManagement.removeSession(session);
-                Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
-                post(returnMessage);
-            }
+        if (msg.getSession().isEmpty()) return;
+        Session session = msg.getSession().get();
+        User userToLogOut = session.getUser();
+        // Could be already logged out
+        if (userToLogOut == null) return;
+        LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
+        userManagement.logout(userToLogOut);
+        try {
+            sessionManagement.removeSession(session);
+        } catch (SessionManagementException e) {
+            LOG.error(e);
         }
+        Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
+        post(returnMessage);
     }
 
     /**
@@ -139,7 +138,7 @@ public class AuthenticationService extends AbstractService {
      * @author Eric Vuong
      * @author Marvin Drees
      * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe
@@ -147,15 +146,19 @@ public class AuthenticationService extends AbstractService {
         LOG.debug("Received NukeUsersSessionsRequest");
         if (req.getUser() == null) return;
         User userToLogOut = req.getUser();
-        LOG.debug("---- Logging out user " + userToLogOut.getUsername());
+        LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
         userManagement.logout(userToLogOut);
         while (sessionManagement.getSession(userToLogOut).isPresent()) {
             post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
                                                      new KillOldClientResponse()));
-            sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
+            try {
+                sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
+            } catch (SessionManagementException e) {
+                LOG.error(e);
+            }
         }
         post(new UserLoggedOutMessage(userToLogOut.getUsername()));
-        NukeUsersSessionsResponse response = new NukeUsersSessionsResponse();
+        NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(userToLogOut);
         response.initWithMessage(req);
         post(response);
     }

@@ -277,7 +277,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of Grain by one*
+     * Increases the amount of Grain by the amount
      *
      * @param i The increase
      */
@@ -286,7 +286,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of KnightCards by one
+     * Increases the amount of KnightCards by the amount
      *
      * @param i The increase
      */
@@ -295,14 +295,14 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of Knights by one
+     * Increases the amount of Knights by the amount
      */
     public void increaseKnights(int i) {
         knights += i;
     }
 
     /**
-     * Increases the amount of Lumber by one
+     * Increases the amount of Lumber by the amount
      *
      * @param i The increase
      */
@@ -311,7 +311,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of MonopolyCards by one
+     * Increases the amount of MonopolyCards by the amount
      *
      * @param i The increase
      */
@@ -320,7 +320,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of Ore by one
+     * Increases the amount of Ore by the amount
      *
      * @param i The increase
      */
@@ -329,7 +329,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of RoadBuildingCards by one
+     * Increases the amount of RoadBuildingCards by the amount
      *
      * @param i The increase
      */
@@ -338,7 +338,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of VictoryPointCards by one
+     * Increases the amount of VictoryPointCards by the amount
      *
      * @param i The increase
      */
@@ -347,7 +347,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of Wool by one
+     * Increases the amount of Wool by the amount
      *
      * @param i The increase
      */
@@ -356,7 +356,7 @@ public class Inventory {
     }
 
     /**
-     * Increases the amount of YearOfPlentyCards by one
+     * Increases the amount of YearOfPlentyCards by the amount
      *
      * @param i The increase
      */

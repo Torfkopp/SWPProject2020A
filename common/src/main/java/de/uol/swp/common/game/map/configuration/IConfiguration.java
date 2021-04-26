@@ -2,6 +2,7 @@ package de.uol.swp.common.game.map.configuration;
 
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.management.MapPoint;
 
 import java.io.Serializable;
 import java.util.List;
@@ -37,6 +38,13 @@ public interface IConfiguration extends Serializable {
      * @see de.uol.swp.common.game.map.Hexes.IResourceHex.ResourceHexType
      */
     List<IResourceHex.ResourceHexType> getHexList();
+
+    /**
+     * Gets the robberPosition
+     *
+     * @return MapPoint of robber
+     */
+    MapPoint getRobberPosition();
 
     /**
      * Gets the List of Tokens to be placed on Hexes

@@ -226,7 +226,7 @@ public class ClientConnection {
      */
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.warn("DeadEvent detected: " + deadEvent);
+        LOG.warn("DeadEvent detected: {}", deadEvent);
     }
 
     /**
@@ -264,7 +264,7 @@ public class ClientConnection {
      */
     @Subscribe
     private void onPingMessage(PingMessage msg) {
-        LOG.info("Server ping received.");
+        LOG.trace("Server ping received.");
         eventBus.post(new PongMessage());
     }
 

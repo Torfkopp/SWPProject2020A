@@ -10,15 +10,11 @@ import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.apache.logging.log4j.Logger;
@@ -54,7 +50,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected TextField messageField;
 
     protected String lobbyName;
-    protected User loggedInUser;
     protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     /**
@@ -72,7 +67,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @implNote Called automatically by JavaFX
      */
     @FXML
-    protected void initialize() { prepareChatVars(); }
+    protected void initialize() {
+        prepareChatVars();
+    }
 
     /**
      * Handles AskLatestChatMessageResponse
@@ -87,33 +84,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onAskLatestChatMessageResponse(AskLatestChatMessageResponse rsp) {
         if (rsp.getLobbyName() != null && rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received AskLatestChatMessageResponse for Lobby " + rsp.getLobbyName());
+            LOG.debug("Received AskLatestChatMessageResponse for Lobby {}", rsp.getLobbyName());
             updateChatMessageList(rsp.getChatHistory());
         } else if (rsp.getLobbyName() == null && this.lobbyName == null) {
             LOG.debug("Received AskLatestChatMessageResponse");
             updateChatMessageList(rsp.getChatHistory());
         }
-    }
-
-    /**
-     * Handles ChangeAccountDetailsSuccessfulResponse
-     * <p>
-     * If a ChangeAccountDetailsSuccessfulResponse is found on the EventBus,
-     * this method overwrites the currently saved loggedInUser if and only if
-     * the ID of the updated User is identical to the one of the loggedInUser.
-     *
-     * @param rsp The ChangeAccountDetailsSuccessfulResponse found on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse
-     * @since 2021-03-23
-     */
-    @Subscribe
-    protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
-        if (this.loggedInUser.getID() != rsp.getUser().getID()) return;
-        LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
-        this.loggedInUser = rsp.getUser();
     }
 
     /**
@@ -134,7 +110,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onCreatedChatMessageMessage(CreatedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received CreatedChatMessageMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("Received CreatedChatMessageMessage for Lobby {}", msg.getLobbyName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received CreatedChatMessageMessage");
@@ -159,11 +135,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
         else return;
         int msgId = chatMsg.getID();
-        if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
+        if (!chatMsg.getAuthor().equals(userService.getLoggedInUser())) return;
         if (lobbyName != null) {
-            chatService.deleteMessage(msgId, this.loggedInUser, lobbyName);
+            chatService.deleteMessage(msgId, lobbyName);
         } else {
-            chatService.deleteMessage(msgId, this.loggedInUser);
+            chatService.deleteMessage(msgId);
         }
     }
 
@@ -186,7 +162,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onDeletedChatMessageMessage(DeletedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received DeletedChatMessageMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("Received DeletedChatMessageMessage for Lobby {}", msg.getLobbyName());
             dropChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received DeletedChatMessageMessage");
@@ -217,11 +193,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
         else return;
         int msgId = chatMsg.getID();
-        if (!chatMsg.getAuthor().equals(this.loggedInUser)) return;
+        if (!chatMsg.getAuthor().equals(userService.getLoggedInUser())) return;
         if (lobbyName != null) {
-            chatService.editMessage(msgId, messageField.getText(), this.loggedInUser, lobbyName);
+            chatService.editMessage(msgId, messageField.getText(), lobbyName);
         } else {
-            chatService.editMessage(msgId, messageField.getText(), this.loggedInUser);
+            chatService.editMessage(msgId, messageField.getText());
         }
         messageField.clear();
     }
@@ -245,7 +221,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onEditedChatMessageMessage(EditedChatMessageMessage msg) {
         if (msg.isLobbyChatMessage() && msg.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received EditedChatMessageMessage for Lobby " + msg.getLobbyName());
+            LOG.debug("Received EditedChatMessageMessage for Lobby {}", msg.getLobbyName());
             editChatMessage(msg);
         } else if (!msg.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received EditedChatMessageMessage");
@@ -268,9 +244,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
         String msg = messageField.getText();
         messageField.clear();
         if (lobbyName != null) {
-            chatService.newMessage(loggedInUser, msg, lobbyName);
+            chatService.newMessage(msg, lobbyName);
         } else {
-            chatService.newMessage(loggedInUser, msg);
+            chatService.newMessage(msg);
         }
     }
 
@@ -286,14 +262,52 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @author Alwin Bossert
      * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageMessage
+     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
      * @since 2021-03-23
      */
     @Subscribe
     protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby " + msg.getName());
+            LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+        }
+    }
+
+    /**
+     * Handles new incoming SystemMessageForRobbingMessage
+     * <p>
+     * If a SystemMessageForRobbingMessage is posted onto the EventBus, this method
+     * places the incoming SystemMessageForRobbingMessage into the chatMessages list.
+     * If the loglevel is set to DEBUG, the massage "Received SystemMessageForRobbingMessage
+     * for Lobby {@code <lobbyName>}" is displayed in the log.
+     *
+     * @param msg The SystemMessageForRobbingMessage foung on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.common.chat.message.SystemMessageForRobbingMessage
+     * @since 2021-04-07
+     */
+    @Subscribe
+    protected void onSystemMessageForRobbingMessage(SystemMessageForRobbingMessage msg) {
+        if (msg.getName().equals(this.lobbyName)) {
+            LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
+            if (msg.getVictim() == null) {
+                if (msg.getUser().equals(userService.getLoggedInUser())) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle(resourceBundle.getString("error.title"));
+                        alert.setHeaderText(resourceBundle.getString("error.header"));
+                        alert.setContentText(resourceBundle.getString("game.robber.error"));
+                        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                            ButtonBar.ButtonData.OK_DONE);
+                        alert.getButtonTypes().setAll(confirm);
+                        alert.showAndWait();
+                    });
+                }
+            } else {
+                Platform.runLater(() -> chatMessages.add(msg.getMsg()));
+            }
         }
     }
 
@@ -315,7 +329,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeResponse for Lobby " + msg.getName());
+            LOG.debug("Received SystemMessageForTradeResponse for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }
@@ -337,8 +351,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @Subscribe
     protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
-        if (msg.getName().equals(this.lobbyName) && !this.loggedInUser.equals(msg.getUser())) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + msg.getName());
+        if (msg.getName().equals(this.lobbyName) && !userService.getLoggedInUser().equals(msg.getUser())) {
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
         }
     }
@@ -361,7 +375,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
         if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby " + rsp.getLobbyName());
+            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby {}", rsp.getLobbyName());
             Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         }
     }
@@ -382,7 +396,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @Subscribe
     protected void onSystemMessageResponse(SystemMessageResponse rsp) {
         if (rsp.isLobbyChatMessage() && rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageResponse for Lobby " + rsp.getLobbyName());
+            LOG.debug("Received SystemMessageResponse for Lobby {}", rsp.getLobbyName());
             Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         } else if (!rsp.isLobbyChatMessage() && this.lobbyName == null) {
             LOG.debug("Received SystemMessageResponse");
@@ -403,7 +417,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @see de.uol.swp.client.AbstractPresenterWithChat#prepareChatVars()
      * @since 2020-12-26
      */
-    protected void resetCharVars() {
+    protected void resetChatVars() {
         chatMessages = null;
     }
 

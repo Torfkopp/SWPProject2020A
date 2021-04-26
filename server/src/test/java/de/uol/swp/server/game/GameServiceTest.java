@@ -1,21 +1,27 @@
 package de.uol.swp.server.game;
 
 import com.google.common.eventbus.EventBus;
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.management.GameMapManagement;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
 import de.uol.swp.common.game.request.ExecuteTradeWithBankRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
+import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
+import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
+import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserDTO;
+import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.LoginRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyManagement;
@@ -31,8 +37,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This is a test of the class used to handle the requests sent by the client regarding the game
@@ -195,6 +200,7 @@ public class GameServiceTest {
             if (value.equals("game.resources.cards.monopoly")) monopolyCards++;
             if (value.equals("game.resources.cards.victorypoints")) victoryPointCards++;
         }
+        game.setDiceRolledAlready(true);
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
@@ -428,6 +434,7 @@ public class GameServiceTest {
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
         game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayKnightCardRequest(lobby.getName(), user[0]));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getKnights());
     }
@@ -449,10 +456,11 @@ public class GameServiceTest {
         inventories[1].increaseBrick(1);
         inventories[2].increaseBrick(2);
         inventories[0].increaseMonopolyCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayMonopolyCardRequest(lobby.getName(), user[0], Resources.BRICK));
-        assertEquals(2, inventories[0].getBrick());
+        assertEquals(3, inventories[0].getBrick());
         assertEquals(0, inventories[1].getBrick());
-        assertEquals(1, inventories[2].getBrick());
+        assertEquals(0, inventories[2].getBrick());
     }
 
     @Test
@@ -470,6 +478,7 @@ public class GameServiceTest {
         Game game = gameManagement.getGame(lobby.getName());
         assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
         game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayYearOfPlentyCardRequest(lobby.getName(), user[0], Resources.BRICK, Resources.GRAIN));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
         assertEquals(1, game.getInventory(Player.PLAYER_1).getGrain());
@@ -478,6 +487,53 @@ public class GameServiceTest {
     @Test
     void onRoadBuildingCardRequestTest() {
         //Methode noch nicht fertig
+    }
+
+    @Test
+    void testRobberMethods() {
+        User[] user = new User[4];
+        user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        UserOrDummy dummy = new DummyDTO();
+        Lobby lobby = new LobbyDTO("Read The Manga", user[0], true, 4, false, 60, true, true);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        lobby.joinUser(dummy);
+        IGameMapManagement gameMap = new GameMapManagement();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap);
+        Game game = gameManagement.getGame(lobby.getName());
+        game.setDiceRolledAlready(true);
+        //Tests robbing a resource
+        game.getInventory(user[1]).increaseBrick(1);
+        game.getInventory(dummy).increaseOre(1);
+        bus.post(new RobberChosenVictimRequest(lobby.getName(), user[0], user[1]));
+        bus.post(new RobberChosenVictimRequest(lobby.getName(), user[0], dummy));
+        assertEquals(1, game.getInventory(user[0]).getBrick());
+        assertEquals(0, game.getInventory(user[1]).getBrick());
+        assertEquals(1, game.getInventory(user[0]).getOre());
+        assertEquals(0, game.getInventory(dummy).getOre());
+
+        //Tests robberTax
+        game.getInventory(user[2]).increaseOre(3);
+        game.getInventory(user[2]).increaseGrain(3);
+        game.getInventory(user[2]).increaseWool(4);
+        Map<Resources, Integer> map = new HashMap<>();
+        map.put(Resources.ORE, 1);
+        map.put(Resources.GRAIN, 2);
+        map.put(Resources.WOOL, 2);
+        bus.post(new RobberTaxChosenRequest(map, user[2], lobby.getName()));
+        assertEquals(2, game.getInventory(user[2]).getOre());
+        assertEquals(1, game.getInventory(user[2]).getGrain());
+        assertEquals(2, game.getInventory(user[2]).getWool());
+
+        //Tests new robber position
+        MapPoint robPos = game.getMap().getRobberPosition();
+        MapPoint mp = MapPoint.HexMapPoint(2, 4);
+        bus.post(new RobberNewPositionChosenRequest(lobby.getName(), user[2], mp));
+        assertNotEquals(robPos, game.getMap().getRobberPosition());
+        assertEquals(mp, game.getMap().getRobberPosition());
     }
 
     /**
@@ -513,8 +569,9 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getOre());
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
-
-        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby", "wool", "brick");
+        game.setDiceRolledAlready(true);
+        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby", Resources.WOOL,
+                                                                              Resources.BRICK);
 
         bus.post(executeTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
@@ -576,21 +633,37 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
 
-        Map<String, Integer> offeringResourceMap = new HashMap<>();
-        offeringResourceMap.put("brick", 2);
-        offeringResourceMap.put("ore", 3);
-        offeringResourceMap.put("wool", 0);
-        offeringResourceMap.put("grain", 0);
-        offeringResourceMap.put("lumber", 0);
-        Map<String, Integer> respondingResourceMap = new HashMap<>();
-        respondingResourceMap.put("brick", 0);
-        respondingResourceMap.put("ore", 0);
-        respondingResourceMap.put("wool", 1);
-        respondingResourceMap.put("grain", 0);
-        respondingResourceMap.put("lumber", 4);
-
-        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", respondingResourceMap,
-                                                           offeringResourceMap);
+        List<Map<String, Object>> offeredResourceList = new ArrayList<>();
+        Map<String, Object> brickMap = new HashMap<>();
+        brickMap.put("amount", 2);
+        brickMap.put("resource", new I18nWrapper("game.resources.brick"));
+        brickMap.put("enumType", Resources.BRICK);
+        offeredResourceList.add(brickMap);
+        Map<String, Object> oreMap = new HashMap<>();
+        oreMap.put("amount", 3);
+        oreMap.put("resource", new I18nWrapper("game.resources.ore"));
+        oreMap.put("enumType", Resources.ORE);
+        offeredResourceList.add(oreMap);
+        offeredResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        offeredResourceList.add(getEmptyResourceMap(Resources.LUMBER));
+        offeredResourceList.add(getEmptyResourceMap(Resources.WOOL));
+        List<Map<String, Object>> demandedResourceList = new ArrayList<>();
+        Map<String, Object> woolMap = new HashMap<>();
+        woolMap.put("amount", 1);
+        woolMap.put("resource", new I18nWrapper("game.resources.wool"));
+        woolMap.put("enumType", Resources.WOOL);
+        demandedResourceList.add(woolMap);
+        Map<String, Object> lumberMap = new HashMap<>();
+        lumberMap.put("amount", 4);
+        lumberMap.put("resource", new I18nWrapper("game.resources.lumber"));
+        lumberMap.put("enumType", Resources.LUMBER);
+        demandedResourceList.add(lumberMap);
+        demandedResourceList.add(getEmptyResourceMap(Resources.BRICK));
+        demandedResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        demandedResourceList.add(getEmptyResourceMap(Resources.ORE));
+        game.setDiceRolledAlready(true);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", demandedResourceList,
+                                                           offeredResourceList);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
@@ -659,21 +732,33 @@ public class GameServiceTest {
         assertEquals(0, gameInventory[2].getGrain());
         assertEquals(0, gameInventory[2].getLumber());
 
-        Map<String, Integer> offeringResourceMap = new HashMap<>();
-        offeringResourceMap.put("brick", 2);
-        offeringResourceMap.put("ore", 3);
-        offeringResourceMap.put("wool", 0);
-        offeringResourceMap.put("grain", 0);
-        offeringResourceMap.put("lumber", 0);
-        Map<String, Integer> respondingResourceMap = new HashMap<>();
-        respondingResourceMap.put("wool", 1);
-        respondingResourceMap.put("lumber", 4);
-        respondingResourceMap.put("brick", 0);
-        respondingResourceMap.put("ore", 0);
-        respondingResourceMap.put("grain", 0);
+        List<Map<String, Object>> offeredResourceList = new ArrayList<>();
+        Map<String, Object> brickMap = new HashMap<>();
+        brickMap.put("amount", 2);
+        brickMap.put("resource", Resources.BRICK);
+        offeredResourceList.add(brickMap);
+        Map<String, Object> oreMap = new HashMap<>();
+        oreMap.put("amount", 3);
+        oreMap.put("resource", Resources.ORE);
+        offeredResourceList.add(oreMap);
+        offeredResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        offeredResourceList.add(getEmptyResourceMap(Resources.LUMBER));
+        offeredResourceList.add(getEmptyResourceMap(Resources.WOOL));
+        List<Map<String, Object>> demandedResourceList = new ArrayList<>();
+        Map<String, Object> woolMap = new HashMap<>();
+        woolMap.put("amount", 1);
+        woolMap.put("resource", Resources.WOOL);
+        demandedResourceList.add(woolMap);
+        Map<String, Object> lumberMap = new HashMap<>();
+        lumberMap.put("amount", 4);
+        lumberMap.put("resource", Resources.LUMBER);
+        demandedResourceList.add(lumberMap);
+        demandedResourceList.add(getEmptyResourceMap(Resources.BRICK));
+        demandedResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        demandedResourceList.add(getEmptyResourceMap(Resources.ORE));
 
-        Message tradeWithUser = new AcceptUserTradeRequest(user[2], user[0], "testlobby", respondingResourceMap,
-                                                           offeringResourceMap);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[2], user[0], "testlobby", demandedResourceList,
+                                                           offeredResourceList);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
@@ -690,8 +775,8 @@ public class GameServiceTest {
         assertEquals(0, gameInventory1[2].getGrain());
         assertEquals(0, gameInventory1[2].getLumber());
 
-        Message tradeWithUser2 = new AcceptUserTradeRequest(user[0], user[2], "testlobby", respondingResourceMap,
-                                                            offeringResourceMap);
+        Message tradeWithUser2 = new AcceptUserTradeRequest(user[0], user[2], "testlobby", demandedResourceList,
+                                                            offeredResourceList);
         bus.post(tradeWithUser2);
 
         Game game2 = gameManagement.getGame("testlobby");
@@ -707,6 +792,24 @@ public class GameServiceTest {
         assertEquals(0, gameInventory2[2].getOre());
         assertEquals(0, gameInventory2[2].getGrain());
         assertEquals(0, gameInventory2[2].getLumber());
+    }
+
+    /**
+     * Helper method to create a resource Map with amount of 0
+     *
+     * @param resources Element of Enum Resources to create an empty resource Map for
+     *
+     * @return Resource Map with 'amount' set to 0
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-20
+     */
+    private Map<String, Object> getEmptyResourceMap(Resources resources) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("amount", 0);
+        map.put("resource", new I18nWrapper("game.resources." + resources.name().toLowerCase()));
+        map.put("enumType", resources);
+        return map;
     }
 
     /**

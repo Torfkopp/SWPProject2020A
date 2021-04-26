@@ -1,5 +1,6 @@
 package de.uol.swp.server;
 
+import com.google.common.hash.Hashing;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.uol.swp.common.user.UserDTO;
@@ -11,10 +12,13 @@ import de.uol.swp.server.devmenu.CommandService;
 import de.uol.swp.server.di.ServerModule;
 import de.uol.swp.server.game.GameService;
 import de.uol.swp.server.lobby.LobbyService;
+import de.uol.swp.server.sessionmanagement.SessionService;
 import de.uol.swp.server.usermanagement.*;
 import io.netty.channel.ChannelHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class handles the startup of the server and the creation of default users
@@ -43,7 +47,9 @@ class ServerApp {
         // Create 5 test user for ease of development
         for (int i = 0; i < 5; i++) {
             if (userManagement.getUser("test" + i).isEmpty()) {
-                userManagement.createUser(new UserDTO(i, "test" + i, "test" + i, "test" + i + "@test.de"));
+                @SuppressWarnings("UnstableApiUsage")
+                String hashedPassword = Hashing.sha256().hashString("test" + i, StandardCharsets.UTF_8).toString();
+                userManagement.createUser(new UserDTO(i, "test" + i, hashedPassword, "test" + i + "@test.de"));
             }
         }
 
@@ -55,6 +61,7 @@ class ServerApp {
         injector.getInstance(ChatService.class);
         injector.getInstance(CommandService.class);
         injector.getInstance(GameService.class);
+        injector.getInstance(SessionService.class);
     }
 
     /**
@@ -80,7 +87,7 @@ class ServerApp {
         if (port < 0) {
             port = 8889;
         }
-        LOG.info("Starting Server on port " + port);
+        LOG.info("Starting Server on port {}", port);
 
         // create components
         Injector injector = Guice.createInjector(new ServerModule());

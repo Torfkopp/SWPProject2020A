@@ -16,25 +16,24 @@ import java.util.*;
  *
  * @author Marco Grawunder
  * @implNote This store will never return the password of a user!
- * @see de.uol.swp.server.usermanagement.store.AbstractUserStore
  * @see de.uol.swp.server.usermanagement.store.UserStore
  * @since 2019-08-05
  */
-public class MainMemoryBasedUserStore extends AbstractUserStore implements UserStore {
+public class MainMemoryBasedUserStore implements UserStore {
 
     private final Map<String, User> usersByName = new HashMap<>();
     private final Map<Integer, User> usersById = new HashMap<>();
     private int id_counter;
 
     @Override
-    public User createUser(String username, String password, String eMail) {
+    public User createUser(String username, String password, String eMail) throws IllegalArgumentException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
         int id;
         if (usersByName.containsKey(username)) id = usersByName.get(username).getID();
         else id = id_counter++;
-        User usr = new UserDTO(id, username, hash(password), eMail);
+        User usr = new UserDTO(id, username, password, eMail);
         usersById.put(id, usr);
         usersByName.put(username, usr);
         return usr.getWithoutPassword();
@@ -61,7 +60,7 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     @Override
     public Optional<User> findUser(String username, String password) {
         User usr = usersByName.get(username);
-        if (usr != null && Objects.equals(usr.getPassword(), hash(password))) {
+        if (usr != null && Objects.equals(usr.getPassword(), password)) {
             return Optional.of(usr.getWithoutPassword());
         }
         return Optional.empty();
@@ -98,21 +97,21 @@ public class MainMemoryBasedUserStore extends AbstractUserStore implements UserS
     }
 
     @Override
-    public User updateUser(int id, String username, String password, String eMail) {
+    public User updateUser(int id, String username, String password, String eMail) throws IllegalArgumentException {
         Optional<User> user = findUser(id);
         if (user.isEmpty()) throw new IllegalArgumentException("No user with this ID found");
         if (Strings.isNullOrEmpty(username)) throw new IllegalArgumentException("Username must not be null");
         if (!user.get().getUsername().equals(username) && findUser(username).isPresent())
             throw new IllegalArgumentException("Username already taken");
         removeUser(user.get().getUsername());
-        User usr = new UserDTO(id, username, hash(password), eMail);
+        User usr = new UserDTO(id, username, password, eMail);
         usersByName.put(username, usr);
         usersById.put(id, usr);
         return usr.getWithoutPassword();
     }
 
     @Override
-    public User updateUser(String username, String password, String eMail) {
+    public User updateUser(String username, String password, String eMail) throws IllegalArgumentException {
         Optional<User> user = findUser(username);
         if (user.isEmpty()) throw new IllegalArgumentException("No user with this name found");
         else return createUser(username, password, eMail);

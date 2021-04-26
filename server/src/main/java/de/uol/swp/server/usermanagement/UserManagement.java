@@ -11,10 +11,10 @@ import java.util.*;
  * Handles most user related issues, e.g. login/logout
  *
  * @author Marco Grawunder
- * @see de.uol.swp.server.usermanagement.AbstractUserManagement
+ * @see de.uol.swp.server.usermanagement.IUserManagement
  * @since 2019-08-05
  */
-public class UserManagement extends AbstractUserManagement {
+public class UserManagement implements IUserManagement {
 
     private final UserStore userStore;
     private final SortedMap<Integer, User> loggedInUsers = new TreeMap<>();
@@ -37,7 +37,12 @@ public class UserManagement extends AbstractUserManagement {
         if (user.isPresent()) {
             throw new UserManagementException("Username already used!");
         }
-        return userStore.createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
+        try {
+            return userStore
+                    .createUser(userToCreate.getUsername(), userToCreate.getPassword(), userToCreate.getEMail());
+        } catch (RuntimeException e) {
+            throw new UserManagementException(e.getMessage());
+        }
     }
 
     @Override
@@ -96,11 +101,15 @@ public class UserManagement extends AbstractUserManagement {
         if (user.isEmpty()) {
             throw new UserManagementException("User unknown!");
         }
-        // Only update if there are new values
-        String newUsername = firstNotNull(userToUpdate.getUsername(), user.get().getUsername());
-        String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
-        String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
-        return userStore.updateUser(user.get().getID(), newUsername, newPassword, newEMail);
+        try {
+            // Only update if there are new values
+            String newUsername = firstNotNull(userToUpdate.getUsername(), user.get().getUsername());
+            String newPassword = firstNotNull(userToUpdate.getPassword(), user.get().getPassword());
+            String newEMail = firstNotNull(userToUpdate.getEMail(), user.get().getEMail());
+            return userStore.updateUser(user.get().getID(), newUsername, newPassword, newEMail);
+        } catch (RuntimeException e) {
+            throw new UserManagementException(e.getMessage());
+        }
     }
 
     /**

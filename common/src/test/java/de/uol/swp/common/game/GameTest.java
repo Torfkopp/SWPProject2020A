@@ -1,18 +1,20 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.GameMapManagement;
-import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.management.GameMapManagement;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static de.uol.swp.common.game.map.MapPoint.IntersectionMapPoint;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -99,29 +101,30 @@ public class GameTest {
     }
 
     @Test
-    @Disabled("This definitely works, trust me!")
     void calculateVictoryPointsTest() {
         Player player = Player.PLAYER_1;
+        IGameMapManagement map = game.getMap();
         assertEquals(Player.PLAYER_1, player);
-        //Player has nothing
-        assertEquals(0, game.calculateVictoryPoints(player));
-        game.getMap().placeSettlement(player, IntersectionMapPoint(0, 0));
-        //Player has a settlement
-        assertEquals(1, game.calculateVictoryPoints(player));
-        game.getMap().upgradeSettlement(player, IntersectionMapPoint(0, 0));
-        //Player has a city
+        // Player has 2 starting settlements
         assertEquals(2, game.calculateVictoryPoints(player));
-        game.getInventory(player).setVictoryPointCards(3);
-        //Player has a city and 3 victory point cards
-        assertEquals(5, game.calculateVictoryPoints(player));
-        game.setPlayerWithLongestRoad(player);
-        //Player has a city, 3 victory point cards, and the longest road
-        assertEquals(7, game.calculateVictoryPoints(player));
-        game.setPlayerWithLargestArmy(player);
-        //Player has a city, 3 point cards, longest road, and the largest army
-        assertEquals(9, game.calculateVictoryPoints(player));
-        game.getMap().placeSettlement(player, IntersectionMapPoint(2, 5));
-        //Player has a city, a settlement, 3 point cards, longest road, and the largest army
+        // build road to next intersection to be able to place a settlement
+        map.placeRoad(player, EdgeMapPoint(HexMapPoint(1, 1), HexMapPoint(1, 2)));
+        map.placeRoad(player, EdgeMapPoint(HexMapPoint(1, 1), HexMapPoint(0, 1)));
+        map.placeSettlement(player, IntersectionMapPoint(0, 1));
+        // Player now has 3 settlements
+        assertEquals(3, game.calculateVictoryPoints(player));
+        map.upgradeSettlement(player, IntersectionMapPoint(0, 1));
+        // Player has 2 settlements (1 VP), 1 city (2 VP) for 4 VP total
+        assertEquals(4, game.calculateVictoryPoints(player));
+        game.getInventory(player).setVictoryPointCards(2);
+        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards for 6 VP total
+        assertEquals(6, game.calculateVictoryPoints(player));
+        game.getInventory(player).setLongestRoad(true);
+        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road for 8 VP total
+        assertEquals(8, game.calculateVictoryPoints(player));
+        game.getInventory(player).setLargestArmy(true);
+        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road, Largest Army
+        // for 10 VP total
         assertEquals(10, game.calculateVictoryPoints(player));
     }
 

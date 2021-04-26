@@ -3,6 +3,7 @@ package de.uol.swp.client.user;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.hash.Hashing;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.request.*;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -25,23 +27,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnstableApiUsage")
 class UserServiceTest {
 
-    final User defaultUser = new UserDTO(1, "Marco", "test", "marco@test.de");
+    private final User defaultUser = new UserDTO(1, "Marco", "test", "marco@test.de");
 
-    final EventBus bus = new EventBus();
-    final CountDownLatch lock = new CountDownLatch(1);
-    Object event;
-
-    /**
-     * Helper method run after each test case
-     * <p>
-     * This method only unregisters the object of this class from the EventBus.
-     *
-     * @since 2019-10-10
-     */
-    @AfterEach
-    protected void deregisterBus() {
-        bus.unregister(this);
-    }
+    private final EventBus bus = new EventBus();
+    private final CountDownLatch lock = new CountDownLatch(1);
+    private Object event;
+    private IUserService userService;
 
     /**
      * Helper method run before each test case
@@ -52,9 +43,23 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     @BeforeEach
-    protected void registerBus() {
+    protected void setUp() {
         event = null;
         bus.register(this);
+        userService = new UserService(bus);
+    }
+
+    /**
+     * Helper method run after each test case
+     * <p>
+     * This method only unregisters the object of this class from the EventBus.
+     *
+     * @since 2019-10-10
+     */
+    @AfterEach
+    protected void tearDown() {
+        bus.unregister(this);
+        userService = null;
     }
 
     /**
@@ -62,7 +67,7 @@ class UserServiceTest {
      * <p>
      * This Test creates a new UserService object registered to the EventBus of
      * this test class. It then calls the createUser function of the object using
-     * the defaultUser as parameter and waits for it to post an UpdateUserRequest
+     * the defaultUser as parameter and waits for it to post an RegisterUserRequest
      * object onto the EventBus.
      * If this happens within one second, it checks if the user in the request object
      * is the same as the default user and if authorisation is needed.
@@ -74,8 +79,9 @@ class UserServiceTest {
      */
     @Test
     void createUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-        userService.createUser(defaultUser);
+        User userToCreate = new UserDTO(defaultUser.getID(), defaultUser.getUsername(),
+                                        userService.hash(defaultUser.getPassword()), defaultUser.getEMail());
+        userService.createUser(userToCreate);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -84,7 +90,8 @@ class UserServiceTest {
         RegisterUserRequest request = (RegisterUserRequest) event;
 
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
-        assertEquals(defaultUser.getPassword(), request.getUser().getPassword());
+        assertEquals(userToCreate.getPassword(), request.getUser().getPassword());
+        assertNotEquals(defaultUser.getPassword(), request.getUser().getPassword());
         assertEquals(defaultUser.getEMail(), request.getUser().getEMail());
         assertFalse(request.authorisationNeeded());
     }
@@ -102,13 +109,13 @@ class UserServiceTest {
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
      * @author Phillip-André Suhr
-     * @since 2019-10-10
+     * @since 2020-11-22
      */
     @Test
     void dropUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-
-        userService.dropUser(defaultUser);
+        User userToDrop = new UserDTO(defaultUser.getID(), defaultUser.getUsername(),
+                                      userService.hash(defaultUser.getPassword()), defaultUser.getEMail());
+        userService.dropUser(userToDrop, userService.hash(defaultUser.getPassword()));
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -117,9 +124,29 @@ class UserServiceTest {
         DeleteUserRequest request = (DeleteUserRequest) event;
 
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
-        assertEquals(defaultUser.getPassword(), request.getUser().getPassword());
+        assertEquals(userService.hash(defaultUser.getPassword()), request.getUser().getPassword());
+        assertNotEquals(defaultUser.getPassword(), request.getUser().getPassword());
         assertEquals(defaultUser.getEMail(), request.getUser().getEMail());
         assertTrue(request.authorisationNeeded());
+    }
+
+    /**
+     * Test for the hash routine
+     * <p>
+     * This test hashes the defaultUser's password using the sha256().hashString()
+     * method of the Hashing Google Guava module and compares the resulting
+     * String with the String returned by the UserService.hash() method.
+     * If the Strings are not equal, the test fails.
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-16
+     */
+    @Test
+    void hashTest() {
+        String hashedPassword = Hashing.sha256().hashString(defaultUser.getPassword(), StandardCharsets.UTF_8)
+                                       .toString();
+
+        assertEquals(hashedPassword, userService.hash(defaultUser.getPassword()));
     }
 
     /**
@@ -141,7 +168,8 @@ class UserServiceTest {
 
         LoginRequest loginRequest = (LoginRequest) event;
         assertEquals(defaultUser.getUsername(), loginRequest.getUsername());
-        assertEquals(defaultUser.getPassword(), loginRequest.getPassword());
+        assertEquals(userService.hash(defaultUser.getPassword()), loginRequest.getPassword());
+        assertNotEquals(defaultUser.getPassword(), loginRequest.getPassword());
     }
 
     /**
@@ -163,7 +191,6 @@ class UserServiceTest {
         loginUser();
         event = null;
 
-        ClientUserService userService = new UserService(bus);
         userService.logout(defaultUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -188,7 +215,6 @@ class UserServiceTest {
      */
     @Test
     void retrieveAllUsersTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
         userService.retrieveAllUsers();
 
         lock.await(250, TimeUnit.MILLISECONDS);
@@ -197,33 +223,40 @@ class UserServiceTest {
     }
 
     /**
-     * Test for the updateUser routine
+     * Test for the updateAccountDetails routine
      * <p>
-     * This Test creates a new UserService object registered to the EventBus of
-     * this test class. It then calls the updateUser function of the object using
-     * the defaultUser as parameter and waits for it to post an UpdateUserRequest
+     * This Test calls the updateAccountDetails function of the UserService with the
+     * provided parameters and waits for it to post an UpdateUserAccountDetailsRequest
      * object onto the EventBus.
-     * If this happens within one second, it checks if the user in the request object
-     * is the same as the default user and if authorisation is needed.
+     * If this happens within one second, it checks if all parameters were correctly
+     * added to the request and if authorisation is needed.
      * Authorisation should be needed.
      * If any of these checks fail or the method takes too long, this test is unsuccessful.
      *
      * @throws java.lang.InterruptedException thrown by lock.await()
-     * @since 2019-10-10
+     * @author Phillip-André Suhr
+     * @since 2021-04-16
      */
     @Test
-    void updateUserTest() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-        userService.updateUser(defaultUser);
+    void updateAccountDetailsTest() throws InterruptedException {
+        String newUsername = "Xx_better_username_xX";
+        User updatedUser = new UserDTO(defaultUser.getID(), newUsername, userService.hash(defaultUser.getPassword()),
+                                       defaultUser.getEMail());
+        userService.updateAccountDetails(updatedUser, userService.hash(defaultUser.getPassword()),
+                                         defaultUser.getUsername(), defaultUser.getEMail());
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof UpdateUserRequest);
+        assertTrue(event instanceof UpdateUserAccountDetailsRequest);
 
-        UpdateUserRequest request = (UpdateUserRequest) event;
+        UpdateUserAccountDetailsRequest request = (UpdateUserAccountDetailsRequest) event;
 
-        assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
-        assertEquals(defaultUser.getPassword(), request.getUser().getPassword());
+        assertEquals(updatedUser, request.getUser());
+        assertEquals(updatedUser.getID(), request.getUser().getID());
+        assertEquals(updatedUser.getPassword(), request.getOldPassword());
+        assertNotEquals(defaultUser.getPassword(), request.getOldPassword());
+        assertEquals(newUsername, request.getUser().getUsername());
+        assertEquals(defaultUser.getEMail(), request.getOldEMail());
         assertEquals(defaultUser.getEMail(), request.getUser().getEMail());
         assertTrue(request.authorisationNeeded());
     }
@@ -238,8 +271,7 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     private void loginUser() throws InterruptedException {
-        ClientUserService userService = new UserService(bus);
-        userService.login(defaultUser.getUsername(), defaultUser.getPassword());
+        userService.login(defaultUser.getUsername(), userService.hash(defaultUser.getPassword()));
         lock.await(250, TimeUnit.MILLISECONDS);
     }
 

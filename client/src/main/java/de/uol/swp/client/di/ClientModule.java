@@ -14,12 +14,14 @@ import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.TradeService;
-import de.uol.swp.client.user.ClientUserService;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
 import javafx.fxml.FXMLLoader;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.*;
 import java.util.Locale;
@@ -47,6 +49,7 @@ public class ClientModule extends AbstractModule {
         //Default settings
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
+        defaultProps.setProperty("debug.loglevel", "DEBUG");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -59,7 +62,13 @@ public class ClientModule extends AbstractModule {
             System.out.println("Error reading config file");
         }
 
-        LOG.debug("Selected Language in config File: " + properties.getProperty("lang"));
+        Level loglevel = Level.toLevel(properties.getProperty("debug.loglevel"));
+        LOG.info("Switching to selected LOG-Level in config File: {}", loglevel);
+        Configurator.setAllLevels(LogManager.getRootLogger().getName(), loglevel);
+        // override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
+        Configurator.setLevel("io.netty", Level.WARN);
+
+        LOG.debug("Selected Language in config File: {}", properties.getProperty("lang"));
 
         //Reading the language property into a locale
         String[] lang = properties.getProperty("lang").split("_");
@@ -97,7 +106,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
-        bind(ClientUserService.class).to(UserService.class).in(Scopes.SINGLETON);
+        bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
         bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
         bind(IGameService.class).to(GameService.class).in(Scopes.SINGLETON);
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);

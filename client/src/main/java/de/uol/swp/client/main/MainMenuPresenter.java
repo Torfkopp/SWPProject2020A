@@ -5,27 +5,24 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
-import de.uol.swp.common.lobby.response.AllLobbiesResponse;
-import de.uol.swp.common.lobby.response.CreateLobbyResponse;
-import de.uol.swp.common.lobby.response.JoinLobbyResponse;
+import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
+import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,13 +50,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     @FXML
+    private Label randomLobbyState;
+    @FXML
     private ListView<Pair<String, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
 
     private ObservableList<Pair<String, String>> lobbies;
     private ObservableList<String> users;
-    private Window window;
 
     /**
      * Constructor
@@ -97,9 +95,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-06
      */
     private void logout() {
-        lobbyService.removeFromLobbies(loggedInUser);
-        userService.logout(loggedInUser);
-        resetCharVars();
+        lobbyService.removeFromAllLobbies();
+        userService.logout(userService.getLoggedInUser());
+        resetChatVars();
     }
 
     /**
@@ -118,9 +116,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllLobbiesMessage(AllLobbiesMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllLobbiesMessage");
         updateLobbyList(msg.getLobbies());
+        randomLobbyState.setVisible(false);
     }
 
     /**
@@ -138,6 +137,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(rsp.getLobbies());
+        randomLobbyState.setVisible(false);
     }
 
     /**
@@ -173,7 +173,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onAllowedAmountOfPlayersMessage(AllowedAmountOfPlayersChangedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -193,7 +193,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
-        lobbyService.checkUserInLobby(loggedInUser);
+        lobbyService.checkUserInLobby();
     }
 
     /**
@@ -212,12 +212,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
-        LOG.debug("Received a CheckUserInLobbyResponse");
-        if (this.loggedInUser == null) return;
-        if (rsp.getIsInLobby() == false) {
-            eventBus.post(new ShowChangeAccountDetailsViewEvent(loggedInUser));
+        LOG.debug("Received CheckUserInLobbyResponse");
+        if (rsp.getIsInLobby()) {
+            lobbyService.showLobbyError(resourceBundle.getString("lobby.error.in.lobby"));
         } else {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.in.lobby")));
+            eventBus.post(new ShowChangeAccountDetailsViewEvent());
         }
     }
 
@@ -237,11 +236,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onCreateLobbyButtonPressed() {
         //give the lobby a default name
-        String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"), loggedInUser.getUsername());
+        String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"),
+                                    userService.getLoggedInUser().getUsername());
 
         //create Dialogue, disallow any use of § in the name (used for command parsing)
-        UnaryOperator<TextFormatter.Change> filter = (s) ->
-                !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
+        UnaryOperator<TextFormatter.Change> filter = s ->
+                s.getControlNewText().matches("[ A-Za-z0-9_',-]+") || s.isDeleted() ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
@@ -265,13 +265,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+        dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
+                () -> lobbyName.getText().isBlank() || !lobbyName.getText().matches("[ A-Za-z0-9_',-]+"),
+                lobbyName.textProperty()));
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), loggedInUser, maxPlayers));
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers));
     }
 
     /**
@@ -295,32 +298,43 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received CreateLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
     }
 
     /**
      * Method called when the DeleteUserButton is pressed
      * <p>
-     * This method is called when the DeleteUserButton is pressed. It first
-     * calls the UserService to log the user out, resets the variables used
-     * for storing the chat history, and then posts an instance of the
-     * ShowLoginViewEvent to the EventBus the SceneManager is subscribed to,
-     * and finally calls the UserService to drop the user.
+     * This method is called when the DeleteUserButton is pressed. It first asks
+     * the user to confirm that they want to delete the Account. It calls on the
+     * UserService to drop the user if and only if the user has a password and
+     * clicked the checkbox.
      *
-     * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
-     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
-     * @see de.uol.swp.client.SceneManager
-     * @see de.uol.swp.client.user.UserService
-     * @since 2020-11-20
+     * @author Timo Gerken
+     * @since 2021-04-19
      */
     @FXML
     private void onDeleteButtonPressed() {
-        userService.logout(loggedInUser);
-        resetCharVars();
-        eventBus.post(showLoginViewMessage);
-        userService.dropUser(loggedInUser);
+        TextInputDialog dialogue = new TextInputDialog();
+        dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
+        dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
+        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
+        PasswordField confirmPasswordField = new PasswordField();
+        CheckBox userDeletionConfirmCheckBox = new CheckBox(
+                resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
+        HBox hbox = new HBox(10, lbl, confirmPasswordField);
+        VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
+        dialogue.getDialogPane().setContent(box);
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+        dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
+                () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
+                userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
+        Optional<String> result = dialogue.showAndWait();
+        result.ifPresent(s -> userService
+                .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
     }
 
     /**
@@ -339,7 +353,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onGameCreatedMessage(GameCreatedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received GameCreatedMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -358,10 +372,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onJoinLobbyButtonPressed() {
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (lobbyView.getSelectionModel().isEmpty()) {
-            eventBus.post(new LobbyErrorEvent(resourceBundle.getString("lobby.error.invalidlobby")));
+            lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
         } else {
             String lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
-            lobbyService.joinLobby(lobbyName, loggedInUser);
+            lobbyService.joinLobby(lobbyName);
         }
     }
 
@@ -386,8 +400,40 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         LOG.debug("Received JoinLobbyResponse");
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobbyName(), loggedInUser, rsp.getLobby());
+            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
         });
+    }
+
+    /**
+     * Method called when the JoinRandomLobbyButton is pressed
+     * <p>
+     * If the JoinRandomLobbyButton is pressed, this method requests the LobbyService
+     * to join a random lobby. If there is no existing lobby or there is no fitting one,
+     * nothing will happen.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-04-08
+     */
+    @FXML
+    private void onJoinRandomLobbyButtonPressed() {
+        lobbyService.joinRandomLobby();
+    }
+
+    /**
+     * Handles a JoinRandomLobbyFailedResponse found on the EventBus
+     * <p>
+     * If a new JoinRandomLobbyFailedResponse object is found on the EventBus,
+     * this method sets the state of the randomLobbyState label to true.
+     *
+     * @author Finn Haase
+     * @author Sven Ahrens
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
+        randomLobbyState.setVisible(true);
     }
 
     /**
@@ -411,8 +457,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        lobbyService.removeFromLobbies(loggedInUser);
-        resetCharVars();
+        resetChatVars();
         eventBus.post(showLoginViewMessage);
         Platform.runLater(() -> eventBus.post(closeLobbiesViewEvent));
     }
@@ -434,7 +479,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyCreatedMessage(LobbyCreatedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received LobbyCreatedMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -453,7 +498,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onLobbyDeletedMessage(LobbyDeletedMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received LobbyDeletedMessage");
         lobbyService.retrieveAllLobbies();
     }
@@ -461,13 +506,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     /**
      * Handles a successful login
      * <p>
-     * If a LoginSuccessfulResponse is posted onto the EventBus, the loggedInUser
-     * of this client is set to the one in the message received.
-     * The list of the currently logged in users and the list of lobbies is requested,
+     * If a LoginSuccessfulResponse is posted onto the EventBus, the list of
+     * the currently logged in users and the list of lobbies is requested,
      * as well as a set amount of history for the global chat.
-     * Makes sure that the user is logged out gracefully
-     * should the window be closed without using the Logout button. Closing
-     * the window also clears the EventBus to avoid NullPointerExceptions.
+     * Makes sure that the user is logged out gracefully, should the window be
+     * closed without using the Logout button. Closing the window also clears
+     * the EventBus to avoid NullPointerExceptions.
      *
      * @param rsp The LoginSuccessfulResponse object seen on the EventBus
      *
@@ -477,21 +521,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
-        this.loggedInUser = rsp.getUser();
+        eventBus.post(new GetOldSessionsRequest(rsp.getUser()));
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
-
-        if (this.window == null) {
-            this.window = this.usersView.getScene().getWindow();
-        }
-        try {
-            this.window.setOnCloseRequest(event -> {
-                logout();
-                ((Stage) event.getSource()).close();
-                clearEventBus();
-            });
-        } catch (Exception ignored) {}
     }
 
     /**
@@ -499,13 +532,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * <p>
      * This method is called when the LogoutButton is pressed. It calls the
      * logout(user) method of the UserService to log out the user, resets the
-     * variables used for storing the chat history, calls the removeFromLobbies
+     * variables used for storing the chat history, calls the removeFromAllLobbies
      * method of the LobbyService, and then posts an
      * instance of the ShowLoginViewEvent and CloseLobbiesViewEvent to the
      * EventBus the SceneManager is subscribed to.
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.AbstractPresenterWithChat#resetCharVars()
+     * @see de.uol.swp.client.AbstractPresenterWithChat#resetChatVars()
      * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
      * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
      * @see de.uol.swp.client.SceneManager
@@ -517,6 +550,34 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         logout();
         eventBus.post(showLoginViewMessage);
         eventBus.post(closeLobbiesViewEvent);
+    }
+
+    /**
+     * Handles a UserDeletionSuccessfulResponse found on the EventBus
+     * <p>
+     * This method logs the currently logged in user out and returns them to the Login Screen.
+     * It also shows a Dialog Window to the user telling them the Account was deleted.
+     *
+     * @param rsp The UserDeletionSuccessfulResponse found on the EventBus
+     *
+     * @author Timo Gerken
+     * @since 2021-04-19
+     */
+    @Subscribe
+    private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
+        LOG.info("User deletion successful");
+        String username = userService.getLoggedInUser().getUsername();
+        eventBus.post(showLoginViewMessage);
+        logout();
+        ButtonType ok = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                                    String.format(resourceBundle.getString("mainmenu.settings.deleteaccount.success"),
+                                                  username), ok);
+            alert.setTitle(resourceBundle.getString("information.title"));
+            alert.setHeaderText(resourceBundle.getString("information.header"));
+            alert.show();
+        });
     }
 
     /**
@@ -534,11 +595,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedInMessage");
-        LOG.debug("---- New user " + msg.getUsername() + " logged in");
+        LOG.debug("---- New user {} logged in", msg.getUsername());
         Platform.runLater(() -> {
-            if (users != null && loggedInUser != null && !loggedInUser.getUsername().equals(msg.getUsername()))
+            if (users != null && !userService.getLoggedInUser().getUsername().equals(msg.getUsername()))
                 users.add(msg.getUsername());
         });
     }
@@ -558,9 +619,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
-        if (this.loggedInUser == null) return;
+        if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedOutMessage");
-        LOG.debug("---- User " + msg.getUsername() + " logged out");
+        LOG.debug("---- User {} logged out", msg.getUsername());
         Platform.runLater(() -> users.remove(msg.getUsername()));
     }
 

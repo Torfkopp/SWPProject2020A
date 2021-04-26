@@ -20,11 +20,10 @@ import java.util.Optional;
  * @author Aldin Dervisi
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
- * @see de.uol.swp.server.usermanagement.store.AbstractUserStore
  * @see de.uol.swp.server.usermanagement.store.UserStore
  * @since 2021-01-20
  */
-public class H2BasedUserStore extends AbstractUserStore {
+public class H2BasedUserStore implements UserStore {
 
     static final String JDBC_DRIVER = "org.h2.Driver";
     static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";
@@ -46,8 +45,6 @@ public class H2BasedUserStore extends AbstractUserStore {
 
         createTable();
 
-        String passwordHash = hash(password);
-
         if (findUser(username).isEmpty()) {
             try {
                 Class.forName(JDBC_DRIVER);
@@ -58,7 +55,7 @@ public class H2BasedUserStore extends AbstractUserStore {
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, username);
                 pstmt.setString(2, eMail);
-                pstmt.setString(3, passwordHash);
+                pstmt.setString(3, password);
                 pstmt.executeUpdate();
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
@@ -187,8 +184,6 @@ public class H2BasedUserStore extends AbstractUserStore {
     public Optional<User> findUser(String username, String password) {
         createTable();
 
-        String passwordHash = hash(password);
-
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -205,7 +200,7 @@ public class H2BasedUserStore extends AbstractUserStore {
                 String mail = rs.getString("mail");
                 String pass = rs.getString("pass");
 
-                if (user.equals(username) && pass.equals(passwordHash)) {
+                if (user.equals(username) && pass.equals(password)) {
                     User usr = new UserDTO(userId, user, pass, mail);
                     return Optional.of(usr.getWithoutPassword());
                 }
@@ -393,14 +388,12 @@ public class H2BasedUserStore extends AbstractUserStore {
      * registered ones.
      */
     @Override
-    public User updateUser(int id, String username, String password, String eMail) {
+    public User updateUser(int id, String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
 
         createTable();
-
-        String passwordHash = hash(password);
 
         Optional<User> usr = findUser(username);
         if (usr.isPresent() && usr.get().getID() != id) throw new IllegalArgumentException("Username already taken");
@@ -413,7 +406,7 @@ public class H2BasedUserStore extends AbstractUserStore {
             String sql = "UPDATE USERDB SET username = ?, pass = ?, mail = ? WHERE id = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
-            pstmt.setString(2, passwordHash);
+            pstmt.setString(2, password);
             pstmt.setString(3, eMail);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
@@ -445,14 +438,12 @@ public class H2BasedUserStore extends AbstractUserStore {
      * @since 2021-02-23
      */
     @Override
-    public User updateUser(String username, String password, String eMail) {
+    public User updateUser(String username, String password, String eMail) throws RuntimeException {
         if (Strings.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("Username must not be null");
         }
 
         createTable();
-
-        String passwordHash = hash(password);
 
         try {
             Class.forName(JDBC_DRIVER);
@@ -461,7 +452,7 @@ public class H2BasedUserStore extends AbstractUserStore {
 
             String sql = "UPDATE USERDB SET pass = ?, mail = ? WHERE username = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, passwordHash);
+            pstmt.setString(1, password);
             pstmt.setString(2, eMail);
             pstmt.setString(3, username);
             pstmt.executeUpdate();

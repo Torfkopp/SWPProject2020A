@@ -32,9 +32,9 @@ import java.util.*;
 public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGamePhase {
 
     public static final String fxml = "/fxml/LobbyView.fxml";
-    public static final int MIN_HEIGHT_PRE_GAME = 700;
+    public static final int MIN_HEIGHT_PRE_GAME = 825;
     public static final int MIN_WIDTH_PRE_GAME = 685;
-    public static final int MIN_HEIGHT_IN_GAME = 740;
+    public static final int MIN_HEIGHT_IN_GAME = 825;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -91,8 +91,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
         if (!this.lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received AllLobbyMembersResponse");
-        LOG.debug("---- Update of lobby member list");
-        LOG.debug("---- Owner of this lobby: " + rsp.getOwner().getUsername());
+        LOG.debug("---- Update of Lobby member list");
+        LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
         LOG.debug("---- Update of ready users");
         this.owner = (User) rsp.getOwner();
         if (this.readyUsers == null) this.readyUsers = new HashSet<>();
@@ -103,6 +103,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
+                setChangeOwnerButtonState();
             }
             setPreGameSettings();
         });
@@ -142,10 +143,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onLobbyUpdateEvent(LobbyUpdateEvent event) {
-        LOG.debug("Received LobbyUpdateEvent for lobby " + event.getLobbyName());
-        if (lobbyName == null || loggedInUser == null) {
-            lobbyName = event.getLobbyName();
-            loggedInUser = (User) event.getUser();
+        LOG.debug("Received LobbyUpdateEvent for Lobby {}", event.getLobby().getName());
+        if (lobbyName == null) {
+            lobbyName = event.getLobby().getName();
             chatService.askLatestMessages(10, lobbyName);
         }
         if (window == null) {
@@ -154,8 +154,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (readyUsers == null) {
             readyUsers = new HashSet<>();
         }
+        if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
+
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+        changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
         tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
 
         addSizeChangeListener();
@@ -170,6 +173,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
         setPreGameSettings();
+        lobbyService.checkForGame(lobbyName);
     }
 
     /**
@@ -190,7 +194,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse rsp) {
         LOG.debug("Received RemoveFromLobbiesResponse");
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
-            lobbyService.leaveLobby(entry.getKey(), loggedInUser);
+            lobbyService.leaveLobby(entry.getKey());
         }
     }
 
@@ -210,9 +214,17 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onUpdateLobbyMessage(UpdateLobbyMessage msg) {
-        LOG.debug("Received a AllowedAmountOfPlayersMessage");
+        LOG.debug("Received AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
+        if (owner != msg.getLobby().getOwner()) {
+            owner = msg.getLobby().getOwner();
+            prepareMembersView();
+            setStartSessionButtonState();
+            setKickUserButtonState();
+            setChangeOwnerButtonState();
+            setPreGameSettings();
+        }
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
         randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
         commandsActivated.setSelected(msg.getLobby().commandsAllowed());
@@ -239,11 +251,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @Subscribe
     private void onUserJoinedLobbyMessage(UserJoinedLobbyMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received UserJoinedLobbyMessage for Lobby " + lobbyName);
+        LOG.debug("Received UserJoinedLobbyMessage for Lobby {}", lobbyName);
         UserOrDummy user = msg.getUser();
-        LOG.debug("---- User " + user.getUsername() + " joined");
+        LOG.debug("---- User {} joined", user.getUsername());
         Platform.runLater(() -> {
-            if (lobbyMembers != null && loggedInUser != null && loggedInUser != user && !lobbyMembers.contains(user))
+            if (lobbyMembers != null && userService.getLoggedInUser() != user && !lobbyMembers.contains(user))
                 lobbyMembers.add(user);
             setStartSessionButtonState();
             setPreGameSettings();
@@ -275,11 +287,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @Subscribe
     private void onUserLeftLobbyMessage(UserLeftLobbyMessage msg) {
         if (!msg.getName().equals(this.lobbyName)) return;
-        LOG.debug("Received UserLeftLobbyMessage for Lobby " + lobbyName);
+        LOG.debug("Received UserLeftLobbyMessage for Lobby {}", lobbyName);
         UserOrDummy user = msg.getUser();
         if (Objects.equals(user, owner)) {
-            LOG.debug("---- Owner " + user.getUsername() + " left");
-        } else LOG.debug("---- User " + user.getUsername() + " left");
+            LOG.debug("---- Owner {} left", user.getUsername());
+        } else LOG.debug("---- User {} left", user.getUsername());
         Platform.runLater(() -> {
             lobbyMembers.remove(user);
             readyUsers.remove(user);
@@ -348,17 +360,21 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
                 return;
             }
             String name = newValue.getUsername();
-            boolean isSelf = newValue.equals(this.loggedInUser);
+            boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
+            changeOwnerButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf);
             if (isSelf) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
                 tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
             } else {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
+                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), name));
                 tradeWithUserButton
                         .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
             }

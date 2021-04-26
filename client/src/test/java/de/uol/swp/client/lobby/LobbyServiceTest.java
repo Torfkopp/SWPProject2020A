@@ -4,6 +4,8 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
@@ -40,6 +42,7 @@ class LobbyServiceTest {
     private final CountDownLatch lock = new CountDownLatch(1);
 
     private ILobbyService lobbyService;
+    private IUserService userService;
     private Object event;
 
     /**
@@ -49,7 +52,9 @@ class LobbyServiceTest {
      */
     @BeforeEach
     protected void setUp() {
-        lobbyService = new LobbyService(eventBus);
+        userService = new UserService(eventBus);
+        userService.setLoggedInUser(defaultUser);
+        lobbyService = new LobbyService(eventBus, userService);
         eventBus.register(this);
     }
 
@@ -61,6 +66,7 @@ class LobbyServiceTest {
     @AfterEach
     protected void tearDown() {
         lobbyService = null;
+        userService = null;
         event = null;
         eventBus.unregister(this);
     }
@@ -80,7 +86,7 @@ class LobbyServiceTest {
      */
     @Test
     void createNewLobby() throws InterruptedException {
-        lobbyService.createNewLobby("Test", defaultUser, 4);
+        lobbyService.createNewLobby("Test", 4);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -111,7 +117,7 @@ class LobbyServiceTest {
      */
     @Test
     void joinLobby() throws InterruptedException {
-        lobbyService.joinLobby(defaultLobbyName, defaultUser);
+        lobbyService.joinLobby(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -140,7 +146,7 @@ class LobbyServiceTest {
      */
     @Test
     void kickUser() throws InterruptedException {
-        lobbyService.kickUser(defaultLobbyName, defaultUser, secondUser);
+        lobbyService.kickUser(defaultLobbyName, secondUser);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -172,7 +178,7 @@ class LobbyServiceTest {
      */
     @Test
     void leaveLobby() throws InterruptedException {
-        lobbyService.leaveLobby(defaultLobbyName, defaultUser);
+        lobbyService.leaveLobby(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -201,7 +207,7 @@ class LobbyServiceTest {
      */
     @Test
     void refreshLobbyPresenterFields() throws InterruptedException {
-        lobbyService.refreshLobbyPresenterFields("Test", defaultUser, defaultLobby);
+        lobbyService.refreshLobbyPresenterFields(defaultLobby);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -209,12 +215,8 @@ class LobbyServiceTest {
 
         LobbyUpdateEvent lobbyUpdateEvent = (LobbyUpdateEvent) event;
 
-        assertEquals("Test", lobbyUpdateEvent.getLobbyName());
-
-        assertEquals(defaultUser, lobbyUpdateEvent.getUser());
-        assertEquals(defaultUser.getID(), lobbyUpdateEvent.getUser().getID());
-        assertEquals(defaultUser.getUsername(), lobbyUpdateEvent.getUser().getUsername());
         assertEquals(defaultLobby, lobbyUpdateEvent.getLobby());
+        assertEquals(defaultLobby.getName(), lobbyUpdateEvent.getLobby().getName());
         assertEquals(defaultLobby.isInGame(), lobbyUpdateEvent.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), lobbyUpdateEvent.getLobby().getMaxPlayers());
         assertEquals(defaultLobby.commandsAllowed(), lobbyUpdateEvent.getLobby().commandsAllowed());
@@ -238,7 +240,7 @@ class LobbyServiceTest {
      */
     @Test
     void removeFromLobbies() throws InterruptedException {
-        lobbyService.removeFromLobbies(defaultUser);
+        lobbyService.removeFromAllLobbies();
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -340,7 +342,7 @@ class LobbyServiceTest {
      */
     @Test
     void updateLobbySettings() throws InterruptedException {
-        lobbyService.updateLobbySettings(defaultLobbyName, defaultUser, 4, true, true, 60, true);
+        lobbyService.updateLobbySettings(defaultLobbyName, 4, true, true, 60, true);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -374,7 +376,7 @@ class LobbyServiceTest {
      */
     @Test
     void userReady() throws InterruptedException {
-        lobbyService.userReady(defaultLobbyName, defaultUser, true);
+        lobbyService.userReady(defaultLobbyName, true);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

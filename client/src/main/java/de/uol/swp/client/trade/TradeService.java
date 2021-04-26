@@ -4,14 +4,16 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +30,7 @@ public class TradeService implements ITradeService {
 
     private static final Logger LOG = LogManager.getLogger(LobbyService.class);
     private final EventBus eventBus;
+    private final IUserService userService;
 
     /**
      * Constructor
@@ -38,25 +41,26 @@ public class TradeService implements ITradeService {
      * @since 2021-04-07
      */
     @Inject
-    public TradeService(EventBus eventBus) {
+    public TradeService(EventBus eventBus, IUserService userService) {
         this.eventBus = eventBus;
         this.eventBus.register(this);
+        this.userService = userService;
         LOG.debug("TradeService started");
     }
 
     @Override
-    public void acceptUserTrade(String lobbyName, UserOrDummy respondingUser, UserOrDummy offeringUser,
-                                Map<String, Integer> demandedResources, Map<String, Integer> offeredResources) {
+    public void acceptUserTrade(String lobbyName, UserOrDummy offeringUser, List<Map<String, Object>> demandedResources,
+                                List<Map<String, Object>> offeredResources) {
         LOG.debug("Sending AcceptUserTradeRequest");
-        Message request = new AcceptUserTradeRequest(respondingUser, offeringUser, lobbyName, demandedResources,
-                                                     offeredResources);
+        Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
+                                                     demandedResources, offeredResources);
         eventBus.post(request);
     }
 
     @Override
-    public void buyDevelopmentCard(String lobbyName, User user) {
+    public void buyDevelopmentCard(String lobbyName) {
         LOG.debug("Sending BuyDevelopmentCardRequest");
-        Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user, lobbyName);
+        Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(userService.getLoggedInUser(), lobbyName);
         eventBus.post(buyDevelopmentCardRequest);
     }
 
@@ -68,11 +72,11 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void closeBankTradeWindow(String lobbyName, User user) {
+    public void closeBankTradeWindow(String lobbyName) {
         LOG.debug("Sending TradeCancelEvent");
         eventBus.post(new TradeCancelEvent(lobbyName));
         LOG.debug("Sending ResetTradeWithBankButtonEvent");
-        eventBus.post(new ResetTradeWithBankButtonEvent(user, lobbyName));
+        eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
     }
 
     @Override
@@ -88,18 +92,19 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void executeTradeWithBank(String lobbyName, User user, String gainedResource, String lostResource) {
+    public void executeTradeWithBank(String lobbyName, Resources gainedResource, Resources lostResource) {
         LOG.debug("Sending ExecuteTradeWithBankRequest");
-        Message request = new ExecuteTradeWithBankRequest(user, lobbyName, gainedResource, lostResource);
+        Message request = new ExecuteTradeWithBankRequest(userService.getLoggedInUser(), lobbyName, gainedResource,
+                                                          lostResource);
         eventBus.post(request);
     }
 
     @Override
-    public void offerTrade(String lobbyName, UserOrDummy user, UserOrDummy respondingUser,
-                           Map<String, Integer> offeredResources, Map<String, Integer> demandedResources) {
-        LOG.debug("Sending an OfferingTradeWithUserRequest");
-        Message request = new OfferingTradeWithUserRequest(user, respondingUser, lobbyName, offeredResources,
-                                                           demandedResources);
+    public void offerTrade(String lobbyName, UserOrDummy respondingUser, List<Map<String, Object>> offeredResources,
+                           List<Map<String, Object>> demandedResources) {
+        LOG.debug("Sending OfferingTradeWithUserRequest");
+        Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
+                                                           offeredResources, demandedResources);
         eventBus.post(request);
     }
 
@@ -111,9 +116,9 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showBankTradeWindow(String lobbyName, User user) {
+    public void showBankTradeWindow(String lobbyName) {
         LOG.debug("Sending ShowTradeWithBankViewEvent");
-        eventBus.post(new ShowTradeWithBankViewEvent(user, lobbyName));
+        eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
     }
 
     @Override
@@ -129,22 +134,22 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showUserTradeWindow(String lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser) {
+    public void showUserTradeWindow(String lobbyName, UserOrDummy respondingUser) {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(offeringUser, lobbyName, respondingUser));
+        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser));
     }
 
     @Override
-    public void tradeWithBank(String lobbyName, User user) {
+    public void tradeWithBank(String lobbyName) {
         LOG.debug("Sending TradeWithBankRequest");
-        Message request = new TradeWithBankRequest(lobbyName, user);
+        Message request = new TradeWithBankRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
     }
 
     @Override
-    public void tradeWithUser(String lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser) {
-        LOG.debug("Sending a TradeWithUserRequest");
-        Message request = new TradeWithUserRequest(lobbyName, offeringUser, respondingUser);
+    public void tradeWithUser(String lobbyName, UserOrDummy respondingUser) {
+        LOG.debug("Sending TradeWithUserRequest");
+        Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser);
         eventBus.post(request);
     }
 }

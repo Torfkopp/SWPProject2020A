@@ -14,9 +14,8 @@ import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
-import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
-import de.uol.swp.client.lobby.event.LobbyErrorEvent;
-import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.lobby.RobberTaxPresenter;
+import de.uol.swp.client.lobby.event.*;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.main.events.ClientDisconnectedFromServerEvent;
 import de.uol.swp.client.register.RegistrationPresenter;
@@ -27,13 +26,13 @@ import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.NukeUsersSessionsResponse;
+import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -43,6 +42,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,9 +70,14 @@ public class SceneManager {
     private final Stage primaryStage;
     private final Map<String, Stage> tradingStages = new HashMap<>();
     private final Map<String, Stage> tradingResponseStages = new HashMap<>();
+    private final Map<String, Stage> robberTaxStages = new HashMap<>();
     private final Map<String, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
+
+    @Inject
+    private IUserService userService;
+
     private Scene loginScene;
     private String lastTitle;
     private Scene registrationScene;
@@ -132,8 +137,7 @@ public class SceneManager {
      * @author Mario Fokken
      * @since 2020-12-19
      */
-    public void showChangeAccountDetailsScreen(User user) {
-        ChangeAccountDetailsScene.setUserData(user);
+    public void showChangeAccountDetailsScreen() {
         showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
@@ -246,6 +250,10 @@ public class SceneManager {
         showScene(mainScene,
                   String.format(resourceBundle.getString("mainmenu.window.title"), currentUser.getUsername()),
                   MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+        primaryStage.setOnCloseRequest(event -> {
+            closeLobbies();
+            closeMainScreen();
+        });
     }
 
     /**
@@ -363,7 +371,7 @@ public class SceneManager {
         FXMLLoader loader = injector.getInstance(FXMLLoader.class);
         try {
             URL url = getClass().getResource(fxmlFile);
-            LOG.debug("Loading FXML-File " + url);
+            LOG.debug("Loading FXML-File {}", url);
             loader.setLocation(url);
             rootPane = loader.load();
         } catch (IOException e) {
@@ -417,7 +425,6 @@ public class SceneManager {
      */
     private String internationaliseServerMessage(String e) {
         String context = e;
-        // @formatter:off
         switch (e) {
             //Found in ChatService
             case "This lobby doesn't allow the use of commands!":
@@ -434,7 +441,7 @@ public class SceneManager {
                 context = resourceBundle.getString("error.context.full");
                 break;
             case "This lobby does not exist!":
-                context = resourceBundle.getString("error.context.noexistant");
+                context = resourceBundle.getString("error.context.nonexistant");
                 break;
             //Found in GameService
             case "Can not kick while a game is ongoing":
@@ -464,41 +471,47 @@ public class SceneManager {
                 break;
         }
         //found in UserManagement
-        if (e.contains("Cannot auth user ")) context =
-                resourceBundle.getString("error.context.cannotauth") +
-                e.substring(16);
+        if (e.contains("Cannot auth user "))
+            context = String.format(resourceBundle.getString("error.context.cannotauth"), e.substring(17));
         //found in UserService
-        if (e.contains("Cannot delete user ")) context =
-                resourceBundle.getString("error.context.cannotdelete") + " " +
-                e.substring(e.indexOf('[')+1, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.unknown");
-        if (e.contains("Cannot create user ")) context =
-                resourceBundle.getString("error.context.cannotcreate") + " " +
-                e.substring(e.indexOf('[')+2-1, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.nameused");
-        if (e.contains("Cannot change Password of ")) context =
-                resourceBundle.getString("error.context.cannotchangepw") + " " +
-                e.substring(e.indexOf('[')+3-2, e.lastIndexOf(']')) + "\n" +
-                resourceBundle.getString("error.context.unknown");
+        if (e.contains("Cannot delete user ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotdelete"),
+                                    e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.unknown"));
+        }
+        if (e.contains("User deletion unsuccessful for user ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotdelete"),
+                                    e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.wrongpw"));
+        }
+        if (e.contains("Cannot create user ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotcreate"),
+                                    e.substring(e.indexOf('[') + 2 - 1, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.nameused"));
+        }
+        if (e.contains("Cannot change Password of ")) {
+            context = String.format(resourceBundle.getString("error.context.cannotchangepw"),
+                                    e.substring(e.indexOf('[') + 3 - 2, e.lastIndexOf(']')),
+                                    resourceBundle.getString("error.context.unknown"));
+        }
         //found in LobbyManagement
-        if (e.contains("Lobby") && e.contains(" already exists!")) context =
-                resourceBundle.getString("error.context.lobbyname") + " " +
-                e.substring(e.indexOf('[')+4-3, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains("Lobby") && e.contains(" not found!")) context =
-                resourceBundle.getString("error.context.lobbyname") + " " +
-                e.substring(e.indexOf('[')+5-4, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.notfound");
+        if (e.contains("Lobby") && e.contains(" already exists!")) {
+            context = String.format(resourceBundle.getString("error.context.lobby.alreadyused"),
+                                    e.substring(e.indexOf('[') + 4 - 3, e.lastIndexOf(']')));
+        }
+        if (e.contains("Lobby") && e.contains(" not found!")) {
+            context = String.format(resourceBundle.getString("error.context.lobby.notfound"),
+                                    e.substring(e.indexOf('[') + 5 - 4, e.lastIndexOf(']')));
+        }
         //found in GameManagement
-        if (e.contains("Game") && e.contains(" already exists!")) context =
-                resourceBundle.getString("error.context.gamelobby") + " " +
-                e.substring(e.indexOf('[')+6-5, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.alreadyexists");
-        if (e.contains("Game") && e.contains(" not found!")) context =
-                resourceBundle.getString("error.context.gamelobby") + " " +
-                e.substring(e.indexOf('[')+7-6, e.lastIndexOf(']')) + " " +
-                resourceBundle.getString("error.context.notfound");
-        // @formatter:on
+        if (e.contains("Game") && e.contains(" already exists!")) {
+            context = String.format(resourceBundle.getString("error.context.game.alreadyexists"),
+                                    e.substring(e.indexOf('[') + 6 - 5, e.lastIndexOf(']')));
+        }
+        if (e.contains("Game") && e.contains(" not found!")) {
+            context = String.format(resourceBundle.getString("error.context.game.notfound"),
+                                    e.substring(e.indexOf('[') + 7 - 6, e.lastIndexOf(']')));
+        }
         return context;
     }
 
@@ -589,6 +602,27 @@ public class SceneManager {
     }
 
     /**
+     * Handles a CloseRobberTaxViewEvent detected on the EventBus.
+     * <p>
+     * It then proceeds to close the robberTax window.
+     *
+     * @param event The CloseRobberTaxViewEvent found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onCloseRobberTaxViewEvent(CloseRobberTaxViewEvent event) {
+        LOG.debug("Received CloseRobberTaxViewEvent");
+        String lobby = event.getLobbyName();
+        if (robberTaxStages.containsKey(lobby)) {
+            robberTaxStages.get(lobby).close();
+            robberTaxStages.remove(lobby);
+        }
+    }
+
+    /**
      * Handles the CloseTradeResponseEvent detected on the EventBus
      * <p>
      * If a CloseTradeResponseEvent is detected on the EventBus, this method gets
@@ -604,8 +638,10 @@ public class SceneManager {
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
         String lobbyName = event.getLobbyName();
         if (tradingResponseStages.containsKey(lobbyName)) {
-            tradingResponseStages.get(lobbyName).close();
-            tradingResponseStages.remove(lobbyName);
+            Platform.runLater(() -> {
+                tradingResponseStages.get(lobbyName).close();
+                tradingResponseStages.remove(lobbyName);
+            });
         }
     }
 
@@ -636,11 +672,12 @@ public class SceneManager {
      *
      * @author Eric Vuong
      * @author Marvin Drees
-     * @see de.uol.swp.common.user.response.NukeUsersSessionsResponse
+     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
      * @since 2021-03-03
      */
     @Subscribe
-    private void onNukeUsersSessionsResponse(NukeUsersSessionsResponse rsp) {
+    private void onNukedUsersSessionsResponse(NukedUsersSessionsResponse rsp) {
+        LOG.debug("Received NukedUsersSessionsResponse");
         eventBus.post(new RetryLoginEvent());
     }
 
@@ -664,7 +701,7 @@ public class SceneManager {
         Platform.runLater(() -> {
             devMenuIsOpen = true;
             Stage devMenuStage = new Stage();
-            devMenuStage.setTitle("Developer Access Board");
+            devMenuStage.setTitle(resourceBundle.getString("devmenu.window.title"));
             devMenuStage.setHeight(DevMenuPresenter.MIN_HEIGHT);
             devMenuStage.setMinHeight(DevMenuPresenter.MIN_HEIGHT);
             devMenuStage.setWidth(DevMenuPresenter.MIN_WIDTH);
@@ -719,6 +756,9 @@ public class SceneManager {
      * If a ShowChangeAccountDetailsViewEvent is detected on the EventBus, this method gets
      * called. It calls a method to switch the current screen to the Change Account Details
      * screen.
+     * If the user wants to close this window, the user gets redirected to the Main Menu.
+     *
+     * @param event The ShowChangeAccountDetailsViewEvent detected on the EventBus
      *
      * @author Eric Vuong
      * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
@@ -726,7 +766,11 @@ public class SceneManager {
      */
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
-        showChangeAccountDetailsScreen(event.getUser());
+        showChangeAccountDetailsScreen();
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            windowEvent.consume();
+            showMainScreen(userService.getLoggedInUser());
+        });
     }
 
     /**
@@ -804,11 +848,52 @@ public class SceneManager {
     }
 
     /**
+     * Handles the ShowRobberTaxViewEvent detected on the EventBus
+     * <p>
+     * If a ShowRobberTaxViewEvent is detected on the EventBus, this method gets
+     * called. It opens the window to choose which resources to give up on and
+     * a ShowRobberTaxUpdateEvent is posted onto the EventBus
+     *
+     * @param event The ShowRobberTaxViewEvent found on the EventBus
+     *
+     * @author Mario Fokken
+     * @author Timo Gerken
+     * @see de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent
+     * @see de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent
+     * @since 2021-04-08
+     */
+    @Subscribe
+    private void onShowRobberTaxViewEvent(ShowRobberTaxViewEvent event) {
+        LOG.debug("Received ShowRobberTaxViewEvent");
+        String lobbyName = event.getLobbyName();
+        Platform.runLater(() -> {
+            Stage robberTaxStage = new Stage();
+            robberTaxStages.put(event.getLobbyName(), robberTaxStage);
+            robberTaxStage.setTitle(resourceBundle.getString("game.robber.tax.title"));
+            robberTaxStage.setHeight(RobberTaxPresenter.MIN_HEIGHT);
+            robberTaxStage.setMinHeight(RobberTaxPresenter.MIN_HEIGHT);
+            robberTaxStage.setWidth(RobberTaxPresenter.MIN_WIDTH);
+            robberTaxStage.setMinWidth(RobberTaxPresenter.MIN_WIDTH);
+            Parent rootPane = initPresenter(RobberTaxPresenter.fxml);
+            Scene robberTaxScene = new Scene(rootPane);
+            robberTaxScene.getStylesheets().add(styleSheet);
+            robberTaxStage.setScene(robberTaxScene);
+            robberTaxStage.initModality(Modality.NONE);
+            robberTaxStage.initOwner(primaryStage);
+            robberTaxStage.initStyle(StageStyle.UNDECORATED);
+            robberTaxStage.show();
+            LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
+            eventBus.post(
+                    new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
+        });
+    }
+
+    /**
      * Handles the ShowTradeWithBankViewEvent detected on the EventBus
      * <p>
      * If a ShowTradeWithBankViewEvent is detected on the EventBus, this method gets
      * called. It opens the trading with the bank window in a new window and a
-     * TradeUpdateEvent is sent onto teh eventBus.
+     * TradeUpdateEvent is sent onto the eventBus.
      *
      * @param event The ShowTradeWithBankViewEvent detected on the EventBus
      *
@@ -818,7 +903,6 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithBankViewEvent(ShowTradeWithBankViewEvent event) {
         //gets the lobby's name
-        User user = event.getUser();
         String lobbyName = event.getLobbyName();
         //New window (Stage)
         Stage bankStage = new Stage();
@@ -839,8 +923,8 @@ public class SceneManager {
         bankStage.initOwner(primaryStage);
         //Shows the window
         bankStage.show();
-        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
-        eventBus.post(new TradeUpdateEvent(lobbyName, user));
+        LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
+        eventBus.post(new TradeUpdateEvent(lobbyName));
     }
 
     /**
@@ -881,7 +965,7 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to lobby " + lobbyName);
+            LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
         });
     }
@@ -904,7 +988,6 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
         String lobbyName = event.getLobbyName();
-        UserOrDummy offeringUser = event.getOfferingUser();
         Stage tradingStage = new Stage();
         tradingStage.setTitle(
                 String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
@@ -920,8 +1003,8 @@ public class SceneManager {
         tradingStage.initModality(Modality.NONE);
         tradingStage.initOwner(primaryStage);
         tradingStage.show();
-        eventBus.post(new TradeWithUserUpdateEvent(lobbyName, offeringUser));
-        LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
+        eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
+        LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
     }
 
     /**
@@ -939,10 +1022,12 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         String lobby = event.getLobbyName();
-        if (tradingStages.containsKey(lobby)) {
-            tradingStages.get(lobby).close();
-            tradingStages.remove(lobby);
-        }
+        Platform.runLater(() -> {
+            if (tradingStages.containsKey(lobby)) {
+                tradingStages.get(lobby).close();
+                tradingStages.remove(lobby);
+            }
+        });
     }
 
     /**
@@ -976,7 +1061,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        LOG.debug("Received a TradeWithUserCancelResponse");
+        LOG.debug("Received TradeWithUserCancelResponse");
         String lobby = rsp.getLobbyName();
         if (tradingResponseStages.containsKey(lobby)) {
             Platform.runLater(() -> {
