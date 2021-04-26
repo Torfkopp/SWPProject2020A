@@ -93,7 +93,7 @@ public class NettyServerHandler implements ChannelInboundHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (ctx.channel().isActive() || ctx.channel().isOpen()) {
-            LOG.error("Exception caught " + cause);
+            LOG.error("Exception caught {}", cause.toString());
         } else {
             delegate.clientDisconnected(new NettyMessageContext(ctx));
         }

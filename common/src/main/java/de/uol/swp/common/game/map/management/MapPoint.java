@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.management;
 
 import java.io.Serializable;
 
@@ -139,7 +139,7 @@ public class MapPoint implements Serializable {
      *
      * @return Type of the MapPoint
      *
-     * @see de.uol.swp.common.game.map.MapPoint.Type
+     * @see de.uol.swp.common.game.map.management.MapPoint.Type
      */
     public Type getType() {
         //@formatter:off

@@ -142,7 +142,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method to disable pre-game Buttons and Checkboxes
+     * Helper method that sets the visibility for the lobby owner and disables pre-game Buttons and Checkboxes
      * for everyone, expect the owner.
      *
      * @author Maximilian Lindner
@@ -151,7 +151,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
         commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
@@ -271,7 +273,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
         Platform.runLater(() -> {
-            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby " + lobbyName);
+            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
@@ -282,16 +284,20 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setVisible(true);
             preGameSettingBox.setPrefHeight(190);
             preGameSettingBox.setMaxHeight(190);
-            turnIndicator.setText("");
+            turnIndicator.setAccessibleText("");
             preGameSettingBox.setMinHeight(190);
             uniqueCardView.setMaxHeight(0);
             uniqueCardView.setMinHeight(0);
             uniqueCardView.setPrefHeight(0);
             uniqueCardView.setVisible(false);
-            inventoryView.setMaxHeight(0);
-            inventoryView.setMinHeight(0);
-            inventoryView.setPrefHeight(0);
-            inventoryView.setVisible(false);
+            resourceTableView.setMaxHeight(0);
+            resourceTableView.setMinHeight(0);
+            resourceTableView.setPrefHeight(0);
+            resourceTableView.setVisible(false);
+            developmentCardTableView.setMaxHeight(0);
+            developmentCardTableView.setMinHeight(0);
+            developmentCardTableView.setPrefHeight(0);
+            developmentCardTableView.setVisible(false);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
@@ -341,7 +347,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onStartSessionMessage(StartSessionMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionMessage for Lobby " + lobbyName);
+        LOG.debug("Received StartSessionMessage for Lobby {}", lobbyName);
         gameWon = false;
         winner = null;
         inGame = true;
@@ -380,7 +386,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onStartSessionResponse(StartSessionResponse rsp) {
         if (!rsp.getLobby().getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionResponse for Lobby " + lobbyName);
+        LOG.debug("Received StartSessionResponse for Lobby {}", lobbyName);
         gameWon = false;
         winner = null;
         inGame = true;
@@ -393,6 +399,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
+            autoRoll.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
@@ -421,7 +428,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @Subscribe
     private void onUserReadyMessage(UserReadyMessage msg) {
         if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received UserReadyMessage for Lobby " + lobbyName);
+        LOG.debug("Received UserReadyMessage for Lobby {}", lobbyName);
         lobbyService.retrieveAllLobbyMembers(lobbyName); // for updateUserList
     }
 
@@ -443,10 +450,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
         ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         ((Stage) window).setMinHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
-        inventoryView.setMaxHeight(280);
-        inventoryView.setMinHeight(280);
-        inventoryView.setPrefHeight(280);
-        inventoryView.setVisible(true);
+        resourceTableView.setMaxHeight(150);
+        resourceTableView.setMinHeight(150);
+        resourceTableView.setPrefHeight(150);
+        resourceTableView.setVisible(true);
+        developmentCardTableView.setMaxHeight(150);
+        developmentCardTableView.setMinHeight(150);
+        developmentCardTableView.setPrefHeight(150);
+        developmentCardTableView.setVisible(true);
         uniqueCardView.setMaxHeight(48);
         uniqueCardView.setMinHeight(48);
         uniqueCardView.setPrefHeight(48);

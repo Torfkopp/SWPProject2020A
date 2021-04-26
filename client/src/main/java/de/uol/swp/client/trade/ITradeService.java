@@ -1,8 +1,10 @@
 package de.uol.swp.client.trade;
 
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,8 +25,8 @@ public interface ITradeService {
      * @param demandedResources The resources the offering User wants
      * @param offeredResources  The resources the offering User is offering
      */
-    void acceptUserTrade(String lobbyName, UserOrDummy offeringUser, Map<String, Integer> demandedResources,
-                         Map<String, Integer> offeredResources);
+    void acceptUserTrade(String lobbyName, UserOrDummy offeringUser, List<Map<String, Object>> demandedResources,
+                         List<Map<String, Object>> offeredResources);
 
     /**
      * Posts a request to buy a Development Card
@@ -69,7 +71,7 @@ public interface ITradeService {
      * @param gainedResource The resource the User wants from the Bank
      * @param lostResource   The resource the User is offering to the Bank
      */
-    void executeTradeWithBank(String lobbyName, String gainedResource, String lostResource);
+    void executeTradeWithBank(String lobbyName, Resources gainedResource, Resources lostResource);
 
     /**
      * Posts a request to offer a trade to another user
@@ -79,8 +81,8 @@ public interface ITradeService {
      * @param offeredResources  Map of resources being offered to the responding user
      * @param demandedResources Map of resources being demanded from the responding user
      */
-    void offerTrade(String lobbyName, UserOrDummy respondingUser, Map<String, Integer> offeredResources,
-                    Map<String, Integer> demandedResources);
+    void offerTrade(String lobbyName, UserOrDummy respondingUser, List<Map<String, Object>> offeredResources,
+                    List<Map<String, Object>> demandedResources);
 
     /**
      * Posts a request to reset the Offer Trade button for the user who proposed a trade

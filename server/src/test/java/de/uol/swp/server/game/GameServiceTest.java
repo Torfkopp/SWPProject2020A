@@ -1,9 +1,13 @@
 package de.uol.swp.server.game;
 
 import com.google.common.eventbus.EventBus;
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.management.GameMapManagement;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
 import de.uol.swp.common.game.request.ExecuteTradeWithBankRequest;
@@ -196,6 +200,7 @@ public class GameServiceTest {
             if (value.equals("game.resources.cards.monopoly")) monopolyCards++;
             if (value.equals("game.resources.cards.victorypoints")) victoryPointCards++;
         }
+        game.setDiceRolledAlready(true);
         Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(user[0], "testlobby");
         bus.post(buyDevelopmentCardRequest);
         Game game1 = gameManagement.getGame("testlobby");
@@ -429,6 +434,7 @@ public class GameServiceTest {
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
         game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayKnightCardRequest(lobby.getName(), user[0]));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getKnights());
     }
@@ -450,10 +456,11 @@ public class GameServiceTest {
         inventories[1].increaseBrick(1);
         inventories[2].increaseBrick(2);
         inventories[0].increaseMonopolyCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayMonopolyCardRequest(lobby.getName(), user[0], Resources.BRICK));
-        assertEquals(2, inventories[0].getBrick());
+        assertEquals(3, inventories[0].getBrick());
         assertEquals(0, inventories[1].getBrick());
-        assertEquals(1, inventories[2].getBrick());
+        assertEquals(0, inventories[2].getBrick());
     }
 
     @Test
@@ -471,6 +478,7 @@ public class GameServiceTest {
         Game game = gameManagement.getGame(lobby.getName());
         assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
         game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
+        game.setDiceRolledAlready(true);
         bus.post(new PlayYearOfPlentyCardRequest(lobby.getName(), user[0], Resources.BRICK, Resources.GRAIN));
         assertEquals(1, game.getInventory(Player.PLAYER_1).getBrick());
         assertEquals(1, game.getInventory(Player.PLAYER_1).getGrain());
@@ -496,7 +504,7 @@ public class GameServiceTest {
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gameManagement.createGame(lobby, user[0], gameMap);
         Game game = gameManagement.getGame(lobby.getName());
-
+        game.setDiceRolledAlready(true);
         //Tests robbing a resource
         game.getInventory(user[1]).increaseBrick(1);
         game.getInventory(dummy).increaseOre(1);
@@ -561,10 +569,9 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getOre());
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
-
-        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby",
-                                                                              "game.resources.wool",
-                                                                              "game.resources.brick");
+        game.setDiceRolledAlready(true);
+        Message executeTradeWithBankRequest = new ExecuteTradeWithBankRequest(user[0], "testlobby", Resources.WOOL,
+                                                                              Resources.BRICK);
 
         bus.post(executeTradeWithBankRequest);
         Game game1 = gameManagement.getGame("testlobby");
@@ -626,21 +633,37 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].getGrain());
         assertEquals(5, gameInventory[0].getLumber());
 
-        Map<String, Integer> offeringResourceMap = new HashMap<>();
-        offeringResourceMap.put("game.resources.brick", 2);
-        offeringResourceMap.put("game.resources.ore", 3);
-        offeringResourceMap.put("game.resources.wool", 0);
-        offeringResourceMap.put("game.resources.grain", 0);
-        offeringResourceMap.put("game.resources.lumber", 0);
-        Map<String, Integer> respondingResourceMap = new HashMap<>();
-        respondingResourceMap.put("game.resources.brick", 0);
-        respondingResourceMap.put("game.resources.ore", 0);
-        respondingResourceMap.put("game.resources.wool", 1);
-        respondingResourceMap.put("game.resources.grain", 0);
-        respondingResourceMap.put("game.resources.lumber", 4);
-
-        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", respondingResourceMap,
-                                                           offeringResourceMap);
+        List<Map<String, Object>> offeredResourceList = new ArrayList<>();
+        Map<String, Object> brickMap = new HashMap<>();
+        brickMap.put("amount", 2);
+        brickMap.put("resource", new I18nWrapper("game.resources.brick"));
+        brickMap.put("enumType", Resources.BRICK);
+        offeredResourceList.add(brickMap);
+        Map<String, Object> oreMap = new HashMap<>();
+        oreMap.put("amount", 3);
+        oreMap.put("resource", new I18nWrapper("game.resources.ore"));
+        oreMap.put("enumType", Resources.ORE);
+        offeredResourceList.add(oreMap);
+        offeredResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        offeredResourceList.add(getEmptyResourceMap(Resources.LUMBER));
+        offeredResourceList.add(getEmptyResourceMap(Resources.WOOL));
+        List<Map<String, Object>> demandedResourceList = new ArrayList<>();
+        Map<String, Object> woolMap = new HashMap<>();
+        woolMap.put("amount", 1);
+        woolMap.put("resource", new I18nWrapper("game.resources.wool"));
+        woolMap.put("enumType", Resources.WOOL);
+        demandedResourceList.add(woolMap);
+        Map<String, Object> lumberMap = new HashMap<>();
+        lumberMap.put("amount", 4);
+        lumberMap.put("resource", new I18nWrapper("game.resources.lumber"));
+        lumberMap.put("enumType", Resources.LUMBER);
+        demandedResourceList.add(lumberMap);
+        demandedResourceList.add(getEmptyResourceMap(Resources.BRICK));
+        demandedResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        demandedResourceList.add(getEmptyResourceMap(Resources.ORE));
+        game.setDiceRolledAlready(true);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], "testlobby", demandedResourceList,
+                                                           offeredResourceList);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
@@ -709,21 +732,33 @@ public class GameServiceTest {
         assertEquals(0, gameInventory[2].getGrain());
         assertEquals(0, gameInventory[2].getLumber());
 
-        Map<String, Integer> offeringResourceMap = new HashMap<>();
-        offeringResourceMap.put("brick", 2);
-        offeringResourceMap.put("ore", 3);
-        offeringResourceMap.put("wool", 0);
-        offeringResourceMap.put("grain", 0);
-        offeringResourceMap.put("lumber", 0);
-        Map<String, Integer> respondingResourceMap = new HashMap<>();
-        respondingResourceMap.put("wool", 1);
-        respondingResourceMap.put("lumber", 4);
-        respondingResourceMap.put("brick", 0);
-        respondingResourceMap.put("ore", 0);
-        respondingResourceMap.put("grain", 0);
+        List<Map<String, Object>> offeredResourceList = new ArrayList<>();
+        Map<String, Object> brickMap = new HashMap<>();
+        brickMap.put("amount", 2);
+        brickMap.put("resource", Resources.BRICK);
+        offeredResourceList.add(brickMap);
+        Map<String, Object> oreMap = new HashMap<>();
+        oreMap.put("amount", 3);
+        oreMap.put("resource", Resources.ORE);
+        offeredResourceList.add(oreMap);
+        offeredResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        offeredResourceList.add(getEmptyResourceMap(Resources.LUMBER));
+        offeredResourceList.add(getEmptyResourceMap(Resources.WOOL));
+        List<Map<String, Object>> demandedResourceList = new ArrayList<>();
+        Map<String, Object> woolMap = new HashMap<>();
+        woolMap.put("amount", 1);
+        woolMap.put("resource", Resources.WOOL);
+        demandedResourceList.add(woolMap);
+        Map<String, Object> lumberMap = new HashMap<>();
+        lumberMap.put("amount", 4);
+        lumberMap.put("resource", Resources.LUMBER);
+        demandedResourceList.add(lumberMap);
+        demandedResourceList.add(getEmptyResourceMap(Resources.BRICK));
+        demandedResourceList.add(getEmptyResourceMap(Resources.GRAIN));
+        demandedResourceList.add(getEmptyResourceMap(Resources.ORE));
 
-        Message tradeWithUser = new AcceptUserTradeRequest(user[2], user[0], "testlobby", respondingResourceMap,
-                                                           offeringResourceMap);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[2], user[0], "testlobby", demandedResourceList,
+                                                           offeredResourceList);
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame("testlobby");
@@ -740,8 +775,8 @@ public class GameServiceTest {
         assertEquals(0, gameInventory1[2].getGrain());
         assertEquals(0, gameInventory1[2].getLumber());
 
-        Message tradeWithUser2 = new AcceptUserTradeRequest(user[0], user[2], "testlobby", respondingResourceMap,
-                                                            offeringResourceMap);
+        Message tradeWithUser2 = new AcceptUserTradeRequest(user[0], user[2], "testlobby", demandedResourceList,
+                                                            offeredResourceList);
         bus.post(tradeWithUser2);
 
         Game game2 = gameManagement.getGame("testlobby");
@@ -757,6 +792,24 @@ public class GameServiceTest {
         assertEquals(0, gameInventory2[2].getOre());
         assertEquals(0, gameInventory2[2].getGrain());
         assertEquals(0, gameInventory2[2].getLumber());
+    }
+
+    /**
+     * Helper method to create a resource Map with amount of 0
+     *
+     * @param resources Element of Enum Resources to create an empty resource Map for
+     *
+     * @return Resource Map with 'amount' set to 0
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-20
+     */
+    private Map<String, Object> getEmptyResourceMap(Resources resources) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("amount", 0);
+        map.put("resource", new I18nWrapper("game.resources." + resources.name().toLowerCase()));
+        map.put("enumType", resources);
+        return map;
     }
 
     /**

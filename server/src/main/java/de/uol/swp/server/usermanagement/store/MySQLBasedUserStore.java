@@ -18,11 +18,10 @@ import java.util.Optional;
  *
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
- * @see AbstractUserStore
- * @see UserStore
+ * @see de.uol.swp.server.usermanagement.store.UserStore
  * @since 2021-02-10
  */
-public class MySQLBasedUserStore extends AbstractUserStore {
+public class MySQLBasedUserStore implements UserStore {
 
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://134.106.11.89:50010/catan_user_schema";

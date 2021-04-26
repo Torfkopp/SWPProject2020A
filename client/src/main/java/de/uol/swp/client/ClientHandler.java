@@ -27,13 +27,13 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        LOG.debug("Connected to server: " + ctx);
+        LOG.debug("Connected to server: {}", ctx);
         clientConnection.fireConnectionEstablished(ctx.channel());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        LOG.debug("Disconnected from server: " + ctx);
+        LOG.debug("Disconnected from server: {}", ctx);
     }
 
     @Override

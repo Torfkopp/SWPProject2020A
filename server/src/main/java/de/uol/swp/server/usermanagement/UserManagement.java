@@ -11,10 +11,10 @@ import java.util.*;
  * Handles most user related issues, e.g. login/logout
  *
  * @author Marco Grawunder
- * @see de.uol.swp.server.usermanagement.AbstractUserManagement
+ * @see de.uol.swp.server.usermanagement.IUserManagement
  * @since 2019-08-05
  */
-public class UserManagement extends AbstractUserManagement {
+public class UserManagement implements IUserManagement {
 
     private final UserStore userStore;
     private final SortedMap<Integer, User> loggedInUsers = new TreeMap<>();
