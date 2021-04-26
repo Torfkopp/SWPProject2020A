@@ -142,7 +142,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method that set the visible for the lobby owner and disable pre-game Buttons and Checkboxes
+     * Helper method that sets the visibility for the lobby owner and disables pre-game Buttons and Checkboxes
      * for everyone, expect the owner.
      *
      * @author Maximilian Lindner
