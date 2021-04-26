@@ -62,9 +62,9 @@ public class LobbyManagement implements ILobbyManagement {
 
     @Override
     public void setHasPassword(String lobbyName, boolean hasPassword) {
-        Optional<Lobby> found = getLobby(lobbyName);
-        if (found.isEmpty()) return;
-        found.get().setHasPassword(hasPassword);
+        Optional<Lobby> lobby = getLobby(lobbyName);
+        if (lobby.isEmpty()) return;
+        lobby.get().setHasPassword(hasPassword);
     }
 
     @Override

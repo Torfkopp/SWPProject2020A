@@ -12,7 +12,7 @@ import de.uol.swp.common.user.User;
  */
 public class JoinLobbyWithPasswordConfirmationRequest extends AbstractLobbyRequest {
 
-    private String password;
+    private final String password;
 
     /**
      * Constructor

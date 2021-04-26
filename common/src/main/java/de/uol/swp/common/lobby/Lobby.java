@@ -117,6 +117,7 @@ public interface Lobby extends Serializable {
      *
      * @return A String containing the password of the lobby
      *
+     * @author Alwin Bossert
      * @since 2021-04-22
      */
     String getPassword();

@@ -125,6 +125,7 @@ public class LobbyDTO implements Lobby {
         return owner;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }

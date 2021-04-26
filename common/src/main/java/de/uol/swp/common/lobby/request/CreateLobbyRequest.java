@@ -13,7 +13,7 @@ import de.uol.swp.common.user.User;
 public class CreateLobbyRequest extends AbstractLobbyRequest {
 
     private final int maxPlayers;
-    private String password;
+    private final String password;
 
     /**
      * Constructor
@@ -57,6 +57,7 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      *
      * @return Password of the lobby
      *
+     * @author Alwin Bossert
      * @since 2021-04-22
      */
     public String getPassword() {

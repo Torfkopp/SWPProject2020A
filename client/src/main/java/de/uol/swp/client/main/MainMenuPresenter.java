@@ -10,6 +10,7 @@ import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
+import de.uol.swp.common.lobby.request.LobbyJoinRandomUserRequest;
 import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -98,15 +99,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-04-26
      */
     @Subscribe
-    public void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
+    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
         LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
         Platform.runLater(() -> {
             TextInputDialog dialogue = new TextInputDialog();
-            //dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
             dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
-            Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
+            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
             PasswordField lobbyPassword = new PasswordField();
-            HBox box3 = new HBox(10, lbl1, lobbyPassword);
+            HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPassword);
             VBox box = new VBox(10, box3);
             dialogue.getDialogPane().setContent(box);
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
@@ -120,9 +120,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             result.ifPresent(s -> eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
                                                                                              userService
                                                                                                      .getLoggedInUser(),
-                                                                                             userService
-                                                                                                     .hash(lobbyPassword
-                                                                                                                   .getText()))));
+                                                                                             (lobbyPassword.getText()))));
         });
     }
 
@@ -317,7 +315,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, userService.hash(lobbyPassword.getText())));
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, (lobbyPassword.getText())));
     }
 
     /**
