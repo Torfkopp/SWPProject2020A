@@ -236,7 +236,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
-        if (!owner.equals(msg.getLobby().getOwner())) {
+        if (!Objects.equals(owner, msg.getLobby().getOwner())) {
             if (ownerTransferNotificationsOn) {
                 if (userService.getLoggedInUser().equals(owner)) {
                     I18nWrapper content = new I18nWrapper("lobby.owner.transferred",

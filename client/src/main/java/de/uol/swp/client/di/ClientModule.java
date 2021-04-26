@@ -50,9 +50,9 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
-        defaultProps.setProperty("join_leave_msgs_on", "false");
-        defaultProps.setProperty("owner_ready_notifs_on", "false");
-        defaultProps.setProperty("owner_transfer_notifs_on", "false");
+        defaultProps.setProperty("join_leave_msgs_on", "true");
+        defaultProps.setProperty("owner_ready_notifs_on", "true");
+        defaultProps.setProperty("owner_transfer_notifs_on", "true");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
