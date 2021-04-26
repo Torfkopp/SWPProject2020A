@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rulesTabPane" prefHeight="501.0" prefWidth="610.0"
+         tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1"
+         fx:controller="de.uol.swp.client.rules.RulesOverviewPresenter">
+    <Tab fx:id="basicsTab" text="%rules.tabs.basics">
+        <VBox>
+            <Label text="%rules.basics.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </Tab>
+    <Tab fx:id="buildingTab" text="%rules.tabs.building">
+        <VBox>
+            <Label text="%rules.building.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </Tab>
+    <Tab fx:id="tradingTab" text="%rules.tabs.trade">
+        <VBox>
+            <Label text="%rules.trading.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </Tab>
+    <Tab fx:id="robberTab" text="%rules.tabs.robber">
+        <VBox>
+            <Label text="%rules.robber.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </Tab>
+    <Tab fx:id="developmentCardTab" text="%rules.tabs.devcards">
+        <VBox>
+            <Label text="%rules.devcards.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </Tab>
+    <Tab fx:id="founderPhaseTab" text="%rules.tabs.founding">
+        <VBox>
+            <Label text="%rules.building.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </Tab>
+</TabPane>

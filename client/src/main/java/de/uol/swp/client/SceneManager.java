@@ -22,6 +22,8 @@ import de.uol.swp.client.register.RegistrationPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.rules.RulesOverviewPresenter;
+import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
@@ -84,8 +86,10 @@ public class SceneManager {
     private Scene mainScene;
     private Scene lastScene = null;
     private Scene currentScene = null;
-    private Scene ChangeAccountDetailsScene;
+    private Scene changeAccountDetailsScene;
+    private Scene rulesScene;
     private boolean devMenuIsOpen;
+    private boolean rulesOverviewIsOpen;
 
     /**
      * Constructor
@@ -138,7 +142,7 @@ public class SceneManager {
      * @since 2020-12-19
      */
     public void showChangeAccountDetailsScreen() {
-        showScene(ChangeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
+        showScene(changeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
@@ -310,10 +314,10 @@ public class SceneManager {
      * @since 2020-12-19
      */
     private void initChangeAccountDetailsView() {
-        if (ChangeAccountDetailsScene == null) {
+        if (changeAccountDetailsScene == null) {
             Parent rootPane = initPresenter(ChangeAccountDetailsPresenter.fxml);
-            ChangeAccountDetailsScene = new Scene(rootPane, 400, 200);
-            ChangeAccountDetailsScene.getStylesheets().add(styleSheet);
+            changeAccountDetailsScene = new Scene(rootPane, 400, 200);
+            changeAccountDetailsScene.getStylesheets().add(styleSheet);
         }
     }
 
@@ -399,6 +403,24 @@ public class SceneManager {
     }
 
     /**
+     * Initialises the Rules Overview View
+     * <p>
+     * If the rulesScene is null, this method sets it to a new Scene showing
+     * the Rules Overview View as specified by the RulesOverviewView FXML file.
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.rules.RulesOverviewPresenter
+     * @since 2021-04-22
+     */
+    private void initRulesOverviewView() {
+        if (rulesScene == null) {
+            Parent rootPane = initPresenter(RulesOverviewPresenter.fxml);
+            rulesScene = new Scene(rootPane, 400, 600);
+            rulesScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
      * Subroutine to initialise all views
      * <p>
      * This is a subroutine of the constructor to initialise all views
@@ -409,6 +431,7 @@ public class SceneManager {
         initLoginView();
         initMainView();
         initRegistrationView();
+        initRulesOverviewView();
         initChangeAccountDetailsView();
     }
 
@@ -885,6 +908,34 @@ public class SceneManager {
             LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(
                     new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
+        });
+    }
+
+    /**
+     * Handles the ShowRulesOverviewViewEvent detected on the EventBus
+     * <p>
+     * If a ShowRulesOverviewViewEvent is detected on the EventBus, this method
+     * gets called. It opens the window showing short game rules explainers.
+     *
+     * @param event The ShowRulesOverviewViewEvent found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-22
+     */
+    @Subscribe
+    private void onShowRulesOverviewViewEvent(ShowRulesOverviewViewEvent event) {
+        if (rulesOverviewIsOpen) return;
+        Platform.runLater(() -> {
+            Stage rulesStage = new Stage();
+            rulesOverviewIsOpen = true;
+            rulesStage.setTitle(resourceBundle.getString("rules.window.title"));
+            rulesStage.setHeight(RulesOverviewPresenter.MIN_HEIGHT);
+            rulesStage.setMinHeight(RulesOverviewPresenter.MIN_HEIGHT);
+            rulesStage.setWidth(RulesOverviewPresenter.MIN_WIDTH);
+            rulesStage.setMinWidth(RulesOverviewPresenter.MIN_WIDTH);
+            rulesStage.setScene(rulesScene);
+            rulesStage.show();
+            rulesStage.toFront();
         });
     }
 
