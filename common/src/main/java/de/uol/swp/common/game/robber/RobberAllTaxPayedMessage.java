@@ -4,7 +4,7 @@ import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
- * Gets sent when every player played their taxes
+ * Gets sent when every player payed their taxes
  *
  * @author Mario Fokken
  * @since 2021-04-23
