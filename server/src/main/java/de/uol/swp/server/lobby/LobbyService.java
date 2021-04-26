@@ -275,8 +275,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onJoinLobbyWithPasswordConfirmationRequest(JoinLobbyWithPasswordConfirmationRequest req) {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby " + req.getName());
+        LOG.debug("Received JoinLobbyWithPasswordConfirmationRequest for Lobby {}" + req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName(), req.getPassword());
         if (lobby.isPresent()) {
             if (req.getPassword().equals(lobby.get().getPassword())) {
