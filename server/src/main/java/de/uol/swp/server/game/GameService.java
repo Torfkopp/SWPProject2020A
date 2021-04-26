@@ -1310,6 +1310,8 @@ public class GameService extends AbstractService {
 
         Game game = gameManagement.getGame(req.getLobby());
         game.removeTaxPayer(req.getPlayer());
+        if (game.getTaxPayers().isEmpty()) lobbyService
+                .sendToAllInLobby(req.getLobby(), new RobberAllTaxPayedMessage(req.getLobby(), game.getActivePlayer()));
         endTurnDummy(game);
     }
 
