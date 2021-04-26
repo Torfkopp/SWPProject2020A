@@ -62,12 +62,12 @@ public class ServerModule extends AbstractModule {
         }
 
         Level loglevel = Level.toLevel(serverProperties.getProperty("debug.loglevel"));
-        LOG.info("Switching to selected LOG-Level: " + loglevel);
+        LOG.info("Switching to selected LOG-Level: {}", loglevel);
         Configurator.setAllLevels(LogManager.getRootLogger().getName(), loglevel);
         // override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
         Configurator.setLevel("io.netty", Level.WARN);
 
-        LOG.debug("Selected database backend: " + serverProperties.getProperty("db"));
+        LOG.debug("Selected database backend: {}", serverProperties.getProperty("db"));
         switch (serverProperties.getProperty("db")) {
             case "h2":
                 store = new H2BasedUserStore();

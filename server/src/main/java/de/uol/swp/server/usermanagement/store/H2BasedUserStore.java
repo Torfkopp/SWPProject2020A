@@ -20,11 +20,10 @@ import java.util.Optional;
  * @author Aldin Dervisi
  * @author Marvin Drees
  * @implNote This store will never return the password of a user!
- * @see de.uol.swp.server.usermanagement.store.AbstractUserStore
  * @see de.uol.swp.server.usermanagement.store.UserStore
  * @since 2021-01-20
  */
-public class H2BasedUserStore extends AbstractUserStore {
+public class H2BasedUserStore implements UserStore {
 
     static final String JDBC_DRIVER = "org.h2.Driver";
     static final String DB_URL = "jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;mode=MySQL";

@@ -29,10 +29,25 @@ public class SessionManagementTest {
     }
 
     @Test
+    void getAllUsers() {
+        Collection<User> users = new HashSet<>();
+        users.add(user);
+        users.add(anotherUser);
+
+        Session s1 = sessionManagement.createSession(user);
+        assertTrue(sessionManagement.hasSession(s1));
+        Session s2 = sessionManagement.createSession(anotherUser);
+        assertTrue(sessionManagement.hasSession(s2));
+
+        assertTrue(users.containsAll(sessionManagement.getAllUsers()));
+    }
+
+    @Test
     void getSession() {
         Session session = sessionManagement.createSession(user);
         assertTrue(sessionManagement.hasSession(session));
 
+        assertTrue(sessionManagement.getSession(user).isPresent());
         assertEquals(sessionManagement.getSession(user).get(), session);
     }
 
@@ -65,16 +80,10 @@ public class SessionManagementTest {
     }
 
     @Test
-    void getAllUsers() {
-        Collection<User> users = new HashSet<>();
-        users.add(user);
-        users.add(anotherUser);
+    void removeSession_NotFound() {
+        Session session = UUIDSession.create(user);
+        assertFalse(sessionManagement.hasSession(session));
 
-        Session s1 = sessionManagement.createSession(user);
-        assertTrue(sessionManagement.hasSession(s1));
-        Session s2 = sessionManagement.createSession(anotherUser);
-        assertTrue(sessionManagement.hasSession(s2));
-
-        assertTrue(users.containsAll(sessionManagement.getAllUsers()));
+        assertThrows(SessionManagementException.class, () -> sessionManagement.removeSession(session));
     }
 }

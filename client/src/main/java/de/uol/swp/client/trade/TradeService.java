@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.message.Message;
@@ -12,6 +13,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,8 +49,8 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void acceptUserTrade(String lobbyName, UserOrDummy offeringUser, Map<String, Integer> demandedResources,
-                                Map<String, Integer> offeredResources) {
+    public void acceptUserTrade(String lobbyName, UserOrDummy offeringUser, List<Map<String, Object>> demandedResources,
+                                List<Map<String, Object>> offeredResources) {
         LOG.debug("Sending AcceptUserTradeRequest");
         Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
                                                      demandedResources, offeredResources);
@@ -90,7 +92,7 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void executeTradeWithBank(String lobbyName, String gainedResource, String lostResource) {
+    public void executeTradeWithBank(String lobbyName, Resources gainedResource, Resources lostResource) {
         LOG.debug("Sending ExecuteTradeWithBankRequest");
         Message request = new ExecuteTradeWithBankRequest(userService.getLoggedInUser(), lobbyName, gainedResource,
                                                           lostResource);
@@ -98,9 +100,9 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void offerTrade(String lobbyName, UserOrDummy respondingUser, Map<String, Integer> offeredResources,
-                           Map<String, Integer> demandedResources) {
-        LOG.debug("Sending an OfferingTradeWithUserRequest");
+    public void offerTrade(String lobbyName, UserOrDummy respondingUser, List<Map<String, Object>> offeredResources,
+                           List<Map<String, Object>> demandedResources) {
+        LOG.debug("Sending OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
                                                            offeredResources, demandedResources);
         eventBus.post(request);
@@ -146,7 +148,7 @@ public class TradeService implements ITradeService {
 
     @Override
     public void tradeWithUser(String lobbyName, UserOrDummy respondingUser) {
-        LOG.debug("Sending a TradeWithUserRequest");
+        LOG.debug("Sending TradeWithUserRequest");
         Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser);
         eventBus.post(request);
     }

@@ -55,9 +55,9 @@ public class LobbyService extends AbstractService {
     @Inject
     public LobbyService(ILobbyManagement lobbyManagement, ISessionManagement sessionManagement, EventBus eventBus) {
         super(eventBus);
-        if (LOG.isDebugEnabled()) LOG.debug("LobbyService started");
         this.lobbyManagement = lobbyManagement;
         this.sessionManagement = sessionManagement;
+        LOG.debug("LobbyService started");
     }
 
     /**
@@ -99,7 +99,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onChangeLobbySettingsRequest(ChangeLobbySettingsRequest req) {
-        LOG.debug("Received a ChangeLobbySettingsRequest");
+        LOG.debug("Received ChangeLobbySettingsRequest");
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
         if (lobby.get().getUserOrDummies().size() > req.getAllowedPlayers()) return;
@@ -180,7 +180,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onCheckUserInLobbyRequest(CheckUserInLobbyRequest req) {
-        LOG.debug("Received a CheckUserInLobbyRequest");
+        LOG.debug("Received CheckUserInLobbyRequest");
         boolean isInLobby = false;
         User user = req.getUser();
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
@@ -207,7 +207,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onCreateLobbyRequest(CreateLobbyRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received CreateLobbyRequest for Lobby " + req.getName());
+        LOG.debug("Received CreateLobbyRequest for Lobby {}", req.getName());
         try {
             lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayers(), req.getPassword());
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
@@ -394,7 +394,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onLobbyJoinUserRequest(LobbyJoinUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received LobbyJoinUserRequest for Lobby " + req.getName());
+        LOG.debug("Received LobbyJoinUserRequest for Lobby {}", req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isPresent()) {
             if (lobby.get().getUserOrDummies().size() < lobby.get().getMaxPlayers()) {
@@ -455,7 +455,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onLobbyLeaveUserRequest(LobbyLeaveUserRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received LobbyLeaveUserRequest for Lobby " + req.getName());
+        LOG.debug("Received LobbyLeaveUserRequest for Lobby {}", req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         try {
@@ -487,7 +487,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onRemoveFromLobbiesRequest(RemoveFromLobbiesRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received RemoveFromLobbiesRequest");
+        LOG.debug("Received RemoveFromLobbiesRequest");
         User user = req.getUser();
         Map<String, Lobby> lobbies = lobbyManagement.getLobbies();
         Map<String, Lobby> lobbiesWithUser = new HashMap<>();
@@ -523,7 +523,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received RetrieveAllLobbiesRequest");
+        LOG.debug("Received RetrieveAllLobbiesRequest");
         Message response = new AllLobbiesResponse(lobbyManagement.getLobbies());
         response.initWithMessage(req);
         post(response);
@@ -543,7 +543,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received RetrieveAllLobbyMembersRequest for Lobby " + req.getLobbyName());
+        LOG.debug("Received RetrieveAllLobbyMembersRequest for Lobby {}", req.getLobbyName());
         String lobbyName = req.getLobbyName();
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
@@ -553,7 +553,7 @@ public class LobbyService extends AbstractService {
             response.initWithMessage(req);
             post(response);
         } else {
-            LOG.error("---- Lobby " + lobbyName + " not found.");
+            LOG.error("---- Lobby {} not found.", lobbyName);
         }
     }
 
@@ -576,7 +576,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onReturnToPreGameLobbyRequest(ReturnToPreGameLobbyRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received ReturnToPreGameLobbyRequest for Lobby " + req.getLobbyName());
+        LOG.debug("Received ReturnToPreGameLobbyRequest for Lobby {}", req.getLobbyName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getLobbyName());
         if (lobby.isEmpty()) return;
         lobbyManagement.setInGame(req.getLobbyName(), false);
@@ -605,7 +605,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onStartSessionRequest(StartSessionRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug("Received StartSessionRequest for Lobby " + req.getName());
+        LOG.debug("Received StartSessionRequest for Lobby {}", req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         if (!req.getUser().equals(lobby.get().getOwner())) return;
@@ -632,8 +632,7 @@ public class LobbyService extends AbstractService {
      */
     @Subscribe
     private void onUserReadyRequest(UserReadyRequest req) {
-        if (LOG.isDebugEnabled()) LOG.debug(
-                "Received UserReadyRequest for User " + req.getUser().getUsername() + " in Lobby " + req.getName());
+        LOG.debug("Received UserReadyRequest for User {} in Lobby {}", req.getUser().getUsername(), req.getName());
         Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;
         if (req.isReady()) {
