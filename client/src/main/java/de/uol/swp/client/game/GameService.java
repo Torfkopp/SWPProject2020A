@@ -60,7 +60,7 @@ public class GameService implements IGameService {
 
     @Override
     public void changeAutoRollState(String lobbyName, boolean autoRollEnabled) {
-        LOG.debug("Sending UpdateGameMapRequest");
+        LOG.debug("Sending ChangeAutoRollStateRequest");
         Message request = new ChangeAutoRollStateRequest(lobbyName, userService.getLoggedInUser(), autoRollEnabled);
         eventBus.post(request);
     }

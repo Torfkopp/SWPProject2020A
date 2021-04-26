@@ -16,7 +16,7 @@ import java.util.*;
  * Class for a game
  *
  * @author Mario Fokken
- * @since 2021 -01-21
+ * @since 2021-01-21
  */
 public class Game {
 
