@@ -277,6 +277,11 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showServerError(String e) {
+        if (e.equals("Eine vorhandene Verbindung wurde vom Remotehost geschlossen")) {
+            //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
+            userService.logout(userService.getLoggedInUser());
+            showLoginScreen();
+        }
         showError(resourceBundle.getString("error.server") + '\n', e);
     }
 
@@ -426,6 +431,10 @@ public class SceneManager {
     private String internationaliseServerMessage(String e) {
         String context = e;
         switch (e) {
+            //Happens when Server is terminated while a Client is connected
+            case "Eine vorhandene Verbindung wurde vom Remotehost geschlossen":
+                context = resourceBundle.getString("error.server.disrupted");
+                break;
             //Found in ChatService
             case "This lobby doesn't allow the use of commands!":
                 context = resourceBundle.getString("error.context.commandsforbidden");
