@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
@@ -55,7 +56,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
-
+    @FXML
+    protected AnimationTimer elapsedTimer;
+    @FXML
+    protected Menu timerLabel = new Menu();
     @FXML
     private Button changeMoveTimeButton;
     @FXML
@@ -68,10 +72,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton fourPlayerRadioButton;
     @FXML
     private VBox preGameSettingBox;
-    @FXML
-    protected AnimationTimer elapsedTimer;
-    @FXML
-    protected Menu timerLabel = new Menu();
 
     @FXML
     @Override
@@ -246,6 +246,35 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Handles the PlayerWonGameMessage
+     * <p>
+     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
+     * with the Player that won is shown. For the owner of the Lobby appears a
+     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
+     *
+     * @param msg The PlayerWonGameMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        gameMap = null;
+        gameWon = true;
+        winner = msg.getUser();
+        if (Objects.equals(owner, userService.getLoggedInUser())) {
+            returnToLobby.setVisible(true);
+            returnToLobby.setPrefHeight(30);
+            returnToLobby.setPrefWidth(250);
+            this.elapsedTimer.stop();
+        }
+        fitCanvasToSize();
+    }
+
+    /**
      * Handles the click on the ReadyCheckBox
      * <p>
      * Method called when the Ready Checkbox is clicked. It checks whether the
@@ -375,9 +404,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 @Override
                 public void handle(long now) {
                     long elapsedMillis = System.currentTimeMillis() - startTime;
-                    Platform.runLater(() -> timerLabel.setText(String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
-                            TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
-                            TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+                    Platform.runLater(() -> timerLabel.setText(
+                            String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                                          TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                                          TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
                 }
             };
             this.elapsedTimer.start();
@@ -513,18 +543,5 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
-    }
-
-    /**
-     * Stops the elapsedTimer
-     * <p>
-     * Stops the Timer if a player has won the game
-     * @param msg The PlayerWonGameMessage found on the EventBus
-     * @author Aldin Dervisi
-     * @since 2021-04-26
-     */
-    public void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        super.onPlayerWonGameMessage(msg);
-        this.elapsedTimer.stop();
     }
 }
