@@ -112,7 +112,6 @@ public class ClientModule extends AbstractModule {
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
         bind(ITradeService.class).to(TradeService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
-        requestStaticInjection(ClientApp.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(SceneManager.class);
     }

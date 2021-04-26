@@ -277,12 +277,29 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showServerError(String e) {
-        if (e.equals("Eine vorhandene Verbindung wurde vom Remotehost geschlossen")) {
+        showError(resourceBundle.getString("error.server") + '\n', e);
+    }
+
+    /**
+     * Shows a server error message inside an error alert
+     * <p>
+     * This method can check for certain Throwables by taking the thrown
+     * Throwable as an argument.
+     *
+     * @param e     The Throwable that was thrown
+     * @param cause The cause of the Throwable being thrown
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-26
+     */
+    public void showServerError(Throwable e, String cause) {
+        if (e instanceof IOException) {
             //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
             userService.logout(userService.getLoggedInUser());
             showLoginScreen();
+            cause = resourceBundle.getString("error.server.disrupted");
         }
-        showError(resourceBundle.getString("error.server") + '\n', e);
+        showServerError(cause);
     }
 
     /**
