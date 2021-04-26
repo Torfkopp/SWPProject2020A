@@ -2,7 +2,7 @@ package de.uol.swp.server.game;
 
 import com.google.inject.Inject;
 import de.uol.swp.common.game.Game;
-import de.uol.swp.common.game.map.IGameMapManagement;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.lobby.ILobbyManagement;

@@ -3,11 +3,14 @@ package de.uol.swp.common.game.map;
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.management.GameMapManagement;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
+import de.uol.swp.common.game.map.management.MapPoint;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.uol.swp.common.game.map.MapPoint.*;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static de.uol.swp.common.game.map.Player.PLAYER_1;
 import static de.uol.swp.common.game.map.Player.PLAYER_2;
 import static org.junit.jupiter.api.Assertions.*;

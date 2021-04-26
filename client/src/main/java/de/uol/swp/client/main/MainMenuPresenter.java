@@ -220,7 +220,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
-        LOG.debug("Received a CheckUserInLobbyResponse");
+        LOG.debug("Received CheckUserInLobbyResponse");
         if (rsp.getIsInLobby()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.in.lobby"));
         } else {
@@ -248,8 +248,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                                     userService.getLoggedInUser().getUsername());
 
         //create Dialogue, disallow any use of § in the name (used for command parsing)
-        UnaryOperator<TextFormatter.Change> filter = (s) ->
-                !s.getControlNewText().startsWith("§") && !s.getControlNewText().contains("§") ? s : null;
+        UnaryOperator<TextFormatter.Change> filter = s ->
+                s.getControlNewText().matches("[ A-Za-z0-9_',-]+") || s.isDeleted() ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
@@ -273,6 +273,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+        dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
+                () -> lobbyName.getText().isBlank() || !lobbyName.getText().matches("[ A-Za-z0-9_',-]+"),
+                lobbyName.textProperty()));
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
@@ -602,7 +605,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserLoggedInMessage(UserLoggedInMessage msg) {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedInMessage");
-        LOG.debug("---- New user " + msg.getUsername() + " logged in");
+        LOG.debug("---- New user {} logged in", msg.getUsername());
         Platform.runLater(() -> {
             if (users != null && !userService.getLoggedInUser().getUsername().equals(msg.getUsername()))
                 users.add(msg.getUsername());
@@ -626,7 +629,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedOutMessage");
-        LOG.debug("---- User " + msg.getUsername() + " logged out");
+        LOG.debug("---- User {} logged out", msg.getUsername());
         Platform.runLater(() -> users.remove(msg.getUsername()));
     }
 

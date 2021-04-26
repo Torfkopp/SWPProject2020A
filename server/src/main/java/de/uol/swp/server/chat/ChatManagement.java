@@ -14,14 +14,13 @@ import java.util.Optional;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.server.chat.AbstractChatManagement
  * @see de.uol.swp.server.chat.IChatManagement
  * @see de.uol.swp.server.chat.store.ChatMessageStore
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage
  * @since 2020-12-16
  */
-public class ChatManagement extends AbstractChatManagement {
+public class ChatManagement implements IChatManagement {
 
     private final ChatMessageStore chatMessageStore;
 

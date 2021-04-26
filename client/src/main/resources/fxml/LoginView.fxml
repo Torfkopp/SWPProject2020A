@@ -22,7 +22,7 @@
     </HBox>
 
     <HBox alignment="CENTER" spacing="10.0">
-        <Button defaultButton="true" mnemonicParsing="false" onAction="#onLoginButtonPressed"
+        <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#onLoginButtonPressed"
                 text="%login.buttons.login"/>
         <Button mnemonicParsing="false" onAction="#onRegisterButtonPressed" text="%login.buttons.register"/>
     </HBox>

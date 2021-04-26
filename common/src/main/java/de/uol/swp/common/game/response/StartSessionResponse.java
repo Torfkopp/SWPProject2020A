@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.game.map.IGameMap;
+import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractResponseMessage;

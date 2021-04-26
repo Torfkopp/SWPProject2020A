@@ -1,4 +1,6 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.management;
+
+import de.uol.swp.common.game.map.Player;
 
 import java.io.Serializable;
 

@@ -226,7 +226,7 @@ public class ClientConnection {
      */
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.warn("DeadEvent detected: " + deadEvent);
+        LOG.warn("DeadEvent detected: {}", deadEvent);
     }
 
     /**
