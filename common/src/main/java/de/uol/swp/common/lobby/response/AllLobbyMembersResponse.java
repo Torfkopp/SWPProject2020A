@@ -1,8 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -24,7 +23,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
     private final List<UserOrDummy> users = new ArrayList<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private final UserOrDummy owner;
-    private final SystemMessage ownerNotice;
+    private final ReadySystemMessageDTO ownerNotice;
 
     /**
      * Constructor
@@ -40,11 +39,12 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @param users      Collection of all lobby members
      * @param owner      Owner of the lobby
      * @param readyUsers Set of all ready lobby members
+     * @param maxPlayers Maximum number of players that will play in the Lobby
      *
      * @since 2021-01-19
      */
     public AllLobbyMembersResponse(String lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
-                                   Set<UserOrDummy> readyUsers) {
+                                   Set<UserOrDummy> readyUsers, int maxPlayers) {
         super(lobbyName);
         for (UserOrDummy user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
@@ -58,10 +58,10 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
         }
         boolean areEqualSize = this.readyUsers.size() == this.users.size();
         boolean ownerReady = this.readyUsers.contains(this.owner);
-        if (ownerReady && areEqualSize && this.users.size() >= 3) {
-            this.ownerNotice = new SystemMessageDTO(new I18nWrapper("lobby.ready.everyone"));
-        } else if (this.users.size() >= 3 && this.readyUsers.size() == this.users.size() - 1 && !ownerReady) {
-            this.ownerNotice = new SystemMessageDTO((new I18nWrapper("lobby.ready.everyoneelse")));
+        if (ownerReady && areEqualSize && this.users.size() == maxPlayers) {
+            this.ownerNotice = new ReadySystemMessageDTO(new I18nWrapper("lobby.ready.everyone"));
+        } else if (!ownerReady && this.readyUsers.size() == maxPlayers - 1) {
+            this.ownerNotice = new ReadySystemMessageDTO((new I18nWrapper("lobby.ready.everyoneelse")));
         } else this.ownerNotice = null;
     }
 
@@ -89,7 +89,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @author Phillip-André Suhr
      * @since 2021-04-26
      */
-    public SystemMessage getOwnerNotice() {
+    public ReadySystemMessageDTO getOwnerNotice() {
         return ownerNotice;
     }
 

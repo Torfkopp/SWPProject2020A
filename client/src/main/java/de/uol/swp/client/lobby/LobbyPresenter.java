@@ -118,7 +118,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         });
         SystemMessage ownerNotice = rsp.getOwnerNotice();
         boolean isOwner = userService.getLoggedInUser().equals(owner);
-        cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
             if (ownerNotice != null && isOwner && !inGame) chatMessages.add(ownerNotice);
         });
@@ -232,7 +231,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
-        if (owner != msg.getLobby().getOwner()) {
+        if (!owner.equals(msg.getLobby().getOwner())) {
             if (userService.getLoggedInUser().equals(owner)) {
                 I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
                                                       msg.getLobby().getOwner().getUsername());

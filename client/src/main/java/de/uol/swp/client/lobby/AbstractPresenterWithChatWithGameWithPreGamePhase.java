@@ -3,7 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
-import de.uol.swp.common.chat.SystemMessage;
+import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
@@ -88,13 +88,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-25
      */
     protected void cleanChatHistoryOfOldOwnerNotices() {
-        String everyoneReady = resourceBundle.getString("lobby.ready.everyone");
-        String everyoneElseReady = resourceBundle.getString("lobby.ready.everyoneelse");
         for (ChatOrSystemMessage msg : chatMessages) {
-            if (!(msg instanceof SystemMessage)) continue;
-            if (msg.toString().equals(everyoneReady) || msg.toString().equals(everyoneElseReady)) {
-                Platform.runLater(() -> chatMessages.remove(msg));
-            }
+            if (msg instanceof ReadySystemMessageDTO) Platform.runLater(() -> chatMessages.remove(msg));
         }
     }
 
