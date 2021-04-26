@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -390,6 +391,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
+            Map<UserOrDummy, Boolean> autoRollMap = rsp.getAutoRollStates();
+            autoRoll.setSelected(autoRollMap.get(userService.getLoggedInUser()));
+            autoRollEnabled = autoRollMap.get(userService.getLoggedInUser());
             int[] dices = rsp.getDices();
             dice1 = dices[0];
             dice2 = dices[1];

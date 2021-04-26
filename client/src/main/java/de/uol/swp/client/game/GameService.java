@@ -5,8 +5,8 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
@@ -55,6 +55,13 @@ public class GameService implements IGameService {
     public void buildRequest(String lobbyName, MapPoint mapPoint) {
         LOG.debug("Sending BuildRequest");
         Message request = new BuildRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
+        eventBus.post(request);
+    }
+
+    @Override
+    public void changeAutoRollState(String lobbyName, boolean autoRollEnabled) {
+        LOG.debug("Sending UpdateGameMapRequest");
+        Message request = new ChangeAutoRollStateRequest(lobbyName, userService.getLoggedInUser(), autoRollEnabled);
         eventBus.post(request);
     }
 

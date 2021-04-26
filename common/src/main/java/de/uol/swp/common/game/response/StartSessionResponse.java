@@ -1,10 +1,12 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.UserOrDummy;
+
+import java.util.Map;
 
 /**
  * This Response is used to inform the user that there is an
@@ -24,23 +26,44 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final IGameMap gameMapDTO;
     private final int[] dices;
     private final boolean rolledDiceAlready;
+    private final Map<UserOrDummy, Boolean> autoRollStates;
 
     /**
      * Constructor
      *
-     * @param lobby         The lobby where the has already started
-     * @param player        The player who has the turn
-     * @param configuration The game map configuration
-     * @param dices         The last rolled dices
+     * @param lobby          The lobby where the has already started
+     * @param player         The player who has the turn
+     * @param configuration  The game map configuration
+     * @param dices          The last rolled dices
+     * @param autoRollStates Map of all Players and their autoRoll status
      */
     public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, IGameMap gameMapDTO,
-                                int[] dices, boolean rolledDiceAlready) {
+                                int[] dices, boolean rolledDiceAlready, Map<UserOrDummy, Boolean> autoRollStates) {
         this.lobby = lobby;
         this.player = player;
         this.configuration = configuration;
         this.gameMapDTO = gameMapDTO;
         this.dices = dices;
         this.rolledDiceAlready = rolledDiceAlready;
+        this.autoRollStates = autoRollStates;
+    }
+
+    /**
+     * Gets the RolledDiceAlready attribute
+     *
+     * @return Whether the current turn rolled the dice or not
+     */
+    public boolean areDiceRolledAlready() {
+        return rolledDiceAlready;
+    }
+
+    /**
+     * Gets a Map of all Players and their autoRoll Status
+     *
+     * @return All autoRoll States
+     */
+    public Map<UserOrDummy, Boolean> getAutoRollStates() {
+        return autoRollStates;
     }
 
     /**
@@ -73,7 +96,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
     /**
      * Gets the Lobby where the user wants to join the game
      *
-     * @return The User who joined a lobby
+     * @return The Lobby the User wants to join
      */
     public Lobby getLobby() {
         return lobby;
@@ -86,14 +109,5 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public UserOrDummy getPlayer() {
         return player;
-    }
-
-    /**
-     * Gets the RolledDiceAlready attribute
-     *
-     * @return Whether the current turn rolled the dice or not
-     */
-    public boolean areDiceRolledAlready() {
-        return rolledDiceAlready;
     }
 }

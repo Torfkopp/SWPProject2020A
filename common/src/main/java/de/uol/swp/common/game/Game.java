@@ -16,7 +16,7 @@ import java.util.*;
  * Class for a game
  *
  * @author Mario Fokken
- * @since 2021-01-21
+ * @since 2021 -01-21
  */
 public class Game {
 
@@ -30,6 +30,7 @@ public class Game {
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
 
     /**
      * Constructor
@@ -41,11 +42,13 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
+        autoRollEnabled = new HashMap<>();
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
                 players.put(userOrDummy, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
+                autoRollEnabled.put(userOrDummy, false);
             }
         }
         activePlayer = first;
@@ -163,6 +166,18 @@ public class Game {
      */
     public Inventory[] getAllInventories() {
         return players.getInventories().toArray(new Inventory[0]);
+    }
+
+    /**
+     * Gets a Map of all Players and their autoRoll Status
+     *
+     * @return All autoRoll States
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-26
+     */
+    public Map<UserOrDummy, Boolean> getAutoRollEnabled() {
+        return autoRollEnabled;
     }
 
     /**
@@ -410,5 +425,18 @@ public class Game {
      */
     public void removeTaxPayer(User user) {
         taxPayers.remove(user);
+    }
+
+    /**
+     * Replaces the autoRoll status for a specific player
+     *
+     * @param userOrDummy       The user who wants to change the status
+     * @param isAutoRollEnabled The new autoRoll status
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-26
+     */
+    public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
+        autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
     }
 }
