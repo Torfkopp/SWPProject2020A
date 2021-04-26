@@ -448,10 +448,6 @@ public class SceneManager {
     private String internationaliseServerMessage(String e) {
         String context = e;
         switch (e) {
-            //Happens when Server is terminated while a Client is connected
-            case "Eine vorhandene Verbindung wurde vom Remotehost geschlossen":
-                context = resourceBundle.getString("error.server.disrupted");
-                break;
             //Found in ChatService
             case "This lobby doesn't allow the use of commands!":
                 context = resourceBundle.getString("error.context.commandsforbidden");
