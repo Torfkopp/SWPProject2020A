@@ -6,10 +6,10 @@ import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
-import de.uol.swp.client.lobby.event.ShowLobbyWithPasswordViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
+import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
 import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -84,6 +84,45 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                     setText(empty || item == null ? "" : item.getValue());
                 });
             }
+        });
+    }
+
+    /**
+     * Method called when a JoinLobbyWithPasswordResponse is found on the EventBus
+     * <p>
+     * If a JoinLobbyWithPasswordResponse is found on the EventBus,
+     * this method sends a JoinLobbyWithPasswordConfirmationRequest to the server
+     * with the confirmation of the lobby password
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-26
+     */
+    @Subscribe
+    public void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
+        LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
+        Platform.runLater(() -> {
+            TextInputDialog dialogue = new TextInputDialog();
+            //dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
+            dialogue.setTitle(lobbyName);
+            Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password"));
+            PasswordField lobbyPassword = new PasswordField();
+            HBox box3 = new HBox(10, lbl1, lobbyPassword);
+            VBox box = new VBox(10, box3);
+            dialogue.getDialogPane().setContent(box);
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+
+            //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
+            Optional<String> result = dialogue.showAndWait();
+            result.ifPresent(s -> eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
+                                                                                             userService
+                                                                                                     .getLoggedInUser(),
+                                                                                             userService
+                                                                                                     .hash(lobbyPassword
+                                                                                                                   .getText()))));
         });
     }
 
@@ -430,27 +469,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
-        });
-    }
-
-    /**
-     * Handles a JoinLobbyWithPasswordResponse found on the EventBus
-     * <p>
-     * If a new JoinLobbyWithPasswordResponse object is found on the EventBus, this method
-     * posts a new ShowLobbyWithPasswordViewEvent onto the EventBus the SceneManager is
-     * subscribed to.
-     *
-     * @param rsp The JoinLobbyWithPasswordResponse object found on the EventBus
-     *
-     * @see de.uol.swp.common.lobby.response.JoinLobbyWithPasswordResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyWithPasswordViewEvent
-     * @since 2021-04-22
-     */
-    @Subscribe
-    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse rsp) {
-        LOG.debug("Received JoinLobbyWithPasswordResponse");
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyWithPasswordViewEvent(rsp.getLobbyName()));
         });
     }
 

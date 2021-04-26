@@ -7,7 +7,6 @@ package de.uol.swp.client.lobby.event;
  * instance of it onto the EventBus the ConfirmLobbyPasswordPresenter is subscribed to.
  *
  * @author Alwin Bossert
- * @see de.uol.swp.client.lobby.ConfirmLobbyPasswordPresenter
  * @since 2021-04-22
  */
 public class ConfirmLobbyPasswordEvent {
