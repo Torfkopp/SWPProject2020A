@@ -35,8 +35,8 @@ class LobbyServiceTest {
     private static final User defaultUser = new UserDTO(1, "chuck", "test", "chuck@norris.com");
     private static final User secondUser = new UserDTO(2, "chuck_testa", "testa", "testa@chuck.com");
     private static final String defaultLobbyName = "testlobby";
-    private static final Lobby defaultLobby = new LobbyDTO(defaultLobbyName, defaultUser, "",false, false, 4, false, 60, true,
-                                                           true);
+    private static final Lobby defaultLobby = new LobbyDTO(defaultLobbyName, defaultUser, "", false, false, 4, false,
+                                                           60, true, true);
 
     private final EventBus eventBus = new EventBus();
     private final CountDownLatch lock = new CountDownLatch(1);

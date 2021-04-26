@@ -103,8 +103,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             TextInputDialog dialogue = new TextInputDialog();
             //dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
-            dialogue.setTitle(lobbyName);
-            Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password"));
+            dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
+            Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
             PasswordField lobbyPassword = new PasswordField();
             HBox box3 = new HBox(10, lbl1, lobbyPassword);
             VBox box = new VBox(10, box3);
@@ -317,7 +317,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, lobbyPassword.getText()));
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, userService.hash(lobbyPassword.getText())));
     }
 
     /**

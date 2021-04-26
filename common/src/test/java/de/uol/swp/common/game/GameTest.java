@@ -1,8 +1,8 @@
 package de.uol.swp.common.game;
 
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.GameMapManagement;
 import de.uol.swp.common.game.map.management.IGameMapManagement;
-import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
