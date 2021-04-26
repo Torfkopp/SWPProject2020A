@@ -6,8 +6,6 @@ import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
-import java.util.Map;
-
 /**
  * This Response is used to inform the user that there is an
  * existing game in his lobby and to give him the status
@@ -26,26 +24,26 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final IGameMap gameMapDTO;
     private final int[] dices;
     private final boolean rolledDiceAlready;
-    private final Map<UserOrDummy, Boolean> autoRollStates;
+    private final boolean autoRollState;
 
     /**
      * Constructor
      *
-     * @param lobby          The lobby where the has already started
-     * @param player         The player who has the turn
-     * @param configuration  The game map configuration
-     * @param dices          The last rolled dices
-     * @param autoRollStates Map of all Players and their autoRoll status
+     * @param lobby         The lobby where the has already started
+     * @param player        The player who has the turn
+     * @param configuration The game map configuration
+     * @param dices         The last rolled dices
+     * @param autoRollState The autoRoll state
      */
     public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, IGameMap gameMapDTO,
-                                int[] dices, boolean rolledDiceAlready, Map<UserOrDummy, Boolean> autoRollStates) {
+                                int[] dices, boolean rolledDiceAlready, boolean autoRollState) {
         this.lobby = lobby;
         this.player = player;
         this.configuration = configuration;
         this.gameMapDTO = gameMapDTO;
         this.dices = dices;
         this.rolledDiceAlready = rolledDiceAlready;
-        this.autoRollStates = autoRollStates;
+        this.autoRollState = autoRollState;
     }
 
     /**
@@ -55,15 +53,6 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public boolean areDiceRolledAlready() {
         return rolledDiceAlready;
-    }
-
-    /**
-     * Gets a Map of all Players and their autoRoll Status
-     *
-     * @return All autoRoll States
-     */
-    public Map<UserOrDummy, Boolean> getAutoRollStates() {
-        return autoRollStates;
     }
 
     /**
@@ -109,5 +98,14 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public UserOrDummy getPlayer() {
         return player;
+    }
+
+    /**
+     * Gets the autoRoll state.
+     *
+     * @return The autoRoll state
+     */
+    public boolean isAutoRollState() {
+        return autoRollState;
     }
 }

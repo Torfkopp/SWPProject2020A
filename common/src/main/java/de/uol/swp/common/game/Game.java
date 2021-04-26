@@ -169,15 +169,15 @@ public class Game {
     }
 
     /**
-     * Gets a Map of all Players and their autoRoll Status
+     * Gets the autoRoll Status of a player
      *
      * @return All autoRoll States
      *
      * @author Maximilian Lindner
      * @since 2021-04-26
      */
-    public Map<UserOrDummy, Boolean> getAutoRollEnabled() {
-        return autoRollEnabled;
+    public Boolean getAutoRollEnabled(UserOrDummy userOrDummy) {
+        return autoRollEnabled.get(userOrDummy);
     }
 
     /**

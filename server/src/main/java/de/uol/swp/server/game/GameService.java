@@ -1574,13 +1574,13 @@ public class GameService extends AbstractService {
         Lobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
-        ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
-                                                                 lobby.getConfiguration(),
-                                                                 game.getMap().getGameMapDTO(playerUserOrDummyMap),
-                                                                 game.getDices(), game.isDiceRolledAlready(),
-                                                                 game.getAutoRollEnabled());
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
+            ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
+                                                                     lobby.getConfiguration(),
+                                                                     game.getMap().getGameMapDTO(playerUserOrDummyMap),
+                                                                     game.getDices(), game.isDiceRolledAlready(),
+                                                                     game.getAutoRollEnabled(event.getUser()));
             returnMessage.setMessageContext(ctx.get());
             LOG.debug("Sending StartSessionResponse");
             post(returnMessage);
@@ -1603,7 +1603,6 @@ public class GameService extends AbstractService {
         LOG.debug("Received UpdateGameMapRequest");
         Game game = gameManagement.getGame(req.getOriginLobby());
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
-        if (game == null) return;
         LOG.debug("Sending UpdateGameMapResponse");
         UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(),
                                                               game.getMap().getGameMapDTO(playerUserOrDummyMap));
