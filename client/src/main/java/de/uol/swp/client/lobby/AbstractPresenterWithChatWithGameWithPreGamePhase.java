@@ -392,6 +392,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         Platform.runLater(() -> {
+            autoRollEnabled = rsp.isAutoRollState();
+            autoRoll.setSelected(autoRollEnabled);
             int[] dices = rsp.getDices();
             dice1 = dices[0];
             dice2 = dices[1];
