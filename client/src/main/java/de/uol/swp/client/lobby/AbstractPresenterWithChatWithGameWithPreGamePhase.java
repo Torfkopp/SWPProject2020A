@@ -2,6 +2,8 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
@@ -71,6 +73,24 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+    }
+
+    /**
+     * Helper method to clean chat history of old owner notices
+     * <p>
+     * This method removes all SystemMessages from the chat history
+     * that match the text used notify the owner that every player
+     * (or every player except the owner) is ready to play and that
+     * the owner should press the "Start Session" button to proceed
+     * to the game.
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-25
+     */
+    protected void cleanChatHistoryOfOldOwnerNotices() {
+        for (ChatOrSystemMessage msg : chatMessages) {
+            if (msg instanceof ReadySystemMessageDTO) Platform.runLater(() -> chatMessages.remove(msg));
+        }
     }
 
     /**
@@ -189,7 +209,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * the owner status of the selected User of the members view .
      *
      * @author Maximilian Lindner
-     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
      * @since 2021-04-13
      */
     @FXML
@@ -352,6 +372,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
@@ -391,6 +412,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
             autoRollEnabled = rsp.isAutoRollState();
             autoRoll.setSelected(autoRollEnabled);
