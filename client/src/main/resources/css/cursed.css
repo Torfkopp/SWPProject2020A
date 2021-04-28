@@ -67,3 +67,34 @@
 .tree-cell {
     -fx-text-fill: -black;
 }
+
+#tradeUserView {
+    -fx-background-image: url("../images/trade_offer.jpg");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#loginView {
+    -fx-background-image: url("../images/okaeri.png");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#changeAccountView {
+    -fx-background-image: url("../images/jojo_coffin.jpeg");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#mainMenuView {
+    -fx-background-image: url("../images/nyan_plopp.gif");
+    -fx-background-repeat: repeat;
+}
+
+#lobbyPane {
+    -fx-background-image: url("../images/egg.gif");
+    -fx-background-repeat: repeat;
+}
