@@ -1,7 +1,10 @@
 package de.uol.swp.common.game;
 
 import de.uol.swp.common.game.map.Hexes.ResourceHex;
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
+import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -27,6 +30,7 @@ public class Game {
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
 
     /**
      * Constructor
@@ -38,11 +42,13 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
+        autoRollEnabled = new HashMap<>();
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
                 players.put(userOrDummy, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
+                autoRollEnabled.put(userOrDummy, false);
             }
         }
         activePlayer = first;
@@ -163,6 +169,18 @@ public class Game {
     }
 
     /**
+     * Gets the autoRoll Status of a player
+     *
+     * @return All autoRoll States
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-26
+     */
+    public Boolean getAutoRollEnabled(UserOrDummy userOrDummy) {
+        return autoRollEnabled.get(userOrDummy);
+    }
+
+    /**
      * Gets the List of the items of the bank.
      *
      * @return The List of the bank inventory
@@ -264,6 +282,19 @@ public class Game {
      */
     public Player getPlayer(UserOrDummy user) {
         return players.getPlayerFromUserOrDummy(user);
+    }
+
+    /**
+     * Gets a mapping of Players to Users
+     *
+     * @return The player user mapping
+     */
+    public Map<Player, UserOrDummy> getPlayerUserMapping() {
+        Map<Player, UserOrDummy> temp = new HashMap<>();
+        for (Player player : Player.values()) {
+            temp.put(player, getUserFromPlayer(player));
+        }
+        return temp;
     }
 
     /**
@@ -394,5 +425,18 @@ public class Game {
      */
     public void removeTaxPayer(User user) {
         taxPayers.remove(user);
+    }
+
+    /**
+     * Replaces the autoRoll status for a specific player
+     *
+     * @param userOrDummy       The user who wants to change the status
+     * @param isAutoRollEnabled The new autoRoll status
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-26
+     */
+    public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
+        autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
     }
 }

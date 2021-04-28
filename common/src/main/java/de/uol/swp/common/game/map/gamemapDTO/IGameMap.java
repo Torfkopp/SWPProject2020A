@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map;
+package de.uol.swp.common.game.map.gamemapDTO;
 
 import de.uol.swp.common.game.map.Hexes.IGameHex;
 
@@ -7,7 +7,6 @@ import java.io.Serializable;
 /**
  * An Interface for a GameMapDTO Class
  *
- * @author Aldin Dervisi
  * @author Temmo Junkhoff
  * @since 2021-04-08
  */

@@ -4,7 +4,9 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +29,8 @@ public class LoginPresenter extends AbstractPresenter {
     private static final ShowRegistrationViewEvent showRegViewMessage = new ShowRegistrationViewEvent();
 
     @FXML
+    private Button loginButton;
+    @FXML
     private PasswordField passwordField;
     @FXML
     private TextField loginField;
@@ -36,13 +40,19 @@ public class LoginPresenter extends AbstractPresenter {
      * <p>
      * This Method is called when the login button is pressed. It takes the text
      * entered in the login and password field, and gives the user service a request
-     * to log in the user specified by those fields.
+     * to log in the user specified by those fields. It will also only enable the login
+     * button if the entered username is valid and the password field is not empty.
      *
      * @see de.uol.swp.client.user.UserService
      * @since 2019-08-13
      */
     @FXML
     private void onLoginButtonPressed() {
+        loginButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            boolean nameInvalid = loginField.getText().isEmpty() || !loginField.getText().matches("[A-Za-z0-9_-]+");
+            boolean passwordInvalid = passwordField.getText().isEmpty();
+            return nameInvalid || passwordInvalid;
+        }, loginField.textProperty(), passwordField.textProperty()));
         userService.login(loginField.getText(), userService.hash(passwordField.getText()));
     }
 

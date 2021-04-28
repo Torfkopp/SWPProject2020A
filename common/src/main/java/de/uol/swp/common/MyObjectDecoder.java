@@ -36,13 +36,9 @@ public class MyObjectDecoder extends ObjectDecoder {
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
         Object decoded;
         try {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Trying to decode: " + in);
-            }
+            LOG.trace("Trying to decode: {}", in);
             decoded = super.decode(ctx, in);
-            if (LOG.isTraceEnabled()) {
-                LOG.trace(in + " " + decoded);
-            }
+            LOG.trace("{} {}", in, decoded);
         } catch (Exception e) {
             LOG.error(e);
             throw e;

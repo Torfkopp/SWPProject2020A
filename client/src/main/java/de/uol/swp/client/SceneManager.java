@@ -281,6 +281,28 @@ public class SceneManager {
     }
 
     /**
+     * Shows a server error message inside an error alert
+     * <p>
+     * This method can check for certain Throwables by taking the thrown
+     * Throwable as an argument.
+     *
+     * @param e     The Throwable that was thrown
+     * @param cause The cause of the Throwable being thrown
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-26
+     */
+    public void showServerError(Throwable e, String cause) {
+        if (e instanceof IOException) {
+            //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
+            userService.logout(userService.getLoggedInUser());
+            showLoginScreen();
+            cause = resourceBundle.getString("error.server.disrupted");
+        }
+        showServerError(cause);
+    }
+
+    /**
      * Method used to display a custom error for the
      * connection timeout.
      *
@@ -371,7 +393,7 @@ public class SceneManager {
         FXMLLoader loader = injector.getInstance(FXMLLoader.class);
         try {
             URL url = getClass().getResource(fxmlFile);
-            LOG.debug("Loading FXML-File " + url);
+            LOG.debug("Loading FXML-File {}", url);
             loader.setLocation(url);
             rootPane = loader.load();
         } catch (IOException e) {
@@ -638,8 +660,10 @@ public class SceneManager {
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
         String lobbyName = event.getLobbyName();
         if (tradingResponseStages.containsKey(lobbyName)) {
-            tradingResponseStages.get(lobbyName).close();
-            tradingResponseStages.remove(lobbyName);
+            Platform.runLater(() -> {
+                tradingResponseStages.get(lobbyName).close();
+                tradingResponseStages.remove(lobbyName);
+            });
         }
     }
 
@@ -880,7 +904,7 @@ public class SceneManager {
             robberTaxStage.initOwner(primaryStage);
             robberTaxStage.initStyle(StageStyle.UNDECORATED);
             robberTaxStage.show();
-            LOG.debug("Sending a ShowRobberTaxUpdateEvent to lobby " + lobbyName);
+            LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(
                     new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
         });
@@ -921,7 +945,7 @@ public class SceneManager {
         bankStage.initOwner(primaryStage);
         //Shows the window
         bankStage.show();
-        LOG.debug("Sending a TradeUpdateEvent for the lobby " + lobbyName);
+        LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
         eventBus.post(new TradeUpdateEvent(lobbyName));
     }
 
@@ -963,7 +987,7 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            LOG.debug("Sending a TradeWithUserResponseUpdateEvent to Lobby " + lobbyName);
+            LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
         });
     }
@@ -1002,7 +1026,7 @@ public class SceneManager {
         tradingStage.initOwner(primaryStage);
         tradingStage.show();
         eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
-        LOG.debug("Sending a TradeWithUserUpdateEvent to lobby " + lobbyName);
+        LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
     }
 
     /**
@@ -1059,7 +1083,7 @@ public class SceneManager {
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
-        LOG.debug("Received a TradeWithUserCancelResponse");
+        LOG.debug("Received TradeWithUserCancelResponse");
         String lobby = rsp.getLobbyName();
         if (tradingResponseStages.containsKey(lobby)) {
             Platform.runLater(() -> {

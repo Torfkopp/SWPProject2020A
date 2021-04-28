@@ -2,7 +2,7 @@ package de.uol.swp.common.game.map.configuration;
 
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IResourceHex;
-import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.map.management.MapPoint;
 
 import java.io.Serializable;
 import java.util.List;
