@@ -275,7 +275,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Handles the click on the autoRollCheckBox
      * <p>
      * Method called when the autoRollCheckBox is clicked.
-     * It enables and disables autoRoll.
+     * It enables and disables autoRoll and posts a request
+     * to save the status on the server.
      *
      * @author Mario Fokken
      * @since 2021-04-15
@@ -283,6 +284,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onAutoRollCheckBoxClicked() {
         autoRollEnabled = autoRoll.isSelected();
+        gameService.changeAutoRollState(lobbyName, autoRoll.isSelected());
     }
 
     /**
@@ -654,6 +656,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a RobberAllTaxPayedMessage
+     *
+     * @param msg The RobberAllTaxPayedMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-04-23
+     */
+    @Subscribe
+    private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
+        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+    }
+
+    /**
      * Handles a RobberChooseVictimResponse
      *
      * @param rsp The RobberChooseVictimResponse found on the EventBus
@@ -734,11 +749,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberTaxMessage(RobberTaxMessage msg) {
         LOG.debug("Received RobberTaxMessage");
-        if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
-            LOG.debug("Sending ShowRobberTaxViewEvent");
-            User user = userService.getLoggedInUser();
-            eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                     msg.getInventory().get(user)));
+        if (msg.getLobbyName().equals(lobbyName)) {
+            disableButtonStates();
+            if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
+                LOG.debug("Sending ShowRobberTaxViewEvent");
+                User user = userService.getLoggedInUser();
+                eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                         msg.getInventory().get(user)));
+            }
         }
     }
 

@@ -287,6 +287,28 @@ public class SceneManager {
     }
 
     /**
+     * Shows a server error message inside an error alert
+     * <p>
+     * This method can check for certain Throwables by taking the thrown
+     * Throwable as an argument.
+     *
+     * @param e     The Throwable that was thrown
+     * @param cause The cause of the Throwable being thrown
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-26
+     */
+    public void showServerError(Throwable e, String cause) {
+        if (e instanceof IOException) {
+            //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
+            userService.logout(userService.getLoggedInUser());
+            showLoginScreen();
+            cause = resourceBundle.getString("error.server.disrupted");
+        }
+        showServerError(cause);
+    }
+
+    /**
      * Method used to display a custom error for the
      * connection timeout.
      *

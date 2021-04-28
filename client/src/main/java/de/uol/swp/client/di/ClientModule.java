@@ -52,6 +52,9 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("lang", "en_GB");
         defaultProps.setProperty("debug.draw_hitbox_grid", "false");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
+        defaultProps.setProperty("join_leave_msgs_on", "true");
+        defaultProps.setProperty("owner_ready_notifs_on", "true");
+        defaultProps.setProperty("owner_transfer_notifs_on", "true");
         defaultProps.setProperty("theme", "default");
 
         //Reading properties-file
@@ -92,7 +95,7 @@ public class ClientModule extends AbstractModule {
         }
 
         LOG.debug("Selected theme in config file: " + properties.getProperty("theme"));
-        
+
         //Setting the theme
         final String theme = properties.getProperty("theme");
 
@@ -101,6 +104,16 @@ public class ClientModule extends AbstractModule {
 
         //Setting the drawHitboxGrid value
         final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
+
+        //Setting the join_leave_msgs_on value
+        final boolean joinLeaveMsgsOn = Boolean.parseBoolean(properties.getProperty("join_leave_msgs_on"));
+
+        //Setting the owner_ready_notifs_on value
+        final boolean ownerReadyNotificationsOn = Boolean.parseBoolean(properties.getProperty("owner_ready_notifs_on"));
+
+        //Setting the owner_transfer_notifs_on value
+        final boolean ownerTransferNotificationsOn;
+        ownerTransferNotificationsOn = Boolean.parseBoolean(properties.getProperty("owner_transfer_notifs_on"));
 
         //DI stuff
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class)
@@ -112,6 +125,9 @@ public class ClientModule extends AbstractModule {
         bind(Properties.class).toInstance(properties);
         bind(ResourceBundle.class).toInstance(resourceBundle);
         bindConstant().annotatedWith(Names.named("drawHitboxGrid")).to(drawHitboxGrid);
+        bindConstant().annotatedWith(Names.named("joinLeaveMsgsOn")).to(joinLeaveMsgsOn);
+        bindConstant().annotatedWith(Names.named("ownerReadyNotificationsOn")).to(ownerReadyNotificationsOn);
+        bindConstant().annotatedWith(Names.named("ownerTransferNotificationsOn")).to(ownerTransferNotificationsOn);
         bindConstant().annotatedWith(Names.named("theme")).to(theme);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
@@ -121,10 +137,10 @@ public class ClientModule extends AbstractModule {
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
         bind(ITradeService.class).to(TradeService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
-        requestStaticInjection(ClientApp.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(SceneManager.class);
         requestStaticInjection(MainMenuPresenter.class);
         requestStaticInjection(AbstractPresenterWithChatWithGame.class);
+        requestStaticInjection(AbstractPresenterWithChat.class);
     }
 }
