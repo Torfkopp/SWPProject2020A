@@ -2,6 +2,7 @@ package de.uol.swp.client;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
@@ -40,10 +41,12 @@ import java.util.List;
 public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected static Logger LOG;
-
+    @Inject
+    @Named("theme")
+    private static String theme;
+    private static String styleSheet;
     @Inject
     protected IChatService chatService;
-
     @FXML
     protected ListView<ChatOrSystemMessage> chatView;
     @FXML
@@ -68,6 +71,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void initialize() {
+        styleSheet = "css/" + theme + ".css";
         prepareChatVars();
     }
 
@@ -302,6 +306,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                             ButtonBar.ButtonData.OK_DONE);
                         alert.getButtonTypes().setAll(confirm);
+                        alert.getDialogPane().getStylesheets().add(styleSheet);
                         alert.showAndWait();
                     });
                 }

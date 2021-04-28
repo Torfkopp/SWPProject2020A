@@ -32,6 +32,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -210,6 +211,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             turnIndicator.getChildren().clear();
             Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
             preUsernameText.setFont(Font.font(20.0));
+            if (theme.equals("dark")) preUsernameText.setFill(Color.web("#F3F5F3"));
 
             String name = user.getUsername();
             if (name.length() > 15) name = name.substring(0, 15) + "...";
@@ -233,6 +235,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             }
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
+            if (theme.equals("dark")) postUsernameText.setFill(Color.web("#F3F5F3"));
             turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
         });
     }
@@ -677,6 +680,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                                    ButtonBar.ButtonData.CANCEL_CLOSE);
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+                dialogue.getDialogPane().getStylesheets().add(styleSheet);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
                 rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
             });
@@ -921,6 +925,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.setDialogPane(pane);
         dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
