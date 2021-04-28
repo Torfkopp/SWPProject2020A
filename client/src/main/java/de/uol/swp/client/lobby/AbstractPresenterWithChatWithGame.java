@@ -12,9 +12,9 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
@@ -36,6 +36,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -56,6 +57,10 @@ import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 @SuppressWarnings({"UnstableApiUsage", "rawtypes"})
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
+    @Inject
+    @Named("theme")
+    private static String theme;
+    private static String styleSheet;
     @FXML
     protected Button endTurn;
     @FXML
@@ -86,10 +91,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
-
     @Inject
     protected IGameService gameService;
-
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
     protected Integer dice1;
     protected Integer dice2;
@@ -106,7 +109,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
-
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<Map, Integer> developmentCardAmountCol;
@@ -116,15 +118,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private TableColumn<Map, Integer> resourceAmountCol;
     @FXML
     private TableColumn<Map, String> resourceNameCol;
-
     @Inject
     private ITradeService tradeService;
-
-    @Inject
-    @Named("theme")
-    private static String theme;
-    private static String styleSheet;
-
     private ObservableList<Pair<String, String>> resourceList;
     private boolean buildingCurrentlyAllowed;
 
