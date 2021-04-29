@@ -55,7 +55,7 @@ public class Game {
                 players.put(randomUser, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
                 playerList.remove(randomUser);
-                autoRollEnabled.put(userOrDummy, false);
+                autoRollEnabled.put(randomUser, false);
             }
         }
         activePlayer = first;

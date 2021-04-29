@@ -557,14 +557,14 @@ public class GameService extends AbstractService {
             }
             Set<UserOrDummy> users = msg.getLobby().getUserOrDummies();
             int randomNbr = (int) (Math.random() * users.size());
-            UserOrDummy[] playerArray = users.toArray(new UserOrDummy[users.size()]);
+            UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
             // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap);
             LOG.debug("Sending GameCreatedMessage");
-            post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
+            post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
-            StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
+            StartSessionMessage message = new StartSessionMessage(lobbyName, firstPlayer, configuration,
                                                                   msg.getLobby().startUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
