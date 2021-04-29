@@ -2,6 +2,7 @@ package de.uol.swp.server.sessionmanagement;
 
 /**
  * Exception thrown in SessionManagement
+ * <p>
  * This exception is thrown if someone wants to remove a not existing session
  * or tries to add a new session to the active session, when the session is already
  * bound to connection.

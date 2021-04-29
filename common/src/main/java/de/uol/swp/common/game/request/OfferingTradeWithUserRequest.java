@@ -2,6 +2,7 @@ package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,26 +18,35 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
     private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
-    private final Map<String, Integer> offeringResourceMap;
-    private final Map<String, Integer> respondingResourceMap;
+    private final List<Map<String, Object>> offeredResources;
+    private final List<Map<String, Object>> demandedResources;
 
     /**
      * Constructor
      *
-     * @param offeringUser          The offering User
-     * @param respondingUser        The responding User
-     * @param lobbyName             The name of the lobby
-     * @param offeringResourceMap   The offered resources
-     * @param respondingResourceMap The responded resources
+     * @param offeringUser      The offering User
+     * @param respondingUser    The responding User
+     * @param lobbyName         The name of the lobby
+     * @param offeredResources  The offered resources
+     * @param demandedResources The responded resources
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, String lobbyName,
-                                        Map<String, Integer> offeringResourceMap,
-                                        Map<String, Integer> respondingResourceMap) {
+                                        List<Map<String, Object>> offeredResources,
+                                        List<Map<String, Object>> demandedResources) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
-        this.offeringResourceMap = offeringResourceMap;
-        this.respondingResourceMap = respondingResourceMap;
+        this.offeredResources = offeredResources;
+        this.demandedResources = demandedResources;
+    }
+
+    /**
+     * Gets the demanded Resources
+     *
+     * @return Gets the demanded Resources as a Map
+     */
+    public List<Map<String, Object>> getDemandedResources() {
+        return demandedResources;
     }
 
     /**
@@ -44,8 +54,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the offering Resources as a Map
      */
-    public Map<String, Integer> getOfferingResourceMap() {
-        return offeringResourceMap;
+    public List<Map<String, Object>> getOfferedResources() {
+        return offeredResources;
     }
 
     /**
@@ -55,15 +65,6 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      */
     public UserOrDummy getOfferingUser() {
         return offeringUser;
-    }
-
-    /**
-     * Gets the demanded Resources
-     *
-     * @return Gets the demanded Resources as a Map
-     */
-    public Map<String, Integer> getRespondingResourceMap() {
-        return respondingResourceMap;
     }
 
     /**

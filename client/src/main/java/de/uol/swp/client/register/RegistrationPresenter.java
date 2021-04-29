@@ -7,12 +7,13 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.common.user.UserDTO;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,8 @@ public class RegistrationPresenter extends AbstractPresenter {
     private PasswordField passwordField1;
     @FXML
     private PasswordField passwordField2;
+    @FXML
+    private Button registerButton;
 
     /**
      * Constructor
@@ -52,6 +55,11 @@ public class RegistrationPresenter extends AbstractPresenter {
     @Inject
     public RegistrationPresenter(EventBus eventBus) {
         setEventBus(eventBus);
+    }
+
+    @FXML
+    protected void initialize() {
+        prepareLoginFormat();
     }
 
     /**
@@ -125,5 +133,30 @@ public class RegistrationPresenter extends AbstractPresenter {
             userService.createUser(new UserDTO(-1, loginField.getText(), userService.hash(passwordField1.getText()),
                                                emailField.getText()));
         }
+    }
+
+    /**
+     * Prepares the loginField
+     * <p>
+     * Helper method, called when the RegistrationPresenter is initialised in order to let the loginField
+     * only accept alphanumeric entries with the addition of underscore and hyphen
+     *
+     * @author Sven Ahrens
+     * @since 2021-04-21
+     */
+    private void prepareLoginFormat() {
+        UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
+                s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
+        loginField.setTextFormatter(new TextFormatter<>(StringFilter));
+        //@formatter:off
+        registerButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            boolean name = loginField.getText().isBlank() || !loginField.getText().matches("[A-Za-z0-9_-]+");
+            boolean mail = emailField.getText().isBlank() || !checkMailFormat(emailField.getText());
+            boolean password = passwordField1.getText().isBlank()
+                               || !passwordField1.getText().equals(passwordField2.getText())
+                               || passwordField2.getText().isBlank();
+            return name || mail || password;
+            }, loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
+        //@formatter:on
     }
 }

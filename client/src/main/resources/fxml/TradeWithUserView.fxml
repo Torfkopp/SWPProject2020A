@@ -84,7 +84,17 @@
 
     <VBox alignment="CENTER" spacing="10.0">
         <Label text="%game.trade.labels.owninventory"/>
-        <ListView fx:id="ownInventoryView" prefHeight="120.0" prefWidth="200.0"/>
+        <TableView fx:id="ownResourceTableView" layoutY="210.0" prefHeight="150.0" prefWidth="230.0">
+            <columns>
+                <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
+                             prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
+                <TableColumn fx:id="resourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
+                             minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TableView>
         <VBox.margin>
             <Insets bottom="10.0" left="10.0"/>
         </VBox.margin>

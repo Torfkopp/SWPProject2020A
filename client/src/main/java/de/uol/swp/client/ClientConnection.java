@@ -102,7 +102,7 @@ public class ClientConnection {
      */
     public void process(Throwable message) {
         for (ConnectionListener l : connectionListener) {
-            l.exceptionOccurred(message.getMessage());
+            l.exceptionOccurred(message, message.getMessage());
         }
     }
 
@@ -178,18 +178,18 @@ public class ClientConnection {
         try {
             Bootstrap bill = new Bootstrap();
             bill.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port))
-             .handler(new ChannelInitializer<SocketChannel>() {
-                 @Override
-                 protected void initChannel(SocketChannel ch) {
-                     // Add IdleStateHandler to handle timeouts
-                     ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
-                     // Add both Encoder and Decoder to send and receive serialisable objects
-                     ch.pipeline().addLast(new ObjectEncoder());
-                     ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                     // Add a ClientHandler
-                     ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
-                 }
-             });
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) {
+                        // Add IdleStateHandler to handle timeouts
+                        ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
+                        // Add both Encoder and Decoder to send and receive serialisable objects
+                        ch.pipeline().addLast(new ObjectEncoder());
+                        ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                        // Add a ClientHandler
+                        ch.pipeline().addLast(new ClientHandler(ClientConnection.this));
+                    }
+                });
             ChannelFuture f = bill.connect().sync();
             f.channel().closeFuture().sync();
         } finally {
@@ -226,7 +226,7 @@ public class ClientConnection {
      */
     @Subscribe
     private void onDeadEvent(DeadEvent deadEvent) {
-        LOG.warn("DeadEvent detected: " + deadEvent);
+        LOG.warn("DeadEvent detected: {}", deadEvent);
     }
 
     /**
