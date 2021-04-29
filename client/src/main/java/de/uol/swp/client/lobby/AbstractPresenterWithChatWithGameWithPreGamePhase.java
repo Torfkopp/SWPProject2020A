@@ -18,8 +18,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.Objects;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
@@ -246,6 +246,28 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
+
+    /**
+     * Handles a KickUserResponse found on the EventBus
+     * <p>
+     * If a KickUserResponse is detected on the EventBus and its
+     * directed to this lobby and this player, the according lobby
+     * window is closed.
+     *
+     * @param rsp The KickUserResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserResponse(KickUserResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
+            Platform.runLater(() -> closeWindow(true));
+        }
+    }
+
     /**
      * Handles the PlayerWonGameMessage
      * <p>
@@ -273,28 +295,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             this.elapsedTimer.stop();
         }
         fitCanvasToSize();
-    }
-
-
-    /**
-     * Handles a KickUserResponse found on the EventBus
-     * <p>
-     * If a KickUserResponse is detected on the EventBus and its
-     * directed to this lobby and this player, the according lobby
-     * window is closed.
-     *
-     * @param rsp The KickUserResponse found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.response.KickUserResponse
-     * @since 2021-03-02
-     */
-    @Subscribe
-    private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
-            Platform.runLater(() -> closeWindow(true));
-        }
     }
 
     /**
@@ -365,6 +365,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
@@ -421,6 +422,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
+            turnIndicator.setVisible(true);
             setRollDiceButtonState(msg.getUser());
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
@@ -432,15 +434,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 @Override
                 public void handle(long now) {
                     long elapsedMillis = System.currentTimeMillis() - startTime;
-            Platform.runLater(() -> timerLabel.setText(
-                    String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
-                                  TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
-                                  TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
-        }
-    };
+                    Platform.runLater(() -> timerLabel.setText(
+                            String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                                          TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                                          TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+                }
+            };
             this.elapsedTimer.start();
-    });
-
+        });
     }
 
     /**
@@ -480,6 +481,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
+            turnIndicator.setVisible(true);
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
