@@ -1,8 +1,12 @@
 package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.SystemMessage;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -16,9 +20,12 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.inject.Named;
 import java.util.*;
 
 /**
@@ -38,6 +45,16 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
+
+    @Inject
+    @Named("joinLeaveMsgsOn")
+    private boolean joinLeaveMsgsOn;
+    @Inject
+    @Named("ownerReadyNotificationsOn")
+    private boolean ownerReadyNotificationsOn;
+    @Inject
+    @Named("ownerTransferNotificationsOn")
+    private boolean ownerTransferNotificationsOn;
 
     /**
      * Constructor
@@ -107,6 +124,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             }
             setPreGameSettings();
         });
+        SystemMessage ownerNotice = rsp.getOwnerNotice();
+        boolean isOwner = userService.getLoggedInUser().equals(owner);
+        if (!ownerReadyNotificationsOn || !isOwner || inGame || ownerNotice == null) return;
+        Platform.runLater(() -> chatMessages.add(ownerNotice));
     }
 
     /**
@@ -217,7 +238,17 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
-        if (owner != msg.getLobby().getOwner()) {
+        if (!Objects.equals(owner, msg.getLobby().getOwner())) {
+            if (ownerTransferNotificationsOn) {
+                if (userService.getLoggedInUser().equals(owner)) {
+                    I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
+                                                          msg.getLobby().getOwner().getUsername());
+                    Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+                } else if (userService.getLoggedInUser().equals(msg.getLobby().getOwner())) {
+                    I18nWrapper content = new I18nWrapper("lobby.owner.promoted", owner.getUsername());
+                    Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(content)));
+                }
+            }
             owner = msg.getLobby().getOwner();
             prepareMembersView();
             setStartSessionButtonState();
@@ -239,7 +270,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * <p>
      * If a new UserJoinedLobbyMessage object is posted onto the EventBus, the name of the newly
      * joined user is appended to the user list in the lobby menu.
-     * The state of the "Start Session" button is updated accordingly.
+     * The state of the "Start Session" button is updated accordingly. If the user enabled the
+     * appropriate option, a SystemMessage is added to the chat to display to them who joined.
+     * <p>
      * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} joined Lobby." is displayed in the log.
      *
@@ -255,6 +288,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         UserOrDummy user = msg.getUser();
         LOG.debug("---- User {} joined", user.getUsername());
         Platform.runLater(() -> {
+            if (joinLeaveMsgsOn)
+                chatMessages.add(new SystemMessageDTO(new I18nWrapper("lobby.user.join", user.getUsername())));
             if (lobbyMembers != null && userService.getLoggedInUser() != user && !lobbyMembers.contains(user))
                 lobbyMembers.add(user);
             setStartSessionButtonState();
@@ -272,7 +307,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * leaving user wasn't the owner, their name is removed from the list
      * of members. If they were marked as ready, they are removed from the
      * Set of ready users. Afterwards, the "Start Session" button is set to
-     * the appropriate state.
+     * the appropriate state. If the user enabled the
+     * appropriate option, a SystemMessage is added to the chat to display
+     * to them who left.
      * <p>
      * Furthermore, if the LOG-Level is set to DEBUG, the message "Owner/User
      * {@literal <Username>} left Lobby {@literal <Lobbyname>}" is displayed
@@ -293,6 +330,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             LOG.debug("---- Owner {} left", user.getUsername());
         } else LOG.debug("---- User {} left", user.getUsername());
         Platform.runLater(() -> {
+            if (joinLeaveMsgsOn)
+                chatMessages.add(new SystemMessageDTO(new I18nWrapper("lobby.user.leave", user.getUsername())));
             lobbyMembers.remove(user);
             readyUsers.remove(user);
             setStartSessionButtonState();
