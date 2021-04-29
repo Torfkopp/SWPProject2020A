@@ -1,5 +1,6 @@
 package de.uol.swp.client.main;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
@@ -10,7 +11,6 @@ import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
-import de.uol.swp.common.lobby.request.LobbyJoinRandomUserRequest;
 import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
@@ -85,42 +85,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                     setText(empty || item == null ? "" : item.getValue());
                 });
             }
-        });
-    }
-
-    /**
-     * Method called when a JoinLobbyWithPasswordResponse is found on the EventBus
-     * <p>
-     * If a JoinLobbyWithPasswordResponse is found on the EventBus,
-     * this method sends a JoinLobbyWithPasswordConfirmationRequest to the server
-     * with the confirmation of the lobby password
-     *
-     * @author Alwin Bossert
-     * @since 2021-04-26
-     */
-    @Subscribe
-    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
-        LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
-        Platform.runLater(() -> {
-            TextInputDialog dialogue = new TextInputDialog();
-            dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
-            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
-            PasswordField lobbyPassword = new PasswordField();
-            HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPassword);
-            VBox box = new VBox(10, box3);
-            dialogue.getDialogPane().setContent(box);
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                               ButtonBar.ButtonData.CANCEL_CLOSE);
-            dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
-
-            //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
-            Optional<String> result = dialogue.showAndWait();
-            result.ifPresent(s -> eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
-                                                                                             userService
-                                                                                                     .getLoggedInUser(),
-                                                                                             (lobbyPassword.getText()))));
         });
     }
 
@@ -296,12 +260,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         threePlayerButton.setToggleGroup(grp);
         fourPlayerButton.setToggleGroup(grp);
         HBox box2 = new HBox(10, threePlayerButton, fourPlayerButton);
-        PasswordField lobbyPassword = new PasswordField();
-        HBox box3 = new HBox(10, lbl1, lobbyPassword);
-        VBox box = new VBox(10, box1, box2, box3);
-        dialogue.getDialogPane().setContent(box);
-        //dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
 
+        CheckBox lobbyPasswordCheckBox = new CheckBox();
+        PasswordField lobbyPassword = new PasswordField();
+        HBox box3 = new HBox(10, lobbyPasswordCheckBox, lbl1, lobbyPassword);
+        VBox box = new VBox(10, box1, box2, box3);
+        lobbyPassword.disableProperty().bind(Bindings.createBooleanBinding(() -> !lobbyPasswordCheckBox.isSelected(),
+                                                                           lobbyPasswordCheckBox.selectedProperty()));
+        dialogue.getDialogPane().setContent(box);
         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -315,7 +281,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         int maxPlayers;
         if (threePlayerButton.isSelected()) maxPlayers = 3;
         else maxPlayers = 4;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, (lobbyPassword.getText())));
+        String lobbyPasswordHash = lobbyPassword.getText();
+        if (!Strings.isNullOrEmpty(lobbyPassword.getText())) {
+            lobbyPasswordHash = userService.hash(lobbyPassword.getText());
+        }
+        String finalLobbyPasswordHash = lobbyPasswordHash;
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, finalLobbyPasswordHash));
     }
 
     /**
@@ -467,6 +438,47 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
+        });
+    }
+
+    /**
+     * Method called when a JoinLobbyWithPasswordResponse is found on the EventBus
+     * <p>
+     * If a JoinLobbyWithPasswordResponse is found on the EventBus,
+     * this method sends a JoinLobbyWithPasswordConfirmationRequest to the server
+     * with the confirmation of the lobby password
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-26
+     */
+    @Subscribe
+    private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
+        LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
+        Platform.runLater(() -> {
+            TextInputDialog dialogue = new TextInputDialog();
+            dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
+            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
+            PasswordField lobbyPasswordField = new PasswordField();
+            HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
+            VBox box = new VBox(10, box3);
+            dialogue.getDialogPane().setContent(box);
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+
+            //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
+            Optional<String> result = dialogue.showAndWait();
+            String lobbyPassword = lobbyPasswordField.getText();
+            if (!Strings.isNullOrEmpty(lobbyPasswordField.getText())) {
+                lobbyPassword = userService.hash(lobbyPasswordField.getText());
+            }
+            String finalLobbyPassword = lobbyPassword;
+            result.ifPresent(s -> eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
+                                                                                             userService
+                                                                                                     .getLoggedInUser(),
+                                                                                             finalLobbyPassword)));
         });
     }
 

@@ -16,6 +16,7 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
@@ -400,11 +401,23 @@ public class LobbyService extends AbstractService {
             if (lobby.get().getUserOrDummies().size() < lobby.get().getMaxPlayers()) {
                 if (!lobby.get().getUserOrDummies().contains(req.getUser())) {
                     if (!lobby.get().isInGame()) {
-                        if (lobby.get().hasAPassword() == true) {
-                            Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(), lobby.get());
-                            responseMessage.initWithMessage(req);
-                            post(responseMessage);
-                        } else if (lobby.get().hasAPassword() == false) {
+                        if (lobby.get().hasAPassword()) {
+                            if (req.getUser() instanceof Dummy) {
+                                lobby.get().joinUser(req.getUser());
+                                lobby = lobbyManagement.getLobby(req.getName());
+                                if (lobby.isEmpty()) return;
+                                Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
+                                responseMessage.initWithMessage(req);
+                                post(responseMessage);
+                                sendToAllInLobby(req.getName(),
+                                                 new UserJoinedLobbyMessage(req.getName(), req.getUser()));
+                                post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+                            } else {
+                                Message responseMessage = new JoinLobbyWithPasswordResponse(req.getName(), lobby.get());
+                                responseMessage.initWithMessage(req);
+                                post(responseMessage);
+                            }
+                        } else if (!lobby.get().hasAPassword()) {
                             lobby.get().joinUser(req.getUser());
                             lobby = lobbyManagement.getLobby(req.getName());
                             if (lobby.isEmpty()) return;
