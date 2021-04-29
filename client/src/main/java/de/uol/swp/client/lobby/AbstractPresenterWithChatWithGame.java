@@ -549,6 +549,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             alert.getButtonTypes().setAll(confirm);
             if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
                 alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }
@@ -996,6 +997,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         grid.add(c2, 1, 1);
         //Put the grid into the dialogue and let it appear
         dialogue.getDialogPane().setContent(grid);
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Get the pressed button
         Optional<String> rst = dialogue.showAndWait();
         Optional<String> button1 = Optional.of(confirm.toString());

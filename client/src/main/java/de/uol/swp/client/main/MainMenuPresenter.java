@@ -584,6 +584,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                                                   username), ok);
             alert.setTitle(resourceBundle.getString("information.title"));
             alert.setHeaderText(resourceBundle.getString("information.header"));
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.show();
         });
     }
