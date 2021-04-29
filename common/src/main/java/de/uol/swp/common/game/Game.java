@@ -39,10 +39,17 @@ public class Game {
         this.lobby = lobby;
         this.map = gameMap;
         {
-            Player counterPlayer = Player.PLAYER_1;
-            for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
-                players.put(userOrDummy, counterPlayer, new Inventory());
+
+            List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+            players.put(first, Player.PLAYER_1, new Inventory());
+            playerList.remove(first);
+            Player counterPlayer = Player.PLAYER_2;
+            while (playerList.size() > 0) {
+                int randomNumber = (int) (Math.random() * playerList.size());
+                UserOrDummy randomUser = playerList.get(randomNumber);
+                players.put(randomUser, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
+                playerList.remove(randomUser);
             }
         }
         activePlayer = first;
