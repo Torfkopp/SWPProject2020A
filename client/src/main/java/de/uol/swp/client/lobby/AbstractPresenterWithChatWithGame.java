@@ -85,6 +85,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
+    @FXML
+    protected Menu CurrentRound = new Menu();
 
     @Inject
     protected IGameService gameService;
@@ -105,6 +107,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
+    protected int RoundCounter = 0;
+
 
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
@@ -457,6 +461,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
+        Platform.runLater(() -> CurrentRound.setText(String.format("Current Round: " + RoundCounter)));
+        RoundCounter++;
     }
 
     /**

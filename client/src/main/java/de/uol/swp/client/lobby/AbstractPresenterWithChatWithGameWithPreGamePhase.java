@@ -369,6 +369,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
+            CurrentRound.setVisible(false);
         });
     }
 
@@ -388,6 +389,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName);
         timerLabel.setVisible(true);
+        CurrentRound.setVisible(true);
+        Platform.runLater(() -> CurrentRound.setText(String.format("Current Round: 1")));
     }
 
     /**
