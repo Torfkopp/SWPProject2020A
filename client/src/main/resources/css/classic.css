@@ -1,0 +1,84 @@
+@import url("palette.css");
+
+@font-face {
+    src: url("../fonts/GaramondMT.ttf");
+}
+
+/*
+ * Style defaults
+ */
+.root {
+    -fx-base: -brown;
+    -fx-background: -darkSienna;
+    -fx-accent: -lightBrown;
+    -fx-focus-color: -fx-accent;
+    -fx-faint-focus-color: transparent;
+    -fx-dark-text-color: -pureBlack;
+    -fx-mid-text-color: -gold;
+    -fx-light-text-color: -gold;
+    -fx-text-background-color: ladder(
+            -fx-background,
+            -fx-light-text-color 49%,
+            -fx-dark-text-color  50%
+    );
+    -fx-default-button: -fx-accent;
+    -fx-font-family: 'Garamond MT';
+    -fx-font-weight: bold;
+    -fx-font-scale: 115%;
+}
+
+.text {
+    -fx-stroke: -pureBlack;
+    -fx-stroke-width: 20%;
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-accent;
+}
+
+.button:default {
+    -fx-border-color: -brown;
+}
+
+.button:cancel {
+    -fx-base: -red;
+    -fx-border-color: -brown;
+    -fx-text-fill: -pureBlack;
+}
+
+.text-field {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 0;
+    -fx-text-fill: -white;
+}
+
+.text-field:focused {
+    -fx-background-color: -brown;
+    -fx-highlight-fill: -fx-accent;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 0;
+}
+
+.menu-bar {
+    -fx-background-color: -brown;
+}
+
+.menu-button > .label {
+    -fx-text-fill: -gold;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -pureBlack;
+}
+
+/*
+ * Style dev menu objects explicitly
+ */
+#devMenuView {
+    -fx-accent: -red;
+}
