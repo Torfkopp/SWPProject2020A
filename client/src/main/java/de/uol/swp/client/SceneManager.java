@@ -67,8 +67,7 @@ public class SceneManager {
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
-    @Named("theme")
-    private static String theme;
+    @Named("styleSheet")
     private static String styleSheet;
 
     private final Stage primaryStage;
@@ -99,7 +98,6 @@ public class SceneManager {
      */
     @Inject
     public SceneManager(EventBus eventBus, @Assisted Stage primaryStage) {
-        styleSheet = "css/" + theme + ".css";
         eventBus.register(this);
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;

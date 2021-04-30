@@ -18,6 +18,11 @@
     -fx-dark-text-color: -black;
     -fx-mid-text-color: -black;
     -fx-light-text-color: -white;
+    -fx-text-background-color: ladder(
+            -fx-background,
+            -fx-light-text-color 49%,
+            -fx-dark-text-color  50%
+    );
     -fx-default-button: -fx-accent;
     -fx-font-family: 'Roboto';
 }

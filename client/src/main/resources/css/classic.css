@@ -9,16 +9,22 @@
  */
 .root {
     -fx-base: -brown;
-    -fx-background: -catanRed;
+    -fx-background: -darkSienna;
     -fx-accent: -lightBrown;
     -fx-focus-color: -fx-accent;
     -fx-faint-focus-color: transparent;
     -fx-dark-text-color: -pureBlack;
     -fx-mid-text-color: -gold;
     -fx-light-text-color: -gold;
+    -fx-text-background-color: ladder(
+            -fx-background,
+            -fx-light-text-color 49%,
+            -fx-dark-text-color  50%
+    );
     -fx-default-button: -fx-accent;
     -fx-font-family: 'Garamond MT';
     -fx-font-weight: bold;
+    -fx-font-scale: 115%;
 }
 
 .text {
@@ -67,12 +73,6 @@
 }
 
 .menu-item > .label {
-    -fx-text-fill: -pureBlack;
-}
-
-.list-cell,
-.table-cell,
-.tree-cell {
     -fx-text-fill: -pureBlack;
 }
 

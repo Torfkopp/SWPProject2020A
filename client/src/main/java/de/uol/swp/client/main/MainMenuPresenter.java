@@ -52,8 +52,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     @Inject
-    @Named("theme")
-    private static String theme;
+    @Named("styleSheet")
     private static String styleSheet;
 
     @FXML
@@ -75,7 +74,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @since 2021-01-02
      */
     public MainMenuPresenter() {
-        styleSheet = "css/" + theme + ".css";
         super.init(LogManager.getLogger(MainMenuPresenter.class));
     }
 

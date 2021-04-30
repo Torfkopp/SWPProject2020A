@@ -15,8 +15,19 @@
     -fx-dark-text-color: -black;
     -fx-mid-text-color: -deepPurple;
     -fx-light-text-color: fuchsia;
+    -fx-text-background-color: ladder(
+            -fx-background,
+            -fx-light-text-color 49%,
+            -fx-dark-text-color  50%
+    );
     -fx-default-button: -fx-accent;
     -fx-font-family: 'CookieMonster';
+    -fx-font-size: 120%;
+}
+
+.text {
+    -fx-stroke: -teal;
+    -fx-stroke-width: 30%;
 }
 
 .button {
@@ -59,12 +70,6 @@
 }
 
 .menu-item > .label {
-    -fx-text-fill: -black;
-}
-
-.list-cell,
-.table-cell,
-.tree-cell {
     -fx-text-fill: -black;
 }
 

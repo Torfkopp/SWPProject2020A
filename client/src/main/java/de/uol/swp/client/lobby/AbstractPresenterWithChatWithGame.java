@@ -37,7 +37,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
-import javafx.util.Pair;
 
 import java.util.*;
 
@@ -61,6 +60,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     @Named("theme")
     private static String theme;
+    @Inject
+    @Named("styleSheet")
     private static String styleSheet;
 
     @FXML
@@ -127,13 +128,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     private ITradeService tradeService;
 
-    private ObservableList<Pair<String, String>> resourceList;
     private boolean buildingCurrentlyAllowed;
 
     @Override
     @FXML
     protected void initialize() {
-        styleSheet = "css/" + theme + ".css";
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();

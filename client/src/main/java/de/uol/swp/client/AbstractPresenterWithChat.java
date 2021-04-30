@@ -43,8 +43,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     protected static Logger LOG;
 
     @Inject
-    @Named("theme")
-    private static String theme;
+    @Named("styleSheet")
     private static String styleSheet;
     @Inject
     protected IChatService chatService;
@@ -73,7 +72,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void initialize() {
-        styleSheet = "css/" + theme + ".css";
         prepareChatVars();
     }
 

@@ -98,6 +98,7 @@ public class ClientModule extends AbstractModule {
 
         //Setting the theme
         final String theme = properties.getProperty("theme");
+        final String styleSheet = "css/" + theme + ".css";
 
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
@@ -129,6 +130,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("ownerReadyNotificationsOn")).to(ownerReadyNotificationsOn);
         bindConstant().annotatedWith(Names.named("ownerTransferNotificationsOn")).to(ownerTransferNotificationsOn);
         bindConstant().annotatedWith(Names.named("theme")).to(theme);
+        bindConstant().annotatedWith(Names.named("styleSheet")).to(styleSheet);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
@@ -140,7 +142,7 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(SceneManager.class);
         requestStaticInjection(MainMenuPresenter.class);
-        requestStaticInjection(AbstractPresenterWithChatWithGame.class);
         requestStaticInjection(AbstractPresenterWithChat.class);
+        requestStaticInjection(AbstractPresenterWithChatWithGame.class);
     }
 }
