@@ -470,7 +470,10 @@ public class GameService extends AbstractService {
                 break;
             }
             case EDGE: {
-                if (gameMap.getEdge(mapPoint).getOwner() != null) {
+                if (gameMap.getEdge(mapPoint) == null) {
+                    sendFailResponse.accept(NOT_A_REAL_ROAD);
+                }
+                else if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (game.getRoadBuildingCardPhase() != RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED) {

@@ -7,9 +7,9 @@ import de.uol.swp.common.game.map.configuration.Configuration;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.Tuple;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static de.uol.swp.common.game.map.management.IIntersection.IntersectionState.*;
 import static de.uol.swp.common.game.map.management.MapPoint.*;
@@ -319,55 +319,61 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public int longestRoadWith(MapPoint mapPoint) {
-        List<Integer> lengths = new LinkedList<>();
-        Set<IEdge> visited = new HashSet<>();
         IEdge edge = getEdge(mapPoint);
+
+        Set<IEdge> visited = new HashSet<>();
         visited.add(edge);
-        var nodes = intersectionEdgeNetwork.incidentNodes(edge);
         Set<IEdge> nodeUEdges = new HashSet<>();
         Set<IEdge> nodeVEdges = new HashSet<>();
-        Map<Integer, Set<IEdge>> nodeULengths = new HashMap<>();
-        Set<Integer> nodeVLengths = new HashSet<>();
-        int nodeULength = 0;
+        List<Tuple<Integer, Set<IEdge>>> nodeULengths = new LinkedList<>();
 
         // Put all edges around the edge specified by the map point in Sets
         // depending on the intersection they share with the specified edge.
+        {
+            EndpointPair<IIntersection> nodes = intersectionEdgeNetwork.incidentNodes(edge);
+            for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+                if (intersectionEdgeNetwork.incidentEdges(nodes.nodeU()).contains(edge)) {
+                    nodeUEdges.add(nextEdge);
+                } else if (intersectionEdgeNetwork.incidentEdges(nodes.nodeV()).contains(edge)) {
+                    nodeVEdges.add(nextEdge);
+                }
+            }
+        }
+        // Find the longest paths for the first side of the specified edge
+        // and save them as a tuple of their length and their visited edges.
+        for (IEdge nextEdge : nodeUEdges) {
+            Set<IEdge> temp = new HashSet<>();
+            nodeULengths
+                    .add(new Tuple<>(roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp),
+                                     temp));
+        }
 
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            if (intersectionEdgeNetwork.incidentEdges(nodes.nodeU()).contains(edge)) {
-                nodeUEdges.add(nextEdge);
-            } else if (intersectionEdgeNetwork.incidentEdges(nodes.nodeV()).contains(edge)) {
-                nodeVEdges.add(nextEdge);
+        // Calculate all combinations of paths from both sides of the edge and store their length in a list
+        List<Integer> lengths = new LinkedList<>();
+        lengths.add(0);
+        if (nodeULengths.isEmpty()) {
+            if (nodeVEdges.isEmpty()) {
+                lengths.add(1);
+            } else {
+                for (IEdge nextEdge : nodeVEdges) {
+                    lengths.add(
+                            1 + roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(), new HashSet<>()));
+                }
+            }
+        } else {
+            for (Tuple<Integer, Set<IEdge>> x : nodeULengths) {
+                if (nodeVEdges.isEmpty()) {
+                    lengths.add(x.getValue1() + 1);
+                }
+                for (IEdge nextEdge : nodeVEdges) {
+                    lengths.add(x.getValue1() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
+                                                               new HashSet<>()));
+                }
             }
         }
 
-        // Find the longest path for the first side of the specified edge
-
-        for (IEdge nextEdge : nodeUEdges) {
-            Set<IEdge> a = new HashSet<>();
-            nodeULengths.put(roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), a), a);
-        }
-        LinkedList<Map.Entry<Integer, Set<IEdge>>> a = new LinkedList<>(nodeULengths.entrySet());
-        Set<IEdge> nodeUVisited = new HashSet<>();
-        if (a.size() == 0) {
-        } else if (a.size() == 1 || a.get(0).getKey() >= a.get(1).getKey()) {
-            nodeUVisited = a.get(0).getValue();
-            nodeULength = a.get(0).getKey();
-        } else if (a.get(1).getKey() > a.get(0).getKey()) {
-            nodeUVisited = a.get(1).getValue();
-            nodeULength = a.get(1).getKey();
-        }
-
-        // Find the longest path for the second side of the specified edge
-
-        for (IEdge nextEdge : nodeVEdges) {
-            nodeVLengths.add(roadLength(nextEdge, edge, null, edge.getOwner(), nodeUVisited, new HashSet<>()));
-        }
-        int nodeVLength = nodeVLengths.isEmpty() ? 0 : Collections.max(nodeVLengths);
-
-        // Return the length of the longest path on both sides of the specified edge plus one for the specified edge
-
-        return nodeULength + 1 + nodeVLength;
+        // Return the length of the longest path found
+        return Collections.max(lengths);
     }
 
     @Override
@@ -680,27 +686,6 @@ public class GameMapManagement implements IGameMapManagement {
         }
     }
 
-    private Set<IEdge> findEnds(IEdge edge, Player owner, Set<IEdge> visited) {
-        if (!Objects.equals(edge.getOwner(), owner)) return new HashSet<>();
-        if (visited.contains(edge)) return new HashSet<>();
-        Set<IEdge> ends = new HashSet<>();
-        visited.add(edge);
-        List<List<IEdge>> a = new LinkedList<>();
-        for (var b : intersectionEdgeNetwork.incidentNodes(edge)) {
-            List<IEdge> x = new LinkedList<>(
-                    intersectionEdgeNetwork.incidentEdges(b).stream().filter((z) -> z.getOwner() == owner)
-                                           .collect(Collectors.toList()));
-            a.add(x);
-        }
-        if (a.get(0).size() > 1 && a.get(1).size() == 1) ends.add(edge);
-        if (a.get(1).size() > 1 && a.get(0).size() == 1) ends.add(edge);
-
-        for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-            ends.addAll(findEnds(nextEdge, owner, new HashSet<>(visited)));
-        }
-        return ends;
-    }
-
     /**
      * Helper method to get the GameHexWrapper of a Hex instead of the IGameHex
      *
@@ -866,8 +851,6 @@ public class GameMapManagement implements IGameMapManagement {
 
             c.retainAll(d);
             IIntersection crossedNode = (new LinkedList<>(c)).get(0);
-            System.out.println("crossedNode.getState() = " + crossedNode.getState());
-            System.out.println("crossedNode.getOwner() = " + crossedNode.getOwner());
             if (crossedNode.getState() != FREE && crossedNode.getOwner() != owner) return 0;
         }
 

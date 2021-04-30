@@ -23,6 +23,7 @@ public class BuildingFailedResponse extends AbstractLobbyResponse {
         CANT_BUILD_HERE,
         NOTHING_HERE,
         NOT_ENOUGH_RESOURCES,
+        NOT_A_REAL_ROAD,
         NOT_THE_RIGHT_TIME
     }
 
