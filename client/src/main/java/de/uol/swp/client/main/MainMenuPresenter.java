@@ -249,15 +249,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
         TextField lobbyName = new TextField(name);
         lobbyName.setTextFormatter(new TextFormatter<>(filter));
-        HBox box1 = new HBox(10, lbl, lobbyName);
-        ToggleGroup grp = new ToggleGroup();
-        RadioButton threePlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.threeplayers"));
-        RadioButton fourPlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.fourplayers"));
-        fourPlayerButton.setSelected(true);
-        threePlayerButton.setToggleGroup(grp);
-        fourPlayerButton.setToggleGroup(grp);
-        HBox box2 = new HBox(10, threePlayerButton, fourPlayerButton);
-        VBox box = new VBox(10, box1, box2);
+        HBox box = new HBox(10, lbl, lobbyName);
         dialogue.getDialogPane().setContent(box);
         //dialogue.setContentText(resourceBundle.getString("lobby.dialog.content"));
 
@@ -271,9 +263,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
-        int maxPlayers;
-        if (threePlayerButton.isSelected()) maxPlayers = 3;
-        else maxPlayers = 4;
+        int maxPlayers = 3;
         result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers));
     }
 
