@@ -9,7 +9,7 @@ import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
@@ -360,11 +360,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null)
-                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+            if (finalAttr != null) Platform.runLater(
+                    () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
-                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
+                    .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
         }
     }
 
