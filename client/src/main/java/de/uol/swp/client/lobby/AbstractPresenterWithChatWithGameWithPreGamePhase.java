@@ -16,10 +16,11 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.Objects;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
@@ -55,9 +56,26 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected CheckBox commandsActivated;
     @FXML
     protected CheckBox readyCheckBox;
+    @FXML
+    protected ColumnConstraints helpColumn;
+    @FXML
+    protected Label help_thisTurnLabel;
+    @FXML
+    protected Label help_rollDiceLabel;
+    @FXML
+    protected Label help_tradeLabel;
+    @FXML
+    protected Label help_buildAStreet;
+    @FXML
+    protected Label help_buildASettlement;
+    @FXML
+    protected Label help_playACard;
+    @FXML
+    protected Label help_endturn;
 
     protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
+    protected boolean helpActivated = false;
 
     @FXML
     protected AnimationTimer elapsedTimer;
@@ -189,6 +207,27 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         threePlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner) || lobbyMembers.size() == 4);
     }
 
+    @FXML
+    private void onHelpButtonPressed() {
+        if (!inGame) {
+            if (!helpActivated) LobbyPresenter.MIN_WIDTH_PRE_GAME += LobbyPresenter.HELP_MIN_WIDTH;
+            else LobbyPresenter.MIN_WIDTH_PRE_GAME -= LobbyPresenter.HELP_MIN_WIDTH;
+
+            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+        } else {
+            if (!helpActivated) LobbyPresenter.MIN_WIDTH_IN_GAME += LobbyPresenter.HELP_MIN_WIDTH;
+            else LobbyPresenter.MIN_WIDTH_IN_GAME -= LobbyPresenter.HELP_MIN_WIDTH;
+
+            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            setHelpButtons();
+        }
+        helpActivated = !helpActivated;
+    }
+
     /**
      * Helper function that sets the Visible and Disable states of the "Start
      * Session" button.
@@ -229,6 +268,27 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Handles a KickUserResponse found on the EventBus
+     * <p>
+     * If a KickUserResponse is detected on the EventBus and its
+     * directed to this lobby and this player, the according lobby
+     * window is closed.
+     *
+     * @param rsp The KickUserResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserResponse(KickUserResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
+            Platform.runLater(() -> closeWindow(true));
+        }
+    }
+
+    /**
      * Method called when the KickUserButton is pressed
      * <p>
      * If the EndTurnButton is pressed, this method requests to kick
@@ -246,6 +306,59 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
+
+    /**
+     * Handles a StartSessionMessage found on the EventBus
+     * <p>
+     * Sets the play field visible.
+     * The startSessionButton and every readyCheckbox are getting invisible for
+     * the lobby members.
+     *
+     * @param msg The StartSessionMessage found on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-02-04
+     */
+    @Subscribe
+    private void onStartSessionMessage(StartSessionMessage msg) {
+        if (!msg.getName().equals(lobbyName)) return;
+        LOG.debug("Received StartSessionMessage for Lobby {}", lobbyName);
+        gameWon = false;
+        winner = null;
+        inGame = true;
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
+        cleanChatHistoryOfOldOwnerNotices();
+        Platform.runLater(() -> {
+            setTurnIndicatorText(msg.getUser());
+            prepareInGameArrangement();
+            endTurn.setDisable(true);
+            autoRoll.setVisible(true);
+            tradeWithUserButton.setVisible(true);
+            tradeWithUserButton.setDisable(true);
+            tradeWithBankButton.setVisible(true);
+            tradeWithBankButton.setDisable(true);
+            setRollDiceButtonState(msg.getUser());
+            kickUserButton.setVisible(false);
+            changeOwnerButton.setVisible(false);
+            playCard.setVisible(true);
+            playCard.setDisable(true);
+            gameService.updateGameMap(lobbyName);
+            long startTime = System.currentTimeMillis();
+            this.elapsedTimer = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    long elapsedMillis = System.currentTimeMillis() - startTime;
+                    Platform.runLater(() -> timerLabel.setText(
+                            String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                                          TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                                          TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+                }
+            };
+            this.elapsedTimer.start();
+        });
+    }
+
     /**
      * Handles the PlayerWonGameMessage
      * <p>
@@ -273,28 +386,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             this.elapsedTimer.stop();
         }
         fitCanvasToSize();
-    }
-
-
-    /**
-     * Handles a KickUserResponse found on the EventBus
-     * <p>
-     * If a KickUserResponse is detected on the EventBus and its
-     * directed to this lobby and this player, the according lobby
-     * window is closed.
-     *
-     * @param rsp The KickUserResponse found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.response.KickUserResponse
-     * @since 2021-03-02
-     */
-    @Subscribe
-    private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
-            Platform.runLater(() -> closeWindow(true));
-        }
     }
 
     /**
@@ -390,57 +481,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         timerLabel.setVisible(true);
     }
 
-    /**
-     * Handles a StartSessionMessage found on the EventBus
-     * <p>
-     * Sets the play field visible.
-     * The startSessionButton and every readyCheckbox are getting invisible for
-     * the lobby members.
-     *
-     * @param msg The StartSessionMessage found on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Maximilian Lindner
-     * @since 2021-02-04
-     */
-    @Subscribe
-    private void onStartSessionMessage(StartSessionMessage msg) {
-        if (!msg.getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionMessage for Lobby {}", lobbyName);
-        gameWon = false;
-        winner = null;
-        inGame = true;
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
-        cleanChatHistoryOfOldOwnerNotices();
-        Platform.runLater(() -> {
-            setTurnIndicatorText(msg.getUser());
-            prepareInGameArrangement();
-            endTurn.setDisable(true);
-            autoRoll.setVisible(true);
-            tradeWithUserButton.setVisible(true);
-            tradeWithUserButton.setDisable(true);
-            tradeWithBankButton.setVisible(true);
-            tradeWithBankButton.setDisable(true);
-            setRollDiceButtonState(msg.getUser());
-            kickUserButton.setVisible(false);
-            changeOwnerButton.setVisible(false);
-            playCard.setVisible(true);
-            playCard.setDisable(true);
-            gameService.updateGameMap(lobbyName);
-            long startTime = System.currentTimeMillis();
-            this.elapsedTimer = new AnimationTimer() {
-                @Override
-                public void handle(long now) {
-                    long elapsedMillis = System.currentTimeMillis() - startTime;
-            Platform.runLater(() -> timerLabel.setText(
-                    String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
-                                  TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
-                                  TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
-        }
-    };
-            this.elapsedTimer.start();
-    });
-
+    private void setHelpButtons() {
+        help_thisTurnLabel.setVisible(true);
     }
 
     /**

@@ -20,8 +20,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,9 +38,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 825;
-    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int HELP_MIN_WIDTH = 200;
     public static final int MIN_HEIGHT_IN_GAME = 825;
-    public static final int MIN_WIDTH_IN_GAME = 1435;
+    public static int MIN_WIDTH_PRE_GAME = 685;
+    public static int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
