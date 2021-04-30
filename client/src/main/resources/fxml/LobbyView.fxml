@@ -162,17 +162,8 @@
             </items>
         </Menu>
     </MenuBar>
-    <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
+    <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
           GridPane.rowSpan="2147483647">
-        <children>
-            <Label fx:id="help_waitLabel" text="%lobby.labels.wait"/>
-            <Label fx:id="help_thisTurnLabel" text="lobby.help.labels.thisturn" visible="false"/>
-            <Label fx:id="help_rollDiceLabel" text="lobby.help.labels.rolldice" visible="false"/>
-            <Label fx:id="help_tradeLabel" text="lobby.help.labels.trade" visible="false"/>
-            <Label fx:id="help_buildAStreet" text="lobby.help.labels.buildastreet" visible="false"/>
-            <Label fx:id="help_buildASettlement" text="lobby.help.labels.buildasettlement" visible="false"/>
-            <Label fx:id="help_playACard" text="lobby.help.labels.playacard" visible="false"/>
-            <Label fx:id="help_endturn" text="lobby.help.labels.endturn" visible="false"/>
-        </children>
+        <TextFlow fx:id="helpLabel"/>
     </VBox>
 </GridPane>

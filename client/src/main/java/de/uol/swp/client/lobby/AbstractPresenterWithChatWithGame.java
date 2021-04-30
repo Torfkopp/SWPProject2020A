@@ -30,6 +30,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -85,6 +86,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
+    @FXML
+    protected ColumnConstraints helpColumn;
+    @FXML
+    protected TextFlow helpLabel;
 
     @Inject
     protected IGameService gameService;
@@ -100,12 +105,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean ownTurn;
     protected int moveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
-
+    protected boolean helpActivated = false;
+    private boolean diceRolled = false;
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<Map, Integer> developmentCardAmountCol;
@@ -175,6 +182,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 // gameMap exists, so redraw map to fit the new canvas dimensions
                 gameRendering.drawGameMap(gameMap);
             if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        }
+    }
+
+    protected void setHelpText() {
+        System.err.println("Buttons werden gesetzt");
+        if (gameWon) return;
+        if (!ownTurn) {
+            Text wait = new Text(resourceBundle.getString("lobby.labels.wait"));
+            Platform.runLater(() -> helpLabel.getChildren().add(wait));
+        } else {
+            System.err.println("Du bist dran und Buttons werden gesetzt");
+            Platform.runLater(() -> {
+                Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
+                Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
+                if (diceRolled) rollDiceText.setStrikethrough(true);
+
+                helpLabel.getChildren().clear();
+                helpLabel.getChildren().addAll(turn, rollDiceText);
+            });
         }
     }
 
@@ -409,6 +435,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName);
+        diceRolled = false;
     }
 
     /**
@@ -456,6 +483,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
+        ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
+        setHelpText();
+        System.out.println(ownTurn);
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }
 
@@ -739,6 +769,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRollDiceButtonPressed() {
         gameService.rollDice(lobbyName);
         rollDice.setDisable(true);
+        diceRolled = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
