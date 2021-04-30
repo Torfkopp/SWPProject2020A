@@ -417,7 +417,7 @@ public class LobbyService extends AbstractService {
                                 responseMessage.initWithMessage(req);
                                 post(responseMessage);
                             }
-                        } else if (!lobby.get().hasAPassword()) {
+                        } else {
                             lobby.get().joinUser(req.getUser());
                             lobby = lobbyManagement.getLobby(req.getName());
                             if (lobby.isEmpty()) return;

@@ -20,8 +20,6 @@ public class JoinLobbyWithPasswordConfirmationRequest extends AbstractLobbyReque
      * @param lobbyName Name of the lobby
      * @param user      User who wants to join the lobby
      * @param password  Password of the lobby
-     *
-     * @since 2021-04-22
      */
     public JoinLobbyWithPasswordConfirmationRequest(String lobbyName, User user, String password) {
         super(lobbyName, user);
@@ -32,8 +30,6 @@ public class JoinLobbyWithPasswordConfirmationRequest extends AbstractLobbyReque
      * Gets the password of the lobby
      *
      * @return password of the lobby
-     *
-     * @since 2021-04-22
      */
     public String getPassword() {
         return password;

@@ -102,8 +102,8 @@ class LobbyServiceTest {
         assertTrue(createdLobby.isPresent());
         // check if lobby has a password
         assertTrue(createdLobby.get().hasAPassword());
-        // check if only 4 or less users are joined
-        assertTrue(createdLobby.get().getUserOrDummies().size() <= 4);
+        // check if only 4 users are joined
+        assertTrue(createdLobby.get().getUserOrDummies().size() == 4);
         // check if every user joined except user5
         assertTrue(createdLobby.get().getUserOrDummies().contains(user1));
         assertTrue(createdLobby.get().getUserOrDummies().contains(user2));
