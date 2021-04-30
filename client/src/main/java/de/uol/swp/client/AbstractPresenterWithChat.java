@@ -41,12 +41,14 @@ import java.util.List;
 public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected static Logger LOG;
+
     @Inject
     @Named("theme")
     private static String theme;
     private static String styleSheet;
     @Inject
     protected IChatService chatService;
+
     @FXML
     protected ListView<ChatOrSystemMessage> chatView;
     @FXML

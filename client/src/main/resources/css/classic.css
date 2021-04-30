@@ -44,7 +44,7 @@
 
 .text-field {
     -fx-background-color: -fx-accent;
-    -fx-background-radius: 20;
+    -fx-background-radius: 0;
     -fx-text-fill: -white;
 }
 

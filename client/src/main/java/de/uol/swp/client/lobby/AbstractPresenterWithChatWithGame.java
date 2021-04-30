@@ -62,6 +62,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Named("theme")
     private static String theme;
     private static String styleSheet;
+
     @FXML
     protected Button endTurn;
     @FXML
@@ -92,8 +93,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
+
     @Inject
     protected IGameService gameService;
+
     protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
     protected Integer dice1;
     protected Integer dice2;
@@ -110,6 +113,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
+
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<Map, Integer> developmentCardAmountCol;
@@ -119,8 +123,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private TableColumn<Map, Integer> resourceAmountCol;
     @FXML
     private TableColumn<Map, String> resourceNameCol;
+
     @Inject
     private ITradeService tradeService;
+
     private ObservableList<Pair<String, String>> resourceList;
     private boolean buildingCurrentlyAllowed;
 

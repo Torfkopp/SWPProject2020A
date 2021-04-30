@@ -37,7 +37,7 @@
 
 .text-field {
     -fx-background-color: -fx-accent;
-    -fx-background-radius: 20;
+    -fx-background-radius: 0;
     -fx-text-fill: -black;
 }
 
@@ -96,5 +96,10 @@
 
 #lobbyPane {
     -fx-background-image: url("../images/egg.gif");
+    -fx-background-repeat: repeat;
+}
+
+#devMenuView {
+    -fx-background-image: url("../images/nullpointer.gif");
     -fx-background-repeat: repeat;
 }

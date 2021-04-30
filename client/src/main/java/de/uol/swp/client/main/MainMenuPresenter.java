@@ -340,6 +340,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
                 () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
                 userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         Optional<String> result = dialogue.showAndWait();
         result.ifPresent(s -> userService
                 .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
