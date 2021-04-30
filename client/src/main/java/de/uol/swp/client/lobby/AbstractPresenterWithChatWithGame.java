@@ -578,34 +578,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles the PlayerWonGameMessage
-     * <p>
-     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
-     * with the Player that won is shown. For the owner of the Lobby appears a
-     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
-     *
-     * @param msg The PlayerWonGameMessage found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        gameMap = null;
-        gameWon = true;
-        winner = msg.getUser();
-        if (Objects.equals(owner, userService.getLoggedInUser())) {
-            returnToLobby.setVisible(true);
-            returnToLobby.setPrefHeight(30);
-            returnToLobby.setPrefWidth(250);
-        }
-        fitCanvasToSize();
-    }
-
-    /**
      * Handles a RefreshCardAmountMessage found on the EventBus
      * <p>
      * If a RefreshCardAmountMessage is found on the EventBus, this method
