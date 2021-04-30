@@ -228,6 +228,7 @@ public interface IGameMapManagement {
      *
      * @param mapPoint The map point that should be in the road
      *
+     * @author Temmo Junkhoff
      * @return The length of the road
      */
     int longestRoadWith(MapPoint mapPoint);

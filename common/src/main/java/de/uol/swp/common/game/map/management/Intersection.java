@@ -40,4 +40,9 @@ public class Intersection implements IIntersection {
         this.owner = owner;
         this.state = state;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
 }
