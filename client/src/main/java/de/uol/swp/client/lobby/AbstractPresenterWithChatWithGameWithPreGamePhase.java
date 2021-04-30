@@ -2,20 +2,26 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
+import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.UserOrDummy;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.util.Objects;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 /**
@@ -54,6 +60,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected Set<UserOrDummy> readyUsers;
 
     @FXML
+    protected AnimationTimer elapsedTimer;
+    @FXML
+    protected Menu timerLabel = new Menu();
+    @FXML
     private Button changeMoveTimeButton;
     @FXML
     private Button startSession;
@@ -71,6 +81,24 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+    }
+
+    /**
+     * Helper method to clean chat history of old owner notices
+     * <p>
+     * This method removes all SystemMessages from the chat history
+     * that match the text used notify the owner that every player
+     * (or every player except the owner) is ready to play and that
+     * the owner should press the "Start Session" button to proceed
+     * to the game.
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-25
+     */
+    protected void cleanChatHistoryOfOldOwnerNotices() {
+        for (ChatOrSystemMessage msg : chatMessages) {
+            if (msg instanceof ReadySystemMessageDTO) Platform.runLater(() -> chatMessages.remove(msg));
+        }
     }
 
     /**
@@ -142,7 +170,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method to disable pre-game Buttons and Checkboxes
+     * Helper method that sets the visibility for the lobby owner and disables pre-game Buttons and Checkboxes
      * for everyone, expect the owner.
      *
      * @author Maximilian Lindner
@@ -151,7 +179,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
         commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
@@ -187,7 +217,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * the owner status of the selected User of the members view .
      *
      * @author Maximilian Lindner
-     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
      * @since 2021-04-13
      */
     @FXML
@@ -216,6 +246,35 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
+    /**
+     * Handles the PlayerWonGameMessage
+     * <p>
+     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
+     * with the Player that won is shown. For the owner of the Lobby appears a
+     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
+     *
+     * @param msg The PlayerWonGameMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @author Finn Haase
+     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
+     * @since 2021-03-22
+     */
+    @Subscribe
+    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        gameMap = null;
+        gameWon = true;
+        winner = msg.getUser();
+        if (Objects.equals(owner, userService.getLoggedInUser())) {
+            returnToLobby.setVisible(true);
+            returnToLobby.setPrefHeight(30);
+            returnToLobby.setPrefWidth(250);
+            this.elapsedTimer.stop();
+        }
+        fitCanvasToSize();
+    }
+
 
     /**
      * Handles a KickUserResponse found on the EventBus
@@ -309,6 +368,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
+            timerLabel.setVisible(false);
         });
     }
 
@@ -327,6 +387,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void onStartSessionButtonPressed() {
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName);
+        timerLabel.setVisible(true);
     }
 
     /**
@@ -350,6 +411,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
@@ -365,7 +427,20 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             playCard.setVisible(true);
             playCard.setDisable(true);
             gameService.updateGameMap(lobbyName);
-        });
+            long startTime = System.currentTimeMillis();
+            this.elapsedTimer = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    long elapsedMillis = System.currentTimeMillis() - startTime;
+            Platform.runLater(() -> timerLabel.setText(
+                    String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                                  TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                                  TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+        }
+    };
+            this.elapsedTimer.start();
+    });
+
     }
 
     /**
@@ -389,7 +464,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
+            autoRollEnabled = rsp.isAutoRollState();
+            autoRoll.setSelected(autoRollEnabled);
             int[] dices = rsp.getDices();
             dice1 = dices[0];
             dice2 = dices[1];

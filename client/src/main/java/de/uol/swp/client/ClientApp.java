@@ -4,7 +4,6 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import de.uol.swp.client.di.ClientModule;
 import de.uol.swp.client.user.IUserService;
@@ -16,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * The application class of the client
@@ -34,8 +32,6 @@ public class ClientApp extends Application implements ConnectionListener {
 
     private static final Logger LOG = LogManager.getLogger(ClientApp.class);
 
-    @Inject
-    private static ResourceBundle resourceBundle;
     private String host;
     private int port;
     private IUserService userService;
@@ -105,7 +101,7 @@ public class ClientApp extends Application implements ConnectionListener {
             try {
                 clientConnection.start();
             } catch (InterruptedException e) {
-                exceptionOccurred(e.getMessage());
+                exceptionOccurred(e, e.getMessage());
             }
         });
         t.setDaemon(true);
@@ -133,6 +129,11 @@ public class ClientApp extends Application implements ConnectionListener {
     @Override
     public void exceptionOccurred(String e) {
         sceneManager.showServerError(e);
+    }
+
+    @Override
+    public void exceptionOccurred(Throwable e, String cause) {
+        sceneManager.showServerError(e, cause);
     }
 
     /**

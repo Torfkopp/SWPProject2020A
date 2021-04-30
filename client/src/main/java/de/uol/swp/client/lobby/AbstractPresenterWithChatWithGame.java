@@ -11,9 +11,9 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
@@ -268,7 +268,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Handles the click on the autoRollCheckBox
      * <p>
      * Method called when the autoRollCheckBox is clicked.
-     * It enables and disables autoRoll.
+     * It enables and disables autoRoll and posts a request
+     * to save the status on the server.
      *
      * @author Mario Fokken
      * @since 2021-04-15
@@ -276,6 +277,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onAutoRollCheckBoxClicked() {
         autoRollEnabled = autoRoll.isSelected();
+        gameService.changeAutoRollState(lobbyName, autoRoll.isSelected());
     }
 
     /**
@@ -562,34 +564,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles the PlayerWonGameMessage
-     * <p>
-     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
-     * with the Player that won is shown. For the owner of the Lobby appears a
-     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
-     *
-     * @param msg The PlayerWonGameMessage found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        gameMap = null;
-        gameWon = true;
-        winner = msg.getUser();
-        if (Objects.equals(owner, userService.getLoggedInUser())) {
-            returnToLobby.setVisible(true);
-            returnToLobby.setPrefHeight(30);
-            returnToLobby.setPrefWidth(250);
-        }
-        fitCanvasToSize();
-    }
-
-    /**
      * Handles a RefreshCardAmountMessage found on the EventBus
      * <p>
      * If a RefreshCardAmountMessage is found on the EventBus, this method
@@ -643,6 +617,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         buildingCosts.setVisible(false);
         inGame = false;
         lobbyService.returnToPreGameLobby(lobbyName);
+    }
+
+    /**
+     * Handles a RobberAllTaxPayedMessage
+     *
+     * @param msg The RobberAllTaxPayedMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-04-23
+     */
+    @Subscribe
+    private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
+        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
     }
 
     /**
@@ -725,11 +712,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberTaxMessage(RobberTaxMessage msg) {
         LOG.debug("Received RobberTaxMessage");
-        if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
-            LOG.debug("Sending ShowRobberTaxViewEvent");
-            User user = userService.getLoggedInUser();
-            eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                     msg.getInventory().get(user)));
+        if (msg.getLobbyName().equals(lobbyName)) {
+            disableButtonStates();
+            if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
+                LOG.debug("Sending ShowRobberTaxViewEvent");
+                User user = userService.getLoggedInUser();
+                eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                         msg.getInventory().get(user)));
+            }
         }
     }
 
