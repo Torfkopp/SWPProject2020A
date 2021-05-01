@@ -5,7 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" fillWidth="false" spacing="25.0"
-      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
+      xmlns="http://javafx.com/javafx/11.0.1" fx:id="tradeUserView"
+      fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
     <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" text="%game.trade.status.makingoffer"
            textAlignment="CENTER">
         <font>

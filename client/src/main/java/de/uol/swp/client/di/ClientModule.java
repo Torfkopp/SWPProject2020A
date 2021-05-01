@@ -10,8 +10,10 @@ import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.game.GameService;
 import de.uol.swp.client.game.IGameService;
+import de.uol.swp.client.lobby.AbstractPresenterWithChatWithGame;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.IUserService;
@@ -53,6 +55,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("join_leave_msgs_on", "true");
         defaultProps.setProperty("owner_ready_notifs_on", "true");
         defaultProps.setProperty("owner_transfer_notifs_on", "true");
+        defaultProps.setProperty("theme", "default");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -91,6 +94,12 @@ public class ClientModule extends AbstractModule {
                 locale = Locale.UK;
         }
 
+        LOG.debug("Selected theme in config file: " + properties.getProperty("theme"));
+
+        //Setting the theme
+        final String theme = properties.getProperty("theme");
+        final String styleSheet = "css/" + theme + ".css";
+
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
 
@@ -120,6 +129,8 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("joinLeaveMsgsOn")).to(joinLeaveMsgsOn);
         bindConstant().annotatedWith(Names.named("ownerReadyNotificationsOn")).to(ownerReadyNotificationsOn);
         bindConstant().annotatedWith(Names.named("ownerTransferNotificationsOn")).to(ownerTransferNotificationsOn);
+        bindConstant().annotatedWith(Names.named("theme")).to(theme);
+        bindConstant().annotatedWith(Names.named("styleSheet")).to(styleSheet);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
@@ -130,5 +141,8 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(SceneManager.class);
+        requestStaticInjection(MainMenuPresenter.class);
+        requestStaticInjection(AbstractPresenterWithChat.class);
+        requestStaticInjection(AbstractPresenterWithChatWithGame.class);
     }
 }
