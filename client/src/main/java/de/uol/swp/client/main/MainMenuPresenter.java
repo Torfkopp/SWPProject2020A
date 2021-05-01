@@ -263,8 +263,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
 
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
-        int maxPlayers = 3;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers));
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), 3));
     }
 
     /**
