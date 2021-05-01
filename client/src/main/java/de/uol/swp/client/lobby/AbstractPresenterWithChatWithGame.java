@@ -11,9 +11,9 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
@@ -100,6 +100,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean tradingCurrentlyAllowed;
     protected int moveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
@@ -247,6 +248,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(true);
         playCard.setDisable(true);
         buildingCurrentlyAllowed = false;
+        tradingCurrentlyAllowed = false;
     }
 
     /**
@@ -1124,5 +1126,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
