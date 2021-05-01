@@ -392,6 +392,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName);
         timerLabel.setVisible(true);
+        CurrentRound.setVisible(true);
+        Platform.runLater(() -> CurrentRound.setText(String.format("Current Round: 1")));
     }
 
     /**
