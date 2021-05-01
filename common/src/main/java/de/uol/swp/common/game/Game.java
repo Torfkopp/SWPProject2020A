@@ -26,6 +26,7 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
+    public int RoundCounter = 1;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -438,5 +439,17 @@ public class Game {
      */
     public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
         autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
+    }
+
+    /**
+     * Gets the Current Round the game is in
+     *
+     * @param RoundCounter
+     *
+     * @author Aldin Derviši
+     * @since 2021-05-01
+     */
+    public int getRoundCounter(int RoundCounter) {
+        return RoundCounter;
     }
 }

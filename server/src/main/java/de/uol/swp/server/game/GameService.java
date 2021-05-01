@@ -689,6 +689,7 @@ public class GameService extends AbstractService {
         if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             endTurnDummy(game);
+            game.getRoundCounter(game.RoundCounter++);
         }
     }
 
