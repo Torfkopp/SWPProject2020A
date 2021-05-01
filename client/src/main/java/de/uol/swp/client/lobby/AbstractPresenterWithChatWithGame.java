@@ -118,7 +118,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected UserOrDummy winner = null;
     protected int RoundCounter = 0;
 
-
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<Map, Integer> developmentCardAmountCol;
@@ -466,14 +465,15 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
+        int getTurn = msg.getCurrentTurn();
+        String Round = String.valueOf(getTurn);
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
-        Platform.runLater(() -> CurrentRound.setText(String.format("Current Round: " + RoundCounter)));
-        RoundCounter++;
+        Platform.runLater(() -> CurrentRound.setText("Current Round: " + getTurn));
     }
 
     /**

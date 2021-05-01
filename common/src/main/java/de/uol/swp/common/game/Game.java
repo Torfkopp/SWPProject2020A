@@ -26,12 +26,13 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
-    public int RoundCounter = 1;
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private int turn = 1;
 
     /**
      * Constructor
@@ -43,6 +44,7 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
+        this.first = first;
         autoRollEnabled = new HashMap<>();
         {
             Player counterPlayer = Player.PLAYER_1;
@@ -225,6 +227,17 @@ public class Game {
     }
 
     /**
+     * Receives if the UserOrDummy is the first one
+     * who made a turn in the current Game
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public UserOrDummy getFirst() {
+        return first;
+    }
+
+    /**
      * Gets a specified player's inventory
      *
      * @param player The player whose inventory to get
@@ -344,6 +357,14 @@ public class Game {
     }
 
     /**
+     * Gets the current Round the Game is in
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public int getTurn() {return turn;}
+
+    /**
      * Returns the user corresponding with the given player
      *
      * @param player The player whose User is required
@@ -413,6 +434,7 @@ public class Game {
      */
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
+        if (activePlayer.equals(first)) turn++;
         return activePlayer;
     }
 
@@ -439,17 +461,5 @@ public class Game {
      */
     public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
         autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
-    }
-
-    /**
-     * Gets the Current Round the game is in
-     *
-     * @param RoundCounter
-     *
-     * @author Aldin Derviši
-     * @since 2021-05-01
-     */
-    public int getRoundCounter(int RoundCounter) {
-        return RoundCounter;
     }
 }

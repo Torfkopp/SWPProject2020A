@@ -682,14 +682,13 @@ public class GameService extends AbstractService {
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         UserOrDummy nextPlayer = game.nextPlayer();
         game.setBuildingAllowed(false);
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getTurn());
         LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         game.setDiceRolledAlready(false);
         if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
             endTurnDummy(game);
-            game.getRoundCounter(game.RoundCounter++);
         }
     }
 
