@@ -10,6 +10,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Tuple;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static de.uol.swp.common.game.map.management.IIntersection.IntersectionState.*;
 import static de.uol.swp.common.game.map.management.MapPoint.*;
@@ -320,15 +321,51 @@ public class GameMapManagement implements IGameMapManagement {
     @Override
     public int longestRoadWith(MapPoint mapPoint) {
         IEdge edge = getEdge(mapPoint);
-
         Set<IEdge> visited = new HashSet<>();
         visited.add(edge);
         Set<IEdge> nodeUEdges = new HashSet<>();
         Set<IEdge> nodeVEdges = new HashSet<>();
-        List<Tuple<Integer, Set<IEdge>>> nodeULengths = new LinkedList<>();
+
+        //Function to calculate the lengths of the paths
+        BiFunction<Set<IEdge>, Set<IEdge>, Integer> a = (leftNodeEdges, rightNodeEdges) -> {
+            List<Integer> lengths = new LinkedList<>();
+            List<Tuple<Integer, Set<IEdge>>> leftNodeLengths = new LinkedList<>();
+            // Find the longest paths for the first side of the specified edge
+            // and save them as a tuple of their length and their visited edges.
+            for (IEdge nextEdge : leftNodeEdges) {
+                Set<IEdge> temp = new HashSet<>(visited);
+                leftNodeLengths.add(new Tuple<>(
+                        roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp), temp));
+            }
+
+            // Calculate all combinations of paths from both sides of the edge and store their length in a list
+            lengths.add(0);
+            if (leftNodeLengths.isEmpty()) {
+                if (rightNodeEdges.isEmpty()) {
+                    lengths.add(1);
+                } else {
+                    for (IEdge nextEdge : rightNodeEdges) {
+                        lengths.add(1 + roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited),
+                                                   new HashSet<>(visited)));
+                    }
+                }
+            } else {
+                for (Tuple<Integer, Set<IEdge>> x : leftNodeLengths) {
+                    if (rightNodeEdges.isEmpty()) {
+                        lengths.add(x.getValue1() + 1);
+                    }
+                    for (IEdge nextEdge : rightNodeEdges) {
+                        lengths.add(x.getValue1() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
+                                                                   new HashSet<>(visited)));
+                    }
+                }
+            }
+            return Collections.max(lengths);
+        };
 
         // Put all edges around the edge specified by the map point in Sets
         // depending on the intersection they share with the specified edge.
+
         {
             EndpointPair<IIntersection> nodes = intersectionEdgeNetwork.incidentNodes(edge);
             for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
@@ -339,38 +376,9 @@ public class GameMapManagement implements IGameMapManagement {
                 }
             }
         }
-        // Find the longest paths for the first side of the specified edge
-        // and save them as a tuple of their length and their visited edges.
-        for (IEdge nextEdge : nodeUEdges) {
-            Set<IEdge> temp = new HashSet<>();
-            nodeULengths
-                    .add(new Tuple<>(roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp),
-                                     temp));
-        }
-
-        // Calculate all combinations of paths from both sides of the edge and store their length in a list
         List<Integer> lengths = new LinkedList<>();
-        lengths.add(0);
-        if (nodeULengths.isEmpty()) {
-            if (nodeVEdges.isEmpty()) {
-                lengths.add(1);
-            } else {
-                for (IEdge nextEdge : nodeVEdges) {
-                    lengths.add(
-                            1 + roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(), new HashSet<>()));
-                }
-            }
-        } else {
-            for (Tuple<Integer, Set<IEdge>> x : nodeULengths) {
-                if (nodeVEdges.isEmpty()) {
-                    lengths.add(x.getValue1() + 1);
-                }
-                for (IEdge nextEdge : nodeVEdges) {
-                    lengths.add(x.getValue1() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
-                                                               new HashSet<>()));
-                }
-            }
-        }
+        lengths.add(a.apply(nodeUEdges, nodeVEdges));
+        lengths.add(a.apply(nodeVEdges, nodeUEdges));
 
         // Return the length of the longest path found
         return Collections.max(lengths);
