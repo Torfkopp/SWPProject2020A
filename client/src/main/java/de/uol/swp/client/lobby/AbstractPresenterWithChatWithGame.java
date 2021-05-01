@@ -118,6 +118,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean playedCard = false;
     protected boolean inGame;
     protected boolean ownTurn;
+    protected boolean tradingCurrentlyAllowed;
     protected int moveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
@@ -136,6 +137,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private TableColumn<Map, Integer> resourceAmountCol;
     @FXML
     private TableColumn<Map, String> resourceNameCol;
+
     @Inject
     private ITradeService tradeService;
 
@@ -331,6 +333,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(true);
         playCard.setDisable(true);
         buildingCurrentlyAllowed = false;
+        tradingCurrentlyAllowed = false;
     }
 
     /**
@@ -554,7 +557,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             robberNewPosition = false;
             notice.setVisible(false);
             resetButtonStates(userService.getLoggedInUser());
-            setHelpText();
+            if (helpActivated)setHelpText();
         }
     }
 
@@ -575,7 +578,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
-        setHelpText();
+        if (helpActivated)setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }
 
@@ -1235,5 +1238,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
