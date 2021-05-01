@@ -11,8 +11,9 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.message.*;
@@ -503,6 +504,25 @@ public class GameService extends AbstractService {
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
         }
+    }
+
+    /**
+     * Handles a ChangeAutoRollStateRequest found on the EventBus
+     * <p>
+     * If a ChangeAutoRollStateRequest is found on the EventBus,
+     * the requesting Users autoRoll status gets changed in the game
+     * according to the value in the request.
+     *
+     * @param req The ChangeAutoRollStateRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-26
+     */
+    @Subscribe
+    private void onChangeAutoRollStateRequest(ChangeAutoRollStateRequest req) {
+        LOG.debug("Received a ChangeAutoRollStateRequest");
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setAutoRollEnabled(req.getUser(), req.isAutoRollEnabled());
     }
 
     /**
@@ -1310,6 +1330,8 @@ public class GameService extends AbstractService {
 
         Game game = gameManagement.getGame(req.getLobby());
         game.removeTaxPayer(req.getPlayer());
+        if (game.getTaxPayers().isEmpty()) lobbyService
+                .sendToAllInLobby(req.getLobby(), new RobberAllTaxPayedMessage(req.getLobby(), game.getActivePlayer()));
         endTurnDummy(game);
     }
 
@@ -1554,12 +1576,13 @@ public class GameService extends AbstractService {
         Lobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
-        ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
-                                                                 lobby.getConfiguration(),
-                                                                 game.getMap().getGameMapDTO(playerUserOrDummyMap), game.getDices(),
-                                                                 game.isDiceRolledAlready());
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
+            ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
+                                                                     lobby.getConfiguration(),
+                                                                     game.getMap().getGameMapDTO(playerUserOrDummyMap),
+                                                                     game.getDices(), game.isDiceRolledAlready(),
+                                                                     game.getAutoRollEnabled(event.getUser()));
             returnMessage.setMessageContext(ctx.get());
             LOG.debug("Sending StartSessionResponse");
             post(returnMessage);
@@ -1582,9 +1605,9 @@ public class GameService extends AbstractService {
         LOG.debug("Received UpdateGameMapRequest");
         Game game = gameManagement.getGame(req.getOriginLobby());
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
-        if (game == null) return;
         LOG.debug("Sending UpdateGameMapResponse");
-        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO(playerUserOrDummyMap));
+        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(),
+                                                              game.getMap().getGameMapDTO(playerUserOrDummyMap));
         rsp.initWithMessage(req);
         post(rsp);
     }

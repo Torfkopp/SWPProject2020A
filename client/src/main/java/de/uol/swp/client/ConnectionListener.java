@@ -22,7 +22,6 @@ public interface ConnectionListener {
      * @param channel The netty channel the connection is established on
      *
      * @see de.uol.swp.client.ClientConnection
-     * @since 2017-03-17
      */
     void connectionEstablished(Channel channel);
 
@@ -32,7 +31,21 @@ public interface ConnectionListener {
      * @param cause The cause which led to sending the exception
      *
      * @see de.uol.swp.client.ClientConnection
-     * @since 2017-03-17
      */
     void exceptionOccurred(String cause);
+
+    /**
+     * If the server sends an exception, this method is called
+     * <p>
+     * This method also accepts the Throwable that was thrown as
+     * an argument.
+     *
+     * @param e     The Throwable that occurred
+     * @param cause The cause which led to sending the exception
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.ClientConnection
+     * @since 2021-04-26
+     */
+    void exceptionOccurred(Throwable e, String cause);
 }
