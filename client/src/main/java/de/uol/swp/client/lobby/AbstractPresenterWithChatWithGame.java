@@ -704,7 +704,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
-        LOG.debug("Received a RefreshCardAmountMessage");
+        LOG.debug("Received RefreshCardAmountMessage");
         if (!lobbyName.equals(msg.getLobbyName())) return;
         cardAmountTripleList = msg.getCardAmountTriples();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
