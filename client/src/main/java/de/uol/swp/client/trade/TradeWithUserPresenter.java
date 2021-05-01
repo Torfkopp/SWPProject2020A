@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
@@ -128,6 +129,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @FXML
     private void onCancelTradeButtonPressed() {
         closeWindow();
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -229,6 +231,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         closeWindow();
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

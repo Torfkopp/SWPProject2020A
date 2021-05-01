@@ -15,6 +15,8 @@ import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.request.PauseTimerRequest;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -37,6 +39,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 
@@ -60,7 +63,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
+    protected Timer moveTimerTimer;
+    @FXML
     protected TableView<Map<String, Object>> developmentCardTableView;
+    @FXML
+    protected Menu moveTimerLabel = new Menu();
     @FXML
     protected TableView<Map<String, Object>> resourceTableView;
     @FXML
@@ -100,7 +107,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean paused;
     protected int moveTime;
+    protected int restMoveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
@@ -127,6 +136,44 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();
+    }
+
+    @Subscribe
+    public void onPauseTimerResponse(PauseTimerMessage msg) {
+        paused = true;
+    }
+
+    @Subscribe
+    public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getLobbyName());
+        paused = false;
+        //setMoveTimer(restMoveTime);
+    }
+
+    /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets null.
+     *
+     * @param moveTime
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    public void setMoveTimer(int moveTime) {
+        moveTimerTimer = new Timer();
+        AtomicInteger zugZeit = new AtomicInteger(moveTime);
+        moveTimerTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if (!paused) {
+                    Platform.runLater(
+                            () -> moveTimerLabel.setText(String.format("Move Time: " + zugZeit.getAndDecrement())));
+                    if (zugZeit.get() == 0) {
+                        gameService.rollDice(lobbyName);
+                        gameService.endTurn(lobbyName);
+                    }
+                } else {restMoveTime = zugZeit.get();}
+            }
+        }, 0, 1000);
     }
 
     /**
@@ -457,6 +504,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
+        moveTimerTimer.cancel();
+        setMoveTimer(moveTime);
     }
 
     /**
@@ -755,6 +804,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         gameService.updateInventory(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -773,6 +823,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
         tradeService.tradeWithBank(lobbyName);
+        eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -798,6 +849,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
             tradeService.tradeWithUser(lobbyName, user);
+            eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
 
@@ -817,6 +869,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

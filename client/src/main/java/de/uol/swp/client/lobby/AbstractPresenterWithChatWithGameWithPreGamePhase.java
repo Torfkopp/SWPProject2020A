@@ -10,6 +10,7 @@ import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -62,12 +63,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     @FXML
     protected AnimationTimer elapsedTimer;
-    @FXML
-    protected Timer moveTimerTimer;
+
     @FXML
     protected Menu timerLabel = new Menu();
-    @FXML
-    protected Menu moveTimerLabel = new Menu();
+
     @FXML
     private Button changeMoveTimeButton;
     @FXML
@@ -416,8 +415,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
-        int delay = 1000;
-        int period = 1000;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -434,15 +431,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
+            setMoveTimer(moveTime);
             gameService.updateGameMap(lobbyName);
-            this.moveTimerTimer = new Timer();
-            AtomicInteger zugZeit = new AtomicInteger(moveTime);
-            moveTimerTimer.scheduleAtFixedRate(new TimerTask() {
-                public void run() {
-                    Platform.runLater(
-                            () -> moveTimerLabel.setText(String.format("Move Time: " + zugZeit.getAndDecrement())));
-                }
-            }, delay, period);
             long startTime = System.currentTimeMillis();
             this.elapsedTimer = new AnimationTimer() {
                 @Override
@@ -456,7 +446,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     };
             this.elapsedTimer.start();
     });
-
     }
 
     /**
@@ -488,6 +477,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             dice1 = dices[0];
             dice2 = dices[1];
             setTurnIndicatorText(rsp.getPlayer());
+            setMoveTimer(moveTime);
             //setMoveTimer(rsp.getPlayer());
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();

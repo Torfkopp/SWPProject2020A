@@ -32,6 +32,16 @@ public class Game {
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
 
+    public boolean getPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    private boolean paused = false;
+
     /**
      * Constructor
      *

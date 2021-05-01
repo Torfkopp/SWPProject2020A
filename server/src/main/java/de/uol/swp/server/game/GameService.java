@@ -569,6 +569,26 @@ public class GameService extends AbstractService {
         }
     }
 
+    @Subscribe
+    private void onPauseTimerRequest(PauseTimerRequest req) {
+        String lobbyName = req.getOriginLobby();
+        LOG.debug("Received PauseTimerRequest for Lobby {}", lobbyName);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setPaused(true);
+        ServerMessage msg = new PauseTimerMessage(req.getOriginLobby(), req.getUser());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+    }
+
+    @Subscribe
+    private void onUnpauseTimerRequest(UnpauseTimerRequest req) {
+        String lobbyName = req.getOriginLobby();
+        LOG.debug("Received UnpauseTimerRequest for Lobby {}", lobbyName);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setPaused(false);
+        ServerMessage msg = new UnpauseTimerMessage(req.getOriginLobby(), req.getUser());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+    }
+
     /**
      * Handles an EditInventoryRequest found on the EventBus
      * <p>
