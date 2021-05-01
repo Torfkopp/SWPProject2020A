@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:controller="de.uol.swp.client.register.RegistrationPresenter">
+      fx:id="registrationView" fx:controller="de.uol.swp.client.register.RegistrationPresenter">
     <HBox alignment="CENTER" spacing="10.0">
         <VBox alignment="CENTER_LEFT" spacing="10.0">
             <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%register.labels.login"/>

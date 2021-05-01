@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
@@ -401,6 +402,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
+            cardAmountTripleList.clear();
+            for (ChatOrSystemMessage m : chatMessages)
+                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
         });
     }
 
@@ -471,8 +475,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 }
             };
             this.elapsedTimer.start();
-            if (helpActivated) setHelpText();
         });
+            if (helpActivated) setHelpText();
     }
 
     /**

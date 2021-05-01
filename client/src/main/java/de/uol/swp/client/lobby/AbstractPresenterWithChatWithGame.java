@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
@@ -9,7 +10,7 @@ import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
@@ -32,6 +33,7 @@ import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -55,6 +57,13 @@ import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
  */
 @SuppressWarnings({"UnstableApiUsage", "rawtypes"})
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
+
+    @Inject
+    @Named("theme")
+    private static String theme;
+    @Inject
+    @Named("styleSheet")
+    private static String styleSheet;
 
     @FXML
     protected Button endTurn;
@@ -233,6 +242,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             turnIndicator.getChildren().clear();
             Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
             preUsernameText.setFont(Font.font(20.0));
+            if (theme.equals("dark")) preUsernameText.setFill(Color.web("#F3F5F3"));
 
             String name = user.getUsername();
             if (name.length() > 15) name = name.substring(0, 15) + "...";
@@ -256,6 +266,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             }
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
+            if (theme.equals("dark")) postUsernameText.setFill(Color.web("#F3F5F3"));
             turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
         });
     }
@@ -386,11 +397,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null)
-                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+            if (finalAttr != null) Platform.runLater(
+                    () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
-                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
+                    .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
         }
     }
 
@@ -515,6 +526,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                               ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
+        alert.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<ButtonType> result = alert.showAndWait();
         //Create Strings based on the languages name for the resources
@@ -572,6 +584,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             alert.getButtonTypes().setAll(confirm);
             if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
                 alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }
@@ -690,6 +703,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                                    ButtonBar.ButtonData.CANCEL_CLOSE);
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+                dialogue.getDialogPane().getStylesheets().add(styleSheet);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
                 rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
             });
@@ -939,6 +953,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.setDialogPane(pane);
         dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
@@ -991,6 +1006,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         grid.add(c2, 1, 1);
         //Put the grid into the dialogue and let it appear
         dialogue.getDialogPane().setContent(grid);
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Get the pressed button
         Optional<String> rst = dialogue.showAndWait();
         Optional<String> button1 = Optional.of(confirm.toString());
