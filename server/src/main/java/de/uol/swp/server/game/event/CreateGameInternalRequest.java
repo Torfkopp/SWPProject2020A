@@ -19,16 +19,23 @@ public class CreateGameInternalRequest extends AbstractServerInternalMessage {
     private final Lobby lobby;
     private final UserOrDummy first;
 
+    public int getMoveTime() {
+        return moveTime;
+    }
+
+    private final int moveTime;
+
     /**
      * Constructor
      *
      * @param lobby The Lobby in which a game should be started
      * @param first The User who started the game
      */
-    public CreateGameInternalRequest(Lobby lobby, UserOrDummy first) {
+    public CreateGameInternalRequest(Lobby lobby, UserOrDummy first, int moveTime) {
         super();
         this.lobby = lobby;
         this.first = first;
+        this.moveTime = moveTime;
     }
 
     /**

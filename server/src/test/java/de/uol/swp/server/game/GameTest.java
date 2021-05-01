@@ -32,7 +32,7 @@ class GameTest {
         Lobby lobby = new LobbyDTO("testLobby", user, false, 4, false, 60, true, true);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gm.createGame(lobby, user, gameMap);
+        gm.createGame(lobby, user, gameMap, 0);
         assertNotNull(gm.getGame("testLobby"));
         Map<String, Game> map = gm.getGames();
         assertEquals(1, map.size());

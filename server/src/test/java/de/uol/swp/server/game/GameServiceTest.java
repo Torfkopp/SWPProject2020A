@@ -103,7 +103,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
@@ -164,7 +164,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
@@ -255,7 +255,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
         List<String> bankInventory = game.getBankInventory();
@@ -381,7 +381,7 @@ public class GameServiceTest {
         lobby.get().joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby.get(), user[0], gameMap);
+        gameManagement.createGame(lobby.get(), user[0], gameMap, 0);
 
         Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
         bus.post(kickUser);
@@ -431,7 +431,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame(lobby.getName());
         game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
         game.setDiceRolledAlready(true);
@@ -450,7 +450,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame(lobby.getName());
         Inventory[] inventories = game.getAllInventories();
         inventories[1].increaseBrick(1);
@@ -474,7 +474,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame(lobby.getName());
         assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
         game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
@@ -502,7 +502,7 @@ public class GameServiceTest {
         lobby.joinUser(dummy);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame(lobby.getName());
         game.setDiceRolledAlready(true);
         //Tests robbing a resource
@@ -556,7 +556,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);
@@ -617,7 +617,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
         for (int i = 0; i < 2; i++) {
@@ -705,7 +705,7 @@ public class GameServiceTest {
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gameManagement.createGame(lobby, user[0], gameMap);
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
         gameInventory[0].setWool(5);

@@ -28,7 +28,8 @@ public interface IGameManagement {
      * only one game per lobby is possible
      * @since 2021-01-24
      */
-    void createGame(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) throws IllegalArgumentException;
+    void createGame(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap,
+                    int moveTime) throws IllegalArgumentException;
 
     /**
      * Deletes a game with its lobby's name

@@ -122,7 +122,7 @@ public interface IGameService {
      * @author Temmo Junkhoff
      * @since 2021-03-23
      */
-    void startSession(String lobbyName);
+    void startSession(String lobbyName, int moveTime);
 
     /**
      * Posts a RobberTaxChosenRequest and a CloseRobberTaxView

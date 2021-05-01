@@ -18,10 +18,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.Objects;
 
-import java.util.Set;
+import java.util.*;
+
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 
 /**
@@ -62,7 +63,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
+    protected Timer moveTimerTimer;
+    @FXML
     protected Menu timerLabel = new Menu();
+    @FXML
+    protected Menu moveTimerLabel = new Menu();
     @FXML
     private Button changeMoveTimeButton;
     @FXML
@@ -386,8 +391,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void onStartSessionButtonPressed() {
         buildingCosts.setVisible(true);
-        gameService.startSession(lobbyName);
+        gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
+        moveTimerLabel.setVisible(true);
     }
 
     /**
@@ -410,6 +416,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        int delay = 1000;
+        int period = 1000;
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -427,16 +435,24 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             playCard.setVisible(true);
             playCard.setDisable(true);
             gameService.updateGameMap(lobbyName);
+            this.moveTimerTimer = new Timer();
+            AtomicInteger zugZeit = new AtomicInteger(moveTime);
+            moveTimerTimer.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    Platform.runLater(
+                            () -> moveTimerLabel.setText(String.format("Move Time: " + zugZeit.getAndDecrement())));
+                }
+            }, delay, period);
             long startTime = System.currentTimeMillis();
             this.elapsedTimer = new AnimationTimer() {
                 @Override
                 public void handle(long now) {
                     long elapsedMillis = System.currentTimeMillis() - startTime;
-            Platform.runLater(() -> timerLabel.setText(
-                    String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
-                                  TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
-                                  TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
-        }
+                    Platform.runLater(() -> timerLabel.setText(
+                            String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                                          TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                                          TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+                }
     };
             this.elapsedTimer.start();
     });
@@ -472,6 +488,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             dice1 = dices[0];
             dice2 = dices[1];
             setTurnIndicatorText(rsp.getPlayer());
+            //setMoveTimer(rsp.getPlayer());
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
