@@ -730,7 +730,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
-                if (l.hasAPassword()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
+                else if (l.hasAPassword())
+                    s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
             }
         });

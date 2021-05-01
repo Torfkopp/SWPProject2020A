@@ -358,7 +358,7 @@ public class LobbyService extends AbstractService {
         lobbies.forEach((String, lobby) -> {
             if (lobby.getUserOrDummies().size() < lobby.getMaxPlayers() && !lobby.getUserOrDummies()
                                                                                  .contains(req.getUser()) && !lobby
-                    .isInGame()) {
+                    .isInGame() && !lobby.hasAPassword()) {
                 filteredLobbies.add(lobby);
             }
         });
