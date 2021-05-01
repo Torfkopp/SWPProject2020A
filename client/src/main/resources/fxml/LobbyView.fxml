@@ -156,9 +156,11 @@
     </VBox>
     <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
         <Menu fx:id="timerLabel"/>
-        <Menu mnemonicParsing="false" text="Settings">
+        <Menu mnemonicParsing="false" text="%game.help.info" fx:id="infoMenu" visible="false">
             <items>
-                <CheckMenuItem mnemonicParsing="false" onAction="#onHelpButtonPressed" text="Help"/>
+                <CheckMenuItem fx:id="helpCheckBox" mnemonicParsing="false" onAction="#onHelpButtonPressed"
+                               text="%game.help.checkbox"
+                               disable="true" visible="false"/>
             </items>
         </Menu>
     </MenuBar>

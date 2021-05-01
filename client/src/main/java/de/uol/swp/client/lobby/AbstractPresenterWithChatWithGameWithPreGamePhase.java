@@ -59,8 +59,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
-
-
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -230,37 +228,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.changeOwner(lobbyName, selectedUser);
     }
 
-    @FXML
-    private void onHelpButtonPressed() {
-        if (!inGame) {
-            if (!helpActivated) LobbyPresenter.MIN_WIDTH_PRE_GAME += LobbyPresenter.HELP_MIN_WIDTH;
-            else {
-                LobbyPresenter.MIN_WIDTH_PRE_GAME -= LobbyPresenter.HELP_MIN_WIDTH;
-                helpColumn.setMaxWidth(0);
-                helpColumn.setMinWidth(0);
-            }
-
-            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
-            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
-        } else {
-            if (!helpActivated) {
-                LobbyPresenter.MIN_WIDTH_IN_GAME += LobbyPresenter.HELP_MIN_WIDTH;
-                setHelpText();
-            } else {
-                LobbyPresenter.MIN_WIDTH_IN_GAME -= LobbyPresenter.HELP_MIN_WIDTH;
-                helpColumn.setMaxWidth(0);
-                helpColumn.setMinWidth(0);
-                helpLabel.getChildren().clear();
-            }
-
-            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
-            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-        }
-        helpActivated = !helpActivated;
-    }
-
     /**
      * Method called when the KickUserButton is pressed
      * <p>
@@ -402,6 +369,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
+            infoMenu.setVisible(false);
+            helpCheckBox.setDisable(true);
+            helpCheckBox.setVisible(false);
             cardAmountTripleList.clear();
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
@@ -458,6 +428,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
             setRollDiceButtonState(msg.getUser());
+            if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
@@ -476,7 +447,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             };
             this.elapsedTimer.start();
         });
-            if (helpActivated) setHelpText();
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -517,6 +488,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
+            if (rsp.getPlayer().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
@@ -578,6 +550,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
+        infoMenu.setVisible(true);
+        helpCheckBox.setDisable(false);
+        helpCheckBox.setVisible(true);
     }
 
     /**
