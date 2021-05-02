@@ -5,7 +5,7 @@ import de.uol.swp.common.game.map.GameMapManagement;
 import de.uol.swp.common.game.map.IGameMapManagement;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.resourceThingies.BankInventory;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
@@ -71,11 +71,11 @@ public class GameTest {
     void bankInventoryCheck() {
         BankInventory bankInventory = game.getBankInventory();
 
-        assertEquals(5, bankInventory.get(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD));
-        assertEquals(2, bankInventory.get(DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD));
-        assertEquals(2, bankInventory.get(DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD));
-        assertEquals(2, bankInventory.get(DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD));
-        assertEquals(14, bankInventory.get(DevelopmentCard.DevelopmentCardType.KNIGHT_CARD));
+        assertEquals(5, bankInventory.get(DevelopmentCardType.VICTORY_POINT_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCardType.MONOPOLY_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD));
+        assertEquals(2, bankInventory.get(DevelopmentCardType.ROAD_BUILDING_CARD));
+        assertEquals(14, bankInventory.get(DevelopmentCardType.KNIGHT_CARD));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class GameTest {
         map.upgradeSettlement(player, IntersectionMapPoint(0, 1));
         // Player has 2 settlements (1 VP), 1 city (2 VP) for 4 VP total
         assertEquals(4, game.calculateVictoryPoints(player));
-        game.getInventory(player).increase(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD, 2);
+        game.getInventory(player).increase(DevelopmentCardType.VICTORY_POINT_CARD, 2);
         // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards for 6 VP total
         assertEquals(6, game.calculateVictoryPoints(player));
     }

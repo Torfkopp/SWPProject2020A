@@ -12,10 +12,10 @@ import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.Lobby;
@@ -185,7 +185,7 @@ public class CommandService extends AbstractService {
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
         LobbyName lobbyName = new LobbyName(args.get(0));
         ResourceType resource = null;
-        DevelopmentCard.DevelopmentCardType developmentCard = null;
+        DevelopmentCardType developmentCard = null;
         switch (args.get(2).toLowerCase()) {
             case "bricks":
             case "brick":
@@ -206,27 +206,27 @@ public class CommandService extends AbstractService {
                 break;
             case "knightcard":
             case "kc":
-                developmentCard = DevelopmentCard.DevelopmentCardType.KNIGHT_CARD;
+                developmentCard = DevelopmentCardType.KNIGHT_CARD;
                 break;
             case "knight":
             case "knights":
                 break;
             case "monopolycard":
             case "mc":
-                developmentCard = DevelopmentCard.DevelopmentCardType.MONOPOLY_CARD;
+                developmentCard = DevelopmentCardType.MONOPOLY_CARD;
                 break;
             case "roadbuildingcard":
             case "rbc":
-                developmentCard = DevelopmentCard.DevelopmentCardType.ROAD_BUILDING_CARD;
+                developmentCard = DevelopmentCardType.ROAD_BUILDING_CARD;
                 break;
             case "victorypointcard":
             case "vpc":
-                developmentCard = DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD;
+                developmentCard = DevelopmentCardType.VICTORY_POINT_CARD;
                 break;
             case "yearofplentycard":
             case "yearofplenty":
             case "yopc":
-                developmentCard = DevelopmentCard.DevelopmentCardType.YEAR_OF_PLENTY_CARD;
+                developmentCard = DevelopmentCardType.YEAR_OF_PLENTY_CARD;
                 break;
         }
         Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,

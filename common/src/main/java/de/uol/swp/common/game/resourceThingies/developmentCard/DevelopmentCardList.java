@@ -2,23 +2,23 @@ package de.uol.swp.common.game.resourceThingies.developmentCard;
 
 import java.util.*;
 
-public class DevelopmentCardListMap implements Iterable<DevelopmentCard> {
+public class DevelopmentCardList implements IDevelopmentCardList {
 
     private final List<DevelopmentCard> list;
 
-    public DevelopmentCardListMap() {
+    public DevelopmentCardList() {
         list = new LinkedList<>();
-        for (DevelopmentCard.DevelopmentCardType resource : DevelopmentCard.DevelopmentCardType.values()) {
+        for (DevelopmentCardType resource : DevelopmentCardType.values()) {
             list.add(new DevelopmentCard(resource, 0));
         }
     }
 
-    private DevelopmentCardListMap(List<DevelopmentCard> list) {
+    private DevelopmentCardList(List<DevelopmentCard> list) {
         this.list = list;
     }
 
-    public static DevelopmentCardListMap createDevelopmentCardListMapFromList(List<DevelopmentCard> list){
-        return new DevelopmentCardListMap(list);
+    public static DevelopmentCardList createDevelopmentCardListFromList(List<DevelopmentCard> list) {
+        return new DevelopmentCardList(list);
     }
 
     @Override
@@ -26,29 +26,35 @@ public class DevelopmentCardListMap implements Iterable<DevelopmentCard> {
         return new ResourceListMapIterator(list);
     }
 
-    public DevelopmentCardListMap create() {
-        return new DevelopmentCardListMap(list);
+    @Override
+    public DevelopmentCardList create() {
+        return new DevelopmentCardList(list);
     }
 
-    public DevelopmentCard get(DevelopmentCard.DevelopmentCardType resource) {
+    @Override
+    public DevelopmentCard get(DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) return resource1;
         }
         return null;
     }
 
-    public void increase(DevelopmentCard.DevelopmentCardType resource){
+    @Override
+    public void increase(DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) resource1.increase();
         }
     }
-    public void decrease(DevelopmentCard.DevelopmentCardType resource){
+
+    @Override
+    public void decrease(DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) resource1.decrease();
         }
     }
 
-    public int getAmount(DevelopmentCard.DevelopmentCardType resource) {
+    @Override
+    public int getAmount(DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) return resource1.getAmount();
         }

@@ -1,40 +1,16 @@
 package de.uol.swp.common.game.resourceThingies.developmentCard;
 
-import javax.inject.Inject;
-import java.io.Serializable;
-import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 
-public class DevelopmentCard implements Serializable {
+public class DevelopmentCard implements IDevelopmentCard {
 
-    @Inject
-    private static ResourceBundle resourceBundle;
+
 
     private final DevelopmentCardType type;
     private int amount;
 
-    public enum DevelopmentCardType {
-        KNIGHT_CARD("game.resources.cards.knight"),
-        ROAD_BUILDING_CARD("game.resources.cards.roadbuilding"),
-        YEAR_OF_PLENTY_CARD("game.resources.cards.yearofplenty"),
-        MONOPOLY_CARD("game.resources.cards.monopoly"),
-        VICTORY_POINT_CARD("game.resources.cards.victorypoints");
-
-        private final String attribute;
-
-        DevelopmentCardType(String attribute) {
-            this.attribute = attribute;
-        }
-
-        @Override
-        public String toString() {
-            return resourceBundle.getString(getAttributeName());
-        }
-
-        public String getAttributeName() {
-            return attribute;
-        }
-    }
-
+    @Override
     public void setAmount(int amount) {
         this.amount = amount;
     }
@@ -44,26 +20,32 @@ public class DevelopmentCard implements Serializable {
         this.amount = amount;
     }
 
+    @Override
     public void decrease(int amount) {
         increase(-amount);
     }
 
+    @Override
     public void decrease() {
         decrease(-1);
     }
 
+    @Override
     public int getAmount() {
         return amount;
     }
 
+    @Override
     public DevelopmentCardType getType() {
         return type;
     }
 
+    @Override
     public void increase(int amount) {
         this.amount += amount;
     }
 
+    @Override
     public void increase() {
         increase(1);
     }

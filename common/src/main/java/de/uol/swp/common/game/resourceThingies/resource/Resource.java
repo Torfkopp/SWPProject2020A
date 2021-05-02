@@ -1,6 +1,4 @@
-package de.uol.swp.common.game.resourceThingies.resource.resource;
-
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+package de.uol.swp.common.game.resourceThingies.resource;
 
 /**
  * The type Mutable resource.
@@ -8,7 +6,7 @@ import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
  * @author Temmo Junkhoff
  * @since 2021-04-23
  */
-public class MutableResource implements IMutableResource, IImmutableResource {
+public class Resource implements IResource {
 
     private final ResourceType type;
     private int amount;
@@ -22,14 +20,14 @@ public class MutableResource implements IMutableResource, IImmutableResource {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public MutableResource(ResourceType type, int amount) {
+    public Resource(ResourceType type, int amount) {
         this.type = type;
         this.amount = amount;
     }
 
     @Override
-    public MutableResource create() {
-        return new MutableResource(getType(), getAmount());
+    public Resource create() {
+        return new Resource(getType(), getAmount());
     }
 
     @Override
@@ -59,16 +57,11 @@ public class MutableResource implements IMutableResource, IImmutableResource {
 
     @Override
     public void increase(int amount) {
-        this.amount += amount;
+        setAmount(getAmount() + amount);
     }
 
     @Override
     public void increase() {
         increase(1);
-    }
-
-    @Override
-    public ImmutableResource getImmutable(){
-        return new ImmutableResource(getType(), getAmount());
     }
 }

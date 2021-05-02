@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.resourceThingies;
 
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 /**
@@ -17,8 +17,8 @@ public class Inventory extends AbstractInventory {
     private int knights = 0;
 
     public Inventory() {
-        resources = new MutableResourceListMap();
-        developmentCards = new DevelopmentCardListMap();
+        resources = new ResourceList();
+        developmentCards = new DevelopmentCardList();
     }
 
     public void decreaseKnights(int amount) {
@@ -40,7 +40,7 @@ public class Inventory extends AbstractInventory {
      */
     public int getAmountOfDevelopmentCards() {
         int returnValue = 0;
-        for (DevelopmentCard.DevelopmentCardType developmentCard : DevelopmentCard.DevelopmentCardType.values())
+        for (DevelopmentCardType developmentCard : DevelopmentCardType.values())
             returnValue += get(developmentCard);
         return returnValue;
     }

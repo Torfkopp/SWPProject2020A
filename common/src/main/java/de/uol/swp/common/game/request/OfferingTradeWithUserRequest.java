@@ -1,12 +1,8 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.IImmutableResourceListMap;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This request contains the necessary information for a trade
@@ -21,8 +17,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
     private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
-    private final IImmutableResourceListMap offeringResourceMap;
-    private final IImmutableResourceListMap demandingResourceMap;
+    private final ResourceList offeredResources;
+    private final ResourceList demandedResources;
 
     /**
      * Constructor
@@ -34,13 +30,13 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param demandedResources The responded resources
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
-                                        MutableResourceListMap offeringResourceMap,
-                                        MutableResourceListMap demandingResourceMap) {
+                                        ResourceList offeredResources,
+                                        ResourceList demandedResources) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
-        this.offeringResourceMap = offeringResourceMap;
-        this.demandingResourceMap = demandingResourceMap;
+        this.offeredResources = offeredResources;
+        this.demandedResources = demandedResources;
     }
 
     /**
@@ -48,7 +44,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the demanded Resources as a Map
      */
-    public IImmutableResourceListMap getDemandedResources() {
+    public ResourceList getDemandedResources() {
         return demandedResources;
     }
 
@@ -57,8 +53,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the offering Resources as a Map
      */
-    public IImmutableResourceListMap getOfferingResourceMap() {
-        return offeringResourceMap;
+    public ResourceList getOfferedResources() {
+        return offeredResources;
     }
 
     /**
@@ -68,15 +64,6 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      */
     public UserOrDummy getOfferingUser() {
         return offeringUser;
-    }
-
-    /**
-     * Gets the demanded Resources
-     *
-     * @return Gets the demanded Resources as a Map
-     */
-    public IImmutableResourceListMap getDemandingResourceMap() {
-        return demandingResourceMap;
     }
 
     /**

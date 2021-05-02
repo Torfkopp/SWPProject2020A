@@ -1,7 +1,7 @@
 package de.uol.swp.client.game;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
@@ -123,7 +123,7 @@ public interface IGameService {
      * @author Mario Fokken
      * @since 2021-04-12
      */
-    void taxPayed(LobbyName lobbyName, MutableResourceListMap selectedResources);
+    void taxPayed(LobbyName lobbyName, ResourceList selectedResources);
 
     /**
      * Posts a request to update the game map

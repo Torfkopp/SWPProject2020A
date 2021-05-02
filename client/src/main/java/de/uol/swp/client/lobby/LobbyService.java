@@ -123,14 +123,14 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void retrieveAllLobbyMembers(String lobbyName) {
+    public void retrieveAllLobbyMembers(LobbyName lobbyName) {
         LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby {}", lobbyName);
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
 
     @Override
-    public void returnToPreGameLobby(String lobbyName) {
+    public void returnToPreGameLobby(LobbyName lobbyName) {
         LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby {}", lobbyName);
         Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
         eventBus.post(returnToPreGameLobbyRequest);

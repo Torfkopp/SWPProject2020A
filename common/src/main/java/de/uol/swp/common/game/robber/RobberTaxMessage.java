@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class RobberTaxMessage extends AbstractGameMessage {
 
     private final Map<User, Integer> players;
-    private final Map<User, MutableResourceListMap> inventory;
+    private final Map<User, ResourceList> inventory;
 
     /**
      * Constructor
@@ -33,7 +33,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      * @param inventory Map of user and the inventory as map with resources and its amount
      */
     public RobberTaxMessage(LobbyName lobbyName, UserOrDummy user, Map<User, Integer> players,
-                            Map<User, MutableResourceListMap> inventory) {
+                            Map<User, ResourceList> inventory) {
         super(lobbyName, user);
         this.players = players;
         this.inventory = inventory;
@@ -54,7 +54,7 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and a map of a resource and its amount
      */
-    public Map<User, MutableResourceListMap> getInventory() {
+    public Map<User, ResourceList> getInventory() {
         return inventory;
     }
 

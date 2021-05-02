@@ -6,7 +6,7 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -123,7 +123,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void taxPayed(LobbyName lobbyName, MutableResourceListMap selectedResources) {
+    public void taxPayed(LobbyName lobbyName, ResourceList selectedResources) {
         LOG.debug("Sending RobberTaxChosenRequest");
         Message request = new RobberTaxChosenRequest(selectedResources, userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);

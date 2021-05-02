@@ -6,23 +6,18 @@ import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
-import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Resources;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourceThingies.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.MapValueFactory;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,24 +36,24 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     public static final int MIN_HEIGHT = 433;
     public static final int MIN_WIDTH = 620;
     private static final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
-    private String lobbyName;
+    private LobbyName lobbyName;
 
     @Inject
     private IGameService gameService;
 
     @FXML
-    private TableView<Map<String, Object>> ownResourcesToTradeWith;
+    private TableView<IResource> ownResourcesToTradeWith;
     @FXML
-    private TableView<Map<String, Object>> bankResourcesView;
+    private TableView<IResource> bankResourcesView;
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
-    private TableColumn<Map, Integer> tradeResourceAmountCol;
+    private TableColumn<IResource, Integer> tradeResourceAmountCol;
     @FXML
-    private TableColumn<Map, String> tradeResourceNameCol;
+    private TableColumn<IResource, ResourceType> tradeResourceNameCol;
     @FXML
-    private TableColumn<Map, Integer> bankResourceAmountCol;
+    private TableColumn<IResource, Integer> bankResourceAmountCol;
     @FXML
-    private TableColumn<Map, String> bankResourceNameCol;
+    private TableColumn<IResource, ResourceType> bankResourceNameCol;
     @FXML
     private Button buyDevelopmentButton;
     @FXML
@@ -89,24 +84,20 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-20
      */
-    private static Map<IHarborHex.HarborResource, Integer> setupHarborRatios(
-            List<IHarborHex.HarborResource> harborMap) {
-        Map<IHarborHex.HarborResource, Integer> tradingRatio = new HashMap<>();
+    private static ResourceList setupHarborRatios(List<IHarborHex.HarborResource> harborMap) {
+        ResourceList tradingRatio = new ResourceList();
         int prepareTradingRatio = 4;
-        if (harborMap.contains(IHarborHex.HarborResource.ANY)) prepareTradingRatio = 3;
-        tradingRatio.put(IHarborHex.HarborResource.BRICK, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.ORE, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.GRAIN, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.WOOL, prepareTradingRatio);
-        tradingRatio.put(IHarborHex.HarborResource.LUMBER, prepareTradingRatio);
-        if (harborMap.contains(IHarborHex.HarborResource.BRICK))
-            tradingRatio.replace(IHarborHex.HarborResource.BRICK, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.ORE)) tradingRatio.replace(IHarborHex.HarborResource.ORE, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.GRAIN))
-            tradingRatio.replace(IHarborHex.HarborResource.GRAIN, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.WOOL)) tradingRatio.replace(IHarborHex.HarborResource.WOOL, 2);
-        if (harborMap.contains(IHarborHex.HarborResource.LUMBER))
-            tradingRatio.replace(IHarborHex.HarborResource.LUMBER, 2);
+        if (harborMap.contains(IHarborHex.HarborResource.ANY)) {
+            prepareTradingRatio = 3;
+        }
+        for (ResourceType resourceType : ResourceType.values()) {
+            tradingRatio.set(resourceType, prepareTradingRatio);
+        }
+        for (ResourceType resourceType : ResourceType.values()) {
+            if (harborMap.contains(resourceType)) {
+                tradingRatio.set(resourceType, 2);
+            }
+        }
         return tradingRatio;
     }
 
@@ -119,10 +110,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @FXML
     public void initialize() {
         super.initialize();
-        tradeResourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        tradeResourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
-        bankResourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        bankResourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
+        tradeResourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        tradeResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        bankResourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        bankResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         LOG.debug("TradeWithBankPresenter initialised");
     }
 
@@ -136,13 +127,12 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
-        //@formatter:off
-        if (resourceMap.getAmount(ResourceType.ORE) >= 1 &&
-            resourceMap.getAmount(ResourceType.GRAIN) >= 1 &&
-            resourceMap.getAmount(ResourceType.WOOL) >= 1) {
-            tradeService.buyDevelopmentCard(lobbyName);
+        for (IResource item : ownResourceTableView.getItems()) {
+            if (item.getType() == ResourceType.GRAIN && item.getAmount() <= 0) return;
+            if (item.getType() == ResourceType.ORE && item.getAmount() <= 0) return;
+            if (item.getType() == ResourceType.WOOL && item.getAmount() <= 0) return;
         }
-        //@formatter:on
+        tradeService.buyDevelopmentCard(lobbyName);
     }
 
     /**
@@ -198,14 +188,14 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
-        List<Map<String, Object>> resourceList = rsp.getResourceMap();
-        Map<IHarborHex.HarborResource, Integer> tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
+        ResourceList resourceList = rsp.getResourceMap();
+        ResourceList tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
         setInventories(resourceList, tradingRatios);
         boolean hasGrain = false, hasOre = false, hasWool = false;
-        for (Map<String, Object> item : resourceList) {
-            if (Resources.GRAIN.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasGrain = true;
-            if (Resources.ORE.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasOre = true;
-            if (Resources.WOOL.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasWool = true;
+        for (Map<String, Object> item : IResourceList.getTableViewFormat(resourceList)) {
+            if (ResourceType.GRAIN.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasGrain = true;
+            if (ResourceType.ORE.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasOre = true;
+            if (ResourceType.WOOL.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasWool = true;
         }
         buyDevelopmentButton.setDisable(!hasGrain || !hasOre || !hasWool);
     }
@@ -223,15 +213,16 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
-        MutableResource bankResource;
-        MutableResource giveResource;
-        ownResourceToTradeWithView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        if (ownResourceToTradeWithView.getSelectionModel().isEmpty()) {
+        IResource bankResource;
+        IResource giveResource;
+        ownResourcesToTradeWith.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        if (ownResourcesToTradeWith.getSelectionModel().isEmpty()) {
             tradeService.showTradeError(resourceBundle.getString("game.error.trade.noplayerresource"));
             return;
         }
-        Map<String, Object> giveResource = ownResourcesToTradeWith.getSelectionModel().getSelectedItem();
+        giveResource = ownResourcesToTradeWith.getSelectionModel().getSelectedItem();
         bankResourcesView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        bankResource = bankResourcesView.getSelectionModel().getSelectedItem();
         if (bankResourcesView.getSelectionModel().isEmpty()) {
             tradeService.showTradeError(resourceBundle.getString("game.error.trade.nobankresource"));
             return;
@@ -296,40 +287,13 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-20
      */
-    private void setInventories(List<Map<String, Object>> ownInventory,
-                                Map<IHarborHex.HarborResource, Integer> tradingRatios) {
-        for (Resources resource : Resources.values()) {
-            Map<String, Object> bankResourceMap = new HashMap<>();
-            bankResourceMap.put("amount", 1);
-            String resourceKey = String.format("game.resources.%s", resource.name().toLowerCase());
-            bankResourceMap.put("resource", new I18nWrapper(resourceKey));
-            bankResourceMap.put("enumType", resource);
-            bankResourcesView.getItems().add(bankResourceMap);
+    private void setInventories(IResourceList ownInventory, IResourceList tradingRatios) {
+        for (ResourceType resource : ResourceType.values()) {
+            bankResourcesView.getItems().add(new Resource(resource, 1));
         }
-        for (Map<String, Object> item : ownInventory) {
-            Resources resource = (Resources) item.get("enumType");
-            Map<String, Object> newResourceMap = new HashMap<>();
-            newResourceMap.put("amount", item.get("amount"));
-            newResourceMap.put("resource", item.get("resource"));
-            newResourceMap.put("enumType", resource);
-            ownResourceTableView.getItems().add(newResourceMap);
-
-        for (MutableResource entry : resourceMap) {
-            ownInventoryList.add(new MutableResource(entry.getType(), entry.getAmount()));
-            IHarborHex.HarborResource harborResource = IHarborHex.getHarborResource(entry.getType());
-            if (entry.getAmount() < tradingRatio.get(harborResource)) continue;
-            resourceList.add(new MutableResource(entry.getType(), tradingRatio.get(harborResource)));
-        }
-        if (resourceList.size() == 0) {
-            tradeResourceWithBankButton.setDisable(true);
-        }
-        if (bankResourceList == null) {
-            bankResourceList = FXCollections.observableArrayList();
-            bankResourceView.setItems(bankResourceList);
-        }
-        bankResourceList.clear();
-        for (MutableResource entry : resourceMap) {
-            bankResourceList.add(new MutableResource(entry.getType(), 1));
-        }
+        for (IResource resource : ownInventory)
+            ownResourceTableView.getItems().add(resource);
+        for (IResource resource : tradingRatios)
+            ownResourcesToTradeWith.getItems().add(resource);
     }
 }

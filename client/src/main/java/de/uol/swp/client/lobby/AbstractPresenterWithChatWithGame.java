@@ -10,12 +10,12 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourceThingies.developmentCard.*;
+import de.uol.swp.common.game.resourceThingies.resource.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -29,7 +29,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.MapValueFactory;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -61,9 +61,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected TableView<Map<String, Object>> developmentCardTableView;
+    protected TableView<IDevelopmentCard> developmentCardTableView;
     @FXML
-    protected TableView<Map<String, Object>> resourceTableView;
+    protected TableView<IResource> resourceTableView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -109,13 +109,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
-    private TableColumn<Map, Integer> developmentCardAmountCol;
+    private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
     @FXML
-    private TableColumn<Map, String> developmentCardNameCol;
+    private TableColumn<IDevelopmentCard, DevelopmentCardType> developmentCardNameCol;
     @FXML
-    private TableColumn<Map, Integer> resourceAmountCol;
+    private TableColumn<IResource, Integer> resourceAmountCol;
     @FXML
-    private TableColumn<Map, String> resourceNameCol;
+    private TableColumn<IResource, ResourceType> resourceNameCol;
 
     @Inject
     private ITradeService tradeService;
@@ -889,10 +889,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
+        rsp.getResourceList().forEach((x)-> System.out.println(x.getType() + " : " + x.getAmount()));
         Platform.runLater(() -> {
-            resourceTableView.getItems().setAll(rsp.getResourceList());
+            resourceTableView.getItems().clear();
+            rsp.getResourceList().forEach((resource)-> resourceTableView.getItems().add(resource));
             resourceTableView.sort();
-            developmentCardTableView.getItems().setAll(rsp.getDevelopmentCardList());
+            developmentCardTableView.getItems().clear();
+            rsp.getDevelopmentCardList().forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
         });
     }
@@ -994,40 +997,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Helper method to create the necessary Map structure
-     * required for MapValueFactories
-     * <p>
-     * This method creates a Map containing a key "amount" with value 0 and
-     * another key "resource" or "card", depending on the parameter {@literal <type>},
-     * with the internationalised name of the Resource or Development Card based
-     * on the parameter {@literal <item>}.
-     *
-     * @param type Either "resource" for Resources or "card" for Development Cards
-     * @param item Lowercase Resource name for Resources or fully qualified i18n key
-     *             for Development Cards <p>
-     *             e.g. {@code prepareEmptyResourceMap("card", "game.resources.cards.knight")}
-     *             or {@code prepareEmptyResourceMap("resource", "brick")}
-     *
-     * @return A Map representing 0 of a resource
-     *
-     * @author Phillip-André Suhr
-     * @since 2021-04-18
-     */
-    private Map<String, Object> prepareEmptyResourceMap(String type, String item) {
-        Map<String, Object> resourceMap = new HashMap<>();
-        resourceMap.put("amount", 0);
-        String preFormat;
-        if (type.equals("resource")) { // Resource like Brick
-            preFormat = "game.resources.%s";
-            resourceMap.put("enumType", Resources.valueOf(item.toUpperCase()));
-        } else { // Development Card like Knight Card
-            preFormat = "%s";
-        }
-        resourceMap.put(type, new I18nWrapper(String.format(preFormat, item)));
-        return resourceMap;
-    }
-
-    /**
      * Prepares the TableViews displaying the inventory
      * <p>
      * Prepares the TableView by setting the CellValueFactories of the
@@ -1038,24 +1007,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-04-18
      */
     private void prepareInventoryTables() {
-        resourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        resourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
-        developmentCardAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        developmentCardNameCol.setCellValueFactory(new MapValueFactory<>("card"));
+        resourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        resourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        developmentCardAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        developmentCardNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
 
-        List<Map<String, Object>> inventoryItems = new ArrayList<>();
-        for (Resources resource : Resources.values()) {
-            inventoryItems.add(prepareEmptyResourceMap("resource", resource.name().toLowerCase()));
-        }
-        resourceTableView.getItems().addAll(inventoryItems);
-
-        List<Map<String, Object>> developmentCards = new ArrayList<>();
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.victorypoints"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.knight"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.roadbuilding"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.yearofplenty"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.monopoly"));
-        developmentCardTableView.getItems().setAll(developmentCards);
+        new ResourceList().forEach((resource) -> resourceTableView.getItems().add(resource));
+        new DevelopmentCardList().forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
     }
 
     /**

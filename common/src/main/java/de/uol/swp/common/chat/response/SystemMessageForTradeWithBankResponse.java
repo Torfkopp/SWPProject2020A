@@ -3,7 +3,7 @@ package de.uol.swp.common.chat.response;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -23,7 +23,7 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
      *  @param lobbyName       The lobby name
      * @param developmentCard The developmentCard that the user bought
      */
-    public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCard.DevelopmentCardType developmentCard) {
+    public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCardType developmentCard) {
         super(lobbyName);
         this.msg = null;
         //this.msg = new SystemMessageDTO(

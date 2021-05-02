@@ -5,7 +5,7 @@ import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.resourceThingies.BankInventory;
 import de.uol.swp.common.game.resourceThingies.Inventory;
 import de.uol.swp.common.game.resourceThingies.InventoryMap;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -89,7 +89,7 @@ public class Game {
         //Points made with settlements & cities
         points += map.getPlayerPoints(player);
         //Points made with victory point cards
-        points += players.get(player).get(DevelopmentCard.DevelopmentCardType.VICTORY_POINT_CARD);
+        points += players.get(player).get(DevelopmentCardType.VICTORY_POINT_CARD);
         //2 Points if player has the longest road
         //if (players.get(player).isLongestRoad()) points += 2;
         //2 Points if player has the largest army

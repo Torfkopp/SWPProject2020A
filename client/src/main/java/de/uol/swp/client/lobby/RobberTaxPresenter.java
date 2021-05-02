@@ -7,9 +7,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourceThingies.resource.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,7 +30,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
-    private final MutableResourceListMap selectedResources = new MutableResourceListMap();
+    private final ResourceList selectedResources = new ResourceList();
 
     @Inject
     protected IGameService gameService;
@@ -42,7 +40,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private Slider brickSlider, grainSlider, lumberSlider, oreSlider, woolSlider;
     @FXML
-    private ListView<MutableResource> ownInventoryView;
+    private ListView<Resource> ownInventoryView;
     @FXML
     private Button taxPay;
     @FXML
@@ -50,8 +48,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
 
     private LobbyName lobbyName;
     private int taxAmount;
-    private MutableResourceListMap inventory;
-    private ObservableList<MutableResource> ownInventoryList;
+    private ResourceList inventory;
+    private ObservableList<Resource> ownInventoryList;
 
     /**
      * Constructor
@@ -82,7 +80,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     private void dragMethod() {
         int selectedAmount = 0;
-        for (MutableResource resource : selectedResources) {
+        for (IResource resource : selectedResources) {
             selectedAmount += resource.getAmount();
         }
         if (selectedAmount <= taxAmount) progress.setProgress((double) selectedAmount / taxAmount);
@@ -107,7 +105,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private void initialize() {
         ownInventoryView.setCellFactory(lv -> new ListCell<>() {
-            protected void updateItem(MutableResource item, boolean empty) {
+            protected void updateItem(Resource item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getAmount() + " " + item.getType());
@@ -185,7 +183,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
             ownInventoryView.setItems(ownInventoryList);
         }
         ownInventoryList.clear();
-        for (MutableResource entry : inventory) {
+        for (IResource entry : inventory) {
             ownInventoryList.add(entry.create());
         }
     }

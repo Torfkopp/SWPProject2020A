@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -25,7 +26,7 @@ public class ExecuteTradeWithBankRequest extends UpdateInventoryRequest {
      * @param getResource  The name of the resource he gets from the bank
      * @param giveResource The name of the resource he has to give to the bank
      */
-    public ExecuteTradeWithBankRequest(UserOrDummy user, String originLobby, ResourceType getResource,
+    public ExecuteTradeWithBankRequest(UserOrDummy user, LobbyName originLobby, ResourceType getResource,
                                        ResourceType giveResource) {
         super(user, originLobby);
         this.getResource = getResource;

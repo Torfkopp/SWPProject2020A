@@ -5,8 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resource.MutableResource;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.*;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -18,9 +17,6 @@ import javafx.scene.control.Label;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the tradingAccept menu
@@ -47,8 +43,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
 
     private LobbyName lobbyName;
     private UserOrDummy offeringUser;
-    private List<Map<String, Object>> offeringResourceMap;
-    private List<Map<String, Object>> respondingResourceMap;
+    private ResourceList offeringResourceMap;
+    private ResourceList respondingResourceMap;
 
     /**
      * Constructor
@@ -167,7 +163,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getDemandedResources();
         offeringResourceMap = rsp.getOfferedResources();
-        ownResourceTableView.getItems().addAll(rsp.getResourceList());
+        for (IResource resource : rsp.getResourceList())
+        ownResourceTableView.getItems().add(resource);
         setOfferLabel();
         Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
@@ -198,10 +195,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-05
      */
-    private String tallyUpOfferOrDemand(MutableResourceListMap resourceMap) {
+    private String tallyUpOfferOrDemand(ResourceList resourceList) {
         boolean nothing = true;
         StringBuilder content = new StringBuilder();
-        for (MutableResource entry : resourceMap) {
+        for (IResource entry : resourceList) {
             int amount = entry.getAmount();
             if (amount > 0) {
                 nothing = false;

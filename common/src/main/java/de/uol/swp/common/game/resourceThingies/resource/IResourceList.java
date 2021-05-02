@@ -1,9 +1,7 @@
-package de.uol.swp.common.game.resourceThingies.resource.resourceListMap;
+package de.uol.swp.common.game.resourceThingies.resource;
 
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
-import de.uol.swp.common.game.resourceThingies.resource.resource.IMutableResource;
-
-import java.util.Iterator;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * The interface Mutable resource list map.
@@ -11,10 +9,18 @@ import java.util.Iterator;
  * @author Temmo Junkhoff
  * @since 2021-04-23
  */
-public interface IMutableResourceListMap extends IResourceListMap, Iterable<IMutableResource> {
+public interface IResourceList extends Iterable<IResource>, Serializable {
+
+    static List<Map<String, Object>> getTableViewFormat(IResourceList resourceList){
+        List<Map<String, Object>> returnMap = new LinkedList<>();
+        for (IResource resource : resourceList){
+            returnMap.add(IResource.getTableViewFormat(resource));
+        }
+        return returnMap;
+    }
 
     @Override
-    Iterator<IMutableResource> iterator();
+    Iterator<IResource> iterator();
 
     /**
      * Clone a mutable resource list map.
@@ -24,7 +30,7 @@ public interface IMutableResourceListMap extends IResourceListMap, Iterable<IMut
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    IMutableResourceListMap create();
+    IResourceList create();
 
     /**
      * Decrease a resource.
@@ -46,6 +52,20 @@ public interface IMutableResourceListMap extends IResourceListMap, Iterable<IMut
      * @since 2021-04-23
      */
     void decrease(ResourceType resource);
+
+    IResource get(ResourceType resource);
+
+    /**
+     * Gets the amount of a specific resource.
+     *
+     * @param resource the resource
+     *
+     * @return the amount
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
+    int getAmount(ResourceType resource);
 
     /**
      * Increase a resource.

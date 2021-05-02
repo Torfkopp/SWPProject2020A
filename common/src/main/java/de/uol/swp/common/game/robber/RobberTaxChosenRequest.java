@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 
@@ -17,7 +17,7 @@ import de.uol.swp.common.user.User;
 public class RobberTaxChosenRequest extends AbstractRequestMessage {
 
     private final User player;
-    private final MutableResourceListMap resources;
+    private final ResourceList resources;
     private final LobbyName lobby;
 
     /**
@@ -27,7 +27,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
      * @param player    The player paying the tax
      * @param lobby     The lobby's name
      */
-    public RobberTaxChosenRequest(MutableResourceListMap resources, User player, LobbyName lobby) {
+    public RobberTaxChosenRequest(ResourceList resources, User player, LobbyName lobby) {
         this.resources = resources;
         this.player = player;
         this.lobby = lobby;
@@ -56,7 +56,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
      *
      * @return Map of a resource and its amount
      */
-    public MutableResourceListMap getResources() {
+    public ResourceList getResources() {
         return resources;
     }
 }

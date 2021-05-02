@@ -1,7 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 
 /**
  * Event used to show the window for the robberTax
@@ -19,7 +19,7 @@ public class ShowRobberTaxViewEvent {
 
     private final LobbyName lobbyName;
     private final int taxAmount;
-    private final MutableResourceListMap inventory;
+    private final ResourceList inventory;
 
     /**
      * Constructor
@@ -28,7 +28,7 @@ public class ShowRobberTaxViewEvent {
      * @param taxAmount The amount of cards to pay
      * @param inventory The inventory
      */
-    public ShowRobberTaxViewEvent(LobbyName lobbyName, int taxAmount, MutableResourceListMap inventory) {
+    public ShowRobberTaxViewEvent(LobbyName lobbyName, int taxAmount, ResourceList inventory) {
         this.lobbyName = lobbyName;
         this.taxAmount = taxAmount;
         this.inventory = inventory;
@@ -39,7 +39,7 @@ public class ShowRobberTaxViewEvent {
      *
      * @return Map of resources and its amount
      */
-    public MutableResourceListMap getInventory() {
+    public ResourceList getInventory() {
         return inventory;
     }
 

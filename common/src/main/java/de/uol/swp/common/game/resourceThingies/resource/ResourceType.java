@@ -22,7 +22,9 @@ public enum ResourceType implements Serializable {
 
     @Override
     public String toString() {
-        return resourceBundle.getString(getAttributeName());
+        if (resourceBundle == null) return "";
+        String string = resourceBundle.getString(getAttributeName());
+        return string == null ? "" : string;
     }
 
     public String getAttributeName() {

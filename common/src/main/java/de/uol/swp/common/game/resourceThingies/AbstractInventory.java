@@ -1,22 +1,22 @@
 package de.uol.swp.common.game.resourceThingies;
 
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardListMap;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 import java.io.Serializable;
 
 public abstract class AbstractInventory implements Serializable {
 
-    protected MutableResourceListMap resources;
-    protected DevelopmentCardListMap developmentCards;
+    protected ResourceList resources;
+    protected DevelopmentCardList developmentCards;
 
     public void decrease(ResourceType resource, int i) {
         increase(resource, -i);
     }
 
-    public void decrease(DevelopmentCard.DevelopmentCardType developmentCard, int i) {
+    public void decrease(DevelopmentCardType developmentCard, int i) {
         increase(developmentCard, -i);
     }
 
@@ -24,7 +24,7 @@ public abstract class AbstractInventory implements Serializable {
         increase(resource, -1);
     }
 
-    public void decrease(DevelopmentCard.DevelopmentCardType developmentCard) {
+    public void decrease(DevelopmentCardType developmentCard) {
         increase(developmentCard, -1);
     }
 
@@ -42,23 +42,23 @@ public abstract class AbstractInventory implements Serializable {
      *
      * @return The amount of Knight Cards
      */
-    public int get(DevelopmentCard.DevelopmentCardType developmentCard) {
+    public int get(DevelopmentCardType developmentCard) {
         return developmentCards.getAmount(developmentCard);
     }
 
-    public DevelopmentCardListMap getDevelopmentCards() {
+    public DevelopmentCardList getDevelopmentCards() {
         return developmentCards.create();
     }
 
-    public MutableResourceListMap getResources() {
+    public ResourceList getResources() {
         return resources.create();
     }
 
     public void increase(ResourceType resource, int i) {
-        resources.get(resource).increase(i);
+        resources.increase(resource, i);
     }
 
-    public void increase(DevelopmentCard.DevelopmentCardType developmentCard, int i) {
+    public void increase(DevelopmentCardType developmentCard, int i) {
         developmentCards.get(developmentCard).increase(i);
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractInventory implements Serializable {
         increase(resource, 1);
     }
 
-    public void increase(DevelopmentCard.DevelopmentCardType developmentCard) {
+    public void increase(DevelopmentCardType developmentCard) {
         increase(developmentCard, 1);
     }
 }

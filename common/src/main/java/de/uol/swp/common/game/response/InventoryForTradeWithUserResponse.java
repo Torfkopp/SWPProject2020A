@@ -1,12 +1,9 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This Response has up-to-date info about the resources in the inventory
@@ -21,7 +18,7 @@ import java.util.Map;
 public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final MutableResourceListMap resourceMap;
+    private final ResourceList resourceList;
     private final int tradingUsersInventorySize;
     private final UserOrDummy tradingUser;
 
@@ -36,7 +33,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param tradingUsersInventorySize Amount of resource cards the other User has
      * @param tradingUser               The User to whom an offer is going to be made
      */
-    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, MutableResourceListMap resourceMap,
+    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
@@ -53,8 +50,8 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @author Phillip-André Suhr
      * @since 2021-04-19
      */
-    public MutableResourceListMap getResourceMap() {
-        return resourceMap;
+    public ResourceList getResourceMap() {
+        return resourceList;
     }
 
     /**

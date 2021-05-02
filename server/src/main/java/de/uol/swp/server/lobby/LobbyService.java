@@ -491,7 +491,7 @@ public class LobbyService extends AbstractService {
     @Subscribe
     private void onRetrieveAllLobbyMembersRequest(RetrieveAllLobbyMembersRequest req) {
         LOG.debug("Received RetrieveAllLobbyMembersRequest for Lobby {}", req.getLobbyName());
-        String lobbyName = req.getLobbyName();
+        LobbyName lobbyName = req.getLobbyName();
         Optional<Lobby> lobby = lobbyManagement.getLobby(lobbyName);
         if (lobby.isPresent()) {
             Set<UserOrDummy> lobbyMembers = lobby.get().getUserOrDummies();

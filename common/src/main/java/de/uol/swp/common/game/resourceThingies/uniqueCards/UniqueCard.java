@@ -8,7 +8,7 @@ import de.uol.swp.common.user.UserOrDummy;
  * @author Temmo Junkhoff
  * @since 2021-04-23
  */
-public class MutableUniqueCard implements IMutableUniqueCard {
+public class UniqueCard implements IUniqueCard {
 
     private final UniqueCardsType type;
     private UserOrDummy owner;
@@ -22,7 +22,7 @@ public class MutableUniqueCard implements IMutableUniqueCard {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public MutableUniqueCard(UniqueCardsType type) {
+    public UniqueCard(UniqueCardsType type) {
         this.type = type;
         this.owner = null;
         this.amount = 0;
@@ -38,7 +38,7 @@ public class MutableUniqueCard implements IMutableUniqueCard {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public MutableUniqueCard(UniqueCardsType type, UserOrDummy owner, int amount) {
+    public UniqueCard(UniqueCardsType type, UserOrDummy owner, int amount) {
         this.type = type;
         this.owner = owner;
         this.amount = amount;

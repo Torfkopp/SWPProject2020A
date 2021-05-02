@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -17,7 +17,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
 
     private final UserOrDummy user;
     private final ResourceType resource;
-    private final DevelopmentCard.DevelopmentCardType developmentCard;
+    private final DevelopmentCardType developmentCard;
     private final int amount;
 
     /**
@@ -30,7 +30,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
      *                    to/from the resource
      */
     public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, ResourceType resource,
-                                DevelopmentCard.DevelopmentCardType developmentCard, int amount) {
+                                DevelopmentCardType developmentCard, int amount) {
         super(originLobby);
         this.user = user;
         this.resource = resource;
@@ -48,7 +48,7 @@ public class EditInventoryRequest extends AbstractGameRequest {
         return amount;
     }
 
-    public DevelopmentCard.DevelopmentCardType getDevelopmentCard() {
+    public DevelopmentCardType getDevelopmentCard() {
         return developmentCard;
     }
 

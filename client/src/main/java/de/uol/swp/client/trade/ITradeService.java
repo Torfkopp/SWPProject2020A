@@ -1,14 +1,10 @@
 package de.uol.swp.client.trade;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * An interface for all methods of the TradeService
@@ -27,8 +23,8 @@ public interface ITradeService {
      * @param demandedResources The resources the offering User wants
      * @param offeredResources  The resources the offering User is offering
      */
-    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, MutableResourceListMap demandedResources,
-                         MutableResourceListMap offeredResources);
+    void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceList demandedResources,
+                         ResourceList offeredResources);
 
     /**
      * Posts a request to buy a Development Card
@@ -83,8 +79,8 @@ public interface ITradeService {
      * @param offeredResources  Map of resources being offered to the responding user
      * @param demandedResources Map of resources being demanded from the responding user
      */
-    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, MutableResourceListMap offeredResources,
-                    MutableResourceListMap demandedResources);
+    void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
+                    ResourceList demandedResources);
 
     /**
      * Posts a request to reset the Offer Trade button for the user who proposed a trade

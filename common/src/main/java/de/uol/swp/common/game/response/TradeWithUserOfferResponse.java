@@ -1,12 +1,9 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.MutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This response is sent when a user offers another user
@@ -21,9 +18,9 @@ import java.util.Map;
 public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy offeringUser;
-    private final MutableResourceListMap resourceMap;
-    private final MutableResourceListMap offeringResourceMap;
-    private final MutableResourceListMap respondingResourceMap;
+    private final ResourceList resourceList;
+    private final ResourceList offeredResources;
+    private final ResourceList demandedResources;
 
     /**
      * Constructor
@@ -35,8 +32,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      * @param lobbyName         The name of the lobby
      */
     public TradeWithUserOfferResponse(UserOrDummy offeringUser,
-                                      MutableResourceListMap resourceMap, MutableResourceListMap offeringResourceMap,
-                                      MutableResourceListMap respondingResourceMap, LobbyName lobbyName) {
+                                      ResourceList resourceList, ResourceList offeredResources,
+                                      ResourceList demandedResources, LobbyName lobbyName) {
         super(lobbyName);
         this.resourceList = resourceList;
         this.offeredResources = offeredResources;
@@ -49,7 +46,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of demanded resources
      */
-    public List<Map<String, Object>> getDemandedResources() {
+    public ResourceList getDemandedResources() {
         return demandedResources;
     }
 
@@ -58,8 +55,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of offered resources
      */
-    public MutableResourceListMap getOfferingResourceMap() {
-        return offeringResourceMap;
+    public ResourceList getOfferedResources() {
+        return offeredResources;
     }
 
     /**
@@ -76,16 +73,8 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      *
      * @return Map of the inventory of the responding User
      */
-    public MutableResourceListMap getResourceMap() {
-        return resourceMap;
+    public ResourceList getResourceList() {
+        return resourceList;
     }
 
-    /**
-     * Gets the demanded resources
-     *
-     * @return Map of demanded resources
-     */
-    public MutableResourceListMap getRespondingResourceMap() {
-        return respondingResourceMap;
-    }
 }

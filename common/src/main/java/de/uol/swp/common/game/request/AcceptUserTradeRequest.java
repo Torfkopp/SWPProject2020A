@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.resourceListMap.IImmutableResourceListMap;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -16,8 +16,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
 
     private final UserOrDummy respondingUser;
     private final UserOrDummy offeringUser;
-    private final IImmutableResourceListMap demandedResources;
-    private final IImmutableResourceListMap offeredResources;
+    private final ResourceList demandedResources;
+    private final ResourceList offeredResources;
 
     /**
      * Constructor
@@ -29,8 +29,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @param offeredResources  The offered resources
      */
     public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, LobbyName lobbyName,
-                                  IImmutableResourceListMap demandedResources,
-                                  IImmutableResourceListMap offeredResources) {
+                                  ResourceList demandedResources,
+                                  ResourceList offeredResources) {
         super(lobbyName);
         this.respondingUser = respondingUser;
         this.offeringUser = offeringUser;
@@ -43,7 +43,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the demanded resources
      */
-    public IImmutableResourceListMap getDemandedResources() {
+    public ResourceList getDemandedResources() {
         return demandedResources;
     }
 
@@ -52,7 +52,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the offered resources
      */
-    public IImmutableResourceListMap getOfferedResources() {
+    public ResourceList getOfferedResources() {
         return offeredResources;
     }
 
