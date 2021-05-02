@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map.Hexes;
+package de.uol.swp.common.game.map.hexes;
 
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 

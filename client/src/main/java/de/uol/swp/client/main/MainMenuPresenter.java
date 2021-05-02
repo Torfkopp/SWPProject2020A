@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
@@ -194,7 +194,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @author Eric Vuong
      * @author Alwin Bossert
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @see de.uol.swp.client.SceneManager
      * @since 2021-03-16
      */
@@ -646,7 +646,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.lobby.dto.LobbyDTO
+     * @see de.uol.swp.common.lobby.LobbyDTO
      * @since 2020-11-29
      */
     private void updateLobbyList(List<Lobby> lobbyList) {

@@ -1,9 +1,7 @@
 package de.uol.swp.common.game.map.configuration;
 
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 import java.io.Serializable;
@@ -27,7 +25,7 @@ public interface IConfiguration extends Serializable {
      * @return Unmodifiable, ordered List of Harbor resources
      *
      * @implSpec Create new LinkedList objects from this due to it being unmodifiable and ordered
-     * @see de.uol.swp.common.game.map.Hexes.IHarborHex.HarborResource
+     * @see de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource
      */
     List<IHarborHex.HarborResource> getHarborList();
 

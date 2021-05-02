@@ -6,10 +6,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
-import de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter;
-import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
-import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent;
-import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
+import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
+import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
+import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.LoginPresenter;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
@@ -336,7 +336,7 @@ public class SceneManager {
      * FXML file.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter
+     * @see de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter
      * @since 2020-12-19
      */
     private void initChangeAccountDetailsView() {
@@ -571,7 +571,7 @@ public class SceneManager {
      * called. It calls a method to show the main screen.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent
      * @since 2020-12-19
      */
     @Subscribe
@@ -586,7 +586,7 @@ public class SceneManager {
      * called. It shows the error message of the event in a error alert.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent
      * @since 2020-12-19
      */
     @Subscribe
@@ -791,7 +791,7 @@ public class SceneManager {
      * @param event The ShowChangeAccountDetailsViewEvent detected on the EventBus
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @since 2020-12-19
      */
     @Subscribe

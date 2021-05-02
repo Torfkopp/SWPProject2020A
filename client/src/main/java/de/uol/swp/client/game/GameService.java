@@ -6,17 +6,14 @@ import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.lobby.event.CloseRobberTaxViewEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
@@ -58,13 +55,6 @@ public class GameService implements IGameService {
     public void buildRequest(LobbyName lobbyName, MapPoint mapPoint) {
         LOG.debug("Sending BuildRequest");
         Message request = new BuildRequest(lobbyName, userService.getLoggedInUser(), mapPoint);
-        eventBus.post(request);
-    }
-
-    @Override
-    public void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled) {
-        LOG.debug("Sending ChangeAutoRollStateRequest");
-        Message request = new ChangeAutoRollStateRequest(lobbyName, userService.getLoggedInUser(), autoRollEnabled);
         eventBus.post(request);
     }
 
@@ -152,6 +142,13 @@ public class GameService implements IGameService {
     public void updateInventory(LobbyName lobbyName) {
         LOG.debug("Sending UpdateInventoryRequest");
         Message request = new UpdateInventoryRequest(userService.getLoggedInUser(), lobbyName);
+        eventBus.post(request);
+    }
+
+    @Override
+    public void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled) {
+        LOG.debug("Sending ChangeAutoRollStateRequest");
+        Message request = new ChangeAutoRollStateRequest(lobbyName, userService.getLoggedInUser(), autoRollEnabled);
         eventBus.post(request);
     }
 }

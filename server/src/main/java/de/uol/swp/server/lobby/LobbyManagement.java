@@ -2,7 +2,7 @@ package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.LobbyDTO;
 import de.uol.swp.common.user.User;
 
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author Marco Grawunder
  * @see de.uol.swp.common.lobby.Lobby
- * @see de.uol.swp.common.lobby.dto.LobbyDTO
+ * @see de.uol.swp.common.lobby.LobbyDTO
  * @since 2019-10-08
  */
 public class LobbyManagement implements ILobbyManagement {
@@ -24,7 +24,7 @@ public class LobbyManagement implements ILobbyManagement {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, false, maxPlayer, true, 60, false, false));
+        lobbies.put(name, new LobbyDTO(name, owner));
     }
 
     @Override

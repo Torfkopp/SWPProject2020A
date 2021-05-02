@@ -1,10 +1,8 @@
 package de.uol.swp.common.game.map.configuration;
 
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 
 import java.util.List;
 

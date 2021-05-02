@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.resourceThingies;
 
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 
 import java.io.Serializable;
 

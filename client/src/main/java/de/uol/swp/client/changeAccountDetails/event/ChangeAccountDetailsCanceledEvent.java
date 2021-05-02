@@ -1,4 +1,4 @@
-package de.uol.swp.client.ChangeAccountDetails.event;
+package de.uol.swp.client.changeAccountDetails.event;
 
 /**
  * Event used to show the window shown before the details change

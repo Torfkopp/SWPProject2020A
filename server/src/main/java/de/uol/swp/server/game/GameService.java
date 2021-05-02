@@ -11,10 +11,9 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IHarborHex.HarborResource;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource;
 import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.message.*;
@@ -420,7 +419,6 @@ public class GameService extends AbstractService {
             } else {
                 configuration = gameMap.getBeginnerConfiguration();
             }
-            msg.getLobby().setConfiguration(configuration);
             gameMap = gameMap.createMapFromConfiguration(configuration);
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
@@ -1260,7 +1258,6 @@ public class GameService extends AbstractService {
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
             ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
-                                                                     lobby.getConfiguration(),
                                                                      game.getMap().getGameMapDTO(playerUserOrDummyMap),
                                                                      game.getDices(), game.isDiceRolledAlready(),
                                                                      game.getAutoRollEnabled(event.getUser()));

@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.robber;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -17,7 +18,7 @@ public class RobberAllTaxPayedMessage extends AbstractGameMessage {
      * @param lobbyName The lobby name
      * @param user      The user
      */
-    public RobberAllTaxPayedMessage(String lobbyName, UserOrDummy user) {
+    public RobberAllTaxPayedMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

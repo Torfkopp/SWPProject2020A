@@ -1,11 +1,9 @@
 package de.uol.swp.client.game;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
-import de.uol.swp.common.game.map.MapPoint;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -38,7 +36,7 @@ public interface IGameService {
      * @author Maximillian Lindner
      * @since 2021-04-26
      */
-    void changeAutoRollState(String lobbyName, boolean autoRollEnabled);
+    void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled);
 
     /**
      * Posts a request to end the turn onto the Event

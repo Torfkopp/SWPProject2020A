@@ -1,8 +1,6 @@
-package de.uol.swp.common.lobby.dto;
+package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.map.configuration.IConfiguration;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -35,28 +33,24 @@ public class LobbyDTO implements Lobby {
     private int moveTime;
     private boolean startUpPhaseEnabled;
     private boolean randomPlayfieldEnabled;
-    private IConfiguration configuration;
 
     /**
      * Constructor
      *
      * @param name    The requested name the lobby
      * @param creator The user who created the lobby and therefore its owner
-     * @param inGame  Whether the lobby is currently in a game
-     *
      * @since 2019-10-08
      */
-    public LobbyDTO(LobbyName name, User creator, boolean inGame, int maxPlayers, boolean commandsAllowed, int moveTime,
-                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public LobbyDTO(LobbyName name, User creator) {
         this.name = name;
         this.owner = creator;
         this.users.add(creator);
-        this.inGame = inGame;
-        this.maxPlayers = maxPlayers;
-        this.commandsAllowed = commandsAllowed;
-        this.moveTime = moveTime;
-        this.startUpPhaseEnabled = startUpPhaseEnabled;
-        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+        this.inGame = false;
+        this.maxPlayers = 3;
+        this.commandsAllowed = true;
+        this.moveTime = 60;
+        this.startUpPhaseEnabled = false;
+        this.randomPlayfieldEnabled = false;
     }
 
     /**
@@ -69,9 +63,7 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.isInGame(), lobby.getMaxPlayers(),
-                            lobby.commandsAllowed(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
-                            lobby.randomPlayfieldEnabled());
+        return new LobbyDTO(lobby.getName(), lobby.getOwner());
     }
 
     @Override
@@ -217,15 +209,5 @@ public class LobbyDTO implements Lobby {
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");
         }
         this.owner = user;
-    }
-
-    @Override
-    public void setConfiguration(IConfiguration configuration) {
-        this.configuration = configuration;
-    }
-
-    @Override
-    public IConfiguration getConfiguration() {
-        return configuration;
     }
 }

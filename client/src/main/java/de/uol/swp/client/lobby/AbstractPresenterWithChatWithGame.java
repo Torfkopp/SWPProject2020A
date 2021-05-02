@@ -12,14 +12,15 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.game.map.IGameMap;
-import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.*;
-import de.uol.swp.common.game.resourceThingies.developmentCard.*;
-import de.uol.swp.common.game.resourceThingies.resource.*;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourceThingies.developmentCard.IDevelopmentCard;
+import de.uol.swp.common.game.resourceThingies.resource.IResource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -900,10 +901,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
             resourceTableView.getItems().clear();
-            rsp.getResourceList().forEach((resource)-> resourceTableView.getItems().add(resource));
+            rsp.getResourceList().forEach((resource) -> resourceTableView.getItems().add(resource));
             resourceTableView.sort();
             developmentCardTableView.getItems().clear();
-            rsp.getDevelopmentCardList().forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
+            rsp.getDevelopmentCardList()
+               .forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
         });
     }

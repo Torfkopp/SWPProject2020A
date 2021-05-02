@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" fillWidth="false" spacing="15.0"
       xmlns="http://javafx.com/javafx/11.0.1" fx:id="changeAccountView"
-      fx:controller="de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter">
+      fx:controller="de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter">
     <HBox spacing="10.0">
         <VBox alignment="CENTER_LEFT" spacing="10.0">
             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" text="%changeaccdetails.labels.oldpw"/>

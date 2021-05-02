@@ -1,11 +1,11 @@
-package de.uol.swp.client.ChangeAccountDetails;
+package de.uol.swp.client.changeAccountDetails;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
-import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent;
+import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
+import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -131,7 +131,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * to.
      *
      * @author Eric Vuong
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent
      * @see de.uol.swp.client.SceneManager
      * @since 2020-11-25
      */
@@ -151,7 +151,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      *
      * @author Eric Vuong
      * @author Steven Luong
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent
      * @see de.uol.swp.client.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2020-12-05

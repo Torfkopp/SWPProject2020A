@@ -1,7 +1,6 @@
 package de.uol.swp.common.game;
 
-import de.uol.swp.common.game.map.Hexes.ResourceHex;
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.hexes.ResourceHex;
 import de.uol.swp.common.game.resourceThingies.BankInventory;
 import de.uol.swp.common.game.resourceThingies.Inventory;
 import de.uol.swp.common.game.resourceThingies.InventoryMap;

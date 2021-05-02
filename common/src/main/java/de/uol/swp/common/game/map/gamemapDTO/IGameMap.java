@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.gamemapDTO;
 
-import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.hexes.IGameHex;
 
 import java.io.Serializable;
 

@@ -1,11 +1,12 @@
 package de.uol.swp.common.game.map;
 
-import de.uol.swp.common.game.map.Hexes.IGameHex;
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.hexes.IGameHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.GameMapManagement;
 import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +63,7 @@ public class GameMapTest {
         IGameHex hex = map.getHex(HexMapPoint(1, 3));
         assertEquals(IGameHex.HexType.RESOURCE, hex.getType());
         IResourceHex resourceHex = (IResourceHex) hex;
-        assertEquals(IResourceHex.ResourceHexType.FOREST, resourceHex.getResource());
+        assertEquals(ResourceType.LUMBER, resourceHex.getResource());
     }
 
     @Test

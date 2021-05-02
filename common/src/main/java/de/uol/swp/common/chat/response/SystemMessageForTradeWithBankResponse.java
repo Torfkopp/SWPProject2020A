@@ -1,10 +1,10 @@
 package de.uol.swp.common.chat.response;
 
+import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -27,7 +27,7 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
     public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCardType developmentCard) {
         super(lobbyName);
         this.msg = new InGameSystemMessageDTO(
-                new I18nWrapper("lobby.trade.withbank.systemresponse", new I18nWrapper(developmentCard)));
+                new I18nWrapper("lobby.trade.withbank.systemresponse", developmentCard));
     }
 
     /**

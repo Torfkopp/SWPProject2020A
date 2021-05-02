@@ -1,4 +1,4 @@
-package de.uol.swp.client.ChangeAccountDetails.event;
+package de.uol.swp.client.changeAccountDetails.event;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Eric Vuong
  * @author Steven Luong
- * @see de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent
+ * @see de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent
  * @since 2020-12-03
  */
 public class ChangeAccountDetailsErrorEventTest {

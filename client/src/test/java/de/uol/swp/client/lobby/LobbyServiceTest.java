@@ -8,7 +8,7 @@
 //import de.uol.swp.client.user.UserService;
 //import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 //import de.uol.swp.common.lobby.Lobby;
-//import de.uol.swp.common.lobby.dto.LobbyDTO;
+//import de.uol.swp.common.lobby.LobbyDTO;
 //import de.uol.swp.common.lobby.request.*;
 //import de.uol.swp.common.user.User;
 //import de.uol.swp.common.user.UserDTO;

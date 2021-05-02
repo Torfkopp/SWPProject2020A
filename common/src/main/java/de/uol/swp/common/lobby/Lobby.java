@@ -1,7 +1,6 @@
 package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -15,7 +14,7 @@ import java.util.Set;
  * possible that not every client has to have every information of the lobby.
  *
  * @author Marco Grawunder
- * @see de.uol.swp.common.lobby.dto.LobbyDTO
+ * @see LobbyDTO
  * @since 2019-10-08
  */
 public interface Lobby extends Serializable {
@@ -31,25 +30,6 @@ public interface Lobby extends Serializable {
      */
     boolean commandsAllowed();
 
-    /**
-     * Gets the configuration of the game Map
-     *
-     * @author Maximilian Lindner
-     * @author Marvin Drees
-     * @since 2021-04-09
-     */
-    IConfiguration getConfiguration();
-
-    /**
-     * Sets the configuration of the game Map
-     *
-     * @param configuration The configuration of the game Map
-     *
-     * @author Maximilian Lindner
-     * @author Marvin Drees
-     * @since 2021-04-09
-     */
-    void setConfiguration(IConfiguration configuration);
 
     /**
      * Gets the maximum amount of players for a lobby.

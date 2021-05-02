@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.resourceThingies.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;

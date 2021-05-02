@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.map.management;
 
-import de.uol.swp.common.game.map.Hexes.IGameHex;
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IGameHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;

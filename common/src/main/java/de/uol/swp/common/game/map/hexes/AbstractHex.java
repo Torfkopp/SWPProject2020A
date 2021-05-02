@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map.Hexes;
+package de.uol.swp.common.game.map.hexes;
 
 /**
  * Abstract class for the interface IGameHex.

@@ -1,6 +1,5 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
@@ -20,7 +19,6 @@ public class StartSessionResponse extends AbstractResponseMessage {
 
     private final Lobby lobby;
     private final UserOrDummy player;
-    private final IConfiguration configuration;
     private final IGameMap gameMapDTO;
     private final int[] dices;
     private final boolean rolledDiceAlready;
@@ -35,11 +33,10 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param dices         The last rolled dices
      * @param autoRollState The autoRoll state
      */
-    public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, IGameMap gameMapDTO,
+    public StartSessionResponse(Lobby lobby, UserOrDummy player, IGameMap gameMapDTO,
                                 int[] dices, boolean rolledDiceAlready, boolean autoRollState) {
         this.lobby = lobby;
         this.player = player;
-        this.configuration = configuration;
         this.gameMapDTO = gameMapDTO;
         this.dices = dices;
         this.rolledDiceAlready = rolledDiceAlready;
@@ -53,15 +50,6 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public boolean areDiceRolledAlready() {
         return rolledDiceAlready;
-    }
-
-    /**
-     * Gets the status of the game
-     *
-     * @return The configuration of the game map
-     */
-    public IConfiguration getConfiguration() {
-        return configuration;
     }
 
     /**

@@ -5,7 +5,7 @@ import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.map.management.GameMapManagement;
 import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -32,7 +32,7 @@ class GameTest {
     void gameManagementTest() {
         IGameManagement gm = new GameManagement(new LobbyManagement());
         User user = new UserDTO(99, "", "", "");
-        Lobby lobby = new LobbyDTO(defaultLobbyName, user, false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO(defaultLobbyName, user);
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         gm.createGame(lobby, user, gameMap);
@@ -50,7 +50,7 @@ class GameTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO(defaultLobbyName, user[0], false, 4, false, 60, true, true);
+        Lobby lobby = new LobbyDTO(defaultLobbyName, user[0]);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();

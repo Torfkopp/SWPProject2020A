@@ -1,7 +1,6 @@
 package de.uol.swp.common.lobby;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.user.UserDTO
  * @see de.uol.swp.common.lobby.Lobby
- * @see de.uol.swp.common.lobby.dto.LobbyDTO
+ * @see LobbyDTO
  * @since 2019-10-08
  */
 class LobbyDTOTest {
@@ -27,7 +26,7 @@ class LobbyDTOTest {
     private static final User defaultUser = new UserDTO(98, "marco", "marco", "marco@grawunder.de");
     private static final User notInLobbyUser = new UserDTO(99, "no", "marco", "no@grawunder.de");
     private static final LobbyName defaultLobbyName = new LobbyName("TestLobby");
-    private static final Lobby defaultLobby = new LobbyDTO(defaultLobbyName, defaultUser, false, 4, false, 60, false, false);
+    private static final Lobby defaultLobby = new LobbyDTO(defaultLobbyName, defaultUser);
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
@@ -49,7 +48,7 @@ class LobbyDTOTest {
      */
     @Test
     void assureNonEmptyLobbyTest() {
-        Lobby lobby = new LobbyDTO(defaultLobbyName, defaultUser, false, 4, false, 60, false, false);
+        Lobby lobby = new LobbyDTO(defaultLobbyName, defaultUser);
 
         assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
     }
@@ -63,7 +62,7 @@ class LobbyDTOTest {
      */
     @Test
     void createLobbyTest() {
-        Lobby lobby = new LobbyDTO(defaultLobbyName, defaultUser, false, 4, false, 60, false, false);
+        Lobby lobby = new LobbyDTO(defaultLobbyName, defaultUser);
 
         assertEquals("test", lobby.getName());
         assertEquals(1, lobby.getUserOrDummies().size());

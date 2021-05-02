@@ -4,8 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.lobby.Lobby;
@@ -21,8 +21,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -1,7 +1,6 @@
 package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;

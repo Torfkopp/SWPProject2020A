@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.map.management;
 
 import com.google.common.graph.*;
-import de.uol.swp.common.game.map.Hexes.*;
+import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.Configuration;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
