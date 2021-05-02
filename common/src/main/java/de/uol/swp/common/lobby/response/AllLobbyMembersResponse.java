@@ -1,6 +1,8 @@
 package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -22,6 +24,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
     private final List<UserOrDummy> users = new ArrayList<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private final UserOrDummy owner;
+    private final ReadySystemMessageDTO ownerNotice;
 
     /**
      * Constructor
@@ -37,11 +40,12 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      * @param users      Collection of all lobby members
      * @param owner      Owner of the lobby
      * @param readyUsers Set of all ready lobby members
+     * @param maxPlayers Maximum number of players that will play in the Lobby
      *
      * @since 2021-01-19
      */
     public AllLobbyMembersResponse(LobbyName lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
-                                   Set<UserOrDummy> readyUsers) {
+                                   Set<UserOrDummy> readyUsers, int maxPlayers) {
         super(lobbyName);
         for (UserOrDummy user : users) {
             if (user instanceof User) this.users.add(UserDTO.createWithoutPassword((User) user));
@@ -53,6 +57,13 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
             if (user instanceof User) this.readyUsers.add(UserDTO.createWithoutPassword((User) user));
             else this.readyUsers.add(user);
         }
+        boolean areEqualSize = this.readyUsers.size() == this.users.size();
+        boolean ownerReady = this.readyUsers.contains(this.owner);
+        if (ownerReady && areEqualSize && this.users.size() == maxPlayers) {
+            this.ownerNotice = new ReadySystemMessageDTO(new I18nWrapper("lobby.ready.everyone"));
+        } else if (!ownerReady && this.readyUsers.size() == maxPlayers - 1) {
+            this.ownerNotice = new ReadySystemMessageDTO((new I18nWrapper("lobby.ready.everyoneelse")));
+        } else this.ownerNotice = null;
     }
 
     /**
@@ -64,6 +75,23 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      */
     public UserOrDummy getOwner() {
         return owner;
+    }
+
+    /**
+     * Gets the owner notice message
+     * <p>
+     * The owner notice message is a SystemMessage notifying the owner
+     * that either all or all users except the owner are ready and that
+     * the owner should use the Start Session button to start the game.
+     *
+     * @return null if not enough users are ready, SystemMessage if all or
+     * all users except the owner are marked as ready
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-26
+     */
+    public ReadySystemMessageDTO getOwnerNotice() {
+        return ownerNotice;
     }
 
     /**

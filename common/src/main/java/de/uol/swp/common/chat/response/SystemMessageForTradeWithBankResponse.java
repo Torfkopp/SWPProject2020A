@@ -4,6 +4,7 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -16,7 +17,7 @@ import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
  */
 public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse {
 
-    private final SystemMessageDTO msg;
+    private final SystemMessage msg;
 
     /**
      * Constructor
@@ -25,9 +26,8 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
      */
     public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCardType developmentCard) {
         super(lobbyName);
-        this.msg = null;
-        //this.msg = new SystemMessageDTO(
-        //        new I18nWrapper("lobby.trade.withbank.systemresponse", new I18nWrapper(developmentCard)));
+        this.msg = new InGameSystemMessageDTO(
+                new I18nWrapper("lobby.trade.withbank.systemresponse", new I18nWrapper(developmentCard)));
     }
 
     /**

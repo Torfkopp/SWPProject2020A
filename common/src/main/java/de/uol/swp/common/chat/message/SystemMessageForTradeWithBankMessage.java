@@ -3,7 +3,7 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -30,9 +30,10 @@ public class SystemMessageForTradeWithBankMessage extends AbstractLobbyMessage {
     /**
      * Gets the SystemMessage object.
      *
-     * @return The encapsulated SystemMessage
+     * @return The encapsulated InGameSystemMessage
      */
     public SystemMessage getMsg() {
-        return new SystemMessageDTO(new I18nWrapper("lobby.trade.withbank.systemmessage", getUser().getUsername()));
+        return new InGameSystemMessageDTO(
+                new I18nWrapper("lobby.trade.withbank.systemmessage", getUser().getUsername()));
     }
 }

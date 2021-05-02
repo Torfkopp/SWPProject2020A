@@ -2,6 +2,7 @@ package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.MapPoint;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**

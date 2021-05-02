@@ -5,7 +5,8 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
       minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="600.0" spacing="25.0"
-      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.lobby.RobberTaxPresenter">
+      xmlns="http://javafx.com/javafx/11.0.1" fx:id="taxView"
+      fx:controller="de.uol.swp.client.lobby.RobberTaxPresenter">
 
     <Label alignment="CENTER" text="%game.robber.tax.header"/>
     <HBox alignment="CENTER" prefHeight="254.0" prefWidth="529.0" spacing="40.0">

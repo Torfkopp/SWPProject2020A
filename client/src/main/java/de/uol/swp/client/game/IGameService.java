@@ -4,6 +4,8 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -27,6 +29,16 @@ public interface IGameService {
      * @since 2021-04-08
      */
     void buildRequest(LobbyName lobbyName, MapPoint mapPoint);
+
+    /**
+     * Posts a request to change the autoRoll-Status of a player
+     *
+     * @param lobbyName The name of the lobby where the auto roll status is changed
+     *
+     * @author Maximillian Lindner
+     * @since 2021-04-26
+     */
+    void changeAutoRollState(String lobbyName, boolean autoRollEnabled);
 
     /**
      * Posts a request to end the turn onto the Event

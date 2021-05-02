@@ -2,6 +2,7 @@ package de.uol.swp.client;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
@@ -42,6 +43,9 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected static Logger LOG;
 
+    @Inject
+    @Named("styleSheet")
+    private static String styleSheet;
     @Inject
     protected IChatService chatService;
 
@@ -303,6 +307,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                             ButtonBar.ButtonData.OK_DONE);
                         alert.getButtonTypes().setAll(confirm);
+                        alert.getDialogPane().getStylesheets().add(styleSheet);
                         alert.showAndWait();
                     });
                 }

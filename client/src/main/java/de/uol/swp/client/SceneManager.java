@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
 import de.uol.swp.client.ChangeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.ChangeAccountDetails.event.ChangeAccountDetailsErrorEvent;
@@ -61,12 +62,14 @@ import java.util.*;
 public class SceneManager {
 
     private static final Logger LOG = LogManager.getLogger(SceneManager.class);
-    private static final String styleSheet = "css/swp.css";
 
     @Inject
     private static Injector injector;
     @Inject
     private static ResourceBundle resourceBundle;
+    @Inject
+    @Named("styleSheet")
+    private static String styleSheet;
 
     private final Stage primaryStage;
     private final Map<LobbyName, Stage> tradingStages = new HashMap<>();
@@ -163,6 +166,7 @@ public class SceneManager {
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }
@@ -201,6 +205,7 @@ public class SceneManager {
             ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
             alert.getButtonTypes().setAll(confirm, cancel);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == confirm) {
                 eventBus.post(new NukeUsersSessionsRequest(user));
@@ -221,6 +226,7 @@ public class SceneManager {
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
             showLoginScreen();
         });
@@ -282,6 +288,28 @@ public class SceneManager {
     }
 
     /**
+     * Shows a server error message inside an error alert
+     * <p>
+     * This method can check for certain Throwables by taking the thrown
+     * Throwable as an argument.
+     *
+     * @param e     The Throwable that was thrown
+     * @param cause The cause of the Throwable being thrown
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-04-26
+     */
+    public void showServerError(Throwable e, String cause) {
+        if (e instanceof IOException) {
+            //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
+            userService.logout(userService.getLoggedInUser());
+            showLoginScreen();
+            cause = resourceBundle.getString("error.server.disrupted");
+        }
+        showServerError(cause);
+    }
+
+    /**
      * Method used to display a custom error for the
      * connection timeout.
      *
@@ -295,6 +323,7 @@ public class SceneManager {
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }

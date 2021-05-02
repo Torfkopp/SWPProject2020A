@@ -1,0 +1,90 @@
+/*
+ * Import color palette and font
+ */
+@import url("palette.css");
+
+@font-face {
+    src: url("../fonts/Roboto.ttf");
+}
+
+/*
+ * Style defaults
+ */
+.root {
+    -fx-base: -eerieBlackLight;
+    -fx-background: -eerieBlack;
+    -fx-accent: -green;
+    -fx-focus-color: -fx-accent;
+    -fx-faint-focus-color: transparent;
+    -fx-dark-text-color: -black;
+    -fx-mid-text-color: -gray;
+    -fx-light-text-color: -white;
+    -fx-text-background-color: ladder(
+            -fx-background,
+            -fx-light-text-color 49%,
+            -fx-dark-text-color  50%
+    );
+    -fx-default-button: -fx-accent;
+    -fx-font-family: 'Roboto';
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-accent;
+}
+
+.button:default {
+    -fx-border-color: -eerieBlackLightest;
+}
+
+.button:cancel {
+    -fx-base: -red;
+    -fx-border-color: -eerieBlackLightest;
+    -fx-text-fill: -white;
+}
+
+.text-field {
+    -fx-background-color: -eerieBlackLight;
+    -fx-background-radius: 0;
+    -fx-text-fill: -white;
+}
+
+.text-field:focused {
+    -fx-background-color: -eerieBlackLighter;
+    -fx-highlight-fill: -fx-accent;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 0;
+}
+
+.menu-bar {
+    -fx-background-color: -eerieBlackLight;
+}
+
+.menu-button > .label {
+    -fx-text-fill: -white;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -black;
+}
+
+/*
+ * Style non game related objects explicitly
+ */
+#changeAccountView,
+#loginView,
+#mainMenuView,
+#registrationView {
+    -fx-accent: -indigo;
+}
+
+/*
+ * Style dev menu objects explicitly
+ */
+#devMenuView {
+    -fx-accent: -red;
+}

@@ -11,10 +11,12 @@ import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
-import de.uol.swp.common.game.map.*;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Hexes.IHarborHex.HarborResource;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -112,7 +114,7 @@ public class GameService extends AbstractService {
      *
      * @param game        The game in which the player might have won
      * @param originLobby The lobby in which the game is taking place
-     * @param user        The use who might have won
+     * @param user        The user who might have won
      *
      * @author Phillip-André Suhr
      * @author Steven Luong
@@ -124,7 +126,6 @@ public class GameService extends AbstractService {
         if (vicPoints >= 10) {
             ServerMessage message = new PlayerWonGameMessage(originLobby, user);
             lobbyService.sendToAllInLobby(originLobby, message);
-            gameManagement.dropGame(originLobby);
             game.setBuildingAllowed(false);
         }
     }
@@ -374,6 +375,25 @@ public class GameService extends AbstractService {
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
         }
+    }
+
+    /**
+     * Handles a ChangeAutoRollStateRequest found on the EventBus
+     * <p>
+     * If a ChangeAutoRollStateRequest is found on the EventBus,
+     * the requesting Users autoRoll status gets changed in the game
+     * according to the value in the request.
+     *
+     * @param req The ChangeAutoRollStateRequest found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @since 2021-04-26
+     */
+    @Subscribe
+    private void onChangeAutoRollStateRequest(ChangeAutoRollStateRequest req) {
+        LOG.debug("Received a ChangeAutoRollStateRequest");
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setAutoRollEnabled(req.getUser(), req.isAutoRollEnabled());
     }
 
     /**
@@ -911,6 +931,31 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a ReturnToPreGameLobbyMessage found on the EventBus
+     * <p>
+     * If a ReturnToPreGameLobbyMessage is found on the EventBus this method drops the
+     * game associated with the Lobby, if one existed.
+     *
+     * @param msg The ReturnToPreGameLobbyMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @since 2021-04-30
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        Game game = gameManagement.getGame(msg.getName());
+        if (game == null) return;
+        try {
+            gameManagement.dropGame(msg.getName());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            LOG.debug("Sending ExceptionMessage");
+            post(exceptionMessage);
+        }
+    }
+
+    /**
      * Handles a RobberChosenVictimRequest found on the EventBus.
      * If a RobberChosenVictimRequest is detected on the EventBus, this method is called.
      * It then decreases the resources in the player's inventory
@@ -987,6 +1032,8 @@ public class GameService extends AbstractService {
 
         Game game = gameManagement.getGame(req.getLobby());
         game.removeTaxPayer(req.getPlayer());
+        if (game.getTaxPayers().isEmpty()) lobbyService
+                .sendToAllInLobby(req.getLobby(), new RobberAllTaxPayedMessage(req.getLobby(), game.getActivePlayer()));
         endTurnDummy(game);
     }
 
@@ -1025,30 +1072,12 @@ public class GameService extends AbstractService {
                         int i = inv.getResourceAmount() / 2;
                         LOG.debug("{} has to give up {} of their {} cards", p, i, inv.getResourceAmount());
                         while (i > 0) {
-                            if (inv.get(BRICK) > 0) {
-                                inv.increase(BRICK, -1);
+                            for (ResourceType resourceType : ResourceType.values()){
+                            if (inv.get(resourceType) > 0) {
+                                inv.increase(resourceType, -1);
                                 i--;
                                 if (i == 0) break;
                             }
-                            if (inv.get(ResourceType.GRAIN) > 0) {
-                                inv.increase(ResourceType.GRAIN, -1);
-                                i--;
-                                if (i == 0) break;
-                            }
-                            if (inv.get(ResourceType.LUMBER) > 0) {
-                                inv.increase(ResourceType.LUMBER, -1);
-                                i--;
-                                if (i == 0) break;
-                            }
-                            if (inv.get(ORE) > 0) {
-                                inv.increase(ORE, -1);
-                                i--;
-                                if (i == 0) break;
-                            }
-                            if (inv.get(WOOL) > 0) {
-                                inv.increase(WOOL, -1);
-                                i--;
-                                if (i == 0) break;
                             }
                         }
                     } else {
@@ -1227,12 +1256,14 @@ public class GameService extends AbstractService {
     private void onTransferLobbyStateEvent(TransferLobbyStateEvent event) {
         Lobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
-        ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
-                                                                 lobby.getConfiguration(),
-                                                                 game.getMap().getGameMapDTO(), game.getDices(),
-                                                                 game.isDiceRolledAlready());
+        Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
+            ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
+                                                                     lobby.getConfiguration(),
+                                                                     game.getMap().getGameMapDTO(playerUserOrDummyMap),
+                                                                     game.getDices(), game.isDiceRolledAlready(),
+                                                                     game.getAutoRollEnabled(event.getUser()));
             returnMessage.setMessageContext(ctx.get());
             LOG.debug("Sending StartSessionResponse");
             post(returnMessage);
@@ -1254,9 +1285,10 @@ public class GameService extends AbstractService {
     private void onUpdateGameMapRequest(UpdateGameMapRequest req) {
         LOG.debug("Received UpdateGameMapRequest");
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (game == null) return;
+        Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         LOG.debug("Sending UpdateGameMapResponse");
-        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(), game.getMap().getGameMapDTO());
+        UpdateGameMapResponse rsp = new UpdateGameMapResponse(req.getOriginLobby(),
+                                                              game.getMap().getGameMapDTO(playerUserOrDummyMap));
         rsp.initWithMessage(req);
         post(rsp);
     }

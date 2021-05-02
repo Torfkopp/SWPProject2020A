@@ -3,7 +3,7 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.User;
 
@@ -28,7 +28,7 @@ public class SystemMessageForPlayingCardsMessage extends AbstractLobbyMessage {
      */
     public SystemMessageForPlayingCardsMessage(LobbyName lobbyName, User user, I18nWrapper playingCard) {
         super(lobbyName, user);
-        this.msg = new SystemMessageDTO(new I18nWrapper("lobby.play.card.systemmessage", user, playingCard));
+        this.msg = new InGameSystemMessageDTO(new I18nWrapper("lobby.play.card.systemmessage", user, playingCard));
     }
 
     /**

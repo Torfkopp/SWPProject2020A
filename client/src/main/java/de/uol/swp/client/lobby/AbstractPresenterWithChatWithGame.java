@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
@@ -9,8 +10,11 @@ import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.map.IGameMap;
 import de.uol.swp.common.game.map.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -32,6 +36,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -39,7 +44,7 @@ import javafx.stage.Window;
 
 import java.util.*;
 
-import static de.uol.swp.common.game.map.MapPoint.Type.*;
+import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 
 /**
  * This class is the base for creating a new Presenter that uses the game.
@@ -55,6 +60,13 @@ import static de.uol.swp.common.game.map.MapPoint.Type.*;
  */
 @SuppressWarnings({"UnstableApiUsage", "rawtypes"})
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
+
+    @Inject
+    @Named("theme")
+    private static String theme;
+    @Inject
+    @Named("styleSheet")
+    private static String styleSheet;
 
     @FXML
     protected Button endTurn;
@@ -101,6 +113,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean tradingCurrentlyAllowed;
     protected int moveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
@@ -208,6 +221,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             turnIndicator.getChildren().clear();
             Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
             preUsernameText.setFont(Font.font(20.0));
+            if (theme.equals("dark")) preUsernameText.setFill(Color.web("#F3F5F3"));
 
             String name = user.getUsername();
             if (name.length() > 15) name = name.substring(0, 15) + "...";
@@ -231,6 +245,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             }
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
+            if (theme.equals("dark")) postUsernameText.setFill(Color.web("#F3F5F3"));
             turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
         });
     }
@@ -248,6 +263,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(true);
         playCard.setDisable(true);
         buildingCurrentlyAllowed = false;
+        tradingCurrentlyAllowed = false;
     }
 
     /**
@@ -270,7 +286,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Handles the click on the autoRollCheckBox
      * <p>
      * Method called when the autoRollCheckBox is clicked.
-     * It enables and disables autoRoll.
+     * It enables and disables autoRoll and posts a request
+     * to save the status on the server.
      *
      * @author Mario Fokken
      * @since 2021-04-15
@@ -278,6 +295,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onAutoRollCheckBoxClicked() {
         autoRollEnabled = autoRoll.isSelected();
+        gameService.changeAutoRollState(lobbyName, autoRoll.isSelected());
     }
 
     /**
@@ -359,11 +377,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null)
-                Platform.runLater(() -> chatMessages.add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+            if (finalAttr != null) Platform.runLater(
+                    () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
-                    .add(new SystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
+                    .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
         }
     }
 
@@ -484,6 +502,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                               ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
+        alert.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<ButtonType> result = alert.showAndWait();
         //Create Strings based on the languages name for the resources
@@ -541,6 +560,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             alert.getButtonTypes().setAll(confirm);
             if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
                 alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
     }
@@ -561,34 +581,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
         playedCard = true;
-    }
-
-    /**
-     * Handles the PlayerWonGameMessage
-     * <p>
-     * If the Message belongs to this Lobby, the GameMap gets cleared and a Text
-     * with the Player that won is shown. For the owner of the Lobby appears a
-     * ReturnToPreGameLobbyButton that resets the Lobby to its Pre-Game state.
-     *
-     * @param msg The PlayerWonGameMessage found on the EventBus
-     *
-     * @author Steven Luong
-     * @author Finn Haase
-     * @see de.uol.swp.common.game.message.PlayerWonGameMessage
-     * @since 2021-03-22
-     */
-    @Subscribe
-    private void onPlayerWonGameMessage(PlayerWonGameMessage msg) {
-        if (!lobbyName.equals(msg.getLobbyName())) return;
-        gameMap = null;
-        gameWon = true;
-        winner = msg.getUser();
-        if (Objects.equals(owner, userService.getLoggedInUser())) {
-            returnToLobby.setVisible(true);
-            returnToLobby.setPrefHeight(30);
-            returnToLobby.setPrefWidth(250);
-        }
-        fitCanvasToSize();
     }
 
     /**
@@ -648,6 +640,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a RobberAllTaxPayedMessage
+     *
+     * @param msg The RobberAllTaxPayedMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-04-23
+     */
+    @Subscribe
+    private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
+        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+    }
+
+    /**
      * Handles a RobberChooseVictimResponse
      *
      * @param rsp The RobberChooseVictimResponse found on the EventBus
@@ -674,6 +679,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                                    ButtonBar.ButtonData.CANCEL_CLOSE);
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+                dialogue.getDialogPane().getStylesheets().add(styleSheet);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
                 rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
             });
@@ -727,11 +733,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberTaxMessage(RobberTaxMessage msg) {
         LOG.debug("Received RobberTaxMessage");
-        if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
-            LOG.debug("Sending ShowRobberTaxViewEvent");
-            User user = userService.getLoggedInUser();
-            eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                     msg.getInventory().get(user)));
+        if (msg.getLobbyName().equals(lobbyName)) {
+            disableButtonStates();
+            if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
+                LOG.debug("Sending ShowRobberTaxViewEvent");
+                User user = userService.getLoggedInUser();
+                eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                         msg.getInventory().get(user)));
+            }
         }
     }
 
@@ -889,7 +898,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onUpdateInventoryResponse(UpdateInventoryResponse rsp) {
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
-        rsp.getResourceList().forEach((x)-> System.out.println(x.getType() + " : " + x.getAmount()));
         Platform.runLater(() -> {
             resourceTableView.getItems().clear();
             rsp.getResourceList().forEach((resource)-> resourceTableView.getItems().add(resource));
@@ -921,6 +929,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.setDialogPane(pane);
         dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
@@ -973,6 +982,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         grid.add(c2, 1, 1);
         //Put the grid into the dialogue and let it appear
         dialogue.getDialogPane().setContent(grid);
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Get the pressed button
         Optional<String> rst = dialogue.showAndWait();
         Optional<String> button1 = Optional.of(confirm.toString());
@@ -1067,5 +1077,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
