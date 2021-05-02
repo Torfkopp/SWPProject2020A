@@ -13,10 +13,6 @@ import de.uol.swp.common.user.User;
  */
 public class StartSessionRequest extends AbstractLobbyRequest {
 
-    public int getMoveTime() {
-        return moveTime;
-    }
-
     private final int moveTime;
 
     /**
@@ -28,5 +24,17 @@ public class StartSessionRequest extends AbstractLobbyRequest {
     public StartSessionRequest(String name, User user, int moveTime) {
         super(name, user);
         this.moveTime = moveTime;
+    }
+
+    /**
+     * Gets the moveTime for the game.
+     *
+     * @return moveTime
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-02
+     */
+    public int getMoveTime() {
+        return moveTime;
     }
 }

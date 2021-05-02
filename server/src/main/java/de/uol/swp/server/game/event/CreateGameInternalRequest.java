@@ -18,18 +18,14 @@ public class CreateGameInternalRequest extends AbstractServerInternalMessage {
 
     private final Lobby lobby;
     private final UserOrDummy first;
-
-    public int getMoveTime() {
-        return moveTime;
-    }
-
     private final int moveTime;
 
     /**
      * Constructor
      *
-     * @param lobby The Lobby in which a game should be started
-     * @param first The User who started the game
+     * @param lobby    The Lobby in which a game should be started
+     * @param first    The User who started the game
+     * @param moveTime The moveTime for the Game
      */
     public CreateGameInternalRequest(Lobby lobby, UserOrDummy first, int moveTime) {
         super();
@@ -54,5 +50,17 @@ public class CreateGameInternalRequest extends AbstractServerInternalMessage {
      */
     public Lobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets the moveTime for the game
+     *
+     * @return moveTime
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-02
+     */
+    public int getMoveTime() {
+        return moveTime;
     }
 }

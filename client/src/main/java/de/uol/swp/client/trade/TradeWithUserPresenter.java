@@ -111,12 +111,14 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeWithUserCancelResponse to close the responding
      * trading window if existent.
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
         tradeService.closeUserTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, respondingUser);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -129,7 +131,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @FXML
     private void onCancelTradeButtonPressed() {
         closeWindow();
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -231,7 +232,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         closeWindow();
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

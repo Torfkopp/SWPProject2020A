@@ -11,7 +11,6 @@ import de.uol.swp.common.game.response.StartSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
-import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -23,11 +22,7 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 import java.util.Set;
-
-import java.util.*;
-
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 
 /**
@@ -377,6 +372,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             playCard.setVisible(false);
             timerLabel.setVisible(false);
             cardAmountTripleList.clear();
+            moveTimeTimer.cancel();
+            moveTimerLabel.setVisible(false);
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
         });

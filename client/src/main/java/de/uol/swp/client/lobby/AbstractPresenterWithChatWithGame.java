@@ -72,7 +72,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected Timer moveTimerTimer;
+    protected Timer moveTimeTimer;
     @FXML
     protected TableView<Map<String, Object>> developmentCardTableView;
     @FXML
@@ -119,7 +119,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean tradingCurrentlyAllowed;
     protected boolean paused;
     protected int moveTime;
-    protected int restMoveTime;
+    protected int remainingMoveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
@@ -148,20 +148,48 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         prepareUniqueCardView();
     }
 
+    /**
+     * Handles a PauseTimerMessage
+     * <p>
+     * If a new PauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on true.
+     *
+     * @param msg The PauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05.02
+     */
     @Subscribe
-    public void onPauseTimerResponse(PauseTimerMessage msg) {
+    public void onPauseTimerMessage(PauseTimerMessage msg) {
+        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
         paused = true;
     }
 
+    /**
+     * Handles a UnpauseTimerMessage
+     * <p>
+     * If a new UnpauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on false.
+     *
+     * @param msg The UnpauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05.02
+     */
     @Subscribe
     public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
-        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getLobbyName());
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
         paused = false;
     }
 
     /**
      * Helper method to set the timer for the players round.
      * The user gets forced to end his turn, if the timer gets null.
+     * If paused is true, the timer is paused.
      *
      * @param moveTime
      *
@@ -169,18 +197,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-05-01
      */
     public void setMoveTimer(int moveTime) {
-        moveTimerTimer = new Timer();
+        moveTimeTimer = new Timer();
         AtomicInteger zugZeit = new AtomicInteger(moveTime);
-        moveTimerTimer.scheduleAtFixedRate(new TimerTask() {
+        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (!paused) {
-                    Platform.runLater(
-                            () -> moveTimerLabel.setText(String.format("Move Time: " + zugZeit.getAndDecrement())));
+                    Platform.runLater(() -> moveTimerLabel.setText(String.format(
+                            resourceBundle.getString("game.labels.movetime") + zugZeit.getAndDecrement())));
                     if (zugZeit.get() == 0) {
                         gameService.rollDice(lobbyName);
                         gameService.endTurn(lobbyName);
                     }
-                } else {restMoveTime = zugZeit.get();}
+                } else {remainingMoveTime = zugZeit.get();}
             }
         }, 0, 1000);
     }
@@ -505,6 +533,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If a new NextPlayerMessage object is posted onto the EventBus,
      * this method is called.
      * It changes the text of a textField to state whose turn it is.
+     * It also sets the timer back to the moveTime
      *
      * @param msg The NextPlayerMessage object seen on the EventBus
      */
@@ -516,7 +545,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
-        moveTimerTimer.cancel();
+        moveTimeTimer.cancel();
         setMoveTimer(moveTime);
     }
 
@@ -808,6 +837,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Handles a TradeOfUsersAcceptedResponse found on the EventBus
      * Updates the Inventories of the trading User.
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeOfUsersAcceptedResponse found on the EventBus
      *
@@ -828,6 +858,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Method called when the TradeWithBankButton is pressed. It calls on
      * the TradeService to show the Trade with Bank window and request the
      * Bank's inventory.
+     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner
@@ -847,6 +878,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If another player of the lobby-member-list is selected and the button gets pressed,
      * this button gets disabled, this method calls on the TradeService to show the Trade
      * with User window and request the inventory overview for the selected user.
+     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -873,6 +905,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * If a TradeWithUserCancelResponse is posted onto the EventBus the
      * the possible options for the active player are re-enabled.
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *

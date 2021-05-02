@@ -25,11 +25,6 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final int[] dices;
     private final boolean rolledDiceAlready;
     private final boolean autoRollState;
-
-    public int getMoveTime() {
-        return moveTime;
-    }
-
     private final int moveTime;
 
     /**
@@ -96,6 +91,15 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public Lobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets the moveTime for the game
+     *
+     * @return moveTime
+     */
+    public int getMoveTime() {
+        return moveTime;
     }
 
     /**

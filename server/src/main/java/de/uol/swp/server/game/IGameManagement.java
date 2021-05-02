@@ -19,9 +19,10 @@ public interface IGameManagement {
     /**
      * Creates a new game and adds it to the list
      *
-     * @param lobby   The game's lobby
-     * @param first   The User or Dummy who will be first
-     * @param gameMap The IGameMap the game will use
+     * @param lobby    The game's lobby
+     * @param first    The User or Dummy who will be first
+     * @param gameMap  The IGameMap the game will use
+     * @param moveTime The moveTime for the game
      *
      * @throws java.lang.IllegalArgumentException Lobby already has a game
      * @implNote The primary key of games is the lobby's name, therefore
