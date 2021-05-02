@@ -227,6 +227,8 @@ public interface IGameMapManagement {
      */
     IConfiguration getRandomisedConfiguration();
 
+    Set<MapPoint> getResourceHexesFromIntersection(MapPoint position);
+
     /**
      * Gets the robber's position
      *

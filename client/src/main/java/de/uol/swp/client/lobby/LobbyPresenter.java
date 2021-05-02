@@ -188,6 +188,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         commandsActivated.setSelected(event.getLobby().commandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().randomPlayfieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().startUpPhaseEnabled());
+        startUpPhaseEnabled = event.getLobby().startUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
@@ -256,7 +257,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         }
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
         startUpPhaseEnabled = msg.getLobby().startUpPhaseEnabled();
-        System.out.println("startupphase is " + startUpPhaseEnabled);
         randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
         commandsActivated.setSelected(msg.getLobby().commandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));

@@ -358,14 +358,21 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());
         }
-        if (startUpPhaseEnabled) {
+        if (startUpPhaseEnabled && userService.getLoggedInUser().equals(msg.getUser())) {
             if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.NONE_BUILT)) {
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT;
                 LOG.debug("--- First founding Settlement successfully built");
-                Platform.runLater(() -> notice.setText(resourceBundle.getString("game.setupphase.building.firstroad")));
+                Platform.runLater(() -> {
+                    notice.setVisible(true);
+                    notice.setText(resourceBundle.getString("game.setupphase.building.firstroad"));
+                });
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT)) {
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT;
+                endTurn.setDisable(false);
                 LOG.debug("--- First founding road successfully built");
+                // TODO: add a "end first round of startupphase" text to resourcebundle, because players _will_ be
+                //  confused by seeing "build second settlement" when they a) can't and b) aren't supposed to
+                //  and have the nextplayermessage display secondsettlement if it is the player's founding turn again
                 Platform.runLater(
                         () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondsettlement")));
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT)) {
@@ -374,12 +381,15 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 Platform.runLater(
                         () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondroad")));
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT)) {
-                // startup phase over
+                // startup phase over because player must have just built the second founding road
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.ALL_BUILT;
                 startUpPhaseEnabled = false;
-                //fixme disable endturn enable rolldice
+                endTurn.setDisable(false);
                 LOG.debug("--- Second founding road successfully built");
-                Platform.runLater(() -> notice.setText(""));
+                Platform.runLater(() -> {
+                    notice.setText("");
+                    endTurn.setText(resourceBundle.getString("game.setupphase.ended"));
+                });
             }
         }
         gameService.updateGameMap(lobbyName);
@@ -499,6 +509,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
+        if (!startUpPhaseEnabled) {
+            // needed to reverse the labeling done in onBuildingSuccessfulMessage
+            String endTurnText = resourceBundle.getString("lobby.game.buttons.endturn");
+            if (!endTurn.getText().equals(endTurnText)) Platform.runLater(() -> endTurn.setText(endTurnText));
+        }
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }

@@ -320,6 +320,28 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public Set<MapPoint> getResourceHexesFromIntersection(MapPoint position) {
+        Set<MapPoint> returnSet = new HashSet<>();
+        Set<IEdge> iEdges = incidentEdges(getIntersection(position));
+        for (IEdge edge : iEdges) {
+            EndpointPair<GameHexWrapper> gameHexWrappers = hexEdgeNetwork.incidentNodes(edge);
+            IGameHex iGameHex = gameHexWrappers.nodeU().get();
+            IGameHex iGameHex1 = gameHexWrappers.nodeV().get();
+            for (int i = 0; i < hexMap.length; i++) {
+                for (int j = 0; j < hexMap[i].length; j++) {
+                    IGameHex gameHex = hexMap[i][j].get();
+                    if (gameHex.getType() != IGameHex.HexType.RESOURCE) continue;
+                    if (gameHex.equals(iGameHex) || gameHex.equals(iGameHex1)) {
+                        MapPoint hexPoint = HexMapPoint(i, j);
+                        if (!hexPointContainedInSet(returnSet, hexPoint)) returnSet.add(hexPoint);
+                    }
+                }
+            }
+        }
+        return returnSet;
+    }
+
+    @Override
     public MapPoint getRobberPosition() {
         return robberPosition;
     }
@@ -766,5 +788,24 @@ public class GameMapManagement implements IGameMapManagement {
                 temp.add(playerUserMapping.get(player));
         }
         return temp;
+    }
+
+    /**
+     * Helper method to check whether a given MapPoint is contained in a given Set
+     *
+     * @param set   The set to check
+     * @param point The MapPoint to look for
+     *
+     * @return true if the MapPoint is represented in the set, false otherwise
+     *
+     * @author Phillip-André Suhr
+     * @since 2021-05-02
+     */
+    private boolean hexPointContainedInSet(Set<MapPoint> set, MapPoint point) {
+        boolean contained = false;
+        for (MapPoint setPoint : set) {
+            if (setPoint.getX() == point.getX() && setPoint.getY() == point.getY()) contained = true;
+        }
+        return contained;
     }
 }

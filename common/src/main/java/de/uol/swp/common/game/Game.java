@@ -58,6 +58,7 @@ public class Game {
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
+                // TODO: add users to startUpPlayerOrder in the order they will take turns in
                 startUpPlayerOrder.addLast(userOrDummy);
                 playersStartUpBuiltMap.put(userOrDummy, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(userOrDummy, counterPlayer, new Inventory());

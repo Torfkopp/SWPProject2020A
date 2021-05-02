@@ -5,6 +5,7 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
@@ -417,14 +418,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
-            System.out.println("started. sup is... ");
             if (startUpPhaseEnabled) {
-                System.err.println("ENABLED");
+                notice.setVisible(true);
                 notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
             }
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
-            endTurn.setDisable(!startUpPhaseEnabled || !userService.getLoggedInUser().equals(msg.getUser()));
+            endTurn.setDisable(true);
             autoRoll.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
@@ -474,8 +474,26 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
-            startUpPhaseEnabled = rsp.getLobby().isStartUpPhaseEnabled();
-            // fixme unbedingt übermitteln, was der Spieler noch bauen muss (oder nicht)
+            startUpPhaseBuiltStructures = rsp.getBuiltStructures();
+            // because startUpPhaseEnabled tracks whether it's _ongoing_, we check if player built everything
+            startUpPhaseEnabled = startUpPhaseBuiltStructures != StartUpPhaseBuiltStructures.ALL_BUILT;
+            if (startUpPhaseEnabled) {
+                switch (startUpPhaseBuiltStructures) {
+                    case NONE_BUILT:
+                        notice.setVisible(true);
+                        notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+                        break;
+                    case FIRST_SETTLEMENT_BUILT:
+                        notice.setText(resourceBundle.getString("game.setupphase.building.firstroad"));
+                        break;
+                    case FIRST_BOTH_BUILT:
+                        notice.setText(resourceBundle.getString("game.setupphase.building.secondsettlement"));
+                        break;
+                    case SECOND_SETTLEMENT_BUILT:
+                        notice.setText(resourceBundle.getString("game.setupphase.building.secondroad"));
+                        break;
+                }
+            }
             autoRollEnabled = rsp.isAutoRollState();
             autoRoll.setSelected(autoRollEnabled);
             int[] dices = rsp.getDices();
@@ -590,25 +608,4 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
-
-
-    /*
-    protected void prepareSetUpPhase() {
-        //Create new alert
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Auswürfeln des beginnenden Spielers");
-        alert.setHeaderText("Würfeln!");
-        alert.setContentText("Der beginnende Spieler muss ausgewürfelt werden!");
-
-
-        ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                              ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(btnCancel);
-
-        alert.getDialogPane().getStylesheets().add(styleSheet);
-
-        alert.showAndWait();
-    }
-
-     */
 }
