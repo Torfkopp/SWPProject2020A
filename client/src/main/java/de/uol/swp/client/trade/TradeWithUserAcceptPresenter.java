@@ -5,7 +5,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.*;
+import de.uol.swp.common.game.resourceThingies.resource.IResource;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -164,7 +165,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         respondingResourceMap = rsp.getDemandedResources();
         offeringResourceMap = rsp.getOfferedResources();
         for (IResource resource : rsp.getResourceList())
-        ownResourceTableView.getItems().add(resource);
+            ownResourceTableView.getItems().add(resource);
         setOfferLabel();
         Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
@@ -202,8 +203,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             int amount = entry.getAmount();
             if (amount > 0) {
                 nothing = false;
-                content.append(entry.getAmount()).append(" ").append(entry.getType())
-                       .append(", ");
+                content.append(entry.getAmount()).append(" ").append(entry.getType()).append(", ");
             }
         }
         if (nothing) content.append(resourceBundle.getString("game.trade.offer.nothing"));

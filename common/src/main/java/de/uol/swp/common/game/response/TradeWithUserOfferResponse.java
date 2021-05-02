@@ -31,9 +31,9 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
      * @param demandedResources The demanded resources
      * @param lobbyName         The name of the lobby
      */
-    public TradeWithUserOfferResponse(UserOrDummy offeringUser,
-                                      ResourceList resourceList, ResourceList offeredResources,
-                                      ResourceList demandedResources, LobbyName lobbyName) {
+    public TradeWithUserOfferResponse(UserOrDummy offeringUser, ResourceList resourceList,
+                                      ResourceList offeredResources, ResourceList demandedResources,
+                                      LobbyName lobbyName) {
         super(lobbyName);
         this.resourceList = resourceList;
         this.offeredResources = offeredResources;
@@ -76,5 +76,4 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
     public ResourceList getResourceList() {
         return resourceList;
     }
-
 }

@@ -12,8 +12,13 @@ public class LobbyName implements Serializable, Comparable<LobbyName> {
     }
 
     @Override
-    public String toString() {
-        return LobbyName;
+    public int compareTo(LobbyName other) {
+        return this.toString().compareTo(other.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(LobbyName);
     }
 
     @Override
@@ -25,12 +30,7 @@ public class LobbyName implements Serializable, Comparable<LobbyName> {
     }
 
     @Override
-    public int compareTo(LobbyName other) {
-        return this.toString().compareTo(other.toString());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(LobbyName);
+    public String toString() {
+        return LobbyName;
     }
 }

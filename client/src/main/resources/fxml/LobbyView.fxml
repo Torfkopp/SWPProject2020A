@@ -154,6 +154,6 @@
     </VBox>
     <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
         <Menu mnemonicParsing="false" text="Settings"/>
-        <Menu  fx:id="timerLabel"/>
+        <Menu fx:id="timerLabel"/>
     </MenuBar>
 </GridPane>

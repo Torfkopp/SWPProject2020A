@@ -18,8 +18,8 @@ public class GameMapDTO implements IGameMap, Serializable {
     /**
      * Instantiates a new Game map dto.
      *
-     * @param hexes                The hexes
-     * @param intersections        The intersections
+     * @param hexes         The hexes
+     * @param intersections The intersections
      *
      * @author Temmo Junkhoff
      * @since 2021-04-25

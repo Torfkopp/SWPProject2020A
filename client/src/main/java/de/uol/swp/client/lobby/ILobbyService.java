@@ -47,7 +47,7 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param lobbyName      The name chosen for the new lobby
+     * @param lobbyName The name chosen for the new lobby
      * @param maxPlayer The maximum amount of players for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest

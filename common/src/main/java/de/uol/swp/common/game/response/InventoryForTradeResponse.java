@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 

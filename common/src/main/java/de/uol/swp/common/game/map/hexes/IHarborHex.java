@@ -24,8 +24,20 @@ public interface IHarborHex extends IWaterHex {
         ANY
     }
 
-    static HarborResource getHarborResource(ResourceType resource){
-        switch (resource){
+    /**
+     * Enum for the sides the harbor can face
+     */
+    enum HarborSide {
+        WEST,
+        NORTHWEST,
+        NORTHEAST,
+        EAST,
+        SOUTHEAST,
+        SOUTHWEST,
+    }
+
+    static HarborResource getHarborResource(ResourceType resource) {
+        switch (resource) {
 
             case LUMBER:
                 return HarborResource.LUMBER;
@@ -39,18 +51,6 @@ public interface IHarborHex extends IWaterHex {
                 return HarborResource.WOOL;
         }
         return null;
-    }
-
-    /**
-     * Enum for the sides the harbor can face
-     */
-    enum HarborSide {
-        WEST,
-        NORTHWEST,
-        NORTHEAST,
-        EAST,
-        SOUTHEAST,
-        SOUTHWEST,
     }
 
     /**

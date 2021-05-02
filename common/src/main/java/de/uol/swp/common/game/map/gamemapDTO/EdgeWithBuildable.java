@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.map.gamemapDTO;
 
-import de.uol.swp.common.game.map.management.Edge;
 import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.management.Edge;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;

@@ -5,9 +5,9 @@ import java.util.*;
 
 public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Serializable {
 
-    static List<Map<String, Object>> getTableViewFormat(IDevelopmentCardList developmentCardList){
+    static List<Map<String, Object>> getTableViewFormat(IDevelopmentCardList developmentCardList) {
         List<Map<String, Object>> returnMap = new LinkedList<>();
-        for (IDevelopmentCard developmentCard : developmentCardList){
+        for (IDevelopmentCard developmentCard : developmentCardList) {
             returnMap.add(IDevelopmentCard.getTableViewFormat(developmentCard));
         }
         return returnMap;
@@ -18,11 +18,11 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
 
     DevelopmentCardList create();
 
-    DevelopmentCard get(DevelopmentCardType resource);
-
-    void increase(DevelopmentCardType resource);
-
     void decrease(DevelopmentCardType resource);
 
+    DevelopmentCard get(DevelopmentCardType resource);
+
     int getAmount(DevelopmentCardType resource);
+
+    void increase(DevelopmentCardType resource);
 }

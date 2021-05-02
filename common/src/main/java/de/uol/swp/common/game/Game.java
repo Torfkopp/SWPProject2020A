@@ -1,14 +1,14 @@
 package de.uol.swp.common.game;
 
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
+import de.uol.swp.common.game.map.management.IGameMapManagement;
+import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourceThingies.BankInventory;
 import de.uol.swp.common.game.resourceThingies.Inventory;
 import de.uol.swp.common.game.resourceThingies.InventoryMap;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.game.map.management.IGameMapManagement;
-import de.uol.swp.common.game.map.management.IIntersection;
-import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -30,11 +30,11 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
 
     /**
      * Constructor

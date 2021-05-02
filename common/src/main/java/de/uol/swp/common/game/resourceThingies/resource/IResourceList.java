@@ -11,9 +11,9 @@ import java.util.*;
  */
 public interface IResourceList extends Iterable<IResource>, Serializable {
 
-    static List<Map<String, Object>> getTableViewFormat(IResourceList resourceList){
+    static List<Map<String, Object>> getTableViewFormat(IResourceList resourceList) {
         List<Map<String, Object>> returnMap = new LinkedList<>();
-        for (IResource resource : resourceList){
+        for (IResource resource : resourceList) {
             returnMap.add(IResource.getTableViewFormat(resource));
         }
         return returnMap;

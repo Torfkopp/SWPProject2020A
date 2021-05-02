@@ -59,6 +59,13 @@ public class GameService implements IGameService {
     }
 
     @Override
+    public void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled) {
+        LOG.debug("Sending ChangeAutoRollStateRequest");
+        Message request = new ChangeAutoRollStateRequest(lobbyName, userService.getLoggedInUser(), autoRollEnabled);
+        eventBus.post(request);
+    }
+
+    @Override
     public void endTurn(LobbyName lobbyName) {
         LOG.debug("Sending EndTurnRequest");
         Message request = new EndTurnRequest(userService.getLoggedInUser(), lobbyName);
@@ -142,13 +149,6 @@ public class GameService implements IGameService {
     public void updateInventory(LobbyName lobbyName) {
         LOG.debug("Sending UpdateInventoryRequest");
         Message request = new UpdateInventoryRequest(userService.getLoggedInUser(), lobbyName);
-        eventBus.post(request);
-    }
-
-    @Override
-    public void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled) {
-        LOG.debug("Sending ChangeAutoRollStateRequest");
-        Message request = new ChangeAutoRollStateRequest(lobbyName, userService.getLoggedInUser(), autoRollEnabled);
         eventBus.post(request);
     }
 }

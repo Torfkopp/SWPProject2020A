@@ -18,7 +18,8 @@ public interface ITradeService {
 
     /**
      * Posts a request to accept a proposed trade
-     *  @param lobbyName         The name of the lobby
+     *
+     * @param lobbyName         The name of the lobby
      * @param offeringUser      The User who offered the trade
      * @param demandedResources The resources the offering User wants
      * @param offeredResources  The resources the offering User is offering

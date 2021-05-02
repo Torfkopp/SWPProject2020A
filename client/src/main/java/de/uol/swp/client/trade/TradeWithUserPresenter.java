@@ -150,7 +150,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         respondingUser = rsp.getTradingUser();
         IResourceList resourceList = rsp.getResourceMap();
         for (IResource resource : resourceList)
-        ownResourceTableView.getItems().add(resource);
+            ownResourceTableView.getItems().add(resource);
         traderInventorySize = rsp.getTradingUsersInventorySize();
         int ownInventorySize = 0;
         for (IResource entry : resourceList) {
@@ -294,5 +294,4 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         ownWoolSlider.setMax(resourceList.getAmount(ResourceType.WOOL));
         ownBrickSlider.setMax(resourceList.getAmount(ResourceType.BRICK));
     }
-
 }

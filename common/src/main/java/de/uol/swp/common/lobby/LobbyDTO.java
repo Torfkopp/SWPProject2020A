@@ -39,6 +39,7 @@ public class LobbyDTO implements Lobby {
      *
      * @param name    The requested name the lobby
      * @param creator The user who created the lobby and therefore its owner
+     *
      * @since 2019-10-08
      */
     public LobbyDTO(LobbyName name, User creator) {
@@ -133,6 +134,16 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public boolean isStartUpPhaseEnabled() {
+        return startUpPhaseEnabled;
+    }
+
+    @Override
+    public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
+        this.startUpPhaseEnabled = startUpPhaseEnabled;
+    }
+
+    @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
         if (user instanceof Dummy) {
@@ -175,16 +186,6 @@ public class LobbyDTO implements Lobby {
     @Override
     public void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled) {
         this.randomPlayfieldEnabled = randomPlayfieldEnabled;
-    }
-
-    @Override
-    public boolean isStartUpPhaseEnabled() {
-        return startUpPhaseEnabled;
-    }
-
-    @Override
-    public void setStartUpPhaseEnabled(boolean startUpPhaseEnabled) {
-        this.startUpPhaseEnabled = startUpPhaseEnabled;
     }
 
     @Override

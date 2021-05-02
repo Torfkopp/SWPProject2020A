@@ -8,7 +8,6 @@ import java.util.Set;
 
 public interface ISimpleLobby {
 
-
     /**
      * Gets the max players.
      *

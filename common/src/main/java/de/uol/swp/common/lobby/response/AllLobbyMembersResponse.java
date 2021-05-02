@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;

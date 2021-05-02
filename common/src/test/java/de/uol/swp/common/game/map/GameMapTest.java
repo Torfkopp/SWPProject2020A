@@ -11,9 +11,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static de.uol.swp.common.game.map.Player.PLAYER_1;
 import static de.uol.swp.common.game.map.Player.PLAYER_2;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

@@ -30,8 +30,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param demandedResources The responded resources
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
-                                        ResourceList offeredResources,
-                                        ResourceList demandedResources) {
+                                        ResourceList offeredResources, ResourceList demandedResources) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;

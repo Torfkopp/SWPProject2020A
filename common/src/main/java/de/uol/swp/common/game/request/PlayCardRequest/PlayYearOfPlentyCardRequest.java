@@ -16,7 +16,8 @@ public class PlayYearOfPlentyCardRequest extends PlayCardRequest {
     ResourceType resource1;
     ResourceType resource2;
 
-    public PlayYearOfPlentyCardRequest(LobbyName originLobby, User user, ResourceType resource1, ResourceType resource2) {
+    public PlayYearOfPlentyCardRequest(LobbyName originLobby, User user, ResourceType resource1,
+                                       ResourceType resource2) {
         super(originLobby, user);
         this.resource1 = resource1;
         this.resource2 = resource2;

@@ -18,7 +18,7 @@
     -fx-text-background-color: ladder(
             -fx-background,
             -fx-light-text-color 49%,
-            -fx-dark-text-color  50%
+            -fx-dark-text-color 50%
     );
     -fx-default-button: -fx-accent;
     -fx-font-family: 'CookieMonster';

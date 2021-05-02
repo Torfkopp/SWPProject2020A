@@ -21,8 +21,9 @@ public class BuyDevelopmentCardResponse extends AbstractLobbyResponse {
 
     /**
      * Constructor
-     *  @param user      user who bought a development card
-     * @param lobbyName name of the lobby where the user bought the card
+     *
+     * @param user            user who bought a development card
+     * @param lobbyName       name of the lobby where the user bought the card
      * @param developmentCard
      */
     public BuyDevelopmentCardResponse(UserOrDummy user, LobbyName lobbyName, DevelopmentCardType developmentCard) {

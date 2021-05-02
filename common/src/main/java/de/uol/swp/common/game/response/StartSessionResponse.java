@@ -33,8 +33,8 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param dices         The last rolled dices
      * @param autoRollState The autoRoll state
      */
-    public StartSessionResponse(Lobby lobby, UserOrDummy player, IGameMap gameMapDTO,
-                                int[] dices, boolean rolledDiceAlready, boolean autoRollState) {
+    public StartSessionResponse(Lobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
+                                boolean rolledDiceAlready, boolean autoRollState) {
         this.lobby = lobby;
         this.player = player;
         this.gameMapDTO = gameMapDTO;

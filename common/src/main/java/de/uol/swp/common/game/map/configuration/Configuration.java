@@ -50,12 +50,12 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public List<Integer> getTokenList() {
-        return tokenList;
+    public MapPoint getRobberPosition() {
+        return robberPosition;
     }
 
     @Override
-    public MapPoint getRobberPosition() {
-        return robberPosition;
+    public List<Integer> getTokenList() {
+        return tokenList;
     }
 }

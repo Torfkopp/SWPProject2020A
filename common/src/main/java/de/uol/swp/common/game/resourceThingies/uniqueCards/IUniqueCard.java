@@ -23,25 +23,6 @@ public interface IUniqueCard extends Serializable {
     int getAmount();
 
     /**
-     * Gets owner.
-     *
-     * @return the owner
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-04-23
-     */
-    UserOrDummy getOwner();
-
-    /**
-     * Gets type.
-     *
-     * @return the type
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-04-23
-     */
-    UniqueCardsType getType();
-    /**
      * Sets amount.
      *
      * @param amount the amount
@@ -52,6 +33,16 @@ public interface IUniqueCard extends Serializable {
     void setAmount(int amount);
 
     /**
+     * Gets owner.
+     *
+     * @return the owner
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
+    UserOrDummy getOwner();
+
+    /**
      * Sets owner.
      *
      * @param owner the owner
@@ -60,4 +51,14 @@ public interface IUniqueCard extends Serializable {
      * @since 2021-04-23
      */
     void setOwner(UserOrDummy owner);
+
+    /**
+     * Gets type.
+     *
+     * @return the type
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
+    UniqueCardsType getType();
 }

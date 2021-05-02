@@ -39,7 +39,6 @@ public class ResourceList implements IResourceList {
             this.list.add(new Resource(resource.getType(), resource.getAmount()));
     }
 
-
     /**
      * Create resource list map from a list of resources.
      *
@@ -141,5 +140,4 @@ public class ResourceList implements IResourceList {
             return list.remove(0);
         }
     }
-
 }

@@ -6,7 +6,7 @@ import java.io.*;
  * Helper class to test if an object is serialisable
  * <p>
  * https://stackoverflow.com/questions/3840356/how-to-test-in-java-that-a-class-implements-serializable-correctly-not-just-is
- * 
+ *
  * @author Phillip-André Suhr
  */
 public class SerialisationTestHelper {

@@ -30,7 +30,6 @@ public interface Lobby extends Serializable {
      */
     boolean commandsAllowed();
 
-
     /**
      * Gets the maximum amount of players for a lobby.
      *

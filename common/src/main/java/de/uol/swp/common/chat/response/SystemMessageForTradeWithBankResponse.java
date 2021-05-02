@@ -21,13 +21,13 @@ public class SystemMessageForTradeWithBankResponse extends AbstractLobbyResponse
 
     /**
      * Constructor
-     *  @param lobbyName       The lobby name
+     *
+     * @param lobbyName       The lobby name
      * @param developmentCard The developmentCard that the user bought
      */
     public SystemMessageForTradeWithBankResponse(LobbyName lobbyName, DevelopmentCardType developmentCard) {
         super(lobbyName);
-        this.msg = new InGameSystemMessageDTO(
-                new I18nWrapper("lobby.trade.withbank.systemresponse", developmentCard));
+        this.msg = new InGameSystemMessageDTO(new I18nWrapper("lobby.trade.withbank.systemresponse", developmentCard));
     }
 
     /**

@@ -4,7 +4,6 @@ import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
-import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -26,15 +25,15 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
     /**
      * Constructor
-     *  @param lobbyName             The lobby name
+     *
+     * @param lobbyName             The lobby name
      * @param offeringUser          The offering User
      * @param respondingUser        The responding User
      * @param offeringResourceMap   The offered resources
      * @param respondingResourceMap The demanded resources
      */
     public SystemMessageForTradeMessage(LobbyName lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser,
-                                        ResourceList offeringResourceMap,
-                                        ResourceList respondingResourceMap) {
+                                        ResourceList offeringResourceMap, ResourceList respondingResourceMap) {
         super(lobbyName, offeringUser);
         this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;

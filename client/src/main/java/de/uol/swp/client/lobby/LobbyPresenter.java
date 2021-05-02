@@ -405,7 +405,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
             changeOwnerButton.setDisable(isSelf);
-            tradeWithUserButton.setDisable(isSelf||!tradingCurrentlyAllowed);
+            tradeWithUserButton.setDisable(isSelf || !tradingCurrentlyAllowed);
             if (isSelf) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
                 changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));

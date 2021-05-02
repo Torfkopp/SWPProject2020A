@@ -1,10 +1,10 @@
 package de.uol.swp.common.game.map.management;
 
-import de.uol.swp.common.game.map.hexes.IGameHex;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
+import de.uol.swp.common.game.map.hexes.IGameHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
@@ -99,6 +99,21 @@ public interface IGameMapManagement {
     IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
 
     /**
+     * Gets the HarborResourceType of a specific Intersection MapPoint
+     * <p>
+     * If the point does not have a harbor, NONE is returned
+     *
+     * @param point specific Intersection MapPoint
+     *
+     * @return HarborResourceType
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    IHarborHex.HarborResource getHarborResource(MapPoint point);
+
+    /**
      * Gets the hex at a specified place
      *
      * @param position The hex's coordinates
@@ -176,6 +191,17 @@ public interface IGameMapManagement {
      * @since 2021-02-05
      */
     int getPlayerPoints(Player player);
+
+    /**
+     * Gets all the Settlements and Cities presented in a map
+     *
+     * @return Map of Players and their Settlements / Cities
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
 
     /**
      * Gets all the Players around a Hex
@@ -347,30 +373,4 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
-
-    /**
-     * Gets all the Settlements and Cities presented in a map
-     *
-     * @return Map of Players and their Settlements / Cities
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
-
-    /**
-     * Gets the HarborResourceType of a specific Intersection MapPoint
-     * <p>
-     * If the point does not have a harbor, NONE is returned
-     *
-     * @param point specific Intersection MapPoint
-     *
-     * @return HarborResourceType
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    IHarborHex.HarborResource getHarborResource(MapPoint point);
 }
