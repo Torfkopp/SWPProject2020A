@@ -1,0 +1,25 @@
+* {
+    -black: #090A0B;
+    -pureBlack: #000000;
+    -white: #F3F5F3;
+    -gray: #9E9E9E;
+    -eerieBlack: #131514;
+    -eerieBlackLight: derive(-eerieBlack, 30%);
+    -eerieBlackLighter: derive(-eerieBlackLight, 15%);
+    -eerieBlackLightest: derive(-eerieBlackLighter, 25%);
+    -red: #F44336;
+    -catanRed: #D83339;
+    -green: #287E29;
+    -materialGreen: #4CAF50;
+    -teal: #009688;
+    -indigo: #3F51B5;
+    -deepPurple: #673AB7;
+    -razzmatazz: #E72371;
+    -blue: #2196F3;
+    -majorelleBlue: #5E4AE3;
+    -xiketic: #201320;
+    -darkSienna: #3F1816;
+    -lightBrown: #99582A;
+    -brown: #432818;
+    -gold: #DBB42C;
+}

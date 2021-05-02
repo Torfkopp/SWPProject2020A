@@ -4,10 +4,9 @@
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<GridPane vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+<?import javafx.scene.text.TextFlow?>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1"
+          fx:id="lobbyPane" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <columnConstraints>
         <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
@@ -117,9 +116,7 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
             </columnResizePolicy>
         </TableView>
-
-        <TextFlow fx:id="turnIndicator" maxHeight="30" minHeight="30" minWidth="-Infinity" prefHeight="30.0"
-                  prefWidth="190.0"/>
+        <TextFlow fx:id="turnIndicator" maxHeight="30" minHeight="30" minWidth="-Infinity" prefWidth="230.0"/>
         <HBox maxHeight="25.0" maxWidth="-Infinity" minHeight="25.0" minWidth="-Infinity" prefWidth="230.0"
               spacing="10.0">
             <CheckBox fx:id="readyCheckBox" maxWidth="-Infinity" minHeight="25.0" minWidth="-Infinity"

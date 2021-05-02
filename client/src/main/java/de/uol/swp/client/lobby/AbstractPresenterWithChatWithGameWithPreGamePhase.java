@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
@@ -19,6 +20,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Objects;
+import java.util.Set;
 
 import java.util.*;
 
@@ -63,10 +67,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     @FXML
     protected AnimationTimer elapsedTimer;
-
     @FXML
     protected Menu timerLabel = new Menu();
-
     @FXML
     private Button changeMoveTimeButton;
     @FXML
@@ -250,6 +252,28 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
+
+    /**
+     * Handles a KickUserResponse found on the EventBus
+     * <p>
+     * If a KickUserResponse is detected on the EventBus and its
+     * directed to this lobby and this player, the according lobby
+     * window is closed.
+     *
+     * @param rsp The KickUserResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserResponse(KickUserResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
+            Platform.runLater(() -> closeWindow(true));
+        }
+    }
+
     /**
      * Handles the PlayerWonGameMessage
      * <p>
@@ -277,28 +301,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             this.elapsedTimer.stop();
         }
         fitCanvasToSize();
-    }
-
-
-    /**
-     * Handles a KickUserResponse found on the EventBus
-     * <p>
-     * If a KickUserResponse is detected on the EventBus and its
-     * directed to this lobby and this player, the according lobby
-     * window is closed.
-     *
-     * @param rsp The KickUserResponse found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.response.KickUserResponse
-     * @since 2021-03-02
-     */
-    @Subscribe
-    private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
-            Platform.runLater(() -> closeWindow(true));
-        }
     }
 
     /**
@@ -369,10 +371,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
+            cardAmountTripleList.clear();
+            for (ChatOrSystemMessage m : chatMessages)
+                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
         });
     }
 
@@ -426,6 +432,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
+            turnIndicator.setVisible(true);
             setRollDiceButtonState(msg.getUser());
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
@@ -443,9 +450,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                                           TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
                                           TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
                 }
-    };
+            };
             this.elapsedTimer.start();
-    });
+        });
     }
 
     /**
@@ -478,7 +485,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             dice2 = dices[1];
             setTurnIndicatorText(rsp.getPlayer());
             setMoveTimer(moveTime);
-            //setMoveTimer(rsp.getPlayer());
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
@@ -487,6 +493,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
+            turnIndicator.setVisible(true);
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
