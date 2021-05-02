@@ -15,7 +15,7 @@ import javafx.scene.control.TabPane;
 public class RulesOverviewPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RulesOverviewView.fxml";
-    public static final int MIN_HEIGHT = 500;
+    public static final int MIN_HEIGHT = 550;
     public static final int MIN_WIDTH = 610;
 
     @FXML

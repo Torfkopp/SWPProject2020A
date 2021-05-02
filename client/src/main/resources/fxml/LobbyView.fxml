@@ -156,6 +156,7 @@
         <Menu mnemonicParsing="false" text="%lobby.menu.settings"/>
         <Menu mnemonicParsing="false" text="%lobby.menu.rules" onAction="#onRulesMenuClicked">
             <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview"/>
+        </Menu>
         <Menu  fx:id="timerLabel"/>
     </MenuBar>
 </GridPane>

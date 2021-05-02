@@ -962,6 +962,7 @@ public class SceneManager {
             rulesStage.setMinHeight(RulesOverviewPresenter.MIN_HEIGHT);
             rulesStage.setWidth(RulesOverviewPresenter.MIN_WIDTH);
             rulesStage.setMinWidth(RulesOverviewPresenter.MIN_WIDTH);
+            rulesStage.setResizable(false);
             rulesStage.setScene(rulesScene);
             rulesStage.show();
             rulesStage.toFront();

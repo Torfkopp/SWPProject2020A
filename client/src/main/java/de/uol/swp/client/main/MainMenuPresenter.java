@@ -8,6 +8,7 @@ import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -557,6 +558,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         logout();
         eventBus.post(showLoginViewMessage);
         eventBus.post(closeLobbiesViewEvent);
+    }
+
+    /**
+     * Handles a click on the Show Rules Overview menu item
+     * <p>
+     * Method called when the Show Rules Overview menu item is clicked.
+     * It posts a ShowRulesOverviewViewEvent onto the EventBus.
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
+     * @since 2021-05-02
+     */
+    @FXML
+    private void onRulesMenuClicked() {
+        eventBus.post(new ShowRulesOverviewViewEvent());
     }
 
     /**

@@ -1,19 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rulesTabPane" prefHeight="501.0" prefWidth="610.0"
+<TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rulesTabPane" prefHeight="550.0" prefWidth="610.0"
          tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1"
          fx:controller="de.uol.swp.client.rules.RulesOverviewPresenter">
     <Tab fx:id="basicsTab" text="%rules.tabs.basics">
-        <VBox>
-            <Label text="%rules.basics.text" wrapText="true" VBox.vgrow="ALWAYS"/>
-        </VBox>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints percentWidth="33.0"/>
+                <ColumnConstraints percentWidth="67.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints percentHeight="100.0"/>
+            </rowConstraints>
+            <VBox spacing="15.0">
+                <padding>
+                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                </padding>
+                <Label text="%rules.basics.text.title" wrapText="true"/>
+                <Label text="%rules.basics.text.intro" wrapText="true"/>
+            </VBox>
+            <ImageView fitHeight="375.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+                       GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER"
+                       GridPane.vgrow="ALWAYS">
+                <Image url="@../images/rules/blank_basic_board.png"/>
+            </ImageView>
+        </GridPane>
     </Tab>
     <Tab fx:id="buildingTab" text="%rules.tabs.building">
-        <VBox>
-            <Label text="%rules.building.text" wrapText="true" VBox.vgrow="ALWAYS"/>
-        </VBox>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" minWidth="10.0" percentWidth="50.0"/>
+                <ColumnConstraints halignment="CENTER" minWidth="10.0" percentWidth="50.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" percentHeight="12.5" valignment="CENTER"/>
+                <RowConstraints minHeight="10.0" valignment="CENTER"/>
+                <RowConstraints minHeight="10.0" valignment="CENTER"/>
+                <RowConstraints minHeight="10.0" percentHeight="22.5" valignment="CENTER"/>
+            </rowConstraints>
+            <Label text="%rules.building.text.title" wrapText="true" GridPane.columnIndex="0"
+                   GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="0"
+                   GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                <GridPane.margin>
+                    <Insets topRightBottomLeft="15.0"/>
+                </GridPane.margin>
+            </Label>
+            <ImageView fitHeight="135.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+                       GridPane.rowIndex="1">
+                <Image url="@../images/rules/settlement_and_street.png"/>
+            </ImageView>
+            <ImageView fitHeight="135.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
+                <Image url="@../images/rules/buildability_indicators.png"/>
+            </ImageView>
+            <ImageView fitHeight="135.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+                       GridPane.rowIndex="3">
+                <Image url="@../images/rules/city_with_streets.png"/>
+            </ImageView>
+            <Label text="%rules.building.text.description" wrapText="true" GridPane.halignment="CENTER"
+                   GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                <GridPane.margin>
+                    <Insets topRightBottomLeft="15.0"/>
+                </GridPane.margin>
+            </Label>
+            <Label text="%rules.building.text.indicators" wrapText="true" GridPane.columnIndex="1"
+                   GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                <GridPane.margin>
+                    <Insets topRightBottomLeft="15.0"/>
+                </GridPane.margin>
+            </Label>
+            <Label text="%rules.building.text.sendoff" wrapText="true" GridPane.halignment="CENTER"
+                   GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                <GridPane.margin>
+                    <Insets topRightBottomLeft="15.0"/>
+                </GridPane.margin>
+            </Label>
+        </GridPane>
     </Tab>
     <Tab fx:id="tradingTab" text="%rules.tabs.trade">
         <VBox>
@@ -32,7 +97,7 @@
     </Tab>
     <Tab fx:id="founderPhaseTab" text="%rules.tabs.founding">
         <VBox>
-            <Label text="%rules.building.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.founding.text" wrapText="true" VBox.vgrow="ALWAYS"/>
         </VBox>
     </Tab>
 </TabPane>
