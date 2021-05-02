@@ -24,13 +24,23 @@ public class Game {
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
+    private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
+    private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private StartUpPhase startUpPhase;
+
+    public enum StartUpPhase {
+        PHASE_1,
+        PHASE_2,
+        NOT_IN_STARTUP_PHASE
+    }
 
     /**
      * Constructor
@@ -42,15 +52,20 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
+        this.first = first;
+        playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
+                startUpPlayerOrder.addLast(userOrDummy);
+                playersStartUpBuiltMap.put(userOrDummy, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(userOrDummy, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
                 autoRollEnabled.put(userOrDummy, false);
             }
         }
+        startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
@@ -223,6 +238,10 @@ public class Game {
         return dices;
     }
 
+    public UserOrDummy getFirst() {
+        return first;
+    }
+
     /**
      * Gets a specified player's inventory
      *
@@ -306,6 +325,10 @@ public class Game {
         return players.getUserOrDummyArray();
     }
 
+    public Map<UserOrDummy, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
+        return playersStartUpBuiltMap;
+    }
+
     /**
      * Gets the roadBuildingCardPhase
      *
@@ -328,6 +351,18 @@ public class Game {
      */
     public void setRoadBuildingCardPhase(RoadBuildingCardPhase roadBuildingCardPhase) {
         this.roadBuildingCardPhase = roadBuildingCardPhase;
+    }
+
+    public StartUpPhase getStartUpPhase() {
+        return startUpPhase;
+    }
+
+    public void setStartUpPhase(StartUpPhase startUpPhase) {
+        this.startUpPhase = startUpPhase;
+    }
+
+    public Deque<UserOrDummy> getStartUpPlayerOrder() {
+        return startUpPlayerOrder;
     }
 
     /**

@@ -99,6 +99,21 @@ public interface IGameMapManagement {
     IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
 
     /**
+     * Gets the HarborResourceType of a specific Intersection MapPoint
+     * <p>
+     * If the point does not have a harbor, NONE is returned
+     *
+     * @param point specific Intersection MapPoint
+     *
+     * @return HarborResourceType
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    IHarborHex.HarborResource getHarborResource(MapPoint point);
+
+    /**
      * Gets the hex at a specified place
      *
      * @param position The hex's coordinates
@@ -178,6 +193,17 @@ public interface IGameMapManagement {
     int getPlayerPoints(Player player);
 
     /**
+     * Gets all the Settlements and Cities presented in a map
+     *
+     * @return Map of Players and their Settlements / Cities
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
+
+    /**
      * Gets all the Players around a Hex
      *
      * @param mapPoint The hex
@@ -240,6 +266,20 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     void moveRobber(MapPoint newPosition);
+
+    /**
+     * Places a settlement during the founding phase
+     *
+     * @param player   The player wanting to build the settlement (1-4)
+     * @param position The position of the intersection
+     *
+     * @return
+     *
+     * @author Sven Ahrens
+     * @author Phillip-André Suhr
+     * @since 2021-05-01
+     */
+    boolean placeFoundingSettlement(Player player, MapPoint position);
 
     /**
      * Places a road for the given player on the given edge.
@@ -347,30 +387,4 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
-
-    /**
-     * Gets all the Settlements and Cities presented in a map
-     *
-     * @return Map of Players and their Settlements / Cities
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
-
-    /**
-     * Gets the HarborResourceType of a specific Intersection MapPoint
-     * <p>
-     * If the point does not have a harbor, NONE is returned
-     *
-     * @param point specific Intersection MapPoint
-     *
-     * @return HarborResourceType
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    IHarborHex.HarborResource getHarborResource(MapPoint point);
 }

@@ -20,8 +20,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -257,6 +255,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             setPreGameSettings();
         }
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
+        startUpPhaseEnabled = msg.getLobby().startUpPhaseEnabled();
+        System.out.println("startupphase is " + startUpPhaseEnabled);
         randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
         commandsActivated.setSelected(msg.getLobby().commandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));

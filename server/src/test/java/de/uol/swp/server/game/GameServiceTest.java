@@ -4,7 +4,8 @@ import com.google.common.eventbus.EventBus;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.map.*;
+import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.management.GameMapManagement;
 import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -69,7 +70,7 @@ public class GameServiceTest {
     @BeforeEach
     protected void setUp() {
         gameManagement = new GameManagement(lobbyManagement);
-        gameService = new GameService(bus, gameManagement, lobbyService);
+        gameService = new GameService(bus, gameManagement, lobbyManagement, lobbyService);
     }
 
     /**

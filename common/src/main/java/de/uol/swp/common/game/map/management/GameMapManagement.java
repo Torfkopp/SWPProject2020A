@@ -178,6 +178,13 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public IHarborHex.HarborResource getHarborResource(MapPoint point) {
+        IIntersection intersection = getIntersection(point);
+        if (!harborResourceMap.containsKey(intersection)) return null;
+        return harborResourceMap.get(intersection);
+    }
+
+    @Override
     public IGameHex getHex(MapPoint position) {
         GameHexWrapper returnValue = getHexWrapper(position);
         return returnValue == null ? null : returnValue.get();
@@ -257,6 +264,11 @@ public class GameMapManagement implements IGameMapManagement {
             }
         }
         return points;
+    }
+
+    @Override
+    public Map<Player, List<MapPoint>> getPlayerSettlementsAndCities() {
+        return playerSettlementsAndCities;
     }
 
     @Override
@@ -363,6 +375,22 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public boolean placeFoundingSettlement(Player player, MapPoint position) {
+        boolean neighbouringIntersectionsFree = true;
+        for (IIntersection intersection : intersectionEdgeNetwork
+                .adjacentNodes(intersectionMap[position.getY()][position.getX()]))
+            if (intersection.getState() != IIntersection.IntersectionState.FREE) neighbouringIntersectionsFree = false;
+
+        IIntersection.IntersectionState state = intersectionMap[position.getY()][position.getX()].getState();
+        if (!state.equals(IIntersection.IntersectionState.FREE) || !neighbouringIntersectionsFree) return false;
+
+        if (!playerSettlementsAndCities.containsKey(player)) playerSettlementsAndCities.put(player, new ArrayList<>());
+        playerSettlementsAndCities.get(player).add(position);
+        intersectionMap[position.getY()][position.getX()].setOwnerAndState(player, SETTLEMENT);
+        return true;
+    }
+
+    @Override
     public boolean placeRoad(Player player, IEdge edge) {
         if (roadPlaceable(player, edge)) {
             edge.buildRoad(player);
@@ -439,18 +467,6 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public Map<Player, List<MapPoint>> getPlayerSettlementsAndCities() {
-        return playerSettlementsAndCities;
-    }
-
-    @Override
-    public IHarborHex.HarborResource getHarborResource(MapPoint point) {
-        IIntersection intersection = getIntersection(point);
-        if (!harborResourceMap.containsKey(intersection)) return null;
-        return harborResourceMap.get(intersection);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {

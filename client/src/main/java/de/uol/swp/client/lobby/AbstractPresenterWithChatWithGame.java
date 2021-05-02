@@ -12,6 +12,7 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -106,9 +107,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
     protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    protected StartUpPhaseBuiltStructures startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.NONE_BUILT;
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean startUpPhaseEnabled;
     protected int moveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
@@ -195,7 +198,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-02-22
      */
     protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(!userService.getLoggedInUser().equals(user));
+        rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
     }
 
     /**
@@ -355,6 +358,30 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());
         }
+        if (startUpPhaseEnabled) {
+            if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.NONE_BUILT)) {
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT;
+                LOG.debug("--- First founding Settlement successfully built");
+                Platform.runLater(() -> notice.setText(resourceBundle.getString("game.setupphase.building.firstroad")));
+            } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT)) {
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT;
+                LOG.debug("--- First founding road successfully built");
+                Platform.runLater(
+                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondsettlement")));
+            } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT)) {
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT;
+                LOG.debug("--- Second founding Settlement successfully built");
+                Platform.runLater(
+                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondroad")));
+            } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT)) {
+                // startup phase over
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.ALL_BUILT;
+                startUpPhaseEnabled = false;
+                //fixme disable endturn enable rolldice
+                LOG.debug("--- Second founding road successfully built");
+                Platform.runLater(() -> notice.setText(""));
+            }
+        }
         gameService.updateGameMap(lobbyName);
         String attr = null;
         switch (msg.getType()) {
@@ -438,16 +465,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
-            gameService.buildRequest(lobbyName, mapPoint);
-        }
-        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-            gameService.buildRequest(lobbyName, mapPoint);
-        if (mapPoint.getType() == HEX && robberNewPosition) {
-            gameService.robberNewPosition(lobbyName, mapPoint);
-            robberNewPosition = false;
-            notice.setVisible(false);
-            resetButtonStates(userService.getLoggedInUser());
+        if (startUpPhaseEnabled) {
+            if (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE) {
+                gameService.buildRequest(lobbyName, mapPoint);
+            }
+        } else {
+            if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
+                gameService.buildRequest(lobbyName, mapPoint);
+            }
+            if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
+                gameService.buildRequest(lobbyName, mapPoint);
+            if (mapPoint.getType() == HEX && robberNewPosition) {
+                gameService.robberNewPosition(lobbyName, mapPoint);
+                robberNewPosition = false;
+                notice.setVisible(false);
+                resetButtonStates(userService.getLoggedInUser());
+            }
         }
     }
 

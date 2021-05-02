@@ -417,9 +417,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
+            System.out.println("started. sup is... ");
+            if (startUpPhaseEnabled) {
+                System.err.println("ENABLED");
+                notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+            }
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
-            endTurn.setDisable(true);
+            endTurn.setDisable(!startUpPhaseEnabled || !userService.getLoggedInUser().equals(msg.getUser()));
             autoRoll.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
@@ -469,6 +474,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
+            startUpPhaseEnabled = rsp.getLobby().isStartUpPhaseEnabled();
+            // fixme unbedingt übermitteln, was der Spieler noch bauen muss (oder nicht)
             autoRollEnabled = rsp.isAutoRollState();
             autoRoll.setSelected(autoRollEnabled);
             int[] dices = rsp.getDices();
@@ -583,4 +590,25 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
+
+
+    /*
+    protected void prepareSetUpPhase() {
+        //Create new alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Auswürfeln des beginnenden Spielers");
+        alert.setHeaderText("Würfeln!");
+        alert.setContentText("Der beginnende Spieler muss ausgewürfelt werden!");
+
+
+        ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                              ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(btnCancel);
+
+        alert.getDialogPane().getStylesheets().add(styleSheet);
+
+        alert.showAndWait();
+    }
+
+     */
 }

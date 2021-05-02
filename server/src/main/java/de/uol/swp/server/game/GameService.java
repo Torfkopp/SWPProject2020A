@@ -9,8 +9,9 @@ import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.Game;
+import de.uol.swp.common.game.Game.StartUpPhase;
 import de.uol.swp.common.game.Inventory;
-import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Hexes.IHarborHex;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.Resources;
@@ -33,6 +34,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
+import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +43,10 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static de.uol.swp.common.game.Game.StartUpPhase.*;
+import static de.uol.swp.common.game.RoadBuildingCardPhase.*;
+import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
+import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.response.BuildingFailedResponse.Reason.*;
 
 /**
@@ -57,6 +63,7 @@ public class GameService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(GameService.class);
 
+    private final ILobbyManagement lobbyManagement;
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
 
@@ -70,9 +77,11 @@ public class GameService extends AbstractService {
      * @since 2021-01-15
      */
     @Inject
-    public GameService(EventBus bus, IGameManagement gameManagement, LobbyService lobbyService) {
+    public GameService(EventBus bus, IGameManagement gameManagement, ILobbyManagement lobbyManagement,
+                       LobbyService lobbyService) {
         super(bus);
         this.gameManagement = gameManagement;
+        this.lobbyManagement = lobbyManagement;
         this.lobbyService = lobbyService;
         LOG.debug("GameService started");
     }
@@ -367,9 +376,13 @@ public class GameService extends AbstractService {
     private void onBuildRequest(BuildRequest req) {
         LOG.debug("Received BuildRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        StartUpPhase currentPhase = game.getStartUpPhase();
+        if (!game.getActivePlayer().equals(req.getUser()) || !game
+                .isDiceRolledAlready() && currentPhase == NOT_IN_STARTUP_PHASE) {
+            return;
+        }
         Consumer<BuildingFailedResponse.Reason> sendFailResponse = reason -> {
-            LOG.debug("Sending BuildingFailedResponse");
+            LOG.debug("Sending BuildingFailedResponse with reason {}", reason);
             BuildingFailedResponse msg = new BuildingFailedResponse(req.getOriginLobby(), reason);
             msg.initWithMessage(req);
             post(msg);
@@ -380,7 +393,7 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, message);
         };
 
-        if (!game.isBuildingAllowed()) {
+        if (!game.isBuildingAllowed() && currentPhase == NOT_IN_STARTUP_PHASE) {
             sendFailResponse.accept(NOT_THE_RIGHT_TIME);
             return;
         }
@@ -403,18 +416,41 @@ public class GameService extends AbstractService {
                         gameMap.placeSettlement(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                                         BuildingSuccessfulMessage.Type.SETTLEMENT));
+                                                                         SETTLEMENT));
                     } else {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
+                } else if (currentPhase != NOT_IN_STARTUP_PHASE) {
+                    Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                    StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
+                    if (built == NONE_BUILT && currentPhase == PHASE_1) {
+                        System.err.println("first settlement, humble beginnings");
+                        boolean success = gameMap.placeFoundingSettlement(player, mapPoint);
+                        if (!success) sendFailResponse.accept(CANT_BUILD_HERE);
+                        else {
+                            startUpBuiltMap.put(user, FIRST_SETTLEMENT_BUILT);
+                            sendSuccess.accept(req.getOriginLobby(),
+                                               new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                             SETTLEMENT));
+                        }
+                    } else if (built == FIRST_BOTH_BUILT && currentPhase == PHASE_2) {
+                        System.err.println("second settlement time");
+                        boolean success = gameMap.placeFoundingSettlement(player, mapPoint);
+                        if (!success) sendFailResponse.accept(CANT_BUILD_HERE);
+                        else {
+                            startUpBuiltMap.put(user, SECOND_SETTLEMENT_BUILT);
+                            sendSuccess.accept(req.getOriginLobby(),
+                                               new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                             SETTLEMENT));
+                        }
+                    } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
                     if (inv.getOre() >= 3 && inv.getGrain() >= 2) {
                         inv.increaseOre(-3);
                         inv.increaseGrain(-2);
                         gameMap.upgradeSettlement(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
-                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                                         BuildingSuccessfulMessage.Type.CITY));
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, CITY));
                     } else {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
@@ -427,24 +463,47 @@ public class GameService extends AbstractService {
                 if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
-                    if (game.getRoadBuildingCardPhase() != RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED) {
-                        if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD)
-                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD);
-                        else if (game.getRoadBuildingCardPhase() == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
+                    if (game.getRoadBuildingCardPhase() != NO_ROAD_BUILDING_CARD_PLAYED) {
+                        if (game.getRoadBuildingCardPhase() == WAITING_FOR_FIRST_ROAD)
+                            game.setRoadBuildingCardPhase(WAITING_FOR_SECOND_ROAD);
+                        else if (game.getRoadBuildingCardPhase() == WAITING_FOR_SECOND_ROAD) {
                             LOG.debug("---- RoadBuildingCardPhase phase ends");
-                            game.setRoadBuildingCardPhase(RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED);
+                            game.setRoadBuildingCardPhase(NO_ROAD_BUILDING_CARD_PLAYED);
                         }
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
-                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                                         BuildingSuccessfulMessage.Type.ROAD));
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, ROAD));
+                    } else if (currentPhase != NOT_IN_STARTUP_PHASE) {
+                        Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game
+                                .getPlayersStartUpBuiltMap();
+                        StartUpPhaseBuiltStructures built = startUpBuiltMap.get(user);
+                        if (built == FIRST_SETTLEMENT_BUILT && currentPhase == PHASE_1) {
+                            System.err.println("baby's first road :O");
+                            boolean success = gameMap.placeRoad(player, mapPoint);
+                            if (!success) sendFailResponse.accept(CANT_BUILD_HERE);
+                            else {
+                                startUpBuiltMap.put(user, FIRST_BOTH_BUILT);
+                                sendSuccess.accept(req.getOriginLobby(),
+                                                   new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                                 ROAD));
+                            }
+                        } else if (built == SECOND_SETTLEMENT_BUILT && currentPhase == PHASE_2) {
+                            System.err.println("already second road, it's over now");
+                            boolean success = gameMap.placeRoad(player, mapPoint);
+                            if (!success) sendFailResponse.accept(CANT_BUILD_HERE);
+                            else {
+                                startUpBuiltMap.put(user, ALL_BUILT);
+                                sendSuccess.accept(req.getOriginLobby(),
+                                                   new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
+                                                                                 ROAD));
+                            }
+                        } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
                     } else if (inv.getBrick() >= 1 && inv.getLumber() >= 1) {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
-                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
-                                                                         BuildingSuccessfulMessage.Type.ROAD));
+                                           new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, ROAD));
                     } else {
                         sendFailResponse.accept(NOT_ENOUGH_RESOURCES);
                     }
@@ -553,7 +612,7 @@ public class GameService extends AbstractService {
             gameMap = gameMap.createMapFromConfiguration(configuration);
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
-            } // TODO: handle founder phase
+            }
             gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
@@ -679,12 +738,65 @@ public class GameService extends AbstractService {
         LOG.debug("Received EndTurnRequest for Lobby {}", req.getOriginLobby());
         LOG.debug("---- User {} wants to end their turn.", req.getUser().getUsername());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
-        UserOrDummy nextPlayer = game.nextPlayer();
+        StartUpPhase currentPhase = game.getStartUpPhase();
+        Deque<UserOrDummy> startUpPlayerOrder = game.getStartUpPlayerOrder();
+
+        if (currentPhase == NOT_IN_STARTUP_PHASE) {
+            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) {
+                return;
+            }
+        } else {
+            if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
+                //todo: denies 2nd player the building?
+                return;
+            }
+        }
         game.setBuildingAllowed(false);
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+        ServerMessage returnMessage;
+        UserOrDummy nextPlayer;
+        UserOrDummy user;
+        Optional<Lobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
+        if (optionalLobby.isEmpty()) return;
+        System.out.println("game.getStartUpPhase() = " + currentPhase);
+        if (optionalLobby.get().isStartUpPhaseEnabled()) {
+            if (currentPhase.equals(PHASE_1)) {
+                System.err.println("still in phase 1 sadge");
+                // in phase 1, continue with Deque order
+                startUpPlayerOrder.addLast(startUpPlayerOrder.pollFirst());
+                user = startUpPlayerOrder.peekFirst();
+                if (user == null) return;
+                if (user.equals(game.getFirst())) {
+                    // first again at the beginning, signals reversal as per rules (2nd phase)
+                    game.setStartUpPhase(PHASE_2);
+                    nextPlayer = startUpPlayerOrder.pollLast();
+                    startUpPlayerOrder.addFirst(nextPlayer);
+                } else {
+                    nextPlayer = user;
+                }
+            } else if (currentPhase.equals(PHASE_2)) {
+                System.err.println("we in phase 2 boys");
+                startUpPlayerOrder.addFirst(startUpPlayerOrder.pollLast());
+                user = startUpPlayerOrder.peekFirst();
+                if (user == null) return;
+                if (user.equals(game.getFirst())) {
+                    // startup phase over, continue with first, disable startup phase
+                    nextPlayer = user;
+                    game.setStartUpPhase(NOT_IN_STARTUP_PHASE);
+                } else {
+                    nextPlayer = user;
+                }
+            } else {
+                nextPlayer = game.nextPlayer();
+            }
+        } else {
+            nextPlayer = game.nextPlayer();
+        }
+        System.err.println("nextplayer = " + nextPlayer);
+        returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+
         LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
         game.setDiceRolledAlready(false);
         if (nextPlayer instanceof Dummy) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
@@ -1103,7 +1215,7 @@ public class GameService extends AbstractService {
         }
 
         LOG.debug("---- RoadBuildingCardPhase phase starts");
-        game.setRoadBuildingCardPhase(RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD);
+        game.setRoadBuildingCardPhase(WAITING_FOR_FIRST_ROAD);
 
         inv.increaseRoadBuildingCards(-1);
 
