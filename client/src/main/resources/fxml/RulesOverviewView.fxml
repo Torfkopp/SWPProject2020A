@@ -91,13 +91,33 @@
         </VBox>
     </Tab>
     <Tab fx:id="developmentCardTab" text="%rules.tabs.devcards">
-        <VBox>
-            <Label text="%rules.devcards.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        <VBox spacing="15.0">
+            <Label text="%rules.devcards.text.title" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.vpc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.vpc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.kc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.kc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.rbc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.rbc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.yopc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.yopc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.mc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.devcards.text.mc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <padding>
+                <Insets topRightBottomLeft="15.0"/>
+            </padding>
         </VBox>
     </Tab>
     <Tab fx:id="founderPhaseTab" text="%rules.tabs.founding">
-        <VBox>
-            <Label text="%rules.founding.text" wrapText="true" VBox.vgrow="ALWAYS"/>
+        <VBox spacing="15.0">
+            <Label text="%rules.founding.text.title" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.founding.text.concept" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.founding.text.order" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.founding.text.order.short" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Label text="%rules.founding.text.startresources" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <padding>
+                <Insets topRightBottomLeft="15.0"/>
+            </padding>
         </VBox>
     </Tab>
 </TabPane>
