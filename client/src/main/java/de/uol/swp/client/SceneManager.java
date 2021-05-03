@@ -782,9 +782,11 @@ public class SceneManager {
     /**
      * Handles the SetMoveTimeErrorEvent detected on the EventBus
      * <p>
-     * If a SetMoveTimeErrorEvent is detected on the EventBus, this method gets called. It shows the error message of the event in a error alert
+     * If a SetMoveTimeErrorEvent is detected on the EventBus,
+     * this method gets called. It shows the error message of
+     * the event in a error alert.
      *
-     * @param event
+     * @param event The SetMoveTimeErrorEvent detected on the EventBus
      *
      * @author Alwin Bossert
      * @see de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent

@@ -206,6 +206,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                             resourceBundle.getString("game.labels.movetime") + moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
+                        tradeService.closeBankTradeWindow(lobbyName);
                         gameService.endTurn(lobbyName);
                     }
                 } else {remainingMoveTime = moveTimeToDecrement.get();}
@@ -871,7 +872,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
         tradeService.tradeWithBank(lobbyName);
-        eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

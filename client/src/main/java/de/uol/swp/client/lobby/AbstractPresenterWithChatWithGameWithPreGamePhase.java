@@ -570,15 +570,21 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void prepareLobbyUpdate() {
         if (!userService.getLoggedInUser().equals(owner)) return;
-        int moveTime =
-                !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
-        int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-        if (moveTime < 30 || moveTime > 500) {
+        try {
+            int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
+                           this.moveTime;
+            int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+
+            if (moveTime < 30 || moveTime > 500) {
+                eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            } else {
+
+                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
+                                                 commandsActivated.isSelected(), moveTime,
+                                                 randomPlayFieldCheckbox.isSelected());
+            }
+        } catch (NumberFormatException ignored) {
             eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
-        } else {
-            lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                             commandsActivated.isSelected(), moveTime,
-                                             randomPlayFieldCheckbox.isSelected());
         }
     }
 

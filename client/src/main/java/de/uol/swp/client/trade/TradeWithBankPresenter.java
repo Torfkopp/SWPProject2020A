@@ -162,7 +162,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
         tradeResourceWithBankButton.setDisable(true);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -176,7 +175,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     @FXML
     private void onCancelButtonPressed() {
         tradeService.closeBankTradeWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -278,7 +276,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
