@@ -780,7 +780,7 @@ public class GameService extends AbstractService {
             return;
         }
         game.setBuildingAllowed(false);
-        ServerMessage returnMessage;
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
         UserOrDummy nextPlayer;
         UserOrDummy user;
         Optional<Lobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());

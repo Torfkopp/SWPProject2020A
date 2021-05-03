@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -217,6 +218,22 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey());
         }
+    }
+
+    /**
+     * Handles a click on the Show Rules Overview menu item
+     * <p>
+     * Method called when the Show Rules Overview menu item is clicked.
+     * It posts a ShowRulesOverviewViewEvent onto the EventBus.
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
+     * @since 2021-04-24
+     */
+    @FXML
+    private void onRulesMenuClicked() {
+        LOG.debug("Sending ShowRulesOverviewViewEvent");
+        eventBus.post(new ShowRulesOverviewViewEvent());
     }
 
     /**

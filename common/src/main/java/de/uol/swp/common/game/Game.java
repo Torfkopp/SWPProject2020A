@@ -35,13 +35,13 @@ public class Game {
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     private StartUpPhase startUpPhase;
-
+    private boolean paused = false;
+    private int round = 1;
     public enum StartUpPhase {
         PHASE_1,
         PHASE_2,
         NOT_IN_STARTUP_PHASE
     }
-    private boolean paused = false;
 
     /**
      * Constructor
@@ -240,6 +240,12 @@ public class Game {
         return dices;
     }
 
+    /**
+     * Gets the UserOrDummy who made the current game's first turn
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
     public UserOrDummy getFirst() {
         return first;
     }
@@ -380,6 +386,14 @@ public class Game {
     }
 
     /**
+     * Gets the current Round the Game is in
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public int getRound() {return round;}
+
+    /**
      * Returns the user corresponding with the given player
      *
      * @param player The player whose User is required
@@ -449,6 +463,7 @@ public class Game {
      */
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
+        if (activePlayer.equals(first)) round++;
         return activePlayer;
     }
 

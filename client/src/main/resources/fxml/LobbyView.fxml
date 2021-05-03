@@ -155,7 +155,6 @@
         </padding>
     </VBox>
     <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
-        <Menu fx:id="timerLabel"/>
         <Menu mnemonicParsing="false" text="%game.help.info" fx:id="infoMenu" visible="false">
             <items>
                 <CheckMenuItem fx:id="helpCheckBox" mnemonicParsing="false" onAction="#onHelpButtonPressed"
@@ -163,8 +162,13 @@
                                disable="true" visible="false"/>
             </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Settings"/>
         <Menu fx:id="moveTimerLabel"/>
+        <Menu mnemonicParsing="false" text="%lobby.menu.settings"/>
+        <Menu mnemonicParsing="false" text="%lobby.menu.rules" onAction="#onRulesMenuClicked">
+            <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview"/>
+        </Menu>
+        <Menu fx:id="timerLabel"/>
+        <Menu fx:id="currentRound" text="%lobby.menu.round" visible="false"/>
     </MenuBar>
     <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
           GridPane.rowSpan="2147483647">
