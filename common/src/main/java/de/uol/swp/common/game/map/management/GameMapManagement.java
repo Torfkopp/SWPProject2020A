@@ -342,21 +342,29 @@ public class GameMapManagement implements IGameMapManagement {
             lengths.add(0);
             if (leftNodeLengths.isEmpty()) {
                 if (rightNodeEdges.isEmpty()) {
+                    System.out.println(1);
                     lengths.add(1);
                 } else {
                     for (IEdge nextEdge : rightNodeEdges) {
-                        lengths.add(1 + roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited),
-                                                   new HashSet<>(visited)));
+                        int i = roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited),
+                                           new HashSet<>(visited));
+                        System.out.println(1 + " : " + i);
+                        lengths.add(1 + i);
                     }
                 }
             } else {
                 for (Tuple<Integer, Set<IEdge>> x : leftNodeLengths) {
                     if (rightNodeEdges.isEmpty()) {
-                        lengths.add(x.getValue1() + 1);
+                        final int value1 = x.getValue1();
+                        System.out.println(value1 + " : " + 1);
+                        lengths.add(value1 + 1);
                     }
                     for (IEdge nextEdge : rightNodeEdges) {
-                        lengths.add(x.getValue1() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
-                                                                   new HashSet<>(visited)));
+                        final int i = roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
+                                                 new HashSet<>(visited));
+                        final int value1 = x.getValue1();
+                        System.out.println(value1 + " : " + 1 + " : " + i);
+                        lengths.add(value1 + 1 + i);
                     }
                 }
             }
@@ -368,14 +376,24 @@ public class GameMapManagement implements IGameMapManagement {
 
         {
             EndpointPair<IIntersection> nodes = intersectionEdgeNetwork.incidentNodes(edge);
+            Outer:
             for (IEdge nextEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
-                if (intersectionEdgeNetwork.incidentEdges(nodes.nodeU()).contains(edge)) {
-                    nodeUEdges.add(nextEdge);
-                } else if (intersectionEdgeNetwork.incidentEdges(nodes.nodeV()).contains(edge)) {
-                    nodeVEdges.add(nextEdge);
+                for (IEdge d : intersectionEdgeNetwork.incidentEdges(nodes.nodeU())) {
+                    if (d == nextEdge) {
+                        nodeUEdges.add(nextEdge);
+                        continue Outer;
+                    }
+                }
+                for (IEdge d : intersectionEdgeNetwork.incidentEdges(nodes.nodeV())) {
+                    if (d == nextEdge) {
+                        nodeVEdges.add(nextEdge);
+                        continue Outer;
+                    }
                 }
             }
         }
+        System.out.println("nodeUEdges = " + nodeUEdges);
+        System.out.println("nodeVEdges = " + nodeVEdges);
         List<Integer> lengths = new LinkedList<>();
         lengths.add(a.apply(nodeUEdges, nodeVEdges));
         lengths.add(a.apply(nodeVEdges, nodeUEdges));
