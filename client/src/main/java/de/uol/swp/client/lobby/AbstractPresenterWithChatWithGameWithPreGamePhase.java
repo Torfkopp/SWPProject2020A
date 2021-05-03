@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -374,6 +375,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             helpCheckBox.setDisable(true);
             helpCheckBox.setVisible(false);
             cardAmountTripleList.clear();
+            moveTimeTimer.cancel();
+            moveTimerLabel.setVisible(false);
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
         });
@@ -393,8 +396,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void onStartSessionButtonPressed() {
         buildingCosts.setVisible(true);
-        gameService.startSession(lobbyName);
+        gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
+        moveTimerLabel.setVisible(true);
     }
 
     /**
@@ -435,6 +439,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
+            setMoveTimer(moveTime);
             gameService.updateGameMap(lobbyName);
             long startTime = System.currentTimeMillis();
             this.elapsedTimer = new AnimationTimer() {
@@ -481,6 +486,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             dice1 = dices[0];
             dice2 = dices[1];
             setTurnIndicatorText(rsp.getPlayer());
+            setMoveTimer(rsp.getMoveTime());
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
@@ -572,12 +578,22 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void prepareLobbyUpdate() {
         if (!userService.getLoggedInUser().equals(owner)) return;
-        int moveTime =
-                !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
-        int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-        lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                         commandsActivated.isSelected(), moveTime,
-                                         randomPlayFieldCheckbox.isSelected());
+        try {
+            int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
+                           this.moveTime;
+            int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+
+            if (moveTime < 30 || moveTime > 500) {
+                eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            } else {
+
+                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
+                                                 commandsActivated.isSelected(), moveTime,
+                                                 randomPlayFieldCheckbox.isSelected());
+            }
+        } catch (NumberFormatException ignored) {
+            eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+        }
     }
 
     /**

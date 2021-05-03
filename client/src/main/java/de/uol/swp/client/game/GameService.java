@@ -123,9 +123,9 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void startSession(LobbyName lobbyName) {
+    public void startSession(LobbyName lobbyName, int moveTime) {
         LOG.debug("Sending StartSessionRequest");
-        Message request = new StartSessionRequest(lobbyName, userService.getLoggedInUser());
+        Message request = new StartSessionRequest(lobbyName, userService.getLoggedInUser(), moveTime);
         eventBus.post(request);
     }
 

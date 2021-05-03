@@ -7,6 +7,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourceThingies.resource.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -154,12 +155,14 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * <p>
      * Posts a request to reduce the resources, posts an event to close the window
      * and then updates the inventory
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      */
     @FXML
     private void onTaxPayButtonPressed() {
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

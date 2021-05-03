@@ -5,12 +5,11 @@
 //import com.google.common.eventbus.Subscribe;
 //import de.uol.swp.client.user.IUserService;
 //import de.uol.swp.client.user.UserService;
-//import de.uol.swp.common.LobbyName;
-//import de.uol.swp.common.game.Resource;
 //import de.uol.swp.common.game.request.EndTurnRequest;
 //import de.uol.swp.common.game.request.PlayCardRequest.*;
 //import de.uol.swp.common.game.request.RollDiceRequest;
 //import de.uol.swp.common.game.request.UpdateInventoryRequest;
+//import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 //import de.uol.swp.common.lobby.request.StartSessionRequest;
 //import de.uol.swp.common.user.User;
 //import de.uol.swp.common.user.UserDTO;
@@ -28,9 +27,9 @@
 //class GameServiceTest {
 //
 //    private static final User defaultUser = new UserDTO(42, "test", "test123", "test@test.test");
-//    private static final LobbyName defaultLobbyName = "Test lobby";
-//    private static final Resource.ResourceType defaultResource = Resource.ResourceType.BRICK;
-//    private static final Resource.ResourceType secondResource = Resource.ResourceType.GRAIN;
+//    private static final String defaultLobbyName = "Test lobby";
+//    private static final ResourceType defaultResource = ResourceType.BRICK;
+//    private static final ResourceType secondResource = ResourceType.GRAIN;
 //
 //    private final EventBus eventBus = new EventBus();
 //    private final CountDownLatch lock = new CountDownLatch(1);
@@ -156,7 +155,7 @@
 //
 //    @Test
 //    void startSession() throws InterruptedException {
-//        gameService.startSession(defaultLobbyName);
+//        gameService.startSession(defaultLobbyName, 0);
 //
 //        lock.await(250, TimeUnit.MILLISECONDS);
 //

@@ -23,6 +23,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final int[] dices;
     private final boolean rolledDiceAlready;
     private final boolean autoRollState;
+    private final int moveTime;
 
     /**
      * Constructor
@@ -32,14 +33,15 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param dices         The last rolled dices
      * @param autoRollState The autoRoll state
      */
-    public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
-                                boolean rolledDiceAlready, boolean autoRollState) {
+    public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO,
+                                int[] dices, boolean rolledDiceAlready, boolean autoRollState, int moveTime) {
         this.lobby = lobby;
         this.player = player;
         this.gameMapDTO = gameMapDTO;
         this.dices = dices;
         this.rolledDiceAlready = rolledDiceAlready;
         this.autoRollState = autoRollState;
+        this.moveTime = moveTime;
     }
 
     /**
@@ -76,6 +78,15 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public ISimpleLobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets the moveTime for the game
+     *
+     * @return moveTime
+     */
+    public int getMoveTime() {
+        return moveTime;
     }
 
     /**

@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
 import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourceThingies.resource.*;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
@@ -108,12 +109,14 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeWithUserCancelResponse to close the responding
      * trading window if existent.
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
         tradeService.closeUserTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, respondingUser);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

@@ -36,6 +36,7 @@ public class Game {
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    private boolean paused = false;
 
     /**
      * Constructor
@@ -426,5 +427,17 @@ public class Game {
      */
     public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
         autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
+    }
+
+    /**
+     * Sets the boolean paused for the game.
+     *
+     * @param paused
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-02
+     */
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 }

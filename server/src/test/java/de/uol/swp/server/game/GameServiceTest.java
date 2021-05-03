@@ -2,10 +2,7 @@
 //
 //import com.google.common.eventbus.EventBus;
 //import de.uol.swp.common.I18nWrapper;
-//import de.uol.swp.common.game.Game;
-//import de.uol.swp.common.game.map.*;
-//import de.uol.swp.server.game.GameMapManagement;
-//import de.uol.swp.server.game.map.IGameMapManagement;
+//import de.uol.swp.common.game.map.Player;
 //import de.uol.swp.common.game.map.management.MapPoint;
 //import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 //import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
@@ -13,18 +10,16 @@
 //import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
 //import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
 //import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
+//import de.uol.swp.common.game.resourceThingies.Inventory;
 //import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 //import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 //import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
-//import de.uol.swp.common.lobby.Lobby;
-//import de.uol.swp.common.lobby.LobbyDTO;
 //import de.uol.swp.common.lobby.request.KickUserRequest;
 //import de.uol.swp.common.message.Message;
 //import de.uol.swp.common.user.*;
 //import de.uol.swp.common.user.request.LoginRequest;
-//import de.uol.swp.server.lobby.ILobbyManagement;
-//import de.uol.swp.server.lobby.LobbyManagement;
-//import de.uol.swp.server.lobby.LobbyService;
+//import de.uol.swp.server.game.map.IGameMapManagement;
+//import de.uol.swp.server.lobby.*;
 //import de.uol.swp.server.sessionmanagement.SessionManagement;
 //import de.uol.swp.server.usermanagement.AuthenticationService;
 //import de.uol.swp.server.usermanagement.UserManagement;
@@ -102,7 +97,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame("testlobby");
 //        Inventory[] gameInventory = game.getAllInventories();
 //        gameInventory[0].setWool(5);
@@ -163,7 +158,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame("testlobby");
 //        Inventory[] gameInventory = game.getAllInventories();
 //        gameInventory[0].setWool(5);
@@ -254,7 +249,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame("testlobby");
 //        Inventory[] gameInventory = game.getAllInventories();
 //        List<String> bankInventory = game.getBankInventory();
@@ -380,7 +375,7 @@
 //        lobby.get().joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby.get(), user[0], gameMap);
+//        gameManagement.createGame(lobby.get(), user[0], gameMap, 0);
 //
 //        Message kickUser = new KickUserRequest("testlobby", user[0], user[1]);
 //        bus.post(kickUser);
@@ -430,7 +425,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame(lobby.getName());
 //        game.getInventory(Player.PLAYER_1).increaseKnightCards(1);
 //        game.setDiceRolledAlready(true);
@@ -449,7 +444,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame(lobby.getName());
 //        Inventory[] inventories = game.getAllInventories();
 //        inventories[1].increaseBrick(1);
@@ -473,7 +468,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame(lobby.getName());
 //        assertEquals(0, game.getInventory(Player.PLAYER_1).getBrick());
 //        game.getInventory(Player.PLAYER_1).increaseYearOfPlentyCards(1);
@@ -501,7 +496,7 @@
 //        lobby.joinUser(dummy);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame(lobby.getName());
 //        game.setDiceRolledAlready(true);
 //        //Tests robbing a resource
@@ -555,7 +550,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame("testlobby");
 //        Inventory[] gameInventory = game.getAllInventories();
 //        gameInventory[0].setWool(5);
@@ -616,7 +611,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame("testlobby");
 //        Inventory[] gameInventory = game.getAllInventories();
 //        for (int i = 0; i < 2; i++) {
@@ -704,7 +699,7 @@
 //        lobby.joinUser(user[2]);
 //        IGameMapManagement gameMap = new GameMapManagement();
 //        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-//        gameManagement.createGame(lobby, user[0], gameMap);
+//        gameManagement.createGame(lobby, user[0], gameMap, 0);
 //        Game game = gameManagement.getGame("testlobby");
 //        Inventory[] gameInventory = game.getAllInventories();
 //        gameInventory[0].setWool(5);

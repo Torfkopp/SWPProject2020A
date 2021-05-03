@@ -117,12 +117,13 @@ public interface IGameService {
      * Posts a request to start the game session
      *
      * @param lobbyName The name of the lobby where the session should be started.
+     * @param moveTime  The moveTime for the game
      *
      * @author Maximillian Lindner
      * @author Temmo Junkhoff
      * @since 2021-03-23
      */
-    void startSession(LobbyName lobbyName);
+    void startSession(LobbyName lobbyName, int moveTime);
 
     /**
      * Posts a RobberTaxChosenRequest and a CloseRobberTaxView

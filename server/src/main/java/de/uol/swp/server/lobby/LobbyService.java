@@ -564,7 +564,7 @@ public class LobbyService extends AbstractService {
         if (lobby.get().getUserOrDummies().size() < 3 || (!lobby.get().getReadyUsers()
                                                                 .equals(lobby.get().getUserOrDummies()))) return;
         LOG.debug("---- All Members are ready, proceeding with sending of CreateGameInternalRequest...");
-        ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser());
+        ServerInternalMessage msg = new CreateGameInternalRequest(lobby.get(), req.getUser(), req.getMoveTime());
         post(msg);
     }
 
