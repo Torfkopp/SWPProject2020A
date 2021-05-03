@@ -109,6 +109,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected TextFlow helpLabel;
     @FXML
     protected Menu infoMenu;
+    @FXML
+    protected Menu currentRound = new Menu();
 
     @Inject
     protected IGameService gameService;
@@ -137,6 +139,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected CheckMenuItem helpCheckBox;
     private boolean diceRolled = false;
+    protected int roundCounter = 0;
+
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<Map, Integer> developmentCardAmountCol;
@@ -648,6 +652,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
+        int getRound = msg.getCurrentRound();
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
@@ -658,6 +663,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
         moveTimeTimer.cancel();
         setMoveTimer(moveTime);
+        Platform.runLater(
+                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
     }
 
     /**
