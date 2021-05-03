@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rulesTabPane" prefHeight="550.0" prefWidth="610.0"
+<TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rulesTabPane" prefHeight="700.0" prefWidth="625.0"
          tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1"
          fx:controller="de.uol.swp.client.rules.RulesOverviewPresenter">
     <Tab fx:id="basicsTab" text="%rules.tabs.basics">
@@ -33,14 +33,14 @@
     <Tab fx:id="buildingTab" text="%rules.tabs.building">
         <GridPane>
             <columnConstraints>
-                <ColumnConstraints halignment="CENTER" minWidth="10.0" percentWidth="50.0"/>
-                <ColumnConstraints halignment="CENTER" minWidth="10.0" percentWidth="50.0"/>
+                <ColumnConstraints halignment="CENTER" percentWidth="50.0"/>
+                <ColumnConstraints halignment="CENTER" percentWidth="50.0"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" percentHeight="12.5" valignment="CENTER"/>
-                <RowConstraints minHeight="10.0" valignment="CENTER"/>
-                <RowConstraints minHeight="10.0" valignment="CENTER"/>
-                <RowConstraints minHeight="10.0" percentHeight="22.5" valignment="CENTER"/>
+                <RowConstraints percentHeight="12.5" valignment="CENTER"/>
+                <RowConstraints valignment="CENTER"/>
+                <RowConstraints valignment="CENTER"/>
+                <RowConstraints percentHeight="22.5" valignment="CENTER"/>
             </rowConstraints>
             <Label text="%rules.building.text.title" wrapText="true" GridPane.columnIndex="0"
                    GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="0"
@@ -83,8 +83,8 @@
     <Tab fx:id="tradingTab" text="%rules.tabs.trade">
         <GridPane>
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0"/>
+                <ColumnConstraints hgrow="SOMETIMES"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints percentHeight="16.0" vgrow="SOMETIMES"/>
@@ -97,37 +97,37 @@
             <Label text="%rules.trading.text.title" wrapText="true" GridPane.columnSpan="2147483647"
                    GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                 <GridPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.1" wrapText="true" GridPane.columnIndex="1"
                    GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                 <GridPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.2" wrapText="true" GridPane.columnIndex="1"
                    GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.3" wrapText="true" GridPane.columnIndex="1"
                    GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                 <GridPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.4" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="4"
                    GridPane.valignment="CENTER">
                 <GridPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.5" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="5"
                    GridPane.valignment="CENTER">
                 <GridPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"
@@ -141,28 +141,155 @@
             </ImageView>
         </GridPane>
     </Tab>
+    <Tab fx:id="bankTab" text="%rules.tabs.bank">
+        <TabPane fx:id="bankTabPane" tabClosingPolicy="UNAVAILABLE">
+            <Tab fx:id="resourceExchangeTab" closable="false" text="%rules.bank.tab.exchange">
+                <GridPane hgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints percentHeight="12.0" vgrow="SOMETIMES"/>
+                        <RowConstraints percentHeight="47.5" vgrow="SOMETIMES"/>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <Label/>
+                    <Label text="%rules.bank.text.title" wrapText="true" GridPane.columnSpan="2"
+                           GridPane.halignment="CENTER" GridPane.valignment="TOP">
+                        <GridPane.margin>
+                            <Insets/>
+                        </GridPane.margin>
+                    </Label>
+                    <Label text="%rules.bank.text.ratios" wrapText="true" GridPane.halignment="CENTER"
+                           GridPane.rowIndex="1" GridPane.valignment="CENTER"/>
+                    <ImageView fitHeight="280.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+                               GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                        <GridPane.margin>
+                            <Insets/>
+                        </GridPane.margin>
+                        <Image url="@../images/rules/bank_only_4-1.png"/>
+                    </ImageView>
+                    <ImageView fitHeight="110.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER"
+                               GridPane.rowIndex="3">
+                        <Image url="@../images/rules/harbour_grain_settled.png"/>
+                    </ImageView>
+                    <Label text="%rules.bank.text.ratio.any" wrapText="true" GridPane.columnIndex="1"
+                           GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER"/>
+                    <ImageView fitHeight="110.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER"
+                               GridPane.rowIndex="2">
+                        <Image url="@../images/rules/harbour_any.png"/>
+                    </ImageView>
+                    <Label text="%rules.bank.text.ratio.specific" wrapText="true" GridPane.columnIndex="1"
+                           GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER"/>
+                    <padding>
+                        <Insets topRightBottomLeft="10.0"/>
+                    </padding>
+                </GridPane>
+            </Tab>
+            <Tab fx:id="devCardSaleTab" closable="false" text="%rules.bank.tab.devcards">
+                <GridPane>
+                    <rowConstraints>
+                        <RowConstraints percentHeight="12.0"/>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                    </rowConstraints>
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="30.0">
+                        </ColumnConstraints>
+                        <ColumnConstraints percentWidth="70.0"/>
+                    </columnConstraints>
+                    <padding>
+                        <Insets topRightBottomLeft="10.0"/>
+                    </padding>
+                    <ImageView fitHeight="280.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+                               GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                        <Image url="@../images/rules/bank_buy_devcard.png"/>
+                    </ImageView>
+                    <Label text="%rules.bank.text.devcards" wrapText="true" GridPane.columnSpan="2"
+                           GridPane.halignment="CENTER" GridPane.valignment="TOP"/>
+                    <Label text="%rules.bank.text.devcards.description" wrapText="true" GridPane.rowIndex="1"/>
+                </GridPane>
+            </Tab>
+        </TabPane>
+    </Tab>
     <Tab fx:id="robberTab" text="%rules.tabs.robber">
-        <VBox>
-            <Label text="%rules.robber.text" wrapText="true" VBox.vgrow="ALWAYS"/>
-        </VBox>
+        <GridPane>
+            <rowConstraints>
+                <RowConstraints percentHeight="10.0"/>
+                <RowConstraints percentHeight="16.0"/>
+                <RowConstraints/>
+            </rowConstraints>
+            <columnConstraints>
+                <ColumnConstraints percentWidth="25.0"/>
+                <ColumnConstraints percentWidth="60.0"/>
+            </columnConstraints>
+            <ImageView fitWidth="400.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+                       GridPane.halignment="LEFT" GridPane.rowIndex="2">
+                <Image url="@../images/rules/robber_tax.png"/>
+            </ImageView>
+            <Label text="%rules.robber.text.title" wrapText="true" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+                <GridPane.margin>
+                    <Insets left="10.0" right="10.0" top="10.0"/>
+                </GridPane.margin>
+            </Label>
+            <Label text="%rules.robber.text.intro" wrapText="true" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+                   GridPane.rowIndex="1">
+                <GridPane.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0"/>
+                </GridPane.margin>
+            </Label>
+            <VBox spacing="10.0" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                <Label text="%rules.robber.text.tax" wrapText="true"/>
+                <ImageView fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+                    <VBox.margin>
+                        <Insets top="25.0"/>
+                    </VBox.margin>
+                    <Image url="@../images/rules/robber_symbol_on_hex.png"/>
+                </ImageView>
+                <Label text="%rules.robber.text.symboldescriptor" wrapText="true"/>
+                <GridPane.margin>
+                    <Insets left="10.0"/>
+                </GridPane.margin>
+                <padding>
+                    <Insets top="10.0"/>
+                </padding>
+            </VBox>
+        </GridPane>
     </Tab>
     <Tab fx:id="developmentCardTab" text="%rules.tabs.devcards">
-        <VBox spacing="15.0">
-            <Label text="%rules.devcards.text.title" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.vpc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.vpc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.kc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.kc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.rbc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.rbc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.yopc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.yopc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.mc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Label text="%rules.devcards.text.mc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <padding>
-                <Insets topRightBottomLeft="15.0"/>
-            </padding>
-        </VBox>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <Tab fx:id="standardDevCardTab" text="%rules.devcards.tab.standard">
+                <VBox spacing="15.0">
+                    <Label text="%rules.devcards.text.title" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.vpc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.vpc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.kc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.kc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.rbc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.rbc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.yopc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.yopc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.mc.name" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <Label text="%rules.devcards.text.mc.description" wrapText="true" VBox.vgrow="ALWAYS"/>
+                    <padding>
+                        <Insets topRightBottomLeft="15.0"/>
+                    </padding>
+                </VBox>
+            </Tab>
+            <Tab fx:id="uniqueDevCardTab" text="%rules.devcards.tab.unique">
+                <VBox spacing="25.0">
+                    <Label text="%rules.devcards.text.unique.intro" wrapText="true"/>
+                    <ImageView pickOnBounds="true" preserveRatio="true">
+                        <Image url="@../images/rules/unique_card_list.png"/>
+                    </ImageView>
+                    <padding>
+                        <Insets topRightBottomLeft="15.0"/>
+                    </padding>
+                </VBox>
+            </Tab>
+        </TabPane>
     </Tab>
     <Tab fx:id="founderPhaseTab" text="%rules.tabs.founding">
         <VBox spacing="15.0">

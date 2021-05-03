@@ -24,6 +24,7 @@ import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import de.uol.swp.client.rules.RulesOverviewPresenter;
+import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
@@ -967,6 +968,10 @@ public class SceneManager {
             rulesStage.initOwner(primaryStage);
             rulesStage.show();
             rulesStage.toFront();
+            rulesStage.setOnCloseRequest(windowEvent -> {
+                rulesOverviewIsOpen = false;
+                eventBus.post(new ResetRulesOverviewEvent());
+            });
         });
     }
 
