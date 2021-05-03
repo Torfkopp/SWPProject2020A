@@ -32,7 +32,7 @@ public class Game {
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
-    private int turn = 1;
+    private int round = 1;
 
     /**
      * Constructor
@@ -227,8 +227,7 @@ public class Game {
     }
 
     /**
-     * Receives if the UserOrDummy is the first one
-     * who made a turn in the current Game
+     * Gets the UserOrDummy who made the current game's first turn
      *
      * @author Aldin Dervisi
      * @since 2021-05-01
@@ -362,7 +361,7 @@ public class Game {
      * @author Aldin Dervisi
      * @since 2021-05-01
      */
-    public int getTurn() {return turn;}
+    public int getRound() {return round;}
 
     /**
      * Returns the user corresponding with the given player
@@ -434,7 +433,7 @@ public class Game {
      */
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
-        if (activePlayer.equals(first)) turn++;
+        if (activePlayer.equals(first)) round++;
         return activePlayer;
     }
 

@@ -465,7 +465,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
-        int getTurn = msg.getCurrentTurn();
+        int getRound = msg.getCurrentRound();
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
@@ -473,7 +473,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
         Platform.runLater(
-                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getTurn)));
+                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
     }
 
     /**

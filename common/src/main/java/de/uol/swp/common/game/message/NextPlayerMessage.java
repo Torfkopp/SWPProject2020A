@@ -9,7 +9,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class NextPlayerMessage extends AbstractGameMessage {
 
-    private final int currentTurn;
+    private final int currentRound;
 
     /**
      * Constructor
@@ -17,9 +17,9 @@ public class NextPlayerMessage extends AbstractGameMessage {
      * @param lobbyName    The lobby name
      * @param activePlayer The active player
      */
-    public NextPlayerMessage(String lobbyName, UserOrDummy activePlayer, int currentTurn) {
+    public NextPlayerMessage(String lobbyName, UserOrDummy activePlayer, int currentRound) {
         super(lobbyName, activePlayer);
-        this.currentTurn = currentTurn;
+        this.currentRound = currentRound;
     }
 
     /**
@@ -37,7 +37,7 @@ public class NextPlayerMessage extends AbstractGameMessage {
      * @author Aldin Dervisi
      * @since 2021-05-01
      */
-    public int getCurrentTurn() {
-        return currentTurn;
+    public int getCurrentRound() {
+        return currentRound;
     }
 }
