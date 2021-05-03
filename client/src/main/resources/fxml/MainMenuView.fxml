@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0"
       prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="de.uol.swp.client.main.MainMenuPresenter">
+      fx:id="mainMenuView" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane vgap="10.0" HBox.hgrow="ALWAYS">
         <columnConstraints>
             <ColumnConstraints percentWidth="17.5"/>
@@ -56,6 +56,9 @@
                           text="%mainmenu.settings.buttons.deleteuser"/>
                 <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
                           text="%mainmenu.settings.buttons.logout"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="%lobby.menu.rules">
+                <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview" onAction="#onRulesMenuClicked"/>
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>

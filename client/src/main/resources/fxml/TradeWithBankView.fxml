@@ -6,7 +6,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
       minHeight="-Infinity"
       minWidth="-Infinity" prefHeight="400" prefWidth="595.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+      fx:id="bankView" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
     <padding>
         <Insets topRightBottomLeft="20.0"/>
     </padding>

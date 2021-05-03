@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
+import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -20,8 +21,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,8 +39,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 825;
-    public static final int MIN_WIDTH_PRE_GAME = 685;
+    public static final int HELP_MIN_WIDTH = 250;
     public static final int MIN_HEIGHT_IN_GAME = 825;
+    public static final int MIN_WIDTH_PRE_GAME = 685;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
@@ -217,6 +217,22 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey());
         }
+    }
+
+    /**
+     * Handles a click on the Show Rules Overview menu item
+     * <p>
+     * Method called when the Show Rules Overview menu item is clicked.
+     * It posts a ShowRulesOverviewViewEvent onto the EventBus.
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
+     * @since 2021-04-24
+     */
+    @FXML
+    private void onRulesMenuClicked() {
+        LOG.debug("Sending ShowRulesOverviewViewEvent");
+        eventBus.post(new ShowRulesOverviewViewEvent());
     }
 
     /**
@@ -406,7 +422,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
             changeOwnerButton.setDisable(isSelf);
-            tradeWithUserButton.setDisable(isSelf);
+            tradeWithUserButton.setDisable(isSelf||!tradingCurrentlyAllowed);
             if (isSelf) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
                 changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
