@@ -52,19 +52,6 @@ public interface IGameMapManagement {
     IConfiguration getBeginnerConfiguration();
 
     /**
-     * Gets the current configuration of the IGameMap
-     *
-     * @return The current, read-only configuration
-     *
-     * @author Finn Haase
-     * @author Phillip-André Suhr
-     * @implNote Not used currently; could be used in future (e.g. rejoining a game)
-     * @see de.uol.swp.common.game.map.configuration.IConfiguration
-     * @since 2021-03-18
-     */
-    IConfiguration getCurrentConfiguration();
-
-    /**
      * Gets an edge that connects two intersections
      *
      * @param position The MapPoint of the Edge
@@ -306,6 +293,14 @@ public interface IGameMapManagement {
      */
     boolean placeRoad(Player player, MapPoint mapPoint);
 
+    /**
+     * Find the length of the longest road and to which player it belongs.
+     *
+     * @return The Player with the length of the longest road
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-03
+     */
     GameMapManagement.PlayerWithLengthOfLongestRoad findLongestRoad();
 
     /**
