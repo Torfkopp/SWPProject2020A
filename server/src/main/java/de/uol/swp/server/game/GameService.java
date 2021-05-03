@@ -98,8 +98,8 @@ public class GameService extends AbstractService {
             for (Map<String, Object> neededResourceMap : neededResourceList) {
                 //@formatter:off
                 if (resourceMap.get("enumType").equals(neededResourceMap.get("enumType"))
-                    && ((int) resourceMap.get("amount")) < (int) neededResourceMap.get("amount"))
-                        return false;
+                        && ((int) resourceMap.get("amount")) < (int) neededResourceMap.get("amount"))
+                    return false;
                 //@formatter:on
             }
         }
@@ -112,7 +112,7 @@ public class GameService extends AbstractService {
      *
      * @param game        The game in which the player might have won
      * @param originLobby The lobby in which the game is taking place
-     * @param user        The use who might have won
+     * @param user        The user who might have won
      *
      * @author Phillip-André Suhr
      * @author Steven Luong
@@ -124,7 +124,6 @@ public class GameService extends AbstractService {
         if (vicPoints >= 10) {
             ServerMessage message = new PlayerWonGameMessage(originLobby, user);
             lobbyService.sendToAllInLobby(originLobby, message);
-            gameManagement.dropGame(originLobby);
             game.setBuildingAllowed(false);
         }
     }
@@ -1240,6 +1239,31 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
         LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby {}", req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
+    }
+
+    /**
+     * Handles a ReturnToPreGameLobbyMessage found on the EventBus
+     * <p>
+     * If a ReturnToPreGameLobbyMessage is found on the EventBus this method drops the
+     * game associated with the Lobby, if one existed.
+     *
+     * @param msg The ReturnToPreGameLobbyMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @since 2021-04-30
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        Game game = gameManagement.getGame(msg.getName());
+        if (game == null) return;
+        try {
+            gameManagement.dropGame(msg.getName());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            LOG.debug("Sending ExceptionMessage");
+            post(exceptionMessage);
+        }
     }
 
     /**
