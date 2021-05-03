@@ -61,20 +61,17 @@ public class Game {
         playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
-            Player counterPlayer = Player.PLAYER_1;
-            for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
-                // TODO: add users to startUpPlayerOrder in the order they will take turns in
-                startUpPlayerOrder.addLast(userOrDummy);
-                playersStartUpBuiltMap.put(userOrDummy, StartUpPhaseBuiltStructures.NONE_BUILT);
-                players.put(userOrDummy, counterPlayer, new Inventory());
-
             List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+            startUpPlayerOrder.addLast(first);
+            playersStartUpBuiltMap.put(first, StartUpPhaseBuiltStructures.NONE_BUILT);
             players.put(first, Player.PLAYER_1, new Inventory());
             playerList.remove(first);
             Player counterPlayer = Player.PLAYER_2;
             while (playerList.size() > 0) {
                 int randomNumber = (int) (Math.random() * playerList.size());
                 UserOrDummy randomUser = playerList.get(randomNumber);
+                startUpPlayerOrder.addLast(randomUser);
+                playersStartUpBuiltMap.put(randomUser, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(randomUser, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
                 playerList.remove(randomUser);
