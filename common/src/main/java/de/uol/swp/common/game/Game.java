@@ -34,6 +34,7 @@ public class Game {
     private Player playerWithLongestRoad = null;
     private Player playerWithLargestArmy = null;
     private int longestRoadLength = 0;
+    private boolean paused = false;
 
     /**
      * Constructor
@@ -515,5 +516,17 @@ public class Game {
      */
     public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
         autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
+    }
+
+    /**
+     * Sets the boolean paused for the game.
+     *
+     * @param paused
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-02
+     */
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 }

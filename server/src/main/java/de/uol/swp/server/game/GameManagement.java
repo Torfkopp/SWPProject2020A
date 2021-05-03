@@ -29,7 +29,8 @@ public class GameManagement implements IGameManagement {
     }
 
     @Override
-    public void createGame(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) throws IllegalArgumentException {
+    public void createGame(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap,
+                           int moveTime) throws IllegalArgumentException {
         if (games.containsKey(lobby.getName())) {
             throw new IllegalArgumentException("Game of lobby [" + lobby.getName() + "] already exists!");
         }
