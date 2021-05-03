@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
+import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
@@ -23,18 +25,21 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final int[] dices;
     private final boolean rolledDiceAlready;
     private final boolean autoRollState;
+    private final StartUpPhaseBuiltStructures builtStructures;
     private final int moveTime;
 
     /**
      * Constructor
      *
-     * @param lobby         The lobby where the has already started
-     * @param player        The player who has the turn
-     * @param dices         The last rolled dices
-     * @param autoRollState The autoRoll state
+     * @param lobby           The lobby where the has already started
+     * @param player          The player who has the turn
+     * @param dices           The last rolled dices
+     * @param autoRollState   The autoRoll state
+     * @param builtStructures What structures of the founding phase the user already built
      */
     public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO,
-                                int[] dices, boolean rolledDiceAlready, boolean autoRollState, int moveTime) {
+                                int[] dices, boolean rolledDiceAlready, boolean autoRollState, int moveTime,
+                                StartUpPhaseBuiltStructures builtStructures) {
         this.lobby = lobby;
         this.player = player;
         this.gameMapDTO = gameMapDTO;
@@ -42,6 +47,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
         this.rolledDiceAlready = rolledDiceAlready;
         this.autoRollState = autoRollState;
         this.moveTime = moveTime;
+        this.builtStructures = builtStructures;
     }
 
     /**
@@ -51,6 +57,10 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public boolean areDiceRolledAlready() {
         return rolledDiceAlready;
+    }
+
+    public StartUpPhaseBuiltStructures getBuiltStructures() {
+        return builtStructures;
     }
 
     /**

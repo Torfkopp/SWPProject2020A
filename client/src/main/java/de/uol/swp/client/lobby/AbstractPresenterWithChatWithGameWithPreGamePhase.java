@@ -6,6 +6,7 @@ import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.response.StartSessionResponse;
@@ -379,6 +380,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             moveTimerLabel.setVisible(false);
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+            currentRound.setVisible(false);
+            roundCounter = 0;
         });
     }
 
@@ -399,6 +402,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
         moveTimerLabel.setVisible(true);
+        currentRound.setVisible(true);
+        Platform.runLater(() -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1)));
     }
 
     /**
@@ -424,6 +429,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
+            if (startUpPhaseEnabled) {
+                notice.setVisible(true);
+                notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+            }
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
             endTurn.setDisable(true);
@@ -480,6 +489,26 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
+            startUpPhaseBuiltStructures = rsp.getBuiltStructures();
+            // because startUpPhaseEnabled tracks whether it's _ongoing_, we check if player built everything
+            startUpPhaseEnabled = startUpPhaseBuiltStructures != StartUpPhaseBuiltStructures.ALL_BUILT;
+            if (startUpPhaseEnabled) {
+                switch (startUpPhaseBuiltStructures) {
+                    case NONE_BUILT:
+                        notice.setVisible(true);
+                        notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+                        break;
+                    case FIRST_SETTLEMENT_BUILT:
+                        notice.setText(resourceBundle.getString("game.setupphase.building.firstroad"));
+                        break;
+                    case FIRST_BOTH_BUILT:
+                        notice.setText(resourceBundle.getString("game.setupphase.building.secondsettlement"));
+                        break;
+                    case SECOND_SETTLEMENT_BUILT:
+                        notice.setText(resourceBundle.getString("game.setupphase.building.secondroad"));
+                        break;
+                }
+            }
             autoRollEnabled = rsp.isAutoRollState();
             autoRoll.setSelected(autoRollEnabled);
             int[] dices = rsp.getDices();

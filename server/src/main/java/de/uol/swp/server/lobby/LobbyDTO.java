@@ -26,7 +26,9 @@ public class LobbyDTO implements Lobby {
     private final LobbyName name;
     private final Set<UserOrDummy> users = new TreeSet<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
+    private final String password;
     private boolean inGame;
+    private boolean hasPassword;
     private User owner;
     private boolean commandsAllowed;
     private int maxPlayers;
@@ -37,14 +39,18 @@ public class LobbyDTO implements Lobby {
     /**
      * Constructor
      *
-     * @param name    The requested name the lobby
-     * @param creator The user who created the lobby and therefore its owner
+     * @param name        The requested name the lobby
+     * @param creator     The user who created the lobby and therefore its owner
+     * @param password    The requested password of the lobby
+     * @param hasPassword Whether the lobby has a password or not
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(LobbyName name, User creator) {
+    public LobbyDTO(LobbyName name, User creator, String password, boolean hasPassword) {
         this.name = name;
         this.owner = creator;
+        this.password = password;
+        this.hasPassword = hasPassword;
         this.users.add(creator);
         this.inGame = false;
         this.maxPlayers = 3;
@@ -64,12 +70,24 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner());
+        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.getPassword(), lobby.isInGame(),
+                            lobby.hasAPassword(), lobby.getMaxPlayers(), lobby.commandsAllowed(), lobby.getMoveTime(),
+                            lobby.startUpPhaseEnabled(), lobby.randomPlayfieldEnabled());
     }
 
     @Override
     public boolean commandsAllowed() {
         return commandsAllowed;
+    }
+
+    @Override
+    public IConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(IConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
@@ -103,6 +121,11 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
     public Set<UserOrDummy> getReadyUsers() {
         return readyUsers;
     }
@@ -121,6 +144,11 @@ public class LobbyDTO implements Lobby {
     @Override
     public Set<UserOrDummy> getUserOrDummies() {
         return Collections.unmodifiableSet(users);
+    }
+
+    @Override
+    public boolean hasAPassword() {
+        return hasPassword;
     }
 
     @Override
@@ -181,6 +209,11 @@ public class LobbyDTO implements Lobby {
     @Override
     public void setCommandsAllowed(boolean commandsAllowed) {
         this.commandsAllowed = commandsAllowed;
+    }
+
+    @Override
+    public void setHasPassword(boolean hasPassword) {
+        this.hasPassword = hasPassword;
     }
 
     @Override

@@ -58,6 +58,9 @@
                 <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
                           text="%mainmenu.settings.buttons.logout"/>
             </Menu>
+            <Menu mnemonicParsing="false" text="%lobby.menu.rules">
+                <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview" onAction="#onRulesMenuClicked"/>
+            </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>
             </GridPane.margin>

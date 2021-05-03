@@ -47,12 +47,13 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param lobbyName The name chosen for the new lobby
+     * @param name      The name chosen for the new lobby
+     * @param password  The password chosen for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(LobbyName lobbyName);
+    void createNewLobby(LobbyName name, String password);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus

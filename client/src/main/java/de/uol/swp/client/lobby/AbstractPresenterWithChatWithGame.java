@@ -12,6 +12,8 @@ import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
+import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -114,6 +116,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected TextFlow helpLabel;
     @FXML
     protected Menu infoMenu;
+    @FXML
+    protected Menu currentRound = new Menu();
 
     @Inject
     protected IGameService gameService;
@@ -126,9 +130,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean gameWon = false;
     protected boolean robberNewPosition = false;
     protected RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    protected StartUpPhaseBuiltStructures startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.NONE_BUILT;
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean startUpPhaseEnabled;
     protected boolean ownTurn;
     protected boolean tradingCurrentlyAllowed;
     protected boolean paused;
@@ -142,6 +148,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected CheckMenuItem helpCheckBox;
     private boolean diceRolled = false;
+    protected int roundCounter = 0;
+
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
@@ -350,7 +358,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-02-22
      */
     protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(!userService.getLoggedInUser().equals(user));
+        rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
     }
 
     /**
@@ -512,6 +520,37 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Platform.runLater(() -> notice.setVisible(false));
             resetButtonStates(userService.getLoggedInUser());
         }
+        if (startUpPhaseEnabled && userService.getLoggedInUser().equals(msg.getUser())) {
+            if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.NONE_BUILT)) {
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT;
+                LOG.debug("--- First founding Settlement successfully built");
+                Platform.runLater(() -> {
+                    notice.setVisible(true);
+                    notice.setText(resourceBundle.getString("game.setupphase.building.firstroad"));
+                });
+            } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT)) {
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT;
+                endTurn.setDisable(false);
+                LOG.debug("--- First founding road successfully built");
+                Platform.runLater(
+                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.firstroundend")));
+            } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT)) {
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT;
+                LOG.debug("--- Second founding Settlement successfully built");
+                Platform.runLater(
+                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondroad")));
+            } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT)) {
+                // startup phase over because player must have just built the second founding road
+                startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.ALL_BUILT;
+                startUpPhaseEnabled = false;
+                endTurn.setDisable(false);
+                LOG.debug("--- Second founding road successfully built");
+                Platform.runLater(() -> {
+                    notice.setText("");
+                    endTurn.setText(resourceBundle.getString("game.setupphase.ended"));
+                });
+            }
+        }
         gameService.updateGameMap(lobbyName);
         String attr = null;
         switch (msg.getType()) {
@@ -627,7 +666,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
-        if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
+        if (startUpPhaseEnabled) {
+            if (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE) {
+                gameService.buildRequest(lobbyName, mapPoint);
+            }
+        }
+        if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
@@ -653,16 +697,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
+        int getRound = msg.getCurrentRound();
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
+        if (!startUpPhaseEnabled) {
+            // needed to reverse the labeling done in onBuildingSuccessfulMessage
+            String endTurnText = resourceBundle.getString("lobby.game.buttons.endturn");
+            if (!endTurn.getText().equals(endTurnText)) Platform.runLater(() -> endTurn.setText(endTurnText));
+        }
         setRollDiceButtonState(msg.getActivePlayer());
         ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
         moveTimeTimer.cancel();
         setMoveTimer(moveTime);
+        Platform.runLater(
+                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
     }
 
     /**
@@ -1121,6 +1173,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles the UpdateUniqueCardsListMessage
+     * If an UpdateUniqueCardsListMessage is found on the bus this method gets called
+     * and updates the uniqueCardList.
+     *
+     * @param msg The UpdateUniqueCardsListMessage found on the bus
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    @Subscribe
+    private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
+        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        uniqueCardList.clear();
+        uniqueCardList.addAll(msg.getUniqueCardsList());
+    }
+
+    /**
      * Helper Method to play a monopoly card
      *
      * @author Mario Fokken
@@ -1265,7 +1335,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 });
             }
         });
-        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
         if (uniqueCardList == null) {
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
