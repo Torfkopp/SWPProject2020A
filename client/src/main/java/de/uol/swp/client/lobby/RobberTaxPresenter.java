@@ -7,6 +7,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -164,6 +165,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

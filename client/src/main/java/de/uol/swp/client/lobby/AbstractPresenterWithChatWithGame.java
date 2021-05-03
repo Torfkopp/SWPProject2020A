@@ -159,7 +159,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @author Alwin Bossert
      * @see de.uol.swp.common.game.message.PauseTimerMessage
-     * @since 2021-05.02
+     * @since 2021-05-02
      */
     @Subscribe
     public void onPauseTimerMessage(PauseTimerMessage msg) {
@@ -178,7 +178,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      *
      * @author Alwin Bossert
      * @see de.uol.swp.common.game.message.UnpauseTimerMessage
-     * @since 2021-05.02
+     * @since 2021-05-02
      */
     @Subscribe
     public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
@@ -188,7 +188,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Helper method to set the timer for the players round.
-     * The user gets forced to end his turn, if the timer gets null.
+     * The user gets forced to end his turn, if the timer gets zero.
      * If paused is true, the timer is paused.
      *
      * @param moveTime
@@ -198,17 +198,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     public void setMoveTimer(int moveTime) {
         moveTimeTimer = new Timer();
-        AtomicInteger zugZeit = new AtomicInteger(moveTime);
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (!paused) {
                     Platform.runLater(() -> moveTimerLabel.setText(String.format(
-                            resourceBundle.getString("game.labels.movetime") + zugZeit.getAndDecrement())));
-                    if (zugZeit.get() == 0) {
+                            resourceBundle.getString("game.labels.movetime") + moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
                         gameService.endTurn(lobbyName);
                     }
-                } else {remainingMoveTime = zugZeit.get();}
+                } else {remainingMoveTime = moveTimeToDecrement.get();}
             }
         }, 0, 1000);
     }
@@ -723,6 +723,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
         if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -813,6 +814,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 User user = userService.getLoggedInUser();
                 eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
                                                          msg.getInventory().get(user)));
+                eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
     }

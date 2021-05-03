@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -481,7 +482,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             dice1 = dices[0];
             dice2 = dices[1];
             setTurnIndicatorText(rsp.getPlayer());
-            setMoveTimer(moveTime);
+            setMoveTimer(rsp.getMoveTime());
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
@@ -572,9 +573,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         int moveTime =
                 !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
         int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-        lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                         commandsActivated.isSelected(), moveTime,
-                                         randomPlayFieldCheckbox.isSelected());
+        if (moveTime < 30 || moveTime > 500) {
+            eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+        } else {
+            lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
+                                             commandsActivated.isSelected(), moveTime,
+                                             randomPlayFieldCheckbox.isSelected());
+        }
     }
 
     /**
