@@ -24,19 +24,28 @@ public class Game {
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
+    private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    private StartUpPhase startUpPhase;
     private Player playerWithLongestRoad = null;
     private Player playerWithLargestArmy = null;
     private int longestRoadLength = 0;
     private boolean paused = false;
     private int round = 1;
+
+    public enum StartUpPhase {
+        PHASE_1,
+        PHASE_2,
+        NOT_IN_STARTUP_PHASE
+    }
 
     /**
      * Constructor
@@ -49,15 +58,20 @@ public class Game {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
+        playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
             Player counterPlayer = Player.PLAYER_1;
             for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
+                // TODO: add users to startUpPlayerOrder in the order they will take turns in
+                startUpPlayerOrder.addLast(userOrDummy);
+                playersStartUpBuiltMap.put(userOrDummy, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(userOrDummy, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
                 autoRollEnabled.put(userOrDummy, false);
             }
         }
+        startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
@@ -378,6 +392,18 @@ public class Game {
     }
 
     /**
+     * Gets a map of the Users and what part of the founding phase they already finished
+     *
+     * @return playersStartUpBuiltMap
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public Map<UserOrDummy, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
+        return playersStartUpBuiltMap;
+    }
+
+    /**
      * Gets the roadBuildingCardPhase
      *
      * @return NO_ROAD_BUILDING, FIRST_ROAD, SECOND_ROAD
@@ -402,6 +428,51 @@ public class Game {
     }
 
     /**
+     * Gets the current Round the Game is in
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public int getRound() {return round;}
+
+    /**
+     * Gets the Founding Phase Enum
+     *
+     * @return startUpPhase
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public StartUpPhase getStartUpPhase() {
+        return startUpPhase;
+    }
+
+    /**
+     * Sets the StartUpPhase Enum
+     *
+     * @param startUpPhase the Enum which is used in order to grasp the current phase
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public void setStartUpPhase(StartUpPhase startUpPhase) {
+        this.startUpPhase = startUpPhase;
+    }
+
+    /**
+     * Gets the StartUpPlayerOrder Deque which is used for setting the order
+     * in which the players take turns during the founding phase
+     *
+     * @return startUpPlayerOrder
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public Deque<UserOrDummy> getStartUpPlayerOrder() {
+        return startUpPlayerOrder;
+    }
+
+    /**
      * Gets the taxPayer Set
      *
      * @return Set of the taxPayer
@@ -412,14 +483,6 @@ public class Game {
     public Set<User> getTaxPayers() {
         return taxPayers;
     }
-
-    /**
-     * Gets the current Round the Game is in
-     *
-     * @author Aldin Dervisi
-     * @since 2021-05-01
-     */
-    public int getRound() {return round;}
 
     /**
      * Gets a List of Triples with information about the unique cards

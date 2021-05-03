@@ -190,6 +190,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         commandsActivated.setSelected(event.getLobby().commandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().randomPlayfieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().startUpPhaseEnabled());
+        startUpPhaseEnabled = event.getLobby().startUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
@@ -273,6 +274,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             setPreGameSettings();
         }
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
+        startUpPhaseEnabled = msg.getLobby().startUpPhaseEnabled();
         randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
         commandsActivated.setSelected(msg.getLobby().commandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
@@ -422,7 +424,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             boolean isSelf = newValue.equals(userService.getLoggedInUser());
             kickUserButton.setDisable(isSelf);
             changeOwnerButton.setDisable(isSelf);
-            tradeWithUserButton.setDisable(isSelf||!tradingCurrentlyAllowed);
+            tradeWithUserButton.setDisable(isSelf || !tradingCurrentlyAllowed);
             if (isSelf) {
                 kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
                 changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));

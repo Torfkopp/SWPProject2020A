@@ -225,6 +225,18 @@ public interface IGameMapManagement {
     IConfiguration getRandomisedConfiguration();
 
     /**
+     * Gets a Set of MapPoints of ResourceHexes surrounding the Intersection
+     *
+     * @param position the given Mappoint
+     *
+     * @return Set<MapPoint> containing all the surrounding ResourceHexes
+     *
+     * @author Sven Ahrens
+     * @since 2021-03-05
+     */
+    Set<MapPoint> getResourceHexesFromIntersection(MapPoint position);
+
+    /**
      * Gets the robber's position
      *
      * @return A MapPoint containing the position of the robber
@@ -275,6 +287,20 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     void moveRobber(MapPoint newPosition);
+
+    /**
+     * Places a settlement during the founding phase
+     *
+     * @param player   The player wanting to build the settlement (1-4)
+     * @param position The position of the intersection
+     *
+     * @return
+     *
+     * @author Sven Ahrens
+     * @author Phillip-André Suhr
+     * @since 2021-05-01
+     */
+    boolean placeFoundingSettlement(Player player, MapPoint position);
 
     /**
      * Places a road for the given player on the given edge.
