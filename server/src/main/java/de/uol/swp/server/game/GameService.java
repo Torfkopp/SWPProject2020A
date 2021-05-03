@@ -729,6 +729,11 @@ public class GameService extends AbstractService {
             LOG.debug("Sending ExceptionMessage");
             post(exceptionMessage);
         }
+        Game game = gameManagement.getGame(lobbyName);
+        if (game.getFirst() instanceof Dummy) {
+            onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
+            endTurnDummy(game);
+        }
     }
 
     /**
