@@ -366,6 +366,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
@@ -425,6 +426,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
+            turnIndicator.setVisible(true);
             setRollDiceButtonState(msg.getUser());
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
@@ -483,6 +485,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
+            turnIndicator.setVisible(true);
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
