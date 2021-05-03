@@ -110,6 +110,7 @@ public class GameService extends AbstractService {
      * Handles the allocation of the largest Army
      *
      * @param lobbyName The lobbyname
+     * @param user      The user for whom the largest army should be checked
      *
      * @author Eric Vuong
      * @author Temmo Junkhoff
@@ -136,6 +137,7 @@ public class GameService extends AbstractService {
      * Handles the allocation of the longest Road
      *
      * @param lobbyName The lobbyname
+     * @param mapPoint  The map point pointing to the edge based on which the longest road should be checked
      *
      * @author Eric Vuong
      * @auhtor Temmo Junkhoff
@@ -471,8 +473,7 @@ public class GameService extends AbstractService {
             case EDGE: {
                 if (gameMap.getEdge(mapPoint) == null) {
                     sendFailResponse.accept(NOT_A_REAL_ROAD);
-                }
-                else if (gameMap.getEdge(mapPoint).getOwner() != null) {
+                } else if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (game.getRoadBuildingCardPhase() != RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED) {

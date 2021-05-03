@@ -26,6 +26,7 @@ public class Game {
     private final InventoryMap players = new InventoryMap();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -33,7 +34,6 @@ public class Game {
     private Player playerWithLongestRoad = null;
     private Player playerWithLargestArmy = null;
     private int longestRoadLength = 0;
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
 
     /**
      * Constructor

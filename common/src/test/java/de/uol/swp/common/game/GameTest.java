@@ -1,8 +1,8 @@
 package de.uol.swp.common.game;
 
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.GameMapManagement;
 import de.uol.swp.common.game.map.management.IGameMapManagement;
-import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.dto.LobbyDTO;
 import de.uol.swp.common.user.User;
@@ -119,13 +119,13 @@ public class GameTest {
         game.getInventory(player).setVictoryPointCards(2);
         // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards for 6 VP total
         assertEquals(6, game.calculateVictoryPoints(player));
-        //game.getInventory(player).setLongestRoad(true);
-        //// Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road for 8 VP total
-        //assertEquals(8, game.calculateVictoryPoints(player));
-        //game.getInventory(player).setLargestArmy(true);
-        //// Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road, Largest Army
-        //// for 10 VP total
-        //assertEquals(10, game.calculateVictoryPoints(player));
+        game.setPlayerWithLongestRoad(player);
+        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road for 8 VP total
+        assertEquals(8, game.calculateVictoryPoints(player));
+        game.setPlayerWithLargestArmy(player);
+        // Player has 2 settlements (1 VP), 1 city (2 VP), 2 victory point cards, Longest Road, Largest Army
+        // for 10 VP total
+        assertEquals(10, game.calculateVictoryPoints(player));
     }
 
     @Test

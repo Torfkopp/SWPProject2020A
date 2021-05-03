@@ -179,6 +179,13 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public IHarborHex.HarborResource getHarborResource(MapPoint point) {
+        IIntersection intersection = getIntersection(point);
+        if (!harborResourceMap.containsKey(intersection)) return null;
+        return harborResourceMap.get(intersection);
+    }
+
+    @Override
     public IGameHex getHex(MapPoint position) {
         GameHexWrapper returnValue = getHexWrapper(position);
         return returnValue == null ? null : returnValue.get();
@@ -258,6 +265,11 @@ public class GameMapManagement implements IGameMapManagement {
             }
         }
         return points;
+    }
+
+    @Override
+    public Map<Player, List<MapPoint>> getPlayerSettlementsAndCities() {
+        return playerSettlementsAndCities;
     }
 
     @Override
@@ -342,29 +354,21 @@ public class GameMapManagement implements IGameMapManagement {
             lengths.add(0);
             if (leftNodeLengths.isEmpty()) {
                 if (rightNodeEdges.isEmpty()) {
-                    System.out.println(1);
                     lengths.add(1);
                 } else {
                     for (IEdge nextEdge : rightNodeEdges) {
-                        int i = roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited),
-                                           new HashSet<>(visited));
-                        System.out.println(1 + " : " + i);
-                        lengths.add(1 + i);
+                        lengths.add(1 + roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited),
+                                                   new HashSet<>(visited)));
                     }
                 }
             } else {
                 for (Tuple<Integer, Set<IEdge>> x : leftNodeLengths) {
                     if (rightNodeEdges.isEmpty()) {
-                        final int value1 = x.getValue1();
-                        System.out.println(value1 + " : " + 1);
-                        lengths.add(value1 + 1);
+                        lengths.add(x.getValue1() + 1);
                     }
                     for (IEdge nextEdge : rightNodeEdges) {
-                        final int i = roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
-                                                 new HashSet<>(visited));
-                        final int value1 = x.getValue1();
-                        System.out.println(value1 + " : " + 1 + " : " + i);
-                        lengths.add(value1 + 1 + i);
+                        lengths.add(x.getValue1() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
+                                                                   new HashSet<>(visited)));
                     }
                 }
             }
@@ -392,8 +396,6 @@ public class GameMapManagement implements IGameMapManagement {
                 }
             }
         }
-        System.out.println("nodeUEdges = " + nodeUEdges);
-        System.out.println("nodeVEdges = " + nodeVEdges);
         List<Integer> lengths = new LinkedList<>();
         lengths.add(a.apply(nodeUEdges, nodeVEdges));
         lengths.add(a.apply(nodeVEdges, nodeUEdges));
@@ -527,18 +529,6 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public Map<Player, List<MapPoint>> getPlayerSettlementsAndCities() {
-        return playerSettlementsAndCities;
-    }
-
-    @Override
-    public IHarborHex.HarborResource getHarborResource(MapPoint point) {
-        IIntersection intersection = getIntersection(point);
-        if (!harborResourceMap.containsKey(intersection)) return null;
-        return harborResourceMap.get(intersection);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {
