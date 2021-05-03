@@ -526,9 +526,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT;
                 endTurn.setDisable(false);
                 LOG.debug("--- First founding road successfully built");
-                // TODO: add a "end first round of startupphase" text to resourcebundle, because players _will_ be
-                //  confused by seeing "build second settlement" when they a) can't and b) aren't supposed to
-                //  and have the nextplayermessage display secondsettlement if it is the player's founding turn again
                 Platform.runLater(
                         () -> notice.setText(resourceBundle.getString("game.setupphase.building.firstroundend")));
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT)) {
@@ -664,13 +661,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (startUpPhaseEnabled) {
-            if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
+            if (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE) {
                 gameService.buildRequest(lobbyName, mapPoint);
             }
-        } else {
-            if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
-                gameService.buildRequest(lobbyName, mapPoint);
-            }
+        }
+        if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
+            gameService.buildRequest(lobbyName, mapPoint);
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);

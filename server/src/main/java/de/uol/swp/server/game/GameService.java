@@ -838,7 +838,7 @@ public class GameService extends AbstractService {
             return;
         }
         game.setBuildingAllowed(false);
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), game.nextPlayer(), game.getRound());
         UserOrDummy nextPlayer;
         UserOrDummy user;
         Optional<Lobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
@@ -873,7 +873,7 @@ public class GameService extends AbstractService {
         } else {
             nextPlayer = game.nextPlayer();
         }
-        returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+        returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
 
         LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
