@@ -155,7 +155,7 @@ class GameServiceTest {
 
     @Test
     void startSession() throws InterruptedException {
-        gameService.startSession(defaultLobbyName);
+        gameService.startSession(defaultLobbyName, 0);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

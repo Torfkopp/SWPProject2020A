@@ -804,6 +804,24 @@ public class SceneManager {
     }
 
     /**
+     * Handles the SetMoveTimeErrorEvent detected on the EventBus
+     * <p>
+     * If a SetMoveTimeErrorEvent is detected on the EventBus,
+     * this method gets called. It shows the error message of
+     * the event in a error alert.
+     *
+     * @param event The SetMoveTimeErrorEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent
+     * @since 2021-05-03
+     */
+    @Subscribe
+    private void onSetMoveTimeErrorEvent(SetMoveTimeErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
      * Handles the ShowChangeAccountDetailsViewEvent detected on the EventBus
      * <p>
      * If a ShowChangeAccountDetailsViewEvent is detected on the EventBus, this method gets

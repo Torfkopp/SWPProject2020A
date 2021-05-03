@@ -16,6 +16,8 @@ import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.request.PauseTimerRequest;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -31,14 +33,17 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 
@@ -69,7 +74,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
+    protected Timer moveTimeTimer;
+    @FXML
     protected TableView<Map<String, Object>> developmentCardTableView;
+    @FXML
+    protected Menu moveTimerLabel = new Menu();
     @FXML
     protected TableView<Map<String, Object>> resourceTableView;
     @FXML
@@ -94,6 +103,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
+    @FXML
+    protected ColumnConstraints helpColumn;
+    @FXML
+    protected TextFlow helpLabel;
+    @FXML
+    protected Menu infoMenu;
+    @FXML
+    protected Menu currentRound = new Menu();
 
     @Inject
     protected IGameService gameService;
@@ -109,11 +126,20 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean autoRollEnabled = false;
     protected boolean playedCard = false;
     protected boolean inGame;
+    protected boolean ownTurn;
+    protected boolean tradingCurrentlyAllowed;
+    protected boolean paused;
     protected int moveTime;
+    protected int remainingMoveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
+    protected boolean helpActivated = false;
+    @FXML
+    protected CheckMenuItem helpCheckBox;
+    private boolean diceRolled = false;
+    protected int roundCounter = 0;
 
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
@@ -136,6 +162,72 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();
+    }
+
+    /**
+     * Handles a PauseTimerMessage
+     * <p>
+     * If a new PauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on true.
+     *
+     * @param msg The PauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    public void onPauseTimerMessage(PauseTimerMessage msg) {
+        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
+        paused = true;
+    }
+
+    /**
+     * Handles a UnpauseTimerMessage
+     * <p>
+     * If a new UnpauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on false.
+     *
+     * @param msg The UnpauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
+        paused = false;
+    }
+
+    /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets zero.
+     * If paused is true, the timer is paused.
+     *
+     * @param moveTime The moveTime for the Lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    public void setMoveTimer(int moveTime) {
+        moveTimeTimer = new Timer();
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
+        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if (!paused) {
+                    Platform.runLater(() -> moveTimerLabel.setText(String.format(
+                            resourceBundle.getString("game.labels.movetime") + moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
+                        gameService.rollDice(lobbyName);
+                        tradeService.closeBankTradeWindow(lobbyName);
+                        gameService.endTurn(lobbyName);
+                    }
+                } else {remainingMoveTime = moveTimeToDecrement.get();}
+            }
+        }, 0, 1000);
     }
 
     /**
@@ -184,6 +276,68 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 // gameMap exists, so redraw map to fit the new canvas dimensions
                 gameRendering.drawGameMap(gameMap);
             if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        }
+    }
+
+    /**
+     * Helper method to set the help text
+     * <p>
+     * If this method gets called it checks the current
+     * game state to show the user what he can do
+     * currently.
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-01
+     */
+    protected void setHelpText() {
+        if (gameWon) return;
+        if (!ownTurn) {
+            Text wait = new Text(resourceBundle.getString("game.help.labels.waitforturn"));
+            Platform.runLater(() -> {
+                helpLabel.getChildren().clear();
+                helpLabel.getChildren().add(wait);
+            });
+        } else {
+            Platform.runLater(() -> {
+                helpLabel.getChildren().clear();
+                Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
+                Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
+                if (!diceRolled) helpLabel.getChildren().addAll(turn, rollDiceText);
+                else {
+                    rollDiceText.setStrikethrough(true);
+                    if (robberNewPosition) {
+                        Text setRobber = new Text(resourceBundle.getString("game.help.labels.setrobber"));
+                        helpLabel.getChildren().addAll(turn, rollDiceText, setRobber);
+                    } else {
+                        Text endTurn = new Text(resourceBundle.getString("game.help.labels.endturn"));
+                        Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
+                        Text build = new Text(resourceBundle.getString("game.help.labels.build"));
+                        Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
+                        helpLabel.getChildren().addAll(turn, rollDiceText, trade, build);
+                        if (playedCard) {
+                            playCard.setStrikethrough(true);
+                            helpLabel.getChildren().add(playCard);
+                        } else {
+                            int cardAmount = 0;
+                            for (int i = 0; i < 4; i++) {
+                                cardAmount += (int) developmentCardTableView.getItems().get(i + 1).get("amount");
+                            }
+                            if (cardAmount == 0) playCard.setStrikethrough(true);
+                            helpLabel.getChildren().add(playCard);
+                            for (int i = 0; i < 4; i++) {
+                                Map<String, Object> cardMap = developmentCardTableView.getItems().get(i + 1);
+                                if ((int) cardMap.get("amount") > 0) {
+                                    Text card = new Text(
+                                            String.format(resourceBundle.getString("game.help.labels.playcard"),
+                                                          cardMap.get("card")));
+                                    helpLabel.getChildren().add(card);
+                                }
+                            }
+                        }
+                        helpLabel.getChildren().add(endTurn);
+                    }
+                }
+            });
         }
     }
 
@@ -258,6 +412,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(true);
         playCard.setDisable(true);
         buildingCurrentlyAllowed = false;
+        tradingCurrentlyAllowed = false;
     }
 
     /**
@@ -274,6 +429,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         disableButtonStates();
         rollDice.setDisable(true);
         gameService.updateInventory(lobbyName);
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -377,6 +533,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (finalAttr != null) Platform.runLater(() -> chatMessages
                     .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
         }
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -405,6 +562,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         gameService.updateInventory(lobbyName);
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -420,6 +578,36 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName);
+        diceRolled = false;
+    }
+
+    /**
+     * Method called when the HelpButton is pressed
+     * <p>
+     * If the help button gets pressed and help is not activated yet,
+     * this method increases the size of the game window for the help
+     * section and calls a method to fill the help text.
+     * Otherwise the size of the window decreases.
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-01
+     */
+    @FXML
+    private void onHelpButtonPressed() {
+        if (!helpActivated) {
+            int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
+            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
+            ((Stage) window).setMinWidth(size);
+            window.setWidth(size);
+            setHelpText();
+        } else {
+            helpColumn.setMaxWidth(0);
+            helpColumn.setMinWidth(0);
+            helpLabel.getChildren().clear();
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        }
+        helpActivated = !helpActivated;
     }
 
     /**
@@ -448,6 +636,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             robberNewPosition = false;
             notice.setVisible(false);
             resetButtonStates(userService.getLoggedInUser());
+            if (helpActivated)setHelpText();
         }
     }
 
@@ -457,17 +646,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If a new NextPlayerMessage object is posted onto the EventBus,
      * this method is called.
      * It changes the text of a textField to state whose turn it is.
+     * It also sets the timer back to the moveTime
      *
      * @param msg The NextPlayerMessage object seen on the EventBus
      */
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
+        int getRound = msg.getCurrentRound();
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
+        ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
+        if (helpActivated)setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
+        moveTimeTimer.cancel();
+        setMoveTimer(moveTime);
+        Platform.runLater(
+                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
     }
 
     /**
@@ -575,6 +772,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
         playedCard = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -594,9 +792,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
+        LOG.debug("Received RefreshCardAmountMessage");
         if (!lobbyName.equals(msg.getLobbyName())) return;
         cardAmountTripleList = msg.getCardAmountTriples();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -643,7 +843,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
+        if (msg.getLobbyName().equals(lobbyName)) {
+            resetButtonStates(msg.getUser());
+            if (helpActivated) setHelpText();
+        }
         if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -695,6 +900,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         Platform.runLater(() -> notice.setText(resourceBundle.getString("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -712,11 +918,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (lobbyName.equals(msg.getLobbyName())) {
             resetButtonStates(msg.getUser());
             gameService.updateGameMap(msg.getLobbyName());
+            if (helpActivated) setHelpText();
         }
     }
 
     /**
      * Handles a RobberTaxMessage
+     * It also posts a new PauseTimerRequest onto the EventBus
      *
      * @param msg The RobberTaxMessage found on the EventBus
      *
@@ -729,11 +937,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received RobberTaxMessage");
         if (msg.getLobbyName().equals(lobbyName)) {
             disableButtonStates();
+            if (helpActivated) setHelpText();
             if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
                 eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
                                                          msg.getInventory().get(user)));
+                eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
     }
@@ -753,11 +963,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRollDiceButtonPressed() {
         gameService.rollDice(lobbyName);
         rollDice.setDisable(true);
+        diceRolled = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
      * Handles a TradeOfUsersAcceptedResponse found on the EventBus
      * Updates the Inventories of the trading User.
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeOfUsersAcceptedResponse found on the EventBus
      *
@@ -769,6 +982,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         gameService.updateInventory(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -795,6 +1009,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If another player of the lobby-member-list is selected and the button gets pressed,
      * this button gets disabled, this method calls on the TradeService to show the Trade
      * with User window and request the inventory overview for the selected user.
+     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -812,6 +1027,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
             tradeService.tradeWithUser(lobbyName, user);
+            eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
 
@@ -820,6 +1036,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * If a TradeWithUserCancelResponse is posted onto the EventBus the
      * the possible options for the active player are re-enabled.
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
@@ -831,6 +1048,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
+        if (helpActivated) setHelpText();
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -1114,5 +1333,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }
