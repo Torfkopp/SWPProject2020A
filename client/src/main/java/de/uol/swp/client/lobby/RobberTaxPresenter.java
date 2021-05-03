@@ -159,6 +159,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * <p>
      * Posts a request to reduce the resources, posts an event to close the window
      * and then updates the inventory
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      */
     @FXML
     private void onTaxPayButtonPressed() {

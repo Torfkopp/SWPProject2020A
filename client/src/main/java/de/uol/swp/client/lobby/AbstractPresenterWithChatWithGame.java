@@ -917,6 +917,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Handles a RobberTaxMessage
+     * It also posts a new PauseTimerRequest onto the EventBus
      *
      * @param msg The RobberTaxMessage found on the EventBus
      *
@@ -983,7 +984,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * Method called when the TradeWithBankButton is pressed. It calls on
      * the TradeService to show the Trade with Bank window and request the
      * Bank's inventory.
-     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Alwin Bossert
      * @author Maximilian Lindner

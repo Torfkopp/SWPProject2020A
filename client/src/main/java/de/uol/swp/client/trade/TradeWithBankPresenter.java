@@ -147,7 +147,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * window and posts a updateInventoryRequest onto the EventBus
      * to get the new Inventory after the trade shown in the
      * LobbyView.
-     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @param rsp The BuyDevelopmentCardResponse found on the eventBus
      *
@@ -170,7 +169,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * Method called when the CancelButton is pressed and uses
      * the helperFunction closeWindow to close the window
      * properly.
-     * It also posts a new UnpauseTimerRequest onto the EventBus.
      */
     @FXML
     private void onCancelButtonPressed() {
@@ -266,7 +264,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * window and posts a updateInventoryRequest onto the EventBus
      * to get the new Inventory after the trade shown in the
      * LobbyView.
-     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @param rsp TradeWithBankButtonAcceptedResponse found on the EventBus
      */
