@@ -380,7 +380,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
             currentRound.setVisible(false);
-            RoundCounter = 0;
+            roundCounter = 0;
         });
     }
 

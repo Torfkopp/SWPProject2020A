@@ -27,7 +27,6 @@ public class Game {
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;

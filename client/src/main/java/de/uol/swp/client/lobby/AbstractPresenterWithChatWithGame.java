@@ -139,7 +139,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected CheckMenuItem helpCheckBox;
     private boolean diceRolled = false;
-    protected int RoundCounter = 0;
+    protected int roundCounter = 0;
 
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
