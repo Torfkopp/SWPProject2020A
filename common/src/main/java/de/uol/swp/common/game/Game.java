@@ -27,6 +27,7 @@ public class Game {
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -35,6 +36,7 @@ public class Game {
     private Player playerWithLargestArmy = null;
     private int longestRoadLength = 0;
     private boolean paused = false;
+    private int round = 1;
 
     /**
      * Constructor
@@ -46,6 +48,7 @@ public class Game {
     public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
+        this.first = first;
         autoRollEnabled = new HashMap<>();
         {
             Player counterPlayer = Player.PLAYER_1;
@@ -228,6 +231,16 @@ public class Game {
     }
 
     /**
+     * Gets the UserOrDummy who made the current game's first turn
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public UserOrDummy getFirst() {
+        return first;
+    }
+
+    /**
      * Gets a specified player's inventory
      *
      * @param player The player whose inventory to get
@@ -401,6 +414,14 @@ public class Game {
     }
 
     /**
+     * Gets the current Round the Game is in
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public int getRound() {return round;}
+
+    /**
      * Gets a List of Triples with information about the unique cards
      * (largest army and longest road)
      *
@@ -490,6 +511,7 @@ public class Game {
      */
     public UserOrDummy nextPlayer() {
         activePlayer = getNextPlayer();
+        if (activePlayer.equals(first)) round++;
         return activePlayer;
     }
 

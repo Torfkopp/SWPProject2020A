@@ -379,6 +379,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             moveTimerLabel.setVisible(false);
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+            currentRound.setVisible(false);
+            roundCounter = 0;
         });
     }
 
@@ -399,6 +401,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
         moveTimerLabel.setVisible(true);
+        currentRound.setVisible(true);
+        Platform.runLater(() -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1)));
     }
 
     /**
