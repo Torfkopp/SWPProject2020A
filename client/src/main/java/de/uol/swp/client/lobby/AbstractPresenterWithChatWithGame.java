@@ -16,6 +16,8 @@ import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.request.PauseTimerRequest;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -41,6 +43,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 
@@ -71,7 +74,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
+    protected Timer moveTimeTimer;
+    @FXML
     protected TableView<Map<String, Object>> developmentCardTableView;
+    @FXML
+    protected Menu moveTimerLabel = new Menu();
     @FXML
     protected TableView<Map<String, Object>> resourceTableView;
     @FXML
@@ -119,7 +126,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean inGame;
     protected boolean ownTurn;
     protected boolean tradingCurrentlyAllowed;
+    protected boolean paused;
     protected int moveTime;
+    protected int remainingMoveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
@@ -149,6 +158,72 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();
+    }
+
+    /**
+     * Handles a PauseTimerMessage
+     * <p>
+     * If a new PauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on true.
+     *
+     * @param msg The PauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    public void onPauseTimerMessage(PauseTimerMessage msg) {
+        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
+        paused = true;
+    }
+
+    /**
+     * Handles a UnpauseTimerMessage
+     * <p>
+     * If a new UnpauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on false.
+     *
+     * @param msg The UnpauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
+        paused = false;
+    }
+
+    /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets zero.
+     * If paused is true, the timer is paused.
+     *
+     * @param moveTime The moveTime for the Lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    public void setMoveTimer(int moveTime) {
+        moveTimeTimer = new Timer();
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
+        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if (!paused) {
+                    Platform.runLater(() -> moveTimerLabel.setText(String.format(
+                            resourceBundle.getString("game.labels.movetime") + moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
+                        gameService.rollDice(lobbyName);
+                        tradeService.closeBankTradeWindow(lobbyName);
+                        gameService.endTurn(lobbyName);
+                    }
+                } else {remainingMoveTime = moveTimeToDecrement.get();}
+            }
+        }, 0, 1000);
     }
 
     /**
@@ -567,6 +642,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If a new NextPlayerMessage object is posted onto the EventBus,
      * this method is called.
      * It changes the text of a textField to state whose turn it is.
+     * It also sets the timer back to the moveTime
      *
      * @param msg The NextPlayerMessage object seen on the EventBus
      */
@@ -580,6 +656,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
         if (helpActivated)setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
+        moveTimeTimer.cancel();
+        setMoveTimer(moveTime);
     }
 
     /**
@@ -762,6 +840,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             resetButtonStates(msg.getUser());
             if (helpActivated) setHelpText();
         }
+        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -837,6 +917,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Handles a RobberTaxMessage
+     * It also posts a new PauseTimerRequest onto the EventBus
      *
      * @param msg The RobberTaxMessage found on the EventBus
      *
@@ -855,6 +936,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 User user = userService.getLoggedInUser();
                 eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
                                                          msg.getInventory().get(user)));
+                eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
     }
@@ -881,6 +963,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Handles a TradeOfUsersAcceptedResponse found on the EventBus
      * Updates the Inventories of the trading User.
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeOfUsersAcceptedResponse found on the EventBus
      *
@@ -892,6 +975,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         gameService.updateInventory(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -918,6 +1002,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If another player of the lobby-member-list is selected and the button gets pressed,
      * this button gets disabled, this method calls on the TradeService to show the Trade
      * with User window and request the inventory overview for the selected user.
+     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -935,6 +1020,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
             tradeService.tradeWithUser(lobbyName, user);
+            eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
 
@@ -943,6 +1029,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * If a TradeWithUserCancelResponse is posted onto the EventBus the
      * the possible options for the active player are re-enabled.
+     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
@@ -955,6 +1042,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
