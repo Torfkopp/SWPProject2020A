@@ -203,7 +203,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * The user gets forced to end his turn, if the timer gets zero.
      * If paused is true, the timer is paused.
      *
-     * @param moveTime
+     * @param moveTime The moveTime for the Lobby
      *
      * @author Alwin Bossert
      * @since 2021-05-01
