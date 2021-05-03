@@ -564,8 +564,6 @@ public class GameService extends AbstractService {
             UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
             // TODO: handle founder phase
-            gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap);
-            } // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap, msg.getMoveTime());
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));

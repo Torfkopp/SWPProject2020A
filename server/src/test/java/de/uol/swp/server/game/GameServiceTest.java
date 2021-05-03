@@ -621,7 +621,7 @@ public class GameServiceTest {
         gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame("testlobby");
         Inventory[] gameInventory = game.getAllInventories();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i <= 2; i++) {
             gameInventory[i].setWool(5);
             gameInventory[i].setBrick(5);
             gameInventory[i].setGrain(5);
@@ -669,17 +669,19 @@ public class GameServiceTest {
 
         Game game1 = gameManagement.getGame("testlobby");
         Inventory[] gameInventory1 = game1.getAllInventories();
-        assertEquals(2, gameInventory1[0].getOre());
-        assertEquals(6, gameInventory1[0].getWool());
-        assertEquals(3, gameInventory1[0].getBrick());
-        assertEquals(5, gameInventory1[0].getGrain());
-        assertEquals(9, gameInventory1[0].getLumber());
+        Inventory inventory0 = game1.getInventory(user[0]);
+        Inventory inventory1 = game1.getInventory(user[1]);
+        assertEquals(2, inventory0.getOre());
+        assertEquals(6, inventory0.getWool());
+        assertEquals(3, inventory0.getBrick());
+        assertEquals(5, inventory0.getGrain());
+        assertEquals(9, inventory0.getLumber());
 
-        assertEquals(8, gameInventory1[1].getOre());
-        assertEquals(4, gameInventory1[1].getWool());
-        assertEquals(7, gameInventory1[1].getBrick());
-        assertEquals(5, gameInventory1[1].getGrain());
-        assertEquals(1, gameInventory1[1].getLumber());
+        assertEquals(8, inventory1.getOre());
+        assertEquals(4, inventory1.getWool());
+        assertEquals(7, inventory1.getBrick());
+        assertEquals(5, inventory1.getGrain());
+        assertEquals(1, inventory1.getLumber());
     }
 
     /**
