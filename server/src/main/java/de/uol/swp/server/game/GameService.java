@@ -98,8 +98,8 @@ public class GameService extends AbstractService {
             for (Map<String, Object> neededResourceMap : neededResourceList) {
                 //@formatter:off
                 if (resourceMap.get("enumType").equals(neededResourceMap.get("enumType"))
-                    && ((int) resourceMap.get("amount")) < (int) neededResourceMap.get("amount"))
-                        return false;
+                        && ((int) resourceMap.get("amount")) < (int) neededResourceMap.get("amount"))
+                    return false;
                 //@formatter:on
             }
         }
@@ -112,7 +112,7 @@ public class GameService extends AbstractService {
      *
      * @param game        The game in which the player might have won
      * @param originLobby The lobby in which the game is taking place
-     * @param user        The use who might have won
+     * @param user        The user who might have won
      *
      * @author Phillip-André Suhr
      * @author Steven Luong
@@ -124,7 +124,6 @@ public class GameService extends AbstractService {
         if (vicPoints >= 10) {
             ServerMessage message = new PlayerWonGameMessage(originLobby, user);
             lobbyService.sendToAllInLobby(originLobby, message);
-            gameManagement.dropGame(originLobby);
             game.setBuildingAllowed(false);
         }
     }
@@ -163,18 +162,23 @@ public class GameService extends AbstractService {
         HashMap<String, Object> vpMap = new HashMap<>();
         vpMap.put("amount", inventory.getVictoryPointCards());
         vpMap.put("card", new I18nWrapper("game.resources.cards.victorypoints"));
+        vpMap.put("type", "game.resources.cards.victorypoints");
         HashMap<String, Object> kMap = new HashMap<>();
         kMap.put("amount", inventory.getKnightCards());
         kMap.put("card", new I18nWrapper("game.resources.cards.knight"));
+        kMap.put("type", "game.resources.cards.knight");
         HashMap<String, Object> rbMap = new HashMap<>();
         rbMap.put("amount", inventory.getRoadBuildingCards());
         rbMap.put("card", new I18nWrapper("game.resources.cards.roadbuilding"));
+        rbMap.put("type", "game.resources.cards.roadbuilding");
         HashMap<String, Object> yopMap = new HashMap<>();
         yopMap.put("amount", inventory.getYearOfPlentyCards());
         yopMap.put("card", new I18nWrapper("game.resources.cards.yearofplenty"));
+        yopMap.put("type", "game.resources.cards.yearofplenty");
         HashMap<String, Object> mMap = new HashMap<>();
         mMap.put("amount", inventory.getMonopolyCards());
         mMap.put("card", new I18nWrapper("game.resources.cards.monopoly"));
+        mMap.put("type", "game.resources.cards.monopoly");
         List<Map<String, Object>> cardList = new ArrayList<>();
         cardList.add(vpMap);
         cardList.add(kMap);
@@ -554,7 +558,7 @@ public class GameService extends AbstractService {
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             } // TODO: handle founder phase
-            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
+            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap, msg.getMoveTime());
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
@@ -682,7 +686,7 @@ public class GameService extends AbstractService {
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         UserOrDummy nextPlayer = game.nextPlayer();
         game.setBuildingAllowed(false);
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer);
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
         LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
         game.setDiceRolledAlready(false);
@@ -916,6 +920,30 @@ public class GameService extends AbstractService {
                                                                        req.getDemandedResources(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
+    }
+
+    /**
+     * Handles a PauseTimerRequest found on the EventBus
+     * <p>
+     * If a PauseTimerRequest is found on the EventBus,
+     * the game gets paused.
+     * It also posts a new PauseTimerMessage to all the players in the lobby.
+     *
+     * @param req The PauseTimerRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.PauseTimerRequest
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onPauseTimerRequest(PauseTimerRequest req) {
+        String lobbyName = req.getOriginLobby();
+        LOG.debug("Received PauseTimerRequest for Lobby {}", lobbyName);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setPaused(true);
+        ServerMessage msg = new PauseTimerMessage(req.getOriginLobby(), req.getUser());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -1235,6 +1263,31 @@ public class GameService extends AbstractService {
         ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
         LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby {}", req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
+    }
+
+    /**
+     * Handles a ReturnToPreGameLobbyMessage found on the EventBus
+     * <p>
+     * If a ReturnToPreGameLobbyMessage is found on the EventBus this method drops the
+     * game associated with the Lobby, if one existed.
+     *
+     * @param msg The ReturnToPreGameLobbyMessage found on the EventBus
+     *
+     * @author Steven Luong
+     * @since 2021-04-30
+     */
+    @Subscribe
+    private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        Game game = gameManagement.getGame(msg.getName());
+        if (game == null) return;
+        try {
+            gameManagement.dropGame(msg.getName());
+        } catch (IllegalArgumentException e) {
+            ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
+            exceptionMessage.initWithMessage(msg);
+            LOG.debug("Sending ExceptionMessage");
+            post(exceptionMessage);
+        }
     }
 
     /**
@@ -1582,11 +1635,36 @@ public class GameService extends AbstractService {
                                                                      lobby.getConfiguration(),
                                                                      game.getMap().getGameMapDTO(playerUserOrDummyMap),
                                                                      game.getDices(), game.isDiceRolledAlready(),
-                                                                     game.getAutoRollEnabled(event.getUser()));
+                                                                     game.getAutoRollEnabled(event.getUser()),
+                                                                     lobby.getMoveTime());
             returnMessage.setMessageContext(ctx.get());
             LOG.debug("Sending StartSessionResponse");
             post(returnMessage);
         }
+    }
+
+    /**
+     * Handles an UnpauseTimerRequest found on the EventBus
+     * <p>
+     * If an UnpauseTimerRequest is found on the EventBus,
+     * the game gets unpaused.
+     * It also posts a new UnpauseTimerMessage to all the players in the lobby.
+     *
+     * @param req The UnpauseTimerRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.UnpauseTimerRequest
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onUnpauseTimerRequest(UnpauseTimerRequest req) {
+        String lobbyName = req.getOriginLobby();
+        LOG.debug("Received UnpauseTimerRequest for Lobby {}", lobbyName);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setPaused(false);
+        ServerMessage msg = new UnpauseTimerMessage(req.getOriginLobby(), req.getUser());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**

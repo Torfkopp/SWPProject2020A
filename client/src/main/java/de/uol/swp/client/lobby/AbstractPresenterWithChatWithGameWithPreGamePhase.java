@@ -2,7 +2,9 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
+import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
@@ -18,8 +20,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.Objects;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
@@ -58,7 +60,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
-
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -246,6 +247,28 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.kickUser(lobbyName, selectedUser);
     }
+
+    /**
+     * Handles a KickUserResponse found on the EventBus
+     * <p>
+     * If a KickUserResponse is detected on the EventBus and its
+     * directed to this lobby and this player, the according lobby
+     * window is closed.
+     *
+     * @param rsp The KickUserResponse found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.response.KickUserResponse
+     * @since 2021-03-02
+     */
+    @Subscribe
+    private void onKickUserResponse(KickUserResponse rsp) {
+        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
+            Platform.runLater(() -> closeWindow(true));
+        }
+    }
+
     /**
      * Handles the PlayerWonGameMessage
      * <p>
@@ -273,28 +296,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             this.elapsedTimer.stop();
         }
         fitCanvasToSize();
-    }
-
-
-    /**
-     * Handles a KickUserResponse found on the EventBus
-     * <p>
-     * If a KickUserResponse is detected on the EventBus and its
-     * directed to this lobby and this player, the according lobby
-     * window is closed.
-     *
-     * @param rsp The KickUserResponse found on the EventBus
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.response.KickUserResponse
-     * @since 2021-03-02
-     */
-    @Subscribe
-    private void onKickUserResponse(KickUserResponse rsp) {
-        if (lobbyName.equals(rsp.getLobbyName()) && userService.getLoggedInUser().equals(rsp.getToBeKickedUser())) {
-            Platform.runLater(() -> closeWindow(true));
-        }
     }
 
     /**
@@ -365,10 +366,21 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
+            infoMenu.setVisible(false);
+            helpCheckBox.setDisable(true);
+            helpCheckBox.setVisible(false);
+            cardAmountTripleList.clear();
+            moveTimeTimer.cancel();
+            moveTimerLabel.setVisible(false);
+            for (ChatOrSystemMessage m : chatMessages)
+                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+            currentRound.setVisible(false);
+            roundCounter = 0;
         });
     }
 
@@ -386,8 +398,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void onStartSessionButtonPressed() {
         buildingCosts.setVisible(true);
-        gameService.startSession(lobbyName);
+        gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
+        moveTimerLabel.setVisible(true);
+        currentRound.setVisible(true);
+        Platform.runLater(() -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1)));
     }
 
     /**
@@ -421,26 +436,29 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
+            turnIndicator.setVisible(true);
             setRollDiceButtonState(msg.getUser());
+            if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
+            setMoveTimer(moveTime);
             gameService.updateGameMap(lobbyName);
             long startTime = System.currentTimeMillis();
             this.elapsedTimer = new AnimationTimer() {
                 @Override
                 public void handle(long now) {
                     long elapsedMillis = System.currentTimeMillis() - startTime;
-            Platform.runLater(() -> timerLabel.setText(
-                    String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
-                                  TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
-                                  TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
-        }
-    };
+                    Platform.runLater(() -> timerLabel.setText(
+                            String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedMillis),
+                                          TimeUnit.MILLISECONDS.toMinutes(elapsedMillis) % 60,
+                                          TimeUnit.MILLISECONDS.toSeconds(elapsedMillis) % 60)));
+                }
+            };
             this.elapsedTimer.start();
-    });
-
+        });
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -472,6 +490,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             dice1 = dices[0];
             dice2 = dices[1];
             setTurnIndicatorText(rsp.getPlayer());
+            setMoveTimer(rsp.getMoveTime());
             gameService.updateGameMap(lobbyName);
             prepareInGameArrangement();
             endTurn.setDisable(!rsp.areDiceRolledAlready());
@@ -480,7 +499,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
+            turnIndicator.setVisible(true);
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
+            if (rsp.getPlayer().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
@@ -542,6 +563,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
+        infoMenu.setVisible(true);
+        helpCheckBox.setDisable(false);
+        helpCheckBox.setVisible(true);
     }
 
     /**
@@ -558,12 +582,22 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private void prepareLobbyUpdate() {
         if (!userService.getLoggedInUser().equals(owner)) return;
-        int moveTime =
-                !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) : this.moveTime;
-        int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-        lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                         commandsActivated.isSelected(), moveTime,
-                                         randomPlayFieldCheckbox.isSelected());
+        try {
+            int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
+                           this.moveTime;
+            int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+
+            if (moveTime < 30 || moveTime > 500) {
+                eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            } else {
+
+                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
+                                                 commandsActivated.isSelected(), moveTime,
+                                                 randomPlayFieldCheckbox.isSelected());
+            }
+        } catch (NumberFormatException ignored) {
+            eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+        }
     }
 
     /**

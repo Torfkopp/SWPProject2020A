@@ -1,0 +1,110 @@
+/*
+ * Import color palette and font
+ */
+@import url("palette.css");
+
+@font-face {
+    src: url("../fonts/CookieMonster.ttf");
+}
+
+.root {
+    -fx-base: -razzmatazz;
+    -fx-accent: -majorelleBlue;
+    -fx-focus-color: -fx-accent;
+    -fx-faint-focus-color: transparent;
+    -fx-dark-text-color: -black;
+    -fx-mid-text-color: -deepPurple;
+    -fx-light-text-color: fuchsia;
+    -fx-text-background-color: ladder(
+            -fx-background,
+            -fx-light-text-color 49%,
+            -fx-dark-text-color  50%
+    );
+    -fx-default-button: -fx-accent;
+    -fx-font-family: 'CookieMonster';
+    -fx-font-size: 120%;
+}
+
+.text {
+    -fx-stroke: -teal;
+    -fx-stroke-width: 30%;
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-border-color: -fx-accent;
+}
+
+.button:default {
+    -fx-border-color: -fx-accent;
+}
+
+.button:cancel {
+    -fx-base: -red;
+    -fx-border-color: -fx-accent;
+    -fx-text-fill: -white;
+}
+
+.text-field {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 0;
+    -fx-text-fill: -black;
+}
+
+.text-field:focused {
+    -fx-background-color: -fx-accent;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 0;
+}
+
+.menu-bar {
+    -fx-background-color: -fx-accent;
+}
+
+.menu-button > .label {
+    -fx-text-fill: -black;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -black;
+}
+
+#tradeUserView {
+    -fx-background-image: url("../images/trade_offer.jpg");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#loginView {
+    -fx-background-image: url("../images/okaeri.png");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#changeAccountView {
+    -fx-background-image: url("../images/jojo_coffin.jpeg");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#mainMenuView {
+    -fx-background-image: url("../images/nyan_plopp.gif");
+    -fx-background-repeat: repeat;
+}
+
+#lobbyPane {
+    -fx-background-image: url("../images/egg.gif");
+    -fx-background-repeat: repeat;
+}
+
+#devMenuView {
+    -fx-background-image: url("../images/nullpointer.gif");
+    -fx-background-repeat: repeat;
+}

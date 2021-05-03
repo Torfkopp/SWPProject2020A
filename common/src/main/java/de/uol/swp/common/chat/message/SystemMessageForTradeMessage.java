@@ -2,7 +2,7 @@ package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -46,17 +46,9 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * @return The encapsulated SystemMessage
      */
     public SystemMessage getMsg() {
-        return new SystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
-                                                            this.respondingResourceMap));
-    }
-
-    /**
-     * Gets the responding User
-     *
-     * @return The responding User
-     */
-    public String getRespondingUser() {
-        return respondingUser;
+        return new InGameSystemMessageDTO(
+                makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
+                                        this.respondingResourceMap));
     }
 
     /**

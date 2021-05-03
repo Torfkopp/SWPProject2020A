@@ -2,11 +2,14 @@ package de.uol.swp.client.main;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
+import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.*;
@@ -50,6 +53,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
+
+    @Inject
+    @Named("styleSheet")
+    private static String styleSheet;
 
     @FXML
     private Label randomLobbyState;
@@ -252,19 +259,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password"));
         TextField lobbyName = new TextField(name);
         lobbyName.setTextFormatter(new TextFormatter<>(filter));
-        HBox box1 = new HBox(10, lbl, lobbyName);
-        ToggleGroup grp = new ToggleGroup();
-        RadioButton threePlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.threeplayers"));
-        RadioButton fourPlayerButton = new RadioButton(resourceBundle.getString("lobby.radio.fourplayers"));
-        fourPlayerButton.setSelected(true);
-        threePlayerButton.setToggleGroup(grp);
-        fourPlayerButton.setToggleGroup(grp);
-        HBox box2 = new HBox(10, threePlayerButton, fourPlayerButton);
-
+        HBox box = new HBox(10, lbl, lobbyName);
         CheckBox lobbyPasswordCheckBox = new CheckBox();
         PasswordField lobbyPassword = new PasswordField();
-        HBox box3 = new HBox(10, lobbyPasswordCheckBox, lbl1, lobbyPassword);
-        VBox box = new VBox(10, box1, box2, box3);
+        HBox box1 = new HBox(10, lobbyPasswordCheckBox, lbl1, lobbyPassword);
+        VBox vBox = new VBox(10, box1);
         lobbyPassword.disableProperty().bind(Bindings.createBooleanBinding(() -> !lobbyPasswordCheckBox.isSelected(),
                                                                            lobbyPasswordCheckBox.selectedProperty()));
         dialogue.getDialogPane().setContent(box);
@@ -275,18 +274,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
                 () -> lobbyName.getText().isBlank() || !lobbyName.getText().matches("[ A-Za-z0-9_',-]+"),
                 lobbyName.textProperty()));
-
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
-        int maxPlayers;
-        if (threePlayerButton.isSelected()) maxPlayers = 3;
-        else maxPlayers = 4;
         String lobbyPasswordHash = lobbyPassword.getText();
         if (!Strings.isNullOrEmpty(lobbyPassword.getText())) {
             lobbyPasswordHash = userService.hash(lobbyPassword.getText());
         }
         String finalLobbyPasswordHash = lobbyPasswordHash;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), maxPlayers, finalLobbyPasswordHash));
+        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), 3, finalLobbyPasswordHash));
     }
 
     /**
@@ -369,6 +365,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
                 () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
                 userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         Optional<String> result = dialogue.showAndWait();
         result.ifPresent(s -> userService
                 .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
@@ -631,6 +628,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Handles a click on the Show Rules Overview menu item
+     * <p>
+     * Method called when the Show Rules Overview menu item is clicked.
+     * It posts a ShowRulesOverviewViewEvent onto the EventBus.
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
+     * @since 2021-05-02
+     */
+    @FXML
+    private void onRulesMenuClicked() {
+        eventBus.post(new ShowRulesOverviewViewEvent());
+    }
+
+    /**
      * Handles a UserDeletionSuccessfulResponse found on the EventBus
      * <p>
      * This method logs the currently logged in user out and returns them to the Login Screen.
@@ -654,6 +666,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                                                   username), ok);
             alert.setTitle(resourceBundle.getString("information.title"));
             alert.setHeaderText(resourceBundle.getString("information.header"));
+            alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.show();
         });
     }
