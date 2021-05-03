@@ -27,11 +27,13 @@ public class Game {
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    private boolean paused = false;
     private int round = 1;
 
     /**
@@ -460,5 +462,17 @@ public class Game {
      */
     public void setAutoRollEnabled(UserOrDummy userOrDummy, boolean isAutoRollEnabled) {
         autoRollEnabled.replace(userOrDummy, isAutoRollEnabled);
+    }
+
+    /**
+     * Sets the boolean paused for the game.
+     *
+     * @param paused
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-02
+     */
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 }
