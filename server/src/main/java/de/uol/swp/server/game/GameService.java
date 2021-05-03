@@ -645,7 +645,7 @@ public class GameService extends AbstractService {
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             }
-            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap);
+            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap, msg.getMoveTime());
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
@@ -1767,6 +1767,7 @@ public class GameService extends AbstractService {
                                                                      game.getMap().getGameMapDTO(playerUserOrDummyMap),
                                                                      game.getDices(), game.isDiceRolledAlready(),
                                                                      game.getAutoRollEnabled(event.getUser()),
+                                                                     game.getLobby().getMoveTime(),
                                                                      game.getPlayersStartUpBuiltMap()
                                                                          .get(event.getUser()));
             returnMessage.setMessageContext(ctx.get());

@@ -30,7 +30,6 @@ public class Game {
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
-    private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
