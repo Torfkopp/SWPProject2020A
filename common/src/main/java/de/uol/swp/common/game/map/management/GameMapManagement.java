@@ -152,11 +152,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public IConfiguration getCurrentConfiguration() {
-        return configuration;
-    }
-
-    @Override
     public IEdge getEdge(MapPoint position) {
         if (position.getType() != MapPoint.Type.EDGE) return null;
         if (position.getL().getType() == MapPoint.Type.INTERSECTION && position.getR()

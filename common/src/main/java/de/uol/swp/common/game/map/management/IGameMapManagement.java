@@ -35,6 +35,16 @@ public interface IGameMapManagement {
     IGameMapManagement createMapFromConfiguration(IConfiguration configuration);
 
     /**
+     * Find the length of the longest road and to which player it belongs.
+     *
+     * @return The Player with the length of the longest road
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-03
+     */
+    GameMapManagement.PlayerWithLengthOfLongestRoad findLongestRoad();
+
+    /**
      * Creates the beginner map configuration
      * <p>
      * Creates the beginner's map configuration as shown in the manual WITHOUT beginner
@@ -294,14 +304,18 @@ public interface IGameMapManagement {
     boolean placeRoad(Player player, MapPoint mapPoint);
 
     /**
-     * Find the length of the longest road and to which player it belongs.
+     * Places a settlement
      *
-     * @return The Player with the length of the longest road
+     * @param player   The player wanting to build the settlement (1-4)
+     * @param position The position of the intersection
      *
-     * @author Temmo Junkhoff
-     * @since 2021-05-03
+     * @return True if placement was successful; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
      */
-    GameMapManagement.PlayerWithLengthOfLongestRoad findLongestRoad();
+    boolean placeSettlement(Player player,
+                            MapPoint position) throws GameMapManagement.SettlementMightInterfereWithLongestRoadException;
 
     /**
      * Checks if a street is placeable
@@ -369,18 +383,4 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
-
-    /**
-     * Places a settlement
-     *
-     * @param player   The player wanting to build the settlement (1-4)
-     * @param position The position of the intersection
-     *
-     * @return True if placement was successful; false if not
-     *
-     * @author Mario Fokken
-     * @since 2021-01-16
-     */
-    boolean placeSettlement(Player player,
-                            MapPoint position) throws GameMapManagement.SettlementMightInterfereWithLongestRoadException;
 }
