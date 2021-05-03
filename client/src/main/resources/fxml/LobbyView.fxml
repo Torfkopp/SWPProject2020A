@@ -163,7 +163,10 @@
             </items>
         </Menu>
         <Menu fx:id="moveTimerLabel"/>
-        <Menu mnemonicParsing="false" text="Settings"/>
+        <Menu mnemonicParsing="false" text="%lobby.menu.settings"/>
+        <Menu mnemonicParsing="false" text="%lobby.menu.rules" onAction="#onRulesMenuClicked">
+            <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview"/>
+        </Menu>
         <Menu fx:id="timerLabel"/>
         <Menu fx:id="currentRound" text="%lobby.menu.round" visible="false"/>
     </MenuBar>
