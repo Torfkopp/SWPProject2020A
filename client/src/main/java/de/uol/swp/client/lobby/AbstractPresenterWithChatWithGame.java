@@ -32,11 +32,13 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.util.*;
@@ -95,6 +97,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
+    @FXML
+    protected ColumnConstraints helpColumn;
+    @FXML
+    protected TextFlow helpLabel;
+    @FXML
+    protected Menu infoMenu;
 
     @Inject
     protected IGameService gameService;
@@ -112,12 +120,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean playedCard = false;
     protected boolean inGame;
     protected boolean startUpPhaseEnabled;
+    protected boolean ownTurn;
+    protected boolean tradingCurrentlyAllowed;
     protected int moveTime;
     protected User owner;
     protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
-
+    protected boolean helpActivated = false;
+    @FXML
+    protected CheckMenuItem helpCheckBox;
+    private boolean diceRolled = false;
     // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<Map, Integer> developmentCardAmountCol;
@@ -187,6 +200,68 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 // gameMap exists, so redraw map to fit the new canvas dimensions
                 gameRendering.drawGameMap(gameMap);
             if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
+        }
+    }
+
+    /**
+     * Helper method to set the help text
+     * <p>
+     * If this method gets called it checks the current
+     * game state to show the user what he can do
+     * currently.
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-01
+     */
+    protected void setHelpText() {
+        if (gameWon) return;
+        if (!ownTurn) {
+            Text wait = new Text(resourceBundle.getString("game.help.labels.waitforturn"));
+            Platform.runLater(() -> {
+                helpLabel.getChildren().clear();
+                helpLabel.getChildren().add(wait);
+            });
+        } else {
+            Platform.runLater(() -> {
+                helpLabel.getChildren().clear();
+                Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
+                Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
+                if (!diceRolled) helpLabel.getChildren().addAll(turn, rollDiceText);
+                else {
+                    rollDiceText.setStrikethrough(true);
+                    if (robberNewPosition) {
+                        Text setRobber = new Text(resourceBundle.getString("game.help.labels.setrobber"));
+                        helpLabel.getChildren().addAll(turn, rollDiceText, setRobber);
+                    } else {
+                        Text endTurn = new Text(resourceBundle.getString("game.help.labels.endturn"));
+                        Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
+                        Text build = new Text(resourceBundle.getString("game.help.labels.build"));
+                        Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
+                        helpLabel.getChildren().addAll(turn, rollDiceText, trade, build);
+                        if (playedCard) {
+                            playCard.setStrikethrough(true);
+                            helpLabel.getChildren().add(playCard);
+                        } else {
+                            int cardAmount = 0;
+                            for (int i = 0; i < 4; i++) {
+                                cardAmount += (int) developmentCardTableView.getItems().get(i + 1).get("amount");
+                            }
+                            if (cardAmount == 0) playCard.setStrikethrough(true);
+                            helpLabel.getChildren().add(playCard);
+                            for (int i = 0; i < 4; i++) {
+                                Map<String, Object> cardMap = developmentCardTableView.getItems().get(i + 1);
+                                if ((int) cardMap.get("amount") > 0) {
+                                    Text card = new Text(
+                                            String.format(resourceBundle.getString("game.help.labels.playcard"),
+                                                          cardMap.get("card")));
+                                    helpLabel.getChildren().add(card);
+                                }
+                            }
+                        }
+                        helpLabel.getChildren().add(endTurn);
+                    }
+                }
+            });
         }
     }
 
@@ -261,6 +336,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(true);
         playCard.setDisable(true);
         buildingCurrentlyAllowed = false;
+        tradingCurrentlyAllowed = false;
     }
 
     /**
@@ -277,6 +353,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         disableButtonStates();
         rollDice.setDisable(true);
         gameService.updateInventory(lobbyName);
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -414,6 +491,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (finalAttr != null) Platform.runLater(() -> chatMessages
                     .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
         }
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -442,6 +520,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         gameRendering.drawDice(msg.getDice1(), msg.getDice2());
         gameService.updateInventory(lobbyName);
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -457,6 +536,36 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onEndTurnButtonPressed() {
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName);
+        diceRolled = false;
+    }
+
+    /**
+     * Method called when the HelpButton is pressed
+     * <p>
+     * If the help button gets pressed and help is not activated yet,
+     * this method increases the size of the game window for the help
+     * section and calls a method to fill the help text.
+     * Otherwise the size of the window decreases.
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-01
+     */
+    @FXML
+    private void onHelpButtonPressed() {
+        if (!helpActivated) {
+            int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
+            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
+            ((Stage) window).setMinWidth(size);
+            window.setWidth(size);
+            setHelpText();
+        } else {
+            helpColumn.setMaxWidth(0);
+            helpColumn.setMinWidth(0);
+            helpLabel.getChildren().clear();
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        }
+        helpActivated = !helpActivated;
     }
 
     /**
@@ -476,21 +585,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onMouseClickedOnCanvas(MouseEvent mouseEvent) {
         MapPoint mapPoint = gameRendering.coordinatesToHex(mouseEvent.getX(), mouseEvent.getY());
         if (startUpPhaseEnabled) {
-            if (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE) {
+            if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
                 gameService.buildRequest(lobbyName, mapPoint);
             }
         } else {
             if ((roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) && mapPoint.getType() == EDGE) {
                 gameService.buildRequest(lobbyName, mapPoint);
             }
-            if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-                gameService.buildRequest(lobbyName, mapPoint);
-            if (mapPoint.getType() == HEX && robberNewPosition) {
-                gameService.robberNewPosition(lobbyName, mapPoint);
-                robberNewPosition = false;
-                notice.setVisible(false);
-                resetButtonStates(userService.getLoggedInUser());
-            }
+        }
+        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
+            gameService.buildRequest(lobbyName, mapPoint);
+        if (mapPoint.getType() == HEX && robberNewPosition) {
+            gameService.robberNewPosition(lobbyName, mapPoint);
+            robberNewPosition = false;
+            notice.setVisible(false);
+            resetButtonStates(userService.getLoggedInUser());
+            if (helpActivated) setHelpText();
         }
     }
 
@@ -515,6 +625,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (!endTurn.getText().equals(endTurnText)) Platform.runLater(() -> endTurn.setText(endTurnText));
         }
         setRollDiceButtonState(msg.getActivePlayer());
+        ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
+        if (helpActivated) setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }
 
@@ -623,6 +735,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received PlayCardSuccessResponse");
         playCard.setDisable(true);
         playedCard = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -642,9 +755,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
+        LOG.debug("Received RefreshCardAmountMessage");
         if (!lobbyName.equals(msg.getLobbyName())) return;
         cardAmountTripleList = msg.getCardAmountTriples();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -691,7 +806,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
-        if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
+        if (msg.getLobbyName().equals(lobbyName)) {
+            resetButtonStates(msg.getUser());
+            if (helpActivated) setHelpText();
+        }
     }
 
     /**
@@ -743,6 +861,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         Platform.runLater(() -> notice.setText(resourceBundle.getString("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -760,6 +879,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (lobbyName.equals(msg.getLobbyName())) {
             resetButtonStates(msg.getUser());
             gameService.updateGameMap(msg.getLobbyName());
+            if (helpActivated) setHelpText();
         }
     }
 
@@ -777,6 +897,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received RobberTaxMessage");
         if (msg.getLobbyName().equals(lobbyName)) {
             disableButtonStates();
+            if (helpActivated) setHelpText();
             if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
@@ -801,6 +922,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRollDiceButtonPressed() {
         gameService.rollDice(lobbyName);
         rollDice.setDisable(true);
+        diceRolled = true;
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -879,6 +1002,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -1162,5 +1286,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
         playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
         buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
     }
 }

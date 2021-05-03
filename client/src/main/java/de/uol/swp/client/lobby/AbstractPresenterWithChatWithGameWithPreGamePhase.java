@@ -60,7 +60,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
-
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
@@ -367,10 +366,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
             tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
             playCard.setVisible(false);
             timerLabel.setVisible(false);
+            infoMenu.setVisible(false);
+            helpCheckBox.setDisable(true);
+            helpCheckBox.setVisible(false);
             cardAmountTripleList.clear();
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
@@ -430,7 +433,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
+            turnIndicator.setVisible(true);
             setRollDiceButtonState(msg.getUser());
+            if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
@@ -449,6 +454,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             };
             this.elapsedTimer.start();
         });
+        if (helpActivated) setHelpText();
     }
 
     /**
@@ -508,7 +514,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
+            turnIndicator.setVisible(true);
             if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
+            if (rsp.getPlayer().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
             changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
@@ -570,6 +578,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
+        infoMenu.setVisible(true);
+        helpCheckBox.setDisable(false);
+        helpCheckBox.setVisible(true);
     }
 
     /**
