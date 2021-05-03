@@ -374,7 +374,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 //  confused by seeing "build second settlement" when they a) can't and b) aren't supposed to
                 //  and have the nextplayermessage display secondsettlement if it is the player's founding turn again
                 Platform.runLater(
-                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondsettlement")));
+                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.firstroundend")));
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT)) {
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT;
                 LOG.debug("--- Second founding Settlement successfully built");
