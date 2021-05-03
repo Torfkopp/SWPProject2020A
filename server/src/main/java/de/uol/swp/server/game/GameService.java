@@ -447,7 +447,21 @@ public class GameService extends AbstractService {
                         inv.increaseLumber(-1);
                         inv.increaseWool(-1);
                         inv.increaseGrain(-1);
-                        gameMap.placeSettlement(player, mapPoint);
+                        try {
+                            gameMap.placeSettlement(player, mapPoint);
+                        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+                            GameMapManagement.PlayerWithLengthOfLongestRoad a = gameMap.findLongestRoad();
+                            if (a.getLength() >= 5) {
+                                game.setPlayerWithLongestRoad(a.getPlayer());
+                                game.setLongestRoadLength(a.getLength());
+                            } else {
+                                game.setPlayerWithLongestRoad(null);
+                                game.setLongestRoadLength(0);
+                            }
+                            lobbyService.sendToAllInLobby(req.getOriginLobby(),
+                                                          new UpdateUniqueCardsListMessage(req.getOriginLobby(),
+                                                                                           game.getUniqueCardsList()));
+                        }
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                                          BuildingSuccessfulMessage.Type.SETTLEMENT));

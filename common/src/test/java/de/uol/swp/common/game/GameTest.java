@@ -110,7 +110,10 @@ public class GameTest {
         // build road to next intersection to be able to place a settlement
         map.placeRoad(player, EdgeMapPoint(HexMapPoint(1, 1), HexMapPoint(1, 2)));
         map.placeRoad(player, EdgeMapPoint(HexMapPoint(1, 1), HexMapPoint(0, 1)));
-        map.placeSettlement(player, IntersectionMapPoint(0, 1));
+        try {
+            map.placeSettlement(player, IntersectionMapPoint(0, 1));
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        }
         // Player now has 3 settlements
         assertEquals(3, game.calculateVictoryPoints(player));
         map.upgradeSettlement(player, IntersectionMapPoint(0, 1));

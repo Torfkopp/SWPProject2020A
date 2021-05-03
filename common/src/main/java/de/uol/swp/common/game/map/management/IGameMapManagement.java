@@ -306,18 +306,7 @@ public interface IGameMapManagement {
      */
     boolean placeRoad(Player player, MapPoint mapPoint);
 
-    /**
-     * Places a settlement
-     *
-     * @param player   The player wanting to build the settlement (1-4)
-     * @param position The position of the intersection
-     *
-     * @return True if placement was successful; false if not
-     *
-     * @author Mario Fokken
-     * @since 2021-01-16
-     */
-    boolean placeSettlement(Player player, MapPoint position);
+    GameMapManagement.PlayerWithLengthOfLongestRoad findLongestRoad();
 
     /**
      * Checks if a street is placeable
@@ -385,4 +374,18 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
+
+    /**
+     * Places a settlement
+     *
+     * @param player   The player wanting to build the settlement (1-4)
+     * @param position The position of the intersection
+     *
+     * @return True if placement was successful; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
+     */
+    boolean placeSettlement(Player player,
+                            MapPoint position) throws GameMapManagement.SettlementMightInterfereWithLongestRoadException;
 }

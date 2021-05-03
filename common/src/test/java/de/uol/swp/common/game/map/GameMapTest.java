@@ -10,9 +10,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static de.uol.swp.common.game.map.Player.PLAYER_1;
 import static de.uol.swp.common.game.map.Player.PLAYER_2;
+import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -78,22 +78,37 @@ public class GameMapTest {
         map.makeBeginnerSettlementsAndRoads(4);
         assertTrue(map.placeRoad(PLAYER_1,
                                  map.getEdge(EdgeMapPoint(IntersectionMapPoint(1, 3), IntersectionMapPoint(0, 2)))));
-        assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        try {
+            assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        }
         assertTrue(map.placeRoad(PLAYER_1, EdgeMapPoint(IntersectionMapPoint(0, 2), IntersectionMapPoint(0, 3))));
         // Tests building another settlement on top
         assertTrue(map.settlementPlaceable(PLAYER_1, IntersectionMapPoint(0, 3)));
-        assertTrue(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        try {
+            assertTrue(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        }
         assertFalse(map.settlementPlaceable(PLAYER_2, IntersectionMapPoint(0, 3)));
-        assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
+        try {
+            assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        }
         // Tests upgrading the settlement
         assertFalse(map.upgradeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
         assertTrue(map.upgradeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
         assertFalse(map.upgradeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
         // Tests building another settlement on top
         assertFalse(map.settlementPlaceable(PLAYER_1, IntersectionMapPoint(0, 3)));
-        assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        try {
+            assertFalse(map.placeSettlement(PLAYER_1, IntersectionMapPoint(0, 3)));
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        }
         assertFalse(map.settlementPlaceable(PLAYER_2, IntersectionMapPoint(0, 3)));
-        assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
+        try {
+            assertFalse(map.placeSettlement(PLAYER_2, IntersectionMapPoint(0, 3)));
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        }
 
         // Tests building a road next to a settlement
         assertFalse(map.roadPlaceable(PLAYER_2, map.getEdge(
