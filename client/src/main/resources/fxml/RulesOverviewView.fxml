@@ -56,7 +56,7 @@
             <ImageView fitHeight="135.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
                 <Image url="@../images/rules/buildability_indicators.png"/>
             </ImageView>
-            <ImageView fitHeight="135.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
+            <ImageView fitHeight="120.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
                        GridPane.rowIndex="3">
                 <Image url="@../images/rules/city_with_streets.png"/>
             </ImageView>
@@ -101,19 +101,19 @@
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.1" wrapText="true" GridPane.columnIndex="1"
-                   GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                   GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.2" wrapText="true" GridPane.columnIndex="1"
-                   GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                   GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
             <Label text="%rules.trading.text.howto.3" wrapText="true" GridPane.columnIndex="1"
-                   GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                   GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                 <GridPane.margin>
                     <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
@@ -130,7 +130,7 @@
                     <Insets topRightBottomLeft="10.0"/>
                 </GridPane.margin>
             </Label>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"
+            <ImageView fitHeight="200.0" pickOnBounds="true" preserveRatio="true"
                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.rowSpan="2"
                        GridPane.valignment="CENTER">
                 <Image url="@../images/rules/accept_trade_offer.png"/>
@@ -228,6 +228,9 @@
             <ImageView fitWidth="400.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1"
                        GridPane.halignment="LEFT" GridPane.rowIndex="2">
                 <Image url="@../images/rules/robber_tax.png"/>
+                <GridPane.margin>
+                    <Insets left="10.0"/>
+                </GridPane.margin>
             </ImageView>
             <Label text="%rules.robber.text.title" wrapText="true" GridPane.columnSpan="2" GridPane.halignment="CENTER">
                 <GridPane.margin>
