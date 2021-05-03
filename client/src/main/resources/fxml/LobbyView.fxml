@@ -11,6 +11,8 @@
         <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
         <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
+        <ColumnConstraints fx:id="helpColumn" hgrow="NEVER" maxWidth="200" minWidth="0" prefWidth="0"/>
     </columnConstraints>
     <rowConstraints>
         <RowConstraints maxHeight="25" minHeight="25.0" vgrow="ALWAYS"/>
@@ -153,7 +155,17 @@
         </padding>
     </VBox>
     <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
-        <Menu mnemonicParsing="false" text="Settings"/>
-        <Menu  fx:id="timerLabel"/>
+        <Menu fx:id="timerLabel"/>
+        <Menu mnemonicParsing="false" text="%game.help.info" fx:id="infoMenu" visible="false">
+            <items>
+                <CheckMenuItem fx:id="helpCheckBox" mnemonicParsing="false" onAction="#onHelpButtonPressed"
+                               text="%game.help.checkbox"
+                               disable="true" visible="false"/>
+            </items>
+        </Menu>
     </MenuBar>
+    <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
+          GridPane.rowSpan="2147483647">
+        <TextFlow fx:id="helpLabel"/>
+    </VBox>
 </GridPane>
