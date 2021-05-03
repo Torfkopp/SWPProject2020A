@@ -163,6 +163,8 @@
                                disable="true" visible="false"/>
             </items>
         </Menu>
+        <Menu mnemonicParsing="false" text="Settings"/>
+        <Menu fx:id="moveTimerLabel"/>
     </MenuBar>
     <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
           GridPane.rowSpan="2147483647">

@@ -1054,6 +1054,30 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a PauseTimerRequest found on the EventBus
+     * <p>
+     * If a PauseTimerRequest is found on the EventBus,
+     * the game gets paused.
+     * It also posts a new PauseTimerMessage to all the players in the lobby.
+     *
+     * @param req The PauseTimerRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.PauseTimerRequest
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onPauseTimerRequest(PauseTimerRequest req) {
+        String lobbyName = req.getOriginLobby();
+        LOG.debug("Received PauseTimerRequest for Lobby {}", lobbyName);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setPaused(true);
+        ServerMessage msg = new PauseTimerMessage(req.getOriginLobby(), req.getUser());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+    }
+
+    /**
      * Handles a PlayKnightCardRequest found on the EventBus
      * <p>
      * If a PlayKnightCardRequest is detected on the EventBus, this method is called.
@@ -1749,6 +1773,30 @@ public class GameService extends AbstractService {
             LOG.debug("Sending StartSessionResponse");
             post(returnMessage);
         }
+    }
+
+    /**
+     * Handles an UnpauseTimerRequest found on the EventBus
+     * <p>
+     * If an UnpauseTimerRequest is found on the EventBus,
+     * the game gets unpaused.
+     * It also posts a new UnpauseTimerMessage to all the players in the lobby.
+     *
+     * @param req The UnpauseTimerRequest found on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.UnpauseTimerRequest
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onUnpauseTimerRequest(UnpauseTimerRequest req) {
+        String lobbyName = req.getOriginLobby();
+        LOG.debug("Received UnpauseTimerRequest for Lobby {}", lobbyName);
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.setPaused(false);
+        ServerMessage msg = new UnpauseTimerMessage(req.getOriginLobby(), req.getUser());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**

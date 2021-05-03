@@ -27,6 +27,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
     private final boolean rolledDiceAlready;
     private final boolean autoRollState;
     private final StartUpPhaseBuiltStructures builtStructures;
+    private final int moveTime;
 
     /**
      * Constructor
@@ -39,7 +40,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param builtStructures What structures of the founding phase the user already built
      */
     public StartSessionResponse(Lobby lobby, UserOrDummy player, IConfiguration configuration, IGameMap gameMapDTO,
-                                int[] dices, boolean rolledDiceAlready, boolean autoRollState,
+                                int[] dices, boolean rolledDiceAlready, boolean autoRollState, int moveTime,
                                 StartUpPhaseBuiltStructures builtStructures) {
         this.lobby = lobby;
         this.player = player;
@@ -48,6 +49,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
         this.dices = dices;
         this.rolledDiceAlready = rolledDiceAlready;
         this.autoRollState = autoRollState;
+        this.moveTime = moveTime;
         this.builtStructures = builtStructures;
     }
 
@@ -98,6 +100,15 @@ public class StartSessionResponse extends AbstractResponseMessage {
      */
     public Lobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets the moveTime for the game
+     *
+     * @return moveTime
+     */
+    public int getMoveTime() {
+        return moveTime;
     }
 
     /**
