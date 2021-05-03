@@ -19,11 +19,12 @@ public class LobbyManagement implements ILobbyManagement {
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException {
+    public void createLobby(String name, User owner, int maxPlayer,
+                            String lobbyPassword) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, false, maxPlayer, true, 60, false, false));
+        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword, false, false, maxPlayer, true, 60, false, false));
     }
 
     @Override
@@ -46,6 +47,22 @@ public class LobbyManagement implements ILobbyManagement {
             return Optional.of(lobby);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<Lobby> getLobby(String name, String password) {
+        Lobby lobby = lobbies.get(name);
+        if (lobby != null) {
+            return Optional.of(lobby);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public void setHasPassword(String lobbyName, boolean hasPassword) {
+        Optional<Lobby> lobby = getLobby(lobbyName);
+        if (lobby.isEmpty()) return;
+        lobby.get().setHasPassword(hasPassword);
     }
 
     @Override

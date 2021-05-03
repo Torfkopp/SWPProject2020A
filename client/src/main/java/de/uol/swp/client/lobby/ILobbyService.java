@@ -48,11 +48,12 @@ public interface ILobbyService {
      *
      * @param name      The name chosen for the new lobby
      * @param maxPlayer The maximum amount of players for the new lobby
+     * @param password  The password chosen for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(String name, int maxPlayer);
+    void createNewLobby(String name, int maxPlayer, String password);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus

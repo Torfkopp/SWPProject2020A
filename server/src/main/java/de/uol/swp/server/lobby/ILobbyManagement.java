@@ -18,9 +18,10 @@ public interface ILobbyManagement {
     /**
      * Creates a new lobby and adds it to the list
      *
-     * @param name      The name of the lobby to create
-     * @param owner     The user who wants to create a lobby
-     * @param maxPlayer The maximum amount of players for this lobby
+     * @param name          The name of the lobby to create
+     * @param owner         The user who wants to create a lobby
+     * @param maxPlayer     The maximum amount of players for this lobby
+     * @param lobbyPassword The password of the lobby to create
      *
      * @throws java.lang.IllegalArgumentException Name already taken
      * @implNote The primary key of the lobbies is the name, therefore the name has
@@ -28,7 +29,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(String name, User owner, int maxPlayer) throws IllegalArgumentException;
+    void createLobby(String name, User owner, int maxPlayer, String lobbyPassword) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name
@@ -60,6 +61,31 @@ public interface ILobbyManagement {
      * @since 2019-10-08
      */
     Optional<Lobby> getLobby(String name);
+
+    /**
+     * Searches for the lobby with the requested name and password
+     *
+     * @param name     String containing the name of the lobby to search for
+     * @param password String containing the password of the lobby to search for
+     *
+     * @return Either an empty Optional or an Optional conaining the lobby
+     *
+     * @author Alwin Bossert
+     * @see java.util.Optional
+     * @since 2021-04-22
+     */
+    Optional<Lobby> getLobby(String name, String password);
+
+    /**
+     * Sets the hasPassword attribute of a lobby according to the boolean provided
+     *
+     * @param lobbyName
+     * @param hasPassword
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-20
+     */
+    void setHasPassword(String lobbyName, boolean hasPassword);
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided

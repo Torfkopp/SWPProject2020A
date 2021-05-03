@@ -13,6 +13,7 @@ import de.uol.swp.common.user.User;
 public class CreateLobbyRequest extends AbstractLobbyRequest {
 
     private final int maxPlayers;
+    private final String password;
 
     /**
      * Constructor
@@ -20,12 +21,14 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
      * @param name       Name of the lobby
      * @param owner      User trying to create the lobby
      * @param maxPlayers Maximum amount of players for the new lobby
+     * @param password   Password of the lobby
      *
      * @since 2019-10-08
      */
-    public CreateLobbyRequest(String name, User owner, int maxPlayers) {
+    public CreateLobbyRequest(String name, User owner, int maxPlayers, String password) {
         super(name, owner);
         this.maxPlayers = maxPlayers;
+        this.password = password;
     }
 
     /**
@@ -47,5 +50,17 @@ public class CreateLobbyRequest extends AbstractLobbyRequest {
     public User getOwner() {
         if (getUser() instanceof User) return (User) getUser();
         return null;
+    }
+
+    /**
+     * Gets the password of the lobby
+     *
+     * @return Password of the lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-22
+     */
+    public String getPassword() {
+        return password;
     }
 }

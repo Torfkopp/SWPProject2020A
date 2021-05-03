@@ -113,6 +113,16 @@ public interface Lobby extends Serializable {
     User getOwner();
 
     /**
+     * Gets the password of the lobby
+     *
+     * @return A String containing the password of the lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-22
+     */
+    String getPassword();
+
+    /**
      * Gets a set of all users marked as ready.
      *
      * @return A Set containing all ready users
@@ -144,6 +154,14 @@ public interface Lobby extends Serializable {
      * @since 2021-03-13
      */
     Set<UserOrDummy> getUserOrDummies();
+
+    /**
+     * Gets whether the Lobby has a password or not
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-19
+     */
+    boolean hasAPassword();
 
     /**
      * Gets whether the Lobby is currently in a game or not
@@ -228,6 +246,16 @@ public interface Lobby extends Serializable {
      * @since 2021-03-15
      */
     void setCommandsAllowed(boolean commandsAllowed);
+
+    /**
+     * Sets whether the Lobby currently has a password according to the boolean provided
+     *
+     * @param hasPassword Whether the Lobby has a password or not
+     *
+     * @author Alwin Bossert
+     * @since 2021-04-22
+     */
+    void setHasPassword(boolean hasPassword);
 
     /**
      * Sets the random playfield attribute.
