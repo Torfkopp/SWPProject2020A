@@ -22,8 +22,6 @@ public class Inventory {
     private int monopolyCards = 0;
 
     private int knights = 0;
-    private boolean longestRoad = false;
-    private boolean largestArmy = false;
     private int victoryPoints = 0;
 
     /**
@@ -364,41 +362,5 @@ public class Inventory {
      */
     public void increaseYearOfPlentyCards(int i) {
         yearOfPlentyCards += i;
-    }
-
-    /**
-     * Gets whether the player holds the unique "Largest Army" card
-     *
-     * @return true if the player has the "Largest Army" card, false if not
-     */
-    public boolean isLargestArmy() {
-        return largestArmy;
-    }
-
-    /**
-     * Sets whether the player holds the unique "Largest Army" card
-     *
-     * @param largestArmy true if the player has the Largest Army, false if not
-     */
-    public void setLargestArmy(boolean largestArmy) {
-        this.largestArmy = largestArmy;
-    }
-
-    /**
-     * Gets whether the player holds the unique "Longest Road" card
-     *
-     * @return true if the player has the "Longest Road" card, false if not
-     */
-    public boolean isLongestRoad() {
-        return longestRoad;
-    }
-
-    /**
-     * Sets whether the player holds the unique "Longest Road" card
-     *
-     * @param longestRoad true if the player has the Longest Road, false if not
-     */
-    public void setLongestRoad(boolean longestRoad) {
-        this.longestRoad = longestRoad;
     }
 }

@@ -35,6 +35,16 @@ public interface IGameMapManagement {
     IGameMapManagement createMapFromConfiguration(IConfiguration configuration);
 
     /**
+     * Find the length of the longest road and to which player it belongs.
+     *
+     * @return The Player with the length of the longest road
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-03
+     */
+    GameMapManagement.PlayerWithLengthOfLongestRoad findLongestRoad();
+
+    /**
      * Creates the beginner map configuration
      * <p>
      * Creates the beginner's map configuration as shown in the manual WITHOUT beginner
@@ -50,19 +60,6 @@ public interface IGameMapManagement {
      * @since 2021-03-18
      */
     IConfiguration getBeginnerConfiguration();
-
-    /**
-     * Gets the current configuration of the IGameMap
-     *
-     * @return The current, read-only configuration
-     *
-     * @author Finn Haase
-     * @author Phillip-André Suhr
-     * @implNote Not used currently; could be used in future (e.g. rejoining a game)
-     * @see de.uol.swp.common.game.map.configuration.IConfiguration
-     * @since 2021-03-18
-     */
-    IConfiguration getCurrentConfiguration();
 
     /**
      * Gets an edge that connects two intersections
@@ -97,6 +94,21 @@ public interface IGameMapManagement {
      * @since 2021-04-08
      */
     IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
+
+    /**
+     * Gets the HarborResourceType of a specific Intersection MapPoint
+     * <p>
+     * If the point does not have a harbor, NONE is returned
+     *
+     * @param point specific Intersection MapPoint
+     *
+     * @return HarborResourceType
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    IHarborHex.HarborResource getHarborResource(MapPoint point);
 
     /**
      * Gets the hex at a specified place
@@ -178,6 +190,17 @@ public interface IGameMapManagement {
     int getPlayerPoints(Player player);
 
     /**
+     * Gets all the Settlements and Cities presented in a map
+     *
+     * @return Map of Players and their Settlements / Cities
+     *
+     * @author Steven Luong
+     * @author Maximilian Lindner
+     * @since 2021-04-07
+     */
+    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
+
+    /**
      * Gets all the Players around a Hex
      *
      * @param mapPoint The hex
@@ -202,6 +225,18 @@ public interface IGameMapManagement {
     IConfiguration getRandomisedConfiguration();
 
     /**
+     * Gets a Set of MapPoints of ResourceHexes surrounding the Intersection
+     *
+     * @param position the given Mappoint
+     *
+     * @return Set<MapPoint> containing all the surrounding ResourceHexes
+     *
+     * @author Sven Ahrens
+     * @since 2021-03-05
+     */
+    Set<MapPoint> getResourceHexesFromIntersection(MapPoint position);
+
+    /**
      * Gets the robber's position
      *
      * @return A MapPoint containing the position of the robber
@@ -224,6 +259,18 @@ public interface IGameMapManagement {
     Set<IEdge> incidentEdges(IIntersection intersection);
 
     /**
+     * Gets the length of the longest road that includes a specified map point
+     *
+     * @param mapPoint The map point that should be in the road
+     *
+     * @return The length of the road
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    int longestRoadWith(MapPoint mapPoint);
+
+    /**
      * Places beginner settlements for 3 or 4 players, depending on the
      * provided parameter
      *
@@ -240,6 +287,20 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     void moveRobber(MapPoint newPosition);
+
+    /**
+     * Places a settlement during the founding phase
+     *
+     * @param player   The player wanting to build the settlement (1-4)
+     * @param position The position of the intersection
+     *
+     * @return
+     *
+     * @author Sven Ahrens
+     * @author Phillip-André Suhr
+     * @since 2021-05-01
+     */
+    boolean placeFoundingSettlement(Player player, MapPoint position);
 
     /**
      * Places a road for the given player on the given edge.
@@ -279,7 +340,8 @@ public interface IGameMapManagement {
      * @author Mario Fokken
      * @since 2021-01-16
      */
-    boolean placeSettlement(Player player, MapPoint position);
+    boolean placeSettlement(Player player,
+                            MapPoint position) throws GameMapManagement.SettlementMightInterfereWithLongestRoadException;
 
     /**
      * Checks if a street is placeable
@@ -347,30 +409,4 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
-
-    /**
-     * Gets all the Settlements and Cities presented in a map
-     *
-     * @return Map of Players and their Settlements / Cities
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    Map<Player, List<MapPoint>> getPlayerSettlementsAndCities();
-
-    /**
-     * Gets the HarborResourceType of a specific Intersection MapPoint
-     * <p>
-     * If the point does not have a harbor, NONE is returned
-     *
-     * @param point specific Intersection MapPoint
-     *
-     * @return HarborResourceType
-     *
-     * @author Steven Luong
-     * @author Maximilian Lindner
-     * @since 2021-04-07
-     */
-    IHarborHex.HarborResource getHarborResource(MapPoint point);
 }

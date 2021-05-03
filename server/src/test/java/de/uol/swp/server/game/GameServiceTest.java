@@ -70,7 +70,7 @@ public class GameServiceTest {
     @BeforeEach
     protected void setUp() {
         gameManagement = new GameManagement(lobbyManagement);
-        gameService = new GameService(bus, gameManagement, lobbyService);
+        gameService = new GameService(bus, gameManagement, lobbyManagement, lobbyService);
     }
 
     /**

@@ -24,16 +24,28 @@ public class Game {
     private final Lobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
+    private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
     private final List<String> bankInventory;
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
+    private StartUpPhase startUpPhase;
+    private Player playerWithLongestRoad = null;
+    private Player playerWithLargestArmy = null;
+    private int longestRoadLength = 0;
     private boolean paused = false;
     private int round = 1;
+
+    public enum StartUpPhase {
+        PHASE_1,
+        PHASE_2,
+        NOT_IN_STARTUP_PHASE
+    }
 
     /**
      * Constructor
@@ -46,8 +58,15 @@ public class Game {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
+        playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
+            Player counterPlayer = Player.PLAYER_1;
+            for (UserOrDummy userOrDummy : lobby.getUserOrDummies()) {
+                // TODO: add users to startUpPlayerOrder in the order they will take turns in
+                startUpPlayerOrder.addLast(userOrDummy);
+                playersStartUpBuiltMap.put(userOrDummy, StartUpPhaseBuiltStructures.NONE_BUILT);
+                players.put(userOrDummy, counterPlayer, new Inventory());
 
             List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
             players.put(first, Player.PLAYER_1, new Inventory());
@@ -62,6 +81,7 @@ public class Game {
                 autoRollEnabled.put(randomUser, false);
             }
         }
+        startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         BankInventory bankInvent = new BankInventory();
         bankInventory = bankInvent.getDevelopmentCards();
@@ -105,9 +125,9 @@ public class Game {
         //Points made with victory point cards
         points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (players.get(player).isLongestRoad()) points += 2;
+        if (Objects.equals(playerWithLongestRoad, player)) points += 2;
         //2 Points if player has the largest army
-        if (players.get(player).isLargestArmy()) points += 2;
+        if (Objects.equals(playerWithLargestArmy, player)) points += 2;
         return points;
     }
 
@@ -276,6 +296,24 @@ public class Game {
     }
 
     /**
+     * Gets the length of the longest road
+     *
+     * @return The length of the longest road
+     */
+    public int getLongestRoadLength() {
+        return longestRoadLength;
+    }
+
+    /**
+     * Set the length of the longest road
+     *
+     * @param longestRoadLength The new length
+     */
+    public void setLongestRoadLength(int longestRoadLength) {
+        this.longestRoadLength = longestRoadLength;
+    }
+
+    /**
      * Gets this game's map
      *
      * @return The IGameMap this game is using
@@ -319,12 +357,60 @@ public class Game {
     }
 
     /**
+     * Gets the player with the largest army
+     *
+     * @return The player with the largest army
+     */
+    public Player getPlayerWithLargestArmy() {
+        return playerWithLargestArmy;
+    }
+
+    /**
+     * Sets the player with the largest army
+     *
+     * @param playerWithLargestArmy The player with the largest army
+     */
+    public void setPlayerWithLargestArmy(Player playerWithLargestArmy) {
+        this.playerWithLargestArmy = playerWithLargestArmy;
+    }
+
+    /**
+     * Gets the player with the longest road
+     *
+     * @return The player with the longest road
+     */
+    public Player getPlayerWithLongestRoad() {
+        return playerWithLongestRoad;
+    }
+
+    /**
+     * Sets the player with the longest road
+     *
+     * @param playerWithLongestRoad The player with the longest road
+     */
+    public void setPlayerWithLongestRoad(Player playerWithLongestRoad) {
+        this.playerWithLongestRoad = playerWithLongestRoad;
+    }
+
+    /**
      * Gets an array of all participating players
      *
      * @return The array of Users participating in this game
      */
     public UserOrDummy[] getPlayers() {
         return players.getUserOrDummyArray();
+    }
+
+    /**
+     * Gets a map of the Users and what part of the founding phase they already finished
+     *
+     * @return playersStartUpBuiltMap
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public Map<UserOrDummy, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
+        return playersStartUpBuiltMap;
     }
 
     /**
@@ -352,6 +438,51 @@ public class Game {
     }
 
     /**
+     * Gets the current Round the Game is in
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public int getRound() {return round;}
+
+    /**
+     * Gets the Founding Phase Enum
+     *
+     * @return startUpPhase
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public StartUpPhase getStartUpPhase() {
+        return startUpPhase;
+    }
+
+    /**
+     * Sets the StartUpPhase Enum
+     *
+     * @param startUpPhase the Enum which is used in order to grasp the current phase
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public void setStartUpPhase(StartUpPhase startUpPhase) {
+        this.startUpPhase = startUpPhase;
+    }
+
+    /**
+     * Gets the StartUpPlayerOrder Deque which is used for setting the order
+     * in which the players take turns during the founding phase
+     *
+     * @return startUpPlayerOrder
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
+    public Deque<UserOrDummy> getStartUpPlayerOrder() {
+        return startUpPlayerOrder;
+    }
+
+    /**
      * Gets the taxPayer Set
      *
      * @return Set of the taxPayer
@@ -364,12 +495,24 @@ public class Game {
     }
 
     /**
-     * Gets the current Round the Game is in
+     * Gets a List of Triples with information about the unique cards
+     * (largest army and longest road)
      *
-     * @author Aldin Dervisi
-     * @since 2021-05-01
+     * @return A List of Triples with information about the unique cards
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
      */
-    public int getRound() {return round;}
+    public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
+        Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
+        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad),
+                                          longestRoadLength));
+        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy),
+                                         playerWithLargestArmy == null ? 0 :
+                                         getInventory(playerWithLargestArmy).getKnights()));
+        return new LinkedList<>(returnMap.values());
+    }
 
     /**
      * Returns the user corresponding with the given player
