@@ -13,29 +13,16 @@ import de.uol.swp.common.user.User;
  */
 public class CreateLobbyRequest extends AbstractLobbyRequest {
 
-    private final int maxPlayers;
-
     /**
      * Constructor
      *
-     * @param name       Name of the lobby
-     * @param owner      User trying to create the lobby
-     * @param maxPlayers Maximum amount of players for the new lobby
+     * @param name  Name of the lobby
+     * @param owner User trying to create the lobby
      *
      * @since 2019-10-08
      */
-    public CreateLobbyRequest(LobbyName name, User owner, int maxPlayers) {
+    public CreateLobbyRequest(LobbyName name, User owner) {
         super(name, owner);
-        this.maxPlayers = maxPlayers;
-    }
-
-    /**
-     * Gets the maximum amount of players for the new lobby
-     *
-     * @return maximum amount of players
-     */
-    public int getMaxPlayers() {
-        return maxPlayers;
     }
 
     /**

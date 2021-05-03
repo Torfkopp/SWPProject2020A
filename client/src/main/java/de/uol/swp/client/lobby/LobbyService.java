@@ -69,9 +69,9 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void createNewLobby(LobbyName lobbyName, int maxPlayers) {
+    public void createNewLobby(LobbyName lobbyName) {
         LOG.debug("Sending CreateLobbyRequest");
-        Message createLobbyRequest = new CreateLobbyRequest(lobbyName, userService.getLoggedInUser(), maxPlayers);
+        Message createLobbyRequest = new CreateLobbyRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(createLobbyRequest);
     }
 

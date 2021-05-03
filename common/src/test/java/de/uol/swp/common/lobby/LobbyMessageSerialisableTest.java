@@ -18,7 +18,7 @@ public class LobbyMessageSerialisableTest {
     @Test
     void testLobbyMessagesSerializable() {
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new CreateLobbyRequest(defaultLobbyName, defaultUser, 4),
+                           .checkSerialisableAndDeserialisable(new CreateLobbyRequest(defaultLobbyName, defaultUser),
                                                                CreateLobbyRequest.class));
         assertTrue(SerialisationTestHelper
                            .checkSerialisableAndDeserialisable(new LobbyJoinUserRequest(defaultLobbyName, defaultUser),

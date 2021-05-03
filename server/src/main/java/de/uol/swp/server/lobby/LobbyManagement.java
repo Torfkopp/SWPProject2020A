@@ -21,7 +21,7 @@ public class LobbyManagement implements ILobbyManagement {
     private final Map<LobbyName, Lobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(LobbyName name, User owner, int maxPlayer) throws IllegalArgumentException {
+    public void createLobby(LobbyName name, User owner) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }

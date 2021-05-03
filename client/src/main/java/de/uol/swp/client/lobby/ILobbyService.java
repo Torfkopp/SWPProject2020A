@@ -48,12 +48,11 @@ public interface ILobbyService {
      * Posts a request to create a lobby onto the EventBus
      *
      * @param lobbyName The name chosen for the new lobby
-     * @param maxPlayer The maximum amount of players for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
-    void createNewLobby(LobbyName lobbyName, int maxPlayer);
+    void createNewLobby(LobbyName lobbyName);
 
     /**
      * Posts a request to join a specified lobby onto the EventBus
