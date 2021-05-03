@@ -40,6 +40,7 @@ public class Game {
     private int longestRoadLength = 0;
     private boolean paused = false;
     private int round = 1;
+
     public enum StartUpPhase {
         PHASE_1,
         PHASE_2,
@@ -390,6 +391,14 @@ public class Game {
         return players.getUserOrDummyArray();
     }
 
+    /**
+     * Gets a map of the Users and what part of the founding phase they already finished
+     *
+     * @return playersStartUpBuiltMap
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
     public Map<UserOrDummy, StartUpPhaseBuiltStructures> getPlayersStartUpBuiltMap() {
         return playersStartUpBuiltMap;
     }
@@ -418,14 +427,47 @@ public class Game {
         this.roadBuildingCardPhase = roadBuildingCardPhase;
     }
 
+    /**
+     * Gets the current Round the Game is in
+     *
+     * @author Aldin Dervisi
+     * @since 2021-05-01
+     */
+    public int getRound() {return round;}
+
+    /**
+     * Gets the Founding Phase Enum
+     *
+     * @return startUpPhase
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
     public StartUpPhase getStartUpPhase() {
         return startUpPhase;
     }
 
+    /**
+     * Sets the StartUpPhase Enum
+     *
+     * @param startUpPhase the Enum which is used in order to grasp the current phase
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
     public void setStartUpPhase(StartUpPhase startUpPhase) {
         this.startUpPhase = startUpPhase;
     }
 
+    /**
+     * Gets the StartUpPlayerOrder Deque which is used for setting the order
+     * in which the players take turns during the founding phase
+     *
+     * @return startUpPlayerOrder
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-03
+     */
     public Deque<UserOrDummy> getStartUpPlayerOrder() {
         return startUpPlayerOrder;
     }
@@ -441,14 +483,6 @@ public class Game {
     public Set<User> getTaxPayers() {
         return taxPayers;
     }
-
-    /**
-     * Gets the current Round the Game is in
-     *
-     * @author Aldin Dervisi
-     * @since 2021-05-01
-     */
-    public int getRound() {return round;}
 
     /**
      * Gets a List of Triples with information about the unique cards

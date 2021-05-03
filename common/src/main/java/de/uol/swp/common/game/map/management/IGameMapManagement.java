@@ -224,6 +224,16 @@ public interface IGameMapManagement {
      */
     IConfiguration getRandomisedConfiguration();
 
+    /**
+     * Gets a Set of MapPoints of ResourceHexes surrounding the Intersection
+     *
+     * @param position the given Mappoint
+     *
+     * @return Set<MapPoint> containing all the surrounding ResourceHexes
+     *
+     * @author Sven Ahrens
+     * @since 2021-03-05
+     */
     Set<MapPoint> getResourceHexesFromIntersection(MapPoint position);
 
     /**
