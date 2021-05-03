@@ -53,14 +53,10 @@ class GameTest {
         IGameMapManagement gameMap = new GameMapManagement();
         gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
         Game game = new Game(lobby, user[0], gameMap);
-        //Lobby speichert Users alphabetisch. SMH mein Haupt
         UserOrDummy[] u = game.getPlayers();
-        assertEquals(user[0], u[0]);
-        assertEquals(user[1], u[1]);
-        assertEquals(user[2], u[2]);
         assertEquals(lobby, game.getLobby());
-        assertEquals(user[1], game.nextPlayer());
-        assertEquals(user[2], game.nextPlayer());
-        assertEquals(user[0], game.nextPlayer());
+        assertEquals(u[1], game.nextPlayer());
+        assertEquals(u[2], game.nextPlayer());
+        assertEquals(u[0], game.nextPlayer());
     }
 }

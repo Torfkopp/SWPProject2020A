@@ -686,7 +686,8 @@ public class GameService extends AbstractService {
      * <p>
      * If a CreateGameInternalRequest is detected on the EventBus, this method is called.
      * It then requests the GameManagement to create a game. Afterwards, it sets up
-     * the map of the game according to the settings of the lobby.
+     * the map of the game according to the settings of the lobby. It also randomly
+     * selects the first player.
      *
      * @param msg The CreateGameInternalRequest found on the EventBus
      *
@@ -710,11 +711,16 @@ public class GameService extends AbstractService {
             if (!msg.getLobby().startUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             }
-            gameManagement.createGame(msg.getLobby(), msg.getFirst(), gameMap, msg.getMoveTime());
+            Set<UserOrDummy> users = msg.getLobby().getUserOrDummies();
+            int randomNbr = (int) (Math.random() * users.size());
+            UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
+            UserOrDummy firstPlayer = playerArray[randomNbr];
+            // TODO: handle founder phase
+            gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
             LOG.debug("Sending GameCreatedMessage");
-            post(new GameCreatedMessage(msg.getLobby().getName(), msg.getFirst()));
+            post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
-            StartSessionMessage message = new StartSessionMessage(lobbyName, msg.getFirst(), configuration,
+            StartSessionMessage message = new StartSessionMessage(lobbyName, firstPlayer, configuration,
                                                                   msg.getLobby().startUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
@@ -722,6 +728,11 @@ public class GameService extends AbstractService {
             exceptionMessage.initWithMessage(msg);
             LOG.debug("Sending ExceptionMessage");
             post(exceptionMessage);
+        }
+        Game game = gameManagement.getGame(lobbyName);
+        if (game.getFirst() instanceof Dummy) {
+            onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
+            endTurnDummy(game);
         }
     }
 

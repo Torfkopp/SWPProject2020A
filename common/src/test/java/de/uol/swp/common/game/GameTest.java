@@ -148,15 +148,10 @@ public class GameTest {
     @Test
     void nextPlayerTest() {
         UserOrDummy[] players = game.getPlayers();
-        //Tests if the players are in correct order
-        //Ordered by ID
-        assertEquals(user, players[0]);
-        assertEquals(user2, players[1]);
-        assertEquals(user3, players[2]);
-        assertEquals(lobby, game.getLobby());
-        //Since Jolyne made the lobby, she goes first
-        assertEquals(user2, game.nextPlayer());
-        assertEquals(user3, game.nextPlayer());
+        assertEquals(players[1], game.nextPlayer());
+        assertEquals(players[2], game.nextPlayer());
+        assertEquals(players[3], game.nextPlayer());
+        assertEquals(players[0], game.nextPlayer());
     }
 
     @Test
