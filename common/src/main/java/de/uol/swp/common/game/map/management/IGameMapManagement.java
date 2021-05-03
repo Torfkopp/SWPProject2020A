@@ -35,6 +35,16 @@ public interface IGameMapManagement {
     IGameMapManagement createMapFromConfiguration(IConfiguration configuration);
 
     /**
+     * Find the length of the longest road and to which player it belongs.
+     *
+     * @return The Player with the length of the longest road
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-03
+     */
+    GameMapManagement.PlayerWithLengthOfLongestRoad findLongestRoad();
+
+    /**
      * Creates the beginner map configuration
      * <p>
      * Creates the beginner's map configuration as shown in the manual WITHOUT beginner
@@ -50,19 +60,6 @@ public interface IGameMapManagement {
      * @since 2021-03-18
      */
     IConfiguration getBeginnerConfiguration();
-
-    /**
-     * Gets the current configuration of the IGameMap
-     *
-     * @return The current, read-only configuration
-     *
-     * @author Finn Haase
-     * @author Phillip-André Suhr
-     * @implNote Not used currently; could be used in future (e.g. rejoining a game)
-     * @see de.uol.swp.common.game.map.configuration.IConfiguration
-     * @since 2021-03-18
-     */
-    IConfiguration getCurrentConfiguration();
 
     /**
      * Gets an edge that connects two intersections
@@ -252,6 +249,18 @@ public interface IGameMapManagement {
     Set<IEdge> incidentEdges(IIntersection intersection);
 
     /**
+     * Gets the length of the longest road that includes a specified map point
+     *
+     * @param mapPoint The map point that should be in the road
+     *
+     * @return The length of the road
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    int longestRoadWith(MapPoint mapPoint);
+
+    /**
      * Places beginner settlements for 3 or 4 players, depending on the
      * provided parameter
      *
@@ -321,7 +330,8 @@ public interface IGameMapManagement {
      * @author Mario Fokken
      * @since 2021-01-16
      */
-    boolean placeSettlement(Player player, MapPoint position);
+    boolean placeSettlement(Player player,
+                            MapPoint position) throws GameMapManagement.SettlementMightInterfereWithLongestRoadException;
 
     /**
      * Checks if a street is placeable

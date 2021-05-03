@@ -35,6 +35,9 @@ public class Game {
     private boolean diceRolledAlready = false;
     private RoadBuildingCardPhase roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
     private StartUpPhase startUpPhase;
+    private Player playerWithLongestRoad = null;
+    private Player playerWithLargestArmy = null;
+    private int longestRoadLength = 0;
     private boolean paused = false;
     private int round = 1;
     public enum StartUpPhase {
@@ -111,9 +114,9 @@ public class Game {
         //Points made with victory point cards
         points += players.get(player).getVictoryPointCards();
         //2 Points if player has the longest road
-        if (players.get(player).isLongestRoad()) points += 2;
+        if (Objects.equals(playerWithLongestRoad, player)) points += 2;
         //2 Points if player has the largest army
-        if (players.get(player).isLargestArmy()) points += 2;
+        if (Objects.equals(playerWithLargestArmy, player)) points += 2;
         return points;
     }
 
@@ -282,6 +285,24 @@ public class Game {
     }
 
     /**
+     * Gets the length of the longest road
+     *
+     * @return The length of the longest road
+     */
+    public int getLongestRoadLength() {
+        return longestRoadLength;
+    }
+
+    /**
+     * Set the length of the longest road
+     *
+     * @param longestRoadLength The new length
+     */
+    public void setLongestRoadLength(int longestRoadLength) {
+        this.longestRoadLength = longestRoadLength;
+    }
+
+    /**
      * Gets this game's map
      *
      * @return The IGameMap this game is using
@@ -322,6 +343,42 @@ public class Game {
             temp.put(player, getUserFromPlayer(player));
         }
         return temp;
+    }
+
+    /**
+     * Gets the player with the largest army
+     *
+     * @return The player with the largest army
+     */
+    public Player getPlayerWithLargestArmy() {
+        return playerWithLargestArmy;
+    }
+
+    /**
+     * Sets the player with the largest army
+     *
+     * @param playerWithLargestArmy The player with the largest army
+     */
+    public void setPlayerWithLargestArmy(Player playerWithLargestArmy) {
+        this.playerWithLargestArmy = playerWithLargestArmy;
+    }
+
+    /**
+     * Gets the player with the longest road
+     *
+     * @return The player with the longest road
+     */
+    public Player getPlayerWithLongestRoad() {
+        return playerWithLongestRoad;
+    }
+
+    /**
+     * Sets the player with the longest road
+     *
+     * @param playerWithLongestRoad The player with the longest road
+     */
+    public void setPlayerWithLongestRoad(Player playerWithLongestRoad) {
+        this.playerWithLongestRoad = playerWithLongestRoad;
     }
 
     /**
@@ -392,6 +449,26 @@ public class Game {
      * @since 2021-05-01
      */
     public int getRound() {return round;}
+
+    /**
+     * Gets a List of Triples with information about the unique cards
+     * (largest army and longest road)
+     *
+     * @return A List of Triples with information about the unique cards
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
+        Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
+        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad),
+                                          longestRoadLength));
+        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy),
+                                         playerWithLargestArmy == null ? 0 :
+                                         getInventory(playerWithLargestArmy).getKnights()));
+        return new LinkedList<>(returnMap.values());
+    }
 
     /**
      * Returns the user corresponding with the given player

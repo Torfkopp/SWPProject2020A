@@ -1168,6 +1168,24 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles the UpdateUniqueCardsListMessage
+     * If an UpdateUniqueCardsListMessage is found on the bus this method gets called
+     * and updates the uniqueCardList.
+     *
+     * @param msg The UpdateUniqueCardsListMessage found on the bus
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    @Subscribe
+    private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
+        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        uniqueCardList.clear();
+        uniqueCardList.addAll(msg.getUniqueCardsList());
+    }
+
+    /**
      * Helper Method to play a monopoly card
      *
      * @author Mario Fokken
@@ -1357,7 +1375,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 });
             }
         });
-        //TODO: remove the following from initialize when largest army and longest road are tracked by the game
         if (uniqueCardList == null) {
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);

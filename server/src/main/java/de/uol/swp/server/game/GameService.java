@@ -117,6 +117,54 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles the allocation of the largest Army
+     *
+     * @param lobbyName The lobbyname
+     * @param user      The user for whom the largest army should be checked
+     *
+     * @author Eric Vuong
+     * @author Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    private void checkLargestArmy(String lobbyName, UserOrDummy user) {
+        Game game = gameManagement.getGame(lobbyName);
+        Inventory[] invs = game.getAllInventories();
+        Inventory largest = game.getInventory(game.getPlayerWithLargestArmy());
+        Inventory currentlyLargest = null;
+        if (largest == null) {
+            largest = new Inventory();
+            largest.setKnights(2);
+        }
+
+        if (game.getInventory(user).getKnights() > largest.getKnights())
+            game.setPlayerWithLargestArmy(game.getPlayer(user));
+
+        lobbyService
+                .sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+    }
+
+    /**
+     * Handles the allocation of the longest Road
+     *
+     * @param lobbyName The lobbyname
+     * @param mapPoint  The map point pointing to the edge based on which the longest road should be checked
+     *
+     * @author Eric Vuong
+     * @auhtor Temmo Junkhoff
+     * @since 2021-04-10
+     */
+    private void checkLongestRoad(String lobbyName, MapPoint mapPoint) {
+        Game game = gameManagement.getGame(lobbyName);
+        int length = game.getMap().longestRoadWith(mapPoint);
+        if (length > 4 && length > game.getLongestRoadLength()) {
+            game.setLongestRoadLength(length);
+            game.setPlayerWithLongestRoad(game.getMap().getEdge(mapPoint).getOwner());
+        }
+        lobbyService
+                .sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+    }
+
+    /**
      * Helper method to handle ending the game if the last change to the
      * inventory pushed the player over the edge in terms of Victory Points
      *
@@ -422,7 +470,21 @@ public class GameService extends AbstractService {
                         inv.increaseLumber(-1);
                         inv.increaseWool(-1);
                         inv.increaseGrain(-1);
-                        gameMap.placeSettlement(player, mapPoint);
+                        try {
+                            gameMap.placeSettlement(player, mapPoint);
+                        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+                            GameMapManagement.PlayerWithLengthOfLongestRoad a = gameMap.findLongestRoad();
+                            if (a.getLength() >= 5) {
+                                game.setPlayerWithLongestRoad(a.getPlayer());
+                                game.setLongestRoadLength(a.getLength());
+                            } else {
+                                game.setPlayerWithLongestRoad(null);
+                                game.setLongestRoadLength(0);
+                            }
+                            lobbyService.sendToAllInLobby(req.getOriginLobby(),
+                                                          new UpdateUniqueCardsListMessage(req.getOriginLobby(),
+                                                                                           game.getUniqueCardsList()));
+                        }
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint,
                                                                          SETTLEMENT));
@@ -494,7 +556,9 @@ public class GameService extends AbstractService {
                 break;
             }
             case EDGE: {
-                if (gameMap.getEdge(mapPoint).getOwner() != null) {
+                if (gameMap.getEdge(mapPoint) == null) {
+                    sendFailResponse.accept(NOT_A_REAL_ROAD);
+                } else if (gameMap.getEdge(mapPoint).getOwner() != null) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.roadPlaceable(player, mapPoint)) {
                     if (game.getRoadBuildingCardPhase() != NO_ROAD_BUILDING_CARD_PLAYED) {
@@ -534,6 +598,7 @@ public class GameService extends AbstractService {
                         inv.increaseBrick(-1);
                         inv.increaseLumber(-1);
                         gameMap.placeRoad(player, mapPoint);
+                        checkLongestRoad(req.getOriginLobby(), mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, ROAD));
                     } else {
@@ -708,6 +773,7 @@ public class GameService extends AbstractService {
             case "knight":
             case "knights":
                 inventory.increaseKnights(req.getAmount());
+                checkLargestArmy(req.getOriginLobby(), req.getUser());
                 break;
             case "monopolycard":
             case "mc":
@@ -729,14 +795,6 @@ public class GameService extends AbstractService {
             case "yearofplenty":
             case "yopc":
                 inventory.increaseYearOfPlentyCards(req.getAmount());
-                break;
-            case "largestarmy":
-            case "la":
-                inventory.setLargestArmy(!inventory.isLargestArmy());
-                break;
-            case "longestroad":
-            case "lr":
-                inventory.setLongestRoad(!inventory.isLongestRoad());
                 break;
         }
         inventory = game.getInventory(req.getUser());
@@ -1108,6 +1166,7 @@ public class GameService extends AbstractService {
             return;
         }
         inv.setKnights(inv.getKnights() + 1);
+        checkLargestArmy(req.getOriginLobby(), req.getUser());
         inv.increaseKnightCards(-1);
 
         robberMovementPlayer(req, req.getUser());
@@ -1829,8 +1888,7 @@ public class GameService extends AbstractService {
      * It searches the inventories in the current game for the one that belongs
      * to the player sending the request. It then posts a UpdateInventoryResponse
      * that contains all the user's items, saved in a resourceMap for
-     * counted items (bricks, grain, etc.) and a armyAndRoadMap which
-     * contains the boolean attributes longestRoad and largestArmy.
+     * counted items (bricks, grain, etc.).
      *
      * @param req The UpdateInventoryRequest found on the EventBus
      *
