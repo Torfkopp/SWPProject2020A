@@ -71,11 +71,11 @@ public class MapPoint implements Serializable {
     public static MapPoint EdgeMapPoint(MapPoint l, MapPoint r) {
         //@formatter:off
         if (l == null
-                || l.getType() == Type.INVALID
-                || r == null
-                || r.getType() == Type.INVALID
-                || l.getType() != r.getType()
-                || l.getType() == Type.EDGE)
+            || l.getType() == Type.INVALID
+            || r == null
+            || r.getType() == Type.INVALID
+            || l.getType() != r.getType()
+            || l.getType() == Type.EDGE)
             return InvalidMapPoint();
         //@formatter:on
         return new MapPoint(l, r);
@@ -144,15 +144,15 @@ public class MapPoint implements Serializable {
     public Type getType() {
         //@formatter:off
         if ((type == Type.HEX
-                || type == Type.INTERSECTION)
-                && l == null
-                && r == null)
-            return type;
+            || type == Type.INTERSECTION)
+            && l == null
+            && r == null)
+                return type;
         else if (type == Type.EDGE
-                && x == null
-                && y == null
-                && ((l.getType() == Type.HEX && r.getType() == Type.HEX)
-                || (l.getType() == Type.INTERSECTION && r.getType() == Type.INTERSECTION)))
+                 && x == null
+                 && y == null
+                 && ((l.getType() == Type.HEX && r.getType() == Type.HEX)
+                     || (l.getType() == Type.INTERSECTION && r.getType() == Type.INTERSECTION)))
             return type;
         else return Type.INVALID;
         //@formatter:on
