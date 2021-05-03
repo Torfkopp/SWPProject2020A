@@ -1,8 +1,8 @@
 package de.uol.swp.server.game.event;
 
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
 
 import java.util.Optional;

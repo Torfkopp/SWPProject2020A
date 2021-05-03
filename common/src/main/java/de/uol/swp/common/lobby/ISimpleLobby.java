@@ -4,9 +4,20 @@ import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public interface ISimpleLobby {
+public interface ISimpleLobby extends Serializable {
+
+    /**
+     * Gets if commands are allowed.
+     *
+     * @return The boolean
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-03
+     */
+    boolean areCommandsAllowed();
 
     /**
      * Gets the max players.
@@ -66,17 +77,7 @@ public interface ISimpleLobby {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    Set<UserOrDummy> getUsers();
-
-    /**
-     * Gets if commands are allowed.
-     *
-     * @return The boolean
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-05-03
-     */
-    boolean isCommandsAllowed();
+    Set<UserOrDummy> getUserOrDummies();
 
     /**
      * Gets if the lobby is inGame.

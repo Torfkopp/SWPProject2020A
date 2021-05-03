@@ -8,7 +8,7 @@ import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
@@ -103,7 +103,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void refreshLobbyPresenterFields(Lobby lobby) {
+    public void refreshLobbyPresenterFields(ISimpleLobby lobby) {
         LOG.debug("Sending LobbyUpdateEvent");
         eventBus.post(new LobbyUpdateEvent(lobby));
     }

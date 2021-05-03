@@ -1,10 +1,13 @@
-package de.uol.swp.common.game.map.management;
+package de.uol.swp.server.game.map;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.management.IEdge;
+import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;

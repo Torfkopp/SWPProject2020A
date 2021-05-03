@@ -1,4 +1,4 @@
-package de.uol.swp.common.lobby;
+package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.Dummy;
@@ -18,7 +18,7 @@ import java.util.TreeSet;
  * lobby's game session.
  *
  * @author Marco Grawunder
- * @see de.uol.swp.common.lobby.Lobby
+ * @see Lobby
  * @since 2019-10-08
  */
 public class LobbyDTO implements Lobby {

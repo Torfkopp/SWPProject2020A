@@ -1,6 +1,7 @@
-package de.uol.swp.common.lobby;
+package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -18,6 +19,22 @@ import java.util.Set;
  * @since 2019-10-08
  */
 public interface Lobby extends Serializable {
+
+    /**
+     * Get a simple lobby from a normal lobby.
+     *
+     * @param lobby The lobby
+     *
+     * @return The simple lobby
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-03
+     */
+    static SimpleLobby getSimpleLobby(Lobby lobby) {
+        return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.commandsAllowed(),
+                               lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
+                               lobby.startUpPhaseEnabled());
+    }
 
     /**
      * Gets whether commands are allowed or not.

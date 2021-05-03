@@ -18,7 +18,6 @@ import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
@@ -29,6 +28,7 @@ import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobbyManagement;
+import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -642,7 +642,7 @@ public class CommandService extends AbstractService {
      *                                            key or value type is provided
      * @implNote Only supports Maps with {@link java.lang.String} key type and one of
      * {@link java.lang.Boolean}, {@link java.lang.Integer}, or
-     * {@link de.uol.swp.common.lobby.Lobby} as value type.
+     * {@link de.uol.swp.server.lobby.Lobby} as value type.
      */
     private Map<Object, Object> parseMap(String[] strings, String keyClassName, String valueClassName) {
         Map<Object, Object> map = new HashMap<>();

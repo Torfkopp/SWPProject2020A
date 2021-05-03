@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -14,7 +14,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class UpdateLobbyMessage extends AbstractLobbyMessage {
 
-    private final Lobby lobby;
+    private final ISimpleLobby lobby;
 
     /**
      * Constructor
@@ -23,7 +23,7 @@ public class UpdateLobbyMessage extends AbstractLobbyMessage {
      * @param user  The user who initiated the update
      * @param lobby The object of the lobby that was updated
      */
-    public UpdateLobbyMessage(LobbyName name, UserOrDummy user, Lobby lobby) {
+    public UpdateLobbyMessage(LobbyName name, UserOrDummy user, ISimpleLobby lobby) {
         super(name, user);
         this.lobby = lobby;
     }
@@ -33,7 +33,7 @@ public class UpdateLobbyMessage extends AbstractLobbyMessage {
      *
      * @return The lobby where the settings were changed.
      */
-    public Lobby getLobby() {
+    public ISimpleLobby getLobby() {
         return lobby;
     }
 }

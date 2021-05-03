@@ -1,7 +1,7 @@
 package de.uol.swp.client.lobby;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -107,7 +107,7 @@ public interface ILobbyService {
      *
      * @since 2020-12-30
      */
-    void refreshLobbyPresenterFields(Lobby lobby);
+    void refreshLobbyPresenterFields(ISimpleLobby lobby);
 
     /**
      * Posts a request to remove the user from all lobbies

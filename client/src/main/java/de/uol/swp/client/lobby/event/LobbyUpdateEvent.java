@@ -1,6 +1,6 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 
 /**
  * Event used to communicate Lobby details to new LobbyPresenter instances
@@ -19,14 +19,14 @@ import de.uol.swp.common.lobby.Lobby;
  */
 public class LobbyUpdateEvent {
 
-    private final Lobby lobby;
+    private final ISimpleLobby lobby;
 
     /**
      * Constructor
      *
      * @param lobby The Lobby-object of the lobby the user wants to join
      */
-    public LobbyUpdateEvent(Lobby lobby) {
+    public LobbyUpdateEvent(ISimpleLobby lobby) {
         this.lobby = lobby;
     }
 
@@ -39,7 +39,7 @@ public class LobbyUpdateEvent {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    public Lobby getLobby() {
+    public ISimpleLobby getLobby() {
         return lobby;
     }
 }

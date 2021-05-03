@@ -4,8 +4,8 @@
 //import de.uol.swp.common.I18nWrapper;
 //import de.uol.swp.common.game.Game;
 //import de.uol.swp.common.game.map.*;
-//import de.uol.swp.common.game.map.management.GameMapManagement;
-//import de.uol.swp.common.game.map.management.IGameMapManagement;
+//import de.uol.swp.server.game.GameMapManagement;
+//import de.uol.swp.server.game.map.IGameMapManagement;
 //import de.uol.swp.common.game.map.management.MapPoint;
 //import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 //import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;

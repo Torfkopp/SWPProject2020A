@@ -32,6 +32,13 @@ public class DevelopmentCardList implements IDevelopmentCardList {
     }
 
     @Override
+    public void decrease(DevelopmentCardType resource) {
+        for (DevelopmentCard resource1 : list) {
+            if (Objects.equals(resource, resource1.getType())) resource1.decrease();
+        }
+    }
+
+    @Override
     public DevelopmentCard get(DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) return resource1;
@@ -40,25 +47,18 @@ public class DevelopmentCardList implements IDevelopmentCardList {
     }
 
     @Override
-    public void increase(DevelopmentCardType resource) {
-        for (DevelopmentCard resource1 : list) {
-            if (Objects.equals(resource, resource1.getType())) resource1.increase();
-        }
-    }
-
-    @Override
-    public void decrease(DevelopmentCardType resource) {
-        for (DevelopmentCard resource1 : list) {
-            if (Objects.equals(resource, resource1.getType())) resource1.decrease();
-        }
-    }
-
-    @Override
     public int getAmount(DevelopmentCardType resource) {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) return resource1.getAmount();
         }
         return 0;
+    }
+
+    @Override
+    public void increase(DevelopmentCardType resource) {
+        for (DevelopmentCard resource1 : list) {
+            if (Objects.equals(resource, resource1.getType())) resource1.increase();
+        }
     }
 
     public class ResourceListMapIterator implements Iterator<DevelopmentCard> {

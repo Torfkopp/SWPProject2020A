@@ -9,7 +9,7 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
 import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.lobby.response.*;
@@ -110,7 +110,8 @@ public class LobbyService extends AbstractService {
         post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
         Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
         if (updatedLobby.isEmpty()) return;
-        ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(), updatedLobby.get());
+        ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(),
+                                                   Lobby.getSimpleLobby(updatedLobby.get()));
         sendToAllInLobby(req.getName(), msg);
     }
 
@@ -142,7 +143,8 @@ public class LobbyService extends AbstractService {
             lobby.get().updateOwner(newOwner);
             Optional<Lobby> updatedLobby = lobbyManagement.getLobby(req.getName());
             if (updatedLobby.isEmpty()) return;
-            ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(), updatedLobby.get());
+            ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(),
+                                                       Lobby.getSimpleLobby(updatedLobby.get()));
             sendToAllInLobby(req.getName(), msg);
         }
     }
@@ -212,7 +214,7 @@ public class LobbyService extends AbstractService {
             lobbyManagement.createLobby(req.getName(), req.getOwner(), req.getMaxPlayers());
             Optional<Lobby> lobby = lobbyManagement.getLobby(req.getName());
             if (lobby.isEmpty()) return;
-            Message responseMessage = new CreateLobbyResponse(req.getName(), lobby.get());
+            Message responseMessage = new CreateLobbyResponse(req.getName(), Lobby.getSimpleLobby(lobby.get()));
             responseMessage.initWithMessage(req);
             post(responseMessage);
             sendToAll(new LobbyCreatedMessage(req.getName(), req.getOwner()));
@@ -245,7 +247,8 @@ public class LobbyService extends AbstractService {
         Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
         for (Map.Entry<LobbyName, Lobby> entry : lobbies.entrySet()) {
             if (entry.getValue().getUserOrDummies().contains(user)) {
-                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(), entry.getValue());
+                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(),
+                                                                        Lobby.getSimpleLobby(entry.getValue()));
                 responseMessage.initWithMessage(req);
                 post(responseMessage);
             }
@@ -284,7 +287,7 @@ public class LobbyService extends AbstractService {
         ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
         post(new ForwardToUserInternalRequest(toBeKickedUser, kickResponse));
         sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), toBeKickedUser));
-        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
 
     /**
@@ -298,7 +301,7 @@ public class LobbyService extends AbstractService {
      *
      * @author Finn Haase
      * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.Lobby
+     * @see Lobby
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2021-04-08
      */
@@ -320,11 +323,11 @@ public class LobbyService extends AbstractService {
 
             randomLobby.joinUser(req.getUser());
 
-            Message responseMessage = new JoinLobbyResponse(randomLobby.getName(), randomLobby);
+            Message responseMessage = new JoinLobbyResponse(randomLobby.getName(), Lobby.getSimpleLobby(randomLobby));
             responseMessage.initWithMessage(req);
             post(responseMessage);
             sendToAllInLobby(randomLobby.getName(), new UserJoinedLobbyMessage(randomLobby.getName(), req.getUser()));
-            post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+            post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
         } else {
             Message responseMessage = new JoinRandomLobbyFailedResponse();
             responseMessage.initWithMessage(req);
@@ -341,7 +344,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The LobbyJoinUserRequest found on the EventBus
      *
-     * @see de.uol.swp.common.lobby.Lobby
+     * @see Lobby
      * @see de.uol.swp.common.lobby.message.UserJoinedLobbyMessage
      * @since 2020-12-19
      */
@@ -356,11 +359,12 @@ public class LobbyService extends AbstractService {
                         lobby.get().joinUser(req.getUser());
                         lobby = lobbyManagement.getLobby(req.getName());
                         if (lobby.isEmpty()) return;
-                        Message responseMessage = new JoinLobbyResponse(req.getName(), lobby.get());
+                        Message responseMessage = new JoinLobbyResponse(req.getName(),
+                                                                        Lobby.getSimpleLobby(lobby.get()));
                         responseMessage.initWithMessage(req);
                         post(responseMessage);
                         sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
-                        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+                        post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
                     } else {
                         ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
                         exceptionMessage.initWithMessage(req);
@@ -396,7 +400,7 @@ public class LobbyService extends AbstractService {
      *
      * @param req The LobbyJoinUserRequest found on the EventBus
      *
-     * @see de.uol.swp.common.lobby.Lobby
+     * @see Lobby
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2019-10-08
      */
@@ -408,7 +412,7 @@ public class LobbyService extends AbstractService {
         try {
             lobby.get().leaveUser(req.getUser());
             sendToAllInLobby(req.getName(), new UserLeftLobbyMessage(req.getName(), req.getUser()));
-            post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+            post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
         } catch (IllegalArgumentException exception) {
             lobbyManagement.dropLobby(lobby.get().getName());
             sendToAll(new LobbyDeletedMessage(req.getName()));
@@ -428,7 +432,7 @@ public class LobbyService extends AbstractService {
      * @author Finn Haase
      * @author Aldin Dervisi
      * @see de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse
-     * @see de.uol.swp.common.lobby.Lobby
+     * @see Lobby
      * @see de.uol.swp.common.lobby.message.UserLeftLobbyMessage
      * @since 2021-01-28
      */
@@ -437,12 +441,12 @@ public class LobbyService extends AbstractService {
         LOG.debug("Received RemoveFromLobbiesRequest");
         User user = req.getUser();
         Map<LobbyName, Lobby> lobbies = lobbyManagement.getLobbies();
-        Map<LobbyName, Lobby> lobbiesWithUser = new HashMap<>();
+        Map<LobbyName, ISimpleLobby> lobbiesWithUser = new HashMap<>();
         for (Map.Entry<LobbyName, Lobby> entry : lobbies.entrySet()) {
             if (entry.getValue().getUserOrDummies().contains(user)) {
                 Lobby lobby = entry.getValue();
                 LobbyName lobbyName = entry.getKey();
-                lobbiesWithUser.put(entry.getKey(), lobby);
+                lobbiesWithUser.put(entry.getKey(), Lobby.getSimpleLobby(lobby));
                 try {
                     lobby.leaveUser(user);
                     sendToAllInLobby(lobbyName, new UserLeftLobbyMessage(lobbyName, user));
@@ -454,7 +458,7 @@ public class LobbyService extends AbstractService {
         }
         Message response = new RemoveFromLobbiesResponse(Collections.unmodifiableMap(lobbiesWithUser));
         post(response);
-        post(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
 
     /**
@@ -471,7 +475,7 @@ public class LobbyService extends AbstractService {
     @Subscribe
     private void onRetrieveAllLobbiesRequest(RetrieveAllLobbiesRequest req) {
         LOG.debug("Received RetrieveAllLobbiesRequest");
-        Message response = new AllLobbiesResponse(lobbyManagement.getLobbies());
+        Message response = new AllLobbiesResponse(lobbyManagement.getSimpleLobbies());
         response.initWithMessage(req);
         post(response);
     }
@@ -533,7 +537,7 @@ public class LobbyService extends AbstractService {
         }
         sendToAllInLobby(req.getLobbyName(),
                          new ReturnToPreGameLobbyMessage(req.getLobbyName(), lobby.get().getOwner()));
-        sendToAll(new AllLobbiesMessage(lobbyManagement.getLobbies()));
+        sendToAll(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
     }
 
     /**

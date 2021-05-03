@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.map.management;
+package de.uol.swp.server.game;
 
 import com.google.common.graph.*;
 import de.uol.swp.common.game.map.Player;
@@ -6,8 +6,10 @@ import de.uol.swp.common.game.map.configuration.Configuration;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.*;
+import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.server.game.map.IGameMapManagement;
 
 import java.util.*;
 
@@ -179,6 +181,13 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public IHarborHex.HarborResource getHarborResource(MapPoint point) {
+        IIntersection intersection = getIntersection(point);
+        if (!harborResourceMap.containsKey(intersection)) return null;
+        return harborResourceMap.get(intersection);
+    }
+
+    @Override
     public IGameHex getHex(MapPoint position) {
         GameHexWrapper returnValue = getHexWrapper(position);
         return returnValue == null ? null : returnValue.get();
@@ -258,6 +267,11 @@ public class GameMapManagement implements IGameMapManagement {
             }
         }
         return points;
+    }
+
+    @Override
+    public Map<Player, List<MapPoint>> getPlayerSettlementsAndCities() {
+        return playerSettlementsAndCities;
     }
 
     @Override
@@ -440,18 +454,6 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public Map<Player, List<MapPoint>> getPlayerSettlementsAndCities() {
-        return playerSettlementsAndCities;
-    }
-
-    @Override
-    public IHarborHex.HarborResource getHarborResource(MapPoint point) {
-        IIntersection intersection = getIntersection(point);
-        if (!harborResourceMap.containsKey(intersection)) return null;
-        return harborResourceMap.get(intersection);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {

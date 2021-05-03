@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ResourceBundle;
 
 public enum ResourceType implements Serializable {
+
     LUMBER("game.resources.lumber"),
     BRICK("game.resources.brick"),
     ORE("game.resources.ore"),

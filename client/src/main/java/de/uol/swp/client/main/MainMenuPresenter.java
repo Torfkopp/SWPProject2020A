@@ -10,7 +10,7 @@ import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.GameCreatedMessage;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
@@ -270,7 +270,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), 3));
+        result.ifPresent(s -> lobbyService.createNewLobby(new LobbyName(lobbyName.getText()), 3));
     }
 
     /**
@@ -635,17 +635,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.lobby.LobbyDTO
      * @since 2020-11-29
      */
-    private void updateLobbyList(List<Lobby> lobbyList) {
+    private void updateLobbyList(List<ISimpleLobby> lobbyList) {
         Platform.runLater(() -> {
             if (lobbies == null) {
                 lobbies = FXCollections.observableArrayList();
                 lobbyView.setItems(lobbies);
             }
             lobbies.clear();
-            for (Lobby l : lobbyList) {
+            for (ISimpleLobby l : lobbyList) {
                 String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())

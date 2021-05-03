@@ -246,16 +246,16 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                         } else {
                             int cardAmount = 0;
                             for (int i = 0; i < 4; i++) {
-                                cardAmount += (int) developmentCardTableView.getItems().get(i + 1).get("amount");
+                                cardAmount += developmentCardTableView.getItems().get(i + 1).getAmount();
                             }
                             if (cardAmount == 0) playCard.setStrikethrough(true);
                             helpLabel.getChildren().add(playCard);
                             for (int i = 0; i < 4; i++) {
-                                Map<String, Object> cardMap = developmentCardTableView.getItems().get(i + 1);
-                                if ((int) cardMap.get("amount") > 0) {
+                                IDevelopmentCard cardMap = developmentCardTableView.getItems().get(i + 1);
+                                if (cardMap.getAmount() > 0) {
                                     Text card = new Text(
                                             String.format(resourceBundle.getString("game.help.labels.playcard"),
-                                                          cardMap.get("card")));
+                                                          cardMap.getType()));
                                     helpLabel.getChildren().add(card);
                                 }
                             }
@@ -562,7 +562,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             robberNewPosition = false;
             notice.setVisible(false);
             resetButtonStates(userService.getLoggedInUser());
-            if (helpActivated)setHelpText();
+            if (helpActivated) setHelpText();
         }
     }
 
@@ -583,7 +583,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
-        if (helpActivated)setHelpText();
+        if (helpActivated) setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
     }
 

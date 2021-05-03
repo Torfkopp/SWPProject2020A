@@ -1,4 +1,4 @@
-package de.uol.swp.common.lobby;
+package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Marco Grawunder
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.user.UserDTO
- * @see de.uol.swp.common.lobby.Lobby
+ * @see Lobby
  * @see LobbyDTO
  * @since 2019-10-08
  */

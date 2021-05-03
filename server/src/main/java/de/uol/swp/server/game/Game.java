@@ -1,18 +1,19 @@
-package de.uol.swp.common.game;
+package de.uol.swp.server.game;
 
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
-import de.uol.swp.common.game.map.management.IGameMapManagement;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourceThingies.BankInventory;
 import de.uol.swp.common.game.resourceThingies.Inventory;
 import de.uol.swp.common.game.resourceThingies.InventoryMap;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
+import de.uol.swp.server.game.map.IGameMapManagement;
+import de.uol.swp.server.lobby.Lobby;
 
 import java.util.*;
 

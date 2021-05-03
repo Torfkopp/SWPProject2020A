@@ -1,8 +1,7 @@
 package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.LobbyDTO;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.user.User;
 
 import java.util.HashMap;
@@ -13,8 +12,8 @@ import java.util.Optional;
  * Manages creation, deletion, and storing of lobbies
  *
  * @author Marco Grawunder
- * @see de.uol.swp.common.lobby.Lobby
- * @see de.uol.swp.common.lobby.LobbyDTO
+ * @see Lobby
+ * @see LobbyDTO
  * @since 2019-10-08
  */
 public class LobbyManagement implements ILobbyManagement {
@@ -40,6 +39,13 @@ public class LobbyManagement implements ILobbyManagement {
     @Override
     public Map<LobbyName, Lobby> getLobbies() {
         return lobbies;
+    }
+
+    @Override
+    public Map<LobbyName, ISimpleLobby> getSimpleLobbies() {
+        Map<LobbyName, ISimpleLobby> temp = new HashMap<>();
+        lobbies.entrySet().forEach((x) -> temp.put(x.getKey(), Lobby.getSimpleLobby(x.getValue())));
+        return temp;
     }
 
     @Override

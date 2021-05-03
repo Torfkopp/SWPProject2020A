@@ -9,13 +9,13 @@ import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
-import de.uol.swp.common.game.Game;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource;
-import de.uol.swp.common.game.map.management.*;
+import de.uol.swp.common.game.map.management.IIntersection;
+import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
@@ -28,7 +28,6 @@ import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
@@ -40,6 +39,8 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
+import de.uol.swp.server.game.map.IGameMapManagement;
+import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1252,7 +1253,8 @@ public class GameService extends AbstractService {
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
-            ResponseMessage returnMessage = new StartSessionResponse(lobby, game.getActivePlayer(),
+            ResponseMessage returnMessage = new StartSessionResponse(Lobby.getSimpleLobby(lobby),
+                                                                     game.getActivePlayer(),
                                                                      game.getMap().getGameMapDTO(playerUserOrDummyMap),
                                                                      game.getDices(), game.isDiceRolledAlready(),
                                                                      game.getAutoRollEnabled(event.getUser()));

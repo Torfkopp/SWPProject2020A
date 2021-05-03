@@ -1,7 +1,7 @@
 package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.user.User;
 
 import java.util.Map;
@@ -61,6 +61,15 @@ public interface ILobbyManagement {
      * @since 2019-10-08
      */
     Optional<Lobby> getLobby(LobbyName name);
+
+    /**
+     * Gets the map with simple lobbies
+     *
+     * @return Map with the lobby's name and its SimpleLobby object
+     *
+     * @since 2020-12-12
+     */
+    Map<LobbyName, ISimpleLobby> getSimpleLobbies();
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided

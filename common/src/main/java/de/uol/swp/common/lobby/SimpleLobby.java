@@ -41,8 +41,8 @@ public class SimpleLobby implements ISimpleLobby {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    private SimpleLobby(LobbyName name, boolean inGame, User owner, boolean commandsAllowed, int maxPlayers,
-                        int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public SimpleLobby(LobbyName name, boolean inGame, User owner, boolean commandsAllowed, int maxPlayers,
+                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -53,20 +53,9 @@ public class SimpleLobby implements ISimpleLobby {
         this.randomPlayfieldEnabled = randomPlayfieldEnabled;
     }
 
-    /**
-     * Get a simple lobby from a normal lobby.
-     *
-     * @param lobby The lobby
-     *
-     * @return The simple lobby
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-05-03
-     */
-    static SimpleLobby getSimpleLobby(Lobby lobby) {
-        return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.commandsAllowed(),
-                               lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
-                               lobby.startUpPhaseEnabled());
+    @Override
+    public boolean areCommandsAllowed() {
+        return commandsAllowed;
     }
 
     @Override
@@ -95,13 +84,8 @@ public class SimpleLobby implements ISimpleLobby {
     }
 
     @Override
-    public Set<UserOrDummy> getUsers() {
+    public Set<UserOrDummy> getUserOrDummies() {
         return users;
-    }
-
-    @Override
-    public boolean isCommandsAllowed() {
-        return commandsAllowed;
     }
 
     @Override

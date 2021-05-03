@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -17,7 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class StartSessionResponse extends AbstractResponseMessage {
 
-    private final Lobby lobby;
+    private final ISimpleLobby lobby;
     private final UserOrDummy player;
     private final IGameMap gameMapDTO;
     private final int[] dices;
@@ -29,11 +29,10 @@ public class StartSessionResponse extends AbstractResponseMessage {
      *
      * @param lobby         The lobby where the has already started
      * @param player        The player who has the turn
-     * @param configuration The game map configuration
      * @param dices         The last rolled dices
      * @param autoRollState The autoRoll state
      */
-    public StartSessionResponse(Lobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
+    public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
                                 boolean rolledDiceAlready, boolean autoRollState) {
         this.lobby = lobby;
         this.player = player;
@@ -75,7 +74,7 @@ public class StartSessionResponse extends AbstractResponseMessage {
      *
      * @return The Lobby the User wants to join
      */
-    public Lobby getLobby() {
+    public ISimpleLobby getLobby() {
         return lobby;
     }
 
