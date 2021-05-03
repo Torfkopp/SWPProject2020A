@@ -95,7 +95,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected CheckBox autoRoll;
     @FXML
-    protected Menu CurrentRound = new Menu();
+    protected Menu currentRound = new Menu();
 
     @Inject
     protected IGameService gameService;
@@ -466,14 +466,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onNextPlayerMessage(NextPlayerMessage msg) {
         int getTurn = msg.getCurrentTurn();
-        String Round = String.valueOf(getTurn);
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received NextPlayerMessage for Lobby {}", msg.getLobbyName());
         gameService.updateGameMap(lobbyName);
         setTurnIndicatorText(msg.getActivePlayer());
         setRollDiceButtonState(msg.getActivePlayer());
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
-        Platform.runLater(() -> CurrentRound.setText("Current Round: " + getTurn));
+        Platform.runLater(
+                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getTurn)));
     }
 
     /**

@@ -373,7 +373,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             cardAmountTripleList.clear();
             for (ChatOrSystemMessage m : chatMessages)
                 if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
-            CurrentRound.setVisible(false);
+            currentRound.setVisible(false);
             RoundCounter = 0;
         });
     }
@@ -394,8 +394,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName);
         timerLabel.setVisible(true);
-        CurrentRound.setVisible(true);
-        Platform.runLater(() -> CurrentRound.setText(String.format("Current Round: 1")));
+        currentRound.setVisible(true);
+        Platform.runLater(() -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1)));
     }
 
     /**
