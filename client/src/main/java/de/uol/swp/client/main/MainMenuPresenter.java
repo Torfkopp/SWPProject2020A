@@ -263,10 +263,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         CheckBox lobbyPasswordCheckBox = new CheckBox();
         PasswordField lobbyPassword = new PasswordField();
         HBox box1 = new HBox(10, lobbyPasswordCheckBox, lbl1, lobbyPassword);
-        VBox vBox = new VBox(10, box1);
+        VBox vBox = new VBox(10, box, box1);
         lobbyPassword.disableProperty().bind(Bindings.createBooleanBinding(() -> !lobbyPasswordCheckBox.isSelected(),
                                                                            lobbyPasswordCheckBox.selectedProperty()));
-        dialogue.getDialogPane().setContent(box);
+        dialogue.getDialogPane().setContent(vBox);
         ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                            ButtonBar.ButtonData.CANCEL_CLOSE);
