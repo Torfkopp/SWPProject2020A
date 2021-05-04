@@ -26,9 +26,9 @@ class LobbyServiceTest {
 
     static final LobbyName defaultLobbyName = new LobbyName("Testlobby");
     static final LobbyName defaultLobbyWithPasswordName = new LobbyName("TestLobbyWithPassword");
-    static final Lobby lobbyToTest = new LobbyDTO(defaultLobbyName, user1, null, false);
-    static final Lobby lobbyToTestWithPassword = new LobbyDTO(defaultLobbyWithPasswordName, user1, "123", false);
-    static final Lobby lobbyWithSameName = new LobbyDTO(new LobbyName("Testlobby"), user2, "", false);
+    static final Lobby lobbyToTest = new LobbyDTO(defaultLobbyName, user1, null);
+    static final Lobby lobbyToTestWithPassword = new LobbyDTO(defaultLobbyWithPasswordName, user1, "123");
+    static final Lobby lobbyWithSameName = new LobbyDTO(new LobbyName("Testlobby"), user2, "");
 
     final EventBus bus = new EventBus();
     final SessionManagement sessionManagement = new SessionManagement();

@@ -375,7 +375,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             infoMenu.setVisible(false);
             helpCheckBox.setDisable(true);
             helpCheckBox.setVisible(false);
-            cardAmountTripleList.clear();
+            cardAmountsList.clear();
             moveTimeTimer.cancel();
             moveTimerLabel.setVisible(false);
             for (ChatOrSystemMessage m : chatMessages)

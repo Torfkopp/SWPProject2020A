@@ -23,7 +23,7 @@ class LobbyDTOTest {
 
     private static final User defaultUser = new UserDTO(98, "marco", "marco", "marco@grawunder.de");
     private static final User notInLobbyUser = new UserDTO(99, "no", "marco", "no@grawunder.de");
-    private static final Lobby defaultLobby = new LobbyDTO(new LobbyName("Testlobby"), defaultUser, "", false);
+    private static final Lobby defaultLobby = new LobbyDTO(new LobbyName("Testlobby"), defaultUser, "");
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
@@ -45,7 +45,7 @@ class LobbyDTOTest {
      */
     @Test
     void assureNonEmptyLobbyTest() {
-        Lobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "", false);
+        Lobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
 
         assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
     }
@@ -59,9 +59,9 @@ class LobbyDTOTest {
      */
     @Test
     void createLobbyTest() {
-        Lobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "", false);
+        Lobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
 
-        assertEquals("test", lobby.getName());
+        assertEquals(new LobbyName("test"), lobby.getName());
         assertEquals(1, lobby.getUserOrDummies().size());
         assertEquals(defaultUser, lobby.getUserOrDummies().iterator().next());
     }

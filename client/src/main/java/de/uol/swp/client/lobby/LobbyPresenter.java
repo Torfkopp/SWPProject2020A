@@ -9,6 +9,7 @@ import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
@@ -17,7 +18,6 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -382,15 +382,16 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                         if (user.equals(owner))
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         if (inGame) {
-                            if (cardAmountTripleList == null) {
-                                cardAmountTripleList = new ArrayList<>();
+                            if (cardAmountsList == null) {
+                                cardAmountsList = new ArrayList<>();
                                 // At the start of the game nobody has any cards, so add 0s for each user
-                                for (UserOrDummy u : lobbyMembers) cardAmountTripleList.add(new Triple<>(u, 0, 0));
+                                for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(user, 0, 0));
                             }
-                            for (Triple<UserOrDummy, Integer, Integer> triple : cardAmountTripleList) {
-                                if (triple.getValue1().equals(user)) {
+                            for (CardsAmount cardsAmount : cardAmountsList) {
+                                if (Objects.equals(cardsAmount.getUser(), user)) {
                                     name = String.format(resourceBundle.getString("lobby.members.amount"), name,
-                                                         triple.getValue2(), triple.getValue3());
+                                                         cardsAmount.getResourceCardsAmount(),
+                                                         cardsAmount.getDevelopmentCardsAmount());
                                     break;
                                 }
                             }

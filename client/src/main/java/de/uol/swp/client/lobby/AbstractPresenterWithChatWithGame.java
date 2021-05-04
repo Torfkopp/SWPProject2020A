@@ -11,6 +11,7 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
@@ -30,7 +31,6 @@ import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -76,12 +76,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Named("styleSheet")
     private static String styleSheet;
 
+    protected Timer moveTimeTimer;
+
     @FXML
     protected Button endTurn;
     @FXML
     protected Canvas gameMapCanvas;
-    @FXML
-    protected Timer moveTimeTimer;
+
     @FXML
     protected TableView<IDevelopmentCard> developmentCardTableView;
     @FXML
@@ -122,7 +123,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     protected IGameService gameService;
 
-    protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
+    protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
     protected IGameMap gameMap;
@@ -709,7 +710,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
-        moveTimeTimer.cancel();
+        if (moveTimeTimer != null) moveTimeTimer.cancel();
         setMoveTimer(moveTime);
         Platform.runLater(
                 () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
@@ -842,7 +843,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
         LOG.debug("Received RefreshCardAmountMessage");
         if (!lobbyName.equals(msg.getLobbyName())) return;
-        cardAmountTripleList = msg.getCardAmountTriples();
+        cardAmountsList = msg.getCardAmountsList();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         if (helpActivated) setHelpText();
     }

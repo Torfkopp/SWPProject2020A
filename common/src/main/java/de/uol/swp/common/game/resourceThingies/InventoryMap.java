@@ -2,7 +2,6 @@ package de.uol.swp.common.game.resourceThingies;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -17,7 +16,7 @@ import java.util.Objects;
  */
 public class InventoryMap implements Serializable {
 
-    private final List<Triple<UserOrDummy, Player, Inventory>> map = new LinkedList<>();
+    private final List<UserPlayerInventoryMapping> map = new LinkedList<>();
 
     /**
      * Gets the inventory for a user or dummy
@@ -27,9 +26,9 @@ public class InventoryMap implements Serializable {
      * @return The requested inventory
      */
     public Inventory get(UserOrDummy userOrDummy) {
-        for (Triple<UserOrDummy, Player, Inventory> entry : map)
-            if (entry.getValue1().equals(userOrDummy)) {
-                return entry.getValue3();
+        for (UserPlayerInventoryMapping entry : map)
+            if (entry.getUser().equals(userOrDummy)) {
+                return entry.getInventory();
             }
         return null;
     }
@@ -42,8 +41,8 @@ public class InventoryMap implements Serializable {
      * @return The requested inventory
      */
     public Inventory get(Player player) {
-        for (Triple<UserOrDummy, Player, Inventory> entry : map)
-            if (Objects.equals(entry.getValue2(), player)) return entry.getValue3();
+        for (UserPlayerInventoryMapping entry : map)
+            if (Objects.equals(entry.getPlayer(), player)) return entry.getInventory();
         return null;
     }
 
@@ -54,7 +53,7 @@ public class InventoryMap implements Serializable {
      */
     public List<Inventory> getInventories() {
         LinkedList<Inventory> returnList = new LinkedList<>();
-        map.forEach(entry -> returnList.add(entry.getValue3()));
+        map.forEach(entry -> returnList.add(entry.getInventory()));
         return returnList;
     }
 
@@ -66,8 +65,8 @@ public class InventoryMap implements Serializable {
      * @return The requested Player
      */
     public Player getPlayerFromUserOrDummy(UserOrDummy userOrDummy) {
-        for (Triple<UserOrDummy, Player, Inventory> entry : map)
-            if (Objects.equals(userOrDummy, entry.getValue1())) return entry.getValue2();
+        for (UserPlayerInventoryMapping entry : map)
+            if (Objects.equals(userOrDummy, entry.getUser())) return entry.getPlayer();
         return null;
     }
 
@@ -78,7 +77,7 @@ public class InventoryMap implements Serializable {
      */
     public UserOrDummy[] getUserOrDummyArray() {
         List<UserOrDummy> returnArray = new LinkedList<>();
-        map.forEach((key -> returnArray.add(key.getValue1())));
+        map.forEach((key -> returnArray.add(key.getUser())));
         return returnArray.toArray(new UserOrDummy[0]);
     }
 
@@ -90,8 +89,8 @@ public class InventoryMap implements Serializable {
      * @return The requested UserOrDummy
      */
     public UserOrDummy getUserOrDummyFromPlayer(Player player) {
-        for (Triple<UserOrDummy, Player, Inventory> entry : map)
-            if (Objects.equals(player, entry.getValue2())) return entry.getValue1();
+        for (UserPlayerInventoryMapping entry : map)
+            if (Objects.equals(player, entry.getPlayer())) return entry.getUser();
         return null;
     }
 
@@ -104,17 +103,42 @@ public class InventoryMap implements Serializable {
      */
     public void put(UserOrDummy userOrDummy, Player player, Inventory inventory) {
         for (int i = 0; i < map.size(); i++) {
-            Triple<UserOrDummy, Player, Inventory> entry = map.get(i);
-            if ((Objects.equals(entry.getValue1(), userOrDummy) && !Objects
-                    .equals(entry.getValue2(), player)) || (Objects.equals(entry.getValue2(), player) && !Objects
-                    .equals(entry.getValue1(), userOrDummy))) {
+            UserPlayerInventoryMapping entry = map.get(i);
+            if ((Objects.equals(entry.getUser(), userOrDummy) && !Objects
+                    .equals(entry.getPlayer(), player)) || (Objects.equals(entry.getPlayer(), player) && !Objects
+                    .equals(entry.getUser(), userOrDummy))) {
                 throw new IllegalArgumentException("Keys are not matching!");
-            } else if (Objects.equals(entry.getValue1(), userOrDummy) && Objects.equals(entry.getValue2(), player)) {
-                map.set(i, new Triple<>(userOrDummy, player, inventory));
+            } else if (Objects.equals(entry.getUser(), userOrDummy) && Objects.equals(entry.getPlayer(), player)) {
+                map.set(i, new UserPlayerInventoryMapping(userOrDummy, player, inventory));
                 return;
             }
         }
-        map.add(new Triple<>(userOrDummy, player, inventory));
+        map.add(new UserPlayerInventoryMapping(userOrDummy, player, inventory));
+    }
+
+    private class UserPlayerInventoryMapping {
+
+        private final UserOrDummy user;
+        private final Player player;
+        private final Inventory inventory;
+
+        public UserPlayerInventoryMapping(UserOrDummy user, Player player, Inventory inventory) {
+            this.user = user;
+            this.player = player;
+            this.inventory = inventory;
+        }
+
+        public Inventory getInventory() {
+            return inventory;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public UserOrDummy getUser() {
+            return user;
+        }
     }
 
     /**

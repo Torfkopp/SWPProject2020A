@@ -39,18 +39,39 @@ public class LobbyDTO implements Lobby {
     /**
      * Constructor
      *
-     * @param name        The requested name the lobby
-     * @param creator     The user who created the lobby and therefore its owner
-     * @param password    The requested password of the lobby
-     * @param hasPassword Whether the lobby has a password or not
+     * @param name     The requested name the lobby
+     * @param creator  The user who created the lobby and therefore its owner
+     * @param password The requested password of the lobby
      *
      * @since 2019-10-08
      */
-    public LobbyDTO(LobbyName name, User creator, String password, boolean hasPassword) {
+    public LobbyDTO(LobbyName name, User creator, String password) {
         this.name = name;
         this.owner = creator;
         this.password = password;
-        this.hasPassword = hasPassword;
+        this.hasPassword = password != null;
+        this.users.add(creator);
+        this.inGame = false;
+        this.maxPlayers = 3;
+        this.commandsAllowed = true;
+        this.moveTime = 60;
+        this.startUpPhaseEnabled = false;
+        this.randomPlayfieldEnabled = false;
+    }
+
+    /**
+     * Constructor to create a lobby without a password
+     *
+     * @param name    The requested name the lobby
+     * @param creator The user who created the lobby and therefore its owner
+     *
+     * @since 2019-10-08
+     */
+    public LobbyDTO(LobbyName name, User creator) {
+        this.name = name;
+        this.owner = creator;
+        this.password = null;
+        this.hasPassword = false;
         this.users.add(creator);
         this.inGame = false;
         this.maxPlayers = 3;
@@ -83,7 +104,7 @@ public class LobbyDTO implements Lobby {
         this.name = name;
         this.password = password;
         this.inGame = inGame;
-        this.hasPassword = hasPassword;
+        this.hasPassword = password != null;
         this.owner = owner;
         this.commandsAllowed = commandsAllowed;
         this.maxPlayers = maxPlayers;

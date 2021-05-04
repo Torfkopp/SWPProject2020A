@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
@@ -14,7 +15,6 @@ import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCard;
 import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.Lobby;
 
@@ -218,13 +218,13 @@ public class Game {
      *
      * @author Alwin Bossert
      * @author Eric Vuong
-     * @see de.uol.swp.common.util.Triple
      * @since 2021-03-27
      */
-    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmounts() {
-        List<Triple<UserOrDummy, Integer, Integer>> list = new ArrayList<>();
+    public List<CardsAmount> getCardAmounts() {
+        List<CardsAmount> list = new ArrayList<>();
         for (UserOrDummy u : lobby.getUserOrDummies()) {
-            list.add(new Triple<>(u, players.get(u).getResourceAmount(), players.get(u).getAmountOfDevelopmentCards()));
+            list.add(new CardsAmount(u, players.get(u).getResourceAmount(),
+                                     players.get(u).getAmountOfDevelopmentCards()));
         }
         return list;
     }

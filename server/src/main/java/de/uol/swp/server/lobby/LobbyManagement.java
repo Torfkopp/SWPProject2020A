@@ -25,7 +25,7 @@ public class LobbyManagement implements ILobbyManagement {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword, lobbyPassword != null));
+        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class LobbyManagement implements ILobbyManagement {
     @Override
     public Map<LobbyName, ISimpleLobby> getSimpleLobbies() {
         Map<LobbyName, ISimpleLobby> temp = new HashMap<>();
-        lobbies.entrySet().forEach((x) -> temp.put(x.getKey(), Lobby.getSimpleLobby(x.getValue())));
+        lobbies.forEach((key, value) -> temp.put(key, Lobby.getSimpleLobby(value)));
         return temp;
     }
 

@@ -128,7 +128,7 @@ public class GameService extends AbstractService {
     private void checkLargestArmy(LobbyName lobbyName, UserOrDummy user) {
         Game game = gameManagement.getGame(lobbyName);
         Inventory largest = game.getInventory(game.getPlayerWithLargestArmy());
-        if ((game.getInventory(user).getKnights() > largest.getKnights() || largest == null) && game.getInventory(user)
+        if ((largest == null || game.getInventory(user).getKnights() > largest.getKnights()) && game.getInventory(user)
                                                                                                     .getKnights() > 2) {
             game.setPlayerWithLargestArmy(game.getPlayer(user));
         }
@@ -143,7 +143,7 @@ public class GameService extends AbstractService {
      * @param mapPoint  The map point pointing to the edge based on which the longest road should be checked
      *
      * @author Eric Vuong
-     * @auhtor Temmo Junkhoff
+     * @author Temmo Junkhoff
      * @since 2021-04-10
      */
     private void checkLongestRoad(LobbyName lobbyName, MapPoint mapPoint) {
@@ -555,6 +555,11 @@ public class GameService extends AbstractService {
             UserOrDummy firstPlayer = playerArray[randomNbr];
             // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
+            Game game = gameManagement.getGame(lobbyName);
+            if (game.getFirst() instanceof Dummy) {
+                onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
+                endTurnDummy(game);
+            }
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
@@ -566,11 +571,6 @@ public class GameService extends AbstractService {
             exceptionMessage.initWithMessage(msg);
             LOG.debug("Sending ExceptionMessage");
             post(exceptionMessage);
-        }
-        Game game = gameManagement.getGame(lobbyName);
-        if (game.getFirst() instanceof Dummy) {
-            onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
-            endTurnDummy(game);
         }
     }
 

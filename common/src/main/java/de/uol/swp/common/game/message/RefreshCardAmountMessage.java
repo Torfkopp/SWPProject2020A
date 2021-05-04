@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 
 import java.util.List;
 
@@ -16,22 +16,21 @@ import java.util.List;
  */
 public class RefreshCardAmountMessage extends AbstractGameMessage {
 
-    private final List<Triple<UserOrDummy, Integer, Integer>> cardAmountTriples;
+    private final List<CardsAmount> cardAmountsList;
 
     /**
      * Constructor
      *
-     * @param lobbyName         The name of the lobby in which the game is taking place
-     * @param user              The user who caused a change in inventories
-     * @param cardAmountTriples List of Triples containing a UserOrDummy, an
-     *                          Integer representing their inventory size, and
-     *                          an Integer representing the amount of Development
-     *                          Cards they have
+     * @param lobbyName       The name of the lobby in which the game is taking place
+     * @param user            The user who caused a change in inventories
+     * @param cardAmountsList List of Triples containing a UserOrDummy, an
+     *                        Integer representing their inventory size, and
+     *                        an Integer representing the amount of Development
+     *                        Cards they have
      */
-    public RefreshCardAmountMessage(LobbyName lobbyName, UserOrDummy user,
-                                    List<Triple<UserOrDummy, Integer, Integer>> cardAmountTriples) {
+    public RefreshCardAmountMessage(LobbyName lobbyName, UserOrDummy user, List<CardsAmount> cardAmountsList) {
         super(lobbyName, user);
-        this.cardAmountTriples = cardAmountTriples;
+        this.cardAmountsList = cardAmountsList;
     }
 
     /**
@@ -39,7 +38,7 @@ public class RefreshCardAmountMessage extends AbstractGameMessage {
      *
      * @return List of Triples of UserOrDummy, Integer, Integer
      */
-    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmountTriples() {
-        return cardAmountTriples;
+    public List<CardsAmount> getCardAmountsList() {
+        return cardAmountsList;
     }
 }

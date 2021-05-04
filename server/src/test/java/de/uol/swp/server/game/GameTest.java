@@ -31,7 +31,7 @@ public class GameTest {
     static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JohnnyJoestar@jojo.us");
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
-    static final Lobby lobby = new LobbyDTO(new LobbyName("Read the Manga"), user, "", true);
+    static final Lobby lobby = new LobbyDTO(new LobbyName("Read the Manga"), user, "");
     static IGameMapManagement gameMap;
     static Game game;
 
@@ -89,7 +89,7 @@ public class GameTest {
         map.placeRoad(player, EdgeMapPoint(HexMapPoint(1, 1), HexMapPoint(0, 1)));
         try {
             map.placeSettlement(player, IntersectionMapPoint(0, 1));
-        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+        } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException ignored) {
         }
         // Player now has 3 settlements
         assertEquals(3, game.calculateVictoryPoints(player));

@@ -9,7 +9,6 @@ import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Tuple;
 import de.uol.swp.server.game.map.IGameMapManagement;
 
 import java.util.*;
@@ -367,6 +366,55 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public int longestRoadWith(MapPoint mapPoint) {
+        /**
+         * Local class path to store a path
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-04
+         */
+        class Path {
+
+            private final int length;
+            private final Set<IEdge> edges;
+
+            /**
+             * Instantiates a new Path.
+             *
+             * @param length The length of the path
+             * @param edges  The edges defining the path
+             *
+             * @author Temmo Junkhoff
+             * @since 2021-05-04
+             */
+            public Path(int length, Set<IEdge> edges) {
+                this.length = length;
+                this.edges = edges;
+            }
+
+            /**
+             * Gets the edges.
+             *
+             * @return The edges
+             *
+             * @author Temmo Junkhoff
+             * @since 2021-05-04
+             */
+            public Set<IEdge> getEdges() {
+                return edges;
+            }
+
+            /**
+             * Gets the length.
+             *
+             * @return The length
+             *
+             * @author Temmo Junkhoff
+             * @since 2021-05-04
+             */
+            public int getLength() {
+                return length;
+            }
+        }
         IEdge edge = getEdge(mapPoint);
         Set<IEdge> visited = new HashSet<>();
         visited.add(edge);
@@ -376,13 +424,14 @@ public class GameMapManagement implements IGameMapManagement {
         //Function to calculate the lengths of the paths
         BiFunction<Set<IEdge>, Set<IEdge>, Integer> a = (leftNodeEdges, rightNodeEdges) -> {
             List<Integer> lengths = new LinkedList<>();
-            List<Tuple<Integer, Set<IEdge>>> leftNodeLengths = new LinkedList<>();
+            List<Path> leftNodeLengths = new LinkedList<>();
             // Find the longest paths for the first side of the specified edge
             // and save them as a tuple of their length and their visited edges.
             for (IEdge nextEdge : leftNodeEdges) {
                 Set<IEdge> temp = new HashSet<>(visited);
-                leftNodeLengths.add(new Tuple<>(
-                        roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp), temp));
+                leftNodeLengths
+                        .add(new Path(roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp),
+                                      temp));
             }
 
             // Calculate all combinations of paths from both sides of the edge and store their length in a list
@@ -397,12 +446,12 @@ public class GameMapManagement implements IGameMapManagement {
                     }
                 }
             } else {
-                for (Tuple<Integer, Set<IEdge>> x : leftNodeLengths) {
+                for (Path x : leftNodeLengths) {
                     if (rightNodeEdges.isEmpty()) {
-                        lengths.add(x.getValue1() + 1);
+                        lengths.add(x.getLength() + 1);
                     }
                     for (IEdge nextEdge : rightNodeEdges) {
-                        lengths.add(x.getValue1() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getValue2(),
+                        lengths.add(x.getLength() + 1 + roadLength(nextEdge, edge, null, edge.getOwner(), x.getEdges(),
                                                                    new HashSet<>(visited)));
                     }
                 }
