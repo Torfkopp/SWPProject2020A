@@ -223,7 +223,7 @@ class LobbyServiceTest {
         assertEquals(defaultLobby.areCommandsAllowed(), lobbyUpdateEvent.getLobby().areCommandsAllowed());
         assertEquals(defaultLobby.getMoveTime(), lobbyUpdateEvent.getLobby().getMoveTime());
         assertEquals(defaultLobby.isStartUpPhaseEnabled(), lobbyUpdateEvent.getLobby().isStartUpPhaseEnabled());
-        assertEquals(defaultLobby.isRandomPlayfieldEnabled(), lobbyUpdateEvent.getLobby().isRandomPlayfieldEnabled());
+        assertEquals(defaultLobby.isRandomPlayFieldEnabled(), lobbyUpdateEvent.getLobby().isRandomPlayFieldEnabled());
     }
 
     /**

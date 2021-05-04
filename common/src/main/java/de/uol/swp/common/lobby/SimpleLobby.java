@@ -24,7 +24,7 @@ public class SimpleLobby implements ISimpleLobby {
     private final int maxPlayers;
     private final int moveTime;
     private final boolean startUpPhaseEnabled;
-    private final boolean randomPlayfieldEnabled;
+    private final boolean randomPlayFieldEnabled;
     private final boolean hasPassword;
 
     /**
@@ -37,13 +37,13 @@ public class SimpleLobby implements ISimpleLobby {
      * @param maxPlayers             the max players
      * @param moveTime               the move time
      * @param startUpPhaseEnabled    the start up phase enabled
-     * @param randomPlayfieldEnabled the random playfield enabled
+     * @param randomPlayFieldEnabled the random play field enabled
      *
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
     public SimpleLobby(LobbyName name, boolean inGame, User owner, boolean commandsAllowed, int maxPlayers,
-                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled, boolean hasPassword) {
+                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -51,7 +51,7 @@ public class SimpleLobby implements ISimpleLobby {
         this.maxPlayers = maxPlayers;
         this.moveTime = moveTime;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
-        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+        this.randomPlayFieldEnabled = randomPlayFieldEnabled;
         this.hasPassword = hasPassword;
     }
 
@@ -101,8 +101,8 @@ public class SimpleLobby implements ISimpleLobby {
     }
 
     @Override
-    public boolean isRandomPlayfieldEnabled() {
-        return randomPlayfieldEnabled;
+    public boolean isRandomPlayFieldEnabled() {
+        return randomPlayFieldEnabled;
     }
 
     @Override

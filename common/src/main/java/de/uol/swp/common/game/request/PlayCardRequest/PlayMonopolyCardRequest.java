@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.user.User;
 
 /**

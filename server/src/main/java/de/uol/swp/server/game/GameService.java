@@ -20,12 +20,12 @@ import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
-import de.uol.swp.common.game.resourceThingies.BankInventory;
-import de.uol.swp.common.game.resourceThingies.Inventory;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.game.resourceThingies.developmentCard.IDevelopmentCardList;
-import de.uol.swp.common.game.resourceThingies.resource.*;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventory;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
@@ -53,7 +53,7 @@ import java.util.function.Consumer;
 import static de.uol.swp.common.game.RoadBuildingCardPhase.*;
 import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
-import static de.uol.swp.common.game.resourceThingies.resource.ResourceType.*;
+import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 import static de.uol.swp.common.game.response.BuildingFailedResponse.Reason.*;
 
 /**

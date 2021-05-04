@@ -7,7 +7,7 @@ import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.*;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 

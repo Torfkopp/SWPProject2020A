@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.resourceThingies;
+package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.UserOrDummy;
@@ -95,7 +95,7 @@ public class InventoryMap implements Serializable {
     }
 
     /**
-     * Puts a new tuple in the list
+     * Puts a new entry in the list
      *
      * @param userOrDummy The userOrDummy key
      * @param player      The player key
@@ -116,31 +116,6 @@ public class InventoryMap implements Serializable {
         map.add(new UserPlayerInventoryMapping(userOrDummy, player, inventory));
     }
 
-    private class UserPlayerInventoryMapping {
-
-        private final UserOrDummy user;
-        private final Player player;
-        private final Inventory inventory;
-
-        public UserPlayerInventoryMapping(UserOrDummy user, Player player, Inventory inventory) {
-            this.user = user;
-            this.player = player;
-            this.inventory = inventory;
-        }
-
-        public Inventory getInventory() {
-            return inventory;
-        }
-
-        public Player getPlayer() {
-            return player;
-        }
-
-        public UserOrDummy getUser() {
-            return user;
-        }
-    }
-
     /**
      * Gets the size of the map
      *
@@ -148,5 +123,70 @@ public class InventoryMap implements Serializable {
      */
     public int size() {
         return map.size();
+    }
+
+    /**
+     * The type User player inventory mapping.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-04
+     */
+    private class UserPlayerInventoryMapping {
+
+        private final UserOrDummy user;
+        private final Player player;
+        private final Inventory inventory;
+
+        /**
+         * Constructor for User player inventory mapping.
+         *
+         * @param user      The user
+         * @param player    The player
+         * @param inventory The inventory
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-04
+         */
+        public UserPlayerInventoryMapping(UserOrDummy user, Player player, Inventory inventory) {
+            this.user = user;
+            this.player = player;
+            this.inventory = inventory;
+        }
+
+        /**
+         * Gets the inventory.
+         *
+         * @return The inventory
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-04
+         */
+        public Inventory getInventory() {
+            return inventory;
+        }
+
+        /**
+         * Gets the player.
+         *
+         * @return The player
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-04
+         */
+        public Player getPlayer() {
+            return player;
+        }
+
+        /**
+         * Gets the user.
+         *
+         * @return The user
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-04
+         */
+        public UserOrDummy getUser() {
+            return user;
+        }
     }
 }

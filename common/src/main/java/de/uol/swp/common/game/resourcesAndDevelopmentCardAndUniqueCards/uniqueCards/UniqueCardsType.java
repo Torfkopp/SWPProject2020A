@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.resourceThingies.uniqueCards;
+package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards;
 
 import java.io.Serializable;
 

@@ -107,7 +107,7 @@ public interface ISimpleLobby extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    boolean isRandomPlayfieldEnabled();
+    boolean isRandomPlayFieldEnabled();
 
     /**
      * Gets if the start up phase is enabled boolean.

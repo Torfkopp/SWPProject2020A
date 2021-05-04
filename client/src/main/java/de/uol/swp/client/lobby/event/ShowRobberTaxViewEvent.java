@@ -1,7 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 
 /**
  * Event used to show the window for the robberTax

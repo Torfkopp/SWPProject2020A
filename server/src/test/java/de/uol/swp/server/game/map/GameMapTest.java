@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.MapPoint;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.server.game.GameMapManagement;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

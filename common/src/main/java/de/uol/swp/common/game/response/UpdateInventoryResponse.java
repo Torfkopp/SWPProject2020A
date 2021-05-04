@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.developmentCard.IDevelopmentCardList;
-import de.uol.swp.common.game.resourceThingies.resource.IResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResourceList;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 

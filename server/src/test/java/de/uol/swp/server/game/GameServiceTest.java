@@ -10,10 +10,10 @@ import de.uol.swp.common.game.request.ExecuteTradeWithBankRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
-import de.uol.swp.common.game.resourceThingies.BankInventory;
-import de.uol.swp.common.game.resourceThingies.Inventory;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventory;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
@@ -34,8 +34,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType.*;
-import static de.uol.swp.common.game.resourceThingies.resource.ResourceType.*;
+import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType.*;
+import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.hexes;
 
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
 /**
  * Class for the resource hex

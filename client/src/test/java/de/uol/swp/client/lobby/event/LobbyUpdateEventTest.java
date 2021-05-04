@@ -41,6 +41,6 @@ class LobbyUpdateEventTest {
         assertEquals(defaultLobby.areCommandsAllowed(), event.getLobby().areCommandsAllowed());
         assertEquals(defaultLobby.getMoveTime(), event.getLobby().getMoveTime());
         assertEquals(defaultLobby.isStartUpPhaseEnabled(), event.getLobby().isStartUpPhaseEnabled());
-        assertEquals(defaultLobby.isRandomPlayfieldEnabled(), event.getLobby().isRandomPlayfieldEnabled());
+        assertEquals(defaultLobby.isRandomPlayFieldEnabled(), event.getLobby().isRandomPlayFieldEnabled());
     }
 }
