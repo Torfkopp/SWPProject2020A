@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.LobbyName;
-import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCard;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
 import de.uol.swp.common.message.AbstractServerMessage;
 
 import java.util.List;

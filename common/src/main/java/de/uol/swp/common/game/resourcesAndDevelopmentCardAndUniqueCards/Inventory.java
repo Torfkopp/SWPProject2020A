@@ -1,30 +1,49 @@
-package de.uol.swp.common.game.resourceThingies;
+package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
-import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
 /**
  * The player's inventory
  *
- * @author Mario Fokken
- * @author Steven Luong
- * @since 2021-01-16
+ * @author Temmo Junkhoff
+ * @since 2021-04-23
  */
 public class Inventory extends AbstractInventory {
 
     private int knights = 0;
 
+    /**
+     * Constructor for Inventory.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public Inventory() {
         resources = new ResourceList();
         developmentCards = new DevelopmentCardList();
     }
 
+    /**
+     * Decrease knights.
+     *
+     * @param amount The amount
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public void decreaseKnights(int amount) {
         increaseKnights(-amount);
     }
 
+    /**
+     * Decrease knights.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public void decreaseKnights() {
         decreaseKnights(1);
     }
@@ -45,6 +64,14 @@ public class Inventory extends AbstractInventory {
         return returnValue;
     }
 
+    /**
+     * Gets the knights.
+     *
+     * @return The knights
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public int getKnights() {
         return knights;
     }
@@ -66,10 +93,24 @@ public class Inventory extends AbstractInventory {
         return returnValue;
     }
 
+    /**
+     * Increase knights.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public void increaseKnights() {
         increaseKnights(1);
     }
 
+    /**
+     * Increase knights.
+     *
+     * @param amount The amount
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public void increaseKnights(int amount) {
         knights += amount;
     }

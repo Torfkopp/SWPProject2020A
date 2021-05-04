@@ -1,22 +1,26 @@
-package de.uol.swp.common.game.resourceThingies;
+package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCard;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
-import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
-import de.uol.swp.common.game.resourceThingies.resource.*;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCard;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 
 import java.util.*;
 
 /**
  * The banks inventory
  *
- * @author Alwin Bossert
- * @author Maximilian Lindner
- * @implNote brick, grain, lumber, ore and wool are not used jet
- * @since 2021-02-21
+ * @author Temmo Junkhoff
+ * @since 2021-04-23
  */
 public class BankInventory extends AbstractInventory {
 
+    /**
+     * Constructor for Bank inventory.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public BankInventory() {
         List<IResource> tempResourceList = new LinkedList<>();
         List<DevelopmentCard> tempDevelopmentCardList = new LinkedList<>();
@@ -31,6 +35,14 @@ public class BankInventory extends AbstractInventory {
         developmentCards = DevelopmentCardList.createDevelopmentCardListFromList(tempDevelopmentCardList);
     }
 
+    /**
+     * Gets a random development card.
+     *
+     * @return The random development card
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     public DevelopmentCardType getRandomDevelopmentCard() {
         List<DevelopmentCardType> temp = new LinkedList<>();
         for (DevelopmentCard developmentCard : developmentCards)

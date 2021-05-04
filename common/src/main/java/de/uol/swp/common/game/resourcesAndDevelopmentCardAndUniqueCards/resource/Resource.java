@@ -1,4 +1,4 @@
-package de.uol.swp.common.game.resourceThingies.resource;
+package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource;
 
 /**
  * The type Mutable resource.

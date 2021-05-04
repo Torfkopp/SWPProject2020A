@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
-import de.uol.swp.common.game.resourceThingies.resource.*;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;

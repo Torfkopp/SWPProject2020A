@@ -8,7 +8,7 @@ import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
-import de.uol.swp.common.game.resourceThingies.resource.*;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

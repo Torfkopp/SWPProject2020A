@@ -2,7 +2,7 @@ package de.uol.swp.server.game;
 
 import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.game.resourceThingies.BankInventory;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -14,8 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static de.uol.swp.common.game.map.management.MapPoint.*;
-import static de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType.*;
-import static de.uol.swp.common.game.resourceThingies.resource.ResourceType.*;
+import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType.*;
+import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
