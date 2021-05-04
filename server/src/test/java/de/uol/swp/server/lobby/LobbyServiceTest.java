@@ -1,8 +1,7 @@
 package de.uol.swp.server.lobby;
 
 import com.google.common.eventbus.EventBus;
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
@@ -25,11 +24,11 @@ class LobbyServiceTest {
     static final User user4 = new UserDTO(4, "User", "NummerVier", "User@NummerVier.com");
     static final User user5 = new UserDTO(5, "Bruder", "WasGeht", "Bruder@WasGeht.com");
 
-    static final Lobby lobbyToTest = new LobbyDTO("Testlobby", user1, "", false, false, 4, false, 60, false, false);
-    static final Lobby lobbyToTestWithPassword = new LobbyDTO("TestLobbyWithPassword", user1, "123", false, true, 4,
-                                                              false, 60, false, false);
-    static final Lobby lobbyWithSameName = new LobbyDTO("Testlobby", user2, "", false, false, 4, false, 60, false,
-                                                        false);
+    static final LobbyName defaultLobbyName = new LobbyName("Testlobby");
+    static final LobbyName defaultLobbyWithPasswordName = new LobbyName("TestLobbyWithPassword");
+    static final Lobby lobbyToTest = new LobbyDTO(defaultLobbyName, user1, null, false);
+    static final Lobby lobbyToTestWithPassword = new LobbyDTO(defaultLobbyWithPasswordName, user1, "123", false);
+    static final Lobby lobbyWithSameName = new LobbyDTO(new LobbyName("Testlobby"), user2, "", false);
 
     final EventBus bus = new EventBus();
     final SessionManagement sessionManagement = new SessionManagement();
@@ -38,7 +37,7 @@ class LobbyServiceTest {
 
     @Test
     void createLobbyTest() {
-        final Message request = new CreateLobbyRequest("Testlobby", user1, 4, "");
+        final Message request = new CreateLobbyRequest(defaultLobbyName, user1, "");
 
         // The post will lead to a call of a LobbyService function
         bus.post(request);
@@ -52,20 +51,20 @@ class LobbyServiceTest {
 
     @Test
     void createLobbyWithPasswordRequest() {
-        final Message request = new CreateLobbyRequest("TestLobbyWithPassword", user1, 3, "123");
+        final Message request = new CreateLobbyRequest(defaultLobbyWithPasswordName, user1, "123");
         bus.post(request);
         final Optional<Lobby> createdLobby = lobbyManagement
                 .getLobby(lobbyToTestWithPassword.getName(), lobbyToTestWithPassword.getPassword());
         // check if joinable lobby was created
         assertTrue(createdLobby.isPresent());
         // check if lobby has a password
-        assertTrue(createdLobby.get().hasAPassword());
+        assertTrue(createdLobby.get().hasPassword());
     }
 
     @Test
     void createSecondLobbyWithSameName() {
-        final Message request1 = new CreateLobbyRequest("Testlobby", user1, 4, "");
-        final Message request2 = new CreateLobbyRequest("Testlobby", user2, 4, "");
+        final Message request1 = new CreateLobbyRequest(defaultLobbyName, user1, "");
+        final Message request2 = new CreateLobbyRequest(defaultLobbyName, user2, "");
 
         bus.post(request1);
         bus.post(request2);
@@ -82,13 +81,18 @@ class LobbyServiceTest {
 
     @Test
     void joinLobbyWithPasswordRequest() {
-        final Message request = new CreateLobbyRequest("TestLobbyWithPassword", user1, 4, "123");
+        final Message request = new CreateLobbyRequest(defaultLobbyWithPasswordName, user1, "123");
         // Create several join requests
-        final Message request1 = new JoinLobbyWithPasswordConfirmationRequest("TestLobbyWithPassword", user1, "123");
-        final Message request2 = new JoinLobbyWithPasswordConfirmationRequest("TestLobbyWithPassword", user2, "123");
-        final Message request3 = new JoinLobbyWithPasswordConfirmationRequest("TestLobbyWithPassword", user3, "1234");
-        final Message request4 = new JoinLobbyWithPasswordConfirmationRequest("TestLobbyWithPassword", user4, "123");
-        final Message request5 = new JoinLobbyWithPasswordConfirmationRequest("TestLobbyWithPassword", user5, "123");
+        final Message request1 = new JoinLobbyWithPasswordConfirmationRequest(defaultLobbyWithPasswordName, user1,
+                                                                              "123");
+        final Message request2 = new JoinLobbyWithPasswordConfirmationRequest(defaultLobbyWithPasswordName, user2,
+                                                                              "123");
+        final Message request3 = new JoinLobbyWithPasswordConfirmationRequest(defaultLobbyWithPasswordName, user3,
+                                                                              "1234");
+        final Message request4 = new JoinLobbyWithPasswordConfirmationRequest(defaultLobbyWithPasswordName, user4,
+                                                                              "123");
+        final Message request5 = new JoinLobbyWithPasswordConfirmationRequest(defaultLobbyWithPasswordName, user5,
+                                                                              "123");
         bus.post(request);
         bus.post(request1);
         bus.post(request2);
@@ -101,7 +105,7 @@ class LobbyServiceTest {
         // check if joinable lobby was created
         assertTrue(createdLobby.isPresent());
         // check if lobby has a password
-        assertTrue(createdLobby.get().hasAPassword());
+        assertTrue(createdLobby.get().hasPassword());
         // check if only 4 users are joined
         assertTrue(createdLobby.get().getUserOrDummies().size() == 4);
         // check if every user joined except user5
@@ -115,13 +119,13 @@ class LobbyServiceTest {
     @Test
     void userJoinLobbyRequest() {
         // Create a joinable lobby first
-        final Message request0 = new CreateLobbyRequest("Testlobby", user1, 4, "");
+        final Message request0 = new CreateLobbyRequest(defaultLobbyName, user1, "");
         // Create several join requests
-        final Message request1 = new LobbyJoinUserRequest("Testlobby", user1);
-        final Message request2 = new LobbyJoinUserRequest("Testlobby", user2);
-        final Message request3 = new LobbyJoinUserRequest("Testlobby", user3);
-        final Message request4 = new LobbyJoinUserRequest("Testlobby", user4);
-        final Message request5 = new LobbyJoinUserRequest("Testlobby", user5);
+        final Message request1 = new LobbyJoinUserRequest(defaultLobbyName, user1);
+        final Message request2 = new LobbyJoinUserRequest(defaultLobbyName, user2);
+        final Message request3 = new LobbyJoinUserRequest(defaultLobbyName, user3);
+        final Message request4 = new LobbyJoinUserRequest(defaultLobbyName, user4);
+        final Message request5 = new LobbyJoinUserRequest(defaultLobbyName, user5);
         // post all requests
         bus.post(request0);
         bus.post(request1);

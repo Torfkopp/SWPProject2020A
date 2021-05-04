@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -21,7 +22,7 @@ public class JoinLobbyWithPasswordConfirmationRequest extends AbstractLobbyReque
      * @param user      User who wants to join the lobby
      * @param password  Password of the lobby
      */
-    public JoinLobbyWithPasswordConfirmationRequest(String lobbyName, User user, String password) {
+    public JoinLobbyWithPasswordConfirmationRequest(LobbyName lobbyName, User user, String password) {
         super(lobbyName, user);
         this.password = password;
     }

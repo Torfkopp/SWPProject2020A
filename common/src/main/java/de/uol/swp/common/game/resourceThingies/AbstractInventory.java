@@ -69,4 +69,12 @@ public abstract class AbstractInventory implements Serializable {
     public void increase(DevelopmentCardType developmentCard) {
         increase(developmentCard, 1);
     }
+
+    public void set(ResourceType resource, int amount) {
+        resources.set(resource, amount);
+    }
+
+    public void set(DevelopmentCardType developmentCardType, int amount) {
+        developmentCards.set(developmentCardType, amount);
+    }
 }

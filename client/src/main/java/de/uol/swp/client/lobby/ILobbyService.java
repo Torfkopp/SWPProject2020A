@@ -47,8 +47,8 @@ public interface ILobbyService {
     /**
      * Posts a request to create a lobby onto the EventBus
      *
-     * @param name      The name chosen for the new lobby
-     * @param password  The password chosen for the new lobby
+     * @param name     The name chosen for the new lobby
+     * @param password The password chosen for the new lobby
      *
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20

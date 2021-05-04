@@ -9,6 +9,7 @@ import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.server.game.GameMapManagement;
 
 import java.util.List;
 import java.util.Map;

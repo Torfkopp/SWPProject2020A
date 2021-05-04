@@ -13,15 +13,14 @@ import de.uol.swp.common.user.User;
  */
 public class CreateLobbyRequest extends AbstractLobbyRequest {
 
-    private final int maxPlayers;
     private final String password;
 
     /**
      * Constructor
      *
-     * @param name       Name of the lobby
-     * @param owner      User trying to create the lobby
-     * @param password   Password of the lobby
+     * @param name     Name of the lobby
+     * @param owner    User trying to create the lobby
+     * @param password Password of the lobby
      *
      * @since 2019-10-08
      */

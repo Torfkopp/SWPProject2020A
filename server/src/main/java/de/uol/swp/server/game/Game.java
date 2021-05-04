@@ -1,6 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.RoadBuildingCardPhase;
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
 import de.uol.swp.common.game.map.management.IIntersection;
@@ -9,6 +10,8 @@ import de.uol.swp.common.game.resourceThingies.BankInventory;
 import de.uol.swp.common.game.resourceThingies.Inventory;
 import de.uol.swp.common.game.resourceThingies.InventoryMap;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCard;
+import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.Triple;
@@ -489,14 +492,14 @@ public class Game {
      * @author Temmo Junkhoff
      * @since 2021-04-10
      */
-    public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
-        Map<Boolean, Triple<String, UserOrDummy, Integer>> returnMap = new HashMap<>();
-        returnMap.put(false, new Triple<>("game.resources.whohas.longestroad", getUserFromPlayer(playerWithLongestRoad),
-                                          longestRoadLength));
-        returnMap.put(true, new Triple<>("game.resources.whohas.largestarmy", getUserFromPlayer(playerWithLargestArmy),
-                                         playerWithLargestArmy == null ? 0 :
-                                         getInventory(playerWithLargestArmy).getKnights()));
-        return new LinkedList<>(returnMap.values());
+    public List<UniqueCard> getUniqueCardsList() {
+        List<UniqueCard> returnList = new LinkedList<>();
+        returnList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, getUserFromPlayer(playerWithLongestRoad),
+                                      longestRoadLength));
+        returnList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, getUserFromPlayer(playerWithLargestArmy),
+                                      playerWithLargestArmy == null ? 0 :
+                                      getInventory(playerWithLargestArmy).getKnights()));
+        return returnList;
     }
 
     /**

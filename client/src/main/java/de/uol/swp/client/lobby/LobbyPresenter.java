@@ -107,7 +107,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
-        if (!this.lobbyName.equals(rsp.getLobbyName())) return;
+        if (!Objects.equals(lobbyName, rsp.getLobbyName())) return;
         LOG.debug("Received AllLobbyMembersResponse");
         LOG.debug("---- Update of Lobby member list");
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
@@ -191,7 +191,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayfieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
-        startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled()StartUpPhaseEnabled();
+        startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));

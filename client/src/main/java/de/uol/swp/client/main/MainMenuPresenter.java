@@ -9,8 +9,8 @@ import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.message.*;
@@ -324,7 +324,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.LobbyName)
      * @since 2021-04-22
      */
     @Subscribe
@@ -743,7 +743,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
-                else if (l.hasAPassword())
+                else if (l.hasPassword())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
             }

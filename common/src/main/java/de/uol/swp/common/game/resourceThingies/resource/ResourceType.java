@@ -23,9 +23,10 @@ public enum ResourceType implements Serializable {
 
     @Override
     public String toString() {
-        if (resourceBundle == null) return "";
-        String string = resourceBundle.getString(getAttributeName());
-        return string == null ? "" : string;
+        try {
+            return resourceBundle.getString(getAttributeName());
+        } catch (NullPointerException ignored) {}
+        return "Something went wrong";
     }
 
     public String getAttributeName() {

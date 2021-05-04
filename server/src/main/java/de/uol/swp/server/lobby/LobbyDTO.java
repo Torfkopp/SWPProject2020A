@@ -61,6 +61,38 @@ public class LobbyDTO implements Lobby {
     }
 
     /**
+     * Private constructor for copying the class
+     *
+     * @param name                   The name
+     * @param password               The password
+     * @param inGame                 The in game
+     * @param hasPassword            The has password
+     * @param owner                  The owner
+     * @param commandsAllowed        The commands allowed
+     * @param maxPlayers             The max players
+     * @param moveTime               The move time
+     * @param startUpPhaseEnabled    The start up phase enabled
+     * @param randomPlayfieldEnabled The random playfield enabled
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-04
+     */
+    private LobbyDTO(LobbyName name, String password, boolean inGame, boolean hasPassword, User owner,
+                     boolean commandsAllowed, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
+                     boolean randomPlayfieldEnabled) {
+        this.name = name;
+        this.password = password;
+        this.inGame = inGame;
+        this.hasPassword = hasPassword;
+        this.owner = owner;
+        this.commandsAllowed = commandsAllowed;
+        this.maxPlayers = maxPlayers;
+        this.moveTime = moveTime;
+        this.startUpPhaseEnabled = startUpPhaseEnabled;
+        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+    }
+
+    /**
      * Copy constructor
      *
      * @param lobby Lobby object to copy the values of
@@ -70,24 +102,14 @@ public class LobbyDTO implements Lobby {
      * @since 2020-11-29
      */
     public static Lobby create(Lobby lobby) {
-        return new LobbyDTO(lobby.getName(), lobby.getOwner(), lobby.getPassword(), lobby.isInGame(),
-                            lobby.hasAPassword(), lobby.getMaxPlayers(), lobby.commandsAllowed(), lobby.getMoveTime(),
+        return new LobbyDTO(lobby.getName(), lobby.getPassword(), lobby.isInGame(), lobby.hasPassword(),
+                            lobby.getOwner(), lobby.commandsAllowed(), lobby.getMaxPlayers(), lobby.getMoveTime(),
                             lobby.startUpPhaseEnabled(), lobby.randomPlayfieldEnabled());
     }
 
     @Override
     public boolean commandsAllowed() {
         return commandsAllowed;
-    }
-
-    @Override
-    public IConfiguration getConfiguration() {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(IConfiguration configuration) {
-        this.configuration = configuration;
     }
 
     @Override
@@ -147,7 +169,7 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public boolean hasAPassword() {
+    public boolean hasPassword() {
         return hasPassword;
     }
 

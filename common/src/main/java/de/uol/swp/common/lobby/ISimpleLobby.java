@@ -80,6 +80,16 @@ public interface ISimpleLobby extends Serializable {
     Set<UserOrDummy> getUserOrDummies();
 
     /**
+     * Returns if the lobby has a password
+     *
+     * @return The boolean indicating if the lobby has a password
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-04
+     */
+    boolean hasPassword();
+
+    /**
      * Gets if the lobby is inGame.
      *
      * @return The boolean

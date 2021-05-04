@@ -13,18 +13,19 @@ import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
+import de.uol.swp.common.game.request.PauseTimerRequest;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourceThingies.developmentCard.IDevelopmentCard;
 import de.uol.swp.common.game.resourceThingies.resource.IResource;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceList;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
-import de.uol.swp.common.game.request.PauseTimerRequest;
-import de.uol.swp.common.game.request.UnpauseTimerRequest;
+import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCard;
+import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
@@ -62,11 +63,10 @@ import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
  * @author Temmo Junkhoff
  * @author Maximillian Lindner
  * @see de.uol.swp.client.AbstractPresenter
- * @see de.uol.swp.client.lobby.AbstractPresenterWithChatWithGameWithPreGamePhase
  * @see de.uol.swp.client.lobby.LobbyPresenter
  * @since 2021-03-23
  */
-@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
+@SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
     @Inject
@@ -105,7 +105,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label notice;
     @FXML
-    protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
+    protected ListView<UniqueCard> uniqueCardView;
     @FXML
     protected Label buildingCosts;
     @FXML
@@ -141,16 +141,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected int moveTime;
     protected int remainingMoveTime;
     protected User owner;
-    protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
+    protected ObservableList<UniqueCard> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
     protected boolean helpActivated = false;
     @FXML
     protected CheckMenuItem helpCheckBox;
-    private boolean diceRolled = false;
     protected int roundCounter = 0;
-
-    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
+    private boolean diceRolled = false;
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
     @FXML
@@ -1320,17 +1318,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareUniqueCardView() {
         uniqueCardView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Triple<String, UserOrDummy, Integer> uniqueCardTriple, boolean empty) {
+            protected void updateItem(UniqueCard uniqueCard, boolean empty) {
                 Platform.runLater(() -> {
-                    super.updateItem(uniqueCardTriple, empty);
-                    if (empty || uniqueCardTriple == null) setText("");
+                    super.updateItem(uniqueCard, empty);
+                    if (empty || uniqueCard == null) setText("");
                     else {
-                        UserOrDummy value2 = uniqueCardTriple.getValue2();
-                        String who;
-                        if (value2 == null) who = resourceBundle.getString("game.resources.whohas.nobody");
-                        else who = value2.getUsername();
-                        setText(String.format(resourceBundle.getString(uniqueCardTriple.getValue1()), who,
-                                              uniqueCardTriple.getValue3()));
+                        setText(uniqueCard.toString());
                     }
                 });
             }
@@ -1339,8 +1332,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
         }
-        uniqueCardList.add(new Triple<>("game.resources.whohas.largestarmy", null, 0));
-        uniqueCardList.add(new Triple<>("game.resources.whohas.longestroad", null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, null, 0));
     }
 
     /**

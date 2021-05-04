@@ -33,7 +33,7 @@ public interface Lobby extends Serializable {
     static SimpleLobby getSimpleLobby(Lobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.commandsAllowed(),
                                lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
-                               lobby.startUpPhaseEnabled());
+                               lobby.startUpPhaseEnabled(), lobby.hasPassword());
     }
 
     /**
@@ -158,7 +158,7 @@ public interface Lobby extends Serializable {
      * @author Alwin Bossert
      * @since 2021-04-19
      */
-    boolean hasAPassword();
+    boolean hasPassword();
 
     /**
      * Gets whether the Lobby is currently in a game or not

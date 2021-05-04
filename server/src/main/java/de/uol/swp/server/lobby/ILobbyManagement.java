@@ -29,7 +29,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(LobbyName name, User owner, int maxPlayer, String lobbyPassword) throws IllegalArgumentException;
+    void createLobby(LobbyName name, User owner, String lobbyPassword) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name
@@ -63,15 +63,6 @@ public interface ILobbyManagement {
     Optional<Lobby> getLobby(LobbyName name);
 
     /**
-     * Gets the map with simple lobbies
-     *
-     * @return Map with the lobby's name and its SimpleLobby object
-     *
-     * @since 2020-12-12
-     */
-    Map<LobbyName, ISimpleLobby> getSimpleLobbies();
-
-    /**
      * Searches for the lobby with the requested name and password
      *
      * @param name     String containing the name of the lobby to search for
@@ -83,7 +74,16 @@ public interface ILobbyManagement {
      * @see java.util.Optional
      * @since 2021-04-22
      */
-    Optional<Lobby> getLobby(String name, String password);
+    Optional<Lobby> getLobby(LobbyName name, String password);
+
+    /**
+     * Gets the map with simple lobbies
+     *
+     * @return Map with the lobby's name and its SimpleLobby object
+     *
+     * @since 2020-12-12
+     */
+    Map<LobbyName, ISimpleLobby> getSimpleLobbies();
 
     /**
      * Sets the hasPassword attribute of a lobby according to the boolean provided
@@ -94,7 +94,7 @@ public interface ILobbyManagement {
      * @author Alwin Bossert
      * @since 2021-04-20
      */
-    void setHasPassword(String lobbyName, boolean hasPassword);
+    void setHasPassword(LobbyName lobbyName, boolean hasPassword);
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided

@@ -21,12 +21,11 @@ public class LobbyManagement implements ILobbyManagement {
     private final Map<LobbyName, Lobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(LobbyName name, User owner,
-                            String lobbyPassword) throws IllegalArgumentException {
+    public void createLobby(LobbyName name, User owner, String lobbyPassword) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword));
+        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword, lobbyPassword != null));
     }
 
     @Override
@@ -43,13 +42,6 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public Map<LobbyName, ISimpleLobby> getSimpleLobbies() {
-        Map<LobbyName, ISimpleLobby> temp = new HashMap<>();
-        lobbies.entrySet().forEach((x) -> temp.put(x.getKey(), Lobby.getSimpleLobby(x.getValue())));
-        return temp;
-    }
-
-    @Override
     public Optional<Lobby> getLobby(LobbyName lobbyName) {
         Lobby lobby = lobbies.get(lobbyName);
         if (lobby != null) {
@@ -59,7 +51,7 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public Optional<Lobby> getLobby(String name, String password) {
+    public Optional<Lobby> getLobby(LobbyName name, String password) {
         Lobby lobby = lobbies.get(name);
         if (lobby != null) {
             return Optional.of(lobby);
@@ -68,7 +60,14 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public void setHasPassword(String lobbyName, boolean hasPassword) {
+    public Map<LobbyName, ISimpleLobby> getSimpleLobbies() {
+        Map<LobbyName, ISimpleLobby> temp = new HashMap<>();
+        lobbies.entrySet().forEach((x) -> temp.put(x.getKey(), Lobby.getSimpleLobby(x.getValue())));
+        return temp;
+    }
+
+    @Override
+    public void setHasPassword(LobbyName lobbyName, boolean hasPassword) {
         Optional<Lobby> lobby = getLobby(lobbyName);
         if (lobby.isEmpty()) return;
         lobby.get().setHasPassword(hasPassword);

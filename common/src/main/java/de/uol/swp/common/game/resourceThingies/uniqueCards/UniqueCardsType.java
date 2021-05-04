@@ -9,6 +9,6 @@ import java.io.Serializable;
  * @since 2021-04-23
  */
 public enum UniqueCardsType implements Serializable {
-    LONGEST_ROAD,
-    LARGEST_ARMY
+    LONGEST_ROAD(),
+    LARGEST_ARMY()
 }

@@ -9,8 +9,8 @@ import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.*;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.common.util.Tuple;
+import de.uol.swp.server.game.map.IGameMapManagement;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -31,13 +31,13 @@ public class GameMapManagement implements IGameMapManagement {
     //Map mapping the player and his settlements/cities
     private final Map<Player, List<MapPoint>> playerSettlementsAndCities = new HashMap<>();
     private final Map<IIntersection, IHarborHex.HarborResource> harborResourceMap = new HashMap<>();
+    private final Set<MapPoint> foundingRoads = new HashSet<>();
     private MapPoint robberPosition = HexMapPoint(3, 3);
     private GameHexWrapper[][] hexMap;
     private IIntersection[][] intersectionMap;
     private ImmutableNetwork<GameHexWrapper, IEdge> hexEdgeNetwork;
     private ImmutableNetwork<IIntersection, IEdge> intersectionEdgeNetwork;
     private IConfiguration configuration;
-    private final Set<MapPoint> foundingRoads = new HashSet<>();
 
     /**
      * Constructor
@@ -98,6 +98,20 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public PlayerWithLengthOfLongestRoad findLongestRoad() {
+        int maxLength = 0;
+        MapPoint baseForMaxLength = null;
+        for (MapPoint edge : foundingRoads) {
+            int length = longestRoadWith(edge);
+            if (length > maxLength) {
+                maxLength = length;
+                baseForMaxLength = edge;
+            }
+        }
+        return new PlayerWithLengthOfLongestRoad(getEdge(baseForMaxLength).getOwner(), maxLength);
+    }
+
+    @Override
     public IConfiguration getBeginnerConfiguration() {
         List<ResourceType> hexList = new LinkedList<>();
         hexList.add(ResourceType.ORE);
@@ -150,7 +164,8 @@ public class GameMapManagement implements IGameMapManagement {
         // wrapped as unmodifiable so it can be reliably retrieved.
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
-                                          Collections.unmodifiableList(hexList), Collections.unmodifiableList(tokenList), robberPosition);
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList), robberPosition);
         return configuration;
     }
 
@@ -159,7 +174,8 @@ public class GameMapManagement implements IGameMapManagement {
         if (position.getType() != MapPoint.Type.EDGE) return null;
         if (position.getL().getType() == MapPoint.Type.INTERSECTION && position.getR()
                                                                                .getType() == MapPoint.Type.INTERSECTION)
-            return intersectionEdgeNetwork.edgeConnectingOrNull(getIntersection(position.getL()), getIntersection(position.getR()));
+            return intersectionEdgeNetwork
+                    .edgeConnectingOrNull(getIntersection(position.getL()), getIntersection(position.getR()));
         else if (position.getL().getType() == MapPoint.Type.HEX && position.getR().getType() == MapPoint.Type.HEX)
             return hexEdgeNetwork.edgeConnectingOrNull(getHexWrapper(position.getL()), getHexWrapper(position.getR()));
         return null;
@@ -312,7 +328,8 @@ public class GameMapManagement implements IGameMapManagement {
         // wrapped as unmodifiable so it can be reliably retrieved.
         // Create new LinkedList objects with the Getter results when creating the map from a Configuration
         configuration = new Configuration(Collections.unmodifiableList(harborList),
-                                          Collections.unmodifiableList(hexList), Collections.unmodifiableList(tokenList), robberPosition);
+                                          Collections.unmodifiableList(hexList),
+                                          Collections.unmodifiableList(tokenList), robberPosition);
         return configuration;
     }
 
@@ -364,7 +381,8 @@ public class GameMapManagement implements IGameMapManagement {
             // and save them as a tuple of their length and their visited edges.
             for (IEdge nextEdge : leftNodeEdges) {
                 Set<IEdge> temp = new HashSet<>(visited);
-                leftNodeLengths.add(new Tuple<>(roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp), temp));
+                leftNodeLengths.add(new Tuple<>(
+                        roadLength(nextEdge, edge, null, edge.getOwner(), new HashSet<>(visited), temp), temp));
             }
 
             // Calculate all combinations of paths from both sides of the edge and store their length in a list
@@ -490,7 +508,8 @@ public class GameMapManagement implements IGameMapManagement {
 
     @Override
     public void moveRobber(MapPoint newPosition) {
-        if (newPosition.getType() != MapPoint.Type.HEX) throw new IllegalArgumentException("The robber can only move to a hex");
+        if (newPosition.getType() != MapPoint.Type.HEX)
+            throw new IllegalArgumentException("The robber can only move to a hex");
         hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(false);
         robberPosition = newPosition;
         hexMap[robberPosition.getY()][robberPosition.getX()].get().setRobberOnField(true);
@@ -573,7 +592,8 @@ public class GameMapManagement implements IGameMapManagement {
         for (IEdge edge : intersectionEdgeNetwork.incidentEdges(intersectionMap[position.getY()][position.getX()])) {
             if (edge.getOwner() == player) hasRoad = true;
         }
-        for (IIntersection intersection : intersectionEdgeNetwork.adjacentNodes(intersectionMap[position.getY()][position.getX()]))
+        for (IIntersection intersection : intersectionEdgeNetwork
+                .adjacentNodes(intersectionMap[position.getY()][position.getX()]))
             if (intersection.getState() != IIntersection.IntersectionState.FREE) neighbouringIntersectionsFree = false;
 
         return intersectionMap[position.getY()][position.getX()].getState()
@@ -597,20 +617,6 @@ public class GameMapManagement implements IGameMapManagement {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public PlayerWithLengthOfLongestRoad findLongestRoad() {
-        int maxLength = 0;
-        MapPoint baseForMaxLength = null;
-        for (MapPoint edge : foundingRoads) {
-            int length = longestRoadWith(edge);
-            if (length > maxLength) {
-                maxLength = length;
-                baseForMaxLength = edge;
-            }
-        }
-        return new PlayerWithLengthOfLongestRoad(getEdge(baseForMaxLength).getOwner(), maxLength);
     }
 
     void setHex(MapPoint position, IGameHex newHex) {
@@ -700,7 +706,8 @@ public class GameMapManagement implements IGameMapManagement {
      * @since 2021-03-05
      */
     private void createIntersectionEdgeNetwork() {
-        var intersectionEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false).nodeOrder(ElementOrder.insertion()).expectedNodeCount(54)
+        var intersectionEdgeNetworkBuilder = NetworkBuilder.undirected().allowsParallelEdges(false)
+                                                           .nodeOrder(ElementOrder.insertion()).expectedNodeCount(54)
                                                            .expectedEdgeCount(72).<IIntersection, IEdge>immutable();
 
         intersectionMap = new IIntersection[6][];
@@ -863,8 +870,10 @@ public class GameMapManagement implements IGameMapManagement {
                 }
                 returnMap[y][x] = new IntersectionWithEdges(new IntersectionWithBuildable(a.getOwner(), a.getState(),
                                                                                           getWhoCanBuildAt(
-                                                                                                  IntersectionMapPoint(y, x),
-                                                                                                  playerUserMapping)), c);
+                                                                                                  IntersectionMapPoint(
+                                                                                                          y, x),
+                                                                                                  playerUserMapping)),
+                                                            c);
             }
         }
         return returnMap;
@@ -943,7 +952,8 @@ public class GameMapManagement implements IGameMapManagement {
      * @author Temmo Junkhoff
      * @since 2021 -04-10
      */
-    private int roadLength(IEdge currentEdge, IEdge previousEdge, IEdge secondPreviousEdge, Player owner, Set<IEdge> visited, Set<IEdge> allVisited) {
+    private int roadLength(IEdge currentEdge, IEdge previousEdge, IEdge secondPreviousEdge, Player owner,
+                           Set<IEdge> visited, Set<IEdge> allVisited) {
         if (!Objects.equals(currentEdge.getOwner(), owner)) return 0;
         if (secondPreviousEdge == currentEdge) return 0;
         if (visited.contains(currentEdge)) return 0;

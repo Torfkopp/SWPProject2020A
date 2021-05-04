@@ -1,6 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.ISimpleLobby;
 
 /**
  * Response sent by the server when a user wants to join a lobby with a password
@@ -12,7 +13,7 @@ import de.uol.swp.common.lobby.Lobby;
  */
 public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse {
 
-    private final Lobby lobby;
+    private final ISimpleLobby lobby;
 
     /**
      * Constructor
@@ -20,7 +21,7 @@ public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse {
      * @param lobbyName The name for the new lobby
      * @param lobby     The object of the joined lobby
      **/
-    public JoinLobbyWithPasswordResponse(String lobbyName, Lobby lobby) {
+    public JoinLobbyWithPasswordResponse(LobbyName lobbyName, ISimpleLobby lobby) {
         super(lobbyName);
         this.lobby = lobby;
     }
@@ -32,7 +33,7 @@ public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse {
      *
      * @author Alwin Bossert
      */
-    public Lobby getLobby() {
+    public ISimpleLobby getLobby() {
         return lobby;
     }
 }

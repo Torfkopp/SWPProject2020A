@@ -34,7 +34,6 @@ import java.util.List;
  * @see de.uol.swp.client.AbstractPresenter
  * @see de.uol.swp.client.main.MainMenuPresenter
  * @see de.uol.swp.client.lobby.AbstractPresenterWithChatWithGame
- * @see de.uol.swp.client.lobby.AbstractPresenterWithChatWithGameWithPreGamePhase
  * @see de.uol.swp.client.lobby.LobbyPresenter
  * @since 2021-01-02
  */

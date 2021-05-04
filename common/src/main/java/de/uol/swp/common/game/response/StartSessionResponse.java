@@ -1,7 +1,6 @@
 package de.uol.swp.common.game.response;
 
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
-import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.message.AbstractResponseMessage;
@@ -37,8 +36,8 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param autoRollState   The autoRoll state
      * @param builtStructures What structures of the founding phase the user already built
      */
-    public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO,
-                                int[] dices, boolean rolledDiceAlready, boolean autoRollState, int moveTime,
+    public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
+                                boolean rolledDiceAlready, boolean autoRollState, int moveTime,
                                 StartUpPhaseBuiltStructures builtStructures) {
         this.lobby = lobby;
         this.player = player;

@@ -21,6 +21,7 @@ import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.game.resourceThingies.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourceThingies.resource.ResourceType;
+import de.uol.swp.common.game.resourceThingies.uniqueCards.UniqueCard;
 import javafx.fxml.FXMLLoader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -144,6 +145,7 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(ResourceType.class);
         requestStaticInjection(DevelopmentCardType.class);
+        requestStaticInjection(UniqueCard.class);
         requestStaticInjection(SceneManager.class);
         requestStaticInjection(MainMenuPresenter.class);
         requestStaticInjection(AbstractPresenterWithChat.class);

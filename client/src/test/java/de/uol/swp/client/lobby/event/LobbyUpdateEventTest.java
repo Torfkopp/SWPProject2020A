@@ -1,7 +1,8 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LobbyUpdateEventTest {
 
     private static final User defaultUser = new UserDTO(1, "I'm tree", "I'm pretty sure I'm a tree", "tree@tree.test");
-    private static final Lobby defaultLobby = new LobbyDTO("Am I a lobby?", defaultUser, "", false, false, 4, false, 60,
-                                                           true, true);
+    private static final ISimpleLobby defaultLobby = new SimpleLobby(new LobbyName("Am I a lobby?"), false, defaultUser,
+                                                                     true, 3, 60, false, false, false);
 
     /**
      * Test for the creation of LobbyUpdateEvents
@@ -37,9 +38,9 @@ class LobbyUpdateEventTest {
         assertEquals(defaultLobby.getName(), event.getLobby().getName());
         assertEquals(defaultLobby.isInGame(), event.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), event.getLobby().getMaxPlayers());
-        assertEquals(defaultLobby.commandsAllowed(), event.getLobby().commandsAllowed());
+        assertEquals(defaultLobby.areCommandsAllowed(), event.getLobby().areCommandsAllowed());
         assertEquals(defaultLobby.getMoveTime(), event.getLobby().getMoveTime());
-        assertEquals(defaultLobby.startUpPhaseEnabled(), event.getLobby().startUpPhaseEnabled());
-        assertEquals(defaultLobby.randomPlayfieldEnabled(), event.getLobby().randomPlayfieldEnabled());
+        assertEquals(defaultLobby.isStartUpPhaseEnabled(), event.getLobby().isStartUpPhaseEnabled());
+        assertEquals(defaultLobby.isRandomPlayfieldEnabled(), event.getLobby().isRandomPlayfieldEnabled());
     }
 }

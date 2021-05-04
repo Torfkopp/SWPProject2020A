@@ -25,6 +25,7 @@ public class SimpleLobby implements ISimpleLobby {
     private final int moveTime;
     private final boolean startUpPhaseEnabled;
     private final boolean randomPlayfieldEnabled;
+    private final boolean hasPassword;
 
     /**
      * Instantiates a new Simple lobby.
@@ -42,7 +43,7 @@ public class SimpleLobby implements ISimpleLobby {
      * @since 2021-05-03
      */
     public SimpleLobby(LobbyName name, boolean inGame, User owner, boolean commandsAllowed, int maxPlayers,
-                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled, boolean hasPassword) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -51,6 +52,12 @@ public class SimpleLobby implements ISimpleLobby {
         this.moveTime = moveTime;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+        this.hasPassword = hasPassword;
+    }
+
+    @Override
+    public boolean hasPassword() {
+        return hasPassword;
     }
 
     @Override

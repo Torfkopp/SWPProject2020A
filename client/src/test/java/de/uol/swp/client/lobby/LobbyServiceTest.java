@@ -6,9 +6,10 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
+import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -34,9 +35,9 @@ class LobbyServiceTest {
 
     private static final User defaultUser = new UserDTO(1, "chuck", "test", "chuck@norris.com");
     private static final User secondUser = new UserDTO(2, "chuck_testa", "testa", "testa@chuck.com");
-    private static final String defaultLobbyName = "testlobby";
-    private static final Lobby defaultLobby = new LobbyDTO(defaultLobbyName, defaultUser, "", false, false, 4, false,
-                                                           60, true, true);
+    private static final LobbyName defaultLobbyName = new LobbyName("testlobby");
+    private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, defaultUser, false, 4, 60,
+                                                                     false, false, false);
 
     private final EventBus eventBus = new EventBus();
     private final CountDownLatch lock = new CountDownLatch(1);
@@ -86,7 +87,7 @@ class LobbyServiceTest {
      */
     @Test
     void createNewLobby() throws InterruptedException {
-        lobbyService.createNewLobby("Test", 4, "");
+        lobbyService.createNewLobby(new LobbyName("Test"), null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -219,10 +220,10 @@ class LobbyServiceTest {
         assertEquals(defaultLobby.getName(), lobbyUpdateEvent.getLobby().getName());
         assertEquals(defaultLobby.isInGame(), lobbyUpdateEvent.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), lobbyUpdateEvent.getLobby().getMaxPlayers());
-        assertEquals(defaultLobby.commandsAllowed(), lobbyUpdateEvent.getLobby().commandsAllowed());
+        assertEquals(defaultLobby.areCommandsAllowed(), lobbyUpdateEvent.getLobby().areCommandsAllowed());
         assertEquals(defaultLobby.getMoveTime(), lobbyUpdateEvent.getLobby().getMoveTime());
-        assertEquals(defaultLobby.startUpPhaseEnabled(), lobbyUpdateEvent.getLobby().startUpPhaseEnabled());
-        assertEquals(defaultLobby.randomPlayfieldEnabled(), lobbyUpdateEvent.getLobby().randomPlayfieldEnabled());
+        assertEquals(defaultLobby.isStartUpPhaseEnabled(), lobbyUpdateEvent.getLobby().isStartUpPhaseEnabled());
+        assertEquals(defaultLobby.isRandomPlayfieldEnabled(), lobbyUpdateEvent.getLobby().isRandomPlayfieldEnabled());
     }
 
     /**

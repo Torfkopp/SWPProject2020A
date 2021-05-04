@@ -61,6 +61,12 @@ public class DevelopmentCardList implements IDevelopmentCardList {
         }
     }
 
+    public void set(DevelopmentCardType developmentCardType, int amount) {
+        for (DevelopmentCard developmentCard : list) {
+            if (Objects.equals(developmentCardType, developmentCard.getType())) developmentCard.setAmount(amount);
+        }
+    }
+
     public class ResourceListMapIterator implements Iterator<DevelopmentCard> {
 
         private final List<DevelopmentCard> list;
