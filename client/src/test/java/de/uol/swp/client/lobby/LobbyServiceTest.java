@@ -87,7 +87,7 @@ class LobbyServiceTest {
      */
     @Test
     void createNewLobby() throws InterruptedException {
-        lobbyService.createNewLobby(new LobbyName("Test"), null);
+        lobbyService.createNewLobby(defaultLobbyName, null);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -95,7 +95,7 @@ class LobbyServiceTest {
 
         CreateLobbyRequest request = (CreateLobbyRequest) event;
 
-        assertEquals("Test", request.getName());
+        assertEquals(defaultLobbyName, request.getName());
         assertEquals(defaultUser, request.getOwner());
         assertEquals(defaultUser.getID(), request.getOwner().getID());
         assertEquals(defaultUser.getUsername(), request.getOwner().getUsername());

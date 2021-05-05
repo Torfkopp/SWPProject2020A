@@ -43,7 +43,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @return Map of the demanded resources
      */
     public ResourceList getDemandedResources() {
-        return demandedResources;
+        return demandedResources.create();
     }
 
     /**
@@ -52,7 +52,7 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @return Map of the offered resources
      */
     public ResourceList getOfferedResources() {
-        return offeredResources;
+        return offeredResources.create();
     }
 
     /**

@@ -191,8 +191,7 @@ public class GameService extends AbstractService {
      */
     private void endTurnDummy(Game game) {
         UserOrDummy activePlayer = game.getActivePlayer();
-        if (activePlayer instanceof User) {
-        } else {
+        if (!(activePlayer instanceof User)) {
             if (game.getTaxPayers().isEmpty())
                 onEndTurnRequest(new EndTurnRequest(activePlayer, game.getLobby().getName()));
         }
@@ -228,8 +227,7 @@ public class GameService extends AbstractService {
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
         if (offeringInventory == null || respondingInventory == null) return;
-        ResourceList offeringInventoryMap = offeringInventory.getResources();
-        ResourceList responseInventoryMap = respondingInventory.getResources();
+        if (req.getOfferedResources() == null || req.getDemandedResources() == null) return;
         boolean enoughToOffer = checkEnoughResourcesInInventory(offeringInventory, req.getOfferedResources());
         boolean enoughToDemand = checkEnoughResourcesInInventory(respondingInventory, req.getDemandedResources());
         if (enoughToOffer && enoughToDemand) {
@@ -639,7 +637,6 @@ public class GameService extends AbstractService {
             return;
         }
         game.setBuildingAllowed(false);
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), game.nextPlayer(), game.getRound());
         UserOrDummy nextPlayer;
         UserOrDummy user;
         Optional<Lobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
@@ -674,7 +671,7 @@ public class GameService extends AbstractService {
         } else {
             nextPlayer = game.nextPlayer();
         }
-        returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
 
         LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
@@ -734,14 +731,17 @@ public class GameService extends AbstractService {
         for (HarborResource resource : harborTradingList)
             tradingRatio.replace(resource, 2);
         //check if user has enough resources
-        if (inventory.get(req.getGiveResource()) < tradingRatio
-                .get(IHarborHex.getHarborResource(req.getGiveResource())))
+        if (inventory.get(req.getGiveResource()) >= tradingRatio
+                .get(IHarborHex.getHarborResource(req.getGiveResource()))) {
             //user gets the resource he demands
             inventory.increase(req.getGetResource());
+            //user gives the resource he offers according to the harbors
+            inventory.decrease(req.getGiveResource(),
+                               tradingRatio.get(IHarborHex.getHarborResource(req.getGiveResource())));
+        }
         respondingResourcesWrapperMap.set(req.getGetResource(), 1);
         offeredResourcesWrapperMap
                 .set(req.getGiveResource(), tradingRatio.get(IHarborHex.getHarborResource(req.getGiveResource())));
-        //user gives the resource he offers according to the harbors
 
         ResponseMessage returnMessage = new TradeWithBankAcceptedResponse(req.getUser(), req.getOriginLobby());
         returnMessage.initWithMessage(req);

@@ -14,6 +14,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInve
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventory;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
@@ -517,11 +518,9 @@ public class GameServiceTest {
         gameManagement.createGame(lobby, user[0], gameMap, 0);
         Game game = gameManagement.getGame(defaultLobby);
         Inventory[] gameInventory = game.getAllInventories();
-        gameInventory[0].set(WOOL, 5);
-        gameInventory[0].set(BRICK, 5);
-        gameInventory[0].set(GRAIN, 5);
-        gameInventory[0].set(ORE, 5);
-        gameInventory[0].set(LUMBER, 5);
+        for (ResourceType resource : ResourceType.values()) {
+            gameInventory[0].increase(resource, 5);
+        }
         assertEquals(5, gameInventory[0].get(WOOL));
         assertEquals(5, gameInventory[0].get(BRICK));
         assertEquals(5, gameInventory[0].get(ORE));
@@ -532,18 +531,18 @@ public class GameServiceTest {
 
         bus.post(executeTradeWithBankRequest);
         Game game1 = gameManagement.getGame(defaultLobby);
-        Inventory[] gameInventory1 = game1.getAllInventories();
-        assertEquals(5, gameInventory1[0].get(LUMBER));
-        assertEquals(6, gameInventory1[0].get(WOOL));
-        assertEquals(1, gameInventory1[0].get(BRICK));
-        assertEquals(5, gameInventory1[0].get(GRAIN));
-        assertEquals(5, gameInventory1[0].get(LUMBER));
+        Inventory gameInventory1 = game1.getInventory(user[0]);
+        assertEquals(5, gameInventory1.get(LUMBER));
+        assertEquals(6, gameInventory1.get(WOOL));
+        assertEquals(1, gameInventory1.get(BRICK));
+        assertEquals(5, gameInventory1.get(GRAIN));
+        assertEquals(5, gameInventory1.get(LUMBER));
 
         bus.post(executeTradeWithBankRequest);
         Game game2 = gameManagement.getGame(defaultLobby);
         //inventory doesnt change because user had not enough resources
         Inventory[] gameInventory2 = game2.getAllInventories();
-        assertEquals(gameInventory1[0], gameInventory2[0]);
+        assertEquals(gameInventory1, gameInventory2[0]);
         assertEquals(5, gameInventory2[0].get(LUMBER));
         assertEquals(6, gameInventory2[0].get(WOOL));
         assertEquals(1, gameInventory2[0].get(BRICK));
@@ -591,17 +590,24 @@ public class GameServiceTest {
         assertEquals(5, gameInventory[0].get(LUMBER));
 
         ResourceList offeredResourceList = new ResourceList();
+        offeredResourceList.set(ORE, 3);
+        offeredResourceList.set(BRICK, 2);
 
         ResourceList demandedResourceList = new ResourceList();
+        demandedResourceList.set(WOOL, 1);
+        demandedResourceList.set(LUMBER, 4);
         game.setDiceRolledAlready(true);
-        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], defaultLobby, demandedResourceList,
-                                                           offeredResourceList);
+        Message tradeWithUser = new AcceptUserTradeRequest(user[1], user[0], defaultLobby,
+                                                           demandedResourceList.create(), offeredResourceList.create());
         bus.post(tradeWithUser);
 
         Game game1 = gameManagement.getGame(defaultLobby);
         Inventory[] gameInventory1 = game1.getAllInventories();
         Inventory inventory0 = game1.getInventory(user[0]);
         Inventory inventory1 = game1.getInventory(user[1]);
+        for (User i : user) {
+            System.out.println(game1.getInventory(i).get(ORE));
+        }
         assertEquals(2, inventory0.get(ORE));
         assertEquals(6, inventory0.get(WOOL));
         assertEquals(3, inventory0.get(BRICK));

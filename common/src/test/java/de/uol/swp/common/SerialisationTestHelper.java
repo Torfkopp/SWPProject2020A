@@ -14,8 +14,6 @@ public class SerialisationTestHelper {
     public static <T extends Serializable> boolean checkSerialisableAndDeserialisable(T obj, Class<T> cl) {
         try {
             byte[] bytes = pickle(obj);
-            //I've come for your pickle
-            //https://youtu.be/0tr2o9-KVFI?t=3
             T obj2 = unpickle(bytes, cl);
             return obj.equals(obj2);
         } catch (IOException | ClassNotFoundException e) {

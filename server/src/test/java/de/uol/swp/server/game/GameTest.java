@@ -9,15 +9,19 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.lobby.LobbyDTO;
+import de.uol.swp.server.lobby.LobbyManagement;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import static de.uol.swp.common.game.map.management.MapPoint.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the Game object
@@ -32,6 +36,7 @@ public class GameTest {
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
     static final Lobby lobby = new LobbyDTO(new LobbyName("Read the Manga"), user, "");
+    static final LobbyName defaultLobbyName = new LobbyName("Read the Manga");
     static IGameMapManagement gameMap;
     static Game game;
 
@@ -55,6 +60,36 @@ public class GameTest {
         lobby.leaveUser(user4);
     }
 
+    @Test
+    void gameManagementTest() {
+        IGameManagement gm = new GameManagement(new LobbyManagement());
+        User user = new UserDTO(99, "", "", "");
+        Lobby lobby = new LobbyDTO(defaultLobbyName, user);
+        IGameMapManagement gameMap = new GameMapManagement();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gm.createGame(lobby, user, gameMap, 120);
+        assertNotNull(gm.getGame(defaultLobbyName));
+        Map<LobbyName, Game> map = gm.getGames();
+        assertEquals(1, map.size());
+        gm.dropGame(defaultLobbyName);
+        map = gm.getGames();
+        assertTrue(map.isEmpty());
+    }
+
+    @Test
+    void gameTest() {
+        IGameMapManagement gameMap = new GameMapManagement();
+        gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        List<UserOrDummy> list = Arrays.asList(user, user2, user3, user4);
+        UserOrDummy[] u = game.getPlayers();
+        //order is random, so just check that everyone is somewhere in the list of users in the Game
+        assertTrue(list.contains(u[0]));
+        assertTrue(list.contains(u[1]));
+        assertTrue(list.contains(u[2]));
+        assertTrue(list.contains(u[3]));
+        assertEquals(lobby, game.getLobby());
+    }
+
     /**
      * Tests if the bankInventory gets created properly when a game is created
      * <p>
@@ -68,7 +103,6 @@ public class GameTest {
      */
     @Test
     void bankInventoryCheck() {
-
         BankInventory bankInventory = new BankInventory();
         assertEquals(5, bankInventory.get(VICTORY_POINT_CARD));
         assertEquals(2, bankInventory.get(MONOPOLY_CARD));

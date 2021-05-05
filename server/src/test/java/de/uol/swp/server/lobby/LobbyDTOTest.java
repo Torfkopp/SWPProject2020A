@@ -122,6 +122,7 @@ class LobbyDTOTest {
         assertEquals(users.size() + 1, lobby.getUserOrDummies().size());
         lobby.leaveUser(users.get(5));
 
+        // +1 for owner, -1 for user who left
         assertEquals(users.size() + 1 - 1, lobby.getUserOrDummies().size());
         assertFalse(lobby.getUserOrDummies().contains(users.get(5)));
     }
@@ -158,10 +159,10 @@ class LobbyDTOTest {
     @Test
     void updateCommandsAllowedTest() {
         Lobby lobby = LobbyDTO.create(defaultLobby);
-        assertFalse(lobby.commandsAllowed());
-
-        lobby.setCommandsAllowed(true);
         assertTrue(lobby.commandsAllowed());
+
+        lobby.setCommandsAllowed(false);
+        assertFalse(lobby.commandsAllowed());
     }
 
     /**
@@ -177,11 +178,11 @@ class LobbyDTOTest {
     @Test
     void updateMaxPlayersTest() {
         Lobby lobby = LobbyDTO.create(defaultLobby);
-        assertEquals(4, lobby.getMaxPlayers());
-
-        lobby.setMaxPlayers(3);
-
         assertEquals(3, lobby.getMaxPlayers());
+
+        lobby.setMaxPlayers(4);
+
+        assertEquals(4, lobby.getMaxPlayers());
     }
 
     /**

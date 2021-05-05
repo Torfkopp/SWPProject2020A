@@ -106,6 +106,7 @@ public class LobbyDTO implements Lobby {
         this.inGame = inGame;
         this.hasPassword = password != null;
         this.owner = owner;
+        this.users.add(owner);
         this.commandsAllowed = commandsAllowed;
         this.maxPlayers = maxPlayers;
         this.moveTime = moveTime;
