@@ -1,7 +1,7 @@
 package de.uol.swp.client.trade.event;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**

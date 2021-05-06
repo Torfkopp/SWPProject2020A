@@ -1,8 +1,8 @@
 package de.uol.swp.common.chat.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.LinkedList;

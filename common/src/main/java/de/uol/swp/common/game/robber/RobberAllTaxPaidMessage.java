@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.robber;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.AbstractGameMessage;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -10,7 +10,7 @@ import de.uol.swp.common.user.UserOrDummy;
  * @author Mario Fokken
  * @since 2021-04-23
  */
-public class RobberAllTaxPayedMessage extends AbstractGameMessage {
+public class RobberAllTaxPaidMessage extends AbstractGameMessage {
 
     /**
      * Constructor
@@ -18,7 +18,7 @@ public class RobberAllTaxPayedMessage extends AbstractGameMessage {
      * @param lobbyName The lobby name
      * @param user      The user
      */
-    public RobberAllTaxPayedMessage(LobbyName lobbyName, UserOrDummy user) {
+    public RobberAllTaxPaidMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

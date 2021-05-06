@@ -1,12 +1,16 @@
 package de.uol.swp.common.lobby;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
 import java.util.Set;
 
+/**
+ * The interface for a simple lobby used to send lobby data over the network.
+ *
+ * @author Temmo Junkhoff
+ */
 public interface ISimpleLobby extends Serializable {
 
     /**

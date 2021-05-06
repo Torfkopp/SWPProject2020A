@@ -1,6 +1,5 @@
 package de.uol.swp.common.lobby;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -8,7 +7,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * The type Simple lobby.
+ * The class Simple lobby.
+ * Used to transfer data about a lobby over the network
  *
  * @author Temmo Junkhoff
  * @since 2021-05-03
@@ -28,16 +28,16 @@ public class SimpleLobby implements ISimpleLobby {
     private final boolean hasPassword;
 
     /**
-     * Instantiates a new Simple lobby.
+     * Constructor.
      *
-     * @param name                   the name
-     * @param inGame                 the in game
-     * @param owner                  the owner
-     * @param commandsAllowed        the commands allowed
-     * @param maxPlayers             the max players
-     * @param moveTime               the move time
-     * @param startUpPhaseEnabled    the start up phase enabled
-     * @param randomPlayFieldEnabled the random play field enabled
+     * @param name                   The name
+     * @param inGame                 The in game
+     * @param owner                  The owner
+     * @param commandsAllowed        Whether commands are allowed or not
+     * @param maxPlayers             The max players
+     * @param moveTime               The move time
+     * @param startUpPhaseEnabled    Whether the start up phase is enabled or not
+     * @param randomPlayFieldEnabled Whether the random play field is enabled or not
      *
      * @author Temmo Junkhoff
      * @since 2021-05-03
@@ -53,11 +53,6 @@ public class SimpleLobby implements ISimpleLobby {
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.randomPlayFieldEnabled = randomPlayFieldEnabled;
         this.hasPassword = hasPassword;
-    }
-
-    @Override
-    public boolean hasPassword() {
-        return hasPassword;
     }
 
     @Override
@@ -93,6 +88,11 @@ public class SimpleLobby implements ISimpleLobby {
     @Override
     public Set<UserOrDummy> getUserOrDummies() {
         return users;
+    }
+
+    @Override
+    public boolean hasPassword() {
+        return hasPassword;
     }
 
     @Override

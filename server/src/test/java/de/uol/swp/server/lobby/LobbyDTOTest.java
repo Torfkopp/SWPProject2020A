@@ -1,6 +1,6 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class LobbyDTOTest {
 
     private static final User defaultUser = new UserDTO(98, "marco", "marco", "marco@grawunder.de");
     private static final User notInLobbyUser = new UserDTO(99, "no", "marco", "no@grawunder.de");
-    private static final Lobby defaultLobby = new LobbyDTO(new LobbyName("Testlobby"), defaultUser, "");
+    private static final ILobby defaultLobby = new LobbyDTO(new LobbyName("Testlobby"), defaultUser, "");
 
     private static final int NO_USERS = 10;
     private static final List<User> users;
@@ -45,7 +45,7 @@ class LobbyDTOTest {
      */
     @Test
     void assureNonEmptyLobbyTest() {
-        Lobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
+        ILobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
 
         assertThrows(IllegalArgumentException.class, () -> lobby.leaveUser(defaultUser));
     }
@@ -59,7 +59,7 @@ class LobbyDTOTest {
      */
     @Test
     void createLobbyTest() {
-        Lobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
+        ILobby lobby = new LobbyDTO(new LobbyName("test"), defaultUser, "");
 
         assertEquals(new LobbyName("test"), lobby.getName());
         assertEquals(1, lobby.getUserOrDummies().size());
@@ -75,7 +75,7 @@ class LobbyDTOTest {
      */
     @Test
     void createWithExistingLobby() {
-        Lobby newLobby = LobbyDTO.create(defaultLobby);
+        ILobby newLobby = LobbyDTO.create(defaultLobby);
 
         // Test every attribute
         assertEquals(defaultLobby.getName(), newLobby.getName());
@@ -92,7 +92,7 @@ class LobbyDTOTest {
      */
     @Test
     void joinUserLobbyTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
 
         lobby.joinUser(users.get(0));
         assertEquals(2, lobby.getUserOrDummies().size());
@@ -116,7 +116,7 @@ class LobbyDTOTest {
      */
     @Test
     void leaveUserLobbyTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         users.forEach(lobby::joinUser);
 
         assertEquals(users.size() + 1, lobby.getUserOrDummies().size());
@@ -137,7 +137,7 @@ class LobbyDTOTest {
      */
     @Test
     void removeOwnerFromLobbyTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         users.forEach(lobby::joinUser);
 
         lobby.leaveUser(defaultUser);
@@ -158,7 +158,7 @@ class LobbyDTOTest {
      */
     @Test
     void updateCommandsAllowedTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         assertTrue(lobby.commandsAllowed());
 
         lobby.setCommandsAllowed(false);
@@ -177,7 +177,7 @@ class LobbyDTOTest {
      */
     @Test
     void updateMaxPlayersTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         assertEquals(3, lobby.getMaxPlayers());
 
         lobby.setMaxPlayers(4);
@@ -197,7 +197,7 @@ class LobbyDTOTest {
      */
     @Test
     void updateMoveTimeTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         assertEquals(60, lobby.getMoveTime());
 
         lobby.setMoveTime(42);
@@ -216,7 +216,7 @@ class LobbyDTOTest {
      */
     @Test
     void updateOwnerTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         users.forEach(lobby::joinUser);
 
         lobby.updateOwner(users.get(6));
@@ -237,10 +237,10 @@ class LobbyDTOTest {
      */
     @Test
     void updateRandomPlayfieldEnabledTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         assertFalse(lobby.randomPlayfieldEnabled());
 
-        lobby.setRandomPlayfieldEnabled(true);
+        lobby.setRandomPlayFieldEnabled(true);
 
         assertTrue(lobby.randomPlayfieldEnabled());
     }
@@ -257,7 +257,7 @@ class LobbyDTOTest {
      */
     @Test
     void updateStartUpPhaseEnabledTest() {
-        Lobby lobby = LobbyDTO.create(defaultLobby);
+        ILobby lobby = LobbyDTO.create(defaultLobby);
         assertFalse(lobby.startUpPhaseEnabled());
 
         lobby.setStartUpPhaseEnabled(true);

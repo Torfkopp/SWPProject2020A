@@ -1,9 +1,9 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
-import de.uol.swp.server.lobby.Lobby;
+import de.uol.swp.server.lobby.ILobby;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public interface IGameManagement {
      * only one game per lobby is possible
      * @since 2021-01-24
      */
-    void createGame(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap,
+    void createGame(ILobby lobby, UserOrDummy first, IGameMapManagement gameMap,
                     int moveTime) throws IllegalArgumentException;
 
     /**

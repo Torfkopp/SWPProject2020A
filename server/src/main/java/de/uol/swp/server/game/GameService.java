@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
@@ -28,6 +27,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
@@ -40,8 +40,8 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.game.map.IGameMapManagement;
+import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
-import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -239,7 +239,6 @@ public class GameService extends AbstractService {
                 offeringInventory.increase(resource.getType(), resource.getAmount());
                 respondingInventory.decrease(resource.getType(), resource.getAmount());
             }
-            //changes the inventories according to the offer
 
             ServerMessage returnSystemMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
                                                                                  req.getOfferingUser(),
@@ -319,12 +318,11 @@ public class GameService extends AbstractService {
                 if (gameMap.getIntersection(mapPoint).getState() == IIntersection.IntersectionState.CITY) {
                     sendFailResponse.accept(ALREADY_BUILT_HERE);
                 } else if (gameMap.settlementPlaceable(player, mapPoint)) {
-                    if (inv.get(BRICK) >= 1 && inv.get(ResourceType.LUMBER) >= 1 && inv.get(WOOL) >= 1 && inv.get(
-                            ResourceType.GRAIN) >= 1) {
+                    if (inv.get(BRICK) >= 1 && inv.get(LUMBER) >= 1 && inv.get(WOOL) >= 1 && inv.get(GRAIN) >= 1) {
                         inv.increase(BRICK, -1);
-                        inv.increase(ResourceType.LUMBER, -1);
+                        inv.increase(LUMBER, -1);
                         inv.increase(WOOL, -1);
-                        inv.increase(ResourceType.GRAIN, -1);
+                        inv.increase(GRAIN, -1);
                         try {
                             gameMap.placeSettlement(player, mapPoint);
                         } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
@@ -380,9 +378,9 @@ public class GameService extends AbstractService {
                         }
                     } else sendFailResponse.accept(NOT_THE_RIGHT_TIME);
                 } else if (gameMap.settlementUpgradeable(player, mapPoint)) {
-                    if (inv.get(ORE) >= 3 && inv.get(ResourceType.GRAIN) >= 2) {
+                    if (inv.get(ORE) >= 3 && inv.get(GRAIN) >= 2) {
                         inv.increase(ORE, -3);
-                        inv.increase(ResourceType.GRAIN, -2);
+                        inv.increase(GRAIN, -2);
                         gameMap.upgradeSettlement(player, mapPoint);
                         sendSuccess.accept(req.getOriginLobby(),
                                            new BuildingSuccessfulMessage(req.getOriginLobby(), user, mapPoint, CITY));
@@ -551,7 +549,6 @@ public class GameService extends AbstractService {
             int randomNbr = (int) (Math.random() * users.size());
             UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
-            // TODO: handle founder phase
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
             Game game = gameManagement.getGame(lobbyName);
             if (game.getFirst() instanceof Dummy) {
@@ -639,7 +636,7 @@ public class GameService extends AbstractService {
         game.setBuildingAllowed(false);
         UserOrDummy nextPlayer;
         UserOrDummy user;
-        Optional<Lobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
+        Optional<ILobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
         if (optionalLobby.isEmpty()) return;
         if (optionalLobby.get().isStartUpPhaseEnabled()) {
             if (currentPhase.equals(Game.StartUpPhase.PHASE_1)) {
@@ -1066,8 +1063,8 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onPlayYearOfPlentyCardRequest(PlayYearOfPlentyCardRequest req) {
         LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby {}", req.getOriginLobby());
-        LOG.debug("---- User {} wants {} and {}", req.getUser().getUsername(), req.getResource1().name(),
-                  req.getResource2().name());
+        LOG.debug("---- User {} wants {} and {}", req.getUser().getUsername(), req.getFirstResource().name(),
+                  req.getSecondResource().name());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
@@ -1083,8 +1080,8 @@ public class GameService extends AbstractService {
             return;
         }
 
-        inv.increase(req.getResource1());
-        inv.increase(req.getResource2());
+        inv.increase(req.getFirstResource());
+        inv.increase(req.getSecondResource());
 
         inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
 
@@ -1236,7 +1233,7 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getLobby());
         game.removeTaxPayer(req.getPlayer());
         if (game.getTaxPayers().isEmpty()) lobbyService
-                .sendToAllInLobby(req.getLobby(), new RobberAllTaxPayedMessage(req.getLobby(), game.getActivePlayer()));
+                .sendToAllInLobby(req.getLobby(), new RobberAllTaxPaidMessage(req.getLobby(), game.getActivePlayer()));
         endTurnDummy(game);
     }
 
@@ -1455,12 +1452,12 @@ public class GameService extends AbstractService {
      */
     @Subscribe
     private void onTransferLobbyStateEvent(TransferLobbyStateEvent event) {
-        Lobby lobby = event.getLobby();
+        ILobby lobby = event.getLobby();
         Game game = gameManagement.getGame(lobby.getName());
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
-            ResponseMessage returnMessage = new StartSessionResponse(Lobby.getSimpleLobby(lobby),
+            ResponseMessage returnMessage = new StartSessionResponse(ILobby.getSimpleLobby(lobby),
                                                                      game.getActivePlayer(),
                                                                      game.getMap().getGameMapDTO(playerUserOrDummyMap),
                                                                      game.getDices(), game.isDiceRolledAlready(),
@@ -1580,8 +1577,8 @@ public class GameService extends AbstractService {
             return;
         }
         if (victimInventory.get(BRICK) > 0) victimsResource.add(BRICK);
-        if (victimInventory.get(ResourceType.GRAIN) > 0) victimsResource.add(ResourceType.GRAIN);
-        if (victimInventory.get(ResourceType.LUMBER) > 0) victimsResource.add(ResourceType.LUMBER);
+        if (victimInventory.get(GRAIN) > 0) victimsResource.add(GRAIN);
+        if (victimInventory.get(LUMBER) > 0) victimsResource.add(LUMBER);
         if (victimInventory.get(ORE) > 0) victimsResource.add(ORE);
         if (victimInventory.get(WOOL) > 0) victimsResource.add(WOOL);
         ResourceType stolenResource = victimsResource.get((int) (Math.random() * victimsResource.size()));
@@ -1667,9 +1664,9 @@ public class GameService extends AbstractService {
                                                               LobbyName lobbyName) {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
         if (inventory == null) return false;
-        if (inventory.get(ORE) >= 1 && inventory.get(ResourceType.GRAIN) >= 1 && inventory.get(WOOL) >= 1) {
+        if (inventory.get(ORE) >= 1 && inventory.get(GRAIN) >= 1 && inventory.get(WOOL) >= 1) {
             inventory.decrease(ORE);
-            inventory.decrease(ResourceType.GRAIN);
+            inventory.decrease(GRAIN);
             inventory.decrease(WOOL);
             inventory.increase(developmentCard);
             ResponseMessage serverMessage = new SystemMessageForTradeWithBankResponse(lobbyName, developmentCard);

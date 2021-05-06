@@ -1,7 +1,7 @@
 package de.uol.swp.server.chat;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 import java.util.List;

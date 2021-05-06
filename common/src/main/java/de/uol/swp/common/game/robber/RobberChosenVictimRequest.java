@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.robber;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;

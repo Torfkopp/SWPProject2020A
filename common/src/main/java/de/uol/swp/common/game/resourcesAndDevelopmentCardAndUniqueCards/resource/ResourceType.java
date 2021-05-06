@@ -4,6 +4,11 @@ import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.ResourceBundle;
 
+/**
+ * The enum for the type of a resource.
+ *
+ * @author Temmo Junkhoff
+ */
 public enum ResourceType implements Serializable {
 
     LUMBER("game.resources.lumber"),
@@ -15,21 +20,35 @@ public enum ResourceType implements Serializable {
     @Inject
     private static ResourceBundle resourceBundle;
 
-    private final String attributeName;
+    private final String InternationalizationPropertyName;
 
-    ResourceType(String attributeName) {
-        this.attributeName = attributeName;
+    /**
+     * Constructor.
+     *
+     * @param InternationalizationPropertyName The internationalization property name
+     *
+     * @author Temmo Junkhoff
+     */
+    ResourceType(String InternationalizationPropertyName) {
+        this.InternationalizationPropertyName = InternationalizationPropertyName;
     }
 
     @Override
     public String toString() {
         try {
-            return resourceBundle.getString(getAttributeName());
+            return resourceBundle.getString(getInternationalizationPropertyName());
         } catch (NullPointerException ignored) {}
         return "Something went wrong";
     }
 
-    public String getAttributeName() {
-        return attributeName;
+    /**
+     * Gets the internationalization property name.
+     *
+     * @return The internationalization property name
+     *
+     * @author Temmo Junkhoff
+     */
+    public String getInternationalizationPropertyName() {
+        return InternationalizationPropertyName;
     }
 }

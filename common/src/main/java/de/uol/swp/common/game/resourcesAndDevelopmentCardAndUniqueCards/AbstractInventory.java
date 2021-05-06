@@ -2,13 +2,14 @@ package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
 import java.io.Serializable;
 
 /**
- * The type Abstract inventory.
+ * An abstract class for all inventories.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
@@ -16,13 +17,13 @@ import java.io.Serializable;
 public abstract class AbstractInventory implements Serializable {
 
     protected ResourceList resources;
-    protected DevelopmentCardList developmentCards;
+    protected IDevelopmentCardList developmentCards;
 
     /**
-     * Decrease the resource.
+     * Decrease a resource by the given amount.
      *
      * @param resource The resource
-     * @param i        The
+     * @param i        The amount to decrease the resource in the inventory by
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
@@ -32,10 +33,10 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Decrease the development card.
+     * Decrease the amount of the development card.
      *
      * @param developmentCard The development card
-     * @param i               The
+     * @param i               The amount to decrease the DevelopmentCard in the inventory by
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
@@ -45,7 +46,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Decrease the resource.
+     * Decrease the amount of the resource.
      *
      * @param resource The resource
      *
@@ -57,7 +58,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Decrease the development card.
+     * Decrease the amount the development card.
      *
      * @param developmentCard The development card
      *
@@ -69,7 +70,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Gets the amount of a resource the bank has in the inventory
+     * Gets the amount of a resource that is in the inventory
      *
      * @return The amount of the resource
      *
@@ -80,7 +81,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Gets the amount of Knight Cards a bank has in the inventory
+     * Gets the amount of Knight Cards that are in the inventory
      *
      * @return The amount of Knight Cards
      *
@@ -91,7 +92,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Gets the development cards.
+     * Gets the development cards in the inventory.
      *
      * @return The development cards
      *
@@ -103,7 +104,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Gets the resources.
+     * Gets the resources in the inventory
      *
      * @return The resources
      *
@@ -115,10 +116,10 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Increase the resource.
+     * Increase the amount of the resource.
      *
      * @param resource The resource
-     * @param i        The
+     * @param i        The amount to increase the resource in the inventory by
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
@@ -128,7 +129,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Increase the development card.
+     * Increase the amount of the development card.
      *
      * @param developmentCard The development card
      * @param i               The
@@ -141,7 +142,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Increase the resource.
+     * Increase the amount of the resource.
      *
      * @param resource The resource
      *
@@ -153,7 +154,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Increase the development card.
+     * Increase the amount of the development card.
      *
      * @param developmentCard The development card
      *

@@ -1,7 +1,7 @@
 package de.uol.swp.common.chat.message;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Message sent by the server when a ChatMessage got edited successfully

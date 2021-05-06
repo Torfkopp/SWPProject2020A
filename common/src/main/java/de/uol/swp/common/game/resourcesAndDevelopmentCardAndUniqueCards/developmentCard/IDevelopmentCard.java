@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The interface Development card.
+ * An Interface to model a development card.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
@@ -40,7 +40,7 @@ public interface IDevelopmentCard extends Serializable {
     void decrease(int amount);
 
     /**
-     * Decrease the amount.
+     * Decrease the amount by 1.
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
@@ -88,7 +88,7 @@ public interface IDevelopmentCard extends Serializable {
     void increase(int amount);
 
     /**
-     * Increase the amount.
+     * Increase the amount by 1.
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23

@@ -5,12 +5,12 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -19,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the TradingWithBank window
@@ -29,7 +28,7 @@ import java.util.Map;
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2021-02-19
  */
-@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
+@SuppressWarnings("UnstableApiUsage")
 public class TradeWithBankPresenter extends AbstractTradePresenter {
 
     public static final String fxml = "/fxml/TradeWithBankView.fxml";
@@ -45,7 +44,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private TableView<IResource> ownResourcesToTradeWith;
     @FXML
     private TableView<IResource> bankResourcesView;
-    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     private TableColumn<IResource, Integer> tradeResourceAmountCol;
     @FXML
@@ -91,12 +89,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
             prepareTradingRatio = 3;
         }
         for (ResourceType resourceType : ResourceType.values()) {
-            tradingRatio.set(resourceType, prepareTradingRatio);
-        }
-        for (ResourceType resourceType : ResourceType.values()) {
-            if (harborMap.contains(resourceType)) {
-                tradingRatio.set(resourceType, 2);
-            }
+            tradingRatio.set(resourceType,
+                             harborMap.contains(IHarborHex.getHarborResource(resourceType)) ? 2 : prepareTradingRatio);
         }
         return tradingRatio;
     }
@@ -188,16 +182,11 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private void onInventoryForTradeResponse(InventoryForTradeResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
-        ResourceList resourceList = rsp.getResourceMap();
+        ResourceList resourceList = rsp.getResourceList();
         ResourceList tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
         setInventories(resourceList, tradingRatios);
-        boolean hasGrain = false, hasOre = false, hasWool = false;
-        for (Map<String, Object> item : IResourceList.getTableViewFormat(resourceList)) {
-            if (ResourceType.GRAIN.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasGrain = true;
-            if (ResourceType.ORE.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasOre = true;
-            if (ResourceType.WOOL.equals(item.get("enumType")) && (int) item.get("amount") > 0) hasWool = true;
-        }
-        buyDevelopmentButton.setDisable(!hasGrain || !hasOre || !hasWool);
+        buyDevelopmentButton.setDisable(resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
+                ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0);
     }
 
     /**

@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import java.util.Map;
  * @author Mario Fokken
  * @see de.uol.swp.common.message.AbstractResponseMessage
  * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
+ * @see de.uol.swp.common.lobby.ISimpleLobby
  * @since 2020-12-12
  */
 public class AllLobbiesResponse extends AbstractResponseMessage {
@@ -41,7 +42,7 @@ public class AllLobbiesResponse extends AbstractResponseMessage {
     /**
      * Getter for the list of existing Lobby objects
      *
-     * @return List of existing lobbyDTOs
+     * @return List of existing lobbies
      *
      * @author Marvin Drees
      * @since 2020-12-16

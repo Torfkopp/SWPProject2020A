@@ -3,7 +3,7 @@ package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.develop
 import java.util.*;
 
 /**
- * The type Development card list.
+ * The class for a list of development cards.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
@@ -27,6 +27,8 @@ public class DevelopmentCardList implements IDevelopmentCardList {
 
     /**
      * Constructor for Development card list.
+     * This is constructor is wrapped in a static method for outside access.
+     * It is also needed internally to clone the class and create the iterator.
      *
      * @param list The list
      *
@@ -91,15 +93,7 @@ public class DevelopmentCardList implements IDevelopmentCardList {
         }
     }
 
-    /**
-     * Set the amount for the specified development card type.
-     *
-     * @param developmentCardType The development card type
-     * @param amount              The amount
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-04-23
-     */
+    @Override
     public void set(DevelopmentCardType developmentCardType, int amount) {
         for (DevelopmentCard developmentCard : list) {
             if (Objects.equals(developmentCardType, developmentCard.getType())) developmentCard.setAmount(amount);

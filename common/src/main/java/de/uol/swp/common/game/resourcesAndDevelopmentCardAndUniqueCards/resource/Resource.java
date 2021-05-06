@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource;
 
 /**
- * The type Mutable resource.
+ * A class to store a resource.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23

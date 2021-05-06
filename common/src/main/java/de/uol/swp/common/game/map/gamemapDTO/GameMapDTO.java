@@ -16,7 +16,7 @@ public class GameMapDTO implements IGameMap, Serializable {
     private final IntersectionWithEdges[][] intersections;
 
     /**
-     * Instantiates a new Game map dto.
+     * Constructor.
      *
      * @param hexes         The hexes
      * @param intersections The intersections

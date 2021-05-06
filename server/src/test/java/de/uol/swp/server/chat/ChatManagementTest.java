@@ -1,10 +1,10 @@
 package de.uol.swp.server.chat;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
-import de.uol.swp.server.chat.store.ChatMessageStore;
+import de.uol.swp.server.chat.store.IChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @see de.uol.swp.server.chat.IChatManagement
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage
- * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see de.uol.swp.server.chat.store.IChatMessageStore
  * @since 2020-12-19
  */
 class ChatManagementTest {
@@ -35,7 +35,7 @@ class ChatManagementTest {
     private static final LobbyName defaultLobbyName = new LobbyName("I might be a lobby, or I might not be");
     private static final LobbyName secondLobbyName = new LobbyName("I don't think I'm a lobby");
     private static ChatManagement chatManagement;
-    private static ChatMessageStore chatMessageStore;
+    private static IChatMessageStore chatMessageStore;
 
     /**
      * Helper method run before each test case

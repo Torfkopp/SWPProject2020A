@@ -1,6 +1,6 @@
 package de.uol.swp.common.chat.request;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Request sent by the client to ask for the latest messages

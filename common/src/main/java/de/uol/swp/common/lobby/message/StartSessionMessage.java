@@ -1,7 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**

@@ -15,7 +15,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * @author Mario Fokken
  * @since 2021-04-16
  */
-@SuppressWarnings("rawtypes")
 public class AbstractTradePresenter extends AbstractPresenter {
 
     @Inject
@@ -23,7 +22,6 @@ public class AbstractTradePresenter extends AbstractPresenter {
 
     @FXML
     protected TableView<IResource> ownResourceTableView;
-    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
     @FXML
     protected TableColumn<IResource, Integer> resourceAmountCol;
     @FXML

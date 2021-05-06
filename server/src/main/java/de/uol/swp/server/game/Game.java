@@ -16,7 +16,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCa
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
-import de.uol.swp.server.lobby.Lobby;
+import de.uol.swp.server.lobby.ILobby;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ import java.util.*;
 public class Game {
 
     private static final int[] dices = new int[2];
-    private final Lobby lobby;
+    private final ILobby lobby;
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
@@ -62,7 +62,7 @@ public class Game {
      * @param first   The first player
      * @param gameMap The IGameMap the game will be using
      */
-    public Game(Lobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
+    public Game(ILobby lobby, UserOrDummy first, IGameMapManagement gameMap) {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
@@ -279,7 +279,7 @@ public class Game {
      *
      * @return The Lobby this game is taking place in
      */
-    public Lobby getLobby() {
+    public ILobby getLobby() {
         return lobby;
     }
 

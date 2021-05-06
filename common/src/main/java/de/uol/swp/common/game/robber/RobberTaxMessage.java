@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.robber;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.AbstractGameMessage;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 

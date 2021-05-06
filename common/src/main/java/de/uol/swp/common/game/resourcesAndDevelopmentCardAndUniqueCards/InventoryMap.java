@@ -126,7 +126,7 @@ public class InventoryMap implements Serializable {
     }
 
     /**
-     * The type User player inventory mapping.
+     * A class to store a mapping of an user, a player and an inventory.
      *
      * @author Temmo Junkhoff
      * @since 2021-05-04
@@ -138,7 +138,7 @@ public class InventoryMap implements Serializable {
         private final Inventory inventory;
 
         /**
-         * Constructor for User player inventory mapping.
+         * Constructor.
          *
          * @param user      The user
          * @param player    The player

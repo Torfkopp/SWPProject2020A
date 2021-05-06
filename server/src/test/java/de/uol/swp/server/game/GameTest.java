@@ -1,13 +1,13 @@
 package de.uol.swp.server.game;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
-import de.uol.swp.server.lobby.Lobby;
+import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.LobbyDTO;
 import de.uol.swp.server.lobby.LobbyManagement;
 import org.junit.jupiter.api.AfterEach;
@@ -35,7 +35,7 @@ public class GameTest {
     static final User user2 = new UserDTO(69, "Johnny", "NailsGoSpin", "JohnnyJoestar@jojo.us");
     static final User user3 = new UserDTO(99, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
     static final User user4 = new UserDTO(179, "Joseph", "SunOfABitch", "JosephJoestar@jojo.uk");
-    static final Lobby lobby = new LobbyDTO(new LobbyName("Read the Manga"), user, "");
+    static final ILobby lobby = new LobbyDTO(new LobbyName("Read the Manga"), user, "");
     static final LobbyName defaultLobbyName = new LobbyName("Read the Manga");
     static IGameMapManagement gameMap;
     static Game game;
@@ -58,36 +58,6 @@ public class GameTest {
         lobby.leaveUser(user2);
         lobby.leaveUser(user3);
         lobby.leaveUser(user4);
-    }
-
-    @Test
-    void gameManagementTest() {
-        IGameManagement gm = new GameManagement(new LobbyManagement());
-        User user = new UserDTO(99, "", "", "");
-        Lobby lobby = new LobbyDTO(defaultLobbyName, user);
-        IGameMapManagement gameMap = new GameMapManagement();
-        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        gm.createGame(lobby, user, gameMap, 120);
-        assertNotNull(gm.getGame(defaultLobbyName));
-        Map<LobbyName, Game> map = gm.getGames();
-        assertEquals(1, map.size());
-        gm.dropGame(defaultLobbyName);
-        map = gm.getGames();
-        assertTrue(map.isEmpty());
-    }
-
-    @Test
-    void gameTest() {
-        IGameMapManagement gameMap = new GameMapManagement();
-        gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
-        List<UserOrDummy> list = Arrays.asList(user, user2, user3, user4);
-        UserOrDummy[] u = game.getPlayers();
-        //order is random, so just check that everyone is somewhere in the list of users in the Game
-        assertTrue(list.contains(u[0]));
-        assertTrue(list.contains(u[1]));
-        assertTrue(list.contains(u[2]));
-        assertTrue(list.contains(u[3]));
-        assertEquals(lobby, game.getLobby());
     }
 
     /**
@@ -154,6 +124,36 @@ public class GameTest {
         assertEquals(1, game.getInventory(Player.PLAYER_2).get(WOOL));
         assertEquals(1, game.getInventory(Player.PLAYER_4).get(GRAIN));
         assertEquals(2, game.getInventory(Player.PLAYER_2).get(GRAIN));
+    }
+
+    @Test
+    void gameManagementTest() {
+        IGameManagement gm = new GameManagement(new LobbyManagement());
+        User user = new UserDTO(99, "", "", "");
+        ILobby lobby = new LobbyDTO(defaultLobbyName, user);
+        IGameMapManagement gameMap = new GameMapManagement();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gm.createGame(lobby, user, gameMap, 120);
+        assertNotNull(gm.getGame(defaultLobbyName));
+        Map<LobbyName, Game> map = gm.getGames();
+        assertEquals(1, map.size());
+        gm.dropGame(defaultLobbyName);
+        map = gm.getGames();
+        assertTrue(map.isEmpty());
+    }
+
+    @Test
+    void gameTest() {
+        IGameMapManagement gameMap = new GameMapManagement();
+        gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        List<UserOrDummy> list = Arrays.asList(user, user2, user3, user4);
+        UserOrDummy[] u = game.getPlayers();
+        //order is random, so just check that everyone is somewhere in the list of users in the Game
+        assertTrue(list.contains(u[0]));
+        assertTrue(list.contains(u[1]));
+        assertTrue(list.contains(u[2]));
+        assertTrue(list.contains(u[3]));
+        assertEquals(lobby, game.getLobby());
     }
 
     @Test

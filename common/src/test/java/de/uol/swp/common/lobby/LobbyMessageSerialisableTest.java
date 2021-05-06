@@ -1,6 +1,5 @@
 package de.uol.swp.common.lobby;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.SerialisationTestHelper;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;

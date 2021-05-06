@@ -35,6 +35,7 @@ public interface IConfiguration extends Serializable {
      * @return Unmodifiable, ordered List of Hex resource types
      *
      * @implSpec Create new LinkedList objects from this due to it being unmodifiable and ordered
+     * @see de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType
      */
     List<ResourceType> getHexList();
 

@@ -1,7 +1,6 @@
 package de.uol.swp.server.game;
 
 import com.google.common.eventbus.EventBus;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
@@ -18,6 +17,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.robber.RobberChosenVictimRequest;
 import de.uol.swp.common.game.robber.RobberNewPositionChosenRequest;
 import de.uol.swp.common.game.robber.RobberTaxChosenRequest;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.*;
@@ -99,7 +99,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -158,7 +158,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -209,7 +209,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -275,7 +275,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
         lobbyManagement.createLobby(defaultLobby, user[0], "");
-        Optional<Lobby> lobby = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
@@ -283,7 +283,7 @@ public class GameServiceTest {
         Message kickUser = new KickUserRequest(defaultLobby, user[0], user[0]);
         bus.post(kickUser);
 
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby2.isPresent());
         assertEquals(3, lobby2.get().getUserOrDummies().size());
     }
@@ -306,7 +306,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
         lobbyManagement.createLobby(defaultLobby, user[0], "");
-        Optional<Lobby> lobby = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
@@ -314,7 +314,7 @@ public class GameServiceTest {
         Message kickUser = new KickUserRequest(defaultLobby, user[0], user[1]);
         bus.post(kickUser);
 
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby2.isPresent());
         assertEquals(2, lobby2.get().getUserOrDummies().size());
     }
@@ -334,7 +334,7 @@ public class GameServiceTest {
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         lobbyManagement.createLobby(defaultLobby, user[0], "");
-        Optional<Lobby> lobby = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
@@ -345,7 +345,7 @@ public class GameServiceTest {
         Message kickUser = new KickUserRequest(defaultLobby, user[0], user[1]);
         bus.post(kickUser);
 
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby2.isPresent());
         assertEquals(3, lobby2.get().getUserOrDummies().size());
     }
@@ -366,7 +366,7 @@ public class GameServiceTest {
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
         lobbyManagement.createLobby(defaultLobby, user[0], "");
-        Optional<Lobby> lobby = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby.isPresent());
         lobby.get().joinUser(user[1]);
         lobby.get().joinUser(user[2]);
@@ -374,7 +374,7 @@ public class GameServiceTest {
         Message kickUser = new KickUserRequest(defaultLobby, user[1], user[2]);
         bus.post(kickUser);
 
-        Optional<Lobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
+        Optional<ILobby> lobby2 = lobbyManagement.getLobby(defaultLobby);
         assertTrue(lobby2.isPresent());
         assertEquals(3, lobby2.get().getUserOrDummies().size());
     }
@@ -385,7 +385,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -404,7 +404,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -428,7 +428,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -455,7 +455,7 @@ public class GameServiceTest {
         user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
         user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
         UserOrDummy dummy = new DummyDTO();
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         lobby.joinUser(dummy);
@@ -510,7 +510,7 @@ public class GameServiceTest {
         user[0] = new UserDTO(0, "Chuck", "Norris", "chuck@norris.com");
         user[1] = new UserDTO(1, "Duck", "Morris", "duck@morris.com");
         user[2] = new UserDTO(2, "Sylvester", "Stallone", "Sly@stall.com");
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -568,7 +568,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();
@@ -640,7 +640,7 @@ public class GameServiceTest {
         loginUser(user[1]);
         loginUser(user[2]);
 
-        Lobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
         lobby.joinUser(user[1]);
         lobby.joinUser(user[2]);
         IGameMapManagement gameMap = new GameMapManagement();

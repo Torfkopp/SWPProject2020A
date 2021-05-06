@@ -1,7 +1,7 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 import java.util.Map;
@@ -48,7 +48,7 @@ public interface ILobbyManagement {
      *
      * @since 2020-12-12
      */
-    Map<LobbyName, Lobby> getLobbies();
+    Map<LobbyName, ILobby> getLobbies();
 
     /**
      * Searches for the lobby with the requested name
@@ -60,7 +60,7 @@ public interface ILobbyManagement {
      * @see java.util.Optional
      * @since 2019-10-08
      */
-    Optional<Lobby> getLobby(LobbyName name);
+    Optional<ILobby> getLobby(LobbyName name);
 
     /**
      * Searches for the lobby with the requested name and password
@@ -74,7 +74,7 @@ public interface ILobbyManagement {
      * @see java.util.Optional
      * @since 2021-04-22
      */
-    Optional<Lobby> getLobby(LobbyName name, String password);
+    Optional<ILobby> getLobby(LobbyName name, String password);
 
     /**
      * Gets the map with simple lobbies
@@ -84,17 +84,6 @@ public interface ILobbyManagement {
      * @since 2020-12-12
      */
     Map<LobbyName, ISimpleLobby> getSimpleLobbies();
-
-    /**
-     * Sets the hasPassword attribute of a lobby according to the boolean provided
-     *
-     * @param lobbyName
-     * @param hasPassword
-     *
-     * @author Alwin Bossert
-     * @since 2021-04-20
-     */
-    void setHasPassword(LobbyName lobbyName, boolean hasPassword);
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided

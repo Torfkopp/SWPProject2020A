@@ -1,8 +1,8 @@
 package de.uol.swp.server.chat.store;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Phillip-André Suhr
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage
- * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see IChatMessageStore
  * @since 2020-12-19
  */
 class MainMemoryBasedChatMessageStoreTest {
@@ -34,7 +34,7 @@ class MainMemoryBasedChatMessageStoreTest {
     private static final String thirdContent = "I am the most intelligent content";
     private static final LobbyName defaultLobbyName = new LobbyName("Am I a lobby?");
     private static final ChatMessage msgNotInStore = new ChatMessageDTO(42, defaultUser, defaultContent);
-    private ChatMessageStore store;
+    private IChatMessageStore store;
 
     /**
      * Helper method run before each test case

@@ -26,7 +26,7 @@ public enum DevelopmentCardType implements Serializable {
     /**
      * Constructor for Development card type.
      *
-     * @param attribute The attribute
+     * @param attribute The L10n property name
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23

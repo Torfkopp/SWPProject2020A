@@ -5,7 +5,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import java.io.Serializable;
 
 /**
- * The interface Mutable unique card.
+ * An interface to model a unique card.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
@@ -33,7 +33,7 @@ public interface IUniqueCard extends Serializable {
     void setAmount(int amount);
 
     /**
-     * Gets owner.
+     * Gets owner of this Unique Card.
      *
      * @return the owner
      *
@@ -43,7 +43,7 @@ public interface IUniqueCard extends Serializable {
     UserOrDummy getOwner();
 
     /**
-     * Sets owner.
+     * Sets owner of this Unique Card.
      *
      * @param owner the owner
      *

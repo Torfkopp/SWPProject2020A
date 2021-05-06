@@ -75,14 +75,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     @Named("styleSheet")
     private static String styleSheet;
-
-    protected Timer moveTimeTimer;
-
+    @Inject
+    protected IGameService gameService;
     @FXML
     protected Button endTurn;
     @FXML
     protected Canvas gameMapCanvas;
-
     @FXML
     protected TableView<IDevelopmentCard> developmentCardTableView;
     @FXML
@@ -119,10 +117,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Menu infoMenu;
     @FXML
     protected Menu currentRound = new Menu();
-
-    @Inject
-    protected IGameService gameService;
-
+    @FXML
+    protected CheckMenuItem helpCheckBox;
     protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
@@ -146,10 +142,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Window window;
     protected UserOrDummy winner = null;
     protected boolean helpActivated = false;
-    @FXML
-    protected CheckMenuItem helpCheckBox;
+    protected Timer moveTimeTimer;
     protected int roundCounter = 0;
-    private boolean diceRolled = false;
+    @Inject
+    private ITradeService tradeService;
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
     @FXML
@@ -158,10 +154,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private TableColumn<IResource, Integer> resourceAmountCol;
     @FXML
     private TableColumn<IResource, ResourceType> resourceNameCol;
-
-    @Inject
-    private ITradeService tradeService;
-
+    private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
 
     @Override
@@ -891,7 +884,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-04-23
      */
     @Subscribe
-    private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
+    private void onRobberAllTaxPayedMessage(RobberAllTaxPaidMessage msg) {
         if (msg.getLobbyName().equals(lobbyName)) {
             resetButtonStates(msg.getUser());
             if (helpActivated) setHelpText();

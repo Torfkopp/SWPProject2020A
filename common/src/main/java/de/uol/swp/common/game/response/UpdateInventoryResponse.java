@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -25,12 +25,8 @@ public class UpdateInventoryResponse extends AbstractLobbyResponse {
      *
      * @param user                The user wanting to update the inventory
      * @param lobbyName           The lobby for which the update is supposed to happen in
-     * @param developmentCardList List of the Resources in the user's inventory, containing Maps
-     *                            containing the following for each type of Resource:<p>
-     *                            {@literal {"amount": <Integer>, "resource", <Resource>}}
-     * @param resourceList        List of the Development Cards in the user's inventory, containing
-     *                            Maps containing the following for each type of Development Card:<p>
-     *                            {@literal {"amount": <Integer>, "card": "game.resources.cards.<Dev Card key>"}}
+     * @param developmentCardList List of the Development Cards in the user's inventory
+     * @param resourceList        List of the Resources in the user's inventory
      *
      * @author Phillip-André Suhr
      * @since 2021-04-17

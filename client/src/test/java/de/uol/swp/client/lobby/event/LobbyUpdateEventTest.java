@@ -1,7 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;

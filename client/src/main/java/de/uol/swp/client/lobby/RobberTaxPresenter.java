@@ -6,9 +6,11 @@ import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.Resource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +18,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
 /**
  * Manages the RobberTax window
@@ -69,7 +73,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void brickSliderListener() {
-        selectedResources.set(ResourceType.BRICK, (int) brickSlider.getValue());
+        selectedResources.set(BRICK, (int) brickSlider.getValue());
         dragMethod();
     }
 
@@ -94,7 +98,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void grainSliderListener() {
-        selectedResources.set(ResourceType.GRAIN, (int) grainSlider.getValue());
+        selectedResources.set(GRAIN, (int) grainSlider.getValue());
         dragMethod();
     }
 
@@ -126,7 +130,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void lumberSliderListener() {
-        selectedResources.set(ResourceType.LUMBER, (int) lumberSlider.getValue());
+        selectedResources.set(LUMBER, (int) lumberSlider.getValue());
         dragMethod();
     }
 
@@ -170,7 +174,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void oreSliderListener() {
-        selectedResources.set(ResourceType.ORE, (int) oreSlider.getValue());
+        selectedResources.set(ORE, (int) oreSlider.getValue());
         dragMethod();
     }
 
@@ -196,11 +200,11 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void setSliders() {
-        brickSlider.setMax(inventory.getAmount(ResourceType.BRICK));
-        grainSlider.setMax(inventory.getAmount(ResourceType.GRAIN));
-        lumberSlider.setMax(inventory.getAmount(ResourceType.LUMBER));
-        oreSlider.setMax(inventory.getAmount(ResourceType.ORE));
-        woolSlider.setMax(inventory.getAmount(ResourceType.WOOL));
+        brickSlider.setMax(inventory.getAmount(BRICK));
+        grainSlider.setMax(inventory.getAmount(GRAIN));
+        lumberSlider.setMax(inventory.getAmount(LUMBER));
+        oreSlider.setMax(inventory.getAmount(ORE));
+        woolSlider.setMax(inventory.getAmount(WOOL));
     }
 
     /**
@@ -208,7 +212,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void woolSliderListener() {
-        selectedResources.set(ResourceType.WOOL, (int) woolSlider.getValue());
+        selectedResources.set(WOOL, (int) woolSlider.getValue());
         dragMethod();
     }
 }

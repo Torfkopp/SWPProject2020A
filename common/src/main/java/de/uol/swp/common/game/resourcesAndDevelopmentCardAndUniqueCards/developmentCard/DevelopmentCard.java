@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard;
 
 /**
- * The type Development card.
+ * A class to store a development card.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23

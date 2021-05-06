@@ -1,6 +1,7 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.LobbyName;
+import com.google.common.base.Strings;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.Dummy;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -18,10 +19,10 @@ import java.util.TreeSet;
  * lobby's game session.
  *
  * @author Marco Grawunder
- * @see Lobby
+ * @see de.uol.swp.server.lobby.ILobby
  * @since 2019-10-08
  */
-public class LobbyDTO implements Lobby {
+public class LobbyDTO implements ILobby {
 
     private final LobbyName name;
     private final Set<UserOrDummy> users = new TreeSet<>();
@@ -34,7 +35,7 @@ public class LobbyDTO implements Lobby {
     private int maxPlayers;
     private int moveTime;
     private boolean startUpPhaseEnabled;
-    private boolean randomPlayfieldEnabled;
+    private boolean randomPlayFieldEnabled;
 
     /**
      * Constructor
@@ -49,14 +50,13 @@ public class LobbyDTO implements Lobby {
         this.name = name;
         this.owner = creator;
         this.password = password;
-        this.hasPassword = password != null;
         this.users.add(creator);
         this.inGame = false;
         this.maxPlayers = 3;
         this.commandsAllowed = true;
         this.moveTime = 60;
         this.startUpPhaseEnabled = false;
-        this.randomPlayfieldEnabled = false;
+        this.randomPlayFieldEnabled = false;
     }
 
     /**
@@ -68,17 +68,7 @@ public class LobbyDTO implements Lobby {
      * @since 2019-10-08
      */
     public LobbyDTO(LobbyName name, User creator) {
-        this.name = name;
-        this.owner = creator;
-        this.password = null;
-        this.hasPassword = false;
-        this.users.add(creator);
-        this.inGame = false;
-        this.maxPlayers = 3;
-        this.commandsAllowed = true;
-        this.moveTime = 60;
-        this.startUpPhaseEnabled = false;
-        this.randomPlayfieldEnabled = false;
+        this(name, creator, null);
     }
 
     /**
@@ -93,25 +83,24 @@ public class LobbyDTO implements Lobby {
      * @param maxPlayers             The max players
      * @param moveTime               The move time
      * @param startUpPhaseEnabled    The start up phase enabled
-     * @param randomPlayfieldEnabled The random playfield enabled
+     * @param randomPlayFieldEnabled The random playfield enabled
      *
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
     private LobbyDTO(LobbyName name, String password, boolean inGame, boolean hasPassword, User owner,
                      boolean commandsAllowed, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
-                     boolean randomPlayfieldEnabled) {
+                     boolean randomPlayFieldEnabled) {
         this.name = name;
         this.password = password;
         this.inGame = inGame;
-        this.hasPassword = password != null;
         this.owner = owner;
         this.users.add(owner);
         this.commandsAllowed = commandsAllowed;
         this.maxPlayers = maxPlayers;
         this.moveTime = moveTime;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
-        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+        this.randomPlayFieldEnabled = randomPlayFieldEnabled;
     }
 
     /**
@@ -123,7 +112,7 @@ public class LobbyDTO implements Lobby {
      *
      * @since 2020-11-29
      */
-    public static Lobby create(Lobby lobby) {
+    public static ILobby create(ILobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getPassword(), lobby.isInGame(), lobby.hasPassword(),
                             lobby.getOwner(), lobby.commandsAllowed(), lobby.getMaxPlayers(), lobby.getMoveTime(),
                             lobby.startUpPhaseEnabled(), lobby.randomPlayfieldEnabled());
@@ -192,7 +181,7 @@ public class LobbyDTO implements Lobby {
 
     @Override
     public boolean hasPassword() {
-        return hasPassword;
+        return !Strings.isNullOrEmpty(password);
     }
 
     @Override
@@ -247,7 +236,7 @@ public class LobbyDTO implements Lobby {
 
     @Override
     public boolean randomPlayfieldEnabled() {
-        return randomPlayfieldEnabled;
+        return randomPlayFieldEnabled;
     }
 
     @Override
@@ -261,8 +250,8 @@ public class LobbyDTO implements Lobby {
     }
 
     @Override
-    public void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled) {
-        this.randomPlayfieldEnabled = randomPlayfieldEnabled;
+    public void setRandomPlayFieldEnabled(boolean randomPlayFieldEnabled) {
+        this.randomPlayFieldEnabled = randomPlayFieldEnabled;
     }
 
     @Override

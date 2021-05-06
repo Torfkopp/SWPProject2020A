@@ -6,11 +6,11 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
@@ -385,7 +385,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                             if (cardAmountsList == null) {
                                 cardAmountsList = new ArrayList<>();
                                 // At the start of the game nobody has any cards, so add 0s for each user
-                                for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(user, 0, 0));
+                                for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
                             }
                             for (CardsAmount cardsAmount : cardAmountsList) {
                                 if (Objects.equals(cardsAmount.getUser(), user)) {

@@ -10,9 +10,9 @@ import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
 import de.uol.swp.common.lobby.response.*;
@@ -299,7 +299,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.LobbyName)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe
@@ -324,7 +324,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.LobbyName)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2021-04-22
      */
     @Subscribe
@@ -427,7 +427,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(LobbyName)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe

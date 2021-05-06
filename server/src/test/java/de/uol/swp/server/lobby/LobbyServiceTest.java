@@ -1,7 +1,7 @@
 package de.uol.swp.server.lobby;
 
 import com.google.common.eventbus.EventBus;
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
@@ -26,9 +26,9 @@ class LobbyServiceTest {
 
     static final LobbyName defaultLobbyName = new LobbyName("Testlobby");
     static final LobbyName defaultLobbyWithPasswordName = new LobbyName("TestLobbyWithPassword");
-    static final Lobby lobbyToTest = new LobbyDTO(defaultLobbyName, user1, null);
-    static final Lobby lobbyToTestWithPassword = new LobbyDTO(defaultLobbyWithPasswordName, user1, "123");
-    static final Lobby lobbyWithSameName = new LobbyDTO(new LobbyName("Testlobby"), user2, "");
+    static final ILobby lobbyToTest = new LobbyDTO(defaultLobbyName, user1, null);
+    static final ILobby lobbyToTestWithPassword = new LobbyDTO(defaultLobbyWithPasswordName, user1, "123");
+    static final ILobby lobbyWithSameName = new LobbyDTO(new LobbyName("Testlobby"), user2, "");
 
     final EventBus bus = new EventBus();
     final SessionManagement sessionManagement = new SessionManagement();
@@ -42,7 +42,7 @@ class LobbyServiceTest {
         // The post will lead to a call of a LobbyService function
         bus.post(request);
 
-        final Optional<Lobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
+        final Optional<ILobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
 
         assertTrue(createdLobby.isPresent());
         assertEquals(lobbyToTest.getName(), createdLobby.get().getName());
@@ -53,7 +53,7 @@ class LobbyServiceTest {
     void createLobbyWithPasswordRequest() {
         final Message request = new CreateLobbyRequest(defaultLobbyWithPasswordName, user1, "123");
         bus.post(request);
-        final Optional<Lobby> createdLobby = lobbyManagement
+        final Optional<ILobby> createdLobby = lobbyManagement
                 .getLobby(lobbyToTestWithPassword.getName(), lobbyToTestWithPassword.getPassword());
         // check if joinable lobby was created
         assertTrue(createdLobby.isPresent());
@@ -69,7 +69,7 @@ class LobbyServiceTest {
         bus.post(request1);
         bus.post(request2);
 
-        final Optional<Lobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
+        final Optional<ILobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
 
         assertTrue(createdLobby.isPresent());
         assertEquals(lobbyToTest.getName(), createdLobby.get().getName());
@@ -99,7 +99,7 @@ class LobbyServiceTest {
         bus.post(request3);
         bus.post(request4);
         bus.post(request5);
-        final Optional<Lobby> createdLobby = lobbyManagement
+        final Optional<ILobby> createdLobby = lobbyManagement
                 .getLobby(lobbyToTestWithPassword.getName(), lobbyToTest.getPassword());
 
         // check if joinable lobby was created
@@ -132,7 +132,7 @@ class LobbyServiceTest {
         bus.post(request3);
         bus.post(request4);
 
-        final Optional<Lobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
+        final Optional<ILobby> createdLobby = lobbyManagement.getLobby(lobbyToTest.getName());
 
         // check if joinable lobby was created
         assertTrue(createdLobby.isPresent());

@@ -1,12 +1,25 @@
-package de.uol.swp.common;
+package de.uol.swp.common.lobby;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A class to store a lobby name.
+ *
+ * @author Temmo Junkhoff
+ */
 public class LobbyName implements Serializable, Comparable<LobbyName> {
 
-    String LobbyName;
+    private final String LobbyName;
 
+    /**
+     * Constructor.
+     *
+     * @param lobbyName The lobby name
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-28
+     */
     public LobbyName(String lobbyName) {
         LobbyName = lobbyName;
     }
@@ -31,6 +44,18 @@ public class LobbyName implements Serializable, Comparable<LobbyName> {
 
     @Override
     public String toString() {
+        return LobbyName;
+    }
+
+    /**
+     * Gets the lobby name.
+     *
+     * @return The lobby name
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-28
+     */
+    public String getLobbyName() {
         return LobbyName;
     }
 }

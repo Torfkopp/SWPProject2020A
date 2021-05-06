@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.robber;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.User;
 
@@ -23,7 +23,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
     /**
      * Constructor
      *
-     * @param resources Map of the resources and its amount
+     * @param resources List of the resources
      * @param player    The player paying the tax
      * @param lobby     The lobby's name
      */
@@ -54,7 +54,7 @@ public class RobberTaxChosenRequest extends AbstractRequestMessage {
     /**
      * Gets the resources
      *
-     * @return Map of a resource and its amount
+     * @return List of resources
      */
     public ResourceList getResources() {
         return resources;

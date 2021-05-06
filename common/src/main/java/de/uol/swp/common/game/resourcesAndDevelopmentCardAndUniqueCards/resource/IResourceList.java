@@ -1,29 +1,21 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Iterator;
 
 /**
- * The interface Mutable resource list map.
+ * An interface for a list of resources.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
  */
 public interface IResourceList extends Iterable<IResource>, Serializable {
 
-    static List<Map<String, Object>> getTableViewFormat(IResourceList resourceList) {
-        List<Map<String, Object>> returnMap = new LinkedList<>();
-        for (IResource resource : resourceList) {
-            returnMap.add(IResource.getTableViewFormat(resource));
-        }
-        return returnMap;
-    }
-
     @Override
     Iterator<IResource> iterator();
 
     /**
-     * Clone a mutable resource list map.
+     * Clone a resource list map.
      *
      * @return the mutable resource list map
      *
@@ -53,6 +45,16 @@ public interface IResourceList extends Iterable<IResource>, Serializable {
      */
     void decrease(ResourceType resource);
 
+    /**
+     * Get a resource.
+     *
+     * @param resource The resource
+     *
+     * @return The resource
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
     IResource get(ResourceType resource);
 
     /**

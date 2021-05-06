@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final ResourceList resourceMap;
+    private final ResourceList resourceList;
     private final List<IHarborHex.HarborResource> harborResourceList;
 
     /**
@@ -27,14 +27,14 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
      *
      * @param user               The user wanting to update the inventory
      * @param lobbyName          The lobby for which the update is supposed to happen in
-     * @param resourceMap        The Map containing the name of a resource as key and the amount as value
-     * @param harborResourceList The List containing all the harbors of the Player
+     * @param resourceList       The resource list
+     * @param harborResourceList The List containing all the types of harbors the Player owns
      */
-    public InventoryForTradeResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceMap,
+    public InventoryForTradeResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
                                      List<IHarborHex.HarborResource> harborResourceList) {
         super(lobbyName);
         this.user = user;
-        this.resourceMap = resourceMap;
+        this.resourceList = resourceList;
         this.harborResourceList = harborResourceList;
     }
 
@@ -52,14 +52,14 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
     }
 
     /**
-     * Gets the resource map, containing mappings of resource name to resource amount.
+     * Gets the resource list.
      * <p>
      * E.g. "Bricks", 1
      *
-     * @return The resource map
+     * @return The resource list
      */
-    public ResourceList getResourceMap() {
-        return resourceMap;
+    public ResourceList getResourceList() {
+        return resourceList;
     }
 
     /**

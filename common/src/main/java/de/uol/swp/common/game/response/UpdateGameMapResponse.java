@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**

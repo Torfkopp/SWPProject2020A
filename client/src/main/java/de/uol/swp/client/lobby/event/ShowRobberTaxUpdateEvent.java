@@ -1,7 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Event used to trigger an update of the RobberTaxPresenter
@@ -44,7 +44,7 @@ public class ShowRobberTaxUpdateEvent {
     /**
      * Gets the lobby's name
      *
-     * @return String lobbyName
+     * @return LobbyName lobbyName
      */
     public LobbyName getLobbyName() {
         return lobbyName;

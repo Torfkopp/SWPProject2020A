@@ -1,6 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -48,7 +48,7 @@ public abstract class AbstractLobbyRequest extends AbstractRequestMessage {
     /**
      * Gets the name variable
      *
-     * @return String containing the lobby's name
+     * @return The lobby's name
      *
      * @since 2019-10-08
      */

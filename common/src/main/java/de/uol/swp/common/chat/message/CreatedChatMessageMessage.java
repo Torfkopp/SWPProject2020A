@@ -1,7 +1,7 @@
 package de.uol.swp.common.chat.message;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Message sent to clients when a new ChatMessage was saved on the server

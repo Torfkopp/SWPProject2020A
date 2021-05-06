@@ -25,7 +25,7 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
     DevelopmentCardList create();
 
     /**
-     * Decrease.
+     * Decrease amount of a DevelopmentCard in the List.
      *
      * @param resource The resource
      *
@@ -59,7 +59,7 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
     int getAmount(DevelopmentCardType resource);
 
     /**
-     * Increase.
+     * Increase amount of a DevelopmentCard in the List.
      *
      * @param resource The resource
      *
@@ -67,4 +67,15 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
      * @since 2021-04-23
      */
     void increase(DevelopmentCardType resource);
+
+    /**
+     * Set the amount for the specified development card type.
+     *
+     * @param developmentCardType The development card type
+     * @param amount              The amount
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-04-23
+     */
+    void set(DevelopmentCardType developmentCardType, int amount);
 }

@@ -5,7 +5,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
@@ -18,6 +17,7 @@ import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
@@ -27,8 +27,8 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
+import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
-import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -103,9 +103,9 @@ public class CommandService extends AbstractService {
         else dummyAmount = 1;
         if (originalMessage.isFromLobby()) {
             LobbyName lobbyName = originalMessage.getOriginLobby();
-            Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
-                Lobby lobby = optLobby.get();
+                ILobby lobby = optLobby.get();
                 int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
@@ -548,7 +548,7 @@ public class CommandService extends AbstractService {
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
-                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(new LobbyName(args.get(i)));
+                    Optional<ILobby> foundLobby = lobbyManagement.getLobby(new LobbyName(args.get(i)));
                     if (foundLobby.isPresent()) argList.add(foundLobby.get());
                     break;
                 case "boolean":
@@ -642,7 +642,7 @@ public class CommandService extends AbstractService {
      *                                            key or value type is provided
      * @implNote Only supports Maps with {@link java.lang.String} key type and one of
      * {@link java.lang.Boolean}, {@link java.lang.Integer}, or
-     * {@link de.uol.swp.server.lobby.Lobby} as value type.
+     * {@link de.uol.swp.server.lobby.ILobby} as value type.
      */
     private Map<Object, Object> parseMap(String[] strings, String keyClassName, String valueClassName) {
         Map<Object, Object> map = new HashMap<>();
@@ -679,7 +679,7 @@ public class CommandService extends AbstractService {
                         try {
                             valBuilder.replace(valueStr.lastIndexOf(","), valueStr.lastIndexOf(",") + 1, "");
                         } catch (Exception ignored) {}
-                        Optional<Lobby> foundLobby = lobbyManagement.getLobby(new LobbyName(valBuilder.toString()));
+                        Optional<ILobby> foundLobby = lobbyManagement.getLobby(new LobbyName(valBuilder.toString()));
                         if (foundLobby.isEmpty()) throw new RuntimeException("Lobby not found");
                         map.put(kvarr[0].trim(), foundLobby.get());
                     }

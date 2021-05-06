@@ -1,9 +1,9 @@
 package de.uol.swp.server.chat.store;
 
 import com.google.common.base.Strings;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 import java.util.*;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see IChatMessageStore
  * @since 2020-12-16
  */
-public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
+public class MainMemoryBasedChatMessageStore implements IChatMessageStore {
 
     private static final int MAX_HISTORY = 10000;
     private static final int MAX_LOBBY_HISTORY = 1000;

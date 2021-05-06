@@ -1,6 +1,6 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
@@ -15,10 +15,10 @@ import java.util.Set;
  * possible that not every client has to have every information of the lobby.
  *
  * @author Marco Grawunder
- * @see LobbyDTO
+ * @see de.uol.swp.server.lobby.LobbyDTO
  * @since 2019-10-08
  */
-public interface Lobby extends Serializable {
+public interface ILobby extends Serializable {
 
     /**
      * Get a simple lobby from a normal lobby.
@@ -30,7 +30,7 @@ public interface Lobby extends Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    static SimpleLobby getSimpleLobby(Lobby lobby) {
+    static SimpleLobby getSimpleLobby(ILobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.commandsAllowed(),
                                lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
                                lobby.startUpPhaseEnabled(), lobby.hasPassword());
@@ -257,13 +257,13 @@ public interface Lobby extends Serializable {
     /**
      * Sets the random playfield attribute.
      *
-     * @param randomPlayfieldEnabled Whether the randomPlayfield should be enabled or not
+     * @param randomPlayFieldEnabled Whether the randomPlayfield should be enabled or not
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    void setRandomPlayfieldEnabled(boolean randomPlayfieldEnabled);
+    void setRandomPlayFieldEnabled(boolean randomPlayFieldEnabled);
 
     /**
      * Sets a user as ready

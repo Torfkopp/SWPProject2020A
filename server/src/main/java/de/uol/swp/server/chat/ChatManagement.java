@@ -2,10 +2,10 @@ package de.uol.swp.server.chat;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
-import de.uol.swp.server.chat.store.ChatMessageStore;
+import de.uol.swp.server.chat.store.IChatMessageStore;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,25 +16,25 @@ import java.util.Optional;
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
  * @see de.uol.swp.server.chat.IChatManagement
- * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see de.uol.swp.server.chat.store.IChatMessageStore
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage
  * @since 2020-12-16
  */
 public class ChatManagement implements IChatManagement {
 
-    private final ChatMessageStore chatMessageStore;
+    private final IChatMessageStore chatMessageStore;
 
     /**
      * Constructor
      *
      * @param chatMessageStore Object of the ChatMessageStore to be used
      *
-     * @see de.uol.swp.server.chat.store.ChatMessageStore
+     * @see de.uol.swp.server.chat.store.IChatMessageStore
      * @since 2020-12-16
      */
     @Inject
-    public ChatManagement(ChatMessageStore chatMessageStore) {
+    public ChatManagement(IChatMessageStore chatMessageStore) {
         this.chatMessageStore = chatMessageStore;
     }
 

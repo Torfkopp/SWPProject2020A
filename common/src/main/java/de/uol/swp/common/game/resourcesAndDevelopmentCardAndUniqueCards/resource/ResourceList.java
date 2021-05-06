@@ -3,7 +3,7 @@ package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resourc
 import java.util.*;
 
 /**
- * The type Mutable resource list map.
+ * A class to store a list of resources.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
@@ -13,7 +13,7 @@ public class ResourceList implements IResourceList {
     private final List<IResource> list;
 
     /**
-     * Instantiates a new Mutable resource list map.
+     * Constructor.
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
@@ -26,7 +26,9 @@ public class ResourceList implements IResourceList {
     }
 
     /**
-     * Instantiates a new Mutable resource list map.
+     * Private Constructor.
+     * This constructor is exposed through the static method createResourceListMapFromList
+     * and is otherwise only needed internally.
      *
      * @param list the list
      *

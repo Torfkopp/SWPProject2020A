@@ -1,7 +1,7 @@
 package de.uol.swp.server.chat.store;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * @see de.uol.swp.common.chat.ChatMessage
  * @since 2020-12-16
  */
-public interface ChatMessageStore {
+public interface IChatMessageStore {
 
     /**
      * Method to create a ChatMessage in the global Chat Store

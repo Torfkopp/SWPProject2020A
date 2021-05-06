@@ -38,7 +38,6 @@ public interface IHarborHex extends IWaterHex {
 
     static HarborResource getHarborResource(ResourceType resource) {
         switch (resource) {
-
             case LUMBER:
                 return HarborResource.LUMBER;
             case BRICK:

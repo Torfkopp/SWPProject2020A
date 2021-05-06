@@ -17,8 +17,8 @@ import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
+import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
-import de.uol.swp.server.lobby.Lobby;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -195,7 +195,7 @@ public class ChatService extends AbstractService {
      *
      * @author Phillip-André Suhr
      * @author Sven Ahrens
-     * @see de.uol.swp.server.chat.IChatManagement#dropLobbyHistory(de.uol.swp.common.LobbyName)
+     * @see de.uol.swp.server.chat.IChatManagement#dropLobbyHistory(de.uol.swp.common.lobby.LobbyName)
      * @see de.uol.swp.common.lobby.message.LobbyDeletedMessage
      * @since 2021-01-16
      */
@@ -231,7 +231,7 @@ public class ChatService extends AbstractService {
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
         if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
             if (req.isFromLobby()) {
-                Optional<Lobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
+                Optional<ILobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
                 if (lobby.isPresent() && !lobby.get().commandsAllowed()) {
                     ExceptionMessage msg = new LobbyExceptionMessage("This lobby doesn't allow the use of commands!");
                     msg.initWithMessage(req);

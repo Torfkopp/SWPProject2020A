@@ -1,6 +1,5 @@
 package de.uol.swp.common.chat;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.SerialisationTestHelper;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
@@ -8,6 +7,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;

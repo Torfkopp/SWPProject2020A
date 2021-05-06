@@ -8,7 +8,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import java.util.*;
 
 /**
- * The banks inventory
+ * The Bank's inventory
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23

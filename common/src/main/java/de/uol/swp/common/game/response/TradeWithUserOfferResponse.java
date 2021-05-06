@@ -1,7 +1,7 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.LobbyName;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -44,7 +44,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
     /**
      * Gets the demanded resources
      *
-     * @return Map of demanded resources
+     * @return List of demanded resources
      */
     public ResourceList getDemandedResources() {
         return demandedResources;
@@ -53,7 +53,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
     /**
      * Gets the offered resources
      *
-     * @return Map of offered resources
+     * @return List of offered resources
      */
     public ResourceList getOfferedResources() {
         return offeredResources;
@@ -71,7 +71,7 @@ public class TradeWithUserOfferResponse extends AbstractLobbyResponse {
     /**
      * Gets the inventory of the responding User
      *
-     * @return Map of the inventory of the responding User
+     * @return List of the inventory of the responding User
      */
     public ResourceList getResourceList() {
         return resourceList;

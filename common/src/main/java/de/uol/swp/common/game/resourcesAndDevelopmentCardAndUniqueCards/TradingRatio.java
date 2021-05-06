@@ -5,7 +5,7 @@ import de.uol.swp.common.game.map.hexes.IHarborHex;
 import java.io.Serializable;
 
 /**
- * The type Trading ratio.
+ * A class to store a trading ratio.
  *
  * @author Temmo Junkhoff
  * @since 2021-05-04
@@ -16,7 +16,7 @@ public class TradingRatio implements Serializable {
     private final int amount;
 
     /**
-     * Constructor for Trading ratio.
+     * Constructor.
      *
      * @param resource The resource
      * @param amount   The amount

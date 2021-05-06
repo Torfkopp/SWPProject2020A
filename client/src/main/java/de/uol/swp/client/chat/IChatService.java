@@ -1,6 +1,6 @@
 package de.uol.swp.client.chat;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * An interface for all methods of the client's ChatService

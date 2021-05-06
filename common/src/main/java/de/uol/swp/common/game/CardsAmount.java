@@ -5,7 +5,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import java.io.Serializable;
 
 /**
- * The type Cards amount.
+ * A class to store the amount a resource cards and development cards of a player.
  *
  * @author Temmo Junkhoff
  * @since 2021-05-04
@@ -17,11 +17,11 @@ public class CardsAmount implements Serializable {
     private final int developmentCardsAmount;
 
     /**
-     * Instantiates a new Cards amount object.
+     * Constructor.
      *
-     * @param user                   the user
-     * @param resourceCardsAmount    the resource cards amount
-     * @param developmentCardsAmount the development cards amount
+     * @param user                   The user to whom the amount of cards belong
+     * @param resourceCardsAmount    The amount of resource cards of the user
+     * @param developmentCardsAmount The amount of development cards of the user
      *
      * @author Temmo Junkhoff
      * @since 2021-05-04

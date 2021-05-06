@@ -1,26 +1,17 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * The interface Mutable resource.
+ * An interface to model a resource.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-23
  */
 public interface IResource extends Serializable {
 
-    static Map<String, Object> getTableViewFormat(IResource resource) {
-        Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("resource", resource.getType().toString());
-        returnMap.put("amount", resource.getAmount());
-        return returnMap;
-    }
-
     /**
-     * Copy the mutable resource.
+     * Copy the resource.
      *
      * @return the mutable resource
      *
@@ -40,7 +31,7 @@ public interface IResource extends Serializable {
     void decrease(int amount);
 
     /**
-     * Decrease the amount of the resource.
+     * Decrease the amount of the resource by 1.
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
@@ -88,7 +79,7 @@ public interface IResource extends Serializable {
     void increase(int amount);
 
     /**
-     * Increase the amount of the resource.
+     * Increase the amount of the resource by 1.
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23

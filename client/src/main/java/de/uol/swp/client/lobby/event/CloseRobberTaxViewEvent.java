@@ -1,6 +1,6 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.LobbyName;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * This event is used to close a RobberTax window
