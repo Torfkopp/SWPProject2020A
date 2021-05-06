@@ -2,12 +2,13 @@ package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.Map;
 
 /**
  * Message sent by the server when a trade between two Users was successful.
@@ -46,11 +47,10 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * @return The encapsulated SystemMessage
      */
     public SystemMessage getMsg() {
-        return null;
-        //respondingUser == null : bank
-
-        //return new SystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser, this.offeringResourceMap,
-        //                                                    this.respondingResourceMap));
+        return new InGameSystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser == null ? "bank" :
+                                                                             this.respondingUser.getUsername(),
+                                                                  this.offeringResourceMap,
+                                                                  this.respondingResourceMap));
     }
 
     /**
@@ -76,19 +76,19 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * be displayed in the client's chosen language
      */
     private I18nWrapper makeSingularI18nWrapper(UserOrDummy offeringUser, String respondingUser,
-                                                Map<I18nWrapper, Integer> offeringResourceMap,
-                                                Map<I18nWrapper, Integer> respondingResourceMap) {
+                                                IResourceList offeringResourceMap,
+                                                IResourceList respondingResourceMap) {
         StringBuilder offerString = new StringBuilder();
-        for (Map.Entry<I18nWrapper, Integer> entry : offeringResourceMap.entrySet()) {
+        for (IResource entry : offeringResourceMap) {
             offerString.append(", ");
-            if (entry.getValue() > 0) offerString.append(entry.getValue()).append(" ");
-            offerString.append(entry.getKey().toString());
+            if (entry.getAmount() > 0) offerString.append(entry.getAmount()).append(" ");
+            offerString.append(entry.getType().toString());
         }
         StringBuilder demandString = new StringBuilder();
-        for (Map.Entry<I18nWrapper, Integer> entry : respondingResourceMap.entrySet()) {
+        for (IResource entry : respondingResourceMap) {
             demandString.append(", ");
-            if (entry.getValue() > 0) demandString.append(entry.getValue()).append(" ");
-            demandString.append(entry.getKey().toString());
+            if (entry.getAmount() > 0) demandString.append(entry.getAmount()).append(" ");
+            demandString.append(entry.getType().toString());
         }
         return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser,
                                offerString.toString().replaceFirst("^, ", ""),
