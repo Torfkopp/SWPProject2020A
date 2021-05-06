@@ -1,14 +1,7 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResourceList;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
-import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
-import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Message sent by the server when a trade between two Users was successful.
@@ -49,8 +42,7 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     public SystemMessage getMsg() {
         return new InGameSystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser == null ? "bank" :
                                                                              this.respondingUser.getUsername(),
-                                                                  this.offeringResourceMap,
-                                                                  this.respondingResourceMap));
+                                                                  this.offeringResourceMap, this.respondingResourceMap));
     }
 
     /**
