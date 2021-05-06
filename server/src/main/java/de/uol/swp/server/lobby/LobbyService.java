@@ -355,7 +355,7 @@ public class LobbyService extends AbstractService {
      * @since 2021-04-08
      */
     @Subscribe
-    private void onLobbyJoinRandomUserRequest(LobbyJoinRandomUserRequest req) {
+    private void onLobbyJoinRandomUserRequest(JoinRandomLobbyRequest req) {
         Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
         List<ILobby> filteredLobbies = new ArrayList<>();
 
@@ -398,7 +398,7 @@ public class LobbyService extends AbstractService {
      * @since 2020-12-19
      */
     @Subscribe
-    private void onLobbyJoinUserRequest(LobbyJoinUserRequest req) {
+    private void onLobbyJoinUserRequest(JoinLobbyRequest req) {
         LOG.debug("Received LobbyJoinUserRequest for Lobby {}", req.getName());
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isPresent()) {
@@ -476,7 +476,7 @@ public class LobbyService extends AbstractService {
      * @since 2019-10-08
      */
     @Subscribe
-    private void onLobbyLeaveUserRequest(LobbyLeaveUserRequest req) {
+    private void onLobbyLeaveUserRequest(LeaveLobbyRequest req) {
         LOG.debug("Received LobbyLeaveUserRequest for Lobby {}", req.getName());
         Optional<ILobby> lobby = lobbyManagement.getLobby(req.getName());
         if (lobby.isEmpty()) return;

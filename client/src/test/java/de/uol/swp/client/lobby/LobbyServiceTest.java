@@ -126,9 +126,9 @@ class LobbyServiceTest {
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof LobbyJoinUserRequest);
+        assertTrue(event instanceof JoinLobbyRequest);
 
-        LobbyJoinUserRequest request = (LobbyJoinUserRequest) event;
+        JoinLobbyRequest request = (JoinLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
         assertEquals(defaultUser, request.getUser());
@@ -187,9 +187,9 @@ class LobbyServiceTest {
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof LobbyLeaveUserRequest);
+        assertTrue(event instanceof LeaveLobbyRequest);
 
-        LobbyLeaveUserRequest request = (LobbyLeaveUserRequest) event;
+        LeaveLobbyRequest request = (LeaveLobbyRequest) event;
 
         assertEquals(defaultLobbyName, request.getName());
         assertEquals(defaultUser, request.getUser());

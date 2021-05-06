@@ -11,7 +11,7 @@ import de.uol.swp.common.user.User;
  * @see de.uol.swp.common.user.User
  * @since 2019-10-08
  */
-public class LobbyLeaveUserRequest extends AbstractLobbyRequest {
+public class LeaveLobbyRequest extends AbstractLobbyRequest {
 
     /**
      * Constructor
@@ -21,7 +21,7 @@ public class LobbyLeaveUserRequest extends AbstractLobbyRequest {
      *
      * @since 2019-10-08
      */
-    public LobbyLeaveUserRequest(LobbyName lobbyName, User user) {
+    public LeaveLobbyRequest(LobbyName lobbyName, User user) {
         super(lobbyName, user);
     }
 }

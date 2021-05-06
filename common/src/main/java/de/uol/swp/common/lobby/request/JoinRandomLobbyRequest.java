@@ -4,24 +4,23 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
- * Request sent to the server when a user wants to join a lobby
+ * Request sent to the server when a user wants to join a random lobby
  *
- * @author Marco Grawunder
+ * @author Finn Haase
+ * @author Sven Ahrens
  * @see de.uol.swp.common.lobby.request.AbstractLobbyRequest
  * @see de.uol.swp.common.user.User
- * @since 2019-10-08
+ * @since 2021-04-08
  */
-public class LobbyJoinUserRequest extends AbstractLobbyRequest {
+public class JoinRandomLobbyRequest extends AbstractLobbyRequest {
 
     /**
      * Constructor
      *
      * @param lobbyName Name of the lobby
-     * @param user      User who wants to join the lobby
-     *
-     * @since 2019-10-08
+     * @param user      User who wants to join a random lobby
      */
-    public LobbyJoinUserRequest(LobbyName lobbyName, UserOrDummy user) {
+    public JoinRandomLobbyRequest(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

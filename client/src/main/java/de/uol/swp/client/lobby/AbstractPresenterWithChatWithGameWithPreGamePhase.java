@@ -9,7 +9,7 @@ import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
-import de.uol.swp.common.game.response.StartSessionResponse;
+import de.uol.swp.common.game.response.RecoverSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
@@ -478,7 +478,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-02-04
      */
     @Subscribe
-    private void onStartSessionResponse(StartSessionResponse rsp) {
+    private void onStartSessionResponse(RecoverSessionResponse rsp) {
         if (!rsp.getLobby().getName().equals(lobbyName)) return;
         LOG.debug("Received StartSessionResponse for Lobby {}", lobbyName);
         gameWon = false;

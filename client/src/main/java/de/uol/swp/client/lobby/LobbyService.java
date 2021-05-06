@@ -78,13 +78,13 @@ public class LobbyService implements ILobbyService {
     @Override
     public void joinLobby(LobbyName lobbyName) {
         LOG.debug("Sending LobbyJoinUserRequest");
-        Message joinUserRequest = new LobbyJoinUserRequest(lobbyName, userService.getLoggedInUser());
+        Message joinUserRequest = new JoinLobbyRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(joinUserRequest);
     }
 
     @Override
     public void joinRandomLobby() {
-        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null, userService.getLoggedInUser());
+        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
         eventBus.post(joinRandomLobbyRequest);
     }
 
@@ -98,7 +98,7 @@ public class LobbyService implements ILobbyService {
     @Override
     public void leaveLobby(LobbyName lobbyName) {
         LOG.debug("Sending LobbyLeaveUserRequest");
-        Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, userService.getLoggedInUser());
+        Message lobbyLeaveUserRequest = new LeaveLobbyRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(lobbyLeaveUserRequest);
     }
 

@@ -60,7 +60,7 @@ public interface ILobbyService {
      *
      * @param name The name of the lobby the user wants to join
      *
-     * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
+     * @see de.uol.swp.common.lobby.request.JoinLobbyRequest
      * @since 2019-11-20
      */
     void joinLobby(LobbyName name);
@@ -70,7 +70,7 @@ public interface ILobbyService {
      *
      * @author Finn Haase
      * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.request.LobbyJoinRandomUserRequest
+     * @see de.uol.swp.common.lobby.request.JoinRandomLobbyRequest
      * @since 2021-04-08
      */
     void joinRandomLobby();
@@ -92,7 +92,7 @@ public interface ILobbyService {
      *
      * @param lobbyName The name of the lobby the User wants to leave
      *
-     * @see de.uol.swp.common.lobby.request.LobbyLeaveUserRequest
+     * @see de.uol.swp.common.lobby.request.LeaveLobbyRequest
      * @since 2020-12-05
      */
     void leaveLobby(LobbyName lobbyName);

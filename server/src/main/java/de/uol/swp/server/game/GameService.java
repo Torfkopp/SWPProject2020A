@@ -1457,14 +1457,15 @@ public class GameService extends AbstractService {
         Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
         Optional<MessageContext> ctx = event.getMessageContext();
         if (ctx.isPresent()) {
-            ResponseMessage returnMessage = new StartSessionResponse(ILobby.getSimpleLobby(lobby),
-                                                                     game.getActivePlayer(),
-                                                                     game.getMap().getGameMapDTO(playerUserOrDummyMap),
-                                                                     game.getDices(), game.isDiceRolledAlready(),
-                                                                     game.getAutoRollEnabled(event.getUser()),
-                                                                     game.getLobby().getMoveTime(),
-                                                                     game.getPlayersStartUpBuiltMap()
-                                                                         .get(event.getUser()));
+            ResponseMessage returnMessage = new RecoverSessionResponse(ILobby.getSimpleLobby(lobby),
+                                                                       game.getActivePlayer(), game.getMap()
+                                                                                                   .getGameMapDTO(
+                                                                                                           playerUserOrDummyMap),
+                                                                       game.getDices(), game.isDiceRolledAlready(),
+                                                                       game.getAutoRollEnabled(event.getUser()),
+                                                                       game.getLobby().getMoveTime(),
+                                                                       game.getPlayersStartUpBuiltMap()
+                                                                           .get(event.getUser()));
             returnMessage.setMessageContext(ctx.get());
             LOG.debug("Sending StartSessionResponse");
             post(returnMessage);

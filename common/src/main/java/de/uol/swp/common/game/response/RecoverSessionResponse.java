@@ -16,7 +16,7 @@ import de.uol.swp.common.user.UserOrDummy;
  * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
  * @since 2021-02-25
  */
-public class StartSessionResponse extends AbstractResponseMessage {
+public class RecoverSessionResponse extends AbstractResponseMessage {
 
     private final ISimpleLobby lobby;
     private final UserOrDummy player;
@@ -36,9 +36,9 @@ public class StartSessionResponse extends AbstractResponseMessage {
      * @param autoRollState   The autoRoll state
      * @param builtStructures What structures of the founding phase the user already built
      */
-    public StartSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
-                                boolean rolledDiceAlready, boolean autoRollState, int moveTime,
-                                StartUpPhaseBuiltStructures builtStructures) {
+    public RecoverSessionResponse(ISimpleLobby lobby, UserOrDummy player, IGameMap gameMapDTO, int[] dices,
+                                  boolean rolledDiceAlready, boolean autoRollState, int moveTime,
+                                  StartUpPhaseBuiltStructures builtStructures) {
         this.lobby = lobby;
         this.player = player;
         this.gameMapDTO = gameMapDTO;

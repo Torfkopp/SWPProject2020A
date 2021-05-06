@@ -8,7 +8,7 @@ import de.uol.swp.common.lobby.LobbyName;
  *
  * @author Alwin Bossert
  * @see de.uol.swp.common.lobby.response.AbstractLobbyResponse
- * @see de.uol.swp.common.lobby.request.LobbyJoinUserRequest
+ * @see de.uol.swp.common.lobby.request.JoinLobbyRequest
  * @since 2021-04-22
  */
 public class JoinLobbyWithPasswordResponse extends AbstractLobbyResponse {

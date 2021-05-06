@@ -3,8 +3,8 @@ package de.uol.swp.server.lobby;
 import com.google.common.eventbus.EventBus;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.CreateLobbyRequest;
+import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
-import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -121,10 +121,10 @@ class LobbyServiceTest {
         // Create a joinable lobby first
         final Message request0 = new CreateLobbyRequest(defaultLobbyName, user1, null);
         // Create several join requests
-        final Message request1 = new LobbyJoinUserRequest(defaultLobbyName, user1);
-        final Message request2 = new LobbyJoinUserRequest(defaultLobbyName, user2);
-        final Message request3 = new LobbyJoinUserRequest(defaultLobbyName, user3);
-        final Message request4 = new LobbyJoinUserRequest(defaultLobbyName, user4);
+        final Message request1 = new JoinLobbyRequest(defaultLobbyName, user1);
+        final Message request2 = new JoinLobbyRequest(defaultLobbyName, user2);
+        final Message request3 = new JoinLobbyRequest(defaultLobbyName, user3);
+        final Message request4 = new JoinLobbyRequest(defaultLobbyName, user4);
         // post all requests
         bus.post(request0);
         bus.post(request1);

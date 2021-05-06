@@ -18,7 +18,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developm
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
+import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.DummyDTO;
@@ -109,7 +109,7 @@ public class CommandService extends AbstractService {
                 int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
-                    post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+                    post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
                 }
             }
         } else {
@@ -549,7 +549,7 @@ public class CommandService extends AbstractService {
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
                     Optional<ILobby> foundLobby = lobbyManagement.getLobby(new LobbyName(args.get(i)));
-                    if (foundLobby.isPresent()) argList.add(foundLobby.get());
+                    foundLobby.ifPresent(argList::add);
                     break;
                 case "boolean":
                     argList.add(Boolean.parseBoolean(args.get(i)));
