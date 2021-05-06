@@ -533,7 +533,7 @@ public class CommandService extends AbstractService {
                 case "de.uol.swp.common.user.User":
                 case "de.uol.swp.common.user.UserOrDummy":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
-                        if (currentUser.isPresent()) argList.add(currentUser.get());
+                        currentUser.ifPresent(argList::add);
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
@@ -617,7 +617,7 @@ public class CommandService extends AbstractService {
             case "de.uol.swp.common.user.User":
                 for (String s : strings) {
                     Optional<User> foundUser = userManagement.getUser(s.trim());
-                    if (foundUser.isPresent()) list.add(foundUser.get());
+                    foundUser.ifPresent(list::add);
                 }
                 break;
             case "de.uol.swp.common.chat.ChatMessage": // this is not in my capabilities right now
