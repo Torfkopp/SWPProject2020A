@@ -82,11 +82,4 @@ public class LobbyManagement implements ILobbyManagement {
         lobbies.get(lobbyName).setStartUpPhaseEnabled(startUpPhaseEnabled);
         lobbies.get(lobbyName).setRandomPlayFieldEnabled(randomPlayfieldEnabled);
     }
-
-    @Override
-    public void setHasPassword(LobbyName lobbyName, boolean hasPassword) {
-        Optional<ILobby> lobby = getLobby(lobbyName);
-        if (lobby.isEmpty()) return;
-        lobby.get().setHasPassword(hasPassword);
-    }
 }
