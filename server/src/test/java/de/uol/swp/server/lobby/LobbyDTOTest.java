@@ -159,10 +159,10 @@ class LobbyDTOTest {
     @Test
     void updateCommandsAllowedTest() {
         ILobby lobby = LobbyDTO.create(defaultLobby);
-        assertTrue(lobby.commandsAllowed());
+        assertTrue(lobby.areCommandsAllowed());
 
         lobby.setCommandsAllowed(false);
-        assertFalse(lobby.commandsAllowed());
+        assertFalse(lobby.areCommandsAllowed());
     }
 
     /**
@@ -238,11 +238,11 @@ class LobbyDTOTest {
     @Test
     void updateRandomPlayfieldEnabledTest() {
         ILobby lobby = LobbyDTO.create(defaultLobby);
-        assertFalse(lobby.randomPlayfieldEnabled());
+        assertFalse(lobby.isRandomPlayFieldEnabled());
 
         lobby.setRandomPlayFieldEnabled(true);
 
-        assertTrue(lobby.randomPlayfieldEnabled());
+        assertTrue(lobby.isRandomPlayFieldEnabled());
     }
 
     /**
@@ -258,10 +258,10 @@ class LobbyDTOTest {
     @Test
     void updateStartUpPhaseEnabledTest() {
         ILobby lobby = LobbyDTO.create(defaultLobby);
-        assertFalse(lobby.startUpPhaseEnabled());
+        assertFalse(lobby.isStartUpPhaseEnabled());
 
         lobby.setStartUpPhaseEnabled(true);
 
-        assertTrue(lobby.startUpPhaseEnabled());
+        assertTrue(lobby.isStartUpPhaseEnabled());
     }
 }

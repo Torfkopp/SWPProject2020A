@@ -4,7 +4,6 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The class Simple lobby.
@@ -16,8 +15,8 @@ import java.util.TreeSet;
 public class SimpleLobby implements ISimpleLobby {
 
     private final LobbyName name;
-    private final Set<UserOrDummy> users = new TreeSet<>();
-    private final Set<UserOrDummy> readyUsers = new TreeSet<>();
+    private final Set<UserOrDummy> users;
+    private final Set<UserOrDummy> readyUsers;
     private final boolean inGame;
     private final User owner;
     private final boolean commandsAllowed;
@@ -43,7 +42,8 @@ public class SimpleLobby implements ISimpleLobby {
      * @since 2021-05-03
      */
     public SimpleLobby(LobbyName name, boolean inGame, User owner, boolean commandsAllowed, int maxPlayers,
-                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword) {
+                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword,
+                       Set<UserOrDummy> users, Set<UserOrDummy> readyUsers) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -53,6 +53,8 @@ public class SimpleLobby implements ISimpleLobby {
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.randomPlayFieldEnabled = randomPlayFieldEnabled;
         this.hasPassword = hasPassword;
+        this.users = users;
+        this.readyUsers = readyUsers;
     }
 
     @Override

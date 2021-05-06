@@ -145,13 +145,14 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onShowRobberTaxUpdateEvent(ShowRobberTaxUpdateEvent event) {
+        LOG.debug("Received ShowRobberTaxUpdateEvent");
         lobbyName = event.getLobbyName();
         taxAmount = event.getTaxAmount();
         inventory = event.getInventory();
 
         resourceAmount.setText(String.valueOf(taxAmount));
         setInventoryList();
-        setSliders();
+        setSliders(event.getInventory());
     }
 
     /**
@@ -199,7 +200,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * Helper method to handle the slider attributes
      */
     @FXML
-    private void setSliders() {
+    private void setSliders(ResourceList inventory) {
+        inventory = inventory.create();
         brickSlider.setMax(inventory.getAmount(BRICK));
         grainSlider.setMax(inventory.getAmount(GRAIN));
         lumberSlider.setMax(inventory.getAmount(LUMBER));

@@ -20,9 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class LobbyUpdateEventTest {
 
-    private static final User defaultUser = new UserDTO(1, "I'm tree", "I'm pretty sure I'm a tree", "tree@tree.test");
-    private static final ISimpleLobby defaultLobby = new SimpleLobby(new LobbyName("Am I a lobby?"), false, defaultUser,
-                                                                     true, 3, 60, false, false, false);
+    private static final User defaultUser = new UserDTO(1, "I'm tree", //
+                                                        "I'm pretty sure I'm a tree", "tree@tree.test");
+    private static final ISimpleLobby defaultLobby = new SimpleLobby(new LobbyName("Am I a lobby?"), false, //
+                                                                     defaultUser, true, 3, //
+                                                                     60, false, //
+                                                                     false, false, //
+                                                                     null, null); //
 
     /**
      * Test for the creation of LobbyUpdateEvents

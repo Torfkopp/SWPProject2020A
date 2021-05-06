@@ -98,9 +98,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-25
      */
     protected void cleanChatHistoryOfOldOwnerNotices() {
-        for (ChatOrSystemMessage msg : chatMessages) {
-            if (msg instanceof ReadySystemMessageDTO) Platform.runLater(() -> chatMessages.remove(msg));
-        }
+        Platform.runLater(() -> chatMessages.removeIf(msg -> msg instanceof ReadySystemMessageDTO));
     }
 
     /**

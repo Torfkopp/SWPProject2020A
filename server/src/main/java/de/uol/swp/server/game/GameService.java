@@ -536,13 +536,13 @@ public class GameService extends AbstractService {
         try {
             IGameMapManagement gameMap = new GameMapManagement();
             IConfiguration configuration;
-            if (msg.getLobby().randomPlayfieldEnabled()) {
+            if (msg.getLobby().isRandomPlayFieldEnabled()) {
                 configuration = gameMap.getRandomisedConfiguration();
             } else {
                 configuration = gameMap.getBeginnerConfiguration();
             }
             gameMap = gameMap.createMapFromConfiguration(configuration);
-            if (!msg.getLobby().startUpPhaseEnabled()) {
+            if (!msg.getLobby().isStartUpPhaseEnabled()) {
                 gameMap.makeBeginnerSettlementsAndRoads(msg.getLobby().getUserOrDummies().size());
             }
             Set<UserOrDummy> users = msg.getLobby().getUserOrDummies();
@@ -550,22 +550,22 @@ public class GameService extends AbstractService {
             UserOrDummy[] playerArray = users.toArray(new UserOrDummy[0]);
             UserOrDummy firstPlayer = playerArray[randomNbr];
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
-            Game game = gameManagement.getGame(lobbyName);
-            if (game.getFirst() instanceof Dummy) {
-                onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
-                endTurnDummy(game);
-            }
             LOG.debug("Sending GameCreatedMessage");
             post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
             StartSessionMessage message = new StartSessionMessage(lobbyName, firstPlayer, configuration,
-                                                                  msg.getLobby().startUpPhaseEnabled());
+                                                                  msg.getLobby().isStartUpPhaseEnabled());
             lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
             ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());
             exceptionMessage.initWithMessage(msg);
             LOG.debug("Sending ExceptionMessage");
             post(exceptionMessage);
+        }
+        Game game = gameManagement.getGame(lobbyName);
+        if (game.getFirst() instanceof Dummy) {
+            onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
+            endTurnDummy(game);
         }
     }
 
@@ -1285,17 +1285,17 @@ public class GameService extends AbstractService {
                     }
                 }
             }
-            Map<User, ResourceList> inventory = new HashMap<>();
+            Map<User, ResourceList> inventories = new HashMap<>();
             for (User user : players.keySet()) {
                 ResourceList resourceMap = new ResourceList();
                 Inventory inv = game.getInventory(user);
                 for (ResourceType resource : ResourceType.values())
                     resourceMap.set(resource, inv.get(resource));
-                inventory.put(user, resourceMap);
+                inventories.put(user, resourceMap);
 
                 game.addTaxPayer(user);
             }
-            RobberTaxMessage rtm = new RobberTaxMessage(req.getOriginLobby(), req.getUser(), players, inventory);
+            RobberTaxMessage rtm = new RobberTaxMessage(req.getOriginLobby(), req.getUser(), players, inventories);
             LOG.debug("Sending RobberTaxMessage for Lobby {}", req.getOriginLobby());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), rtm);
             if (req.getUser() instanceof Dummy) {
@@ -1429,7 +1429,7 @@ public class GameService extends AbstractService {
         int traderInventorySize = traderInventory.getResourceAmount();
         ResourceList offeringInventory = inventory.getResources();
         ResponseMessage returnMessage;
-        returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), offeringInventory,
+        returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), offeringInventory.create(),
                                                               traderInventorySize, req.getRespondingUser());
         LOG.debug("Sending InventoryForTradeWithUserResponse for Lobby {}", req.getName());
         returnMessage.initWithMessage(req);

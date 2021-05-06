@@ -60,7 +60,7 @@ public class DevelopmentCardList implements IDevelopmentCardList {
 
     @Override
     public DevelopmentCardList create() {
-        return new DevelopmentCardList(list);
+        return new DevelopmentCardList(new LinkedList<>(list));
     }
 
     @Override

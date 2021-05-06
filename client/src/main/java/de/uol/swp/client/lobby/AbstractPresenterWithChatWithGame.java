@@ -219,8 +219,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (!paused) {
-                    Platform.runLater(() -> moveTimerLabel.setText(String.format(
-                            resourceBundle.getString("game.labels.movetime") + moveTimeToDecrement.getAndDecrement())));
+                    Platform.runLater(() -> moveTimerLabel.setText(
+                            String.format(resourceBundle.getString("game.labels.movetime"),
+                                          moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
                         tradeService.closeBankTradeWindow(lobbyName);
@@ -379,19 +380,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             username.setFont(Font.font(20.0));
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
-            if (user.equals(membersList.get(0))) {
+            if (membersList.size() > 0 && user.equals(membersList.get(0))) {
                 username.setFill(GameRendering.PLAYER_1_COLOUR);
             }
-            if (user.equals(membersList.get(1))) {
+            if (membersList.size() > 1 && user.equals(membersList.get(1))) {
                 username.setFill(GameRendering.PLAYER_2_COLOUR);
             }
-            if (user.equals(membersList.get(2))) {
+            if (membersList.size() > 2 && user.equals(membersList.get(2))) {
                 username.setFill(GameRendering.PLAYER_3_COLOUR);
             }
-            if (membersList.size() == 4) {
-                if (user.equals(membersList.get(3))) {
-                    username.setFill(GameRendering.PLAYER_4_COLOUR);
-                }
+            if (membersList.size() == 4 && user.equals(membersList.get(3))) {
+                username.setFill(GameRendering.PLAYER_4_COLOUR);
             }
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
@@ -984,7 +983,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
                 eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                         msg.getInventory().get(user)));
+                                                         msg.getInventories().get(user).create()));
                 eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }

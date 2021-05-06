@@ -31,7 +31,7 @@ public class BankInventory extends AbstractInventory {
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCardType.YEAR_OF_PLENTY_CARD, 2));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCardType.MONOPOLY_CARD, 2));
         tempDevelopmentCardList.add(new DevelopmentCard(DevelopmentCardType.VICTORY_POINT_CARD, 5));
-        resources = ResourceList.createResourceListMapFromList(tempResourceList);
+        resources = ResourceList.createResourceListFromList(tempResourceList);
         developmentCards = DevelopmentCardList.createDevelopmentCardListFromList(tempDevelopmentCardList);
     }
 
@@ -47,9 +47,6 @@ public class BankInventory extends AbstractInventory {
         List<DevelopmentCardType> temp = new LinkedList<>();
         for (DevelopmentCard developmentCard : developmentCards)
             temp.addAll(Collections.nCopies(developmentCard.getAmount(), developmentCard.getType()));
-        Random random = new Random(); // new Random object, named random
-        DevelopmentCardType returnCard = temp.get(random.nextInt(temp.size()));
-        //decrease(returnCard);
-        return returnCard;
+        return temp.get((new Random()).nextInt(temp.size()));
     }
 }

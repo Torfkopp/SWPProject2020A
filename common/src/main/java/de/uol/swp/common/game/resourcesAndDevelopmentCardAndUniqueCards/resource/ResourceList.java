@@ -51,13 +51,13 @@ public class ResourceList implements IResourceList {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public static ResourceList createResourceListMapFromList(List<IResource> list) {
+    public static ResourceList createResourceListFromList(List<IResource> list) {
         return new ResourceList(list);
     }
 
     @Override
     public Iterator<IResource> iterator() {
-        return new ResourceListMapIterator(list);
+        return new ResourceListMapIterator(new LinkedList<>(list));
     }
 
     @Override
@@ -86,7 +86,9 @@ public class ResourceList implements IResourceList {
     @Override
     public int getAmount(ResourceType resource) {
         for (IResource resource1 : list) {
-            if (Objects.equals(resource, resource1.getType())) return resource1.getAmount();
+            if (resource == resource1.getType()) {
+                return resource1.getAmount();
+            }
         }
         return 0;
     }

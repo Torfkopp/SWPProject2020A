@@ -38,7 +38,7 @@ public class ShowRobberTaxUpdateEvent {
      * @return Map with the resource and its amount as integer
      */
     public ResourceList getInventory() {
-        return inventory;
+        return inventory.create();
     }
 
     /**

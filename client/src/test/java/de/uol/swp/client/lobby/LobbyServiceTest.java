@@ -30,14 +30,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @see de.uol.swp.client.lobby.LobbyService
  * @since 2020-11-26
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class LobbyServiceTest {
 
-    private static final User defaultUser = new UserDTO(1, "chuck", "test", "chuck@norris.com");
-    private static final User secondUser = new UserDTO(2, "chuck_testa", "testa", "testa@chuck.com");
+    private static final User defaultUser = new UserDTO(1, "chuck", "test",//
+                                                        "chuck@norris.com");
+    private static final User secondUser = new UserDTO(2, "chuck_testa", "testa",//
+                                                       "testa@chuck.com");
     private static final LobbyName defaultLobbyName = new LobbyName("testlobby");
-    private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, defaultUser, false, 4, 60,
-                                                                     false, false, false);
+    private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, defaultUser,//
+                                                                     false, 4, 60,//
+                                                                     false, false,//
+                                                                     false, null, null);
 
     private final EventBus eventBus = new EventBus();
     private final CountDownLatch lock = new CountDownLatch(1);

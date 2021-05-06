@@ -280,9 +280,11 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         for (ResourceType resource : ResourceType.values()) {
             bankResourcesView.getItems().add(new Resource(resource, 1));
         }
-        for (IResource resource : ownInventory)
+        for (IResource resource : ownInventory) {
             ownResourceTableView.getItems().add(resource);
-        for (IResource resource : tradingRatios)
-            ownResourcesToTradeWith.getItems().add(resource);
+            if (resource.getAmount() >= tradingRatios.getAmount(resource.getType())) {
+                ownResourcesToTradeWith.getItems().add(tradingRatios.get(resource.getType()));
+            }
+        }
     }
 }

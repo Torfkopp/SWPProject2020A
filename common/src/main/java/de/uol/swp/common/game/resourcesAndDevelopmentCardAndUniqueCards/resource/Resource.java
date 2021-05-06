@@ -12,10 +12,10 @@ public class Resource implements IResource {
     private int amount;
 
     /**
-     * Instantiates a new Mutable resource.
+     * Constructor
      *
-     * @param type   the type
-     * @param amount the amount
+     * @param type   The type of the resource
+     * @param amount The amount of the resource
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23

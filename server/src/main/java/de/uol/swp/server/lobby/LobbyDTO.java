@@ -114,12 +114,12 @@ public class LobbyDTO implements ILobby {
      */
     public static ILobby create(ILobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getPassword(), lobby.isInGame(), lobby.hasPassword(),
-                            lobby.getOwner(), lobby.commandsAllowed(), lobby.getMaxPlayers(), lobby.getMoveTime(),
-                            lobby.startUpPhaseEnabled(), lobby.randomPlayfieldEnabled());
+                            lobby.getOwner(), lobby.areCommandsAllowed(), lobby.getMaxPlayers(), lobby.getMoveTime(),
+                            lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled());
     }
 
     @Override
-    public boolean commandsAllowed() {
+    public boolean areCommandsAllowed() {
         return commandsAllowed;
     }
 
@@ -195,6 +195,16 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
+    public boolean isRandomPlayFieldEnabled() {
+        return randomPlayFieldEnabled;
+    }
+
+    @Override
+    public void setRandomPlayFieldEnabled(boolean randomPlayFieldEnabled) {
+        this.randomPlayFieldEnabled = randomPlayFieldEnabled;
+    }
+
+    @Override
     public boolean isStartUpPhaseEnabled() {
         return startUpPhaseEnabled;
     }
@@ -235,11 +245,6 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public boolean randomPlayfieldEnabled() {
-        return randomPlayFieldEnabled;
-    }
-
-    @Override
     public void setCommandsAllowed(boolean commandsAllowed) {
         this.commandsAllowed = commandsAllowed;
     }
@@ -250,18 +255,8 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
-    public void setRandomPlayFieldEnabled(boolean randomPlayFieldEnabled) {
-        this.randomPlayFieldEnabled = randomPlayFieldEnabled;
-    }
-
-    @Override
     public void setUserReady(UserOrDummy user) {
         this.readyUsers.add(user);
-    }
-
-    @Override
-    public boolean startUpPhaseEnabled() {
-        return startUpPhaseEnabled;
     }
 
     @Override

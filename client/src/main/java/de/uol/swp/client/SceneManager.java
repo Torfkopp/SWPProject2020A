@@ -955,8 +955,8 @@ public class SceneManager {
             robberTaxStage.initStyle(StageStyle.UNDECORATED);
             robberTaxStage.show();
             LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
-            eventBus.post(
-                    new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(), event.getInventory()));
+            eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(),
+                                                       event.getInventory().create()));
         });
     }
 

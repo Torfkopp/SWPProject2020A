@@ -1,7 +1,13 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResourceList;
+import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
+import de.uol.swp.common.user.UserOrDummy;
 
 /**
  * Message sent by the server when a trade between two Users was successful.
@@ -14,8 +20,8 @@ import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
 
     private final UserOrDummy respondingUser;
-    private final ResourceList respondingResourceMap;
-    private final ResourceList offeringResourceMap;
+    private final IResourceList respondingResourceMap;
+    private final IResourceList offeringResourceMap;
 
     /**
      * Constructor
@@ -27,7 +33,7 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      * @param respondingResourceMap The demanded resources
      */
     public SystemMessageForTradeMessage(LobbyName lobbyName, UserOrDummy offeringUser, UserOrDummy respondingUser,
-                                        ResourceList offeringResourceMap, ResourceList respondingResourceMap) {
+                                        IResourceList offeringResourceMap, IResourceList respondingResourceMap) {
         super(lobbyName, offeringUser);
         this.respondingUser = respondingUser;
         this.respondingResourceMap = respondingResourceMap;
@@ -42,16 +48,8 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     public SystemMessage getMsg() {
         return new InGameSystemMessageDTO(makeSingularI18nWrapper(getUser(), this.respondingUser == null ? "bank" :
                                                                              this.respondingUser.getUsername(),
-                                                                  this.offeringResourceMap, this.respondingResourceMap));
-    }
-
-    /**
-     * Gets the responding User
-     *
-     * @return The responding User
-     */
-    public UserOrDummy getRespondingUser() {
-        return respondingUser;
+                                                                  this.offeringResourceMap,
+                                                                  this.respondingResourceMap));
     }
 
     /**

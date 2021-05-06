@@ -232,7 +232,7 @@ public class ChatService extends AbstractService {
         if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
             if (req.isFromLobby()) {
                 Optional<ILobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
-                if (lobby.isPresent() && !lobby.get().commandsAllowed()) {
+                if (lobby.isPresent() && !lobby.get().areCommandsAllowed()) {
                     ExceptionMessage msg = new LobbyExceptionMessage("This lobby doesn't allow the use of commands!");
                     msg.initWithMessage(req);
                     post(msg);

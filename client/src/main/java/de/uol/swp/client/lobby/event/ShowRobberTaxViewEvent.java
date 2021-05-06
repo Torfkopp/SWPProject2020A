@@ -40,7 +40,7 @@ public class ShowRobberTaxViewEvent {
      * @return Map of resources and its amount
      */
     public ResourceList getInventory() {
-        return inventory;
+        return inventory.create();
     }
 
     /**

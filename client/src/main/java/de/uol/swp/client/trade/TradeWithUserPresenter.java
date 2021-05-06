@@ -186,6 +186,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onOfferTradeButtonPressed() {
+        setResourceLists();
         if (checkResources()) {
             LOG.debug("Failed sending the offer");
             return;
@@ -262,7 +263,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * @since 2021-04-20
      */
     @FXML
-    private void setResourceMaps() {
+    private void setResourceLists() {
         selectedOwnResourceList = new ResourceList();
         selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
         selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));

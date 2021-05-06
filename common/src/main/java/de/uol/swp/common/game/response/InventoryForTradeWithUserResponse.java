@@ -49,7 +49,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @since 2021-04-19
      */
     public ResourceList getResourceMap() {
-        return resourceList;
+        return resourceList.create();
     }
 
     /**

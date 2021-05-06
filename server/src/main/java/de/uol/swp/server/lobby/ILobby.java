@@ -31,9 +31,10 @@ public interface ILobby extends Serializable {
      * @since 2021-05-03
      */
     static SimpleLobby getSimpleLobby(ILobby lobby) {
-        return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.commandsAllowed(),
-                               lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.startUpPhaseEnabled(),
-                               lobby.startUpPhaseEnabled(), lobby.hasPassword());
+        return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.areCommandsAllowed(),
+                               lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(),
+                               lobby.isRandomPlayFieldEnabled(), lobby.hasPassword(), lobby.getUserOrDummies(),
+                               lobby.getReadyUsers());
     }
 
     /**
@@ -45,7 +46,7 @@ public interface ILobby extends Serializable {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    boolean commandsAllowed();
+    boolean areCommandsAllowed();
 
     /**
      * Gets the maximum amount of players for a lobby.
@@ -183,6 +184,28 @@ public interface ILobby extends Serializable {
     void setInGame(boolean inGame);
 
     /**
+     * Gets whether the random playfield is enabled or not.
+     *
+     * @return If random playfield is enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    boolean isRandomPlayFieldEnabled();
+
+    /**
+     * Sets the random playfield attribute.
+     *
+     * @param randomPlayFieldEnabled Whether the randomPlayfield should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @author Aldin Dervisi
+     * @since 2021-03-15
+     */
+    void setRandomPlayFieldEnabled(boolean randomPlayFieldEnabled);
+
+    /**
      * Gets whether the startUpPhase is enabled or not
      *
      * @return Boolean whether the startup phase is enabled
@@ -223,17 +246,6 @@ public interface ILobby extends Serializable {
     void leaveUser(UserOrDummy user);
 
     /**
-     * Gets whether the random playfield is enabled or not.
-     *
-     * @return If random playfield is enabled or not
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
-     */
-    boolean randomPlayfieldEnabled();
-
-    /**
      * Sets whether commands are allowed or not.
      *
      * @param commandsAllowed Whether commands should be enabled or not
@@ -255,17 +267,6 @@ public interface ILobby extends Serializable {
     void setHasPassword(boolean hasPassword);
 
     /**
-     * Sets the random playfield attribute.
-     *
-     * @param randomPlayFieldEnabled Whether the randomPlayfield should be enabled or not
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
-     */
-    void setRandomPlayFieldEnabled(boolean randomPlayFieldEnabled);
-
-    /**
      * Sets a user as ready
      *
      * @param user The user to mark as ready
@@ -275,17 +276,6 @@ public interface ILobby extends Serializable {
      * @since 2021-01-19
      */
     void setUserReady(UserOrDummy user);
-
-    /**
-     * Gets whether the startUpPhase is enabled or not.
-     *
-     * @return If the startUpPhase is enabled or not
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
-     */
-    boolean startUpPhaseEnabled();
 
     /**
      * Marks a user as not ready.
