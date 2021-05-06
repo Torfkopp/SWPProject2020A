@@ -23,7 +23,7 @@ public class CheckUserInLobbyResponse extends AbstractResponseMessage {
     /**
      * Constructor
      *
-     * @param user The user to check
+     * @param user      The user to check
      * @param isInLobby Checks all lobbies
      *
      * @since 2021-04-09
@@ -32,6 +32,15 @@ public class CheckUserInLobbyResponse extends AbstractResponseMessage {
         this.user = user;
         this.isInLobby = isInLobby;
     }
+
+    /**
+     * Gets a boolean (True if the user is in a lobby)
+     *
+     * @return Boolean
+     *
+     * @since 2021-04-09
+     */
+    public Boolean getIsInLobby() {return isInLobby;}
 
     /**
      * Gets the user variable
@@ -43,13 +52,4 @@ public class CheckUserInLobbyResponse extends AbstractResponseMessage {
     public User getUser() {
         return user;
     }
-
-    /**
-     * Gets a boolean (True if the user is in a lobby)
-     *
-     * @return Boolean
-     *
-     * @since 2021-04-09
-     */
-    public Boolean getIsInLobby(){return isInLobby;}
 }

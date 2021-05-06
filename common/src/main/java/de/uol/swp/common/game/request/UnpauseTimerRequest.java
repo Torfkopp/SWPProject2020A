@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -10,7 +11,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class UnpauseTimerRequest extends AbstractGameRequest {
 
-    private UserOrDummy user;
+    private final UserOrDummy user;
 
     /**
      * Constructor
@@ -18,7 +19,7 @@ public class UnpauseTimerRequest extends AbstractGameRequest {
      * @param lobbyName The lobby this game is taking place in
      * @param user      The user who canceled a trade/window
      */
-    public UnpauseTimerRequest(String lobbyName, UserOrDummy user) {
+    public UnpauseTimerRequest(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName);
         this.user = user;
     }

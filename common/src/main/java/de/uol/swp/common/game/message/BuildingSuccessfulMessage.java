@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.message;
 
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -33,7 +34,7 @@ public class BuildingSuccessfulMessage extends AbstractGameMessage {
      * @param mapPoint  The mappoint where something was built
      * @param type      The type of structure that was built
      */
-    public BuildingSuccessfulMessage(String lobbyName, UserOrDummy user, MapPoint mapPoint, Type type) {
+    public BuildingSuccessfulMessage(LobbyName lobbyName, UserOrDummy user, MapPoint mapPoint, Type type) {
         super(lobbyName, user);
         this.mapPoint = mapPoint;
         this.type = type;

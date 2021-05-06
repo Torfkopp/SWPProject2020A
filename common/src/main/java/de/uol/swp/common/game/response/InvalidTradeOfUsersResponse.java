@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -22,7 +23,7 @@ public class InvalidTradeOfUsersResponse extends AbstractLobbyResponse {
      * @param lobbyName        Name of the lobby
      * @param offeringUserName Name of the offering user
      */
-    public InvalidTradeOfUsersResponse(String lobbyName, UserOrDummy offeringUserName) {
+    public InvalidTradeOfUsersResponse(LobbyName lobbyName, UserOrDummy offeringUserName) {
         super(lobbyName);
         this.offeringUser = offeringUserName;
     }

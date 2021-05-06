@@ -1,9 +1,8 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This request contains the necessary information for a trade
@@ -18,8 +17,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
 
     private final UserOrDummy offeringUser;
     private final UserOrDummy respondingUser;
-    private final List<Map<String, Object>> offeredResources;
-    private final List<Map<String, Object>> demandedResources;
+    private final ResourceList offeredResources;
+    private final ResourceList demandedResources;
 
     /**
      * Constructor
@@ -30,9 +29,8 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param offeredResources  The offered resources
      * @param demandedResources The responded resources
      */
-    public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, String lobbyName,
-                                        List<Map<String, Object>> offeredResources,
-                                        List<Map<String, Object>> demandedResources) {
+    public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
+                                        ResourceList offeredResources, ResourceList demandedResources) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
@@ -45,7 +43,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the demanded Resources as a Map
      */
-    public List<Map<String, Object>> getDemandedResources() {
+    public ResourceList getDemandedResources() {
         return demandedResources;
     }
 
@@ -54,7 +52,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      *
      * @return Gets the offering Resources as a Map
      */
-    public List<Map<String, Object>> getOfferedResources() {
+    public ResourceList getOfferedResources() {
         return offeredResources;
     }
 

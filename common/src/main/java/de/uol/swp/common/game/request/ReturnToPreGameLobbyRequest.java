@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
@@ -11,14 +12,14 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  */
 public class ReturnToPreGameLobbyRequest extends AbstractRequestMessage {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The lobby this game takes place in
      */
-    public ReturnToPreGameLobbyRequest(String lobbyName) {
+    public ReturnToPreGameLobbyRequest(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -27,7 +28,7 @@ public class ReturnToPreGameLobbyRequest extends AbstractRequestMessage {
      *
      * @return The name of the lobby
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

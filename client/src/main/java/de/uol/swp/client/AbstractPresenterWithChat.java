@@ -11,6 +11,7 @@ import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,7 +34,6 @@ import java.util.List;
  * @see de.uol.swp.client.AbstractPresenter
  * @see de.uol.swp.client.main.MainMenuPresenter
  * @see de.uol.swp.client.lobby.AbstractPresenterWithChatWithGame
- * @see de.uol.swp.client.lobby.AbstractPresenterWithChatWithGameWithPreGamePhase
  * @see de.uol.swp.client.lobby.LobbyPresenter
  * @since 2021-01-02
  */
@@ -53,7 +53,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected TextField messageField;
 
-    protected String lobbyName;
+    protected LobbyName lobbyName;
     protected ObservableList<ChatOrSystemMessage> chatMessages;
 
     /**

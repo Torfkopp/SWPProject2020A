@@ -1,9 +1,8 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Request sent to the server when the responding user wants to accept the trade offer.
@@ -17,8 +16,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
 
     private final UserOrDummy respondingUser;
     private final UserOrDummy offeringUser;
-    private final List<Map<String, Object>> demandedResources;
-    private final List<Map<String, Object>> offeredResources;
+    private final ResourceList demandedResources;
+    private final ResourceList offeredResources;
 
     /**
      * Constructor
@@ -29,9 +28,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      * @param demandedResources The demanded resources
      * @param offeredResources  The offered resources
      */
-    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, String lobbyName,
-                                  List<Map<String, Object>> demandedResources,
-                                  List<Map<String, Object>> offeredResources) {
+    public AcceptUserTradeRequest(UserOrDummy respondingUser, UserOrDummy offeringUser, LobbyName lobbyName,
+                                  ResourceList demandedResources, ResourceList offeredResources) {
         super(lobbyName);
         this.respondingUser = respondingUser;
         this.offeringUser = offeringUser;
@@ -44,8 +42,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the demanded resources
      */
-    public List<Map<String, Object>> getDemandedResources() {
-        return demandedResources;
+    public ResourceList getDemandedResources() {
+        return demandedResources.create();
     }
 
     /**
@@ -53,8 +51,8 @@ public class AcceptUserTradeRequest extends AbstractGameRequest {
      *
      * @return Map of the offered resources
      */
-    public List<Map<String, Object>> getOfferedResources() {
-        return offeredResources;
+    public ResourceList getOfferedResources() {
+        return offeredResources.create();
     }
 
     /**

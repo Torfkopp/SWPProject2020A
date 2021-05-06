@@ -2,6 +2,7 @@ package de.uol.swp.common.lobby.response;
 
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.UserOrDummy;
@@ -43,7 +44,7 @@ public class AllLobbyMembersResponse extends AbstractLobbyResponse {
      *
      * @since 2021-01-19
      */
-    public AllLobbyMembersResponse(String lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
+    public AllLobbyMembersResponse(LobbyName lobbyName, Set<UserOrDummy> users, UserOrDummy owner,
                                    Set<UserOrDummy> readyUsers, int maxPlayers) {
         super(lobbyName);
         for (UserOrDummy user : users) {

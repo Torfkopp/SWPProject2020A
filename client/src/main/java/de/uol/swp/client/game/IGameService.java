@@ -1,10 +1,10 @@
 package de.uol.swp.client.game;
 
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.Map;
 
 /**
  * An interface for all methods of the GameService
@@ -26,7 +26,7 @@ public interface IGameService {
      * @author Temmo Junkhoff
      * @since 2021-04-08
      */
-    void buildRequest(String lobbyName, MapPoint mapPoint);
+    void buildRequest(LobbyName lobbyName, MapPoint mapPoint);
 
     /**
      * Posts a request to change the autoRoll-Status of a player
@@ -36,7 +36,7 @@ public interface IGameService {
      * @author Maximillian Lindner
      * @since 2021-04-26
      */
-    void changeAutoRollState(String lobbyName, boolean autoRollEnabled);
+    void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled);
 
     /**
      * Posts a request to end the turn onto the Event
@@ -46,14 +46,14 @@ public interface IGameService {
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @since 2021-01-15
      */
-    void endTurn(String lobbyName);
+    void endTurn(LobbyName lobbyName);
 
     /**
      * Posts a request to play a KnightCard
      *
      * @param lobbyName The name of the lobby
      */
-    void playKnightCard(String lobbyName);
+    void playKnightCard(LobbyName lobbyName);
 
     /**
      * Posts a request to play a MonopolyCard
@@ -61,14 +61,14 @@ public interface IGameService {
      * @param lobbyName The name of the lobby
      * @param resource  The resource the user wants
      */
-    void playMonopolyCard(String lobbyName, Resources resource);
+    void playMonopolyCard(LobbyName lobbyName, ResourceType resource);
 
     /**
      * Posts a request to play a RoadBuildingCard
      *
      * @param lobbyName The name of the lobby
      */
-    void playRoadBuildingCard(String lobbyName);
+    void playRoadBuildingCard(LobbyName lobbyName);
 
     /**
      * Posts a request to play a YearOfPlentyCard
@@ -77,7 +77,7 @@ public interface IGameService {
      * @param resource1 The resource the user wants
      * @param resource2 The resource the user wants
      */
-    void playYearOfPlentyCard(String lobbyName, Resources resource1, Resources resource2);
+    void playYearOfPlentyCard(LobbyName lobbyName, ResourceType resource1, ResourceType resource2);
 
     /**
      * Posts a RobberChosenVictimRequest
@@ -89,7 +89,7 @@ public interface IGameService {
      * @author Timo Gerken
      * @since 2021-04-06
      */
-    void robberChooseVictim(String lobbyName, UserOrDummy victim);
+    void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim);
 
     /**
      * Posts a RobberNewPositionMessage
@@ -101,7 +101,7 @@ public interface IGameService {
      * @author Timo Gerken
      * @since 2021-04-06
      */
-    void robberNewPosition(String lobby, MapPoint mapPoint);
+    void robberNewPosition(LobbyName lobby, MapPoint mapPoint);
 
     /**
      * Posts a request to roll the dices
@@ -111,7 +111,7 @@ public interface IGameService {
      * @see de.uol.swp.common.game.request.RollDiceRequest
      * @since 2021-02-22
      */
-    void rollDice(String lobbyName);
+    void rollDice(LobbyName lobbyName);
 
     /**
      * Posts a request to start the game session
@@ -123,7 +123,7 @@ public interface IGameService {
      * @author Temmo Junkhoff
      * @since 2021-03-23
      */
-    void startSession(String lobbyName, int moveTime);
+    void startSession(LobbyName lobbyName, int moveTime);
 
     /**
      * Posts a RobberTaxChosenRequest and a CloseRobberTaxView
@@ -134,7 +134,7 @@ public interface IGameService {
      * @author Mario Fokken
      * @since 2021-04-12
      */
-    void taxPayed(String lobbyName, Map<Resources, Integer> selectedResources);
+    void taxPayed(LobbyName lobbyName, ResourceList selectedResources);
 
     /**
      * Posts a request to update the game map
@@ -145,7 +145,7 @@ public interface IGameService {
      * @author Temmo Junkhoff
      * @since 2021-04-08
      */
-    void updateGameMap(String lobbyName);
+    void updateGameMap(LobbyName lobbyName);
 
     /**
      * Posts a request to update ones Inventory
@@ -157,5 +157,5 @@ public interface IGameService {
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest
      * @since 2021-01-25
      */
-    void updateInventory(String lobbyName);
+    void updateInventory(LobbyName lobbyName);
 }

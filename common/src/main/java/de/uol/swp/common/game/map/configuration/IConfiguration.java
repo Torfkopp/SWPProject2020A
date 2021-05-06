@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.map.configuration;
 
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,7 +25,7 @@ public interface IConfiguration extends Serializable {
      * @return Unmodifiable, ordered List of Harbor resources
      *
      * @implSpec Create new LinkedList objects from this due to it being unmodifiable and ordered
-     * @see de.uol.swp.common.game.map.Hexes.IHarborHex.HarborResource
+     * @see de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource
      */
     List<IHarborHex.HarborResource> getHarborList();
 
@@ -35,9 +35,9 @@ public interface IConfiguration extends Serializable {
      * @return Unmodifiable, ordered List of Hex resource types
      *
      * @implSpec Create new LinkedList objects from this due to it being unmodifiable and ordered
-     * @see de.uol.swp.common.game.map.Hexes.IResourceHex.ResourceHexType
+     * @see de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType
      */
-    List<IResourceHex.ResourceHexType> getHexList();
+    List<ResourceType> getHexList();
 
     /**
      * Gets the robberPosition

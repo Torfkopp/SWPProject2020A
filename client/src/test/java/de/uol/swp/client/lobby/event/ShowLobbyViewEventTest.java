@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby.event;
 
+import de.uol.swp.common.lobby.LobbyName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ShowLobbyViewEventTest {
 
+    private static final LobbyName defaultLobbyName = new LobbyName("Test");
+
     /**
      * Test for the creation of ShowLobbyViewEvents
      * <p>
@@ -22,8 +25,8 @@ class ShowLobbyViewEventTest {
      */
     @Test
     void createShowLobbyViewEventTest() {
-        ShowLobbyViewEvent event = new ShowLobbyViewEvent("Test");
+        ShowLobbyViewEvent event = new ShowLobbyViewEvent(defaultLobbyName);
 
-        assertEquals("Test", event.getName());
+        assertEquals(defaultLobbyName, event.getName());
     }
 }

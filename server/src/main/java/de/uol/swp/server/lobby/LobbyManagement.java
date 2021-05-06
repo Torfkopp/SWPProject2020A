@@ -1,34 +1,35 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.dto.LobbyDTO;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manages creation, deletion, and storing of lobbies
  *
  * @author Marco Grawunder
- * @see de.uol.swp.common.lobby.Lobby
- * @see de.uol.swp.common.lobby.dto.LobbyDTO
+ * @see ILobby
+ * @see LobbyDTO
  * @since 2019-10-08
  */
 public class LobbyManagement implements ILobbyManagement {
 
-    private final Map<String, Lobby> lobbies = new HashMap<>();
+    private final Map<LobbyName, ILobby> lobbies = new HashMap<>();
 
     @Override
-    public void createLobby(String name, User owner, int maxPlayer,
-                            String lobbyPassword) throws IllegalArgumentException {
+    public void createLobby(LobbyName name, User owner, String lobbyPassword) throws IllegalArgumentException {
         if (lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] already exists!");
         }
-        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword, false, false, maxPlayer, true, 60, false, false));
+        lobbies.put(name, new LobbyDTO(name, owner, lobbyPassword));
     }
 
     @Override
-    public void dropLobby(String name) throws IllegalArgumentException {
+    public void dropLobby(LobbyName name) throws IllegalArgumentException {
         if (!lobbies.containsKey(name)) {
             throw new IllegalArgumentException("Lobby name [" + name + "] not found!");
         }
@@ -36,13 +37,13 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public Map<String, Lobby> getLobbies() {
+    public Map<LobbyName, ILobby> getLobbies() {
         return lobbies;
     }
 
     @Override
-    public Optional<Lobby> getLobby(String name) {
-        Lobby lobby = lobbies.get(name);
+    public Optional<ILobby> getLobby(LobbyName lobbyName) {
+        ILobby lobby = lobbies.get(lobbyName);
         if (lobby != null) {
             return Optional.of(lobby);
         }
@@ -50,8 +51,8 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public Optional<Lobby> getLobby(String name, String password) {
-        Lobby lobby = lobbies.get(name);
+    public Optional<ILobby> getLobby(LobbyName name, String password) {
+        ILobby lobby = lobbies.get(name);
         if (lobby != null) {
             return Optional.of(lobby);
         }
@@ -59,26 +60,26 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public void setHasPassword(String lobbyName, boolean hasPassword) {
-        Optional<Lobby> lobby = getLobby(lobbyName);
-        if (lobby.isEmpty()) return;
-        lobby.get().setHasPassword(hasPassword);
+    public Map<LobbyName, ISimpleLobby> getSimpleLobbies() {
+        Map<LobbyName, ISimpleLobby> temp = new HashMap<>();
+        lobbies.forEach((key, value) -> temp.put(key, ILobby.getSimpleLobby(value)));
+        return temp;
     }
 
     @Override
-    public void setInGame(String lobbyName, boolean inGame) {
-        Optional<Lobby> found = getLobby(lobbyName);
+    public void setInGame(LobbyName lobbyName, boolean inGame) {
+        Optional<ILobby> found = getLobby(lobbyName);
         if (found.isEmpty()) return;
         found.get().setInGame(inGame);
     }
 
     @Override
-    public void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
                                     boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
         lobbies.get(lobbyName).setMaxPlayers(maxPlayers);
         lobbies.get(lobbyName).setCommandsAllowed(commandsAllowed);
         lobbies.get(lobbyName).setMoveTime(moveTime);
         lobbies.get(lobbyName).setStartUpPhaseEnabled(startUpPhaseEnabled);
-        lobbies.get(lobbyName).setRandomPlayfieldEnabled(randomPlayfieldEnabled);
+        lobbies.get(lobbyName).setRandomPlayFieldEnabled(randomPlayfieldEnabled);
     }
 }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.AbstractLobbyRequest;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -23,7 +24,7 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      * @param user           The User who is making a trade offer
      * @param tradingPartner The trading partner
      */
-    public TradeWithUserRequest(String name, UserOrDummy user, UserOrDummy tradingPartner) {
+    public TradeWithUserRequest(LobbyName name, UserOrDummy user, UserOrDummy tradingPartner) {
         super(name, user);
         this.respondingUser = tradingPartner;
     }

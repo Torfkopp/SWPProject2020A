@@ -7,6 +7,7 @@ import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
 import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class ChatMessageSerialisableTest {
     private static final ChatMessageDTO defaultChatMessage = new ChatMessageDTO(1, defaultUser, defaultTimestamp,
                                                                                 "test message content");
     private static final List<ChatMessage> defaultLatestChatMessageList = new LinkedList<>();
-    private static final String defaultLobby = "I'm a lobby... full of TREES!!!";
+    private static final LobbyName defaultLobby = new LobbyName("I'm a lobby... full of TREES!!!");
 
     static {
         defaultLatestChatMessageList.add(defaultChatMessage);

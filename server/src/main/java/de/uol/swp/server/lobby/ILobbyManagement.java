@@ -1,6 +1,7 @@
 package de.uol.swp.server.lobby;
 
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 import java.util.Map;
@@ -20,7 +21,6 @@ public interface ILobbyManagement {
      *
      * @param name          The name of the lobby to create
      * @param owner         The user who wants to create a lobby
-     * @param maxPlayer     The maximum amount of players for this lobby
      * @param lobbyPassword The password of the lobby to create
      *
      * @throws java.lang.IllegalArgumentException Name already taken
@@ -29,7 +29,7 @@ public interface ILobbyManagement {
      * @see de.uol.swp.common.user.User
      * @since 2019-10-08
      */
-    void createLobby(String name, User owner, int maxPlayer, String lobbyPassword) throws IllegalArgumentException;
+    void createLobby(LobbyName name, User owner, String lobbyPassword) throws IllegalArgumentException;
 
     /**
      * Deletes a lobby with a requested name
@@ -39,7 +39,7 @@ public interface ILobbyManagement {
      * @throws java.lang.IllegalArgumentException There is no lobby with the requested name
      * @since 2019-10-08
      */
-    void dropLobby(String name) throws IllegalArgumentException;
+    void dropLobby(LobbyName name) throws IllegalArgumentException;
 
     /**
      * Gets the map
@@ -48,7 +48,7 @@ public interface ILobbyManagement {
      *
      * @since 2020-12-12
      */
-    Map<String, Lobby> getLobbies();
+    Map<LobbyName, ILobby> getLobbies();
 
     /**
      * Searches for the lobby with the requested name
@@ -60,7 +60,7 @@ public interface ILobbyManagement {
      * @see java.util.Optional
      * @since 2019-10-08
      */
-    Optional<Lobby> getLobby(String name);
+    Optional<ILobby> getLobby(LobbyName name);
 
     /**
      * Searches for the lobby with the requested name and password
@@ -74,18 +74,16 @@ public interface ILobbyManagement {
      * @see java.util.Optional
      * @since 2021-04-22
      */
-    Optional<Lobby> getLobby(String name, String password);
+    Optional<ILobby> getLobby(LobbyName name, String password);
 
     /**
-     * Sets the hasPassword attribute of a lobby according to the boolean provided
+     * Gets the map with simple lobbies
      *
-     * @param lobbyName
-     * @param hasPassword
+     * @return Map with the lobby's name and its SimpleLobby object
      *
-     * @author Alwin Bossert
-     * @since 2021-04-20
+     * @since 2020-12-12
      */
-    void setHasPassword(String lobbyName, boolean hasPassword);
+    Map<LobbyName, ISimpleLobby> getSimpleLobbies();
 
     /**
      * Sets the inGame attribute of a lobby according to the boolean provided
@@ -98,7 +96,7 @@ public interface ILobbyManagement {
      * @author Phillip-André Suhr
      * @since 2021-03-01
      */
-    void setInGame(String lobbyName, boolean inGame);
+    void setInGame(LobbyName lobbyName, boolean inGame);
 
     /**
      * This method is used to update the pre-game settings of a specific lobby.
@@ -114,6 +112,6 @@ public interface ILobbyManagement {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    void updateLobbySettings(String lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
+    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
                              boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled);
 }

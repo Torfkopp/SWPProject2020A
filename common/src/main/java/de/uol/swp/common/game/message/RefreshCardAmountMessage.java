@@ -1,7 +1,8 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.game.CardsAmount;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 
 import java.util.List;
 
@@ -15,30 +16,26 @@ import java.util.List;
  */
 public class RefreshCardAmountMessage extends AbstractGameMessage {
 
-    private final List<Triple<UserOrDummy, Integer, Integer>> cardAmountTriples;
+    private final List<CardsAmount> cardAmountsList;
 
     /**
      * Constructor
      *
-     * @param lobbyName         The name of the lobby in which the game is taking place
-     * @param user              The user who caused a change in inventories
-     * @param cardAmountTriples List of Triples containing a UserOrDummy, an
-     *                          Integer representing their inventory size, and
-     *                          an Integer representing the amount of Development
-     *                          Cards they have
+     * @param lobbyName       The name of the lobby in which the game is taking place
+     * @param user            The user who caused a change in inventories
+     * @param cardAmountsList List of CardsAmount objects
      */
-    public RefreshCardAmountMessage(String lobbyName, UserOrDummy user,
-                                    List<Triple<UserOrDummy, Integer, Integer>> cardAmountTriples) {
+    public RefreshCardAmountMessage(LobbyName lobbyName, UserOrDummy user, List<CardsAmount> cardAmountsList) {
         super(lobbyName, user);
-        this.cardAmountTriples = cardAmountTriples;
+        this.cardAmountsList = cardAmountsList;
     }
 
     /**
-     * Gets the List of Triples containing inventory information
+     * Gets the List of CardsAmount objects
      *
-     * @return List of Triples of UserOrDummy, Integer, Integer
+     * @return List of CardsAmount objects
      */
-    public List<Triple<UserOrDummy, Integer, Integer>> getCardAmountTriples() {
-        return cardAmountTriples;
+    public List<CardsAmount> getCardAmountsList() {
+        return cardAmountsList;
     }
 }

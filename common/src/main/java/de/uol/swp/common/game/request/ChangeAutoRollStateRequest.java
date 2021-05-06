@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -22,7 +23,7 @@ public class ChangeAutoRollStateRequest extends AbstractGameRequest {
      * @param user        The User who wants to change the status
      * @param autoRoll    The new value of the autoRoll status
      */
-    public ChangeAutoRollStateRequest(String originLobby, User user, boolean autoRoll) {
+    public ChangeAutoRollStateRequest(LobbyName originLobby, User user, boolean autoRoll) {
         super(originLobby);
         this.user = user;
         this.autoRoll = autoRoll;

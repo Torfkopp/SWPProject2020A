@@ -1,6 +1,7 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Message sent by the server when a ChatMessage got edited successfully
@@ -40,7 +41,7 @@ public class EditedChatMessageMessage extends AbstractChatMessageMessage {
      *
      * @since 2020-12-30
      */
-    public EditedChatMessageMessage(ChatMessage chatMsg, String lobbyName) {
+    public EditedChatMessageMessage(ChatMessage chatMsg, LobbyName lobbyName) {
         super(lobbyName);
         this.chatMsg = chatMsg;
     }

@@ -1,6 +1,7 @@
 package de.uol.swp.common.lobby.message;
 
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
 
 import java.util.ArrayList;
@@ -17,14 +18,14 @@ import java.util.Map;
  */
 public class AllLobbiesMessage extends AbstractServerMessage {
 
-    private final List<Lobby> lobbies = new ArrayList<>();
+    private final List<ISimpleLobby> lobbies = new ArrayList<>();
 
     /**
      * Constructor
      *
      * @param lobbies Map of lobby's name and the lobby itself
      */
-    public AllLobbiesMessage(Map<String, Lobby> lobbies) {
+    public AllLobbiesMessage(Map<LobbyName, ISimpleLobby> lobbies) {
         lobbies.forEach((lobbyName, lobby) -> this.lobbies.add(lobby));
     }
 
@@ -33,7 +34,7 @@ public class AllLobbiesMessage extends AbstractServerMessage {
      *
      * @return List of existing LobbyDTO
      */
-    public List<Lobby> getLobbies() {
+    public List<ISimpleLobby> getLobbies() {
         return lobbies;
     }
 }

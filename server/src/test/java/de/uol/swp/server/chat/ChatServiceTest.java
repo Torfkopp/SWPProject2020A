@@ -5,6 +5,7 @@ import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.request.DeleteChatMessageRequest;
 import de.uol.swp.common.chat.request.EditChatMessageRequest;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
@@ -43,7 +44,7 @@ class ChatServiceTest {
     private static final String secondContent = "I am new, even more intelligent content";
     private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
     private static final User secondUser = new UserDTO(2, "test2", "test2", "test2@test.de");
-    private static final String defaultLobby = "I am an intelligent lobby";
+    private static final LobbyName defaultLobby = new LobbyName("I am an intelligent lobby");
 
     final EventBus bus = new EventBus();
     final CountDownLatch lock = new CountDownLatch(1);

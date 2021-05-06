@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -20,7 +21,7 @@ public class UserJoinedLobbyMessage extends AbstractLobbyMessage {
      *
      * @since 2019-10-08
      */
-    public UserJoinedLobbyMessage(String lobbyName, UserOrDummy user) {
+    public UserJoinedLobbyMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

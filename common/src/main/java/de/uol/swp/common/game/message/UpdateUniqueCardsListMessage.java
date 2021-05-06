@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
-import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
 
-    private final String lobbyName;
-    private final List<Triple<String, UserOrDummy, Integer>> uniqueCardsList;
+    private final LobbyName lobbyName;
+    private final List<UniqueCard> uniqueCardsList;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
      * @param lobbyName       The name of the lobby
      * @param uniqueCardsList The list of unique cards
      */
-    public UpdateUniqueCardsListMessage(String lobbyName, List<Triple<String, UserOrDummy, Integer>> uniqueCardsList) {
+    public UpdateUniqueCardsListMessage(LobbyName lobbyName, List<UniqueCard> uniqueCardsList) {
         this.lobbyName = lobbyName;
         this.uniqueCardsList = uniqueCardsList;
     }
@@ -34,7 +34,7 @@ public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
      *
      * @return The lobbyname
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 
@@ -43,7 +43,7 @@ public class UpdateUniqueCardsListMessage extends AbstractServerMessage {
      *
      * @return The list of unique cards
      */
-    public List<Triple<String, UserOrDummy, Integer>> getUniqueCardsList() {
+    public List<UniqueCard> getUniqueCardsList() {
         return uniqueCardsList;
     }
 }

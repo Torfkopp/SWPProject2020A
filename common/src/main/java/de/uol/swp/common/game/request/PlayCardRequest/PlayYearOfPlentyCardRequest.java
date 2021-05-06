@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
-import de.uol.swp.common.game.map.Resources;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -10,22 +11,41 @@ import de.uol.swp.common.user.User;
  * @author Mario Fokken
  * @since 2021-02-26
  */
-public class PlayYearOfPlentyCardRequest extends PlayCardRequest {
+public class PlayYearOfPlentyCardRequest extends AbstractPlayCardRequest {
 
-    Resources resource1;
-    Resources resource2;
+    private final ResourceType firstResource;
+    private final ResourceType secondResource;
 
-    public PlayYearOfPlentyCardRequest(String originLobby, User user, Resources resource1, Resources resource2) {
+    /**
+     * Constructor.
+     *
+     * @param originLobby    The origin lobby
+     * @param user           The user
+     * @param firstResource  The resource 1
+     * @param secondResource The resource 2
+     */
+    public PlayYearOfPlentyCardRequest(LobbyName originLobby, User user, ResourceType firstResource,
+                                       ResourceType secondResource) {
         super(originLobby, user);
-        this.resource1 = resource1;
-        this.resource2 = resource2;
+        this.firstResource = firstResource;
+        this.secondResource = secondResource;
     }
 
-    public Resources getResource1() {
-        return resource1;
+    /**
+     * Gets the first resource.
+     *
+     * @return The first resource
+     */
+    public ResourceType getFirstResource() {
+        return firstResource;
     }
 
-    public Resources getResource2() {
-        return resource2;
+    /**
+     * Gets the second resource.
+     *
+     * @return The second resource
+     */
+    public ResourceType getSecondResource() {
+        return secondResource;
     }
 }

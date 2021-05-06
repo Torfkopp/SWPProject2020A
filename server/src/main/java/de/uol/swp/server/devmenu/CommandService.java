@@ -14,9 +14,11 @@ import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.request.EditInventoryRequest;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.RollDiceRequest;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TurnSkippedResponse;
-import de.uol.swp.common.lobby.Lobby;
-import de.uol.swp.common.lobby.request.LobbyJoinUserRequest;
+import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.user.DummyDTO;
@@ -25,6 +27,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
+import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
@@ -99,14 +102,14 @@ public class CommandService extends AbstractService {
         if (args.size() > 0) dummyAmount = Integer.parseInt(args.get(0));
         else dummyAmount = 1;
         if (originalMessage.isFromLobby()) {
-            String lobbyName = originalMessage.getOriginLobby();
-            Optional<Lobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
             if (optLobby.isPresent()) {
-                Lobby lobby = optLobby.get();
+                ILobby lobby = optLobby.get();
                 int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
                 if (dummyAmount > freeUsers) dummyAmount = freeUsers;
                 for (; dummyAmount > 0; dummyAmount--) {
-                    post(new LobbyJoinUserRequest(lobbyName, new DummyDTO()));
+                    post(new JoinLobbyRequest(lobbyName, new DummyDTO()));
                 }
             }
         } else {
@@ -149,7 +152,7 @@ public class CommandService extends AbstractService {
             return;
         }
         try {
-            args.add(originalMessage.getOriginLobby());
+            args.add(originalMessage.getOriginLobby().toString());
             // roll dice for the skipped player
             Message req = parseArguments(args, RollDiceRequest.class.getConstructors()[0],
                                          Optional.of(originalMessage.getAuthor()));
@@ -177,10 +180,57 @@ public class CommandService extends AbstractService {
      */
     private void command_Give(List<String> args, NewChatMessageRequest originalMessage) {
         LOG.debug("Received /give command");
-        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby());
+        if (args.size() == 3) args.add(0, originalMessage.getOriginLobby().toString());
         UserOrDummy user = getUserOrDummy(args.get(1));
         if (args.get(1).equals("me") || args.get(1).equals(".")) user = originalMessage.getAuthor();
-        Message msg = new EditInventoryRequest(args.get(0), user, args.get(2), Integer.parseInt(args.get(3)));
+        LobbyName lobbyName = new LobbyName(args.get(0));
+        ResourceType resource = null;
+        DevelopmentCardType developmentCard = null;
+        switch (args.get(2).toLowerCase()) {
+            case "bricks":
+            case "brick":
+                resource = ResourceType.BRICK;
+                break;
+            case "grains":
+            case "grain":
+                resource = ResourceType.GRAIN;
+                break;
+            case "ore":
+                resource = ResourceType.ORE;
+                break;
+            case "lumber":
+                resource = ResourceType.LUMBER;
+                break;
+            case "wool":
+                resource = ResourceType.WOOL;
+                break;
+            case "knightcard":
+            case "kc":
+                developmentCard = DevelopmentCardType.KNIGHT_CARD;
+                break;
+            case "knight":
+            case "knights":
+                break;
+            case "monopolycard":
+            case "mc":
+                developmentCard = DevelopmentCardType.MONOPOLY_CARD;
+                break;
+            case "roadbuildingcard":
+            case "rbc":
+                developmentCard = DevelopmentCardType.ROAD_BUILDING_CARD;
+                break;
+            case "victorypointcard":
+            case "vpc":
+                developmentCard = DevelopmentCardType.VICTORY_POINT_CARD;
+                break;
+            case "yearofplentycard":
+            case "yearofplenty":
+            case "yopc":
+                developmentCard = DevelopmentCardType.YEAR_OF_PLENTY_CARD;
+                break;
+        }
+        Message msg = new EditInventoryRequest(lobbyName, user, resource, developmentCard,
+                                               Integer.parseInt(args.get(3)));
         post(msg);
     }
 
@@ -483,7 +533,7 @@ public class CommandService extends AbstractService {
                 case "de.uol.swp.common.user.User":
                 case "de.uol.swp.common.user.UserOrDummy":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
-                        if (currentUser.isPresent()) argList.add(currentUser.get());
+                        currentUser.ifPresent(argList::add);
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
@@ -498,8 +548,8 @@ public class CommandService extends AbstractService {
                     }
                     break;
                 case "de.uol.swp.common.lobby.Lobby":
-                    Optional<Lobby> foundLobby = lobbyManagement.getLobby(args.get(i));
-                    if (foundLobby.isPresent()) argList.add(foundLobby.get());
+                    Optional<ILobby> foundLobby = lobbyManagement.getLobby(new LobbyName(args.get(i)));
+                    foundLobby.ifPresent(argList::add);
                     break;
                 case "boolean":
                     argList.add(Boolean.parseBoolean(args.get(i)));
@@ -567,7 +617,7 @@ public class CommandService extends AbstractService {
             case "de.uol.swp.common.user.User":
                 for (String s : strings) {
                     Optional<User> foundUser = userManagement.getUser(s.trim());
-                    if (foundUser.isPresent()) list.add(foundUser.get());
+                    foundUser.ifPresent(list::add);
                 }
                 break;
             case "de.uol.swp.common.chat.ChatMessage": // this is not in my capabilities right now
@@ -592,7 +642,7 @@ public class CommandService extends AbstractService {
      *                                            key or value type is provided
      * @implNote Only supports Maps with {@link java.lang.String} key type and one of
      * {@link java.lang.Boolean}, {@link java.lang.Integer}, or
-     * {@link de.uol.swp.common.lobby.Lobby} as value type.
+     * {@link de.uol.swp.server.lobby.ILobby} as value type.
      */
     private Map<Object, Object> parseMap(String[] strings, String keyClassName, String valueClassName) {
         Map<Object, Object> map = new HashMap<>();
@@ -629,7 +679,7 @@ public class CommandService extends AbstractService {
                         try {
                             valBuilder.replace(valueStr.lastIndexOf(","), valueStr.lastIndexOf(",") + 1, "");
                         } catch (Exception ignored) {}
-                        Optional<Lobby> foundLobby = lobbyManagement.getLobby(valBuilder.toString());
+                        Optional<ILobby> foundLobby = lobbyManagement.getLobby(new LobbyName(valBuilder.toString()));
                         if (foundLobby.isEmpty()) throw new RuntimeException("Lobby not found");
                         map.put(kvarr[0].trim(), foundLobby.get());
                     }

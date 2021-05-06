@@ -6,15 +6,15 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.*;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.*;
 
-import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -24,12 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("UnstableApiUsage")
 class TradeServiceTest {
 
-    private static final List<Map<String, Object>> defaultOffer = new ArrayList<>();
-    private static final List<Map<String, Object>> defaultDemand = new ArrayList<>();
-    private static final List<Map<String, Object>> defaultInventoryMap = new ArrayList<>();
-    private static final Resources defaultGainedResource = Resources.BRICK;
-    private static final String defaultLobbyName = "Test lobby";
-    private static final Resources defaultLostResource = Resources.GRAIN;
+    private static final ResourceList defaultOffer = new ResourceList();
+    private static final ResourceList defaultDemand = new ResourceList();
+    private static final ResourceList defaultInventory = new ResourceList();
+    private static final LobbyName defaultLobbyName = new LobbyName("Test lobby");
+    private static final ResourceType defaultGainedResource = ResourceType.BRICK;
+    private static final ResourceType defaultLostResource = ResourceType.GRAIN;
     private static final String defaultTradeError = "Test Trade Error";
     private static final User defaultUser = new UserDTO(42, "test", "test123", "test@test.test");
     private static final User secondUser = new UserDTO(69, "test2", "test2123", "test2@test.test");
@@ -44,37 +44,15 @@ class TradeServiceTest {
     private Object event;
 
     @BeforeAll
-    protected static void fillMaps() {
-        Map<String, Object> brickOffer = new HashMap<>();
-        brickOffer.put("amount", 10);
-        brickOffer.put("resource", new I18nWrapper("game.resources.brick"));
-        brickOffer.put("enumType", Resources.BRICK);
-        defaultOffer.add(brickOffer);
-        Map<String, Object> grainOffer = new HashMap<>();
-        grainOffer.put("amount", 10);
-        grainOffer.put("resource", new I18nWrapper("game.resources.grain"));
-        grainOffer.put("enumType", Resources.GRAIN);
-        defaultOffer.add(grainOffer);
-        Map<String, Object> lumberDemand = new HashMap<>();
-        lumberDemand.put("amount", 10);
-        lumberDemand.put("resource", new I18nWrapper("game.resources.lumber"));
-        lumberDemand.put("enumType", Resources.LUMBER);
-        defaultDemand.add(lumberDemand);
-        Map<String, Object> oreDemand = new HashMap<>();
-        oreDemand.put("amount", 10);
-        oreDemand.put("resource", new I18nWrapper("game.resources.ore"));
-        oreDemand.put("enumType", Resources.ORE);
-        defaultDemand.add(oreDemand);
-        defaultInventoryMap.add(Map.copyOf(brickOffer));
-        defaultInventoryMap.add(Map.copyOf(grainOffer));
-        defaultInventoryMap.add(Map.copyOf(oreDemand));
-        defaultInventoryMap.add(Map.copyOf(lumberDemand));
-        Map<String, Object> woolMap = new HashMap<>();
-        woolMap.put("amount", 10);
-        woolMap.put("resource", new I18nWrapper("game.resources.wool"));
-        woolMap.put("enumType", Resources.WOOL);
-        defaultInventoryMap.add(woolMap);
-        defaultTradeOfferResp = new TradeWithUserOfferResponse(defaultUser, defaultInventoryMap, defaultOffer,
+    static void fillLists() {
+        defaultOffer.increase(ResourceType.BRICK, 10);
+        defaultOffer.increase(ResourceType.GRAIN, 10);
+        defaultDemand.increase(ResourceType.LUMBER, 10);
+        defaultDemand.increase(ResourceType.ORE, 10);
+        for (ResourceType resource : ResourceType.values()) {
+            defaultInventory.increase(resource, 10);
+        }
+        defaultTradeOfferResp = new TradeWithUserOfferResponse(defaultUser, defaultInventory, defaultOffer,
                                                                defaultDemand, defaultLobbyName);
     }
 
@@ -111,24 +89,10 @@ class TradeServiceTest {
         assertEquals(defaultUser, request.getRespondingUser());
         assertEquals(defaultUser.getID(), request.getRespondingUser().getID());
         assertEquals(defaultUser.getUsername(), request.getRespondingUser().getUsername());
-        assertEquals(defaultOffer, request.getOfferedResources());
-        assertEquals(defaultOffer.get(0), request.getOfferedResources().get(0));
-        assertEquals(defaultOffer.get(0).get("amount"), request.getOfferedResources().get(0).get("amount"));
-        assertEquals(defaultOffer.get(0).get("resource"), request.getOfferedResources().get(0).get("resource"));
-        assertEquals(defaultOffer.get(0).get("enumType"), request.getOfferedResources().get(0).get("enumType"));
-        assertEquals(defaultOffer.get(1), request.getOfferedResources().get(1));
-        assertEquals(defaultOffer.get(1).get("amount"), request.getOfferedResources().get(1).get("amount"));
-        assertEquals(defaultOffer.get(1).get("resource"), request.getOfferedResources().get(1).get("resource"));
-        assertEquals(defaultOffer.get(1).get("enumType"), request.getOfferedResources().get(1).get("enumType"));
-        assertEquals(defaultDemand, request.getDemandedResources());
-        assertEquals(defaultDemand.get(0), request.getDemandedResources().get(0));
-        assertEquals(defaultDemand.get(0).get("amount"), request.getDemandedResources().get(0).get("amount"));
-        assertEquals(defaultDemand.get(0).get("resource"), request.getDemandedResources().get(0).get("resource"));
-        assertEquals(defaultDemand.get(0).get("enumType"), request.getDemandedResources().get(0).get("enumType"));
-        assertEquals(defaultDemand.get(1), request.getDemandedResources().get(1));
-        assertEquals(defaultDemand.get(1).get("amount"), request.getDemandedResources().get(1).get("amount"));
-        assertEquals(defaultDemand.get(1).get("resource"), request.getDemandedResources().get(1).get("resource"));
-        assertEquals(defaultDemand.get(1).get("enumType"), request.getDemandedResources().get(1).get("enumType"));
+        for (ResourceType resource : ResourceType.values()) {
+            assertEquals(defaultDemand.getAmount(resource), request.getDemandedResources().getAmount(resource));
+            assertEquals(defaultOffer.getAmount(resource), request.getOfferedResources().getAmount(resource));
+        }
     }
 
     @Test
@@ -225,23 +189,7 @@ class TradeServiceTest {
         assertEquals(secondUser.getID(), request.getRespondingUser().getID());
         assertEquals(secondUser.getUsername(), request.getRespondingUser().getUsername());
         assertEquals(defaultOffer, request.getOfferedResources());
-        assertEquals(defaultOffer.get(0), request.getOfferedResources().get(0));
-        assertEquals(defaultOffer.get(0).get("amount"), request.getOfferedResources().get(0).get("amount"));
-        assertEquals(defaultOffer.get(0).get("resource"), request.getOfferedResources().get(0).get("resource"));
-        assertEquals(defaultOffer.get(0).get("enumType"), request.getOfferedResources().get(0).get("enumType"));
-        assertEquals(defaultOffer.get(1), request.getOfferedResources().get(1));
-        assertEquals(defaultOffer.get(1).get("amount"), request.getOfferedResources().get(1).get("amount"));
-        assertEquals(defaultOffer.get(1).get("resource"), request.getOfferedResources().get(1).get("resource"));
-        assertEquals(defaultOffer.get(1).get("enumType"), request.getOfferedResources().get(1).get("enumType"));
         assertEquals(defaultDemand, request.getDemandedResources());
-        assertEquals(defaultDemand.get(0), request.getDemandedResources().get(0));
-        assertEquals(defaultDemand.get(0).get("amount"), request.getDemandedResources().get(0).get("amount"));
-        assertEquals(defaultDemand.get(0).get("resource"), request.getDemandedResources().get(0).get("resource"));
-        assertEquals(defaultDemand.get(0).get("enumType"), request.getDemandedResources().get(0).get("enumType"));
-        assertEquals(defaultDemand.get(1), request.getDemandedResources().get(1));
-        assertEquals(defaultDemand.get(1).get("amount"), request.getDemandedResources().get(1).get("amount"));
-        assertEquals(defaultDemand.get(1).get("resource"), request.getDemandedResources().get(1).get("resource"));
-        assertEquals(defaultDemand.get(1).get("enumType"), request.getDemandedResources().get(1).get("enumType"));
     }
 
     @Test
@@ -289,48 +237,8 @@ class TradeServiceTest {
         assertEquals(defaultUser.getUsername(), eve.getOfferingUser().getUsername());
         assertEquals(defaultTradeOfferResp, eve.getRsp());
         assertEquals(defaultTradeOfferResp.getOfferedResources(), eve.getRsp().getOfferedResources());
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(0), eve.getRsp().getOfferedResources().get(0));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(0).get("amount"),
-                     eve.getRsp().getOfferedResources().get(0).get("amount"));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(0).get("resource"),
-                     eve.getRsp().getOfferedResources().get(0).get("resource"));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(0).get("enumType"),
-                     eve.getRsp().getOfferedResources().get(0).get("enumType"));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(1), eve.getRsp().getOfferedResources().get(1));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(1).get("amount"),
-                     eve.getRsp().getOfferedResources().get(1).get("amount"));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(1).get("resource"),
-                     eve.getRsp().getOfferedResources().get(1).get("resource"));
-        assertEquals(defaultTradeOfferResp.getOfferedResources().get(1).get("enumType"),
-                     eve.getRsp().getOfferedResources().get(1).get("enumType"));
-
         assertEquals(defaultTradeOfferResp.getResourceList(), eve.getRsp().getResourceList());
-
-        for (int i = 0; i < Resources.values().length; i++) {
-            assertEquals(defaultTradeOfferResp.getResourceList().get(i), eve.getRsp().getResourceList().get(i));
-            assertEquals(defaultTradeOfferResp.getResourceList().get(i).get("amount"),
-                         eve.getRsp().getResourceList().get(i).get("amount"));
-            assertEquals(defaultTradeOfferResp.getResourceList().get(i).get("resource"),
-                         eve.getRsp().getResourceList().get(i).get("resource"));
-            assertEquals(defaultTradeOfferResp.getResourceList().get(i).get("enumType"),
-                         eve.getRsp().getResourceList().get(i).get("enumType"));
-        }
-
         assertEquals(defaultTradeOfferResp.getDemandedResources(), eve.getRsp().getDemandedResources());
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(0), eve.getRsp().getDemandedResources().get(0));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(0).get("amount"),
-                     eve.getRsp().getDemandedResources().get(0).get("amount"));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(0).get("resource"),
-                     eve.getRsp().getDemandedResources().get(0).get("resource"));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(0).get("enumType"),
-                     eve.getRsp().getDemandedResources().get(0).get("enumType"));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(1), eve.getRsp().getDemandedResources().get(1));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(1).get("amount"),
-                     eve.getRsp().getDemandedResources().get(1).get("amount"));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(1).get("resource"),
-                     eve.getRsp().getDemandedResources().get(1).get("resource"));
-        assertEquals(defaultTradeOfferResp.getDemandedResources().get(1).get("enumType"),
-                     eve.getRsp().getDemandedResources().get(1).get("enumType"));
     }
 
     @Test

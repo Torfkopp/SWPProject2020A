@@ -1,6 +1,7 @@
 package de.uol.swp.common.chat.message;
 
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Message sent to clients when a new ChatMessage was saved on the server
@@ -40,7 +41,7 @@ public class CreatedChatMessageMessage extends AbstractChatMessageMessage {
      *
      * @since 2020-12-30
      */
-    public CreatedChatMessageMessage(ChatMessage msg, String lobbyName) {
+    public CreatedChatMessageMessage(ChatMessage msg, LobbyName lobbyName) {
         super(lobbyName);
         this.msg = msg;
     }

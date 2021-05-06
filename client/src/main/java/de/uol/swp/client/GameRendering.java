@@ -3,11 +3,11 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.game.map.Hexes.IGameHex;
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
+import de.uol.swp.common.game.map.hexes.IGameHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.MapPoint;
 import javafx.geometry.VPos;
@@ -921,19 +921,19 @@ public class GameRendering {
                 break;
             case RESOURCE:
                 switch (((IResourceHex) hex).getResource()) {
-                    case HILLS:
+                    case BRICK:
                         gfxCtx.setFill(HILLS_COLOUR);
                         break;
-                    case FOREST:
+                    case LUMBER:
                         gfxCtx.setFill(FOREST_COLOUR);
                         break;
-                    case MOUNTAINS:
+                    case ORE:
                         gfxCtx.setFill(MOUNTAINS_COLOUR);
                         break;
-                    case FIELDS:
+                    case GRAIN:
                         gfxCtx.setFill(FIELDS_COLOUR);
                         break;
-                    case PASTURE:
+                    case WOOL:
                         gfxCtx.setFill(PASTURE_COLOUR);
                         break;
                     default:

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -12,32 +13,20 @@ import de.uol.swp.common.user.User;
  */
 public class CreateLobbyRequest extends AbstractLobbyRequest {
 
-    private final int maxPlayers;
     private final String password;
 
     /**
      * Constructor
      *
-     * @param name       Name of the lobby
-     * @param owner      User trying to create the lobby
-     * @param maxPlayers Maximum amount of players for the new lobby
-     * @param password   Password of the lobby
+     * @param name     Name of the lobby
+     * @param owner    User trying to create the lobby
+     * @param password Password of the lobby
      *
      * @since 2019-10-08
      */
-    public CreateLobbyRequest(String name, User owner, int maxPlayers, String password) {
+    public CreateLobbyRequest(LobbyName name, User owner, String password) {
         super(name, owner);
-        this.maxPlayers = maxPlayers;
         this.password = password;
-    }
-
-    /**
-     * Gets the maximum amount of players for the new lobby
-     *
-     * @return maximum amount of players
-     */
-    public int getMaxPlayers() {
-        return maxPlayers;
     }
 
     /**

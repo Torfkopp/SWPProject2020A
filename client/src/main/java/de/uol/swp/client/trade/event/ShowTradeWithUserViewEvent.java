@@ -1,5 +1,6 @@
 package de.uol.swp.client.trade.event;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -15,7 +16,7 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class ShowTradeWithUserViewEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
     private final UserOrDummy respondingUser;
 
     /**
@@ -24,7 +25,7 @@ public class ShowTradeWithUserViewEvent {
      * @param lobbyName      Lobby name of the lobby where the player wants to trade
      * @param respondingUser User who the offer will be made to
      */
-    public ShowTradeWithUserViewEvent(String lobbyName, UserOrDummy respondingUser) {
+    public ShowTradeWithUserViewEvent(LobbyName lobbyName, UserOrDummy respondingUser) {
         this.lobbyName = lobbyName;
         this.respondingUser = respondingUser;
     }
@@ -35,7 +36,7 @@ public class ShowTradeWithUserViewEvent {
      *
      * @return Lobby name of the lobby where the player wants to trade
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 

@@ -1,10 +1,9 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.UserOrDummy;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This Response has up-to-date info about the resources in the inventory
@@ -19,7 +18,7 @@ import java.util.Map;
 public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
-    private final List<Map<String, Object>> resourceList;
+    private final ResourceList resourceList;
     private final int tradingUsersInventorySize;
     private final UserOrDummy tradingUser;
 
@@ -28,13 +27,11 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      *
      * @param user                      The User wanting to create a trade offer
      * @param lobbyName                 The Lobby in which the trade is happening
-     * @param resourceList              List of the Resources in the offering User's inventory, containing Maps
-     *                                  containing the following for each type of Resource:<p>
-     *                                  {@literal {"amount": <Integer>, "resource", <Resource>}}
+     * @param resourceList              The list of resources of the offering user
      * @param tradingUsersInventorySize Amount of resource cards the other User has
      * @param tradingUser               The User to whom an offer is going to be made
      */
-    public InventoryForTradeWithUserResponse(UserOrDummy user, String lobbyName, List<Map<String, Object>> resourceList,
+    public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser) {
         super(lobbyName);
         this.user = user;
@@ -44,15 +41,15 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
     }
 
     /**
-     * Gets the list of Resource maps for the MapValueFactory
+     * Gets the resource list
      *
      * @return List of Maps for MapValueFactory
      *
      * @author Phillip-André Suhr
      * @since 2021-04-19
      */
-    public List<Map<String, Object>> getResourceList() {
-        return resourceList;
+    public ResourceList getResourceMap() {
+        return resourceList.create();
     }
 
     /**

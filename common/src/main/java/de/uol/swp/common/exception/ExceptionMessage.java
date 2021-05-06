@@ -25,6 +25,11 @@ public class ExceptionMessage extends AbstractResponseMessage {
         this.exception = message;
     }
 
+    @Override
+    public String toString() {
+        return exception;
+    }
+
     /**
      * Gets the exception message
      *
@@ -33,11 +38,6 @@ public class ExceptionMessage extends AbstractResponseMessage {
      * @since 2017-03-17
      */
     public String getException() {
-        return exception;
-    }
-
-    @Override
-    public String toString() {
         return exception;
     }
 }

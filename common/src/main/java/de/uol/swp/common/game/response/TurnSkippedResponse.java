@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -17,7 +18,7 @@ public class TurnSkippedResponse extends AbstractLobbyResponse {
      *
      * @param lobbyName The lobby in which the game is taking place
      */
-    public TurnSkippedResponse(String lobbyName) {
+    public TurnSkippedResponse(LobbyName lobbyName) {
         super(lobbyName);
     }
 }

@@ -4,9 +4,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,9 +18,6 @@ import javafx.scene.control.Label;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the tradingAccept menu
@@ -42,10 +42,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private Label tradeResponseLabel;
 
-    private String lobbyName;
+    private LobbyName lobbyName;
     private UserOrDummy offeringUser;
-    private List<Map<String, Object>> offeringResourceMap;
-    private List<Map<String, Object>> respondingResourceMap;
+    private ResourceList offeringResourceMap;
+    private ResourceList respondingResourceMap;
 
     /**
      * Constructor
@@ -164,7 +164,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         offeringUser = rsp.getOfferingUser();
         respondingResourceMap = rsp.getDemandedResources();
         offeringResourceMap = rsp.getOfferedResources();
-        ownResourceTableView.getItems().addAll(rsp.getResourceList());
+        for (IResource resource : rsp.getResourceList())
+            ownResourceTableView.getItems().add(resource);
         setOfferLabel();
         Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
@@ -195,14 +196,14 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-05
      */
-    private String tallyUpOfferOrDemand(List<Map<String, Object>> resourceList) {
+    private String tallyUpOfferOrDemand(ResourceList resourceList) {
         boolean nothing = true;
         StringBuilder content = new StringBuilder();
-        for (Map<String, Object> resourceMap : resourceList) {
-            int amount = (int) resourceMap.get("amount");
+        for (IResource entry : resourceList) {
+            int amount = entry.getAmount();
             if (amount > 0) {
                 nothing = false;
-                content.append(amount).append(" ").append(resourceMap.get("resource")).append(", ");
+                content.append(entry.getAmount()).append(" ").append(entry.getType()).append(", ");
             }
         }
         if (nothing) content.append(resourceBundle.getString("game.trade.offer.nothing"));

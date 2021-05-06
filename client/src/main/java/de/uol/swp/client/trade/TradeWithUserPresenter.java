@@ -4,12 +4,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
-import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
 import de.uol.swp.common.game.response.ResetOfferTradeButtonResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -20,8 +20,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.*;
 
 /**
  * Manages the TradingWithUser window
@@ -50,11 +48,11 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @FXML
     private Button offerTradeButton;
 
-    private String lobbyName;
+    private LobbyName lobbyName;
     private UserOrDummy respondingUser;
     private int traderInventorySize;
-    private List<Map<String, Object>> selectedOwnResourceList;
-    private List<Map<String, Object>> selectedPartnersResourceList;
+    private ResourceList selectedOwnResourceList;
+    private ResourceList selectedPartnersResourceList;
 
     /**
      * Constructor
@@ -90,11 +88,11 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private boolean checkResources() {
         int selectedOwnResourceMapCounter = 0;
         int selectedPartnersResourceMapCounter = 0;
-        for (Map<String, Object> map : selectedOwnResourceList) {
-            selectedOwnResourceMapCounter += (int) map.get("amount");
+        for (IResource entry : selectedOwnResourceList) {
+            selectedOwnResourceMapCounter += entry.getAmount();
         }
-        for (Map<String, Object> map : selectedPartnersResourceList) {
-            selectedPartnersResourceMapCounter += (int) map.get("amount");
+        for (IResource entry : selectedPartnersResourceList) {
+            selectedPartnersResourceMapCounter += entry.getAmount();
         }
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
             tradeService.showTradeError(resourceBundle.getString("game.trade.error.demandtoohigh"));
@@ -153,12 +151,13 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
-        List<Map<String, Object>> resourceList = Collections.unmodifiableList(rsp.getResourceList());
-        ownResourceTableView.getItems().addAll(resourceList);
+        IResourceList resourceList = rsp.getResourceMap();
+        for (IResource resource : resourceList)
+            ownResourceTableView.getItems().add(resource);
         traderInventorySize = rsp.getTradingUsersInventorySize();
         int ownInventorySize = 0;
-        for (Map<String, Object> map : resourceList) {
-            ownInventorySize += (int) map.get("amount");
+        for (IResource entry : resourceList) {
+            ownInventorySize += entry.getAmount();
         }
         if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
             setSliders(resourceList);
@@ -265,64 +264,19 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void setResourceLists() {
-        selectedOwnResourceList = new ArrayList<>();
-        selectedPartnersResourceList = new ArrayList<>();
-        for (Resources resource : Resources.values()) {
-            Map<String, Object> offeredResources = new HashMap<>();
-            Map<String, Object> demandedResources = new HashMap<>();
-            switch (resource) {
-                case BRICK:
-                    offeredResources.put("amount", (int) ownBrickSlider.getValue());
-                    offeredResources.put("resource", new I18nWrapper("game.resources.brick"));
-                    offeredResources.put("enumType", resource);
-                    demandedResources.put("amount", (int) tradingPartnerBrickSlider.getValue());
-                    demandedResources.put("resource", new I18nWrapper("game.resources.brick"));
-                    demandedResources.put("enumType", resource);
-                    selectedOwnResourceList.add(offeredResources);
-                    selectedPartnersResourceList.add(demandedResources);
-                    break;
-                case GRAIN:
-                    offeredResources.put("amount", (int) ownGrainSlider.getValue());
-                    offeredResources.put("resource", new I18nWrapper("game.resources.grain"));
-                    offeredResources.put("enumType", resource);
-                    demandedResources.put("amount", (int) tradingPartnerGrainSlider.getValue());
-                    demandedResources.put("resource", new I18nWrapper("game.resources.grain"));
-                    demandedResources.put("enumType", resource);
-                    selectedOwnResourceList.add(offeredResources);
-                    selectedPartnersResourceList.add(demandedResources);
-                    break;
-                case LUMBER:
-                    offeredResources.put("amount", (int) ownLumberSlider.getValue());
-                    offeredResources.put("resource", new I18nWrapper("game.resources.lumber"));
-                    offeredResources.put("enumType", resource);
-                    demandedResources.put("amount", (int) tradingPartnerLumberSlider.getValue());
-                    demandedResources.put("resource", new I18nWrapper("game.resources.lumber"));
-                    demandedResources.put("enumType", resource);
-                    selectedOwnResourceList.add(offeredResources);
-                    selectedPartnersResourceList.add(demandedResources);
-                    break;
-                case ORE:
-                    offeredResources.put("amount", (int) ownOreSlider.getValue());
-                    offeredResources.put("resource", new I18nWrapper("game.resources.ore"));
-                    offeredResources.put("enumType", resource);
-                    demandedResources.put("amount", (int) tradingPartnerOreSlider.getValue());
-                    demandedResources.put("resource", new I18nWrapper("game.resources.ore"));
-                    demandedResources.put("enumType", resource);
-                    selectedOwnResourceList.add(offeredResources);
-                    selectedPartnersResourceList.add(demandedResources);
-                    break;
-                case WOOL:
-                    offeredResources.put("amount", (int) ownWoolSlider.getValue());
-                    offeredResources.put("resource", new I18nWrapper("game.resources.wool"));
-                    offeredResources.put("enumType", resource);
-                    demandedResources.put("amount", (int) tradingPartnerWoolSlider.getValue());
-                    demandedResources.put("resource", new I18nWrapper("game.resources.wool"));
-                    demandedResources.put("enumType", resource);
-                    selectedOwnResourceList.add(offeredResources);
-                    selectedPartnersResourceList.add(demandedResources);
-                    break;
-            }
-        }
+        selectedOwnResourceList = new ResourceList();
+        selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.LUMBER, ((int) (ownLumberSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.GRAIN, ((int) (ownGrainSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.WOOL, ((int) (ownWoolSlider.getValue())));
+
+        selectedPartnersResourceList = new ResourceList();
+        selectedPartnersResourceList.set(ResourceType.BRICK, ((int) (tradingPartnerBrickSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.ORE, ((int) (tradingPartnerOreSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
     }
 
     /**
@@ -331,19 +285,17 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * @param resourceList List of resourceMaps to determine the Slider values
      */
     @FXML
-    private void setSliders(List<Map<String, Object>> resourceList) {
+    private void setSliders(IResourceList resourceList) {
         tradingPartnerBrickSlider.setMax(traderInventorySize);
         tradingPartnerOreSlider.setMax(traderInventorySize);
         tradingPartnerLumberSlider.setMax(traderInventorySize);
         tradingPartnerWoolSlider.setMax(traderInventorySize);
         tradingPartnerGrainSlider.setMax(traderInventorySize);
 
-        for (Map<String, Object> map : resourceList) {
-            if (Resources.GRAIN.equals(map.get("enumType"))) ownGrainSlider.setMax((int) map.get("amount"));
-            if (Resources.BRICK.equals(map.get("enumType"))) ownBrickSlider.setMax((int) map.get("amount"));
-            if (Resources.LUMBER.equals(map.get("enumType"))) ownLumberSlider.setMax((int) map.get("amount"));
-            if (Resources.ORE.equals(map.get("enumType"))) ownOreSlider.setMax((int) map.get("amount"));
-            if (Resources.WOOL.equals(map.get("enumType"))) ownWoolSlider.setMax((int) map.get("amount"));
-        }
+        ownGrainSlider.setMax(resourceList.getAmount(ResourceType.GRAIN));
+        ownOreSlider.setMax(resourceList.getAmount(ResourceType.ORE));
+        ownLumberSlider.setMax(resourceList.getAmount(ResourceType.LUMBER));
+        ownWoolSlider.setMax(resourceList.getAmount(ResourceType.WOOL));
+        ownBrickSlider.setMax(resourceList.getAmount(ResourceType.BRICK));
     }
 }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -22,7 +23,7 @@ public class UserReadyMessage extends AbstractLobbyMessage {
      * @param lobbyName The Name of the lobby
      * @param user      The User who changed their ready status
      */
-    public UserReadyMessage(String lobbyName, UserOrDummy user) {
+    public UserReadyMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

@@ -1,5 +1,8 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -13,7 +16,8 @@ import de.uol.swp.common.user.UserOrDummy;
 public class EditInventoryRequest extends AbstractGameRequest {
 
     private final UserOrDummy user;
-    private final String resource;
+    private final ResourceType resource;
+    private final DevelopmentCardType developmentCard;
     private final int amount;
 
     /**
@@ -25,10 +29,12 @@ public class EditInventoryRequest extends AbstractGameRequest {
      * @param amount      The amount to be added (substracted if negative)
      *                    to/from the resource
      */
-    public EditInventoryRequest(String originLobby, UserOrDummy user, String resource, int amount) {
+    public EditInventoryRequest(LobbyName originLobby, UserOrDummy user, ResourceType resource,
+                                DevelopmentCardType developmentCard, int amount) {
         super(originLobby);
         this.user = user;
         this.resource = resource;
+        this.developmentCard = developmentCard;
         this.amount = amount;
     }
 
@@ -43,11 +49,20 @@ public class EditInventoryRequest extends AbstractGameRequest {
     }
 
     /**
+     * Gets the development card.
+     *
+     * @return The development card
+     */
+    public DevelopmentCardType getDevelopmentCard() {
+        return developmentCard;
+    }
+
+    /**
      * Gets the resource that should be changed
      *
      * @return The name of the resource
      */
-    public String getResource() {
+    public ResourceType getResource() {
         return resource;
     }
 

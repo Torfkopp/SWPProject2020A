@@ -5,13 +5,14 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
-import de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
+import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.game.message.GameCreatedMessage;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.JoinLobbyWithPasswordConfirmationRequest;
 import de.uol.swp.common.lobby.response.*;
@@ -61,11 +62,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private Label randomLobbyState;
     @FXML
-    private ListView<Pair<String, String>> lobbyView;
+    private ListView<Pair<LobbyName, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
 
-    private ObservableList<Pair<String, String>> lobbies;
+    private ObservableList<Pair<LobbyName, String>> lobbies;
     private ObservableList<String> users;
 
     /**
@@ -86,7 +87,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         super.initialize();
         lobbyView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<String, String> item, boolean empty) {
+            protected void updateItem(Pair<LobbyName, String> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
@@ -196,7 +197,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @author Eric Vuong
      * @author Alwin Bossert
-     * @see de.uol.swp.client.ChangeAccountDetails.event.ShowChangeAccountDetailsViewEvent
+     * @see de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent
      * @see de.uol.swp.client.SceneManager
      * @since 2021-03-16
      */
@@ -282,7 +283,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             lobbyPasswordHash = userService.hash(lobbyPassword.getText());
         }
         String finalLobbyPasswordHash = lobbyPasswordHash;
-        result.ifPresent(s -> lobbyService.createNewLobby(lobbyName.getText(), 3, finalLobbyPasswordHash));
+        result.ifPresent(s -> lobbyService.createNewLobby(new LobbyName(lobbyName.getText()), finalLobbyPasswordHash));
     }
 
     /**
@@ -298,7 +299,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe
@@ -323,7 +324,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2021-04-22
      */
     @Subscribe
@@ -408,7 +409,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (lobbyView.getSelectionModel().isEmpty()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
         } else {
-            String lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
+            LobbyName lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
             lobbyService.joinLobby(lobbyName);
         }
     }
@@ -426,7 +427,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
      * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
-     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(String)
+     * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe
@@ -728,22 +729,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @implNote The code inside this Method has to run in the JavaFX-application
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.lobby.dto.LobbyDTO
      * @since 2020-11-29
      */
-    private void updateLobbyList(List<Lobby> lobbyList) {
+    private void updateLobbyList(List<ISimpleLobby> lobbyList) {
         Platform.runLater(() -> {
             if (lobbies == null) {
                 lobbies = FXCollections.observableArrayList();
                 lobbyView.setItems(lobbies);
             }
             lobbies.clear();
-            for (Lobby l : lobbyList) {
+            for (ISimpleLobby l : lobbyList) {
                 String s = l.getName() + " (" + l.getUserOrDummies().size() + "/" + l.getMaxPlayers() + ")";
                 if (l.isInGame()) s = String.format(resourceBundle.getString("mainmenu.lobbylist.ingame"), s);
                 else if (l.getUserOrDummies().size() == l.getMaxPlayers())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
-                else if (l.hasAPassword())
+                else if (l.hasPassword())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
                 lobbies.add(new Pair<>(l.getName(), s));
             }

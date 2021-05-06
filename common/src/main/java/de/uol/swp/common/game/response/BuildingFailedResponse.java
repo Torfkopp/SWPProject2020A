@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 
 /**
@@ -32,7 +33,7 @@ public class BuildingFailedResponse extends AbstractLobbyResponse {
      *
      * @param lobbyName The name of the Lobby which this Response is directed to
      */
-    public BuildingFailedResponse(String lobbyName, Reason reason) {
+    public BuildingFailedResponse(LobbyName lobbyName, Reason reason) {
         super(lobbyName);
         this.reason = reason;
     }

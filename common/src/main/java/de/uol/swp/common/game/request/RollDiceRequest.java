@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -13,7 +14,7 @@ public class RollDiceRequest extends AbstractGameRequest {
 
     private final UserOrDummy user;
 
-    public RollDiceRequest(UserOrDummy user, String originLobby) {
+    public RollDiceRequest(UserOrDummy user, LobbyName originLobby) {
         super(originLobby);
         this.user = user;
     }

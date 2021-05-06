@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -26,7 +27,7 @@ public class EndTurnRequest extends AbstractGameRequest {
      *
      * @since 2021-01-15
      */
-    public EndTurnRequest(UserOrDummy user, String originLobby) {
+    public EndTurnRequest(UserOrDummy user, LobbyName originLobby) {
         super(originLobby);
         this.user = user;
     }

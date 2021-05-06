@@ -1,5 +1,7 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
+
 /**
  * Request sent to the server to request an update for the game map
  *
@@ -15,7 +17,7 @@ public class UpdateGameMapRequest extends AbstractGameRequest {
      *
      * @param originLobby The Origin lobby
      */
-    public UpdateGameMapRequest(String originLobby) {
+    public UpdateGameMapRequest(LobbyName originLobby) {
         super(originLobby);
     }
 }

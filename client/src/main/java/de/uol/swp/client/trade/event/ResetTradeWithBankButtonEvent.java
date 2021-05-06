@@ -1,5 +1,7 @@
 package de.uol.swp.client.trade.event;
 
+import de.uol.swp.common.lobby.LobbyName;
+
 /**
  * Event used to trigger the updating of the Trade with Bank Button status
  * in the according lobby if a trade was not successful
@@ -14,14 +16,14 @@ package de.uol.swp.client.trade.event;
  */
 public class ResetTradeWithBankButtonEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the lobby where the button should be enabled
      */
-    public ResetTradeWithBankButtonEvent(String lobbyName) {
+    public ResetTradeWithBankButtonEvent(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -30,7 +32,7 @@ public class ResetTradeWithBankButtonEvent {
      *
      * @return The name of the lobby where the button should be enabled
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

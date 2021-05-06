@@ -1,20 +1,20 @@
 package de.uol.swp.common.game.map.gamemapDTO;
 
-import de.uol.swp.common.game.map.management.Edge;
 import de.uol.swp.common.game.map.Player;
+import de.uol.swp.common.game.map.management.Edge;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.util.List;
 
 /**
- * The type Edge with buildable.
+ * A Class to store an edge with the players that can build on it.
  *
  * @author Temmo Junkhoff
  * @since 2021-04-25
  */
 public class EdgeWithBuildable extends Edge implements IEdgeWithBuildable {
 
-    private List<UserOrDummy> buildable;
+    private final List<UserOrDummy> buildable;
 
     /**
      * Instantiates a new Edge.
@@ -33,7 +33,6 @@ public class EdgeWithBuildable extends Edge implements IEdgeWithBuildable {
 
     @Override
     public boolean isBuildableBy(UserOrDummy user) {
-        if (buildable.contains(user)) return true;
-        return false;
+        return buildable.contains(user);
     }
 }

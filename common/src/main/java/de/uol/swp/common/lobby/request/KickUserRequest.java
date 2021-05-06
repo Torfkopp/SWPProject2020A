@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -22,7 +23,7 @@ public class KickUserRequest extends AbstractLobbyRequest {
      * @param user           The user who wants to kick someone
      * @param toBeKickedUser The user about to be kicked
      */
-    public KickUserRequest(String name, UserOrDummy user, UserOrDummy toBeKickedUser) {
+    public KickUserRequest(LobbyName name, UserOrDummy user, UserOrDummy toBeKickedUser) {
         super(name, user);
         this.toBeKickedUser = toBeKickedUser;
     }

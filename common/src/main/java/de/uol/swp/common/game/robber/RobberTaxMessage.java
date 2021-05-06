@@ -1,10 +1,12 @@
 package de.uol.swp.common.game.robber;
 
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.message.AbstractGameMessage;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,21 +23,21 @@ import java.util.Map;
 public class RobberTaxMessage extends AbstractGameMessage {
 
     private final Map<User, Integer> players;
-    private final Map<User, Map<Resources, Integer>> inventory;
+    private final Map<User, ResourceList> inventories;
 
     /**
      * Constructor
      *
-     * @param lobbyName The lobby's name
-     * @param user      The UserOrDummy who triggered this message
-     * @param players   Map of User to pay the tax and the amount of card to pay
-     * @param inventory Map of user and the inventory as map with resources and its amount
+     * @param lobbyName   The lobby's name
+     * @param user        The UserOrDummy who triggered this message
+     * @param players     Map of User to pay the tax and the amount of card to pay
+     * @param inventories Map of user and the inventory as map with resources and its amount
      */
-    public RobberTaxMessage(String lobbyName, UserOrDummy user, Map<User, Integer> players,
-                            Map<User, Map<Resources, Integer>> inventory) {
+    public RobberTaxMessage(LobbyName lobbyName, UserOrDummy user, Map<User, Integer> players,
+                            Map<User, ResourceList> inventories) {
         super(lobbyName, user);
         this.players = players;
-        this.inventory = inventory;
+        this.inventories = inventories;
     }
 
     /**
@@ -53,8 +55,8 @@ public class RobberTaxMessage extends AbstractGameMessage {
      *
      * @return Map of user and a map of a resource and its amount
      */
-    public Map<User, Map<Resources, Integer>> getInventory() {
-        return inventory;
+    public Map<User, ResourceList> getInventories() {
+        return new HashMap<>(inventories);
     }
 
     /**

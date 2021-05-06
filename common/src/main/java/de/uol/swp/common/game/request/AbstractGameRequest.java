@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
@@ -17,7 +18,7 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  */
 public abstract class AbstractGameRequest extends AbstractRequestMessage {
 
-    private final String originLobby;
+    private final LobbyName originLobby;
 
     /**
      * Constructor
@@ -27,7 +28,7 @@ public abstract class AbstractGameRequest extends AbstractRequestMessage {
      *
      * @param originLobby The Lobby from which a request originated from
      */
-    public AbstractGameRequest(String originLobby) {
+    public AbstractGameRequest(LobbyName originLobby) {
         this.originLobby = originLobby;
     }
 
@@ -36,7 +37,7 @@ public abstract class AbstractGameRequest extends AbstractRequestMessage {
      *
      * @return The name of the Lobby the EndTurnRequest originated from.
      */
-    public String getOriginLobby() {
+    public LobbyName getOriginLobby() {
         return originLobby;
     }
 }

@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -30,7 +31,7 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
      * @param moveTime               The maximum move time in seconds
      * @param randomPlayFieldEnabled Whether a randomly generated play field will be used
      */
-    public ChangeLobbySettingsRequest(String name, User user, int allowedPlayers, boolean startUpPhaseEnabled,
+    public ChangeLobbySettingsRequest(LobbyName name, User user, int allowedPlayers, boolean startUpPhaseEnabled,
                                       boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
         super(name, user);
         this.allowedPlayers = allowedPlayers;

@@ -1,6 +1,7 @@
 package de.uol.swp.common.lobby.response;
 
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Response sent by the server to a user who created a lobby with a password
@@ -12,7 +13,7 @@ import de.uol.swp.common.lobby.Lobby;
  */
 public class CreateLobbyWithPasswordResponse extends AbstractLobbyResponse {
 
-    private final Lobby lobby;
+    private final ISimpleLobby lobby;
     private final String password;
 
     /**
@@ -22,7 +23,7 @@ public class CreateLobbyWithPasswordResponse extends AbstractLobbyResponse {
      * @param lobby     The object of the created lobby
      * @param password  The password for the new lobby
      **/
-    public CreateLobbyWithPasswordResponse(String lobbyName, Lobby lobby, String password) {
+    public CreateLobbyWithPasswordResponse(LobbyName lobbyName, ISimpleLobby lobby, String password) {
         super(lobbyName);
         this.lobby = lobby;
         this.password = password;
@@ -33,7 +34,7 @@ public class CreateLobbyWithPasswordResponse extends AbstractLobbyResponse {
      *
      * @return The created lobby
      */
-    public Lobby getLobby() {
+    public ISimpleLobby getLobby() {
         return lobby;
     }
 

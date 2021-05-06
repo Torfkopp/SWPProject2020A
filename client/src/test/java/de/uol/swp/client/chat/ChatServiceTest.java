@@ -6,6 +6,7 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.chat.request.*;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -32,7 +33,7 @@ class ChatServiceTest {
     private static final int defaultId = 42;
     private static final int defaultAmount = 37;
     private static final User defaultUser = new UserDTO(1, "test", "test", "test@test.de");
-    private static final String defaultLobby = "I am an intelligent lobby";
+    private static final LobbyName defaultLobby = new LobbyName("I am an intelligent lobby");
     private static IChatService chatService;
     private static IUserService userService;
     final EventBus bus = new EventBus();

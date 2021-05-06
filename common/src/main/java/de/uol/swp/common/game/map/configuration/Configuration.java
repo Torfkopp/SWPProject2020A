@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.map.configuration;
 
-import de.uol.swp.common.game.map.Hexes.IHarborHex;
-import de.uol.swp.common.game.map.Hexes.IResourceHex;
+import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.management.MapPoint;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class Configuration implements IConfiguration {
 
-    private final List<IResourceHex.ResourceHexType> hexList;
+    private final List<ResourceType> hexList;
     private final List<IHarborHex.HarborResource> harborList;
     private final List<Integer> tokenList;
     private final MapPoint robberPosition;
@@ -31,7 +31,7 @@ public class Configuration implements IConfiguration {
      * @param hexList    Unmodifiable, ordered List of Hex resource types
      * @param tokenList  Unmodifiable, ordered List of Tokens to be placed on Hexes
      */
-    public Configuration(List<IHarborHex.HarborResource> harborList, List<IResourceHex.ResourceHexType> hexList,
+    public Configuration(List<IHarborHex.HarborResource> harborList, List<ResourceType> hexList,
                          List<Integer> tokenList, MapPoint robberPosition) {
         this.harborList = harborList;
         this.hexList = hexList;
@@ -45,17 +45,17 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public List<IResourceHex.ResourceHexType> getHexList() {
+    public List<ResourceType> getHexList() {
         return hexList;
-    }
-
-    @Override
-    public List<Integer> getTokenList() {
-        return tokenList;
     }
 
     @Override
     public MapPoint getRobberPosition() {
         return robberPosition;
+    }
+
+    @Override
+    public List<Integer> getTokenList() {
+        return tokenList;
     }
 }

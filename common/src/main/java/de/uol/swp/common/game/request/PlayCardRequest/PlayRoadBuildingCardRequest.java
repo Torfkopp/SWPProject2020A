@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request.PlayCardRequest;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 /**
@@ -9,7 +10,7 @@ import de.uol.swp.common.user.User;
  * @author Mario Fokken
  * @since 2021-02-26
  */
-public class PlayRoadBuildingCardRequest extends PlayCardRequest {
+public class PlayRoadBuildingCardRequest extends AbstractPlayCardRequest {
 
     /**
      * Constructor
@@ -17,7 +18,7 @@ public class PlayRoadBuildingCardRequest extends PlayCardRequest {
      * @param originLobby The lobby
      * @param user        The user
      */
-    public PlayRoadBuildingCardRequest(String originLobby, User user) {
+    public PlayRoadBuildingCardRequest(LobbyName originLobby, User user) {
         super(originLobby, user);
     }
 }

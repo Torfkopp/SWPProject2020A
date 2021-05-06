@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.message;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -17,7 +18,7 @@ public class PlayerWonGameMessage extends AbstractGameMessage {
      * @param lobbyName The lobby this game is taking place in
      * @param user      The user that won the game.
      */
-    public PlayerWonGameMessage(String lobbyName, UserOrDummy user) {
+    public PlayerWonGameMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 }

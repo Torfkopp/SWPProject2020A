@@ -3,6 +3,7 @@ package de.uol.swp.server.chat.store;
 import com.google.common.base.Strings;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 
 import java.util.*;
@@ -17,10 +18,10 @@ import java.util.stream.Collectors;
  *
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
- * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see IChatMessageStore
  * @since 2020-12-16
  */
-public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
+public class MainMemoryBasedChatMessageStore implements IChatMessageStore {
 
     private static final int MAX_HISTORY = 10000;
     private static final int MAX_LOBBY_HISTORY = 1000;
@@ -31,7 +32,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
             return size() > MAX_HISTORY;
         }
     };
-    private final Map<String, Map<Integer, ChatMessage>> lobbyChatHistories = new HashMap<>();
+    private final Map<LobbyName, Map<Integer, ChatMessage>> lobbyChatHistories = new HashMap<>();
     private int id_count;
 
     @Override
@@ -46,7 +47,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
     }
 
     @Override
-    public ChatMessage createChatMessage(User author, String content, String originLobby) {
+    public ChatMessage createChatMessage(User author, String content, LobbyName originLobby) {
         if (author == null) {
             throw new IllegalArgumentException("Message author must not be null");
         } else if (originLobby == null) {
@@ -70,7 +71,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
     }
 
     @Override
-    public Optional<ChatMessage> findMessage(int id, String originLobby) {
+    public Optional<ChatMessage> findMessage(int id, LobbyName originLobby) {
         if (originLobby == null) {
             return findMessage(id);
         } else {
@@ -94,7 +95,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
     }
 
     @Override
-    public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
+    public List<ChatMessage> getLatestMessages(int amount, LobbyName originLobby) {
         if (originLobby == null) {
             return getLatestMessages(amount);
         } else {
@@ -115,7 +116,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
     }
 
     @Override
-    public void removeChatMessage(int id, String originLobby) {
+    public void removeChatMessage(int id, LobbyName originLobby) {
         if (originLobby == null) {
             removeChatMessage(id);
         } else {
@@ -125,7 +126,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
     }
 
     @Override
-    public void removeLobbyHistory(String originLobby) {
+    public void removeLobbyHistory(LobbyName originLobby) {
         if (originLobby != null) {
             lobbyChatHistories.remove(originLobby);
         }
@@ -145,7 +146,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
     }
 
     @Override
-    public ChatMessage updateChatMessage(int id, String updatedContent, String originLobby) {
+    public ChatMessage updateChatMessage(int id, String updatedContent, LobbyName originLobby) {
         if (originLobby == null) {
             return updateChatMessage(id, updatedContent);
         } else {
@@ -170,7 +171,7 @@ public class MainMemoryBasedChatMessageStore implements ChatMessageStore {
      *
      * @since 2021-01-02
      */
-    private void ensureLobbyChatHistory(String originLobby) {
+    private void ensureLobbyChatHistory(LobbyName originLobby) {
         if (lobbyChatHistories.get(originLobby) == null) {
             lobbyChatHistories.put(originLobby, new LinkedHashMap<>() {
                 @Override

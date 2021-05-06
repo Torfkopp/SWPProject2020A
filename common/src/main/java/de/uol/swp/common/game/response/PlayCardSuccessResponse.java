@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.response;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
 import de.uol.swp.common.user.User;
 
@@ -12,13 +13,24 @@ import de.uol.swp.common.user.User;
  */
 public class PlayCardSuccessResponse extends AbstractLobbyResponse {
 
-    User user;
+    private final User user;
 
-    public PlayCardSuccessResponse(String lobbyName, User user) {
+    /**
+     * Constructor.
+     *
+     * @param lobbyName The lobby name
+     * @param user      The user
+     */
+    public PlayCardSuccessResponse(LobbyName lobbyName, User user) {
         super(lobbyName);
         this.user = user;
     }
 
+    /**
+     * Gets the user.
+     *
+     * @return The user
+     */
     public User getUser() {
         return user;
     }

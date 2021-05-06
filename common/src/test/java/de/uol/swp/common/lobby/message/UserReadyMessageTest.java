@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserReadyMessageTest {
 
     private static final User defaultUser = new UserDTO(42, "chuck", "test", "chuck@norris.com");
+    private static final LobbyName defaultLobbyName = new LobbyName("Lobby");
 
     /**
      * Tests the userReadyMessage
@@ -25,9 +27,9 @@ class UserReadyMessageTest {
      */
     @Test
     void basicUserReadyMessageTest() {
-        UserReadyMessage userReadyMessage = new UserReadyMessage("Lobby", defaultUser);
+        UserReadyMessage userReadyMessage = new UserReadyMessage(defaultLobbyName, defaultUser);
 
-        assertEquals("Lobby", userReadyMessage.getName());
+        assertEquals(defaultLobbyName, userReadyMessage.getName());
         assertEquals(defaultUser, userReadyMessage.getUser());
         assertEquals(defaultUser.getUsername(), userReadyMessage.getUser().getUsername());
     }

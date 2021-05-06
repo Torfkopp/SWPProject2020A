@@ -1,5 +1,6 @@
 package de.uol.swp.common.chat.message;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractServerMessage;
 
 /**
@@ -15,7 +16,7 @@ import de.uol.swp.common.message.AbstractServerMessage;
 public abstract class AbstractChatMessageMessage extends AbstractServerMessage {
 
     private final boolean isLobbyChatMessage;
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
@@ -25,7 +26,7 @@ public abstract class AbstractChatMessageMessage extends AbstractServerMessage {
      *
      * @param lobbyName the lobby name
      */
-    public AbstractChatMessageMessage(String lobbyName) {
+    public AbstractChatMessageMessage(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
         this.isLobbyChatMessage = (lobbyName != null);
     }
@@ -35,7 +36,7 @@ public abstract class AbstractChatMessageMessage extends AbstractServerMessage {
      *
      * @return The lobbyName of the destination lobby
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 

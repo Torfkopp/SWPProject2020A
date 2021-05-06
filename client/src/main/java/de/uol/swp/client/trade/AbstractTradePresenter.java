@@ -2,12 +2,12 @@ package de.uol.swp.client.trade;
 
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.MapValueFactory;
-
-import java.util.Map;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 /**
  * An AbstractPresenter for all TradePresenters
@@ -15,19 +15,17 @@ import java.util.Map;
  * @author Mario Fokken
  * @since 2021-04-16
  */
-@SuppressWarnings("rawtypes")
 public class AbstractTradePresenter extends AbstractPresenter {
 
     @Inject
     protected ITradeService tradeService;
 
     @FXML
-    protected TableView<Map<String, Object>> ownResourceTableView;
-    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
+    protected TableView<IResource> ownResourceTableView;
     @FXML
-    protected TableColumn<Map, Integer> resourceAmountCol;
+    protected TableColumn<IResource, Integer> resourceAmountCol;
     @FXML
-    protected TableColumn<Map, String> resourceNameCol;
+    protected TableColumn<IResource, ResourceType> resourceNameCol;
 
     /**
      * Initialises the Presenters by setting up the ownResourceTableView
@@ -36,7 +34,7 @@ public class AbstractTradePresenter extends AbstractPresenter {
      */
     @FXML
     public void initialize() {
-        resourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        resourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
+        resourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        resourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
     }
 }

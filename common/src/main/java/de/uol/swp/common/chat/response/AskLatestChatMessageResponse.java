@@ -2,6 +2,7 @@ package de.uol.swp.common.chat.response;
 
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.dto.ChatMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 import java.util.LinkedList;
@@ -24,7 +25,7 @@ import java.util.List;
 public class AskLatestChatMessageResponse extends AbstractResponseMessage {
 
     private final List<ChatMessage> chatHistory = new LinkedList<>();
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
@@ -55,7 +56,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      *
      * @since 2020-12-30
      */
-    public AskLatestChatMessageResponse(List<ChatMessage> latestMessages, String lobbyName) {
+    public AskLatestChatMessageResponse(List<ChatMessage> latestMessages, LobbyName lobbyName) {
         for (ChatMessage msg : latestMessages) {
             chatHistory.add(ChatMessageDTO.create(msg));
         }
@@ -80,7 +81,7 @@ public class AskLatestChatMessageResponse extends AbstractResponseMessage {
      *
      * @since 2021-01-02
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

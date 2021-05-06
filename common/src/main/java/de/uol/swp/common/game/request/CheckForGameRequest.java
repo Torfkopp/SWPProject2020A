@@ -1,5 +1,6 @@
 package de.uol.swp.common.game.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -21,7 +22,7 @@ public class CheckForGameRequest extends AbstractGameRequest {
      * @param originLobby The Lobby from which a request originated from
      * @param user        The User who is checking for a game in the lobby
      */
-    public CheckForGameRequest(String originLobby, UserOrDummy user) {
+    public CheckForGameRequest(LobbyName originLobby, UserOrDummy user) {
         super(originLobby);
         this.user = user;
     }

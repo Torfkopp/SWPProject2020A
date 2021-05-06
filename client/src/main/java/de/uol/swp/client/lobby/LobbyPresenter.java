@@ -8,7 +8,9 @@ import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.game.CardsAmount;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.UpdateLobbyMessage;
 import de.uol.swp.common.lobby.message.UserJoinedLobbyMessage;
 import de.uol.swp.common.lobby.message.UserLeftLobbyMessage;
@@ -16,7 +18,6 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -106,7 +107,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
-        if (!this.lobbyName.equals(rsp.getLobbyName())) return;
+        if (!Objects.equals(lobbyName, rsp.getLobbyName())) return;
         LOG.debug("Received AllLobbyMembersResponse");
         LOG.debug("---- Update of Lobby member list");
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
@@ -187,10 +188,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
-        commandsActivated.setSelected(event.getLobby().commandsAllowed());
-        randomPlayFieldCheckbox.setSelected(event.getLobby().randomPlayfieldEnabled());
-        setStartUpPhaseCheckBox.setSelected(event.getLobby().startUpPhaseEnabled());
-        startUpPhaseEnabled = event.getLobby().startUpPhaseEnabled();
+        commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
+        randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
+        setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
+        startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
         moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
         moveTimeTextField.setText(String.valueOf(moveTime));
@@ -215,7 +216,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @Subscribe
     private void onRemoveFromLobbiesResponse(RemoveFromLobbiesResponse rsp) {
         LOG.debug("Received RemoveFromLobbiesResponse");
-        for (Map.Entry<String, Lobby> entry : rsp.getLobbiesWithUser().entrySet()) {
+        for (Map.Entry<LobbyName, ISimpleLobby> entry : rsp.getLobbiesWithUser().entrySet()) {
             lobbyService.leaveLobby(entry.getKey());
         }
     }
@@ -273,10 +274,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             setChangeOwnerButtonState();
             setPreGameSettings();
         }
-        setStartUpPhaseCheckBox.setSelected(msg.getLobby().startUpPhaseEnabled());
-        startUpPhaseEnabled = msg.getLobby().startUpPhaseEnabled();
-        randomPlayFieldCheckbox.setSelected(msg.getLobby().randomPlayfieldEnabled());
-        commandsActivated.setSelected(msg.getLobby().commandsAllowed());
+        setStartUpPhaseCheckBox.setSelected(msg.getLobby().isStartUpPhaseEnabled());
+        startUpPhaseEnabled = msg.getLobby().isStartUpPhaseEnabled();
+        randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
+        commandsActivated.setSelected(msg.getLobby().areCommandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
         Platform.runLater(() -> moveTimeLabel
@@ -381,15 +382,16 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                         if (user.equals(owner))
                             name = String.format(resourceBundle.getString("lobby.members.owner"), name);
                         if (inGame) {
-                            if (cardAmountTripleList == null) {
-                                cardAmountTripleList = new ArrayList<>();
+                            if (cardAmountsList == null) {
+                                cardAmountsList = new ArrayList<>();
                                 // At the start of the game nobody has any cards, so add 0s for each user
-                                for (UserOrDummy u : lobbyMembers) cardAmountTripleList.add(new Triple<>(u, 0, 0));
+                                for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
                             }
-                            for (Triple<UserOrDummy, Integer, Integer> triple : cardAmountTripleList) {
-                                if (triple.getValue1().equals(user)) {
+                            for (CardsAmount cardsAmount : cardAmountsList) {
+                                if (Objects.equals(cardsAmount.getUser(), user)) {
                                     name = String.format(resourceBundle.getString("lobby.members.amount"), name,
-                                                         triple.getValue2(), triple.getValue3());
+                                                         cardsAmount.getResourceCardsAmount(),
+                                                         cardsAmount.getDevelopmentCardsAmount());
                                     break;
                                 }
                             }

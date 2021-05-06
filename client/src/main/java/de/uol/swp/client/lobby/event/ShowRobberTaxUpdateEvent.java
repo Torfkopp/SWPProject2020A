@@ -1,8 +1,7 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.game.map.Resources;
-
-import java.util.Map;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.lobby.LobbyName;
 
 /**
  * Event used to trigger an update of the RobberTaxPresenter
@@ -16,9 +15,9 @@ import java.util.Map;
  */
 public class ShowRobberTaxUpdateEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
     private final int taxAmount;
-    private final Map<Resources, Integer> inventory;
+    private final ResourceList inventory;
 
     /**
      * Constructor
@@ -27,7 +26,7 @@ public class ShowRobberTaxUpdateEvent {
      * @param taxAmount The amount of cards to pay
      * @param inventory The inventory of the user
      */
-    public ShowRobberTaxUpdateEvent(String lobbyName, int taxAmount, Map<Resources, Integer> inventory) {
+    public ShowRobberTaxUpdateEvent(LobbyName lobbyName, int taxAmount, ResourceList inventory) {
         this.lobbyName = lobbyName;
         this.taxAmount = taxAmount;
         this.inventory = inventory;
@@ -38,16 +37,16 @@ public class ShowRobberTaxUpdateEvent {
      *
      * @return Map with the resource and its amount as integer
      */
-    public Map<Resources, Integer> getInventory() {
-        return inventory;
+    public ResourceList getInventory() {
+        return inventory.create();
     }
 
     /**
      * Gets the lobby's name
      *
-     * @return String lobbyName
+     * @return LobbyName lobbyName
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 

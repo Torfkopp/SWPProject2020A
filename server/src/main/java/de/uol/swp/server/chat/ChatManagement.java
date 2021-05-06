@@ -3,8 +3,9 @@ package de.uol.swp.server.chat;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import de.uol.swp.common.chat.ChatMessage;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.User;
-import de.uol.swp.server.chat.store.ChatMessageStore;
+import de.uol.swp.server.chat.store.IChatMessageStore;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,25 +16,25 @@ import java.util.Optional;
  * @author Temmo Junkhoff
  * @author Phillip-André Suhr
  * @see de.uol.swp.server.chat.IChatManagement
- * @see de.uol.swp.server.chat.store.ChatMessageStore
+ * @see de.uol.swp.server.chat.store.IChatMessageStore
  * @see de.uol.swp.common.user.User
  * @see de.uol.swp.common.chat.ChatMessage
  * @since 2020-12-16
  */
 public class ChatManagement implements IChatManagement {
 
-    private final ChatMessageStore chatMessageStore;
+    private final IChatMessageStore chatMessageStore;
 
     /**
      * Constructor
      *
      * @param chatMessageStore Object of the ChatMessageStore to be used
      *
-     * @see de.uol.swp.server.chat.store.ChatMessageStore
+     * @see de.uol.swp.server.chat.store.IChatMessageStore
      * @since 2020-12-16
      */
     @Inject
-    public ChatManagement(ChatMessageStore chatMessageStore) {
+    public ChatManagement(IChatMessageStore chatMessageStore) {
         this.chatMessageStore = chatMessageStore;
     }
 
@@ -49,7 +50,7 @@ public class ChatManagement implements IChatManagement {
 
     @Override
     public ChatMessage createChatMessage(User author, String content,
-                                         String originLobby) throws ChatManagementException {
+                                         LobbyName originLobby) throws ChatManagementException {
         if (Strings.isNullOrEmpty(content)) {
             throw new ChatManagementException("Content must not be empty");
         } else if (author == null) {
@@ -68,7 +69,7 @@ public class ChatManagement implements IChatManagement {
     }
 
     @Override
-    public void dropChatMessage(int id, String originLobby) throws ChatManagementException {
+    public void dropChatMessage(int id, LobbyName originLobby) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");
@@ -77,7 +78,7 @@ public class ChatManagement implements IChatManagement {
     }
 
     @Override
-    public void dropLobbyHistory(String originLobby) {
+    public void dropLobbyHistory(LobbyName originLobby) {
         chatMessageStore.removeLobbyHistory(originLobby);
     }
 
@@ -87,12 +88,12 @@ public class ChatManagement implements IChatManagement {
     }
 
     @Override
-    public Optional<ChatMessage> findChatMessage(int id, String originLobby) {
+    public Optional<ChatMessage> findChatMessage(int id, LobbyName originLobby) {
         return chatMessageStore.findMessage(id, originLobby);
     }
 
     @Override
-    public List<ChatMessage> getLatestMessages(int amount, String originLobby) {
+    public List<ChatMessage> getLatestMessages(int amount, LobbyName originLobby) {
         return chatMessageStore.getLatestMessages(amount, originLobby);
     }
 
@@ -103,7 +104,7 @@ public class ChatManagement implements IChatManagement {
 
     @Override
     public ChatMessage updateChatMessage(int id, String updatedContent,
-                                         String originLobby) throws ChatManagementException {
+                                         LobbyName originLobby) throws ChatManagementException {
         Optional<ChatMessage> chatMessage = chatMessageStore.findMessage(id, originLobby);
         if (chatMessage.isEmpty()) {
             throw new ChatManagementException("ChatMessage ID unknown");

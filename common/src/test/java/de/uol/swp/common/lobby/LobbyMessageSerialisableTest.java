@@ -12,23 +12,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LobbyMessageSerialisableTest {
 
     private static final UserDTO defaultUser = new UserDTO(42, "marco", "marco", "marco@grawunder.de");
+    private static final LobbyName defaultLobby = new LobbyName("test");
 
     @Test
     void testLobbyMessagesSerializable() {
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new CreateLobbyRequest("test", defaultUser, 4, ""),
+                           .checkSerialisableAndDeserialisable(new CreateLobbyRequest(defaultLobby, defaultUser, ""),
                                                                CreateLobbyRequest.class));
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new LobbyJoinUserRequest("test", defaultUser),
-                                                               LobbyJoinUserRequest.class));
+                           .checkSerialisableAndDeserialisable(new JoinLobbyRequest(defaultLobby, defaultUser),
+                                                               JoinLobbyRequest.class));
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new LobbyLeaveUserRequest("test", defaultUser),
-                                                               LobbyLeaveUserRequest.class));
+                           .checkSerialisableAndDeserialisable(new LeaveLobbyRequest(defaultLobby, defaultUser),
+                                                               LeaveLobbyRequest.class));
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new UserJoinedLobbyMessage("test", defaultUser),
+                           .checkSerialisableAndDeserialisable(new UserJoinedLobbyMessage(defaultLobby, defaultUser),
                                                                UserJoinedLobbyMessage.class));
         assertTrue(SerialisationTestHelper
-                           .checkSerialisableAndDeserialisable(new UserLeftLobbyMessage("test", defaultUser),
+                           .checkSerialisableAndDeserialisable(new UserLeftLobbyMessage(defaultLobby, defaultUser),
                                                                UserLeftLobbyMessage.class));
         assertTrue(SerialisationTestHelper.checkSerialisableAndDeserialisable(new RetrieveAllLobbiesRequest(),
                                                                               RetrieveAllLobbiesRequest.class));

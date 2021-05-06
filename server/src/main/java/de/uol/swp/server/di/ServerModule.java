@@ -6,7 +6,7 @@ import com.google.inject.Scopes;
 import de.uol.swp.server.chat.ChatManagement;
 import de.uol.swp.server.chat.ChatService;
 import de.uol.swp.server.chat.IChatManagement;
-import de.uol.swp.server.chat.store.ChatMessageStore;
+import de.uol.swp.server.chat.store.IChatMessageStore;
 import de.uol.swp.server.chat.store.MainMemoryBasedChatMessageStore;
 import de.uol.swp.server.game.GameManagement;
 import de.uol.swp.server.game.GameService;
@@ -38,7 +38,7 @@ public class ServerModule extends AbstractModule {
 
     private final Logger LOG = LogManager.getLogger(ServerModule.class);
     private final EventBus bus = new EventBus();
-    private final ChatMessageStore chatMessageStore = new MainMemoryBasedChatMessageStore();
+    private final IChatMessageStore chatMessageStore = new MainMemoryBasedChatMessageStore();
 
     @Override
     protected void configure() {
@@ -83,7 +83,7 @@ public class ServerModule extends AbstractModule {
                 store = new H2BasedUserStore();
         }
 
-        bind(ChatMessageStore.class).toInstance(chatMessageStore);
+        bind(IChatMessageStore.class).toInstance(chatMessageStore);
         bind(EventBus.class).toInstance(bus);
         bind(Properties.class).toInstance(serverProperties);
         bind(UserStore.class).toInstance(store);

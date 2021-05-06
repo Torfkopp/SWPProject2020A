@@ -7,7 +7,8 @@ import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
-import de.uol.swp.common.lobby.Lobby;
+import de.uol.swp.common.lobby.ISimpleLobby;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
@@ -47,14 +48,14 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void changeOwner(String lobbyName, UserOrDummy newOwner) {
+    public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
         LOG.debug("Sending ChangeOwnerRequest");
         Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
         eventBus.post(req);
     }
 
     @Override
-    public void checkForGame(String lobbyName) {
+    public void checkForGame(LobbyName lobbyName) {
         LOG.debug("Sending CheckForGameRequest");
         Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(request);
@@ -68,41 +69,41 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void createNewLobby(String name, int maxPlayers, String password) {
+    public void createNewLobby(LobbyName name, String password) {
         LOG.debug("Sending CreateLobbyRequest");
-        Message createLobbyRequest = new CreateLobbyRequest(name, userService.getLoggedInUser(), maxPlayers, password);
+        Message createLobbyRequest = new CreateLobbyRequest(name, userService.getLoggedInUser(), password);
         eventBus.post(createLobbyRequest);
     }
 
     @Override
-    public void joinLobby(String name) {
+    public void joinLobby(LobbyName lobbyName) {
         LOG.debug("Sending LobbyJoinUserRequest");
-        Message joinUserRequest = new LobbyJoinUserRequest(name, userService.getLoggedInUser());
+        Message joinUserRequest = new JoinLobbyRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(joinUserRequest);
     }
 
     @Override
     public void joinRandomLobby() {
-        Message joinRandomLobbyRequest = new LobbyJoinRandomUserRequest(null, userService.getLoggedInUser());
+        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
         eventBus.post(joinRandomLobbyRequest);
     }
 
     @Override
-    public void kickUser(String lobbyName, UserOrDummy userToKick) {
+    public void kickUser(LobbyName lobbyName, UserOrDummy userToKick) {
         LOG.debug("Sending KickUserRequest");
         Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
         eventBus.post(kickUserRequest);
     }
 
     @Override
-    public void leaveLobby(String lobbyName) {
+    public void leaveLobby(LobbyName lobbyName) {
         LOG.debug("Sending LobbyLeaveUserRequest");
-        Message lobbyLeaveUserRequest = new LobbyLeaveUserRequest(lobbyName, userService.getLoggedInUser());
+        Message lobbyLeaveUserRequest = new LeaveLobbyRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(lobbyLeaveUserRequest);
     }
 
     @Override
-    public void refreshLobbyPresenterFields(Lobby lobby) {
+    public void refreshLobbyPresenterFields(ISimpleLobby lobby) {
         LOG.debug("Sending LobbyUpdateEvent");
         eventBus.post(new LobbyUpdateEvent(lobby));
     }
@@ -122,14 +123,14 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void retrieveAllLobbyMembers(String lobbyName) {
+    public void retrieveAllLobbyMembers(LobbyName lobbyName) {
         LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby {}", lobbyName);
         Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
         eventBus.post(retrieveAllLobbyMembersRequest);
     }
 
     @Override
-    public void returnToPreGameLobby(String lobbyName) {
+    public void returnToPreGameLobby(LobbyName lobbyName) {
         LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby {}", lobbyName);
         Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
         eventBus.post(returnToPreGameLobbyRequest);
@@ -142,7 +143,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateLobbySettings(String lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
                                     boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
@@ -151,7 +152,7 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void userReady(String lobbyName, boolean isReady) {
+    public void userReady(LobbyName lobbyName, boolean isReady) {
         LOG.debug("Sending UserReadyRequest");
         Message userReadyRequest = new UserReadyRequest(lobbyName, userService.getLoggedInUser(), isReady);
         eventBus.post(userReadyRequest);

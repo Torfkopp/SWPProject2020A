@@ -1,5 +1,7 @@
 package de.uol.swp.client.trade.event;
 
+import de.uol.swp.common.lobby.LobbyName;
+
 /**
  * Event used to show the window for the trading with the bank
  * <p>
@@ -13,14 +15,14 @@ package de.uol.swp.client.trade.event;
  */
 public class ShowTradeWithBankViewEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName Lobby name of the lobby where the player wants to trade
      */
-    public ShowTradeWithBankViewEvent(String lobbyName) {
+    public ShowTradeWithBankViewEvent(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -30,7 +32,7 @@ public class ShowTradeWithBankViewEvent {
      *
      * @return Lobby name of the lobby where the player wants to trade
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

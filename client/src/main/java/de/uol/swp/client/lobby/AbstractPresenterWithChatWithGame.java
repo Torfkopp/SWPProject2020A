@@ -11,19 +11,26 @@ import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.PauseTimerRequest;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCard;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCard;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.uniqueCards.UniqueCardsType;
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
-import de.uol.swp.common.util.Triple;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -32,7 +39,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.MapValueFactory;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -56,11 +63,10 @@ import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
  * @author Temmo Junkhoff
  * @author Maximillian Lindner
  * @see de.uol.swp.client.AbstractPresenter
- * @see de.uol.swp.client.lobby.AbstractPresenterWithChatWithGameWithPreGamePhase
  * @see de.uol.swp.client.lobby.LobbyPresenter
  * @since 2021-03-23
  */
-@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
+@SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
     @Inject
@@ -69,19 +75,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Inject
     @Named("styleSheet")
     private static String styleSheet;
-
+    @Inject
+    protected IGameService gameService;
     @FXML
     protected Button endTurn;
     @FXML
     protected Canvas gameMapCanvas;
     @FXML
-    protected Timer moveTimeTimer;
-    @FXML
-    protected TableView<Map<String, Object>> developmentCardTableView;
+    protected TableView<IDevelopmentCard> developmentCardTableView;
     @FXML
     protected Menu moveTimerLabel = new Menu();
     @FXML
-    protected TableView<Map<String, Object>> resourceTableView;
+    protected TableView<IResource> resourceTableView;
     @FXML
     protected ListView<UserOrDummy> membersView;
     @FXML
@@ -99,7 +104,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Label notice;
     @FXML
-    protected ListView<Triple<String, UserOrDummy, Integer>> uniqueCardView;
+    protected ListView<UniqueCard> uniqueCardView;
     @FXML
     protected Label buildingCosts;
     @FXML
@@ -112,11 +117,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Menu infoMenu;
     @FXML
     protected Menu currentRound = new Menu();
-
-    @Inject
-    protected IGameService gameService;
-
-    protected List<Triple<UserOrDummy, Integer, Integer>> cardAmountTripleList;
+    @FXML
+    protected CheckMenuItem helpCheckBox;
+    protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
     protected IGameMap gameMap;
@@ -135,28 +138,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected int moveTime;
     protected int remainingMoveTime;
     protected User owner;
-    protected ObservableList<Triple<String, UserOrDummy, Integer>> uniqueCardList;
+    protected ObservableList<UniqueCard> uniqueCardList;
     protected Window window;
     protected UserOrDummy winner = null;
     protected boolean helpActivated = false;
-    @FXML
-    protected CheckMenuItem helpCheckBox;
-    private boolean diceRolled = false;
+    protected Timer moveTimeTimer;
     protected int roundCounter = 0;
-
-    // MapValueFactory doesn't support specifying a Map's generics, so the Map type is used raw here (Warning suppressed)
-    @FXML
-    private TableColumn<Map, Integer> developmentCardAmountCol;
-    @FXML
-    private TableColumn<Map, String> developmentCardNameCol;
-    @FXML
-    private TableColumn<Map, Integer> resourceAmountCol;
-    @FXML
-    private TableColumn<Map, String> resourceNameCol;
-
     @Inject
     private ITradeService tradeService;
-
+    @FXML
+    private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
+    @FXML
+    private TableColumn<IDevelopmentCard, DevelopmentCardType> developmentCardNameCol;
+    @FXML
+    private TableColumn<IResource, Integer> resourceAmountCol;
+    @FXML
+    private TableColumn<IResource, ResourceType> resourceNameCol;
+    private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
 
     @Override
@@ -221,8 +219,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (!paused) {
-                    Platform.runLater(() -> moveTimerLabel.setText(String.format(
-                            resourceBundle.getString("game.labels.movetime") + moveTimeToDecrement.getAndDecrement())));
+                    Platform.runLater(() -> moveTimerLabel.setText(
+                            String.format(resourceBundle.getString("game.labels.movetime"),
+                                          moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
                         tradeService.closeBankTradeWindow(lobbyName);
@@ -323,16 +322,16 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                         } else {
                             int cardAmount = 0;
                             for (int i = 0; i < 4; i++) {
-                                cardAmount += (int) developmentCardTableView.getItems().get(i + 1).get("amount");
+                                cardAmount += developmentCardTableView.getItems().get(i + 1).getAmount();
                             }
                             if (cardAmount == 0) playCard.setStrikethrough(true);
                             helpLabel.getChildren().add(playCard);
                             for (int i = 0; i < 4; i++) {
-                                Map<String, Object> cardMap = developmentCardTableView.getItems().get(i + 1);
-                                if ((int) cardMap.get("amount") > 0) {
+                                IDevelopmentCard cardMap = developmentCardTableView.getItems().get(i + 1);
+                                if (cardMap.getAmount() > 0) {
                                     Text card = new Text(
                                             String.format(resourceBundle.getString("game.help.labels.playcard"),
-                                                          cardMap.get("card")));
+                                                          cardMap.getType()));
                                     helpLabel.getChildren().add(card);
                                 }
                             }
@@ -381,19 +380,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             username.setFont(Font.font(20.0));
 
             ObservableList<UserOrDummy> membersList = membersView.getItems();
-            if (user.equals(membersList.get(0))) {
+            if (membersList.size() > 0 && user.equals(membersList.get(0))) {
                 username.setFill(GameRendering.PLAYER_1_COLOUR);
             }
-            if (user.equals(membersList.get(1))) {
+            if (membersList.size() > 1 && user.equals(membersList.get(1))) {
                 username.setFill(GameRendering.PLAYER_2_COLOUR);
             }
-            if (user.equals(membersList.get(2))) {
+            if (membersList.size() > 2 && user.equals(membersList.get(2))) {
                 username.setFill(GameRendering.PLAYER_3_COLOUR);
             }
-            if (membersList.size() == 4) {
-                if (user.equals(membersList.get(3))) {
-                    username.setFill(GameRendering.PLAYER_4_COLOUR);
-                }
+            if (membersList.size() == 4 && user.equals(membersList.get(3))) {
+                username.setFill(GameRendering.PLAYER_4_COLOUR);
             }
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
@@ -705,7 +702,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         ownTurn = msg.getActivePlayer().equals(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
-        moveTimeTimer.cancel();
+        if (moveTimeTimer != null) moveTimeTimer.cancel();
         setMoveTimer(moveTime);
         Platform.runLater(
                 () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
@@ -838,7 +835,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRefreshCardAmountMessage(RefreshCardAmountMessage msg) {
         LOG.debug("Received RefreshCardAmountMessage");
         if (!lobbyName.equals(msg.getLobbyName())) return;
-        cardAmountTripleList = msg.getCardAmountTriples();
+        cardAmountsList = msg.getCardAmountsList();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         if (helpActivated) setHelpText();
     }
@@ -886,7 +883,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-04-23
      */
     @Subscribe
-    private void onRobberAllTaxPayedMessage(RobberAllTaxPayedMessage msg) {
+    private void onRobberAllTaxPayedMessage(RobberAllTaxPaidMessage msg) {
         if (msg.getLobbyName().equals(lobbyName)) {
             resetButtonStates(msg.getUser());
             if (helpActivated) setHelpText();
@@ -986,7 +983,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
                 eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                         msg.getInventory().get(user)));
+                                                         msg.getInventories().get(user).create()));
                 eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
@@ -1156,9 +1153,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received UpdateInventoryResponse for Lobby {}", lobbyName);
         Platform.runLater(() -> {
-            resourceTableView.getItems().setAll(rsp.getResourceList());
+            resourceTableView.getItems().clear();
+            rsp.getResourceList().forEach((resource) -> resourceTableView.getItems().add(resource));
             resourceTableView.sort();
-            developmentCardTableView.getItems().setAll(rsp.getDevelopmentCardList());
+            developmentCardTableView.getItems().clear();
+            rsp.getDevelopmentCardList()
+               .forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
             developmentCardTableView.sort();
         });
     }
@@ -1206,12 +1206,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Show the dialogue and get the result
         Optional<String> rst = dialogue.showAndWait();
         //Convert String to Resources and send the request
-        Resources resource = Resources.BRICK;
+        ResourceType resource = ResourceType.BRICK;
         if (rst.isPresent()) {
-            if (rst.get().equals(ore)) resource = Resources.ORE;
-            else if (rst.get().equals(grain)) resource = Resources.GRAIN;
-            else if (rst.get().equals(lumber)) resource = Resources.LUMBER;
-            else if (rst.get().equals(wool)) resource = Resources.WOOL;
+            if (rst.get().equals(ore)) resource = ResourceType.ORE;
+            else if (rst.get().equals(grain)) resource = ResourceType.GRAIN;
+            else if (rst.get().equals(lumber)) resource = ResourceType.LUMBER;
+            else if (rst.get().equals(wool)) resource = ResourceType.WOOL;
             gameService.playMonopolyCard(lobbyName, resource);
         }
     }
@@ -1262,55 +1262,21 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Checks if the pressed button is the same as the confirm button
         if (rst.toString().equals(button1.toString())) {
             //Create two resource variables
-            Resources resource1 = Resources.BRICK;
-            Resources resource2 = Resources.BRICK;
+            ResourceType resource1 = ResourceType.BRICK;
+            ResourceType resource2 = ResourceType.BRICK;
             //Convert String to Resource
-            if (c1.getValue().equals(ore)) resource1 = Resources.ORE;
-            else if (c1.getValue().equals(grain)) resource1 = Resources.GRAIN;
-            else if (c1.getValue().equals(lumber)) resource1 = Resources.LUMBER;
-            else if (c1.getValue().equals(wool)) resource1 = Resources.WOOL;
+            if (c1.getValue().equals(ore)) resource1 = ResourceType.ORE;
+            else if (c1.getValue().equals(grain)) resource1 = ResourceType.GRAIN;
+            else if (c1.getValue().equals(lumber)) resource1 = ResourceType.LUMBER;
+            else if (c1.getValue().equals(wool)) resource1 = ResourceType.WOOL;
             //Second ChoiceBox's conversion
-            if (c2.getValue().equals(ore)) resource2 = Resources.ORE;
-            else if (c2.getValue().equals(grain)) resource2 = Resources.GRAIN;
-            else if (c2.getValue().equals(lumber)) resource2 = Resources.LUMBER;
-            else if (c2.getValue().equals(wool)) resource2 = Resources.WOOL;
+            if (c2.getValue().equals(ore)) resource2 = ResourceType.ORE;
+            else if (c2.getValue().equals(grain)) resource2 = ResourceType.GRAIN;
+            else if (c2.getValue().equals(lumber)) resource2 = ResourceType.LUMBER;
+            else if (c2.getValue().equals(wool)) resource2 = ResourceType.WOOL;
             //Send Request
             gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
         }
-    }
-
-    /**
-     * Helper method to create the necessary Map structure
-     * required for MapValueFactories
-     * <p>
-     * This method creates a Map containing a key "amount" with value 0 and
-     * another key "resource" or "card", depending on the parameter {@literal <type>},
-     * with the internationalised name of the Resource or Development Card based
-     * on the parameter {@literal <item>}.
-     *
-     * @param type Either "resource" for Resources or "card" for Development Cards
-     * @param item Lowercase Resource name for Resources or fully qualified i18n key
-     *             for Development Cards <p>
-     *             e.g. {@code prepareEmptyResourceMap("card", "game.resources.cards.knight")}
-     *             or {@code prepareEmptyResourceMap("resource", "brick")}
-     *
-     * @return A Map representing 0 of a resource
-     *
-     * @author Phillip-André Suhr
-     * @since 2021-04-18
-     */
-    private Map<String, Object> prepareEmptyResourceMap(String type, String item) {
-        Map<String, Object> resourceMap = new HashMap<>();
-        resourceMap.put("amount", 0);
-        String preFormat;
-        if (type.equals("resource")) { // Resource like Brick
-            preFormat = "game.resources.%s";
-            resourceMap.put("enumType", Resources.valueOf(item.toUpperCase()));
-        } else { // Development Card like Knight Card
-            preFormat = "%s";
-        }
-        resourceMap.put(type, new I18nWrapper(String.format(preFormat, item)));
-        return resourceMap;
     }
 
     /**
@@ -1324,24 +1290,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-04-18
      */
     private void prepareInventoryTables() {
-        resourceAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        resourceNameCol.setCellValueFactory(new MapValueFactory<>("resource"));
-        developmentCardAmountCol.setCellValueFactory(new MapValueFactory<>("amount"));
-        developmentCardNameCol.setCellValueFactory(new MapValueFactory<>("card"));
+        resourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        resourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        developmentCardAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        developmentCardNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
 
-        List<Map<String, Object>> inventoryItems = new ArrayList<>();
-        for (Resources resource : Resources.values()) {
-            inventoryItems.add(prepareEmptyResourceMap("resource", resource.name().toLowerCase()));
-        }
-        resourceTableView.getItems().addAll(inventoryItems);
-
-        List<Map<String, Object>> developmentCards = new ArrayList<>();
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.victorypoints"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.knight"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.roadbuilding"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.yearofplenty"));
-        developmentCards.add(prepareEmptyResourceMap("card", "game.resources.cards.monopoly"));
-        developmentCardTableView.getItems().setAll(developmentCards);
+        new ResourceList().forEach((resource) -> resourceTableView.getItems().add(resource));
+        new DevelopmentCardList().forEach(developmentCard -> developmentCardTableView.getItems().add(developmentCard));
     }
 
     /**
@@ -1356,17 +1311,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void prepareUniqueCardView() {
         uniqueCardView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Triple<String, UserOrDummy, Integer> uniqueCardTriple, boolean empty) {
+            protected void updateItem(UniqueCard uniqueCard, boolean empty) {
                 Platform.runLater(() -> {
-                    super.updateItem(uniqueCardTriple, empty);
-                    if (empty || uniqueCardTriple == null) setText("");
+                    super.updateItem(uniqueCard, empty);
+                    if (empty || uniqueCard == null) setText("");
                     else {
-                        UserOrDummy value2 = uniqueCardTriple.getValue2();
-                        String who;
-                        if (value2 == null) who = resourceBundle.getString("game.resources.whohas.nobody");
-                        else who = value2.getUsername();
-                        setText(String.format(resourceBundle.getString(uniqueCardTriple.getValue1()), who,
-                                              uniqueCardTriple.getValue3()));
+                        setText(uniqueCard.toString());
                     }
                 });
             }
@@ -1375,8 +1325,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             uniqueCardList = FXCollections.observableArrayList();
             uniqueCardView.setItems(uniqueCardList);
         }
-        uniqueCardList.add(new Triple<>("game.resources.whohas.largestarmy", null, 0));
-        uniqueCardList.add(new Triple<>("game.resources.whohas.longestroad", null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LARGEST_ARMY, null, 0));
+        uniqueCardList.add(new UniqueCard(UniqueCardsType.LONGEST_ROAD, null, 0));
     }
 
     /**

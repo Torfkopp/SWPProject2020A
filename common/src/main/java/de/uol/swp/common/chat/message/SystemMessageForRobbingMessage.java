@@ -3,6 +3,7 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -26,7 +27,7 @@ public class SystemMessageForRobbingMessage extends AbstractLobbyMessage {
      * @param robber    User getting the card
      * @param victim    User losing the card
      */
-    public SystemMessageForRobbingMessage(String lobbyName, UserOrDummy robber, UserOrDummy victim) {
+    public SystemMessageForRobbingMessage(LobbyName lobbyName, UserOrDummy robber, UserOrDummy victim) {
         super(lobbyName, robber);
         this.victim = victim;
     }

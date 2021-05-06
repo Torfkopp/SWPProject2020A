@@ -3,6 +3,7 @@ package de.uol.swp.common.chat.response;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
 /**
@@ -21,7 +22,7 @@ import de.uol.swp.common.message.AbstractResponseMessage;
  */
 public class SystemMessageResponse extends AbstractResponseMessage {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
     private final SystemMessage msg;
 
     /**
@@ -32,7 +33,7 @@ public class SystemMessageResponse extends AbstractResponseMessage {
      *
      * @since 2021-03-07
      */
-    public SystemMessageResponse(String lobbyName, I18nWrapper contentWrapper) {
+    public SystemMessageResponse(LobbyName lobbyName, I18nWrapper contentWrapper) {
         this.lobbyName = lobbyName;
         this.msg = new SystemMessageDTO(contentWrapper);
     }
@@ -42,7 +43,7 @@ public class SystemMessageResponse extends AbstractResponseMessage {
      *
      * @return The name of the target lobby
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 

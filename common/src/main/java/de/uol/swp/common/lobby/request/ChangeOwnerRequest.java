@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -20,7 +21,7 @@ public class ChangeOwnerRequest extends AbstractLobbyRequest {
      * @param user     Requesting user
      * @param newOwner New owner
      */
-    public ChangeOwnerRequest(String name, UserOrDummy user, UserOrDummy newOwner) {
+    public ChangeOwnerRequest(LobbyName name, UserOrDummy user, UserOrDummy newOwner) {
         super(name, user);
         this.newOwner = newOwner;
     }

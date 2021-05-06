@@ -1,5 +1,7 @@
 package de.uol.swp.client.trade.event;
 
+import de.uol.swp.common.lobby.LobbyName;
+
 /**
  * Event used to trigger the updating of the TradeWithUserPresenter
  * <p>
@@ -15,14 +17,14 @@ package de.uol.swp.client.trade.event;
  */
 public class TradeWithUserUpdateEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the Lobby of the trade
      */
-    public TradeWithUserUpdateEvent(String lobbyName) {
+    public TradeWithUserUpdateEvent(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -31,7 +33,7 @@ public class TradeWithUserUpdateEvent {
      *
      * @return The lobbyName
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

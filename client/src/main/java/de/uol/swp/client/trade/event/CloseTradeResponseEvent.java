@@ -1,5 +1,7 @@
 package de.uol.swp.client.trade.event;
 
+import de.uol.swp.common.lobby.LobbyName;
+
 /**
  * This event is used to cancel a Response window of a possible
  * previous trade.
@@ -10,14 +12,14 @@ package de.uol.swp.client.trade.event;
  */
 public class CloseTradeResponseEvent {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the lobby
      */
-    public CloseTradeResponseEvent(String lobbyName) {
+    public CloseTradeResponseEvent(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -26,7 +28,7 @@ public class CloseTradeResponseEvent {
      *
      * @return The lobby name
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

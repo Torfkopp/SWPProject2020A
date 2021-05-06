@@ -3,6 +3,7 @@ package de.uol.swp.common.chat.message;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.AbstractLobbyMessage;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -22,7 +23,7 @@ public class SystemMessageForTradeWithBankMessage extends AbstractLobbyMessage {
      * @param lobbyName The lobby name
      * @param user      The user that traded with the bank
      */
-    public SystemMessageForTradeWithBankMessage(String lobbyName, UserOrDummy user) {
+    public SystemMessageForTradeWithBankMessage(LobbyName lobbyName, UserOrDummy user) {
         super(lobbyName, user);
     }
 

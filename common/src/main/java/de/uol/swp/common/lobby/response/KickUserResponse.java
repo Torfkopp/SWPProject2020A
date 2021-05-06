@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.response;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -20,7 +21,7 @@ public class KickUserResponse extends AbstractLobbyResponse {
      * @param lobbyName      Name of the lobby
      * @param toBeKickedUser The user about to be kicked
      */
-    public KickUserResponse(String lobbyName, UserOrDummy toBeKickedUser) {
+    public KickUserResponse(LobbyName lobbyName, UserOrDummy toBeKickedUser) {
         super(lobbyName);
         this.toBeKickedUser = toBeKickedUser;
     }

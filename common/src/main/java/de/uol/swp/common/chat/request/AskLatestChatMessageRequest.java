@@ -1,5 +1,7 @@
 package de.uol.swp.common.chat.request;
 
+import de.uol.swp.common.lobby.LobbyName;
+
 /**
  * Request sent by the client to ask for the latest messages
  *
@@ -37,7 +39,7 @@ public class AskLatestChatMessageRequest extends AbstractChatMessageRequest {
      *
      * @since 2020-12-30
      */
-    public AskLatestChatMessageRequest(int amount, String originLobby) {
+    public AskLatestChatMessageRequest(int amount, LobbyName originLobby) {
         super(originLobby);
         this.amount = amount;
     }

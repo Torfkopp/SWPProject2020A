@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.gamemapDTO;
 
-import de.uol.swp.common.game.map.Hexes.IGameHex;
+import de.uol.swp.common.game.map.hexes.IGameHex;
 
 import java.io.Serializable;
 
@@ -16,10 +16,10 @@ public class GameMapDTO implements IGameMap, Serializable {
     private final IntersectionWithEdges[][] intersections;
 
     /**
-     * Instantiates a new Game map dto.
+     * Constructor.
      *
-     * @param hexes                The hexes
-     * @param intersections        The intersections
+     * @param hexes         The hexes
+     * @param intersections The intersections
      *
      * @author Temmo Junkhoff
      * @since 2021-04-25

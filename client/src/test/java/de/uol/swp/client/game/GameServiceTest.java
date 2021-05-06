@@ -5,11 +5,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
-import de.uol.swp.common.game.map.Resources;
 import de.uol.swp.common.game.request.EndTurnRequest;
 import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.request.RollDiceRequest;
 import de.uol.swp.common.game.request.UpdateInventoryRequest;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.StartSessionRequest;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
@@ -27,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GameServiceTest {
 
     private static final User defaultUser = new UserDTO(42, "test", "test123", "test@test.test");
-    private static final String defaultLobbyName = "Test lobby";
-    private static final Resources defaultResource = Resources.BRICK;
-    private static final Resources secondResource = Resources.GRAIN;
+    private static final LobbyName defaultLobbyName = new LobbyName("Test lobby");
+    private static final ResourceType defaultResource = ResourceType.BRICK;
+    private static final ResourceType secondResource = ResourceType.GRAIN;
 
     private final EventBus eventBus = new EventBus();
     private final CountDownLatch lock = new CountDownLatch(1);
@@ -133,8 +134,8 @@ class GameServiceTest {
         assertEquals(defaultUser, request.getUser());
         assertEquals(defaultUser.getID(), request.getUser().getID());
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
-        assertEquals(defaultResource, request.getResource1());
-        assertEquals(secondResource, request.getResource2());
+        assertEquals(defaultResource, request.getFirstResource());
+        assertEquals(secondResource, request.getSecondResource());
     }
 
     @Test

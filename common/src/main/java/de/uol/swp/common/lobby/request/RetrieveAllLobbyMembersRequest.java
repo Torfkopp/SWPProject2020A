@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.request;
 
+import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractRequestMessage;
 
 /**
@@ -15,14 +16,14 @@ import de.uol.swp.common.message.AbstractRequestMessage;
  */
 public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
 
-    private final String lobbyName;
+    private final LobbyName lobbyName;
 
     /**
      * Constructor
      *
      * @param lobbyName The name of the lobby for which to retrieve the list of members
      */
-    public RetrieveAllLobbyMembersRequest(String lobbyName) {
+    public RetrieveAllLobbyMembersRequest(LobbyName lobbyName) {
         this.lobbyName = lobbyName;
     }
 
@@ -31,7 +32,7 @@ public class RetrieveAllLobbyMembersRequest extends AbstractRequestMessage {
      *
      * @return The lobby name
      */
-    public String getLobbyName() {
+    public LobbyName getLobbyName() {
         return lobbyName;
     }
 }

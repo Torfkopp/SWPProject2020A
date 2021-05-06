@@ -1,8 +1,8 @@
 package de.uol.swp.server.game.event;
 
-import de.uol.swp.common.lobby.Lobby;
 import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.message.AbstractServerInternalMessage;
 
 import java.util.Optional;
@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public class TransferLobbyStateEvent extends AbstractServerInternalMessage {
 
-    private final Lobby lobby;
+    private final ILobby lobby;
     private final UserOrDummy user;
     private final Optional<MessageContext> context;
 
@@ -30,7 +30,7 @@ public class TransferLobbyStateEvent extends AbstractServerInternalMessage {
      * @param user    The user that requested data
      * @param context The MessageContext from the previous message, which cause this event to be posted
      */
-    public TransferLobbyStateEvent(Lobby lobby, UserOrDummy user, Optional<MessageContext> context) {
+    public TransferLobbyStateEvent(ILobby lobby, UserOrDummy user, Optional<MessageContext> context) {
         this.lobby = lobby;
         this.user = user;
         this.context = context;
@@ -46,7 +46,7 @@ public class TransferLobbyStateEvent extends AbstractServerInternalMessage {
      *
      * @return The stored lobby object
      */
-    public Lobby getLobby() {
+    public ILobby getLobby() {
         return lobby;
     }
 
