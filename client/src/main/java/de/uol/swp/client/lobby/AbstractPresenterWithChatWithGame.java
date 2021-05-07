@@ -84,7 +84,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected TableView<IDevelopmentCard> developmentCardTableView;
     @FXML
-    protected Menu moveTimerLabel = new Menu();
+    protected Label moveTimerLabel;
     @FXML
     protected TableView<IResource> resourceTableView;
     @FXML
@@ -116,9 +116,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Menu infoMenu;
     @FXML
-    protected Menu currentRound = new Menu();
+    protected Label currentRound;
     @FXML
-    protected CheckMenuItem helpCheckBox;
+    protected Button helpCheckBox;
     protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;

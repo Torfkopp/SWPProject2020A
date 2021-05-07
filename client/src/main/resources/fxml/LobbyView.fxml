@@ -154,22 +154,22 @@
             <Insets topRightBottomLeft="10.0"/>
         </padding>
     </VBox>
-    <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
-        <Menu mnemonicParsing="false" text="%game.help.info" fx:id="infoMenu" visible="false">
-            <items>
-                <CheckMenuItem fx:id="helpCheckBox" mnemonicParsing="false" onAction="#onHelpButtonPressed"
-                               text="%game.help.checkbox"
-                               disable="true" visible="false"/>
-            </items>
-        </Menu>
-        <Menu fx:id="moveTimerLabel"/>
-        <Menu mnemonicParsing="false" text="%lobby.menu.settings"/>
-        <Menu mnemonicParsing="false" text="%lobby.menu.rules" onAction="#onRulesMenuClicked">
-            <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview"/>
-        </Menu>
-        <Menu fx:id="timerLabel"/>
-        <Menu fx:id="currentRound" text="%lobby.menu.round" visible="false"/>
-    </MenuBar>
+    <ToolBar prefHeight="35.0" GridPane.columnSpan="3">
+        <items>
+            <Button mnemonicParsing="false" text="%lobby.menu.settings"/>
+            <Button mnemonicParsing="false" onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
+                <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview"/>
+            </Button>
+            <Button fx:id="helpCheckBox" disable="true" mnemonicParsing="false" onAction="#onHelpButtonPressed"
+                    text="%game.help.checkbox" visible="false"/>
+            <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>
+            <Label fx:id="moveTimerLabel"/>
+            <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>
+            <Label fx:id="timerLabel"/>
+            <Separator/>
+            <Label fx:id="currentRound" text="%lobby.menu.round" visible="false"/>
+        </items>
+    </ToolBar>
     <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
           GridPane.rowSpan="2147483647">
         <TextFlow fx:id="helpLabel"/>

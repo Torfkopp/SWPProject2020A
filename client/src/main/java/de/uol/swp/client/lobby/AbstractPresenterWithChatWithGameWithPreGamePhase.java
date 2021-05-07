@@ -64,7 +64,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
-    protected Menu timerLabel = new Menu();
+    protected Label timerLabel;
     @FXML
     private Button changeMoveTimeButton;
     @FXML
@@ -586,7 +586,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        infoMenu.setVisible(true);
         helpCheckBox.setDisable(false);
         helpCheckBox.setVisible(true);
     }
