@@ -50,6 +50,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private Button taxPay;
     @FXML
     private ProgressBar progress;
+
     private LobbyName lobbyName;
     private int taxAmount;
     private ResourceList inventory;
@@ -91,7 +92,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
             progress.setProgress((double) selectedAmount / taxAmount);
             progress.getStyleClass().removeAll(barColourClasses);
             progress.getStyleClass().add(BLUE_BAR);
-            if (selectedAmount == taxAmount) ;
         } else if (selectedAmount == taxAmount) {
             progress.setProgress(100);
             progress.getStyleClass().removeAll(barColourClasses);
