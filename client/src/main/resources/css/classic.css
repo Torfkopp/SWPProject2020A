@@ -1,4 +1,5 @@
 @import url("palette.css");
+@import url("bars.css");
 
 @font-face {
     src: url("../fonts/GaramondMT.ttf");
@@ -74,22 +75,6 @@
 
 .menu-item > .label {
     -fx-text-fill: -pureBlack;
-}
-
-.progress-bar {
-    -fx-box-border: -gold;
-}
-
-.green-bar {
-    -fx-accent: -green;
-}
-
-.blue-bar {
-    -fx-accent: -blue;
-}
-
-.red-bar {
-    -fx-accent: -red;
 }
 
 /*
