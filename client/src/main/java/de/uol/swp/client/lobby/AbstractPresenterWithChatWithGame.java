@@ -206,6 +206,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper method to set the timer for the players round.
      * The user gets forced to end his turn, if the timer gets zero.
+     * It also closes all the opened windows.
      * If paused is true, the timer is paused.
      *
      * @param moveTime The moveTime for the Lobby
@@ -224,7 +225,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                           moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
+                        tradeService.closeTradeResponseWindow(lobbyName);
                         tradeService.closeBankTradeWindow(lobbyName);
+                        tradeService.closeUserTradeWindow(lobbyName);
+                        disableButtonStates();
                         gameService.endTurn(lobbyName);
                     }
                 } else {remainingMoveTime = moveTimeToDecrement.get();}
@@ -876,6 +880,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Handles a RobberAllTaxPayedMessage
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @param msg The RobberAllTaxPayedMessage found on the EventBus
      *
@@ -1050,7 +1055,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If another player of the lobby-member-list is selected and the button gets pressed,
      * this button gets disabled, this method calls on the TradeService to show the Trade
      * with User window and request the inventory overview for the selected user.
-     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -1068,7 +1072,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
             tradeService.tradeWithUser(lobbyName, user);
-            eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
 
@@ -1077,7 +1080,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * If a TradeWithUserCancelResponse is posted onto the EventBus the
      * the possible options for the active player are re-enabled.
-     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
@@ -1090,7 +1092,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

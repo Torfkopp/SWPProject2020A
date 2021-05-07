@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
+import de.uol.swp.common.game.request.PauseTimerRequest;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
@@ -109,14 +110,12 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeWithUserCancelResponse to close the responding
      * trading window if existent.
-     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
         tradeService.closeUserTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, respondingUser);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -181,6 +180,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * the server.
      * The offerTradeButton gets disabled and the user gets the message to wait
      * for the other user.
+     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @see de.uol.swp.common.game.request.OfferingTradeWithUserRequest
      */
@@ -195,6 +195,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
         tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList);
         tradeService.closeTradeResponseWindow(lobbyName);
+        eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
