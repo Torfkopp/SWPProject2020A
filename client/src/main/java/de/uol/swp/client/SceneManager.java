@@ -957,6 +957,8 @@ public class SceneManager {
             LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
             eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(),
                                                        event.getInventory().create()));
+            Platform.setImplicitExit(false);
+            robberTaxStages.get(lobbyName).setOnCloseRequest(windowEvent -> windowEvent.consume());
         });
     }
 
