@@ -6,6 +6,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
       minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="600.0" spacing="25.0"
       xmlns="http://javafx.com/javafx/11.0.1" fx:id="taxView"
+      style="-fx-border-color:red; -fx-border-width: 1; -fx-border-style:solid"
       fx:controller="de.uol.swp.client.lobby.RobberTaxPresenter">
 
     <Label alignment="CENTER" text="%game.robber.tax.header"/>
