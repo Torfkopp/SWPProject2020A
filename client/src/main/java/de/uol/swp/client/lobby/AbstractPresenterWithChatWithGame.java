@@ -84,7 +84,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected TableView<IDevelopmentCard> developmentCardTableView;
     @FXML
-    protected Menu moveTimerLabel = new Menu();
+    protected Label moveTimerLabel;
     @FXML
     protected TableView<IResource> resourceTableView;
     @FXML
@@ -116,9 +116,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Menu infoMenu;
     @FXML
-    protected Menu currentRound = new Menu();
+    protected Label currentRound;
     @FXML
-    protected CheckMenuItem helpCheckBox;
+    protected Button helpCheckBox;
+
     protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
@@ -144,6 +145,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean helpActivated = false;
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
+    protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
+
     @Inject
     private ITradeService tradeService;
     @FXML
@@ -154,6 +157,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private TableColumn<IResource, Integer> resourceAmountCol;
     @FXML
     private TableColumn<IResource, ResourceType> resourceNameCol;
+
     private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
 
@@ -272,17 +276,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
         gameRendering = new GameRendering(gameMapCanvas);
-
-        if (gameWon) {
-            gameRendering.showWinnerText(!Objects.equals(winner, userService.getLoggedInUser()) ?
-                                         String.format(resourceBundle.getString("game.won.info"), winner) :
-                                         resourceBundle.getString("game.won.you"));
-        } else {
-            if (gameMap != null)
-                // gameMap exists, so redraw map to fit the new canvas dimensions
-                gameRendering.drawGameMap(gameMap);
-            if (dice1 != null && dice2 != null) gameRendering.drawDice(dice1, dice2);
-        }
+        gameRendering.bindGameMapDescription(gameMapDescription);
+        gameRendering.redraw();
     }
 
     /**
@@ -467,27 +462,27 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onBuildingFailedResponse(BuildingFailedResponse rsp) {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received BuildingFailedResponse");
-        gameRendering.drawGameMap(gameMap);
         switch (rsp.getReason()) {
             case ALREADY_BUILT_HERE:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
+                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
                 break;
             case BAD_GROUND:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.badground"));
+                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.badground"));
                 break;
             case CANT_BUILD_HERE:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.cantbuildhere"));
+                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.cantbuildhere"));
                 break;
             case NOTHING_HERE:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.nothinghere"));
+                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.nothinghere"));
                 break;
             case NOT_ENOUGH_RESOURCES:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.notenoughresources"));
+                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.notenoughresources"));
                 break;
             case NOT_THE_RIGHT_TIME:
-                gameRendering.showText(resourceBundle.getString("game.building.failed.nottherighttime"));
+                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.nottherighttime"));
                 break;
         }
+        gameRendering.redraw();
     }
 
     /**
@@ -595,7 +590,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if ((dice1 + dice2) != 7) {
             resetButtonStates(msg.getUser());
         }
-        gameRendering.drawDice(msg.getDice1(), msg.getDice2());
+        gameMapDescription.setDice(msg.getDice1(), msg.getDice2());
+        gameRendering.redraw();
         gameService.updateInventory(lobbyName);
         if (helpActivated) setHelpText();
     }
@@ -1129,9 +1125,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!Objects.equals(rsp.getLobbyName(), lobbyName)) return;
         LOG.debug("Received UpdateGameMapResponse");
         if (rsp.getGameMapDTO() == null) return;
-        gameMap = rsp.getGameMapDTO();
-        gameRendering.drawGameMap(gameMap);
-        gameRendering.drawDice(dice1, dice2);
+        if (gameRendering == null) return;
+        gameMapDescription.setGameMap(rsp.getGameMapDTO());
+        gameRendering.redraw();
     }
 
     /**

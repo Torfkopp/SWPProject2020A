@@ -19,8 +19,7 @@ import javafx.scene.text.TextAlignment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static de.uol.swp.common.game.map.management.MapPoint.*;
 
@@ -32,7 +31,7 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  *
  * @author Timo Gerken
  * @author Temmo Junkhoff
- * @see de.uol.swp.common.game.map.management.GameMapManagement
+ * @see de.uol.swp.common.game.map.gamemapDTO.GameMapDTO
  * @see javafx.scene.canvas.Canvas
  * @since 2021-01-31
  */
@@ -71,6 +70,7 @@ public class GameRendering {
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
     private final GraphicsContext gfxCtx;
+    GameMapDescription gameMapDescription = new GameMapDescription();
 
     /**
      * Constructor
@@ -104,13 +104,16 @@ public class GameRendering {
     }
 
     /**
-     * Helper method to clear the game map
+     * Bind a game map description to this game rendering.
+     *
+     * @param gameMapDescription The game map description
      *
      * @author Temmo Junkhoff
-     * @since 2021-03-29
+     * @since 2021-05-07
      */
-    public void clearGameMap() {
-        gfxCtx.clearRect(0, 0, width, height);
+    public void bindGameMapDescription(GameMapDescription gameMapDescription) {
+        if (gameMapDescription == null) this.gameMapDescription = new GameMapDescription();
+        this.gameMapDescription = gameMapDescription;
     }
 
     /**
@@ -135,79 +138,49 @@ public class GameRendering {
     }
 
     /**
-     * drawDice method
-     * <p>
-     * This method draws the dice.
+     * Redraws the canvas based on the information found in the game map description.
      *
-     * @param die1 The first die
-     * @param die2 The second die
+     * @author Temmo Junkhoff
+     * @since 2021-05-07
      */
-    public void drawDice(Integer die1, Integer die2) {
-        if (die1 == null || die2 == null || die1 == 0 || die2 == 0) return;
-        gfxCtx.clearRect(OFFSET_X, OFFSET_Y, 2 * diceSize + diceSize / 8.0 + 2 * diceLineWidth,
-                         diceSize + 2 * diceLineWidth);
-        double startX = OFFSET_X;
-        double startY = OFFSET_Y;
-        renderDice(die1, startX, startY);
-        startX += diceSize + diceSize / 8.0;
-        renderDice(die2, startX, startY);
-    }
-
-    /**
-     * drawGameMap Method
-     * <p>
-     * This method draws the game map represented in the given IGameMap on the given canvas
-     * This method is the only one that ever needs to be accessed from outside this interface.
-     *
-     * @param gameMap An IGameMap providing the game map to draw
-     */
-    public void drawGameMap(IGameMap gameMap) {
-        LOG.debug("Drawing Game map");
-
-        //Get hexes, intersections, and edges in a usable format from the IGameMap
-        IGameHex[][] hexes = gameMap.getHexes();
-        IIntersectionWithEdges[][] intersections = gameMap.getIntersections();
+    public void redraw() {
         clearGameMap();
-        //Call functions to draw hexes, intersections, and edges
-        drawHexTiles(hexes);
-        drawIntersectionsAndEdges(intersections);
-
-        if (drawHitboxGrid) drawHitboxGrid();
+        if (gameMapDescription.getGameMap() != null) {
+            drawGameMap(gameMapDescription.getGameMap());
+        }
+        if ((gameMapDescription.getFirstDie() != null && gameMapDescription.getSecondDie() != null)) {
+            drawDice(gameMapDescription.getFirstDie(), gameMapDescription.getSecondDie());
+        }
+        if (gameMapDescription.getCenterText() != null) {
+            showCenterText(gameMapDescription.getCenterText());
+        }
+        if (gameMapDescription.getBottomText() != null) {
+            clearGameMap();
+            drawGameMap(gameMapDescription.getGameMap());
+            drawDice(gameMapDescription.getFirstDie(), gameMapDescription.getSecondDie());
+            showBottomText(gameMapDescription.getBottomText());
+            gameMapDescription.setBottomText(null);
+            {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        redraw();
+                        timer.cancel();
+                    }
+                }, 1500);
+            }
+        }
     }
 
     /**
-     * Shows a text notification on the canvas
-     *
-     * @param text The text to display
+     * Helper method to clear the game map
      *
      * @author Temmo Junkhoff
-     * @author Aldin Dervisi
-     * @since 2021-04-08
-     */
-    public void showText(String text) {
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(20));
-        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
-    }
-
-    /**
-     * Shows a winner notification on the canvas
-     *
-     * @param text The text to display
-     *
-     * @author Temmo Junkhoff
-     * @author Maximilian Lindner
      * @since 2021-03-29
      */
-    public void showWinnerText(String text) {
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        clearGameMap();
-        gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(25));
-        gfxCtx.fillText(text, width / 2.0, height / 2.0);
+    private void clearGameMap() {
+        gfxCtx.clearRect(0, 0, width, height);
     }
 
     /**
@@ -224,6 +197,44 @@ public class GameRendering {
         else gfxCtx.setFill(getPlayerColour(owner.get()));
         gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
                              citySize / 2.0, citySize / 2.0);
+    }
+
+    /**
+     * drawDice method
+     * <p>
+     * This method draws the dice.
+     *
+     * @param die1 The first die
+     * @param die2 The second die
+     */
+    private void drawDice(Integer die1, Integer die2) {
+        if (die1 == null || die2 == null || die1 == 0 || die2 == 0) return;
+        double startX = OFFSET_X;
+        double startY = OFFSET_Y;
+        renderDice(die1, startX, startY);
+        startX += diceSize + diceSize / 8.0;
+        renderDice(die2, startX, startY);
+    }
+
+    /**
+     * drawGameMap Method
+     * <p>
+     * This method draws the game map represented in the given IGameMap on the given canvas
+     * This method is the only one that ever needs to be accessed from outside this interface.
+     *
+     * @param gameMap An IGameMap providing the game map to draw
+     */
+    private void drawGameMap(IGameMap gameMap) {
+        LOG.debug("Drawing Game map");
+
+        //Get hexes, intersections, and edges in a usable format from the IGameMap
+        IGameHex[][] hexes = gameMap.getHexes();
+        IIntersectionWithEdges[][] intersections = gameMap.getIntersections();
+        //Call functions to draw hexes, intersections, and edges
+        drawHexTiles(hexes);
+        drawIntersectionsAndEdges(intersections);
+
+        if (drawHitboxGrid) drawHitboxGrid();
     }
 
     /**
@@ -645,7 +656,9 @@ public class GameRendering {
      */
     private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
         gfxCtx.setLineWidth(roadWidth);
+        if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
+            if (edge == null) continue;
             if (edge.isBuildableBy(userService.getLoggedInUser())) {
                 gfxCtx.setStroke(BUILDABLE_COLOUR);
             } else if (edge.getOwner() == null) {
@@ -680,6 +693,7 @@ public class GameRendering {
      * @param currentY The current y-coordinate
      */
     private void renderHex(IGameHex hex, double currentX, double currentY) {
+        if (hex == null) return;
         if (!setHexColour(hex)) return;
 
         drawHex(currentX, currentY);
@@ -701,6 +715,7 @@ public class GameRendering {
      * @param intersection The intersection to draw
      */
     private void renderIntersection(double currentX, double currentY, IIntersectionWithBuildable intersection) {
+        if (intersection == null) return;
         switch (intersection.getState()) {
             case FREE:
                 if (intersection.isBuildableBy(userService.getLoggedInUser()))
@@ -911,6 +926,7 @@ public class GameRendering {
      * @return True if the colour couldn't be set, false otherwise
      */
     private boolean setHexColour(IGameHex hex) {
+        if (hex == null) return false;
         switch (hex.getType()) {
             case WATER:
             case HARBOR:
@@ -947,6 +963,42 @@ public class GameRendering {
     }
 
     /**
+     * Shows a text notification on the canvas
+     *
+     * @param text The text to display
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-08
+     */
+    private void showBottomText(String text) {
+        if (text == null) return;
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.setFont(Font.font(20));
+        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
+    }
+
+    /**
+     * Shows a winner notification on the canvas
+     *
+     * @param text The text to display
+     *
+     * @author Temmo Junkhoff
+     * @author Maximilian Lindner
+     * @since 2021-03-29
+     */
+    private void showCenterText(String text) {
+        if (text == null) return;
+        gfxCtx.setTextAlign(TextAlignment.CENTER);
+        gfxCtx.setTextBaseline(VPos.CENTER);
+        gfxCtx.setFill(Color.BLACK);
+        gfxCtx.setFont(Font.font(25));
+        gfxCtx.fillText(text, width / 2.0, height / 2.0);
+    }
+
+    /**
      * verticalEdgeToMapPoint method
      * <p>
      * This method maps a row, column coordinate for a vertical Edge to
@@ -966,5 +1018,158 @@ public class GameRendering {
         MapPoint left = rowColCoordinatesToMapPoint(row - 2, col);
         MapPoint right = rowColCoordinatesToMapPoint(row + 2, col);
         return EdgeMapPoint(left, right);
+    }
+
+    /**
+     * A class to store a description of the current state of the game map.
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-07
+     */
+    public static class GameMapDescription {
+
+        IGameMap gameMap;
+        Integer firstDie;
+        Integer secondDie;
+        String bottomText;
+        String centerText;
+
+        /**
+         * Constructor
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public GameMapDescription() {
+            gameMap = null;
+            firstDie = null;
+            secondDie = null;
+            bottomText = null;
+            centerText = null;
+        }
+
+        /**
+         * Clears the description.
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public void clear() {
+            gameMap = null;
+            firstDie = null;
+            secondDie = null;
+            bottomText = null;
+            centerText = null;
+        }
+
+        /**
+         * Gets the bottom text.
+         *
+         * @return The bottom text
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public String getBottomText() {
+            return bottomText;
+        }
+
+        /**
+         * Sets The bottom text.
+         *
+         * @param bottomText The bottom text
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public void setBottomText(String bottomText) {
+            this.bottomText = bottomText;
+        }
+
+        /**
+         * Gets the center text.
+         *
+         * @return The center text
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public String getCenterText() {
+            return centerText;
+        }
+
+        /**
+         * Sets The center text.
+         *
+         * @param centerText The center text
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public void setCenterText(String centerText) {
+            this.centerText = centerText;
+        }
+
+        /**
+         * Gets the first die.
+         *
+         * @return The first die
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public Integer getFirstDie() {
+            return firstDie;
+        }
+
+        /**
+         * Gets the game map.
+         *
+         * @return The game map
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public IGameMap getGameMap() {
+            return gameMap;
+        }
+
+        /**
+         * Sets The game map.
+         *
+         * @param gameMap The game map
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public void setGameMap(IGameMap gameMap) {
+            this.gameMap = gameMap;
+        }
+
+        /**
+         * Gets the second die.
+         *
+         * @return The second die
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public Integer getSecondDie() {
+            return secondDie;
+        }
+
+        /**
+         * Sets The dice.
+         *
+         * @param firstDie  The first die
+         * @param secondDie The second die
+         *
+         * @author Temmo Junkhoff
+         * @since 2021-05-07
+         */
+        public void setDice(int firstDie, int secondDie) {
+            this.firstDie = firstDie;
+            this.secondDie = secondDie;
+        }
     }
 }
