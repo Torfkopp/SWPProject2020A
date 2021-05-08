@@ -400,8 +400,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
         moveTimerLabel.setVisible(true);
-        currentRound.setVisible(true);
-        Platform.runLater(() -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1)));
     }
 
     /**
@@ -440,6 +438,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
             turnIndicator.setVisible(true);
+            currentRound.setVisible(true);
+            currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1));
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
