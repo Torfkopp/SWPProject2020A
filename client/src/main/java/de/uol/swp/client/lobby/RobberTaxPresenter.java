@@ -38,8 +38,10 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private static final String GREEN_BAR = "green-bar", BLUE_BAR = "blue-bar", RED_BAR = "red-bar";
     private static final String[] barColourClasses = {RED_BAR, BLUE_BAR, GREEN_BAR};
     private final ResourceList selectedResources = new ResourceList();
+
     @Inject
     protected IGameService gameService;
+
     @FXML
     private Label resourceAmount;
     @FXML
