@@ -1,6 +1,5 @@
 package de.uol.swp.client.trade;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
@@ -56,18 +55,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private Button buyDevelopmentButton;
     @FXML
     private Button tradeResourceWithBankButton;
-
-    /**
-     * Constructor
-     * <p>
-     * Sets the eventBus
-     *
-     * @param eventBus EventBus
-     */
-    @Inject
-    public TradeWithBankPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     /**
      * Helper method to set the tradingRatio Map according to the provided harborMap

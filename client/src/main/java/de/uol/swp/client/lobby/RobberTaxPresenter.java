@@ -1,6 +1,5 @@
 package de.uol.swp.client.lobby;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
@@ -55,18 +54,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private int taxAmount;
     private ResourceList inventory;
     private ObservableList<Resource> ownInventoryList;
-
-    /**
-     * Constructor
-     * <p>
-     * Sets the eventBus
-     *
-     * @param eventBus The EventBus
-     */
-    @Inject
-    public RobberTaxPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     /**
      * Listener for the brickSlider

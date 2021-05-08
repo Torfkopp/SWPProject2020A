@@ -15,7 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * @author Mario Fokken
  * @since 2021-04-16
  */
-public class AbstractTradePresenter extends AbstractPresenter {
+public abstract class AbstractTradePresenter extends AbstractPresenter {
 
     @Inject
     protected ITradeService tradeService;
