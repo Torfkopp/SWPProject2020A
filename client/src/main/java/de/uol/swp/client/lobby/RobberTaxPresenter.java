@@ -130,6 +130,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
                 });
             }
         });
+        Platform.runLater(()-> brickSlider.requestFocus());
+
         brickSlider.valueProperty().addListener((obs, oldValue, newValue) -> brickSliderListener());
         grainSlider.valueProperty().addListener((obs, oldValue, newValue) -> grainSliderListener());
         lumberSlider.valueProperty().addListener((obs, oldValue, newValue) -> lumberSliderListener());
