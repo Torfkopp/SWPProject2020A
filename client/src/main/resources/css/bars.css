@@ -1,0 +1,15 @@
+.progress-bar {
+    -fx-box-border: -gold;
+}
+
+.green-bar {
+    -fx-accent: -green;
+}
+
+.blue-bar {
+    -fx-accent: -blue;
+}
+
+.red-bar {
+    -fx-accent: -red;
+}
