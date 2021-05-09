@@ -2,6 +2,7 @@
  * Import color palette and font
  */
 @import url("palette.css");
+@import url("bars.css");
 
 @font-face {
     src: url("../fonts/Roboto.ttf");

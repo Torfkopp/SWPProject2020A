@@ -73,6 +73,22 @@
     -fx-text-fill: -black;
 }
 
+.progress-bar {
+    -fx-box-border: -blue;
+}
+
+.green-bar {
+    -fx-accent: -red;
+}
+
+.blue-bar {
+    -fx-accent: -gold;
+}
+
+.red-bar {
+    -fx-accent: -green;
+}
+
 #tradeUserView {
     -fx-background-image: url("../images/trade_offer.jpg");
     -fx-background-position: center;

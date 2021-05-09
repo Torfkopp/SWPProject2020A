@@ -64,7 +64,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected AnimationTimer elapsedTimer;
     @FXML
-    protected Menu timerLabel = new Menu();
+    protected Label timerLabel;
     @FXML
     private Button changeMoveTimeButton;
     @FXML
@@ -400,8 +400,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
         moveTimerLabel.setVisible(true);
-        currentRound.setVisible(true);
-        Platform.runLater(() -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1)));
     }
 
     /**
@@ -440,6 +438,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
             turnIndicator.setVisible(true);
+            currentRound.setVisible(true);
+            currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1));
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
@@ -565,6 +565,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         preGameSettingBox.setMaxHeight(0);
         preGameSettingBox.setMinHeight(0);
         gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering.bindGameMapDescription(gameMapDescription);
         gameService.updateInventory(lobbyName);
         window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         window.setHeight(LobbyPresenter.MIN_HEIGHT_IN_GAME);
@@ -586,7 +587,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         startSession.setVisible(false);
         rollDice.setVisible(true);
         endTurn.setVisible(true);
-        infoMenu.setVisible(true);
         helpCheckBox.setDisable(false);
         helpCheckBox.setVisible(true);
     }
