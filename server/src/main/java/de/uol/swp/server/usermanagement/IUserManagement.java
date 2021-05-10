@@ -95,6 +95,17 @@ public interface IUserManagement {
     boolean isLoggedIn(User user);
 
     /**
+     * Test if given user is logged in
+     *
+     * @param username The user to check for
+     *
+     * @return True if the User is logged in
+     *
+     * @since 2021-05-10
+     */
+    boolean isLoggedIn(String username);
+
+    /**
      * Login with username and password
      *
      * @param username The name of the user
