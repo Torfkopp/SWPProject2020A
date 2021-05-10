@@ -112,13 +112,8 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2021-03-18
      */
     public void sendPingMessage(MessageContext ctx) {
-        if (sessionManagement.getSession(ctx).isPresent()) {
-            ResponseMessage msg = new PingMessage();
-            msg.setSession(null);
-            msg.setMessageContext(null);
-            LOG.debug("Send to client {} message {}", ctx, msg);
-            sendToClient(ctx, msg);
-        }
+        LOG.debug("Send ping message to client {}", ctx);
+        sendToClient(ctx, new PingMessage());
     }
 
     /**
