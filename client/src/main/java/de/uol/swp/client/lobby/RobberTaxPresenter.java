@@ -35,6 +35,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
+    private static final String GREEN_BAR = "green-bar", BLUE_BAR = "blue-bar", RED_BAR = "red-bar";
+    private static final String[] barColourClasses = {RED_BAR, BLUE_BAR, GREEN_BAR};
     private final ResourceList selectedResources = new ResourceList();
 
     @Inject
@@ -88,8 +90,16 @@ public class RobberTaxPresenter extends AbstractPresenter {
         for (IResource resource : selectedResources) {
             selectedAmount += resource.getAmount();
         }
-        if (selectedAmount <= taxAmount) progress.setProgress((double) selectedAmount / taxAmount);
-        else progress.setProgress(1.0 - (selectedAmount % taxAmount) / (double) taxAmount);
+        if (selectedAmount < taxAmount) {
+            progress.setProgress((double) selectedAmount / taxAmount);
+            progress.getStyleClass().removeAll(barColourClasses);
+            progress.getStyleClass().add(BLUE_BAR);
+        } else if (selectedAmount == taxAmount) {
+            progress.setProgress(100);
+            progress.getStyleClass().removeAll(barColourClasses);
+            progress.getStyleClass().add(GREEN_BAR);
+        } else progress.getStyleClass().add(RED_BAR);
+
         taxPay.setDisable(selectedAmount != taxAmount);
     }
 
