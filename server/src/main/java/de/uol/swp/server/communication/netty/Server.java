@@ -8,11 +8,18 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
+import java.security.cert.CertificateException;
 
 /**
  * This class handles opening a port clients can connect to.
@@ -43,11 +50,13 @@ public class Server {
      *
      * @param port Port number the server shall be reachable on
      *
-     * @throws java.lang.Exception Server failed to start, e.g. the port is already in use
+     * @throws java.lang.InterruptedException          Server failed to start, e.g. the port is already in use
+     * @throws java.security.cert.CertificateException Server failed to create a certificate
      * @see java.net.InetSocketAddress
      * @since 2019-11-20
      */
-    public void start(int port) throws Exception {
+    public void start(int port) throws InterruptedException, CertificateException {
+        SelfSignedCertificate cert = new SelfSignedCertificate();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -56,11 +65,18 @@ public class Server {
              .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
 
                 @Override
-                protected void initChannel(SocketChannel ch) {
+                protected void initChannel(SocketChannel ch) throws SSLException {
+                    // Create and add SslHandler accordingly
+                    LOG.trace("Adding SSLHandler to pipeline");
+                    SslContext context = SslContextBuilder.forServer(cert.key(), cert.cert()).build();
+                    SSLEngine engine = context.newEngine(ch.alloc());
+                    ch.pipeline().addLast(new SslHandler(engine));
                     // Add IdleStateHandler to handle timeouts
-                    ch.pipeline().addLast(new IdleStateHandler(65, 20, 0));
+                    LOG.trace("Adding IdleStateHandler to pipeline");
+                    ch.pipeline().addLast(new IdleStateHandler(70, 20, 0));
                     // Encoder and decoder are both needed!
                     // Send and receive serialisable objects
+                    LOG.trace("Adding Encoder and Decoder to pipeline");
                     ch.pipeline().addLast(new MyObjectEncoder());
                     ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
                     // Must be last in the pipeline, else they will not
