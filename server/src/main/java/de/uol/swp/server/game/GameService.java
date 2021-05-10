@@ -834,8 +834,8 @@ public class GameService extends AbstractService {
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!(req.getRespondingUser() instanceof User && game.getActivePlayer().equals(req.getOfferingUser()) && game
-                .isDiceRolledAlready())) {
+        if (!(req.getRespondingUser() instanceof User && (game.getActivePlayer().equals(req.getOfferingUser()) || req
+                .isCounterOffer()) && game.isDiceRolledAlready())) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
@@ -1383,7 +1383,7 @@ public class GameService extends AbstractService {
     private void onTradeWithUserCancelRequest(TradeWithUserCancelRequest req) {
         LOG.debug("Received TradeWithUserCancelRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (req.getSession().isEmpty()) return;
+        if (req.getSession().isEmpty() || game == null) return;
         if (!game.getActivePlayer().equals(req.getSession().get().getUser()) || !game.isDiceRolledAlready()) return;
         game.setBuildingAllowed(true);
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
@@ -1421,19 +1421,25 @@ public class GameService extends AbstractService {
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
         LOG.debug("Received TradeWithUserRequest for Lobby {}", req.getName());
         Game game = gameManagement.getGame(req.getName());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
-        game.setBuildingAllowed(false);
-        Inventory inventory = game.getInventory(req.getUser());
-        Inventory traderInventory = game.getInventory(req.getRespondingUser());
-        if (inventory == null || traderInventory == null) return;
-        int traderInventorySize = traderInventory.getResourceAmount();
-        ResourceList offeringInventory = inventory.getResources();
-        ResponseMessage returnMessage;
-        returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(), offeringInventory.create(),
-                                                              traderInventorySize, req.getRespondingUser());
-        LOG.debug("Sending InventoryForTradeWithUserResponse for Lobby {}", req.getName());
-        returnMessage.initWithMessage(req);
-        post(returnMessage);
+        System.err.println(game.getActivePlayer().equals(req.getUser()));
+        System.err.println(req.isCounterOffer());
+        System.err.println(game.isDiceRolledAlready());
+        if (!game.isDiceRolledAlready()) return;
+        if (game.getActivePlayer().equals(req.getUser()) || req.isCounterOffer()) {
+            game.setBuildingAllowed(false);
+            Inventory inventory = game.getInventory(req.getUser());
+            Inventory traderInventory = game.getInventory(req.getRespondingUser());
+            if (inventory == null || traderInventory == null) return;
+            int traderInventorySize = traderInventory.getResourceAmount();
+            ResourceList offeringInventory = inventory.getResources();
+            ResponseMessage returnMessage;
+            returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
+                                                                  offeringInventory.create(), traderInventorySize,
+                                                                  req.getRespondingUser(), req.isCounterOffer());
+            LOG.debug("Sending InventoryForTradeWithUserResponse for Lobby {}", req.getName());
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+        }
     }
 
     /**

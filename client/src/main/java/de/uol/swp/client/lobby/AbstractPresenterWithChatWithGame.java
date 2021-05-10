@@ -1063,7 +1063,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else {
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
-            tradeService.tradeWithUser(lobbyName, user);
+            tradeService.tradeWithUser(lobbyName, user, false);
             eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }

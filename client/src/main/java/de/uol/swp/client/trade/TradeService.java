@@ -100,10 +100,10 @@ public class TradeService implements ITradeService {
 
     @Override
     public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
-                           ResourceList demandedResources) {
+                           ResourceList demandedResources, boolean counterOffer) {
         LOG.debug("Sending OfferingTradeWithUserRequest");
         Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
-                                                           offeredResources, demandedResources);
+                                                           offeredResources, demandedResources, counterOffer);
         eventBus.post(request);
     }
 
@@ -146,9 +146,10 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser) {
+    public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer) {
         LOG.debug("Sending TradeWithUserRequest");
-        Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser);
+        Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser,
+                                                   counterOffer);
         eventBus.post(request);
     }
 }
