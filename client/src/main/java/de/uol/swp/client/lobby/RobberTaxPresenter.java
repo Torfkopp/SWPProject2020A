@@ -3,6 +3,7 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.sun.javafx.scene.control.IntegerField;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
@@ -46,6 +47,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private Label resourceAmount;
     @FXML
     private Slider brickSlider, grainSlider, lumberSlider, oreSlider, woolSlider;
+    @FXML
+    private IntegerField brickField, grainField, lumberField, oreField, woolField;
     @FXML
     private ListView<Resource> ownInventoryView;
     @FXML
@@ -127,11 +130,20 @@ public class RobberTaxPresenter extends AbstractPresenter {
                 });
             }
         });
+        Platform.runLater(()-> brickSlider.requestFocus());
+
         brickSlider.valueProperty().addListener((obs, oldValue, newValue) -> brickSliderListener());
         grainSlider.valueProperty().addListener((obs, oldValue, newValue) -> grainSliderListener());
         lumberSlider.valueProperty().addListener((obs, oldValue, newValue) -> lumberSliderListener());
         oreSlider.valueProperty().addListener((obs, oldValue, newValue) -> oreSliderListener());
         woolSlider.valueProperty().addListener((obs, oldValue, newValue) -> woolSliderListener());
+
+        brickSlider.valueProperty().bindBidirectional(brickField.valueProperty());
+        grainSlider.valueProperty().bindBidirectional(grainField.valueProperty());
+        lumberSlider.valueProperty().bindBidirectional(lumberField.valueProperty());
+        oreSlider.valueProperty().bindBidirectional(oreField.valueProperty());
+        woolSlider.valueProperty().bindBidirectional(woolField.valueProperty());
+
         LOG.debug("RobberTaxPresenter initialised");
     }
 
