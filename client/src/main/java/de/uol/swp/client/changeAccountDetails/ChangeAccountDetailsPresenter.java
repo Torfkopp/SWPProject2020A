@@ -1,12 +1,9 @@
 package de.uol.swp.client.changeAccountDetails;
 
 import com.google.common.base.Strings;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
-import de.uol.swp.client.main.MainMenuPresenter;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
@@ -34,7 +31,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 390;
     public static final int MIN_WIDTH = 395;
     private static final ChangeAccountDetailsCanceledEvent changeAccountDetailsCanceledEvent = new ChangeAccountDetailsCanceledEvent();
-    private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(ChangeAccountDetailsPresenter.class);
 
     @FXML
     private Button changeButton;
@@ -48,21 +45,6 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     private PasswordField confirmPasswordField;
     @FXML
     private PasswordField newPasswordField2;
-
-    /**
-     * Constructor
-     *
-     * @param eventBus The EventBus set in ClientModule
-     *
-     * @author Eric Vuong
-     * @author Steven Luong
-     * @see de.uol.swp.client.di.ClientModule
-     * @since 2020-11-25
-     */
-    @Inject
-    public ChangeAccountDetailsPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     @FXML
     protected void initialize() {

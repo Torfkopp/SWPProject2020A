@@ -1,8 +1,6 @@
 package de.uol.swp.client.trade;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
@@ -53,18 +51,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private int traderInventorySize;
     private ResourceList selectedOwnResourceList;
     private ResourceList selectedPartnersResourceList;
-
-    /**
-     * Constructor
-     * <p>
-     * Sets the eventBus
-     *
-     * @param eventBus The EventBus
-     */
-    @Inject
-    public TradeWithUserPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     /**
      * Initialises the Presenter using its superclass

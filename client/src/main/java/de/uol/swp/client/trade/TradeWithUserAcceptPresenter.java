@@ -1,8 +1,6 @@
 package de.uol.swp.client.trade;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
@@ -46,16 +44,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private UserOrDummy offeringUser;
     private ResourceList offeringResourceMap;
     private ResourceList respondingResourceMap;
-
-    /**
-     * Constructor
-     *
-     * @param eventBus The EventBus
-     */
-    @Inject
-    public TradeWithUserAcceptPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     /**
      * Initialises the Presenter using the superclass.
