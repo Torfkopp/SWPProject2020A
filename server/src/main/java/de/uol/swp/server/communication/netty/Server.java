@@ -50,11 +50,13 @@ public class Server {
      *
      * @param port Port number the server shall be reachable on
      *
-     * @throws java.lang.InterruptedException Server failed to start, e.g. the port is already in use
+     * @throws java.lang.InterruptedException          Server failed to start, e.g. the port is already in use
+     * @throws java.security.cert.CertificateException Server failed to create a certificate
      * @see java.net.InetSocketAddress
      * @since 2019-11-20
      */
-    public void start(int port) throws InterruptedException {
+    public void start(int port) throws InterruptedException, CertificateException {
+        SelfSignedCertificate cert = new SelfSignedCertificate();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -63,16 +65,18 @@ public class Server {
              .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
 
                 @Override
-                protected void initChannel(SocketChannel ch) throws CertificateException, SSLException {
+                protected void initChannel(SocketChannel ch) throws SSLException {
                     // Create and add SslHandler accordingly
-                    SelfSignedCertificate cert = new SelfSignedCertificate(); // Why is this not working? :(
-                    SslContext context = SslContextBuilder.forServer(cert.privateKey(), cert.certificate()).build();
+                    LOG.trace("Adding SSLHandler to pipeline");
+                    SslContext context = SslContextBuilder.forServer(cert.key(), cert.cert()).build();
                     SSLEngine engine = context.newEngine(ch.alloc());
                     ch.pipeline().addLast(new SslHandler(engine));
                     // Add IdleStateHandler to handle timeouts
+                    LOG.trace("Adding IdleStateHandler to pipeline");
                     ch.pipeline().addLast(new IdleStateHandler(70, 20, 0));
                     // Encoder and decoder are both needed!
                     // Send and receive serialisable objects
+                    LOG.trace("Adding Encoder and Decoder to pipeline");
                     ch.pipeline().addLast(new MyObjectEncoder());
                     ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
                     // Must be last in the pipeline, else they will not

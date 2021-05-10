@@ -188,14 +188,17 @@ public class ClientConnection {
                     @Override
                     protected void initChannel(SocketChannel ch) throws SSLException {
                         // Create and add SslHandler accordingly
+                        LOG.trace("Adding SSLHandler to pipeline");
                         SslContext context = SslContextBuilder.forClient()
                                                               .trustManager(InsecureTrustManagerFactory.INSTANCE)
                                                               .build();
                         SSLEngine engine = context.newEngine(ch.alloc(), host, port);
                         ch.pipeline().addLast(new SslHandler(engine));
                         // Add IdleStateHandler to handle timeouts
+                        LOG.trace("Adding IdleStateHandler to pipeline");
                         ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
                         // Add both Encoder and Decoder to send and receive serialisable objects
+                        LOG.trace("Adding Encoder and Decoder to pipeline");
                         ch.pipeline().addLast(new ObjectEncoder());
                         ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
                         // Add a ClientHandler
