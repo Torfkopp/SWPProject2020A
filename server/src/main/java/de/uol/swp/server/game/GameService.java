@@ -1421,9 +1421,6 @@ public class GameService extends AbstractService {
     private void onTradeWithUserRequest(TradeWithUserRequest req) {
         LOG.debug("Received TradeWithUserRequest for Lobby {}", req.getName());
         Game game = gameManagement.getGame(req.getName());
-        System.err.println(game.getActivePlayer().equals(req.getUser()));
-        System.err.println(req.isCounterOffer());
-        System.err.println(game.isDiceRolledAlready());
         if (!game.isDiceRolledAlready()) return;
         if (game.getActivePlayer().equals(req.getUser()) || req.isCounterOffer()) {
             game.setBuildingAllowed(false);
