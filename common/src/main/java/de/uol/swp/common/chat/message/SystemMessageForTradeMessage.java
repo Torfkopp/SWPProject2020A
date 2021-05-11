@@ -53,6 +53,28 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     }
 
     /**
+     * Helper method to transform a resource list into the corresponding string.
+     *
+     * @param resourceMap The resource list containing the traded resources
+     *
+     * @return The string containing the traded resources
+     *
+     * @author Marvin Drees
+     * @since 2021-05-11
+     */
+    private String buildTradeString(IResourceList resourceMap) {
+        StringBuilder tradeString = new StringBuilder();
+        for (IResource entry : resourceMap) {
+            if (entry.getAmount() > 0) {
+                tradeString.append(", ");
+                tradeString.append(entry.getAmount()).append(" ");
+                tradeString.append(entry.getType().toString());
+            }
+        }
+        return tradeString.toString().replaceFirst("^, ", "");
+    }
+
+    /**
      * Helper method to create a singular I18nWrapper from the resource maps
      *
      * @param offeringUser          The name of the offering user
@@ -68,20 +90,9 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     private I18nWrapper makeSingularI18nWrapper(UserOrDummy offeringUser, String respondingUser,
                                                 IResourceList offeringResourceMap,
                                                 IResourceList respondingResourceMap) {
-        StringBuilder offerString = new StringBuilder();
-        for (IResource entry : offeringResourceMap) {
-            offerString.append(", ");
-            if (entry.getAmount() > 0) offerString.append(entry.getAmount()).append(" ");
-            offerString.append(entry.getType().toString());
-        }
-        StringBuilder demandString = new StringBuilder();
-        for (IResource entry : respondingResourceMap) {
-            demandString.append(", ");
-            if (entry.getAmount() > 0) demandString.append(entry.getAmount()).append(" ");
-            demandString.append(entry.getType().toString());
-        }
+        String offerString = buildTradeString(offeringResourceMap);
+        String demandString = buildTradeString(respondingResourceMap);
         return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser,
-                               offerString.toString().replaceFirst("^, ", ""),
-                               demandString.toString().replaceFirst("^, ", ""));
+                               offerString, demandString);
     }
 }
