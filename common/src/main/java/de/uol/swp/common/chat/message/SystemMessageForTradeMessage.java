@@ -57,12 +57,12 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
      *
      * @param resourceMap The resource list containing the traded resources
      *
-     * @return The StringBuilder containing the traded resources
+     * @return The string containing the traded resources
      *
      * @author Marvin Drees
      * @since 2021-05-11
      */
-    private StringBuilder buildTradeString(IResourceList resourceMap) {
+    private String buildTradeString(IResourceList resourceMap) {
         StringBuilder tradeString = new StringBuilder();
         for (IResource entry : resourceMap) {
             if (entry.getAmount() > 0) {
@@ -71,7 +71,7 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
                 tradeString.append(entry.getType().toString());
             }
         }
-        return tradeString;
+        return tradeString.toString().replaceFirst("^, ", "");
     }
 
     /**
@@ -90,10 +90,9 @@ public class SystemMessageForTradeMessage extends AbstractLobbyMessage {
     private I18nWrapper makeSingularI18nWrapper(UserOrDummy offeringUser, String respondingUser,
                                                 IResourceList offeringResourceMap,
                                                 IResourceList respondingResourceMap) {
-        StringBuilder offerString = buildTradeString(offeringResourceMap);
-        StringBuilder demandString = buildTradeString(respondingResourceMap);
+        String offerString = buildTradeString(offeringResourceMap);
+        String demandString = buildTradeString(respondingResourceMap);
         return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser,
-                               offerString.toString().replaceFirst("^, ", ""),
-                               demandString.toString().replaceFirst("^, ", ""));
+                               offerString, demandString);
     }
 }
