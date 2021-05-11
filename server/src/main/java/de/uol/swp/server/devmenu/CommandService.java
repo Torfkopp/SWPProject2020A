@@ -29,6 +29,7 @@ import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
+import de.uol.swp.server.message.AbstractServerInternalMessage;
 import de.uol.swp.server.usermanagement.IUserManagement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -347,6 +348,7 @@ public class CommandService extends AbstractService {
             clsSet.stream().filter(Message.class::isAssignableFrom) // Only things that implement the Message interface
                   .filter(cls -> !Modifier.isAbstract(cls.getModifiers())) // No Abstract classes
                   .filter(cls -> !cls.isInterface()) // No interfaces
+                  .filter(cls -> !AbstractServerInternalMessage.class.isAssignableFrom(cls)) // No server-only Messages
                   .forEach(allClasses::add);
         } catch (IOException | ClassNotFoundException ignored) {}
     }
