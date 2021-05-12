@@ -10,6 +10,8 @@ import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -308,6 +310,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
+            chatMessages.add(new SystemMessageDTO(
+                    new I18nWrapper("mainmenu.user.create.lobby", userService.getLoggedInUser().getUsername(),
+                                    rsp.getLobbyName())));
         });
     }
 
@@ -333,6 +338,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
             lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
+            chatMessages.add(new SystemMessageDTO(
+                    new I18nWrapper("mainmenu.user.create.protected.lobby", userService.getLoggedInUser().getUsername(),
+                                    rsp.getLobbyName())));
         });
     }
 
@@ -693,6 +701,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             if (users != null && !userService.getLoggedInUser().getUsername().equals(msg.getUsername()))
                 users.add(msg.getUsername());
+            chatMessages.add(new SystemMessageDTO(new I18nWrapper("mainmenu.user.login", msg.getUsername())));
         });
     }
 
@@ -714,7 +723,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedOutMessage");
         LOG.debug("---- User {} logged out", msg.getUsername());
-        Platform.runLater(() -> users.remove(msg.getUsername()));
+        Platform.runLater(() -> {
+            users.remove(msg.getUsername());
+            chatMessages.add(new SystemMessageDTO(new I18nWrapper("mainmenu.user.logout", msg.getUsername())));
+        });
     }
 
     /**
