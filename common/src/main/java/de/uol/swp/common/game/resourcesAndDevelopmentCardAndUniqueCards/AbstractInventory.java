@@ -58,7 +58,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Decrease the amount the development card.
+     * Decrease the amount of the development card.
      *
      * @param developmentCard The development card
      *
