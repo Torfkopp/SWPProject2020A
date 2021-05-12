@@ -594,6 +594,7 @@ public class GameService extends AbstractService {
         Inventory inventory = game.getInventory(req.getUser());
         if (req.getResource() != null) inventory.increase(req.getResource(), req.getAmount());
         else if (req.getDevelopmentCard() != null) inventory.increase(req.getDevelopmentCard(), req.getAmount());
+        else if (req.isGiveAllCards()) inventory.increaseAll(req.getAmount());
 
         ResponseMessage returnMessage = new UpdateInventoryResponse(req.getUser(), req.getOriginLobby(),
                                                                     inventory.getResources(),

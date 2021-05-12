@@ -166,6 +166,22 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
+     * Increases all resources by the given amount
+     *
+     * @param i The amount to increase the resources in the inventory by
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-12
+     */
+    public void increaseAll(int i) {
+        increase(ResourceType.ORE, i);
+        increase(ResourceType.WOOL, i);
+        increase(ResourceType.LUMBER, i);
+        increase(ResourceType.GRAIN, i);
+        increase(ResourceType.BRICK, i);
+    }
+
+    /**
      * Set the resource amount.
      *
      * @param resource The resource
