@@ -3,6 +3,7 @@ package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
@@ -174,11 +175,9 @@ public abstract class AbstractInventory implements Serializable {
      * @since 2021-05-12
      */
     public void increaseAll(int i) {
-        increase(ResourceType.ORE, i);
-        increase(ResourceType.WOOL, i);
-        increase(ResourceType.LUMBER, i);
-        increase(ResourceType.GRAIN, i);
-        increase(ResourceType.BRICK, i);
+        for (IResource resource : resources) {
+            increase(resource.getType(), i);
+        }
     }
 
     /**
