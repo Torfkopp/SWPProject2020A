@@ -25,6 +25,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -65,7 +67,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private ListView<Pair<LobbyName, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
+    @FXML
+    private TextField lobbyFilterTextField;
 
+    private ObservableList<String> lobbyObservableList;
+    private FilteredList<String> filteredLobbyList;
     private ObservableList<Pair<LobbyName, String>> lobbies;
     private ObservableList<String> users;
 
@@ -94,6 +100,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 });
             }
         });
+        if (lobbyObservableList == null) lobbyObservableList = FXCollections.observableArrayList();
+        filteredLobbyList = new FilteredList<>(lobbyObservableList, p -> true);
+
+        lobbyFilterTextField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredLobbyList.setPredicate(clsn -> {
+                if(newValue == null || newValue.isEmpty()) return true;
+                return clsn.toLowerCase().contains(newValue.toLowerCase());
+            });
+        }));
+        lobbyView.setItems(new SortedList(filteredLobbyList));
     }
 
     /**

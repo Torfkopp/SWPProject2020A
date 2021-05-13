@@ -3,10 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity"
-      prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:id="mainMenuView" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
+<HBox fx:id="mainMenuView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane vgap="10.0" HBox.hgrow="ALWAYS">
         <columnConstraints>
             <ColumnConstraints percentWidth="17.5"/>
@@ -22,6 +21,12 @@
             <RowConstraints maxHeight="50.0" minHeight="25.0" vgrow="NEVER"/>
             <RowConstraints vgrow="ALWAYS"/>
         </rowConstraints>
+        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+            <children>
+                <TextField fx:id="lobbyFilterTextField"/>
+                <ListView fx:id="lobbyView" prefHeight="500.0"/>
+            </children>
+        </VBox>
 
         <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
@@ -36,7 +41,6 @@
             <Label fx:id="randomLobbyState" text="%mainmenu.labels.lobby.randomLobbyState" visible="false"
                    wrapText="true"/>
         </VBox>
-        <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
         <VBox spacing="10.0" GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
             <ListView fx:id="chatView" GridPane.columnSpan="2" VBox.vgrow="ALWAYS"/>
@@ -59,7 +63,7 @@
                           text="%mainmenu.settings.buttons.logout"/>
             </Menu>
             <Menu mnemonicParsing="false" text="%lobby.menu.rules">
-                <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview" onAction="#onRulesMenuClicked"/>
+                <MenuItem mnemonicParsing="false" onAction="#onRulesMenuClicked" text="%lobby.menu.rules.overview"/>
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>
