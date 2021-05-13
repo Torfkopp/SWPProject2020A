@@ -21,6 +21,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
     private final ResourceList resourceList;
     private final int tradingUsersInventorySize;
     private final UserOrDummy tradingUser;
+    private final boolean counterOffer;
 
     /**
      * Constructor
@@ -30,14 +31,17 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param resourceList              The list of resources of the offering user
      * @param tradingUsersInventorySize Amount of resource cards the other User has
      * @param tradingUser               The User to whom an offer is going to be made
+     * @param counterOffer              Whether the offer is a counter offer or not
      */
     public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
-                                             int tradingUsersInventorySize, UserOrDummy tradingUser) {
+                                             int tradingUsersInventorySize, UserOrDummy tradingUser,
+                                             boolean counterOffer) {
         super(lobbyName);
         this.user = user;
         this.resourceList = resourceList;
         this.tradingUsersInventorySize = tradingUsersInventorySize;
         this.tradingUser = tradingUser;
+        this.counterOffer = counterOffer;
     }
 
     /**
@@ -77,5 +81,14 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      */
     public UserOrDummy getUser() {
         return user;
+    }
+
+    /**
+     * Gets the counter offer status
+     *
+     * @return Whether the offer is a counter offer or not
+     */
+    public boolean isCounterOffer() {
+        return counterOffer;
     }
 }
