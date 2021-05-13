@@ -69,6 +69,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
+        soundService.buttonSound();
         eventBus.post(showRegViewMessage);
     }
 
