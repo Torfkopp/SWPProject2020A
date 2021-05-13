@@ -3,6 +3,7 @@ package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.IDevelopmentCardList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
@@ -163,6 +164,20 @@ public abstract class AbstractInventory implements Serializable {
      */
     public void increase(DevelopmentCardType developmentCard) {
         increase(developmentCard, 1);
+    }
+
+    /**
+     * Increases all resources by the given amount
+     *
+     * @param i The amount to increase the resources in the inventory by
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-12
+     */
+    public void increaseAll(int i) {
+        for (IResource resource : resources) {
+            increase(resource.getType(), i);
+        }
     }
 
     /**
