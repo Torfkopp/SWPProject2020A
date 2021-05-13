@@ -94,6 +94,13 @@ public class DevelopmentCardList implements IDevelopmentCardList {
     }
 
     @Override
+    public void increase(DevelopmentCardType resource, int i) {
+        for (DevelopmentCard resource1 : list) {
+            if (Objects.equals(resource, resource1.getType())) resource1.increase(i);
+        }
+    }
+
+    @Override
     public void set(DevelopmentCardType developmentCardType, int amount) {
         for (DevelopmentCard developmentCard : list) {
             if (Objects.equals(developmentCardType, developmentCard.getType())) developmentCard.setAmount(amount);

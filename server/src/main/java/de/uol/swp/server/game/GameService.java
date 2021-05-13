@@ -480,10 +480,7 @@ public class GameService extends AbstractService {
         BankInventory bankInventory = game.getBankInventory();
         if (bankInventory.getDevelopmentCards() != null) {
             DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
-            System.err.println(developmentCard.getAttributeName());
             if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
-                System.err.println("AMOUNT: " + bankInventory.getDevelopmentCards()
-                                                             .getAmount(developmentCard)); // Always 0 aka it brokey
                 bankInventory.decrease(developmentCard);
                 ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(), req.getOriginLobby(),
                                                                                developmentCard);
