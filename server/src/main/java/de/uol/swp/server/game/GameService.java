@@ -843,10 +843,9 @@ public class GameService extends AbstractService {
             return;
         }
         if (req.getRespondingUser() instanceof AI) {
-            switch (((AI) req.getRespondingUser()).getDifficulty()) {
-                case EASY: //TODO häufiges Akzeptieren
-                case HARD: //TODO Strategisch günstiges Bestimmen der Akzeptanz
-            }
+            boolean accepted = tradeAcceptionAI(((AI) req.getRespondingUser()), req.getOriginLobby(),req.getOfferedResources(), req.getDemandedResources());
+            if(accepted) writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(), WriteType.TRADE_ACCEPT);
+            else writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(), WriteType.TRADE_DECLINE);
             return;
         }
         game.setBuildingAllowed(false);
@@ -860,6 +859,68 @@ public class GameService extends AbstractService {
                                                                        req.getDemandedResources(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
+    }
+
+    /**
+     * Helper method to calculate if the AI
+     * wants to accept the trade offer
+     *
+     * @param uehara The AI to decide
+     * @param lobby The lobby
+     * @param offered The offered Resources
+     * @param demanded The demanded Resources
+     *
+     * @return If AI accepts
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private boolean tradeAcceptionAI(AI uehara, LobbyName lobby, ResourceList offered, ResourceList demanded){
+        int difference = offered.getTotal() - demanded.getTotal();
+        switch (uehara.getDifficulty()){
+            case EASY:
+                if (uehara.getUsername().equals("Robert E. O. Speedwagon")) return true;
+                //Difference:4-100%, 3-92%, 2-84%, 1-76%, 0-68%
+                if(difference >= 0 && ((int)(Math.random() * 100) < (68 + difference * 8))) return true;
+                //Difference:4-0%, 3-8%, 2-16%, 1-24%
+                else return difference < 0 && ((int) (Math.random() * 100) < (32 - difference * 8));
+            case HARD:
+                //Resource prio: EarlyGame - Brick, Wood - Wool, Grain - Ore - LateGame
+                //If AI is low on that Ressource, it will prioritise it
+
+                //todo mathematische Formel zur Berechnung der Prozentzahl anlegen
+
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Enum for all types of
+     * ChatMessages an AI can write
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private enum WriteType{
+        TRADE_ACCEPT,
+        TRADE_DECLINE,
+    }
+
+    /**
+     * Helper method to make a chat
+     * message for an AI
+     *
+     * @param uehara The AI to send the message
+     * @param lobbyName The lobby the AI is in
+     * @param type The type of chat message
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private void writeChatMessageAI(AI uehara, LobbyName lobbyName, WriteType type){
+
     }
 
     /**
@@ -1619,7 +1680,7 @@ public class GameService extends AbstractService {
                     ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
                 break;
             case HARD:
-                //todo STRATEGISCH GÜNSTIGE POSITION AUSSUCHEN (meiste Karten)
+                //todo STRATEGISCH GÜNSTIGE POSITION AUSSUCHEN (meiste Leute)
         }
         mapPoint = MapPoint.HexMapPoint(y, x);
         LOG.debug("{} moves the robber to position: {}|{}", uehara, y, x);
@@ -1714,6 +1775,8 @@ public class GameService extends AbstractService {
                 }
                 break;
             case HARD: //todo STRATEGISCH GÜNSTIGE AUSWAHL DER RESSOURCEN
+                //Resource prio: EarlyGame - Brick, Wood - Wool, Grain - Ore - LateGame
+                //If AI is high on that Ressource, it will prioritise it
         }
     }
 
@@ -1747,7 +1810,39 @@ public class GameService extends AbstractService {
      */
     private void turnAI(Game game, AI uehara) {
         //todo STRATEGISCH GÜNSTIGES BAUEN SOWIE KARTENKAUFEN UND -SPIELEN
-        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(uehara, game.getLobby().getName()));
+        switch (uehara.getDifficulty()){
+            case EASY:
+                //Build City
+                //Build Settlement
+                //Build Street
+                //Buy Dev Card
+            case HARD:
+                //Prio: Early-Game: Streets, Settlements, Development Cards, Cities : Late-Game
+        }
+        //Trying to end the turn
+        while(!endTurnAI(game,uehara)){
+            try{
+                wait(1000);
+            } catch (Exception e){
+                //todo Irgendwas
+            }
+        }
+    }
+
+    /** Helper method to end an AI's turn
+     *
+     * @param game The game the AI is in
+     * @param uehara The AI to make its turn
+     * @return If ending was successful
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private boolean endTurnAI(Game game, AI uehara){
+        if (game.getTaxPayers().isEmpty()){
+            onEndTurnRequest(new EndTurnRequest(uehara, game.getLobby().getName()));
+            return true;
+        } else return false;
     }
 
     /**
