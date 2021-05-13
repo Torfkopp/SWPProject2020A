@@ -1,8 +1,7 @@
 package de.uol.swp.server.lobby;
 
-import com.google.common.base.Strings;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.Dummy;
+import de.uol.swp.common.user.ComputedPlayer;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -94,6 +93,7 @@ public class LobbyDTO implements ILobby {
         this.name = name;
         this.password = password;
         this.inGame = inGame;
+        this.hasPassword = hasPassword;
         this.owner = owner;
         this.users.add(owner);
         this.commandsAllowed = commandsAllowed;
@@ -181,7 +181,7 @@ public class LobbyDTO implements ILobby {
 
     @Override
     public boolean hasPassword() {
-        return !Strings.isNullOrEmpty(password);
+        return hasPassword;
     }
 
     @Override
@@ -217,7 +217,7 @@ public class LobbyDTO implements ILobby {
     @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
-        if (user instanceof Dummy) {
+        if (user instanceof ComputedPlayer) {
             readyUsers.add(user);
         }
     }

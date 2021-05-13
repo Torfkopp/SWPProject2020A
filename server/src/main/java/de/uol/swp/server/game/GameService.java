@@ -34,9 +34,7 @@ import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.MessageContext;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
-import de.uol.swp.common.user.Dummy;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.game.map.IGameMapManagement;
@@ -191,7 +189,7 @@ public class GameService extends AbstractService {
      */
     private void endTurnDummy(Game game) {
         UserOrDummy activePlayer = game.getActivePlayer();
-        if (!(activePlayer instanceof User)) {
+        if (activePlayer instanceof Dummy) {
             if (game.getTaxPayers().isEmpty())
                 onEndTurnRequest(new EndTurnRequest(activePlayer, game.getLobby().getName()));
         }
@@ -563,9 +561,11 @@ public class GameService extends AbstractService {
             post(exceptionMessage);
         }
         Game game = gameManagement.getGame(lobbyName);
-        if (game.getFirst() instanceof Dummy) {
-            onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
-            endTurnDummy(game);
+        UserOrDummy first = game.getFirst();
+        if (first instanceof ComputedPlayer) {
+            onRollDiceRequest(new RollDiceRequest(first, lobbyName));
+            if (first instanceof Dummy) endTurnDummy(game);
+            if (first instanceof AI) turnAI(game, (AI) first);
         }
     }
 
@@ -674,9 +674,10 @@ public class GameService extends AbstractService {
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
 
         game.setDiceRolledAlready(false);
-        if (nextPlayer instanceof Dummy) {
+        if (nextPlayer instanceof ComputedPlayer) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            endTurnDummy(game);
+            if (nextPlayer instanceof Dummy) endTurnDummy(game);
+            if (nextPlayer instanceof AI) turnAI(game, (AI) nextPlayer);
         }
     }
 
@@ -834,9 +835,18 @@ public class GameService extends AbstractService {
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!(req.getRespondingUser() instanceof User && game.getActivePlayer().equals(req.getOfferingUser()) && game
-                .isDiceRolledAlready())) {
+        //only false if respondingUser is no Dummy, the dice is rolled already and the offeringUser is the active user
+        if (!(!(req.getRespondingUser() instanceof Dummy) && game.getActivePlayer()
+                                                                 .equals(req.getOfferingUser()) && game
+                      .isDiceRolledAlready())) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+            return;
+        }
+        if (req.getRespondingUser() instanceof AI) {
+            switch (((AI) req.getRespondingUser()).getDifficulty()) {
+                case EASY: //TODO häufiges Akzeptieren
+                case HARD: //TODO Strategisch günstiges Bestimmen der Akzeptanz
+            }
             return;
         }
         game.setBuildingAllowed(false);
@@ -982,7 +992,7 @@ public class GameService extends AbstractService {
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
 
         for (UserOrDummy user : game.getPlayers()) {
-            if (!(user instanceof Dummy)) {
+            if (user instanceof User) {
                 Inventory inventory = game.getInventory(user);
                 DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
                 ResourceList resourceList = inventory.getResources();
@@ -1266,20 +1276,10 @@ public class GameService extends AbstractService {
             Game g = gameManagement.getGame(req.getOriginLobby());
             for (UserOrDummy p : g.getPlayers()) {
                 if (g.getInventory(p).getResourceAmount() > 7) {
-                    //Takes a dummy's resources away
                     if (p instanceof Dummy) {
-                        Inventory inv = g.getInventory(p);
-                        int i = inv.getResourceAmount() / 2;
-                        LOG.debug("{} has to give up {} of their {} cards", p, i, inv.getResourceAmount());
-                        while (i > 0) {
-                            for (ResourceType resourceType : ResourceType.values()) {
-                                if (inv.get(resourceType) > 0) {
-                                    inv.increase(resourceType, -1);
-                                    i--;
-                                    if (i == 0) break;
-                                }
-                            }
-                        }
+                        taxPayDummy(g, (Dummy) p);
+                    } else if (p instanceof AI) {
+                        taxPayAI(g, (AI) p);
                     } else {
                         players.put((User) p, g.getInventory(p).getResourceAmount() / 2);
                     }
@@ -1300,6 +1300,8 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(req.getOriginLobby(), rtm);
             if (req.getUser() instanceof Dummy) {
                 robberMovementDummy((Dummy) req.getUser(), req.getOriginLobby());
+            } else if (req.getUser() instanceof AI) {
+                robberMovementAI((AI) req.getUser(), req.getOriginLobby());
             } else {
                 robberMovementPlayer(req, (User) req.getUser());
             }
@@ -1597,6 +1599,57 @@ public class GameService extends AbstractService {
 
     /**
      * Helper method to move the robber when
+     * an AI gets a seven.
+     *
+     * @author Mario Fokken
+     * @since 2021-05-11
+     */
+    private void robberMovementAI(AI uehara, LobbyName lobby) {
+        IGameMapManagement map = gameManagement.getGame(lobby).getMap();
+        AI.Difficulty difficulty = uehara.getDifficulty();
+
+        //Pick place to put the robber on
+        int y = 3;
+        int x = 3;
+        MapPoint mapPoint;
+        switch (difficulty) {
+            case EASY:
+                y = (int) (Math.random() * 4 + 1);
+                x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
+                    ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
+                break;
+            case HARD:
+                //todo STRATEGISCH GÜNSTIGE POSITION AUSSUCHEN (meiste Karten)
+        }
+        mapPoint = MapPoint.HexMapPoint(y, x);
+        LOG.debug("{} moves the robber to position: {}|{}", uehara, y, x);
+        map.moveRobber(mapPoint);
+        LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
+        AbstractGameMessage msg = new RobberPositionMessage(lobby, uehara, mapPoint);
+        lobbyService.sendToAllInLobby(lobby, msg);
+
+        //Pick victim to steal random card from
+        Set<Player> players = map.getPlayersAroundHex(mapPoint);
+        Set<UserOrDummy> players2 = new HashSet<>();
+        for (Player p : players) {
+            players2.add(gameManagement.getGame(lobby).getUserFromPlayer(p));
+        }
+        if (players.size() > 0) {
+            int i = 0;
+            switch (difficulty) {
+                case EASY:
+                    i = (int) (Math.random() * players.size());
+                    break;
+                case HARD:
+                    //todo STRATEGISCH GÜNSTIGE PERSON AUSWÄHLEN (meiste Karten)
+            }
+            UserOrDummy victim = (UserOrDummy) players2.toArray()[i];
+            robRandomResource(lobby, uehara, victim);
+        }
+    }
+
+    /**
+     * Helper method to move the robber when
      * a dummy gets a seven.
      *
      * @author Mario Fokken
@@ -1605,25 +1658,15 @@ public class GameService extends AbstractService {
      */
     private void robberMovementDummy(Dummy dummy, LobbyName lobby) {
         IGameMapManagement map = gameManagement.getGame(lobby).getMap();
-        int y = (int) (Math.random() * 4 + 1);
-        int x = (y == 1 || y == 5) ? ((int) (Math.random() * 3 + 1)) :
-                ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
-        MapPoint mapPoint = MapPoint.HexMapPoint(y, x);
+        MapPoint mapPoint = MapPoint.HexMapPoint(3, 3);
         map.moveRobber(mapPoint);
         LOG.debug("Sending RobberPositionMessage for Lobby {}", lobby);
         AbstractGameMessage msg = new RobberPositionMessage(lobby, dummy, mapPoint);
         lobbyService.sendToAllInLobby(lobby, msg);
-        LOG.debug("{} moves the robber to position: {}|{}", dummy, y, x);
+        LOG.debug("{} moves the robber to position: {}|{}", dummy, 3, 3);
         Set<Player> players = map.getPlayersAroundHex(mapPoint);
-        Set<UserOrDummy> players2 = new HashSet<>();
-        for (Player p : players) {
-            players2.add(gameManagement.getGame(lobby).getUserFromPlayer(p));
-        }
-        if (players.size() > 0) {
-            int i = (int) (Math.random() * players.size());
-            UserOrDummy victim = (UserOrDummy) players2.toArray()[i];
-            robRandomResource(lobby, dummy, victim);
-        }
+        if (players.size() > 0) robRandomResource(lobby, dummy, gameManagement.getGame(lobby).getUserFromPlayer(
+                (Player) players.toArray()[0]));
     }
 
     /**
@@ -1643,6 +1686,68 @@ public class GameService extends AbstractService {
         RobberNewPositionResponse msg = new RobberNewPositionResponse(player);
         msg.initWithMessage(req);
         post(msg);
+    }
+
+    /**
+     * Helper method to pay the tax for an AI
+     *
+     * @param game   The game the AI is in
+     * @param uehara The AI to pay the tax
+     *
+     * @author Mario Fokken
+     * @since 2021-05-11
+     */
+    private void taxPayAI(Game game, AI uehara) {
+        Inventory inv = game.getInventory(uehara);
+        int i = inv.getResourceAmount() / 2;
+        LOG.debug("{} has to give up {} of their {} cards", uehara, i, inv.getResourceAmount());
+        switch (uehara.getDifficulty()) {
+            case EASY:
+                while (i > 0) {
+                    for (ResourceType resourceType : ResourceType.values()) {
+                        if (inv.get(resourceType) > 0) {
+                            inv.increase(resourceType, -1);
+                            i--;
+                            if (i == 0) break;
+                        }
+                    }
+                }
+                break;
+            case HARD: //todo STRATEGISCH GÜNSTIGE AUSWAHL DER RESSOURCEN
+        }
+    }
+
+    /**
+     * Helper method to pay the tax for a dummy
+     *
+     * @param game  The game the dummy is in
+     * @param dummy The Dummy to pay the tax
+     *
+     * @author Mario Fokken
+     * @since 2021-05-11
+     */
+    private void taxPayDummy(Game game, Dummy dummy) {
+        Inventory inv = game.getInventory(dummy);
+        int i = inv.getResourceAmount() / 2;
+        LOG.debug("{} has to give up {} of their {} cards", dummy, i, inv.getResourceAmount());
+        for (ResourceType resourceType : ResourceType.values()) {
+            //Not 100% accurate, but it's a dummy, they don't care
+            inv.set(resourceType, inv.get(resourceType) / 2);
+        }
+    }
+
+    /**
+     * Helper method for an AI's turn
+     *
+     * @param game   The game the AI is in
+     * @param uehara The AI to make its turn
+     *
+     * @author Mario Fokken
+     * @since 2021-05-11
+     */
+    private void turnAI(Game game, AI uehara) {
+        //todo STRATEGISCH GÜNSTIGES BAUEN SOWIE KARTENKAUFEN UND -SPIELEN
+        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(uehara, game.getLobby().getName()));
     }
 
     /**

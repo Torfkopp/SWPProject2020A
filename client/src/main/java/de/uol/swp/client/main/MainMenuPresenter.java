@@ -460,12 +460,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
             VBox box = new VBox(10, box3);
             dialogue.getDialogPane().setContent(box);
+
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
             ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getStylesheets().add(styleSheet);
             dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
-
             //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
             Optional<String> result = dialogue.showAndWait();
             String lobbyPassword = lobbyPasswordField.getText();
