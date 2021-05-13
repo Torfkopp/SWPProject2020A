@@ -478,7 +478,7 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         BankInventory bankInventory = game.getBankInventory();
-        if (bankInventory != null) {
+        if (bankInventory.getDevelopmentCards() != null) {
             DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
             if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
                 bankInventory.decrease(developmentCard);
@@ -1668,7 +1668,7 @@ public class GameService extends AbstractService {
     private boolean updatePlayersInventoryWithDevelopmentCard(DevelopmentCardType developmentCard, UserOrDummy user,
                                                               LobbyName lobbyName) {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
-        if (inventory == null) return false;
+        if (inventory == null || developmentCard == null) return false;
         if (inventory.get(ORE) >= 1 && inventory.get(GRAIN) >= 1 && inventory.get(WOOL) >= 1) {
             inventory.decrease(ORE);
             inventory.decrease(GRAIN);
