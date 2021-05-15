@@ -47,6 +47,10 @@ public class BankInventory extends AbstractInventory {
         List<DevelopmentCardType> temp = new LinkedList<>();
         for (DevelopmentCard developmentCard : developmentCards)
             temp.addAll(Collections.nCopies(developmentCard.getAmount(), developmentCard.getType()));
-        return temp.get((new Random()).nextInt(temp.size()));
+        try {
+            return temp.get((new Random()).nextInt(temp.size()));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
