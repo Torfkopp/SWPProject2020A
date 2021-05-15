@@ -14,6 +14,7 @@ import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
+import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -71,6 +72,28 @@ public class GameService extends AbstractService {
     private final ILobbyManagement lobbyManagement;
     private final IGameManagement gameManagement;
     private final LobbyService lobbyService;
+
+    /**
+     * Enum for all types of
+     * ChatMessages an AI can write
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private enum WriteType {
+        //Message, when...
+        FIRST, //AI is the first player
+        START, //the game starts
+        TRADE_ACCEPTABLE, //AI accepts a trade
+        TRADE_DECLINABLE, //AI declines a trade
+        TRADE_ACCEPTED, //an AI's trade was accepted
+        TRADE_DECLINED, //an AI's trade was declined
+        GAME_WIN, //AI wins the game
+        GAME_LOSE, //AI loses
+        MOVE_ROBBER, //AI moves robber
+        TAX, //AI has to pay tax
+        MONOPOLY, //AI plays a monopoly card
+    }
 
     /**
      * Constructor
@@ -174,24 +197,10 @@ public class GameService extends AbstractService {
             ServerMessage message = new PlayerWonGameMessage(originLobby, user);
             lobbyService.sendToAllInLobby(originLobby, message);
             game.setBuildingAllowed(false);
-        }
-    }
-
-    /**
-     * Helper method to end a dummy's turn
-     * AFTER every player has chosen the resources
-     * to give up on.
-     *
-     * @param game The game
-     *
-     * @author Mario Fokken
-     * @since 2021-04-09
-     */
-    private void endTurnDummy(Game game) {
-        UserOrDummy activePlayer = game.getActivePlayer();
-        if (activePlayer instanceof Dummy) {
-            if (game.getTaxPayers().isEmpty())
-                onEndTurnRequest(new EndTurnRequest(activePlayer, game.getLobby().getName()));
+            for (UserOrDummy ai : game.getPlayers())
+                if (ai instanceof AI) writeChatMessageAI((AI) ai, originLobby,
+                                                         user.getUsername().equals(ai.getUsername()) ?
+                                                         WriteType.GAME_WIN : WriteType.GAME_LOSE);
         }
     }
 
@@ -560,12 +569,17 @@ public class GameService extends AbstractService {
             LOG.debug("Sending ExceptionMessage");
             post(exceptionMessage);
         }
+        for (UserOrDummy ai : msg.getLobby().getUserOrDummies())
+            if (ai instanceof AI) writeChatMessageAI((AI) ai, lobbyName, WriteType.START);
         Game game = gameManagement.getGame(lobbyName);
         UserOrDummy first = game.getFirst();
         if (first instanceof ComputedPlayer) {
             onRollDiceRequest(new RollDiceRequest(first, lobbyName));
-            if (first instanceof Dummy) endTurnDummy(game);
-            if (first instanceof AI) turnAI(game, (AI) first);
+            if (first instanceof Dummy) turnEndDummy(game, (Dummy) first);
+            if (first instanceof AI) {
+                writeChatMessageAI((AI) first, lobbyName, WriteType.FIRST);
+                turnAI(game, (AI) first);
+            }
         }
     }
 
@@ -676,7 +690,7 @@ public class GameService extends AbstractService {
         game.setDiceRolledAlready(false);
         if (nextPlayer instanceof ComputedPlayer) {
             onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            if (nextPlayer instanceof Dummy) endTurnDummy(game);
+            if (nextPlayer instanceof Dummy) turnEndDummy(game, (Dummy) nextPlayer);
             if (nextPlayer instanceof AI) turnAI(game, (AI) nextPlayer);
         }
     }
@@ -839,13 +853,23 @@ public class GameService extends AbstractService {
         if (!(!(req.getRespondingUser() instanceof Dummy) && game.getActivePlayer()
                                                                  .equals(req.getOfferingUser()) && game
                       .isDiceRolledAlready())) {
-            post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+            onResetOfferTradeButtonRequest(
+                    new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
         if (req.getRespondingUser() instanceof AI) {
-            boolean accepted = tradeAcceptionAI(((AI) req.getRespondingUser()), req.getOriginLobby(),req.getOfferedResources(), req.getDemandedResources());
-            if(accepted) writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(), WriteType.TRADE_ACCEPT);
-            else writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(), WriteType.TRADE_DECLINE);
+            boolean accepted = tradeAcceptationAI(((AI) req.getRespondingUser()), req.getOriginLobby(),
+                                                  req.getOfferedResources(), req.getDemandedResources());
+            if (accepted) {
+                writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(), WriteType.TRADE_ACCEPTABLE);
+                onAcceptUserTradeRequest(
+                        new AcceptUserTradeRequest(req.getRespondingUser(), req.getOfferingUser(), req.getOriginLobby(),
+                                                   req.getDemandedResources(), req.getOfferedResources()));
+            } else {
+                writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(), WriteType.TRADE_DECLINABLE);
+                onResetOfferTradeButtonRequest(
+                        new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+            }
             return;
         }
         game.setBuildingAllowed(false);
@@ -859,68 +883,6 @@ public class GameService extends AbstractService {
                                                                        req.getDemandedResources(),
                                                                        req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getRespondingUser(), offerResponse));
-    }
-
-    /**
-     * Helper method to calculate if the AI
-     * wants to accept the trade offer
-     *
-     * @param uehara The AI to decide
-     * @param lobby The lobby
-     * @param offered The offered Resources
-     * @param demanded The demanded Resources
-     *
-     * @return If AI accepts
-     *
-     * @author Mario Fokken
-     * @since 2021-05-13
-     */
-    private boolean tradeAcceptionAI(AI uehara, LobbyName lobby, ResourceList offered, ResourceList demanded){
-        int difference = offered.getTotal() - demanded.getTotal();
-        switch (uehara.getDifficulty()){
-            case EASY:
-                if (uehara.getUsername().equals("Robert E. O. Speedwagon")) return true;
-                //Difference:4-100%, 3-92%, 2-84%, 1-76%, 0-68%
-                if(difference >= 0 && ((int)(Math.random() * 100) < (68 + difference * 8))) return true;
-                //Difference:4-0%, 3-8%, 2-16%, 1-24%
-                else return difference < 0 && ((int) (Math.random() * 100) < (32 - difference * 8));
-            case HARD:
-                //Resource prio: EarlyGame - Brick, Wood - Wool, Grain - Ore - LateGame
-                //If AI is low on that Ressource, it will prioritise it
-
-                //todo mathematische Formel zur Berechnung der Prozentzahl anlegen
-
-                return false;
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Enum for all types of
-     * ChatMessages an AI can write
-     *
-     * @author Mario Fokken
-     * @since 2021-05-13
-     */
-    private enum WriteType{
-        TRADE_ACCEPT,
-        TRADE_DECLINE,
-    }
-
-    /**
-     * Helper method to make a chat
-     * message for an AI
-     *
-     * @param uehara The AI to send the message
-     * @param lobbyName The lobby the AI is in
-     * @param type The type of chat message
-     *
-     * @author Mario Fokken
-     * @since 2021-05-13
-     */
-    private void writeChatMessageAI(AI uehara, LobbyName lobbyName, WriteType type){
-
     }
 
     /**
@@ -1305,7 +1267,9 @@ public class GameService extends AbstractService {
         game.removeTaxPayer(req.getPlayer());
         if (game.getTaxPayers().isEmpty()) lobbyService
                 .sendToAllInLobby(req.getLobby(), new RobberAllTaxPaidMessage(req.getLobby(), game.getActivePlayer()));
-        endTurnDummy(game);
+        UserOrDummy activePlayer = game.getActivePlayer();
+        if (activePlayer instanceof Dummy) turnEndDummy(game, (Dummy) activePlayer);
+        else if (activePlayer instanceof AI) turnEndAI(game, (AI) activePlayer);
     }
 
     /**
@@ -1668,6 +1632,7 @@ public class GameService extends AbstractService {
     private void robberMovementAI(AI uehara, LobbyName lobby) {
         IGameMapManagement map = gameManagement.getGame(lobby).getMap();
         AI.Difficulty difficulty = uehara.getDifficulty();
+        writeChatMessageAI(uehara, lobby, WriteType.MOVE_ROBBER);
 
         //Pick place to put the robber on
         int y = 3;
@@ -1761,6 +1726,8 @@ public class GameService extends AbstractService {
     private void taxPayAI(Game game, AI uehara) {
         Inventory inv = game.getInventory(uehara);
         int i = inv.getResourceAmount() / 2;
+        writeChatMessageAI(uehara, game.getLobby().getName(), WriteType.TAX);
+
         LOG.debug("{} has to give up {} of their {} cards", uehara, i, inv.getResourceAmount());
         switch (uehara.getDifficulty()) {
             case EASY:
@@ -1800,6 +1767,41 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to calculate if the AI
+     * wants to accept the trade offer
+     *
+     * @param uehara   The AI to decide
+     * @param lobby    The lobby
+     * @param offered  The offered Resources
+     * @param demanded The demanded Resources
+     *
+     * @return If AI accepts
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private boolean tradeAcceptationAI(AI uehara, LobbyName lobby, ResourceList offered, ResourceList demanded) {
+        int difference = offered.getTotal() - demanded.getTotal();
+        switch (uehara.getDifficulty()) {
+            case EASY:
+                if (uehara.getUsername().equals("Robert E. O. Speedwagon")) return true;
+                //Difference:4-100%, 3-92%, 2-84%, 1-76%, 0-68%
+                if (difference >= 0 && ((int) (Math.random() * 100) < (68 + difference * 8))) return true;
+                    //Difference:4-0%, 3-8%, 2-16%, 1-24%
+                else return difference < 0 && ((int) (Math.random() * 100) < (32 - difference * 8));
+            case HARD:
+                //Resource prio: EarlyGame - Brick, Wood - Wool, Grain - Ore - LateGame
+                //If AI is low on that Ressource, it will prioritise it
+
+                //todo mathematische Formel zur Berechnung der Prozentzahl anlegen
+
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    /**
      * Helper method for an AI's turn
      *
      * @param game   The game the AI is in
@@ -1809,40 +1811,224 @@ public class GameService extends AbstractService {
      * @since 2021-05-11
      */
     private void turnAI(Game game, AI uehara) {
-        //todo STRATEGISCH GÜNSTIGES BAUEN SOWIE KARTENKAUFEN UND -SPIELEN
-        switch (uehara.getDifficulty()){
+        switch (uehara.getDifficulty()) {
             case EASY:
-                //Build City
-                //Build Settlement
-                //Build Street
-                //Buy Dev Card
+                turnBuildAIEasy(game, uehara);
+                turnPlayCardsAIEasy(game, uehara);
             case HARD:
                 //Prio: Early-Game: Streets, Settlements, Development Cards, Cities : Late-Game
+                // todo STRATEGISCH GÜNSTIGES BAUEN SOWIE KARTENKAUFEN UND -SPIELEN
         }
         //Trying to end the turn
-        while(!endTurnAI(game,uehara)){
-            try{
-                wait(1000);
-            } catch (Exception e){
-                //todo Irgendwas
-            }
-        }
+        turnEndAI(game, uehara);
     }
 
-    /** Helper method to end an AI's turn
+    /**
+     * Helper method for an easy AI's
+     * building phase
      *
-     * @param game The game the AI is in
-     * @param uehara The AI to make its turn
-     * @return If ending was successful
+     * @param game   The game the AI is in
+     * @param uehara The AI to do the building
      *
      * @author Mario Fokken
      * @since 2021-05-13
      */
-    private boolean endTurnAI(Game game, AI uehara){
-        if (game.getTaxPayers().isEmpty()){
-            onEndTurnRequest(new EndTurnRequest(uehara, game.getLobby().getName()));
-            return true;
-        } else return false;
+    private void turnBuildAIEasy(Game game, AI uehara) {
+        Player ai = game.getPlayer(uehara);
+        ResourceList resources = game.getInventory(uehara).getResources();
+        IGameMapManagement map = game.getMap();
+        LobbyName lobbyName = game.getLobby().getName();
+
+        List<MapPoint> cities = new ArrayList<>();
+        List<MapPoint> settlements = new ArrayList<>();
+        List<MapPoint> roads = new ArrayList<>();
+
+        for (MapPoint mp : map.getPlayerSettlementsAndCities().get(ai))
+            if (map.settlementUpgradeable(ai, mp)) cities.add(mp);
+
+        MapPoint mp;
+        for (int i = 0; i <= 5; i++) {
+            for (int j = 0; j <= 10; j++) {
+                //Why? see GameMapManagement.createIntersectionEdgeNetwork
+                if ((i == 0 || i == 5) && j >= 7) break;
+                else if ((i == 1 || i == 4) && j >= 9) break;
+                mp = MapPoint.IntersectionMapPoint(i, j);
+                //Settlement Stuff
+                if (map.settlementPlaceable(ai, mp)) settlements.add(mp);
+                //Road Stuff
+                for (IEdge e : map.incidentEdges(map.getIntersection(mp))) {
+                    if (map.roadPlaceable(ai, e)) {
+                        switch (e.getOrientation()) {
+                            case EAST:
+                                roads.add(MapPoint.EdgeMapPoint(mp, MapPoint.IntersectionMapPoint(mp.getY(),
+                                                                                                  mp.getX() + 1)));
+                                break;
+                            case WEST:
+                                roads.add(MapPoint.EdgeMapPoint(mp, MapPoint.IntersectionMapPoint(mp.getY(),
+                                                                                                  mp.getX() - 1)));
+                                break;
+                            case SOUTH:
+                                roads.add(MapPoint.EdgeMapPoint(mp, MapPoint.IntersectionMapPoint(mp.getY() - 1,
+                                                                                                  mp.getX())));
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        //Build City for Rock 'n' Roll
+        while (resources.getAmount(GRAIN) > 2 && resources.getAmount(ORE) > 3) {
+            mp = cities.remove((int) (Math.random() * cities.size()));
+            map.upgradeSettlement(ai, mp);
+            resources.decrease(GRAIN, 2);
+            resources.decrease(ORE, 3);
+            lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, uehara, mp, CITY));
+        }
+
+        //Build Settlement
+        while (resources.getAmount(BRICK) > 1 && resources.getAmount(LUMBER) > 1 && resources.getAmount(
+                GRAIN) > 1 && resources.getAmount(WOOL) > 1) {
+            mp = settlements.remove((int) (Math.random() * settlements.size()));
+            try {
+                map.placeSettlement(ai, mp);
+            } catch (GameMapManagement.SettlementMightInterfereWithLongestRoadException e) {
+                GameMapManagement.PlayerWithLengthOfLongestRoad a = map.findLongestRoad();
+                if (a.getLength() >= 5) {
+                    game.setPlayerWithLongestRoad(a.getPlayer());
+                    game.setLongestRoadLength(a.getLength());
+                } else {
+                    game.setPlayerWithLongestRoad(null);
+                    game.setLongestRoadLength(0);
+                }
+                lobbyService.sendToAllInLobby(lobbyName,
+                                              new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+            }
+            resources.decrease(BRICK);
+            resources.decrease(LUMBER);
+            resources.decrease(GRAIN);
+            resources.decrease(WOOL);
+            lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, uehara, mp, SETTLEMENT));
+        }
+
+        //Build Street
+        while (resources.getAmount(BRICK) > 1 && resources.getAmount(LUMBER) > 1) {
+            mp = roads.remove((int) (Math.random() * roads.size()));
+            map.placeRoad(ai, mp);
+            resources.decrease(BRICK);
+            resources.decrease(LUMBER);
+            lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, uehara, mp, ROAD));
+        }
+
+        //Buy Dev Card
+        while (resources.getAmount(WOOL) > 1 && resources.getAmount(GRAIN) > 1 && resources.getAmount(ORE) > 1)
+            onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(uehara, lobbyName));
+    }
+
+    /**
+     * Helper method to end an AI's turn
+     *
+     * @param game   The game the AI is in
+     * @param uehara The AI to make its turn
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private void turnEndAI(Game game, AI uehara) {
+        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(uehara, game.getLobby().getName()));
+    }
+
+    /**
+     * Helper method to end a dummy's turn
+     * AFTER every player has chosen the resources
+     * to give up on.
+     *
+     * @param game  The game
+     * @param dummy The dummy to end it
+     *
+     * @author Mario Fokken
+     * @since 2021-04-09
+     */
+    private void turnEndDummy(Game game, Dummy dummy) {
+        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(dummy, game.getLobby().getName()));
+    }
+
+    /**
+     * Helper method for an easy AI's
+     * card playing phase
+     *
+     * @param game   The game the AI is in
+     * @param uehara The AI to do the card playing
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private void turnPlayCardsAIEasy(Game game, AI uehara) {
+        DevelopmentCardList cards = game.getInventory(uehara).getDevelopmentCards();
+        LobbyName lobbyName = game.getLobby().getName();
+        Inventory inv = game.getInventory(uehara);
+
+        /**
+         * Local class
+         *
+         * @author Mario Fokken
+         * @since 2021-05-13
+         */
+        class randomResource {
+
+            /**
+             * Returns a random resource
+             *
+             * @return random Resource
+             */
+            public ResourceType randomResource() {
+                switch ((int) (Math.random() * 4)) {
+                    case 0:
+                        return BRICK;
+                    case 1:
+                        return GRAIN;
+                    case 2:
+                        return LUMBER;
+                    case 3:
+                        return ORE;
+                    default:
+                        return WOOL;
+                }
+            }
+        }
+        randomResource r = new randomResource();
+
+        if (cards.getAmount(DevelopmentCardType.MONOPOLY_CARD) > 0) {
+            onPlayMonopolyCardRequest(new PlayMonopolyCardRequest(lobbyName, (User) uehara, r.randomResource()));
+            writeChatMessageAI(uehara, lobbyName, WriteType.MONOPOLY);
+            return;
+        }
+        if (cards.getAmount(DevelopmentCardType.ROAD_BUILDING_CARD) > 0) {
+            List<IEdge> roads = new ArrayList<>();
+            Player ai = game.getPlayer(uehara);
+            for (int i = 0; i <= 5; i++) {
+                for (int j = 0; j <= 5; j++) {
+                    MapPoint mp = MapPoint.HexMapPoint(i, j);
+                    for (IEdge edge : game.getMap().getEdgesFromHex(mp))
+                        if (game.getMap().roadPlaceable(ai, edge)) roads.add(edge);
+                }
+            }
+            if (roads.size() > 1) {
+                game.getMap().placeRoad(ai, roads.remove((int) (Math.random() * roads.size())));
+                inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
+                if (roads.size() > 2) game.getMap().placeRoad(ai, roads.remove((int) (Math.random() * roads.size())));
+            }
+            return;
+        }
+        if (cards.getAmount(DevelopmentCardType.YEAR_OF_PLENTY_CARD) > 0) {
+            onPlayYearOfPlentyCardRequest(
+                    new PlayYearOfPlentyCardRequest(lobbyName, (User) uehara, r.randomResource(), r.randomResource()));
+            return;
+        }
+        if (cards.getAmount(DevelopmentCardType.KNIGHT_CARD) > 1) {
+            inv.increaseKnights();
+            inv.decrease(DevelopmentCardType.KNIGHT_CARD);
+            robberMovementAI(uehara, lobbyName);
+        }
     }
 
     /**
@@ -1877,5 +2063,84 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
+    }
+
+    /**
+     * Helper method to make a chat
+     * message for an AI
+     *
+     * @param uehara    The AI to send the message
+     * @param lobbyName The lobby the AI is in
+     * @param type      The type of chat message
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    private void writeChatMessageAI(AI uehara, LobbyName lobbyName, GameService.WriteType type) {
+        String msg = "";
+        /* BAUSTEINE
+        if(uehara.getUsername().equals("")) msg = "";
+        EASY-----
+        Bri'ish: if(uehara.getAINameEasy().subList(0,6).contains(uehara.getUsername()))
+        US-American: if(uehara.getAINameEasy().subList(18,28).contains(uehara.getUsername()))
+        Japanese: if(uehara.getAINameEasy().subList(30, 37).contains(uehara.getUsername()))
+        Italian: if(uehara.getAINameEasy().subList(37, ende(45)).contains(uehara.getUsername()))
+        HARD-----
+        British: if(uehara.getAINameHard().subList(0,6).contains(uehara.getUsername()))
+        Arabic: if(uehara.getAINameHard().subList(10,17).contains(uehara.getUsername()))
+        'Merican: if(uehara.getAINameHard().subList(17,23).contains(uehara.getUsername()))
+        */
+        switch (uehara.getDifficulty()) {
+            case EASY:
+                switch (type) {
+                    case FIRST:
+                        if (uehara.getUsername().equals("Giorno Giovanna")) msg = "I, Giorno Giovanna, have a dream";
+                        break;
+                    case START:
+                        break;
+                    case TRADE_ACCEPTABLE:
+                        break;
+                    case TRADE_DECLINABLE:
+                        break;
+                    case GAME_WIN:
+                        break;
+                    case GAME_LOSE:
+                        break;
+                    case TAX:
+                        break;
+                    case MONOPOLY:
+                        break;
+                    case MOVE_ROBBER:
+                        break;
+                }
+                break;
+            case HARD:
+                switch (type) {
+                    case FIRST:
+                        break;
+                    case START:
+                        break;
+                    case TRADE_ACCEPTABLE:
+                        break;
+                    case TRADE_DECLINABLE:
+                        break;
+                    case TRADE_ACCEPTED:
+                        break;
+                    case TRADE_DECLINED:
+                        break;
+                    case GAME_WIN:
+                        break;
+                    case GAME_LOSE:
+                        break;
+                    case TAX:
+                        break;
+                    case MONOPOLY:
+                        break;
+                    case MOVE_ROBBER:
+                        break;
+                }
+                break;
+        }
+        //todo post Chat message
     }
 }

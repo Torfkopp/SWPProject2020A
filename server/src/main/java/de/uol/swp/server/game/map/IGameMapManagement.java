@@ -25,6 +25,18 @@ import java.util.Set;
 public interface IGameMapManagement {
 
     /**
+     * Gets the incident intersections of a given intersection
+     *
+     * @param intersection The intersection of which the intersection should be returned
+     *
+     * @return A Set<> containing all intersection objects
+     *
+     * @author Mario Fokken
+     * @since 2021-05-14
+     */
+    Set<IIntersection> adjacentIntersections(IIntersection intersection);
+
+    /**
      * Creates an IGameMap from the provided configuration
      *
      * @param configuration The map configuration used in the current Game
@@ -298,7 +310,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to build the settlement (1-4)
      * @param position The position of the intersection
      *
-     * @return
+     * @return If placing was successful
      *
      * @author Sven Ahrens
      * @author Phillip-André Suhr

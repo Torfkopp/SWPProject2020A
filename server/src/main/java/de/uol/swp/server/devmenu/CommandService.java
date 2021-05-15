@@ -587,7 +587,8 @@ public class CommandService extends AbstractService {
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
-                            //todo AI einfügen
+                        else if (new AIDTO(AI.Difficulty.EASY).getAINames().contains(args.get(i)))
+                            argList.add(new AIDTO(AI.Difficulty.EASY, args.get(i)));
                         else {
                             // Dummy
                             // Dummies aren't saved anywhere, so we parse the integer at the end of the name

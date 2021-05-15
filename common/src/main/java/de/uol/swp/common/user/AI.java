@@ -17,9 +17,27 @@ public interface AI extends ComputedPlayer, Serializable {
     }
 
     /**
+     * Gets all AI names for
+     * difficulty easy and
+     * activated talking
+     *
+     * @return List of Strings
+     */
+    List<String> getAINameEasy();
+
+    /**
+     * Gets all AI names for
+     * difficulty hard and
+     * activated talking
+     *
+     * @return List of Strings
+     */
+    List<String> getAINameHard();
+
+    /**
      * Gets all possible AI names
      *
-     * @return AI names
+     * @return List of Strings
      */
     List<String> getAINames();
 

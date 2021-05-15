@@ -365,6 +365,11 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public Set<IIntersection> adjacentIntersections(IIntersection intersection) {
+        return intersectionEdgeNetwork.adjacentNodes(intersection);
+    }
+
+    @Override
     public int longestRoadWith(MapPoint mapPoint) {
         /**
          * Local class path to store a path

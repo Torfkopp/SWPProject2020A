@@ -16,38 +16,51 @@ public class AIDTO implements AI {
     private final int id;
     private final String name;
     private final Difficulty difficulty;
-
     private final List<String> aiNameEasy = new ArrayList<>(
-            Arrays.asList("Jonathan Joestar", "Will A. Zeppeli", "Robert E. O. Speedwagon", "Erina Pendleton",
-                          "Tonpetty", "Dire", "Straizo", "George Joestar I.", "Joseph Joestar", "Caesar Zeppeli",
-                          "Lisa Lisa", "Smokey Brown", "Suzie Q", "Rudol von Stroheim", "Jotaro Kujo", "Muhammad Avdol",
-                          "Noriaki Kakyoin", "Jean Pierre Polnareff", "Iggy", "Holy Kujo", "Josuke Higashikata",
-                          "Koichi Hirose", "Okuyasu Nijimura", "Rohan Kishibe", "Tonio Trussardi", "Shigechi",
+            Arrays.asList("Jonathan Joestar", "Robert E. O. Speedwagon", "Erina Pendleton", "George Joestar I.",
+                          "Lisa Lisa", "Johnny Joestar", //British
+                          "Rudol von Stroheim", //German
+                          "Jean Pierre Polnareff", //French
+                          "Will A. Zeppeli", "Caesar Zeppeli", "Suzie Q", "Gyro Zeppeli", //English with Italian accent
+                          "Tonpetty", "Dire", "Straizo", //English with Tibetan accent
+                          "Jotaro Kujo", "Noriaki Kakyoin", //English with Japanese accent
+                          "Muhammad Avdol", //Arabic
+                          "Joseph Joestar", "Smokey Brown", "Holy Kujo", "Jolyne Cujoh", "Ermes Costello",
+                          "Emporio Alnino", "Weather Report", "Foo Fighters", "Lucy Steel", "Hot Pants", //US-American
+                          "Iggy", "Coco Jumbo", //Animal
+                          "Josuke Higashikata", "Koichi Hirose", "Okuyasu Nijimura", "Rohan Kishibe", "Shigechi",
+                          "Yasuho Hirose", "Rai Mamezuku", //Japanese
                           "Giorno Giovanna", "Bruno Bucciarati", "Leone Abbacchio", "Guido Mista", "Narancia Ghirga",
-                          "Pannacotta Fugo", "Trish Una", "Coco Jumbo", "Jolyne Cujoh", "Ermes Costello",
-                          "Emporio Alnino", "Foo Fighters", "Weather Report", "Johnny Joestar", "Gyro Zeppeli",
-                          "Lucy Steel", "Hot Pants", "Yasuho Hirose", "Rai Mamezuku", "Star Platinum", "Magician's Red",
-                          "Hermit Purple", "Hierophant Green", "Silver Chariot", "The Fool", "Crazy Diamond",
-                          "Earth, Wind and Fire", "The Hand", "Echoes", "Heaven's Door", "Love Deluxe", "Achtung Baby!",
-                          "Gold Experience", "Sticky Fingers", "Moody Blues", "Sex Pistols", "Aerosmith", "Purple Haze",
-                          "Spice Girl", "Mr. President", "Stone Free", "Kiss", "Burning Down The House", "Tusk",
-                          "Ball Breaker", "Oh! Lonesome Me", "Cream Starter", "Ticket to Ride", "Soft & Wet",
-                          "Paisley Park", "Doggy Style", "Nut King Call", "Paper Moon King", "King Nothing"));
+                          "Pannacotta Fugo", "Trish Una", "Tonio Trussardi")); //Italian
     private final List<String> aiNameHard = new ArrayList<>(
-            Arrays.asList("Dio Brando", "Bruford", "Tarkus", "Jack the Ripper", "Kars", "Esidisi", "Wamuu", "Santana",
-                          "DIO", "Enya the Hag", "Vanilla Ice", "Hol Horse", "Pet Shop", "Terence T. D'Arby",
-                          "Daniel J. D'Arby", "Oingo", "Boingo", "Steely Dan", "Kenny G.", "J. Geil", "Yoshikage Kira",
-                          "Diavolo", "Polpo", "Enrico Pucci", "Diego Brando", "Sandman", "Axl Ro", "The World",
-                          "Bug-Eaten", "Not Bug-Eaten", "Bad Company", "Red Hot Chilli Pepper", "Atom Heart Father",
-                          "Highway Star", "Super Fly", "Stray Cat", "Enigma", "Cheap Trick", "Killer Queen",
-                          "Sheer Heart Attack", "Bites the Dust", "Black Sabbath", "Beach Boy", "Man in the Mirror",
-                          "Kraft Work", "The Grateful Dead", "Notorious B.I.G", "Green Day", "Oasis", "Metallica",
-                          "Rolling Stones", "King Crimson", "Talking Head", "Whitesnake", "C-Moon", "Made in Heaven",
+            Arrays.asList("Dio Brando", "Bruford", "Tarkus", "Jack the Ripper", "DIO", "Diego Brando", //British
+                          "Kars", "Esidisi", "Wamuu", "Santana", //Aztec
+                          "Enya the Hag", "Oingo", "Boingo", "Steely Dan", "Kenny G.", "J. Geil", "Vanilla Ice",
+                          //Arabic
+                          "Hol Horse", "Terence T. D'Arby", "Daniel J. D'Arby", "Axl Ro", "Enrico Pucci", "Sandman",
+                          //US-American
+                          "Pet Shop", "Bug-Eaten", "Not Bug-Eaten", "Stray Cat", //Animals
+                          "Yoshikage Kira", "Head Doctor", // Japanese
+                          "Diavolo", "Polpo")); //Italian
+    private final List<String> aiNameEasyNoTalk = new ArrayList<>(
+            Arrays.asList("Star Platinum", "Stone Free", "Soft & Wet", "Tusk", "Silver Chariot", "Crazy Diamond",
+                          "Gold Experience", "Sticky Fingers", "Moody Blues", "Sex Pistols", "Aerosmith", "Purple Haze",
+                          "Spice Girl", "Kiss", "Magician's Red", "Hermit Purple", "Hierophant Green", "The Fool",
+                          "Earth, Wind and Fire", "The Hand", "Echoes", "Heaven's Door", "Love Deluxe", "Achtung Baby!",
+                          "Mr. President", "Burning Down The House", "Ball Breaker", "Oh! Lonesome Me", "Cream Starter",
+                          "Ticket to Ride", "Paisley Park", "Doggy Style", "Nut King Call", "Paper Moon King",
+                          "King Nothing"));
+    private final List<String> aiNameHardNoTalk = new ArrayList<>(
+            Arrays.asList("The World", "Killer Queen", "Metallica", "Oasis", "Whitesnake", "C-Moon", "Scary Monsters",
+                          "Speed King", "Bad Company", "Red Hot Chilli Pepper", "Atom Heart Father", "Highway Star",
+                          "Super Fly", "Enigma", "Cheap Trick", "Sheer Heart Attack", "Bites the Dust", "Black Sabbath",
+                          "Beach Boy", "Man in the Mirror", "Kraft Work", "The Grateful Dead", "Notorious B.I.G",
+                          "Green Day", "Rolling Stones", "King Crimson", "Talking Head", "Made in Heaven",
                           "Highway to Hell", "Limp Bizkit", "Bohemian Rhapsody", "Driver Down", "Jumpin' Jack Flash",
-                          "Jail House Lock", "Yo-Yo Ma", "Manhatten Transfer", "Survivor", "Scary Monsters",
-                          "Dirty Deeds Done Dirt Cheap", "Hey Ya!", "Tomb of the Boom", "Catch the Rainbow",
-                          "Civil War", "In a Silent Way", "Speed King", "Fun Fun Fun", "I Am a Rock", "Doobie Wah!",
-                          "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
+                          "Jail House Lock", "Yo-Yo Ma", "Survivor", "Dirty Deeds Done Dirt Cheap", "Hey Ya!",
+                          "Tomb of the Boom", "Catch the Rainbow", "Civil War", "In a Silent Way", "Fun Fun Fun",
+                          "I Am a Rock", "Doobie Wah!", "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
+    private boolean aiTalking = true;
 
     /**
      * Constructor
@@ -59,10 +72,12 @@ public class AIDTO implements AI {
         String name = "Danny";
         switch (difficulty) {
             case EASY:
-                name = aiNameEasy.get((int) (Math.random() * aiNameEasy.size()));
+                name = aiTalking ? aiNameEasy.get((int) (Math.random() * aiNameEasy.size())) :
+                       aiNameEasyNoTalk.get((int) (Math.random() * aiNameEasyNoTalk.size()));
                 break;
             case HARD:
-                name = aiNameHard.get((int) (Math.random() * aiNameHard.size()));
+                name = aiTalking ? aiNameHard.get((int) (Math.random() * aiNameHard.size())) :
+                       aiNameHardNoTalk.get((int) (Math.random() * aiNameHardNoTalk.size()));
                 break;
         }
         this.name = name;
@@ -109,14 +124,38 @@ public class AIDTO implements AI {
         return name;
     }
 
+    @Override
+    public List<String> getAINameEasy() {
+        return aiNameEasy;
+    }
+
+    @Override
+    public List<String> getAINameHard() {
+        return aiNameHard;
+    }
+
+    @Override
     public List<String> getAINames() {
-        List<String> list = new ArrayList<>(aiNameEasy);
-        list.addAll(aiNameHard);
-        return list;
+        List<String> names = new ArrayList<>();
+        names.addAll(aiNameEasy);
+        names.addAll(aiNameEasyNoTalk);
+        names.addAll(aiNameHard);
+        names.addAll(aiNameHardNoTalk);
+        return names;
     }
 
     @Override
     public Difficulty getDifficulty() {
         return difficulty;
+    }
+
+    /**
+     * Sets if the AI is allowed
+     * to write chat messages
+     *
+     * @param b Boolean
+     */
+    public void setAiTalking(boolean b) {
+        aiTalking = b;
     }
 }
