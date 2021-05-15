@@ -603,6 +603,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onEndTurnButtonPressed() {
+        soundService.button();
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName);
         diceRolled = false;
@@ -621,6 +622,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onHelpButtonPressed() {
+        soundService.button();
         if (!helpActivated) {
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
             helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
@@ -717,6 +719,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onPlayCardButtonPressed() {
+        soundService.button();
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
@@ -865,6 +868,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onReturnToLobbyButtonPressed() {
+        soundService.button();
         buildingCosts.setVisible(false);
         inGame = false;
         lobbyService.returnToPreGameLobby(lobbyName);
@@ -998,6 +1002,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onRollDiceButtonPressed() {
+        soundService.dice();
         gameService.rollDice(lobbyName);
         rollDice.setDisable(true);
         diceRolled = true;
@@ -1035,6 +1040,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onTradeWithBankButtonPressed() {
+        soundService.button();
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
         tradeService.tradeWithBank(lobbyName);
@@ -1054,6 +1060,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onTradeWithUserButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {

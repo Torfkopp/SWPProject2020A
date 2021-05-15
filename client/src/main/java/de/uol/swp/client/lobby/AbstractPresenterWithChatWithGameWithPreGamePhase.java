@@ -222,6 +222,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onChangeOwnerButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
@@ -241,6 +242,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onKickUserButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
@@ -295,6 +297,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             this.elapsedTimer.stop();
         }
         fitCanvasToSize();
+        soundService.fanfare();
     }
 
     /**
@@ -396,6 +399,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onStartSessionButtonPressed() {
+        soundService.button();
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);

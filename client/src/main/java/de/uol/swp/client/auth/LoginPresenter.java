@@ -48,6 +48,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onLoginButtonPressed() {
+        soundService.button();
         loginButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             boolean nameInvalid = loginField.getText().isEmpty() || !loginField.getText().matches("[A-Za-z0-9_-]+");
             boolean passwordInvalid = passwordField.getText().isEmpty();
@@ -69,7 +70,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
-        soundService.buttonSound();
+        soundService.button();
         eventBus.post(showRegViewMessage);
     }
 

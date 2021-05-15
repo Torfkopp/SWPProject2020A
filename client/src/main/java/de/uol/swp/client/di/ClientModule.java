@@ -62,6 +62,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("owner_transfer_notifs_on", "true");
         defaultProps.setProperty("theme", "default");
         defaultProps.setProperty("soundpack", "default");
+        defaultProps.setProperty("volume", "100");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -105,9 +106,11 @@ public class ClientModule extends AbstractModule {
         final String theme = properties.getProperty("theme");
         final String styleSheet = "css/" + theme + ".css";
 
-        //Setting the sound pack
-        LOG.debug("Selected sound pack in config file: {}", properties.getProperty("soundpack"));
+        //Setting the sound pack and volume
+        LOG.debug("Selected sound pack {} with volume {}", properties.getProperty("soundpack"),
+                  properties.getProperty("volume"));
         final String soundPack = "client/src/main/resources/sounds/" + properties.getProperty("soundpack") + "/";
+        final double volume = Double.parseDouble(properties.getProperty("volume")) / 100;
 
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
@@ -141,6 +144,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("theme")).to(theme);
         bindConstant().annotatedWith(Names.named("styleSheet")).to(styleSheet);
         bindConstant().annotatedWith(Names.named("soundPack")).to(soundPack);
+        bindConstant().annotatedWith(Names.named("volume")).to(volume);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);

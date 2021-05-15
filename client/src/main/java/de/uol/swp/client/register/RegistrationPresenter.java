@@ -82,6 +82,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
+        soundService.button();
         eventBus.post(registrationCanceledEvent);
     }
 
@@ -106,6 +107,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
+        soundService.button();
         if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
         } else if (!checkMailFormat(emailField.getText())) {

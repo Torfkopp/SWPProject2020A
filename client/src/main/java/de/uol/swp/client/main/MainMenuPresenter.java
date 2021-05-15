@@ -203,6 +203,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
+        soundService.button();
         lobbyService.checkUserInLobby();
     }
 
@@ -245,6 +246,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onCreateLobbyButtonPressed() {
+        soundService.button();
         //give the lobby a default name
         String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"),
                                     userService.getLoggedInUser().getUsername());
@@ -349,6 +351,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onDeleteButtonPressed() {
+        soundService.button();
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
         dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
@@ -405,6 +408,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onJoinLobbyButtonPressed() {
+        soundService.button();
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (lobbyView.getSelectionModel().isEmpty()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
@@ -494,6 +498,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onJoinRandomLobbyButtonPressed() {
+        soundService.button();
         lobbyService.joinRandomLobby();
     }
 
@@ -623,6 +628,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onLogoutButtonPressed() {
+        soundService.button();
         logout();
         eventBus.post(showLoginViewMessage);
         eventBus.post(closeLobbiesViewEvent);
