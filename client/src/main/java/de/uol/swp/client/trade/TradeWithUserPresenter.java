@@ -51,6 +51,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private int traderInventorySize;
     private ResourceList selectedOwnResourceList;
     private ResourceList selectedPartnersResourceList;
+    private boolean counterOffer;
 
     /**
      * Initialises the Presenter using its superclass
@@ -137,6 +138,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
+        counterOffer = rsp.isCounterOffer();
         IResourceList resourceList = rsp.getResourceMap();
         for (IResource resource : resourceList)
             ownResourceTableView.getItems().add(resource);
@@ -179,7 +181,8 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         }
         offerTradeButton.setDisable(true);
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList);
+        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
+                                counterOffer);
         tradeService.closeTradeResponseWindow(lobbyName);
     }
 

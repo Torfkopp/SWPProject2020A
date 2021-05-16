@@ -69,6 +69,17 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
     void increase(DevelopmentCardType resource);
 
     /**
+     * Increase amount of a DevelopmentCard in the List by i.
+     *
+     * @param resource The resource type
+     * @param i        The amount to increase
+     *
+     * @author Marvin Drees
+     * @since 2021-05-12
+     */
+    void increase(DevelopmentCardType resource, int i);
+
+    /**
      * Set the amount for the specified development card type.
      *
      * @param developmentCardType The development card type

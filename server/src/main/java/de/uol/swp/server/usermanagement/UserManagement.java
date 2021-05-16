@@ -75,6 +75,11 @@ public class UserManagement implements IUserManagement {
     }
 
     @Override
+    public boolean isLoggedIn(String username) {
+        return userStore.findUser(username).filter(value -> loggedInUsers.containsKey(value.getID())).isPresent();
+    }
+
+    @Override
     public User login(String username, String password) throws SecurityException {
         Optional<User> user = userStore.findUser(username, password);
         if (user.isPresent()) {

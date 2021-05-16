@@ -79,9 +79,10 @@ public interface ITradeService {
      * @param respondingUser    The user to whom the trade offer is being made
      * @param offeredResources  Map of resources being offered to the responding user
      * @param demandedResources Map of resources being demanded from the responding user
+     * @param counterOffer      Whether the offer is a counter offer or not
      */
     void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
-                    ResourceList demandedResources);
+                    ResourceList demandedResources, boolean counterOffer);
 
     /**
      * Posts a request to reset the Offer Trade button for the user who proposed a trade
@@ -138,6 +139,7 @@ public interface ITradeService {
      *
      * @param lobbyName      The name of the lobby
      * @param respondingUser The user to whom the offer is being made
+     * @param counterOffer   Whether the offer is a counter offer or not
      */
-    void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser);
+    void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer);
 }
