@@ -478,8 +478,7 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         BankInventory bankInventory = game.getBankInventory();
-        if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards()
-                                                                         .isEmpty()) { // This null check doesn't work like this
+        if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards().isEmpty()) {
             DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
             if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
                 bankInventory.decrease(developmentCard);

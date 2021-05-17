@@ -11,8 +11,6 @@ import java.util.Iterator;
  */
 public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Serializable {
 
-    boolean isEmpty();
-
     @Override
     Iterator<DevelopmentCard> iterator();
 
@@ -80,6 +78,15 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
      * @since 2021-05-12
      */
     void increase(DevelopmentCardType resource, int i);
+
+    /**
+     * Returns if the list if empty
+     *
+     * @return If the list if empty
+     *
+     * @author Temmo Junkhoff
+     */
+    boolean isEmpty();
 
     /**
      * Set the amount for the specified development card type.

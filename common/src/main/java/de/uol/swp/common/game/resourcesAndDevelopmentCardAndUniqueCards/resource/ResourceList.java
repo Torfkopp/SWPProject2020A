@@ -118,7 +118,7 @@ public class ResourceList implements IResourceList {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public class ResourceListIterator implements Iterator<IResource> {
+    public static class ResourceListIterator implements Iterator<IResource> {
 
         private final List<IResource> list;
 

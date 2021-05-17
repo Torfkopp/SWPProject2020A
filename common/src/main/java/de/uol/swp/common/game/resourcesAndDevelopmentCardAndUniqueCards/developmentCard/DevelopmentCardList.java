@@ -54,11 +54,6 @@ public class DevelopmentCardList implements IDevelopmentCardList {
     }
 
     @Override
-    public boolean isEmpty() {
-        return list.isEmpty();
-    }
-
-    @Override
     public Iterator<DevelopmentCard> iterator() {
         return new DevelopmentCardListIterator(list);
     }
@@ -103,6 +98,11 @@ public class DevelopmentCardList implements IDevelopmentCardList {
         for (DevelopmentCard resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) resource1.increase(i);
         }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
     }
 
     @Override
