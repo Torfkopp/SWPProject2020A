@@ -208,10 +208,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         Platform.runLater(() -> {
             notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
             notice.setVisible(true);
-            disableButtonStates();
-            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
-            gameService.playRoadBuildingCard(rsp.getLobbyName());
         });
+        disableButtonStates();
+        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
+        gameService.playRoadBuildingCard(rsp.getLobbyName());
     }
 
     /**
