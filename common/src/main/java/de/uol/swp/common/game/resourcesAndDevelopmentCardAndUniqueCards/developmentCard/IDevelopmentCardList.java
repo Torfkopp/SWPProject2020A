@@ -11,6 +11,8 @@ import java.util.Iterator;
  */
 public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Serializable {
 
+    boolean isEmpty();
+
     @Override
     Iterator<DevelopmentCard> iterator();
 
