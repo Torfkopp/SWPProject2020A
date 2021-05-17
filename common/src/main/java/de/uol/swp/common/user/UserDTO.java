@@ -111,6 +111,4 @@ public class UserDTO implements User {
     public String toString() {
         return getUsername();
     }
-
-    public int getUsernameLength() {return usernameLength;}
 }

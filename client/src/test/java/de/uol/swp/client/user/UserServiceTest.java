@@ -239,7 +239,7 @@ class UserServiceTest {
      */
     @Test
     void updateAccountDetailsTest() throws InterruptedException {
-        String newUsername = "Xx_better_username_xX";
+        String newUsername = "Xx_goodName_xX";
         User updatedUser = new UserDTO(defaultUser.getID(), newUsername, userService.hash(defaultUser.getPassword()),
                                        defaultUser.getEMail());
         userService.updateAccountDetails(updatedUser, userService.hash(defaultUser.getPassword()),
