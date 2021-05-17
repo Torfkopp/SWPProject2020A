@@ -18,7 +18,6 @@ public class UserDTO implements User {
     private final String username;
     private final String password;
     private final String eMail;
-    private final int usernameLength;
 
     /**
      * Constructor
@@ -36,7 +35,6 @@ public class UserDTO implements User {
         this.username = username;
         this.password = password;
         this.eMail = eMail;
-        this.usernameLength = username.length();
     }
 
     /**
