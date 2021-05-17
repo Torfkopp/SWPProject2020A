@@ -112,13 +112,8 @@ public class ServerHandler implements ServerHandlerDelegate {
      * @since 2021-03-18
      */
     public void sendPingMessage(MessageContext ctx) {
-        if (sessionManagement.getSession(ctx).isPresent()) {
-            ResponseMessage msg = new PingMessage();
-            msg.setSession(null);
-            msg.setMessageContext(null);
-            LOG.debug("Send to client {} message {}", ctx, msg);
-            sendToClient(ctx, msg);
-        }
+        LOG.debug("Send ping message to client {}", ctx);
+        sendToClient(ctx, new PingMessage());
     }
 
     /**
@@ -199,11 +194,11 @@ public class ServerHandler implements ServerHandlerDelegate {
     @Subscribe
     private void onClientAuthorisedMessage(ClientAuthorisedMessage msg) {
         Optional<MessageContext> ctx = getCtx(msg);
-        if (ctx.isPresent() && msg.getSession().isPresent()) {
+        if (ctx.isPresent()) {
             if (msg.hasOldSession()) {
                 sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
             } else {
-                try {
+                if (msg.getSession().isPresent()) try {
                     sessionManagement.putSession(ctx.get(), msg.getSession().get());
                     sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
                     sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));

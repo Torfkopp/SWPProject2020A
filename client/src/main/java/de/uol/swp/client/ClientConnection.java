@@ -16,10 +16,16 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -180,10 +186,19 @@ public class ClientConnection {
             bill.group(group).channel(NioSocketChannel.class).remoteAddress(new InetSocketAddress(host, port))
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel ch) {
+                    protected void initChannel(SocketChannel ch) throws SSLException {
+                        // Create and add SslHandler accordingly
+                        LOG.trace("Adding SSLHandler to pipeline");
+                        SslContext context = SslContextBuilder.forClient()
+                                                              .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                              .build();
+                        SSLEngine engine = context.newEngine(ch.alloc(), host, port);
+                        ch.pipeline().addLast(new SslHandler(engine));
                         // Add IdleStateHandler to handle timeouts
+                        LOG.trace("Adding IdleStateHandler to pipeline");
                         ch.pipeline().addLast(new IdleStateHandler(65, 0, 0));
                         // Add both Encoder and Decoder to send and receive serialisable objects
+                        LOG.trace("Adding Encoder and Decoder to pipeline");
                         ch.pipeline().addLast(new ObjectEncoder());
                         ch.pipeline().addLast(new MyObjectDecoder(ClassResolvers.cacheDisabled(null)));
                         // Add a ClientHandler

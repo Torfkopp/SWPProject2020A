@@ -10,4 +10,10 @@ package de.uol.swp.common.message;
  * @see de.uol.swp.common.message.PingMessage
  * @since 2021-03-18
  */
-public class PongMessage extends AbstractRequestMessage {}
+public class PongMessage extends AbstractRequestMessage {
+
+    @Override
+    public boolean authorisationNeeded() {
+        return false;
+    }
+}

@@ -55,10 +55,10 @@ public class AuthenticationService extends AbstractService {
      * Handles a LoginRequest found on the EventBus
      * <p>
      * If a LoginRequest is detected on the EventBus, this method is called.
-     * It tries to login a user via the UserManagement.
-     * If this succeeds, the user and his session are stored in the userSessions map,
-     * and a ClientAuthorisedMessage is posted onto the EventBus. Additionally if
-     * the user already had a session registered the oldSession attribute of the
+     * It checks if the user is logged in via the UserManagement.
+     * If this succeeds, the user and his newly created session are stored
+     * in the userSessions map and a ClientAuthorisedMessage is posted onto the EventBus.
+     * Additionally if the user was already logged in, the oldSession attribute of the
      * ClientAuthorizedMessage gets set to true, otherwise to false.
      * When login fails, a ServerExceptionMessage gets posted there.
      *
@@ -74,14 +74,14 @@ public class AuthenticationService extends AbstractService {
         LOG.debug("Received LoginRequest for User {}", msg.getUsername());
         ServerInternalMessage returnMessage;
         try {
-            User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
-            if (sessionManagement.hasSession(newUser)) {
-                returnMessage = new ClientAuthorisedMessage(newUser, true);
+            if (userManagement.isLoggedIn(msg.getUsername())) {
+                // Don't need isPresent check here as it is implied by isLoggedIn
+                returnMessage = new ClientAuthorisedMessage(userManagement.getUser(msg.getUsername()).get(), true);
             } else {
+                User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
                 returnMessage = new ClientAuthorisedMessage(newUser, false);
+                returnMessage.setSession(sessionManagement.createSession(newUser));
             }
-            Session newSession = sessionManagement.createSession(newUser);
-            returnMessage.setSession(newSession);
         } catch (SecurityException e) {
             LOG.error(e);
             returnMessage = new ServerExceptionMessage(new LoginException("Cannot auth user " + msg.getUsername()));
@@ -148,6 +148,7 @@ public class AuthenticationService extends AbstractService {
         User userToLogOut = req.getUser();
         LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
         userManagement.logout(userToLogOut);
+        // With the new logic there should only ever be one session but keep this to be safe.
         while (sessionManagement.getSession(userToLogOut).isPresent()) {
             post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
                                                      new KillOldClientResponse()));

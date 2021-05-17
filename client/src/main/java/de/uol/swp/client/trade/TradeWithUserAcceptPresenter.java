@@ -1,8 +1,6 @@
 package de.uol.swp.client.trade;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
@@ -47,16 +45,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private UserOrDummy offeringUser;
     private ResourceList offeringResourceMap;
     private ResourceList respondingResourceMap;
-
-    /**
-     * Constructor
-     *
-     * @param eventBus The EventBus
-     */
-    @Inject
-    public TradeWithUserAcceptPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     /**
      * Initialises the Presenter using the superclass.
@@ -115,7 +103,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         tradeService.showUserTradeWindow(lobbyName, offeringUser);
-        tradeService.tradeWithUser(lobbyName, offeringUser);
+        tradeService.tradeWithUser(lobbyName, offeringUser, true);
         eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 

@@ -1,8 +1,8 @@
 package de.uol.swp.client.lobby;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.sun.javafx.scene.control.IntegerField;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
@@ -35,6 +35,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
+    private static final String GREEN_BAR = "green-bar", BLUE_BAR = "blue-bar", RED_BAR = "red-bar";
+    private static final String[] barColourClasses = {RED_BAR, BLUE_BAR, GREEN_BAR};
     private final ResourceList selectedResources = new ResourceList();
 
     @Inject
@@ -44,6 +46,8 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private Label resourceAmount;
     @FXML
     private Slider brickSlider, grainSlider, lumberSlider, oreSlider, woolSlider;
+    @FXML
+    private IntegerField brickField, grainField, lumberField, oreField, woolField;
     @FXML
     private ListView<Resource> ownInventoryView;
     @FXML
@@ -55,18 +59,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private int taxAmount;
     private ResourceList inventory;
     private ObservableList<Resource> ownInventoryList;
-
-    /**
-     * Constructor
-     * <p>
-     * Sets the eventBus
-     *
-     * @param eventBus The EventBus
-     */
-    @Inject
-    public RobberTaxPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     /**
      * Listener for the brickSlider
@@ -88,8 +80,16 @@ public class RobberTaxPresenter extends AbstractPresenter {
         for (IResource resource : selectedResources) {
             selectedAmount += resource.getAmount();
         }
-        if (selectedAmount <= taxAmount) progress.setProgress((double) selectedAmount / taxAmount);
-        else progress.setProgress(1.0 - (selectedAmount % taxAmount) / (double) taxAmount);
+        if (selectedAmount < taxAmount) {
+            progress.setProgress((double) selectedAmount / taxAmount);
+            progress.getStyleClass().removeAll(barColourClasses);
+            progress.getStyleClass().add(BLUE_BAR);
+        } else if (selectedAmount == taxAmount) {
+            progress.setProgress(100);
+            progress.getStyleClass().removeAll(barColourClasses);
+            progress.getStyleClass().add(GREEN_BAR);
+        } else progress.getStyleClass().add(RED_BAR);
+
         taxPay.setDisable(selectedAmount != taxAmount);
     }
 
@@ -117,11 +117,20 @@ public class RobberTaxPresenter extends AbstractPresenter {
                 });
             }
         });
+        Platform.runLater(()-> brickSlider.requestFocus());
+
         brickSlider.valueProperty().addListener((obs, oldValue, newValue) -> brickSliderListener());
         grainSlider.valueProperty().addListener((obs, oldValue, newValue) -> grainSliderListener());
         lumberSlider.valueProperty().addListener((obs, oldValue, newValue) -> lumberSliderListener());
         oreSlider.valueProperty().addListener((obs, oldValue, newValue) -> oreSliderListener());
         woolSlider.valueProperty().addListener((obs, oldValue, newValue) -> woolSliderListener());
+
+        brickSlider.valueProperty().bindBidirectional(brickField.valueProperty());
+        grainSlider.valueProperty().bindBidirectional(grainField.valueProperty());
+        lumberSlider.valueProperty().bindBidirectional(lumberField.valueProperty());
+        oreSlider.valueProperty().bindBidirectional(oreField.valueProperty());
+        woolSlider.valueProperty().bindBidirectional(woolField.valueProperty());
+
         LOG.debug("RobberTaxPresenter initialised");
     }
 

@@ -1,8 +1,6 @@
 package de.uol.swp.client.register;
 
 import com.google.common.base.Strings;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
@@ -43,19 +41,6 @@ public class RegistrationPresenter extends AbstractPresenter {
     private PasswordField passwordField2;
     @FXML
     private Button registerButton;
-
-    /**
-     * Constructor
-     *
-     * @param eventBus The EventBus set in ClientModule
-     *
-     * @see de.uol.swp.client.di.ClientModule
-     * @since 2019-09-18
-     */
-    @Inject
-    public RegistrationPresenter(EventBus eventBus) {
-        setEventBus(eventBus);
-    }
 
     @FXML
     protected void initialize() {

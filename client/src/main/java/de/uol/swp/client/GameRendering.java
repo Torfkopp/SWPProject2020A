@@ -55,9 +55,7 @@ public class GameRendering {
     private static final Color FIELDS_COLOUR = Color.rgb(240, 215, 103);
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
-    private static final double TOKEN_SIZE = 16;
     private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
-
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
@@ -65,12 +63,14 @@ public class GameRendering {
     @Inject
     @Named("drawHitboxGrid")
     private static boolean drawHitboxGrid;
-
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
     private final GraphicsContext gfxCtx;
     GameMapDescription gameMapDescription = new GameMapDescription();
+    private final double tokenTextFontSize;
+    private final double centerTextFontSize;
+    private final double bottomTextFontSize;
 
     /**
      * Constructor
@@ -101,6 +101,9 @@ public class GameRendering {
         this.diceSize = effectiveHeight / 12.0;
         this.diceLineWidth = diceSize / 16.0;
         this.diceDotSize = diceSize / 4.0;
+        this.tokenTextFontSize = (20.0 / 750.0) * effectiveWidth;
+        this.bottomTextFontSize = (25.0 / 750.0) * effectiveWidth;
+        this.centerTextFontSize = (30.0 / 750.0) * effectiveWidth;
     }
 
     /**
@@ -325,7 +328,7 @@ public class GameRendering {
         gfxCtx.setTextAlign(TextAlignment.CENTER);
         gfxCtx.setTextBaseline(VPos.CENTER);
         gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.setFont(Font.font(TOKEN_SIZE));
+        gfxCtx.setFont(Font.font(tokenTextFontSize));
         gfxCtx.fillText(text, currentX + hexWidth / 2.0, currentY + hexHeight / 2.0, hexWidth * (6.0 / 8.0));
     }
 
@@ -455,7 +458,7 @@ public class GameRendering {
         gfxCtx.setFill(TEXT_COLOUR);
         gfxCtx.setTextAlign(TextAlignment.CENTER);
         gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFont(Font.font(TOKEN_SIZE));
+        gfxCtx.setFont(Font.font(tokenTextFontSize));
         gfxCtx.fillText(resourceBundle.getString("game.token." + token), currentX + hexWidth / 2.0,
                         currentY + hexWidth / 2.0, tokenSize * (7.0 / 8.0));
     }
@@ -976,7 +979,7 @@ public class GameRendering {
         gfxCtx.setTextAlign(TextAlignment.CENTER);
         gfxCtx.setTextBaseline(VPos.CENTER);
         gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(20));
+        gfxCtx.setFont(Font.font(bottomTextFontSize));
         gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
     }
 
@@ -994,7 +997,7 @@ public class GameRendering {
         gfxCtx.setTextAlign(TextAlignment.CENTER);
         gfxCtx.setTextBaseline(VPos.CENTER);
         gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(25));
+        gfxCtx.setFont(Font.font(centerTextFontSize));
         gfxCtx.fillText(text, width / 2.0, height / 2.0);
     }
 
