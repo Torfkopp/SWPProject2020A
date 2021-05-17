@@ -326,6 +326,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             returnToLobby.setPrefHeight(30);
             returnToLobby.setPrefWidth(250);
         }
+        gameMapDescription.setGameMap(null);
+        gameMapDescription.setCenterText(
+                winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
+                String.format(resourceBundle.getString("game.won.info"), winner));
         fitCanvasToSize();
     }
 
