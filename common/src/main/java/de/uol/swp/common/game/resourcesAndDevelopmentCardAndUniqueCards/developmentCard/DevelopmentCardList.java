@@ -113,7 +113,7 @@ public class DevelopmentCardList implements IDevelopmentCardList {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public class ResourceListMapIterator implements Iterator<DevelopmentCard> {
+    public static class ResourceListMapIterator implements Iterator<DevelopmentCard> {
 
         private final List<DevelopmentCard> list;
 
@@ -126,7 +126,7 @@ public class DevelopmentCardList implements IDevelopmentCardList {
          * @since 2021-04-23
          */
         public ResourceListMapIterator(List<DevelopmentCard> list) {
-            this.list = list;
+            this.list = new LinkedList<>(list);
         }
 
         @Override
