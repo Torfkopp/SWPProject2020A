@@ -9,4 +9,4 @@ import java.io.Serializable;
  * @author Temmo Junkhoff
  * @since 2021-03-13
  */
-public interface Dummy extends ComputedPlayer, Serializable {}
+public interface Dummy extends NPC, Serializable {}

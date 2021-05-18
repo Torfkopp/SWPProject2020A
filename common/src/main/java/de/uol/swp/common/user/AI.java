@@ -9,7 +9,7 @@ import java.util.List;
  * @author Mario Fokken
  * @since 2021-05-11
  */
-public interface AI extends ComputedPlayer, Serializable {
+public interface AI extends NPC, Serializable {
 
     enum Difficulty {
         EASY,
