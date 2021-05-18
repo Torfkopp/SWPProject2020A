@@ -1,7 +1,7 @@
 package de.uol.swp.server.lobby;
 
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.ComputedPlayer;
+import de.uol.swp.common.user.NPC;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -217,7 +217,7 @@ public class LobbyDTO implements ILobby {
     @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
-        if (user instanceof ComputedPlayer) {
+        if (user instanceof NPC) {
             readyUsers.add(user);
         }
     }
