@@ -27,7 +27,7 @@ public class AIDTO implements AI {
                           "Muhammad Avdol", //Arabic
                           "Joseph Joestar", "Smokey Brown", "Holy Kujo", "Jolyne Cujoh", "Ermes Costello",
                           "Emporio Alnino", "Weather Report", "Foo Fighters", "Lucy Steel", "Hot Pants", //US-American
-                          "Iggy", "Coco Jumbo", //Animal
+                          "Iggy", "Coco Jumbo", "Danny", //Animal
                           "Josuke Higashikata", "Koichi Hirose", "Okuyasu Nijimura", "Rohan Kishibe", "Shigechi",
                           "Yasuho Hirose", "Rai Mamezuku", //Japanese
                           "Giorno Giovanna", "Bruno Bucciarati", "Leone Abbacchio", "Guido Mista", "Narancia Ghirga",
@@ -37,11 +37,11 @@ public class AIDTO implements AI {
                           "Kars", "Esidisi", "Wamuu", "Santana", //Aztec
                           "Enya the Hag", "Oingo", "Boingo", "Steely Dan", "Kenny G.", "J. Geil", "Vanilla Ice",
                           //Arabic
-                          "Hol Horse", "Terence T. D'Arby", "Daniel J. D'Arby", "Axl Ro", "Enrico Pucci", "Sandman",
+                          "Hol Horse", "Terence T. D'Arby", "Daniel J. D'Arby", "Axl Ro", "Enrico Pucci",
                           //US-American
                           "Pet Shop", "Bug-Eaten", "Not Bug-Eaten", "Stray Cat", //Animals
                           "Yoshikage Kira", "Head Doctor", // Japanese
-                          "Diavolo", "Polpo")); //Italian
+                          "Diavolo", "Polpo", "Doppio")); //Italian
     private final List<String> aiNameEasyNoTalk = new ArrayList<>(
             Arrays.asList("Star Platinum", "Stone Free", "Soft & Wet", "Tusk", "Silver Chariot", "Crazy Diamond",
                           "Gold Experience", "Sticky Fingers", "Moody Blues", "Sex Pistols", "Aerosmith", "Purple Haze",
@@ -69,7 +69,7 @@ public class AIDTO implements AI {
      */
     public AIDTO(Difficulty difficulty) {
         this.id = ++idCounter;
-        String name = "Danny";
+        String name = "Man X";
         switch (difficulty) {
             case EASY:
                 name = aiTalking ? aiNameEasy.get((int) (Math.random() * aiNameEasy.size())) :
@@ -78,6 +78,7 @@ public class AIDTO implements AI {
             case HARD:
                 name = aiTalking ? aiNameHard.get((int) (Math.random() * aiNameHard.size())) :
                        aiNameHardNoTalk.get((int) (Math.random() * aiNameHardNoTalk.size()));
+                if ((int) (Math.random() * 10000) <= 1) name = "Temmo";
                 break;
         }
         this.name = name;
