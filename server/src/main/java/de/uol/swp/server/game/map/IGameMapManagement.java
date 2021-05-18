@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.hexes.IGameHex;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -112,19 +112,19 @@ public interface IGameMapManagement {
     IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
 
     /**
-     * Gets the HarborResourceType of a specific Intersection MapPoint
+     * Gets the HarbourResourceType of a specific Intersection MapPoint
      * <p>
-     * If the point does not have a harbor, NONE is returned
+     * If the point does not have a harbour, NONE is returned
      *
      * @param point specific Intersection MapPoint
      *
-     * @return HarborResourceType
+     * @return HarbourResourceType
      *
      * @author Steven Luong
      * @author Maximilian Lindner
      * @since 2021-04-07
      */
-    IHarborHex.HarborResource getHarborResource(MapPoint point);
+    IHarbourHex.HarbourResource getHarbourResource(MapPoint point);
 
     /**
      * Gets the hex at a specified place
