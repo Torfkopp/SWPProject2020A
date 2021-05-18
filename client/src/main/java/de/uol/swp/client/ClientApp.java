@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * The application class of the client
@@ -31,13 +32,14 @@ import java.util.List;
 public class ClientApp extends Application implements ConnectionListener {
 
     private static final Logger LOG = LogManager.getLogger(ClientApp.class);
-
+    private static final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
     private String host;
     private int port;
     private IUserService userService;
     private ClientConnection clientConnection;
     private EventBus eventBus;
     private SceneManager sceneManager;
+    private boolean attemptingStoredLogin;
 
     // -----------------------------------------------------
     // Java FX Methods
@@ -110,7 +112,7 @@ public class ClientApp extends Application implements ConnectionListener {
 
     @Override
     public void stop() {
-        if (userService != null) userService.logout(userService.getLoggedInUser());
+        if (userService != null) userService.logout(false);
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
@@ -123,12 +125,33 @@ public class ClientApp extends Application implements ConnectionListener {
 
     @Override
     public void connectionEstablished(Channel ch) {
-        sceneManager.showLoginScreen();
+        if (preferences.getBoolean("rememberMeEnabled", false)) {
+            LOG.trace("'Remember Me' enabled, using stored user details for LoginRequest");
+            String username = preferences.get("username", "");
+            String password = preferences.get("password", "");
+            attemptingStoredLogin = true;
+            if (!username.equals("") && !password.equals("")) userService.login(username, password, true);
+            else {
+                LOG.trace("No user details found, showing Login screen");
+                attemptingStoredLogin = false;
+                sceneManager.showLoginScreen();
+            }
+        } else {
+            LOG.trace("'Remember Me' disabled, showing Login screen");
+            attemptingStoredLogin = false;
+            sceneManager.showLoginScreen();
+        }
     }
 
     @Override
     public void exceptionOccurred(String e) {
-        sceneManager.showServerError(e);
+        if (e.startsWith("Cannot auth user ") && attemptingStoredLogin) {
+            LOG.trace("Stored user details were incorrect, showing normal login screen");
+            attemptingStoredLogin = false;
+            sceneManager.showLoginScreen();
+        } else {
+            sceneManager.showServerError(e);
+        }
     }
 
     @Override

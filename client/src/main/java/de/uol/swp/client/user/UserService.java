@@ -3,6 +3,7 @@ package de.uol.swp.client.user;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import de.uol.swp.client.ClientApp;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.*;
@@ -10,6 +11,8 @@ import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.prefs.Preferences;
 
 /**
  * This class is used to hide the communication details.
@@ -23,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 public class UserService implements IUserService {
 
     private static final Logger LOG = LogManager.getLogger(UserService.class);
+    private static final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
     private final EventBus bus;
     private User loggedInUser;
 
@@ -85,13 +89,17 @@ public class UserService implements IUserService {
     /**
      * Posts a LoginRequest onto the EventBus
      *
-     * @param username     the user's name
-     * @param passwordHash the user's hashed password
+     * @param username     The user's name
+     * @param passwordHash The user's hashed password
+     * @param rememberMe   whether to remember the user details for automatic login
      *
      * @since 2017-03-17
      */
     @Override
-    public void login(String username, String passwordHash) {
+    public void login(String username, String passwordHash, boolean rememberMe) {
+        preferences.putBoolean("rememberMeEnabled", rememberMe);
+        preferences.put("username", username);
+        preferences.put("password", passwordHash);
         LOG.debug("Sending LoginRequest");
         Message msg = new LoginRequest(username, passwordHash);
         bus.post(msg);
@@ -99,11 +107,18 @@ public class UserService implements IUserService {
 
     /**
      * Posts a LogoutRequest onto the EventBus
+     * <p>
+     * This also disables the "Remember Me" setting and empties the stored user details
      *
-     * @param username the user's name
+     * @param resetRememberMe Whether to reset the stored user details
      */
     @Override
-    public void logout(User username) {
+    public void logout(boolean resetRememberMe) {
+        if (resetRememberMe) {
+            preferences.putBoolean("rememberMeEnabled", false);
+            preferences.put("username", "");
+            preferences.put("password", "");
+        }
         LOG.debug("Sending LogoutRequest");
         Message msg = new LogoutRequest();
         bus.post(msg);

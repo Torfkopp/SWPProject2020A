@@ -86,21 +86,22 @@ public interface IUserService {
      *
      * @param username     the user's name
      * @param passwordHash the user's hashed password
+     * @param rememberMe   whether to remember the user details for automatic login on start up
      *
      * @since 2017-03-17
      */
-    void login(String username, String passwordHash);
+    void login(String username, String passwordHash, boolean rememberMe);
 
     /**
      * Log out from server
      * <p>
-     * This method logs the user specified by the User object out.
+     * This method logs out the currently logged in user.
      *
-     * @implNote The User object has to contain a unique identifier in order to
-     * remove the correct user
+     * @param resetRememberMe Whether to reset the stored user details
+     *
      * @since 2017-03-17
      */
-    void logout(User user);
+    void logout(boolean resetRememberMe);
 
     /**
      * Retrieve the list of all currently logged in users

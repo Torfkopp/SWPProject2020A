@@ -2,7 +2,7 @@ package de.uol.swp.client;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import de.uol.swp.client.user.UserService;
+import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
@@ -56,21 +56,23 @@ public class GameRendering {
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
+
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
-    private static UserService userService;
+    private static IUserService userService;
     @Inject
     @Named("drawHitboxGrid")
+
     private static boolean drawHitboxGrid;
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
     private final GraphicsContext gfxCtx;
-    GameMapDescription gameMapDescription = new GameMapDescription();
     private final double tokenTextFontSize;
     private final double centerTextFontSize;
     private final double bottomTextFontSize;
+    private GameMapDescription gameMapDescription = new GameMapDescription();
 
     /**
      * Constructor
