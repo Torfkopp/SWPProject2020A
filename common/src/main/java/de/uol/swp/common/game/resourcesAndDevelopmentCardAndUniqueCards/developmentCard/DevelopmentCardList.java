@@ -55,7 +55,7 @@ public class DevelopmentCardList implements IDevelopmentCardList {
 
     @Override
     public Iterator<DevelopmentCard> iterator() {
-        return new ResourceListMapIterator(list);
+        return new DevelopmentCardListIterator(list);
     }
 
     @Override
@@ -101,6 +101,11 @@ public class DevelopmentCardList implements IDevelopmentCardList {
     }
 
     @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
+
+    @Override
     public void set(DevelopmentCardType developmentCardType, int amount) {
         for (DevelopmentCard developmentCard : list) {
             if (Objects.equals(developmentCardType, developmentCard.getType())) developmentCard.setAmount(amount);
@@ -108,25 +113,25 @@ public class DevelopmentCardList implements IDevelopmentCardList {
     }
 
     /**
-     * The type Resource list map iterator.
+     * The iterator for a development card list map.
      *
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public class ResourceListMapIterator implements Iterator<DevelopmentCard> {
+    public static class DevelopmentCardListIterator implements Iterator<DevelopmentCard> {
 
         private final List<DevelopmentCard> list;
 
         /**
-         * Constructor for Resource list map iterator.
+         * Constructor for an iterator for a resource list map.
          *
          * @param list The list
          *
          * @author Temmo Junkhoff
          * @since 2021-04-23
          */
-        public ResourceListMapIterator(List<DevelopmentCard> list) {
-            this.list = list;
+        public DevelopmentCardListIterator(List<DevelopmentCard> list) {
+            this.list = new LinkedList<>(list);
         }
 
         @Override

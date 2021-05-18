@@ -80,6 +80,16 @@ public interface IDevelopmentCardList extends Iterable<DevelopmentCard>, Seriali
     void increase(DevelopmentCardType resource, int i);
 
     /**
+     * Returns if the list is empty
+     *
+     * @return True if the list is empty, false otherwise
+     *
+     * @author Temmo Junkhoff
+     * @since 2021-05-17
+     */
+    boolean isEmpty();
+
+    /**
      * Set the amount for the specified development card type.
      *
      * @param developmentCardType The development card type
