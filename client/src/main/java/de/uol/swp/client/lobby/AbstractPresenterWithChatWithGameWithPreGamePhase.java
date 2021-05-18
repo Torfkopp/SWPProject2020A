@@ -288,12 +288,48 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         winner = msg.getUser();
+        uniqueCardView.setMaxHeight(0);
+        uniqueCardView.setMinHeight(0);
+        uniqueCardView.setPrefHeight(0);
+        uniqueCardView.setVisible(false);
+        resourceTableView.setMaxHeight(0);
+        resourceTableView.setMinHeight(0);
+        resourceTableView.setPrefHeight(0);
+        resourceTableView.setVisible(false);
+        developmentCardTableView.setMaxHeight(0);
+        developmentCardTableView.setMinHeight(0);
+        developmentCardTableView.setPrefHeight(0);
+        developmentCardTableView.setVisible(false);
+        rollDice.setVisible(false);
+        autoRoll.setVisible(false);
+        endTurn.setVisible(false);
+        tradeWithUserButton.setVisible(false);
+        tradeWithUserButton.setDisable(false);
+        tradeWithBankButton.setVisible(false);
+        turnIndicator.setVisible(false);
+        playCard.setVisible(false);
+        timerLabel.setVisible(false);
+        helpCheckBox.setDisable(true);
+        helpCheckBox.setVisible(false);
+        turnIndicator.setAccessibleText("");
+        buildingCosts.setVisible(false);
+        cardAmountsList.clear();
+        moveTimeTimer.cancel();
+        moveTimerLabel.setVisible(false);
+        for (ChatOrSystemMessage m : chatMessages)
+            if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+        currentRound.setVisible(false);
+        roundCounter = 0;
+        this.elapsedTimer.stop();
         if (Objects.equals(owner, userService.getLoggedInUser())) {
             returnToLobby.setVisible(true);
             returnToLobby.setPrefHeight(30);
             returnToLobby.setPrefWidth(250);
-            this.elapsedTimer.stop();
         }
+        gameMapDescription.clear();
+        gameMapDescription.setCenterText(
+                winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
+                String.format(resourceBundle.getString("game.won.info"), winner));
         fitCanvasToSize();
     }
 
@@ -341,45 +377,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setVisible(true);
             preGameSettingBox.setPrefHeight(190);
             preGameSettingBox.setMaxHeight(190);
-            turnIndicator.setAccessibleText("");
             preGameSettingBox.setMinHeight(190);
-            uniqueCardView.setMaxHeight(0);
-            uniqueCardView.setMinHeight(0);
-            uniqueCardView.setPrefHeight(0);
-            uniqueCardView.setVisible(false);
-            resourceTableView.setMaxHeight(0);
-            resourceTableView.setMinHeight(0);
-            resourceTableView.setPrefHeight(0);
-            resourceTableView.setVisible(false);
-            developmentCardTableView.setMaxHeight(0);
-            developmentCardTableView.setMinHeight(0);
-            developmentCardTableView.setPrefHeight(0);
-            developmentCardTableView.setVisible(false);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
-            rollDice.setVisible(false);
-            autoRoll.setVisible(false);
-            endTurn.setVisible(false);
-            tradeWithUserButton.setVisible(false);
-            tradeWithUserButton.setDisable(false);
-            tradeWithBankButton.setVisible(false);
-            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
-            playCard.setVisible(false);
-            timerLabel.setVisible(false);
-            infoMenu.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
-            cardAmountsList.clear();
-            moveTimeTimer.cancel();
-            moveTimerLabel.setVisible(false);
-            for (ChatOrSystemMessage m : chatMessages)
-                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
-            currentRound.setVisible(false);
-            roundCounter = 0;
         });
     }
 

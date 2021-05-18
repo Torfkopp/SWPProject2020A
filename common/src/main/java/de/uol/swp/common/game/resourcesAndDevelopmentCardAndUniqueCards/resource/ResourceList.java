@@ -57,7 +57,7 @@ public class ResourceList implements IResourceList {
 
     @Override
     public Iterator<IResource> iterator() {
-        return new ResourceListMapIterator(new LinkedList<>(list));
+        return new ResourceListIterator(new LinkedList<>(list));
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ResourceList implements IResourceList {
      * @author Temmo Junkhoff
      * @since 2021-04-23
      */
-    public class ResourceListMapIterator implements Iterator<IResource> {
+    public static class ResourceListIterator implements Iterator<IResource> {
 
         private final List<IResource> list;
 
@@ -135,7 +135,7 @@ public class ResourceList implements IResourceList {
          * @author Temmo Junkhoff
          * @since 2021-04-23
          */
-        public ResourceListMapIterator(List<IResource> list) {
+        public ResourceListIterator(List<IResource> list) {
             this.list = list;
         }
 

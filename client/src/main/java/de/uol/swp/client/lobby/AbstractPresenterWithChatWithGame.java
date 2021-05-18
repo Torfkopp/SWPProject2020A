@@ -18,6 +18,7 @@ import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.PauseTimerRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardAllowedRequest;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
@@ -186,6 +187,31 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     public void onPauseTimerMessage(PauseTimerMessage msg) {
         LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
         paused = true;
+    }
+
+    /**
+     * Handles a PlayRoadBuildingCardAllowedResponse
+     * <p>
+     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
+     * this method is called.
+     * It disables the Buttons and gives a note to choose
+     * the roads.
+     *
+     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
+     * @since 2021-05-16
+     */
+    @Subscribe
+    public void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
+        Platform.runLater(() -> {
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+        });
+        disableButtonStates();
+        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
+        gameService.playRoadBuildingCard(rsp.getLobbyName());
     }
 
     /**
@@ -754,11 +780,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
-            notice.setVisible(true);
-            disableButtonStates();
-            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
-            gameService.playRoadBuildingCard(lobbyName);
+            eventBus.post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -1063,7 +1085,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else {
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
-            tradeService.tradeWithUser(lobbyName, user);
+            tradeService.tradeWithUser(lobbyName, user, false);
             eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }

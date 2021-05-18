@@ -19,6 +19,7 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
     private final UserOrDummy respondingUser;
     private final ResourceList offeredResources;
     private final ResourceList demandedResources;
+    private final boolean counterOffer;
 
     /**
      * Constructor
@@ -28,14 +29,17 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      * @param lobbyName         The name of the lobby
      * @param offeredResources  The offered resources
      * @param demandedResources The responded resources
+     * @param counterOffer      Whether the offer is a counter offer or not
      */
     public OfferingTradeWithUserRequest(UserOrDummy offeringUser, UserOrDummy respondingUser, LobbyName lobbyName,
-                                        ResourceList offeredResources, ResourceList demandedResources) {
+                                        ResourceList offeredResources, ResourceList demandedResources,
+                                        boolean counterOffer) {
         super(lobbyName);
         this.offeringUser = offeringUser;
         this.respondingUser = respondingUser;
         this.offeredResources = offeredResources;
         this.demandedResources = demandedResources;
+        this.counterOffer = counterOffer;
     }
 
     /**
@@ -72,5 +76,14 @@ public class OfferingTradeWithUserRequest extends AbstractGameRequest {
      */
     public UserOrDummy getRespondingUser() {
         return respondingUser;
+    }
+
+    /**
+     * Gets the counter offer status
+     *
+     * @return Whether the offer is a counter offer or not
+     */
+    public boolean isCounterOffer() {
+        return counterOffer;
     }
 }
