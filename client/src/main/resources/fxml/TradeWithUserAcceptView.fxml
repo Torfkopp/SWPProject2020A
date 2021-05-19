@@ -8,6 +8,7 @@
       fx:id="tradeUserAcceptView" fx:controller="de.uol.swp.client.trade.TradeWithUserAcceptPresenter">
     <Label fx:id="tradeNotPossibleLabel" disable="true" prefWidth="328.0"/>
     <Label fx:id="tradeResponseLabel" minHeight="100" prefHeight="108.0" prefWidth="328.0" wrapText="true"/>
+    <Label fx:id="acceptTradeTimerLabel"/>
     <HBox minHeight="150" minWidth="300" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
         <TableView fx:id="ownResourceTableView" prefHeight="150.0" prefWidth="230.0">
             <columns>

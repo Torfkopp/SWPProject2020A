@@ -198,7 +198,7 @@ class LobbyDTOTest {
     @Test
     void updateMoveTimeTest() {
         ILobby lobby = LobbyDTO.create(defaultLobby);
-        assertEquals(60, lobby.getMoveTime());
+        assertEquals(120, lobby.getMoveTime());
 
         lobby.setMoveTime(42);
 
