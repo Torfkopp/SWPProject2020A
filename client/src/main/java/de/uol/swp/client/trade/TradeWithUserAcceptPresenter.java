@@ -2,6 +2,7 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
+import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
@@ -16,6 +17,10 @@ import javafx.scene.control.Label;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Manages the tradingAccept menu
@@ -33,17 +38,54 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
+    protected Timer tradeAcceptTimer;
+
     @FXML
     private Button acceptTradeButton;
     @FXML
     private Label tradeNotPossibleLabel;
     @FXML
     private Label tradeResponseLabel;
+    @FXML
+    protected Label acceptTradeTimerLabel;
 
     private LobbyName lobbyName;
     private UserOrDummy offeringUser;
     private ResourceList offeringResourceMap;
     private ResourceList respondingResourceMap;
+
+    protected boolean paused;
+    protected int remainingMoveTime;
+
+    /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets zero.
+     * It also closes all the opened windows.
+     * If paused is true, the timer is paused.
+     *
+     * @param moveTime The moveTime for the Lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    public void setAcceptTradeTimer(int moveTime) {
+        tradeAcceptTimer = new Timer();
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
+        tradeAcceptTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if (!paused) {
+                    Platform.runLater(() -> acceptTradeTimerLabel.setText(
+                            String.format(resourceBundle.getString("game.labels.movetime"),
+                                          moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
+                        tradeService.resetOfferTradeButton(lobbyName, offeringUser);
+                        tradeService.closeTradeResponseWindow(lobbyName);
+                        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+                    }
+                } else {remainingMoveTime = moveTimeToDecrement.get();}
+            }
+        }, 0, 1000);
+    }
 
     /**
      * Initialises the Presenter using the superclass.
@@ -54,6 +96,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     public void initialize() {
         super.initialize();
         LOG.debug("TradeWithUserAcceptPresenter initialised");
+        setAcceptTradeTimer(30);
     }
 
     /**
@@ -91,6 +134,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * ShowTradeWithUserViewEvent to open up the trading window and
      * a TradeWithUserRequest to get the needed information from the
      * server for the trade.
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
@@ -102,6 +146,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onMakeCounterOfferButtonPressed() {
         tradeService.showUserTradeWindow(lobbyName, offeringUser);
         tradeService.tradeWithUser(lobbyName, offeringUser, true);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -111,16 +156,19 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithUserPresenter is created. If a window is closed using, e.g.
      * X(top-right-Button), the closeWindowAfterNotSuccessfulTrade method is called.
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      */
     @FXML
     private void onRejectTradeButtonPressed() {
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         tradeService.closeTradeResponseWindow(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
      * This method calls the closeWindow function to close the
      * according window.
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @param rsp TradeOfUsersAcceptedResponse found on the EventBus
      *
@@ -130,6 +178,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeTradeResponseWindow(lobbyName);
+        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

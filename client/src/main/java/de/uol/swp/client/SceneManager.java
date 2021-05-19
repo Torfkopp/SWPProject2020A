@@ -307,7 +307,7 @@ public class SceneManager {
     public void showServerError(Throwable e, String cause) {
         if (e instanceof IOException) {
             //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
-            userService.logout(userService.getLoggedInUser());
+            userService.logout(false);
             showLoginScreen();
             cause = resourceBundle.getString("error.server.disrupted");
         }

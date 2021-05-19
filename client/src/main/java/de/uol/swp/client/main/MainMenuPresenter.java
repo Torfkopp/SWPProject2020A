@@ -122,7 +122,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     private void logout() {
         lobbyService.removeFromAllLobbies();
-        userService.logout(userService.getLoggedInUser());
+        // called from logout button or onUserDeletionSuccessfulResponse; both warrant reset of 'Remember Me'
+        userService.logout(true);
         resetChatVars();
     }
 
