@@ -260,6 +260,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                         tradeService.closeUserTradeWindow(lobbyName);
                         disableButtonStates();
                         gameService.endTurn(lobbyName);
+                        moveTimeTimer.cancel();
                     }
                 } else {remainingMoveTime = moveTimeToDecrement.get();}
             }
