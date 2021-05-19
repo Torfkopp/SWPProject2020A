@@ -59,6 +59,10 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Named("styleSheet")
     private static String styleSheet;
 
+    @Inject
+    @Named("soundPack")
+    private static String soundPack;
+
     @FXML
     private Label randomLobbyState;
     @FXML
@@ -94,6 +98,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 });
             }
         });
+        if (!soundPack.equals("client/src/main/resources/sounds/default/")) soundService.background();
     }
 
     /**

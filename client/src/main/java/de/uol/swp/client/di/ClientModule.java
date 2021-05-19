@@ -63,6 +63,7 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("theme", "default");
         defaultProps.setProperty("soundpack", "default");
         defaultProps.setProperty("volume", "100");
+        defaultProps.setProperty("backgroundvolume", "50");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -110,7 +111,17 @@ public class ClientModule extends AbstractModule {
         LOG.debug("Selected sound pack {} with volume {}", properties.getProperty("soundpack"),
                   properties.getProperty("volume"));
         final String soundPack = "client/src/main/resources/sounds/" + properties.getProperty("soundpack") + "/";
-        final double volume = Double.parseDouble(properties.getProperty("volume")) / 100;
+        double volume;
+        double backgroundVolume;
+        try {
+            volume = Double.parseDouble(properties.getProperty("volume")) / 100;
+            backgroundVolume = Double.parseDouble(properties.getProperty("backgroundvolume")) / 100;
+            if (volume < 0.0 || volume > 1.0) volume = 1.0;
+            if (backgroundVolume < 0.0 || backgroundVolume > 1.0) backgroundVolume = 0.5;
+        } catch (NumberFormatException ignored) {
+            volume = 1.0;
+            backgroundVolume = 0.5;
+        }
 
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
@@ -145,6 +156,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("styleSheet")).to(styleSheet);
         bindConstant().annotatedWith(Names.named("soundPack")).to(soundPack);
         bindConstant().annotatedWith(Names.named("volume")).to(volume);
+        bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);

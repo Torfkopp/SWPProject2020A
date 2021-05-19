@@ -333,7 +333,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
                 String.format(resourceBundle.getString("game.won.info"), winner));
         fitCanvasToSize();
-        soundService.fanfare();
+        soundService.victory();
     }
 
     /**

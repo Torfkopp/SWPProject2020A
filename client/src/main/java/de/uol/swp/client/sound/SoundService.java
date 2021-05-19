@@ -22,9 +22,21 @@ public class SoundService implements ISoundService {
     @Named("volume")
     private static double volume;
 
+    @Inject
+    @Named("backgroundVolume")
+    private static double backgroundVolume;
+
+    @Override
+    public void background() {
+        AudioClip audio = new AudioClip(new File(soundPack + "background.wav").toURI().toString());
+        audio.setCycleCount(10000);
+        audio.setPriority(-1);
+        audio.play(backgroundVolume);
+    }
+
     @Override
     public void building() {
-        playSound("hammer.wav");
+        playSound("building.wav");
     }
 
     @Override
@@ -43,18 +55,13 @@ public class SoundService implements ISoundService {
     }
 
     @Override
-    public void fanfare() {
-        playSound("fanfare.wav");
-    }
-
-    @Override
-    public void notification() {
-        playSound("notification.wav");
-    }
-
-    @Override
     public void popup() {
         playSound("popup.wav");
+    }
+
+    @Override
+    public void victory() {
+        playSound("victory.wav");
     }
 
     /**
@@ -64,7 +71,6 @@ public class SoundService implements ISoundService {
      */
     private void playSound(String sound) {
         AudioClip audio = new AudioClip(new File(soundPack + sound).toURI().toString());
-        audio.setVolume(volume);
-        audio.play();
+        audio.play(volume);
     }
 }

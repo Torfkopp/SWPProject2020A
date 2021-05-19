@@ -579,8 +579,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null) Platform.runLater(
-                    () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+            if (finalAttr != null) Platform.runLater(() -> {
+                soundService.building();
+                chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you")));
+            });
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
                     .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));

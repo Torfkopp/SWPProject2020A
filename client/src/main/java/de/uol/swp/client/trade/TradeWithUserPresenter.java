@@ -219,6 +219,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
+        Platform.runLater(() -> soundService.coins());
         closeWindow();
     }
 

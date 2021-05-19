@@ -9,6 +9,11 @@ package de.uol.swp.client.sound;
 public interface ISoundService {
 
     /**
+     * Plays background music.
+     */
+    void background();
+
+    /**
      * Plays the building sound.
      */
     void building();
@@ -29,17 +34,12 @@ public interface ISoundService {
     void dice();
 
     /**
-     * Plays the fanfare sound.
-     */
-    void fanfare();
-
-    /**
-     * Plays the notification sound.
-     */
-    void notification();
-
-    /**
      * Plays the popup sound.
      */
     void popup();
+
+    /**
+     * Plays the victory sound.
+     */
+    void victory();
 }
