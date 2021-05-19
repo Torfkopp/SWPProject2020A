@@ -122,6 +122,7 @@ public class UserService implements IUserService {
         LOG.debug("Sending LogoutRequest");
         Message msg = new LogoutRequest();
         bus.post(msg);
+        setLoggedInUser(null);
     }
 
     /**
