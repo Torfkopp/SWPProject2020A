@@ -191,7 +191,7 @@ class UserServiceTest {
         loginUser();
         event = null;
 
-        userService.logout(defaultUser);
+        userService.logout(false);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -239,7 +239,7 @@ class UserServiceTest {
      */
     @Test
     void updateAccountDetailsTest() throws InterruptedException {
-        String newUsername = "Xx_better_username_xX";
+        String newUsername = "Xx_goodName_xX";
         User updatedUser = new UserDTO(defaultUser.getID(), newUsername, userService.hash(defaultUser.getPassword()),
                                        defaultUser.getEMail());
         userService.updateAccountDetails(updatedUser, userService.hash(defaultUser.getPassword()),
@@ -271,7 +271,7 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     private void loginUser() throws InterruptedException {
-        userService.login(defaultUser.getUsername(), userService.hash(defaultUser.getPassword()));
+        userService.login(defaultUser.getUsername(), userService.hash(defaultUser.getPassword()), false);
         lock.await(250, TimeUnit.MILLISECONDS);
     }
 

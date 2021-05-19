@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
@@ -49,6 +50,7 @@ public class AuthenticationService extends AbstractService {
         super(bus);
         this.userManagement = userManagement;
         this.sessionManagement = sessionManagement;
+        LOG.debug("AuthenticationService started");
     }
 
     /**
@@ -159,7 +161,7 @@ public class AuthenticationService extends AbstractService {
             }
         }
         post(new UserLoggedOutMessage(userToLogOut.getUsername()));
-        NukedUsersSessionsResponse response = new NukedUsersSessionsResponse(userToLogOut);
+        ResponseMessage response = new NukedUsersSessionsResponse(userToLogOut);
         response.initWithMessage(req);
         post(response);
     }
