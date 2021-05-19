@@ -104,13 +104,17 @@ public class ClientModule extends AbstractModule {
 
         //Setting the theme
         LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
-        final String theme = properties.getProperty("theme");
+        String theme = properties.getProperty("theme");
+        if (!theme.equals("default") && !theme.equals("dark") && !theme.equals("classic") && !theme.equals("cursed"))
+            theme = "default";
         final String styleSheet = "css/" + theme + ".css";
 
         //Setting the sound pack and volume
         LOG.debug("Selected sound pack {} with volume {}", properties.getProperty("soundpack"),
                   properties.getProperty("volume"));
-        final String soundPack = "client/src/main/resources/sounds/" + properties.getProperty("soundpack") + "/";
+        String pack = properties.getProperty("soundpack");
+        if (!pack.equals("default") && !pack.equals("classic") && !pack.equals("cursed")) pack = "default";
+        final String soundPack = "client/src/main/resources/sounds/" + pack + "/";
         double volume;
         double backgroundVolume;
         try {
