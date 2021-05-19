@@ -191,7 +191,7 @@ class UserServiceTest {
         loginUser();
         event = null;
 
-        userService.logout(defaultUser);
+        userService.logout(false);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -271,7 +271,7 @@ class UserServiceTest {
      * @since 2019-10-10
      */
     private void loginUser() throws InterruptedException {
-        userService.login(defaultUser.getUsername(), userService.hash(defaultUser.getPassword()));
+        userService.login(defaultUser.getUsername(), userService.hash(defaultUser.getPassword()), false);
         lock.await(250, TimeUnit.MILLISECONDS);
     }
 

@@ -222,10 +222,10 @@ public class ClientConnection {
      * @since 2017-03-17
      */
     void fireConnectionEstablished(Channel channel) {
+        this.channel = channel;
         for (ConnectionListener listener : connectionListener) {
             listener.connectionEstablished(channel);
         }
-        this.channel = channel;
     }
 
     /**
