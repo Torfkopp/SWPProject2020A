@@ -173,7 +173,7 @@ class TradeServiceTest {
 
     @Test
     void offerTrade() throws InterruptedException {
-        tradeService.offerTrade(defaultLobbyName, secondUser, defaultOffer, defaultDemand);
+        tradeService.offerTrade(defaultLobbyName, secondUser, defaultOffer, defaultDemand, false);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -288,7 +288,7 @@ class TradeServiceTest {
 
     @Test
     void tradeWithUser() throws InterruptedException {
-        tradeService.tradeWithUser(defaultLobbyName, secondUser);
+        tradeService.tradeWithUser(defaultLobbyName, secondUser, false);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

@@ -16,6 +16,7 @@ import de.uol.swp.common.user.UserOrDummy;
 public class TradeWithUserRequest extends AbstractLobbyRequest {
 
     private final UserOrDummy respondingUser;
+    private final boolean counterOffer;
 
     /**
      * Constructor
@@ -23,10 +24,12 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      * @param name           The Name of the lobby
      * @param user           The User who is making a trade offer
      * @param tradingPartner The trading partner
+     * @param counterOffer   Whether the offer is a counter offer or not
      */
-    public TradeWithUserRequest(LobbyName name, UserOrDummy user, UserOrDummy tradingPartner) {
+    public TradeWithUserRequest(LobbyName name, UserOrDummy user, UserOrDummy tradingPartner, boolean counterOffer) {
         super(name, user);
         this.respondingUser = tradingPartner;
+        this.counterOffer = counterOffer;
     }
 
     /**
@@ -36,5 +39,14 @@ public class TradeWithUserRequest extends AbstractLobbyRequest {
      */
     public UserOrDummy getRespondingUser() {
         return respondingUser;
+    }
+
+    /**
+     * Gets the counter offer status
+     *
+     * @return Whether the offer is a counter offer or not
+     */
+    public boolean isCounterOffer() {
+        return counterOffer;
     }
 }
