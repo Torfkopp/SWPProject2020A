@@ -54,7 +54,7 @@ public class LobbyDTO implements ILobby {
         this.inGame = false;
         this.maxPlayers = 3;
         this.commandsAllowed = true;
-        this.moveTime = 60;
+        this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
     }
