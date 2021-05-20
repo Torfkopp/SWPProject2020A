@@ -134,6 +134,7 @@ public class DevMenuPresenter extends AbstractPresenter {
      */
     @FXML
     private void onSendButtonPressed() {
+        soundService.button();
         List<String> args = new LinkedList<>();
         for (TextField tf : textFields) {
             args.add(tf.getText());

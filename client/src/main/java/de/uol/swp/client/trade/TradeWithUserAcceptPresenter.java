@@ -106,6 +106,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
+        soundService.button();
         tradeService.acceptUserTrade(lobbyName, offeringUser, respondingResourceMap, offeringResourceMap);
     }
 
@@ -144,6 +145,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onMakeCounterOfferButtonPressed() {
+        soundService.button();
         tradeService.showUserTradeWindow(lobbyName, offeringUser);
         tradeService.tradeWithUser(lobbyName, offeringUser, true);
         eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
@@ -160,6 +162,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onRejectTradeButtonPressed() {
+        soundService.button();
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         tradeService.closeTradeResponseWindow(lobbyName);
         eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
