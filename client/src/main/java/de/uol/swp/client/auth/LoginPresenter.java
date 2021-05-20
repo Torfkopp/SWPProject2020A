@@ -6,9 +6,7 @@ import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,9 +29,20 @@ public class LoginPresenter extends AbstractPresenter {
     @FXML
     private Button loginButton;
     @FXML
+    private CheckBox rememberMeCheckbox;
+    @FXML
     private PasswordField passwordField;
     @FXML
     private TextField loginField;
+
+    @FXML
+    private void initialize() {
+        loginButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            boolean nameInvalid = loginField.getText().isEmpty() || !loginField.getText().matches("[A-Za-z0-9_-]+");
+            boolean passwordInvalid = passwordField.getText().isEmpty();
+            return nameInvalid || passwordInvalid;
+        }, loginField.textProperty(), passwordField.textProperty()));
+    }
 
     /**
      * Method called when the login button is pressed
@@ -48,12 +57,9 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onLoginButtonPressed() {
-        loginButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-            boolean nameInvalid = loginField.getText().isEmpty() || !loginField.getText().matches("[A-Za-z0-9_-]+");
-            boolean passwordInvalid = passwordField.getText().isEmpty();
-            return nameInvalid || passwordInvalid;
-        }, loginField.textProperty(), passwordField.textProperty()));
-        userService.login(loginField.getText(), userService.hash(passwordField.getText()));
+        soundService.button();
+        userService.login(loginField.getText(), userService.hash(passwordField.getText()),
+                          rememberMeCheckbox.isSelected());
     }
 
     /**
@@ -69,6 +75,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
+        soundService.button();
         eventBus.post(showRegViewMessage);
     }
 
@@ -85,6 +92,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onRetryLoginEvent(RetryLoginEvent event) {
+        LOG.debug("Received RetryLoginEvent");
         onLoginButtonPressed();
     }
 }

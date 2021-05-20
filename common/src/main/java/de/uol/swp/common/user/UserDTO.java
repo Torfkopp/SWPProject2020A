@@ -30,6 +30,7 @@ public class UserDTO implements User {
     public UserDTO(int id, String username, String password, String eMail) {
         if (!Objects.nonNull(username)) throw new IllegalArgumentException("Username must not be null");
         if (!Objects.nonNull(password)) throw new IllegalArgumentException("Password must not be null");
+        if (username.length() > 20) throw new IllegalArgumentException("Username can only be 20 symbols long");
         this.id = id;
         this.username = username;
         this.password = password;

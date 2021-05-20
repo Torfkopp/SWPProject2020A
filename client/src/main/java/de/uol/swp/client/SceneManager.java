@@ -26,6 +26,7 @@ import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import de.uol.swp.client.rules.RulesOverviewPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
@@ -84,6 +85,9 @@ public class SceneManager {
 
     @Inject
     private IUserService userService;
+
+    @Inject
+    private ISoundService soundService;
 
     private Scene loginScene;
     private String lastTitle;
@@ -163,6 +167,7 @@ public class SceneManager {
      */
     public void showError(String message, String e) {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(resourceBundle.getString("error.title"));
             alert.setHeaderText(resourceBundle.getString("error.header"));
@@ -202,6 +207,7 @@ public class SceneManager {
      */
     public void showLogOldSessionOutScreen(User user) {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
             alert.setTitle(resourceBundle.getString("confirmation.title"));
             alert.setHeaderText(resourceBundle.getString("confirmation.header"));
@@ -227,6 +233,7 @@ public class SceneManager {
      */
     public void showLoginErrorScreen() {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
@@ -307,7 +314,7 @@ public class SceneManager {
     public void showServerError(Throwable e, String cause) {
         if (e instanceof IOException) {
             //so users don't have any access to settings and the like, even though the LogoutRequest won't go through
-            userService.logout(userService.getLoggedInUser());
+            userService.logout(false);
             showLoginScreen();
             cause = resourceBundle.getString("error.server.disrupted");
         }
@@ -323,6 +330,7 @@ public class SceneManager {
      */
     public void showTimeoutErrorScreen() {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
             alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),

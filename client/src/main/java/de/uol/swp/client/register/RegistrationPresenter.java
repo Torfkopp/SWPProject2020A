@@ -82,6 +82,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
+        soundService.button();
         eventBus.post(registrationCanceledEvent);
     }
 
@@ -106,6 +107,7 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
+        soundService.button();
         if (Strings.isNullOrEmpty(loginField.getText())) {
             eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
         } else if (!checkMailFormat(emailField.getText())) {
@@ -141,7 +143,13 @@ public class RegistrationPresenter extends AbstractPresenter {
                                || !passwordField1.getText().equals(passwordField2.getText())
                                || passwordField2.getText().isBlank();
             return name || mail || password;
-            }, loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
+            },
+        loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
         //@formatter:on
+        Pattern pattern = Pattern.compile(".{0,20}");
+        TextFormatter formatter = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return pattern.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        loginField.setTextFormatter(formatter);
     }
 }

@@ -134,6 +134,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onDeleteMessageButtonPressed() {
+        soundService.button();
         ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
         ChatMessage chatMsg;
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
@@ -192,6 +193,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onEditMessageButtonPressed() {
+        soundService.button();
         ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
         ChatMessage chatMsg;
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
@@ -245,6 +247,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onSendMessageButtonPressed() {
+        soundService.button();
         String msg = messageField.getText();
         messageField.clear();
         if (lobbyName != null) {
