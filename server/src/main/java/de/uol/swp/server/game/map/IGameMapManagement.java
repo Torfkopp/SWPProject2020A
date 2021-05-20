@@ -90,6 +90,30 @@ public interface IGameMapManagement {
     IEdge getEdge(MapPoint position);
 
     /**
+     * Gets the MapPoint of an edge
+     *
+     * @param edge The edge to get the MapPoint from
+     *
+     * @return EdgeMapPoint
+     *
+     * @author Mario Fokken
+     * @since 2021-05-19
+     */
+    MapPoint getEdgeMapPoint(IEdge edge);
+
+    /**
+     * Gets all edges around an intersection
+     *
+     * @param intersection The intersection
+     *
+     * @return Set of IEdge
+     *
+     * @author Mario Fokken
+     * @since 2021-05-19
+     */
+    Set<IEdge> getEdgesAroundIntersection(IIntersection intersection);
+
+    /**
      * Gets all the edges around the hex
      *
      * @param mapPoint The hex's mapPoint
@@ -171,6 +195,18 @@ public interface IGameMapManagement {
      * @since 2021-03-05
      */
     IIntersection getIntersection(MapPoint position);
+
+    /**
+     * Gets the MapPoint of an intersection
+     *
+     * @param intersection The intersection
+     *
+     * @return IntersectionMapPoint
+     *
+     * @author Mario Fokken
+     * @since 2021-05-19
+     */
+    MapPoint getIntersectionMapPoint(IIntersection intersection);
 
     /**
      * Gets the intersections in a usable format for rendering them as a jagged array

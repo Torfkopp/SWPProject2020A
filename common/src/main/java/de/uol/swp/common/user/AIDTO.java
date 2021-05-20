@@ -68,6 +68,7 @@ public class AIDTO implements AI {
      * @param difficulty The AI's difficulty
      */
     public AIDTO(Difficulty difficulty) {
+        //todo Einbauen, dass ein AI Name nur alle 3 Aufrufe vorkommen darf | aiTalking setzen können
         this.id = ++idCounter;
         String name = "Man X";
         switch (difficulty) {
@@ -88,19 +89,17 @@ public class AIDTO implements AI {
     /**
      * Constructor with username
      *
-     * @param difficulty The AI's difficulty
-     * @param name       The AI's name
+     * @param name The AI's name
      */
-    public AIDTO(Difficulty difficulty, String name) {
+    public AIDTO(String name) {
         this.id = ++idCounter;
         this.name = name;
-        this.difficulty = difficulty;
+        difficulty = aiNameHardNoTalk.contains(name) || aiNameHard.contains(name) ? Difficulty.HARD : Difficulty.EASY;
     }
 
     @Override
     public int compareTo(UserOrDummy o) {
-        Integer id_obj = id; // compareTo is only defined on the wrapper class, so we make one here
-        if (o instanceof AI) return id_obj.compareTo(o.getID());
+        if (o instanceof AI) return name.compareTo(o.getUsername());
         else return 1;
     }
 
