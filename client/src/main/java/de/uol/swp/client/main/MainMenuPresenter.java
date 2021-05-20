@@ -23,6 +23,8 @@ import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -37,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
@@ -64,15 +67,18 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private Label randomLobbyState;
     @FXML
-    private ListView<Pair<LobbyName, String>> lobbyView;
+    private ListView<Pair<ISimpleLobby, String>> lobbyView;
     @FXML
     private ListView<String> usersView;
     @FXML
+    private CheckBox lobbyListFilteredProtectedBox;
+    @FXML
+    private CheckBox lobbyListFilteredInGameBox;
+    @FXML
     private TextField lobbyFilterTextField;
 
-    private ObservableList<String> lobbyObservableList;
-    private FilteredList<String> filteredLobbyList;
-    private ObservableList<Pair<LobbyName, String>> lobbies;
+    private FilteredList<Pair<ISimpleLobby, String>> filteredLobbyList;
+    private ObservableList<Pair<ISimpleLobby, String>> lobbies;
     private ObservableList<String> users;
 
     /**
@@ -93,23 +99,38 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         super.initialize();
         lobbyView.setCellFactory(lv -> new ListCell<>() {
             @Override
-            protected void updateItem(Pair<LobbyName, String> item, boolean empty) {
+            protected void updateItem(Pair<ISimpleLobby, String> item, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : item.getValue());
                 });
             }
         });
-        if (lobbyObservableList == null) lobbyObservableList = FXCollections.observableArrayList();
-        filteredLobbyList = new FilteredList<>(lobbyObservableList, p -> true);
+        if (lobbies == null) lobbies = FXCollections.observableArrayList();
+        filteredLobbyList = new FilteredList<>(lobbies, p -> true);
 
-        lobbyFilterTextField.textProperty().addListener(((observable, oldValue, newValue) -> {
-            filteredLobbyList.setPredicate(clsn -> {
-                if(newValue == null || newValue.isEmpty()) return true;
-                return clsn.toLowerCase().contains(newValue.toLowerCase());
-            });
-        }));
-        lobbyView.setItems(new SortedList(filteredLobbyList));
+        ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> nameFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> passwordFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> inGameFilter = new SimpleObjectProperty<>();
+
+        nameFilter.bind(Bindings.createObjectBinding(
+                () -> lobby -> lobby.getValue().toLowerCase().contains(lobbyFilterTextField.getText().toLowerCase()),
+                lobbyFilterTextField.textProperty()));
+
+        passwordFilter.bind(Bindings.createObjectBinding(
+                () -> lobby -> (lobbyListFilteredProtectedBox.isSelected() && lobby.getKey()
+                                                                                   .hasPassword()) || !lobbyListFilteredProtectedBox
+                        .isSelected(), lobbyListFilteredProtectedBox.selectedProperty()));
+
+        inGameFilter.bind(Bindings.createObjectBinding(
+                () -> lobby -> (lobbyListFilteredInGameBox.isSelected() && !lobby.getKey()
+                                                                                 .isInGame()) || (!lobbyListFilteredInGameBox
+                        .isSelected()), lobbyListFilteredInGameBox.selectedProperty()));
+
+        filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
+                () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get()), nameFilter, passwordFilter,
+                inGameFilter));
+        lobbyView.setItems(new SortedList<>(filteredLobbyList));
     }
 
     /**
@@ -426,8 +447,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (lobbyView.getSelectionModel().isEmpty()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
         } else {
-            LobbyName lobbyName = lobbyView.getSelectionModel().getSelectedItem().getKey();
-            lobbyService.joinLobby(lobbyName);
+            ISimpleLobby lobby = lobbyView.getSelectionModel().getSelectedItem().getKey();
+            lobbyService.joinLobby(lobby.getName());
         }
     }
 
@@ -762,7 +783,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.full"), s);
                 else if (l.hasPassword())
                     s = String.format(resourceBundle.getString("mainmenu.lobbylist.haspassword"), s);
-                lobbies.add(new Pair<>(l.getName(), s));
+                lobbies.add(new Pair<>(l, s));
             }
         });
     }
