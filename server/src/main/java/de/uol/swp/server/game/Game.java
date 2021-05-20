@@ -105,17 +105,6 @@ public class Game {
     }
 
     /**
-     * Gets a map of users or dummies and their corresponding players
-     *
-     * @return A map containing users or dummies and their corresponding players
-     *
-     * @since 2021-05-20
-     */
-    public Map<UserOrDummy, Player> getUserToPlayerMap() {
-        return players.getUserToPlayerMap();
-    }
-
-    /**
      * Adds a taxPayer to the set
      *
      * @param user The user to add
@@ -522,6 +511,17 @@ public class Game {
      */
     public UserOrDummy getUserFromPlayer(Player player) {
         return players.getUserOrDummyFromPlayer(player);
+    }
+
+    /**
+     * Gets a map of users or dummies and their corresponding players
+     *
+     * @return A map containing users or dummies and their corresponding players
+     *
+     * @since 2021-05-20
+     */
+    public Map<UserOrDummy, Player> getUserToPlayerMap() {
+        return players.getUserToPlayerMap();
     }
 
     /**
