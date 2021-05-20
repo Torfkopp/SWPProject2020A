@@ -57,6 +57,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onLoginButtonPressed() {
+        soundService.button();
         userService.login(loginField.getText(), userService.hash(passwordField.getText()),
                           rememberMeCheckbox.isSelected());
     }
@@ -74,6 +75,7 @@ public class LoginPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
+        soundService.button();
         eventBus.post(showRegViewMessage);
     }
 

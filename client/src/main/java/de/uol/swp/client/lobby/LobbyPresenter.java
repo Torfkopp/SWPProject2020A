@@ -142,6 +142,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onLeaveLobbyButtonPressed() {
+        soundService.button();
         closeWindow(false);
     }
 
