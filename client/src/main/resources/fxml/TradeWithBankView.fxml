@@ -3,24 +3,24 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="400" prefWidth="595.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:id="bankView" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+<VBox alignment="CENTER" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter" id="bankView"
+      maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400"
+      prefWidth="595.0" xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets topRightBottomLeft="20.0"/>
     </padding>
-    <HBox alignment="CENTER" VBox.vgrow="NEVER">
-        <AnchorPane prefHeight="350" prefWidth="555.0" HBox.hgrow="NEVER" VBox.vgrow="NEVER">
+    <HBox VBox.vgrow="NEVER" alignment="CENTER">
+        <AnchorPane HBox.hgrow="NEVER" VBox.vgrow="NEVER" prefHeight="350" prefWidth="555.0">
             <Label layoutY="6.0" text="%game.trade.labels.yougive"/>
-            <Button fx:id="buyDevelopmentButton" disable="true" layoutX="352.0" layoutY="235.0" mnemonicParsing="false"
+            <Button disable="true" fx:id="buyDevelopmentButton" layoutX="352.0" layoutY="235.0"
                     onAction="#onBuyDevelopmentCardButtonPressed" prefHeight="50"
                     text="%game.trade.buttons.buydevcard"/>
-            <Button layoutX="352.0" layoutY="321.0" mnemonicParsing="false" onAction="#onCancelButtonPressed"
-                    prefHeight="25.0" text="%button.cancel"/>
+            <Button layoutX="352.0" layoutY="321.0" onAction="#onCancelButtonPressed" prefHeight="25.0"
+                    text="%button.cancel"/>
             <VBox alignment="CENTER" layoutX="229.0" layoutY="30.0" prefHeight="145.0" prefWidth="125.0">
-                <Button fx:id="tradeResourceWithBankButton" mnemonicParsing="false"
-                        onAction="#onTradeResourceWithBankButtonPressed" text="%game.trade.buttons.tradefor"/>
+                <Button fx:id="tradeResourceWithBankButton" onAction="#onTradeResourceWithBankButtonPressed"
+                        text="%game.trade.buttons.tradefor"/>
                 <padding>
                     <Insets left="10.0" right="10.0"/>
                 </padding>
@@ -32,9 +32,9 @@
                     <Label text="%game.trade.lists.insufficientplayerresources"/>
                 </placeholder>
                 <columns>
-                    <TableColumn fx:id="tradeResourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
+                    <TableColumn editable="false" fx:id="tradeResourceAmountCol" maxWidth="75.0" minWidth="75.0"
                                  prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
-                    <TableColumn fx:id="tradeResourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
+                    <TableColumn editable="false" fx:id="tradeResourceNameCol" maxWidth="1.7976931348623157E308"
                                  minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
                 </columns>
                 <columnResizePolicy>
@@ -43,9 +43,9 @@
             </TableView>
             <TableView fx:id="ownResourceTableView" layoutY="210.0" prefHeight="150.0" prefWidth="230.0">
                 <columns>
-                    <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
+                    <TableColumn editable="false" fx:id="resourceAmountCol" maxWidth="75.0" minWidth="75.0"
                                  prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
-                    <TableColumn fx:id="resourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
+                    <TableColumn editable="false" fx:id="resourceNameCol" maxWidth="1.7976931348623157E308"
                                  minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
                 </columns>
                 <columnResizePolicy>
@@ -54,9 +54,9 @@
             </TableView>
             <TableView fx:id="bankResourcesView" layoutX="352.0" layoutY="30.0" prefHeight="150.0" prefWidth="230.0">
                 <columns>
-                    <TableColumn fx:id="bankResourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
+                    <TableColumn editable="false" fx:id="bankResourceAmountCol" maxWidth="75.0" minWidth="75.0"
                                  prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
-                    <TableColumn fx:id="bankResourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
+                    <TableColumn editable="false" fx:id="bankResourceNameCol" maxWidth="1.7976931348623157E308"
                                  minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
                 </columns>
                 <columnResizePolicy>

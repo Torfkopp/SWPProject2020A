@@ -3,11 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity"
-      prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:id="mainMenuView" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
-    <GridPane vgap="10.0" HBox.hgrow="ALWAYS">
+<HBox fx:controller="de.uol.swp.client.main.MainMenuPresenter" id="mainMenuView" maxHeight="-Infinity"
+      maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="820.0"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <GridPane HBox.hgrow="ALWAYS" vgap="10.0">
         <columnConstraints>
             <ColumnConstraints percentWidth="17.5"/>
             <ColumnConstraints hgrow="NEVER" percentWidth="2.5"/>
@@ -23,43 +22,35 @@
             <RowConstraints vgrow="ALWAYS"/>
         </rowConstraints>
 
-        <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
+        <ListView GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" fx:id="usersView"/>
 
-        <VBox spacing="15.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.create"/>
-
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.join"/>
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinRandomLobbyButtonPressed"
+        <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" spacing="15.0">
+            <Button maxWidth="Infinity" onAction="#onCreateLobbyButtonPressed" text="%mainmenu.buttons.lobby.create"/>
+            <Button maxWidth="Infinity" onAction="#onJoinLobbyButtonPressed" text="%mainmenu.buttons.lobby.join"/>
+            <Button maxWidth="Infinity" onAction="#onJoinRandomLobbyButtonPressed"
                     text="%mainmenu.buttons.lobby.joinRandom"/>
             <Label fx:id="randomLobbyState" text="%mainmenu.labels.lobby.randomLobbyState" visible="false"
                    wrapText="true"/>
         </VBox>
-        <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
+        <ListView GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" fx:id="lobbyView"/>
 
-        <VBox spacing="10.0" GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
-            <ListView fx:id="chatView" GridPane.columnSpan="2" VBox.vgrow="ALWAYS"/>
+        <VBox GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" spacing="10.0">
+            <ListView GridPane.columnSpan="2" VBox.vgrow="ALWAYS" fx:id="chatView"/>
             <TextField fx:id="messageField" onAction="#onSendMessageButtonPressed" prefHeight="25.0"/>
-            <Button mnemonicParsing="false" onAction="#onSendMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.sendmessage"/>
-            <Button mnemonicParsing="false" onAction="#onDeleteMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.deletemessage"/>
-            <Button mnemonicParsing="false" onAction="#onEditMessageButtonPressed" prefWidth="150.0"
-                    text="%chat.buttons.editmessage"/>
+            <Button onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.sendmessage"/>
+            <Button onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.deletemessage"/>
+            <Button onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage"/>
         </VBox>
 
-        <MenuBar prefHeight="25.0" GridPane.columnSpan="2147483647">
-            <Menu mnemonicParsing="false" text="%mainmenu.settings">
-                <MenuItem mnemonicParsing="false" onAction="#onChangeAccountDetailsButtonPressed"
+        <MenuBar GridPane.columnSpan="2147483647" prefHeight="25.0">
+            <Menu text="%mainmenu.settings">
+                <MenuItem onAction="#onChangeAccountDetailsButtonPressed"
                           text="%mainmenu.settings.buttons.changeaccdetails"/>
-                <MenuItem mnemonicParsing="false" onAction="#onDeleteButtonPressed"
-                          text="%mainmenu.settings.buttons.deleteuser"/>
-                <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
-                          text="%mainmenu.settings.buttons.logout"/>
+                <MenuItem onAction="#onDeleteButtonPressed" text="%mainmenu.settings.buttons.deleteuser"/>
+                <MenuItem onAction="#onLogoutButtonPressed" text="%mainmenu.settings.buttons.logout"/>
             </Menu>
-            <Menu mnemonicParsing="false" text="%lobby.menu.rules">
-                <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview" onAction="#onRulesMenuClicked"/>
+            <Menu text="%lobby.menu.rules">
+                <MenuItem onAction="#onRulesMenuClicked" text="%lobby.menu.rules.overview"/>
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>

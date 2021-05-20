@@ -2,31 +2,51 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:id="registrationView" fx:controller="de.uol.swp.client.register.RegistrationPresenter">
+<VBox alignment="CENTER" fx:controller="de.uol.swp.client.register.RegistrationPresenter" id="registrationView"
+      spacing="20.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <HBox alignment="CENTER" spacing="10.0">
         <VBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%register.labels.login"/>
-            <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%register.labels.email"/>
-            <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%register.labels.pw"/>
-            <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%register.labels.pw"/>
+            <Label maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
+                   text="%register.labels.login">
+                <labelFor>
+                    <TextField fx:id="loginField" promptText="%register.prompts.login">
+                        <tooltip>
+                            <Tooltip text="%register.tooltips.login"/>
+                        </tooltip>
+                    </TextField>
+                </labelFor>
+            </Label>
+            <Label maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
+                   text="%register.labels.email">
+                <labelFor>
+                    <TextField fx:id="emailField" promptText="%register.prompts.email"/>
+                </labelFor>
+            </Label>
+            <Label maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
+                   text="%register.labels.pw">
+                <labelFor>
+                    <PasswordField fx:id="passwordField1" promptText="%register.prompts.pw.enter"/>
+                </labelFor>
+            </Label>
+            <Label maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
+                   text="%register.labels.pw">
+                <labelFor>
+                    <PasswordField fx:id="passwordField2" promptText="%register.prompts.pw.repeat"/>
+                </labelFor>
+            </Label>
         </VBox>
 
         <VBox alignment="CENTER_RIGHT" spacing="10.0">
-            <TextField fx:id="loginField" promptText="%register.prompts.login">
-                <tooltip>
-                    <Tooltip text="%register.tooltips.login"/>
-                </tooltip>
-            </TextField>
-            <TextField fx:id="emailField" promptText="%register.prompts.email"/>
-            <PasswordField fx:id="passwordField1" promptText="%register.prompts.pw.enter"/>
-            <PasswordField fx:id="passwordField2" promptText="%register.prompts.pw.repeat"/>
+            <fx:reference source="loginField"/>
+            <fx:reference source="emailField"/>
+            <fx:reference source="passwordField1"/>
+            <fx:reference source="passwordField2"/>
         </VBox>
     </HBox>
 
     <HBox alignment="CENTER" spacing="10.0">
-        <Button fx:id="registerButton" defaultButton="true" mnemonicParsing="false" onAction="#onRegisterButtonPressed"
+        <Button defaultButton="true" fx:id="registerButton" onAction="#onRegisterButtonPressed"
                 text="%register.buttons.register"/>
-        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%button.cancel"/>
+        <Button cancelButton="true" onAction="#onCancelButtonPressed" text="%button.cancel"/>
     </HBox>
 </VBox>
