@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.user.IUserService;
 
 import java.util.ResourceBundle;
@@ -18,6 +19,9 @@ import java.util.ResourceBundle;
  */
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenter {
+
+    @Inject
+    protected ISoundService soundService;
 
     @Inject
     protected IUserService userService;

@@ -173,6 +173,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void onTaxPayButtonPressed() {
+        soundService.button();
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
