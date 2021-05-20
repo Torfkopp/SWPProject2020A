@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
@@ -27,14 +28,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 /**
@@ -642,6 +645,43 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onRulesMenuClicked() {
         eventBus.post(new ShowRulesOverviewViewEvent());
+    }
+
+    /**
+     * Handles a SetAcceleratorEvent found on the EventBus
+     * <p>
+     * This method sets the accelerators for the MainMenuPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + N = Create Lobby button
+     *     <li> CTRL/META + J = Join Lobby button
+     *     <li> CTRL/META + C = Open Change Account Details window
+     *     <li> CTRL/META + L = Logout button
+     *     <li> CTRL/META + D = Delete Account
+     *     <li> F2            = Open Rules menu
+     *
+     * @param event The SetAcceleratorEvent found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @since 2021-05-20
+     */
+    @Subscribe
+    private void onSetAcceleratorsEvent(SetAcceleratorsEvent event) {
+        LOG.debug("Received SetAcceleratorsEvent");
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), // CTRL/META + N
+                         this::onCreateLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.J, KeyCombination.SHORTCUT_DOWN), // CTRL/META + J
+                         this::onJoinLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onChangeAccountDetailsButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN), // CTRL/META + L
+                         this::onLogoutButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
+                         this::onDeleteButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.F2), // F2 for Rules
+                         this::onRulesMenuClicked);
+        usersView.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
