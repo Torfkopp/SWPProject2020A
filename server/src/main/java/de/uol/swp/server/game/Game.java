@@ -104,6 +104,10 @@ public class Game {
         return (new int[]{dice1, dice2});
     }
 
+    public Map<UserOrDummy, Player> getUserToPlayerMap() {
+        return players.getUserToPlayerMap();
+    }
+
     /**
      * Adds a taxPayer to the set
      *
