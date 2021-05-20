@@ -97,44 +97,6 @@ public class GameService extends AbstractService {
         LOG.debug("GameService started");
     }
 
-
-    /**
-     * Handles a PlayRoadBuildingCardAllowedRequest found on the eventBus
-     * <p>
-     * If a PlayRoadBuildingCardAllowedRequest is found on the event bus,
-     * this method checks if the user has more than zero RoadBuildingCards.
-     * If there is atleast one card, this method posts a
-     * new PlayRoadBuildingCardAllowedResponse onto the eventBus.
-     *
-     * @param req The request found on the event bus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardAllowedRequest
-     * @since 2021-05-16
-     */
-    @Subscribe
-    public void onPlayRoadBuildingCardAllowedRequest(PlayRoadBuildingCardAllowedRequest req) {
-        LOG.debug("Received PlayRoadBuildingCardRequest for Lobby {}", req.getOriginLobby());
-
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
-            return;
-        Inventory inv = game.getInventory(req.getUser());
-
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
-            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending PlayCardFailureResponse");
-            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
-            return;
-        }
-        ResponseMessage returnMessage = new PlayRoadBuildingCardAllowedResponse(req.getOriginLobby(), req.getUser());
-        returnMessage.initWithMessage(req);
-        post(returnMessage);
-    }
-
     /**
      * Handles the allocation of the largest Army
      *
@@ -174,7 +136,7 @@ public class GameService extends AbstractService {
      * @since 2021-02-22
      */
     @Subscribe
-    private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
+    void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
         LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
@@ -196,200 +158,6 @@ public class GameService extends AbstractService {
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
         } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
-    }
-
-    /**
-     * Handles a EndTurnRequest found on the EventBus
-     * <p>
-     * If a EndTurnRequest is detected on the EventBus, this method is called.
-     * It then sends a NextPlayerMessage to all members in the lobby.
-     *
-     * @param req The EndTurnRequest found on the EventBus
-     *
-     * @author Mario Fokken
-     * @see de.uol.swp.common.game.request.EndTurnRequest
-     * @see de.uol.swp.common.game.message.NextPlayerMessage
-     * @since 2021-01-15
-     */
-    @Subscribe
-    void onEndTurnRequest(EndTurnRequest req) {
-        LOG.debug("Received EndTurnRequest for Lobby {}", req.getOriginLobby());
-        LOG.debug("---- User {} wants to end their turn.", req.getUser().getUsername());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        Game.StartUpPhase currentPhase = game.getStartUpPhase();
-        Deque<UserOrDummy> startUpPlayerOrder = game.getStartUpPlayerOrder();
-        if (currentPhase == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) {
-                return;
-            }
-        } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
-            return;
-        }
-        game.setBuildingAllowed(false);
-        UserOrDummy nextPlayer;
-        UserOrDummy user;
-        Optional<ILobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
-        if (optionalLobby.isEmpty()) return;
-        if (optionalLobby.get().isStartUpPhaseEnabled()) {
-            if (currentPhase.equals(Game.StartUpPhase.PHASE_1)) {
-                // in phase 1, continue with Deque order
-                startUpPlayerOrder.addLast(startUpPlayerOrder.pollFirst());
-                user = startUpPlayerOrder.peekFirst();
-                if (user == null) return;
-                if (user.equals(game.getFirst())) {
-                    // first again at the beginning, signals reversal as per rules (2nd phase)
-                    game.setStartUpPhase(Game.StartUpPhase.PHASE_2);
-                    nextPlayer = startUpPlayerOrder.pollLast();
-                    startUpPlayerOrder.addFirst(nextPlayer);
-                } else {
-                    nextPlayer = user;
-                }
-            } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
-                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
-                    nextPlayer = game.getFirst();
-                    game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
-                } else {
-                    startUpPlayerOrder.addFirst(startUpPlayerOrder.pollLast());
-                    user = startUpPlayerOrder.peekFirst();
-                    if (user == null) return;
-                    nextPlayer = user;
-                }
-            } else {
-                nextPlayer = game.nextPlayer();
-            }
-        } else {
-            nextPlayer = game.nextPlayer();
-        }
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
-
-        LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-
-        game.setDiceRolledAlready(false);
-        if (nextPlayer instanceof NPC) {
-            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            if (nextPlayer instanceof Dummy) turnEndDummy(game, (Dummy) nextPlayer);
-            if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
-        }
-    }
-
-    /**
-     * Handles a PlayMonopolyCardRequest found on the EventBus
-     * <p>
-     * If a PlayMonopolyCardRequest is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param req The PlayMonopolyCardRequest found on the EventBus
-     *
-     * @author Mario Fokken
-     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest
-     * @since 2021-02-25
-     */
-    @Subscribe
-    void onPlayMonopolyCardRequest(PlayMonopolyCardRequest req) {
-        LOG.debug("Received MonopolyCardPlayedMessage for Lobby {}", req.getOriginLobby());
-        LOG.debug("---- User {} wants to monopolise {}", req.getUser().getUsername(), req.getResource().name());
-
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
-        Inventory invMono = game.getInventory(req.getUser());
-
-        if (invMono.get(DevelopmentCardType.MONOPOLY_CARD) == 0) {
-            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending PlayCardFailureResponse");
-            LOG.debug("---- Not enough Monopoly cards");
-            return;
-        }
-        Inventory[] inventories = game.getAllInventories();
-
-        for (Inventory inv : inventories)
-            if (inv.get(req.getResource()) > 0) {
-                invMono.increase(req.getResource(), inv.get(req.getResource()));
-                inv.decrease(req.getResource(), inv.get(req.getResource()));
-            }
-
-        invMono.decrease(DevelopmentCardType.MONOPOLY_CARD);
-
-        I18nWrapper monopolyCard = new I18nWrapper("game.resources.cards.monopoly");
-        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
-                                                                                    monopolyCard);
-        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
-        ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
-        returnMessage.initWithMessage(req);
-        LOG.debug("Sending PlayCardSuccessResponse");
-        post(returnMessage);
-        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-
-        for (UserOrDummy user : game.getPlayers()) {
-            if (user instanceof User) {
-                Inventory inventory = game.getInventory(user);
-                DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
-                ResourceList resourceList = inventory.getResources();
-                ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), resourceList,
-                                                                              developmentCardList);
-                LOG.debug("Sending ForwardToUserInternalRequest with UpdateInventoryResponse to User {} in Lobby {}",
-                          user, req.getOriginLobby());
-                post(new ForwardToUserInternalRequest(user, responseMessage));
-            }
-        }
-    }
-
-    /**
-     * Handles a PlayYearOfPlentyCardRequest found on the EventBus
-     * <p>
-     * If a PlayYearOfPlentyCardRequest is detected on the EventBus, this method is called.
-     * It then requests the GameManagement to handle the card.
-     *
-     * @param req The PlayYearOfPlentyCardRequest found on the EventBus
-     *
-     * @author Mario Fokken
-     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest
-     * @since 2021-02-25
-     */
-    @Subscribe
-    void onPlayYearOfPlentyCardRequest(PlayYearOfPlentyCardRequest req) {
-        LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby {}", req.getOriginLobby());
-        LOG.debug("---- User {} wants {} and {}", req.getUser().getUsername(), req.getFirstResource().name(),
-                  req.getSecondResource().name());
-
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
-        Inventory inv = game.getInventory(req.getUser());
-
-        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) == 0) {
-            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending PlayCardFailureResponse");
-            LOG.debug("---- Not enough YearOfPlenty cards");
-            return;
-        }
-
-        inv.increase(req.getFirstResource());
-        inv.increase(req.getSecondResource());
-
-        inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
-
-        I18nWrapper yearOfPlentyCard = new I18nWrapper("game.resources.cards.yearofplenty");
-        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
-                                                                                    yearOfPlentyCard);
-        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
-
-        ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
-        returnMessage.initWithMessage(req);
-        LOG.debug("Sending PlayCardSuccessResponse");
-        post(returnMessage);
-        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
-        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**
@@ -889,6 +657,7 @@ public class GameService extends AbstractService {
     @Subscribe
     private void onEditInventoryRequest(EditInventoryRequest req) {
         LOG.debug("Received EditInventoryRequest");
+        if (req.getUser() == null) return;
         Game game = gameManagement.getGame(req.getOriginLobby());
         Inventory inventory = game.getInventory(req.getUser());
         if (req.getResource() != null) inventory.increase(req.getResource(), req.getAmount());
@@ -904,6 +673,81 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+    }
+
+    /**
+     * Handles a EndTurnRequest found on the EventBus
+     * <p>
+     * If a EndTurnRequest is detected on the EventBus, this method is called.
+     * It then sends a NextPlayerMessage to all members in the lobby.
+     *
+     * @param req The EndTurnRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.game.request.EndTurnRequest
+     * @see de.uol.swp.common.game.message.NextPlayerMessage
+     * @since 2021-01-15
+     */
+    @Subscribe
+    private void onEndTurnRequest(EndTurnRequest req) {
+        LOG.debug("Received EndTurnRequest for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to end their turn.", req.getUser().getUsername());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        Game.StartUpPhase currentPhase = game.getStartUpPhase();
+        Deque<UserOrDummy> startUpPlayerOrder = game.getStartUpPlayerOrder();
+        if (currentPhase == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
+            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) {
+                return;
+            }
+        } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
+            return;
+        }
+        game.setBuildingAllowed(false);
+        UserOrDummy nextPlayer;
+        UserOrDummy user;
+        Optional<ILobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
+        if (optionalLobby.isEmpty()) return;
+        if (optionalLobby.get().isStartUpPhaseEnabled()) {
+            if (currentPhase.equals(Game.StartUpPhase.PHASE_1)) {
+                // in phase 1, continue with Deque order
+                startUpPlayerOrder.addLast(startUpPlayerOrder.pollFirst());
+                user = startUpPlayerOrder.peekFirst();
+                if (user == null) return;
+                if (user.equals(game.getFirst())) {
+                    // first again at the beginning, signals reversal as per rules (2nd phase)
+                    game.setStartUpPhase(Game.StartUpPhase.PHASE_2);
+                    nextPlayer = startUpPlayerOrder.pollLast();
+                    startUpPlayerOrder.addFirst(nextPlayer);
+                } else {
+                    nextPlayer = user;
+                }
+            } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
+                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
+                    nextPlayer = game.getFirst();
+                    game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
+                } else {
+                    startUpPlayerOrder.addFirst(startUpPlayerOrder.pollLast());
+                    user = startUpPlayerOrder.peekFirst();
+                    if (user == null) return;
+                    nextPlayer = user;
+                }
+            } else {
+                nextPlayer = game.nextPlayer();
+            }
+        } else {
+            nextPlayer = game.nextPlayer();
+        }
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+
+        LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+        game.setDiceRolledAlready(false);
+        if (nextPlayer instanceof NPC) {
+            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+            if (nextPlayer instanceof Dummy) turnEndDummy(game, (Dummy) nextPlayer);
+            if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
+        }
     }
 
     /**
@@ -1060,13 +904,23 @@ public class GameService extends AbstractService {
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        //only false if respondingUser is no Dummy, the dice is rolled already
-        // and the offeringUser is the active user/ it is a counteroffer
+        //only false if respondingUser is no Dummy, the dice is rolled already,
+        //and the offeringUser is the active user/ it is a counteroffer
         if (!(!(req.getRespondingUser() instanceof User) && (game.getActivePlayer().equals(req.getOfferingUser()) || req
                 .isCounterOffer()) && game.isDiceRolledAlready())) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
+        Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
+        if (respondingInventory == null) return;
+        //Checks if trade is possible
+        for (ResourceType r : ResourceType.values())
+            if (respondingInventory.get(r) - req.getDemandedResources().getAmount(r) < 0) {
+                onResetOfferTradeButtonRequest(
+                        new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+                return;
+            }
+
         if (req.getRespondingUser() instanceof AI) {
             boolean accepted = gameAI
                     .tradeAcceptationAI(((AI) req.getRespondingUser()), req.getOriginLobby(), req.getOfferedResources(),
@@ -1086,8 +940,7 @@ public class GameService extends AbstractService {
             return;
         }
         game.setBuildingAllowed(false);
-        Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
-        if (respondingInventory == null) return;
+
         ResourceList resourceMap = respondingInventory.getResources();
 
         LOG.debug("Sending TradeWithUserOfferMessage to Lobby {}", req.getOriginLobby());
@@ -1175,6 +1028,110 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a PlayMonopolyCardRequest found on the EventBus
+     * <p>
+     * If a PlayMonopolyCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayMonopolyCardRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayMonopolyCardRequest(PlayMonopolyCardRequest req) {
+        LOG.debug("Received MonopolyCardPlayedMessage for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants to monopolise {}", req.getUser().getUsername(), req.getResource().name());
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        Inventory invMono = game.getInventory(req.getUser());
+
+        if (invMono.get(DevelopmentCardType.MONOPOLY_CARD) == 0) {
+            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending PlayCardFailureResponse");
+            LOG.debug("---- Not enough Monopoly cards");
+            return;
+        }
+        Inventory[] inventories = game.getAllInventories();
+
+        for (Inventory inv : inventories)
+            if (inv.get(req.getResource()) > 0) {
+                invMono.increase(req.getResource(), inv.get(req.getResource()));
+                inv.decrease(req.getResource(), inv.get(req.getResource()));
+            }
+
+        invMono.decrease(DevelopmentCardType.MONOPOLY_CARD);
+
+        I18nWrapper monopolyCard = new I18nWrapper("game.resources.cards.monopoly");
+        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
+                                                                                    monopolyCard);
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
+        ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        LOG.debug("Sending PlayCardSuccessResponse");
+        post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+
+        for (UserOrDummy user : game.getPlayers()) {
+            if (user instanceof User) {
+                Inventory inventory = game.getInventory(user);
+                DevelopmentCardList developmentCardList = inventory.getDevelopmentCards();
+                ResourceList resourceList = inventory.getResources();
+                ResponseMessage responseMessage = new UpdateInventoryResponse(user, req.getOriginLobby(), resourceList,
+                                                                              developmentCardList);
+                LOG.debug("Sending ForwardToUserInternalRequest with UpdateInventoryResponse to User {} in Lobby {}",
+                          user, req.getOriginLobby());
+                post(new ForwardToUserInternalRequest(user, responseMessage));
+            }
+        }
+    }
+
+    /**
+     * Handles a PlayRoadBuildingCardAllowedRequest found on the eventBus
+     * <p>
+     * If a PlayRoadBuildingCardAllowedRequest is found on the event bus,
+     * this method checks if the user has more than zero RoadBuildingCards.
+     * If there is atleast one card, this method posts a
+     * new PlayRoadBuildingCardAllowedResponse onto the eventBus.
+     *
+     * @param req The request found on the event bus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardAllowedRequest
+     * @since 2021-05-16
+     */
+    @Subscribe
+    private void onPlayRoadBuildingCardAllowedRequest(PlayRoadBuildingCardAllowedRequest req) {
+        LOG.debug("Received PlayRoadBuildingCardRequest for Lobby {}", req.getOriginLobby());
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
+            return;
+        Inventory inv = game.getInventory(req.getUser());
+
+        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
+            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending PlayCardFailureResponse");
+            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
+            return;
+        }
+        ResponseMessage returnMessage = new PlayRoadBuildingCardAllowedResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+    }
+
+    /**
      * Handles a PlayRoadBuildingCardRequest found on the EventBus
      * <p>
      * If a PlayRoadBuildingCardRequest is detected on the EventBus, this method is called.
@@ -1213,6 +1170,58 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+    }
+
+    /**
+     * Handles a PlayYearOfPlentyCardRequest found on the EventBus
+     * <p>
+     * If a PlayYearOfPlentyCardRequest is detected on the EventBus, this method is called.
+     * It then requests the GameManagement to handle the card.
+     *
+     * @param req The PlayYearOfPlentyCardRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest
+     * @since 2021-02-25
+     */
+    @Subscribe
+    private void onPlayYearOfPlentyCardRequest(PlayYearOfPlentyCardRequest req) {
+        LOG.debug("Received YearOfPlentyCardPlayedMessage for Lobby {}", req.getOriginLobby());
+        LOG.debug("---- User {} wants {} and {}", req.getUser().getUsername(), req.getFirstResource().name(),
+                  req.getSecondResource().name());
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        Inventory inv = game.getInventory(req.getUser());
+
+        if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) == 0) {
+            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending PlayCardFailureResponse");
+            LOG.debug("---- Not enough YearOfPlenty cards");
+            return;
+        }
+
+        inv.increase(req.getFirstResource());
+        inv.increase(req.getSecondResource());
+
+        inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
+
+        I18nWrapper yearOfPlentyCard = new I18nWrapper("game.resources.cards.yearofplenty");
+        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
+                                                                                    yearOfPlentyCard);
+        LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
+
+        ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        LOG.debug("Sending PlayCardSuccessResponse");
+        post(returnMessage);
+        ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
+        LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 
     /**

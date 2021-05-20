@@ -432,9 +432,9 @@ public class CommandService extends AbstractService {
                 StringBuilder x = new StringBuilder();
                 for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
                 return new DummyDTO(Integer.parseInt(x.toString()));
-            } else if (new AIDTO(AI.Difficulty.EASY).getAINames().contains(name))
-                return new AIDTO(AI.Difficulty.EASY, name);
-            else return null;
+            }
+            if (new AIDTO(AI.Difficulty.EASY).getAINames().contains(name)) return new AIDTO(name);
+            return null;
         }
     }
 
@@ -595,7 +595,7 @@ public class CommandService extends AbstractService {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
                         else if (new AIDTO(AI.Difficulty.EASY).getAINames().contains(args.get(i)))
-                            argList.add(new AIDTO(AI.Difficulty.EASY, args.get(i)));
+                            argList.add(new AIDTO(args.get(i)));
                         else {
                             // Dummy
                             // Dummies aren't saved anywhere, so we parse the integer at the end of the name
