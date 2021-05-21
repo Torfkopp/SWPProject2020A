@@ -16,7 +16,6 @@ import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -59,7 +58,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
@@ -374,6 +372,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             helpCheckBox.setDisable(true);
             helpCheckBox.setVisible(false);
             cardAmountsList.clear();
+            pauseButton.setVisible(false);
             moveTimeTimer.cancel();
             moveTimerLabel.setVisible(false);
             for (ChatOrSystemMessage m : chatMessages)
@@ -560,6 +559,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
+        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);

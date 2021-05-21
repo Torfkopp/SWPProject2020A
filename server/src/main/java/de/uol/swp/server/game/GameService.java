@@ -854,6 +854,31 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a PauseGameRequest found on the eventBus
+     * <p>
+     * If a PauseGameRequest is found on the eventBus, the
+     * pauseStatus of the game is changed if everyone of the lobby
+     * wants it and a PauseGameMessage is posted to everyone in the
+     * lobby to update everyone of the lobby.
+     *
+     * @param req The request found on the eventBus
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.request.PauseGameRequest
+     * @see de.uol.swp.common.game.message.UpdatePauseStatusMessage
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onPauseGameRequest(PauseGameRequest req) {
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        game.changePauseStatus(req.getUserOrDummy());
+        int pausingPlayers = game.getPausedMembers();
+        game.checkToChangePauseStatus();
+        ServerMessage msg = new UpdatePauseStatusMessage(req.getOriginLobby(), game.isPaused(), pausingPlayers);
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+    }
+
+    /**
      * Handles a PauseTimerRequest found on the EventBus
      * <p>
      * If a PauseTimerRequest is found on the EventBus,

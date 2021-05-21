@@ -36,6 +36,7 @@ public class Game {
     private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
+    private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
     private UserOrDummy activePlayer;
@@ -70,6 +71,8 @@ public class Game {
         autoRollEnabled = new HashMap<>();
         {
             List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+            System.err.println("Game wird gestartet");
+            preparePausedMembers();
             startUpPlayerOrder.addLast(first);
             playersStartUpBuiltMap.put(first, StartUpPhaseBuiltStructures.NONE_BUILT);
             players.put(first, Player.PLAYER_1, new Inventory());
@@ -133,6 +136,39 @@ public class Game {
         //2 Points if player has the largest army
         if (Objects.equals(playerWithLargestArmy, player)) points += 2;
         return points;
+    }
+
+    /**
+     * Changes status of a user in the pauseGameMap
+     * to true.
+     *
+     * @param user A User who wants to change the pause status of a game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    public void changePauseStatus(UserOrDummy user) {
+        pauseGameMap.replace(user, true);
+    }
+
+    /**
+     * Checks if all player want to change the pause status of the game.
+     * Returns false if not everyone want to change the status. Otherwise
+     * the pause status gets changed and the preparePausedMembers method is
+     * called.
+     *
+     * @return Whether the paused status of the game has changed
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    public boolean checkToChangePauseStatus() {
+        for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
+            if (!entry.getValue()) return paused;
+        }
+        paused = !paused;
+        preparePausedMembers();
+        return paused;
     }
 
     /**
@@ -318,6 +354,24 @@ public class Game {
     public UserOrDummy getNextPlayer() {
         return players
                 .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(activePlayer).nextPlayer(players.size()));
+    }
+
+    /**
+     * Gets how many players in the lobby want to change the paused
+     * status.
+     *
+     * @return How many players want to change the paused status
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    public int getPausedMembers() {
+        int pausedMemebers = 0;
+        for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
+            System.err.println(entry.getValue());
+            if (entry.getValue() == true) pausedMemebers++;
+        }
+        return pausedMemebers;
     }
 
     /**
@@ -566,6 +620,30 @@ public class Game {
     }
 
     /**
+     * Gets the paused status
+     *
+     * @return Whether the game is paused or not
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    public boolean isPaused() {
+        return paused;
+    }
+
+    /**
+     * Sets the boolean paused for the game.
+     *
+     * @param paused
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-02
+     */
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    /**
      * Gets the next player and sets it as the new active player
      *
      * @return User object of the next player
@@ -602,14 +680,16 @@ public class Game {
     }
 
     /**
-     * Sets the boolean paused for the game.
+     * Helper method to prepare the pauseGameMap.
      *
-     * @param paused
-     *
-     * @author Alwin Bossert
-     * @since 2021-05-02
+     * @author Maximilian Lindner
+     * @since 2021-05-21
      */
-    public void setPaused(boolean paused) {
-        this.paused = paused;
+    private void preparePausedMembers() {
+        List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
+        for (UserOrDummy userOrDummy : playerList) {
+            if (userOrDummy instanceof User) pauseGameMap.put(userOrDummy, false);
+            else pauseGameMap.put(userOrDummy, true);
+        }
     }
 }

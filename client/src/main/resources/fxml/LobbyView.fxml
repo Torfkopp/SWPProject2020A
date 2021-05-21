@@ -156,10 +156,11 @@
     </VBox>
     <ToolBar prefHeight="35.0" GridPane.columnSpan="3">
         <items>
-            <Button mnemonicParsing="false" text="%lobby.menu.settings"/>
             <Button mnemonicParsing="false" onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
                 <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview"/>
             </Button>
+            <Button visible="false" fx:id="pauseButton" mnemonicParsing="false" text="%game.menu.pause"
+                    onAction="#onPauseButtonPressed"/>
             <Button fx:id="helpCheckBox" disable="true" mnemonicParsing="false" onAction="#onHelpButtonPressed"
                     text="%game.help.checkbox" visible="false"/>
             <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>
