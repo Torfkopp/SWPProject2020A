@@ -60,15 +60,17 @@ public class AIDTO implements AI {
                           "Jail House Lock", "Yo-Yo Ma", "Survivor", "Dirty Deeds Done Dirt Cheap", "Hey Ya!",
                           "Tomb of the Boom", "Catch the Rainbow", "Civil War", "In a Silent Way", "Fun Fun Fun",
                           "I Am a Rock", "Doobie Wah!", "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
-    private boolean aiTalking = true;
+    private boolean aiTalking;
+    private Language language;
 
     /**
      * Constructor
      *
      * @param difficulty The AI's difficulty
+     * @param aiTalking  If the AI writes commands
      */
-    public AIDTO(Difficulty difficulty) {
-        //todo Einbauen, dass ein AI Name nur alle 3 Aufrufe vorkommen darf | aiTalking setzen können
+    public AIDTO(Difficulty difficulty, boolean aiTalking) {
+        this.aiTalking = aiTalking;
         this.id = ++idCounter;
         String name = "Man X";
         switch (difficulty) {
@@ -83,7 +85,17 @@ public class AIDTO implements AI {
                 break;
         }
         this.name = name;
+        setLanguage();
         this.difficulty = difficulty;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param difficulty The AI's difficulty
+     */
+    public AIDTO(Difficulty difficulty) {
+        this(difficulty, true);
     }
 
     /**
@@ -125,16 +137,6 @@ public class AIDTO implements AI {
     }
 
     @Override
-    public List<String> getAINameEasy() {
-        return aiNameEasy;
-    }
-
-    @Override
-    public List<String> getAINameHard() {
-        return aiNameHard;
-    }
-
-    @Override
     public List<String> getAINames() {
         List<String> names = new ArrayList<>();
         names.addAll(aiNameEasy);
@@ -145,17 +147,37 @@ public class AIDTO implements AI {
     }
 
     @Override
+    public Language getLanguage() {
+        return language;
+    }
+
+    @Override
     public Difficulty getDifficulty() {
         return difficulty;
     }
 
-    /**
-     * Sets if the AI is allowed
-     * to write chat messages
-     *
-     * @param b Boolean
-     */
+    @Override
     public void setAiTalking(boolean b) {
         aiTalking = b;
+    }
+
+    /**
+     * Sets the AI's language
+     *
+     * @since 2021-05-20
+     */
+    private void setLanguage() {
+        Language language = Language.NONE;
+        if (aiNameEasy.subList(0, 6).contains(name)) language = Language.BRITISH;
+        else if (aiNameEasy.subList(9, 19).contains(name)) language = Language.SIMPLE_ENGLISH;
+        else if (aiNameEasy.subList(18, 28).contains(name)) language = Language.US_AMERICAN;
+        else if (aiNameEasy.subList(31, 38).contains(name)) language = Language.JAPANESE;
+        else if (aiNameEasy.subList(38, aiNameEasy.size()).contains(name)) language = Language.ITALIAN;
+        else if (aiNameHard.subList(0, 6).contains(name)) language = Language.BRITISH;
+        else if (aiNameHard.subList(6, 10).contains(name)) language = Language.AZTEC;
+        else if (aiNameHard.subList(10, 17).contains(name)) language = Language.ARABIC;
+        else if (aiNameHard.subList(17, 23).contains(name)) language = Language.US_AMERICAN;
+
+        this.language = language;
     }
 }

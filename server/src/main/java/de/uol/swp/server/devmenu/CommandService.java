@@ -122,9 +122,7 @@ public class CommandService extends AbstractService {
                 ILobby lobby = optLobby.get();
                 int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
                 if (aiAmount > freeUsers) aiAmount = freeUsers;
-                for (; aiAmount > 0; aiAmount--) {
-                    post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
-                }
+                for (; aiAmount > 0; aiAmount--) post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
             }
         } else {
             command_Invalid(args, originalMessage);
@@ -581,7 +579,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     private Message parseArguments(List<String> args, Constructor<?> constr,
-                                   Optional<User> currentUser) throws ReflectiveOperationException {
+                                   Optional<UserOrDummy> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
@@ -590,7 +588,7 @@ public class CommandService extends AbstractService {
                 case "de.uol.swp.common.user.User":
                 case "de.uol.swp.common.user.UserOrDummy":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
-                        currentUser.ifPresent(argList::add);
+                        if (currentUser.get() instanceof User) currentUser.ifPresent(argList::add);
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());

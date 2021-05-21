@@ -14,7 +14,6 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
-import de.uol.swp.common.user.User;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.lobby.ILobby;
@@ -220,7 +219,7 @@ public class ChatService extends AbstractService {
      *
      * @param req The NewChatMessageRequest found on the EventBus
      *
-     * @see de.uol.swp.server.chat.ChatManagement#createChatMessage(User, String)
+     * @see de.uol.swp.server.chat.ChatManagement#createChatMessage(de.uol.swp.common.user.UserOrDummy, String)
      * @see de.uol.swp.common.chat.request.NewChatMessageRequest
      * @see de.uol.swp.common.chat.message.CreatedChatMessageMessage
      * @see de.uol.swp.server.devmenu.CommandService

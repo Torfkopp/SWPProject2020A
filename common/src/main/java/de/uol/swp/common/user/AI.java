@@ -11,28 +11,29 @@ import java.util.List;
  */
 public interface AI extends NPC, Serializable {
 
+    /**
+     * Enum for an AI's difficulty
+     */
     enum Difficulty {
         EASY,
         HARD
     }
 
     /**
-     * Gets all AI names for
-     * difficulty easy and
-     * activated talking
+     * Enum for an AI's language
      *
-     * @return List of Strings
+     * @since 2021-05-20
      */
-    List<String> getAINameEasy();
-
-    /**
-     * Gets all AI names for
-     * difficulty hard and
-     * activated talking
-     *
-     * @return List of Strings
-     */
-    List<String> getAINameHard();
+    enum Language {
+        BRITISH,
+        US_AMERICAN,
+        JAPANESE,
+        ITALIAN,
+        ARABIC,
+        AZTEC,
+        SIMPLE_ENGLISH,
+        NONE
+    }
 
     /**
      * Gets all possible AI names
@@ -42,9 +43,24 @@ public interface AI extends NPC, Serializable {
     List<String> getAINames();
 
     /**
+     * Gets the AI's language
+     *
+     * @return Language
+     */
+    Language getLanguage();
+
+    /**
      * Gets the difficulty
      *
      * @return AI's difficulty
      */
     Difficulty getDifficulty();
+
+    /**
+     * Sets if the AI is able
+     * to write chat messages
+     *
+     * @param b Boolean
+     */
+    void setAiTalking(boolean b);
 }

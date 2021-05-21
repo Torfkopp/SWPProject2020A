@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.message.*;
+import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
@@ -31,12 +32,9 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.message.MessageContext;
-import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.message.*;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.chat.IChatManagement;
 import de.uol.swp.server.game.event.*;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
@@ -71,7 +69,6 @@ public class GameService extends AbstractService {
 
     private final ILobbyManagement lobbyManagement;
     private final IGameManagement gameManagement;
-    private final IChatManagement chatManagement;
     private final LobbyService lobbyService;
     private final GameAI gameAI;
 
@@ -80,18 +77,16 @@ public class GameService extends AbstractService {
      *
      * @param bus            The EventBus used throughout the entire server (injected)
      * @param gameManagement The GameManagement to use (injected)
-     * @param chatManagement The ChatManagement to use (injected)
      * @param lobbyService   The LobbyService to use (injected)
      *
      * @since 2021-01-15
      */
     @Inject
     public GameService(EventBus bus, IGameManagement gameManagement, ILobbyManagement lobbyManagement,
-                       IChatManagement chatManagement, LobbyService lobbyService) {
+                       LobbyService lobbyService) {
         super(bus);
         this.gameManagement = gameManagement;
         this.lobbyManagement = lobbyManagement;
-        this.chatManagement = chatManagement;
         this.lobbyService = lobbyService;
         this.gameAI = new GameAI(this, gameManagement, lobbyService);
         LOG.debug("GameService started");
@@ -171,9 +166,8 @@ public class GameService extends AbstractService {
      * @since 2021-05-17
      */
     void postAI(AI uehara, String content, LobbyName lobbyName) {
-        //todo fix this shit
-        //Message msg = new CreatedChatMessageMessage(chatManagement.createChatMessage(uehara, content), lobbyName);
-        //post(msg);
+        Message msg = new NewChatMessageRequest(uehara, content, lobbyName);
+        post(msg);
     }
 
     /**
