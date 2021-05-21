@@ -18,6 +18,7 @@ import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
 import de.uol.swp.common.game.request.PauseTimerRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardAllowedRequest;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
@@ -193,6 +194,31 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a PlayRoadBuildingCardAllowedResponse
+     * <p>
+     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
+     * this method is called.
+     * It disables the Buttons and gives a note to choose
+     * the roads.
+     *
+     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
+     * @since 2021-05-16
+     */
+    @Subscribe
+    public void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
+        Platform.runLater(() -> {
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+        });
+        disableButtonStates();
+        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
+        gameService.playRoadBuildingCard(rsp.getLobbyName());
+    }
+
+    /**
      * Handles a UnpauseTimerMessage
      * <p>
      * If a new UnpauseTimerMessage object is posted onto the EventBus,
@@ -214,6 +240,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     /**
      * Helper method to set the timer for the players round.
      * The user gets forced to end his turn, if the timer gets zero.
+     * It also closes all the opened windows.
      * If paused is true, the timer is paused.
      *
      * @param moveTime The moveTime for the Lobby
@@ -232,8 +259,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                           moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
+                        tradeService.closeTradeResponseWindow(lobbyName);
                         tradeService.closeBankTradeWindow(lobbyName);
+                        tradeService.closeUserTradeWindow(lobbyName);
+                        disableButtonStates();
                         gameService.endTurn(lobbyName);
+                        moveTimeTimer.cancel();
                     }
                 } else {remainingMoveTime = moveTimeToDecrement.get();}
             }
@@ -557,8 +588,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null) Platform.runLater(
-                    () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+            if (finalAttr != null) Platform.runLater(() -> {
+                soundService.building();
+                chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you")));
+            });
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
                     .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
@@ -607,6 +640,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onEndTurnButtonPressed() {
+        soundService.button();
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName);
         diceRolled = false;
@@ -625,6 +659,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onHelpButtonPressed() {
+        soundService.button();
         if (!helpActivated) {
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
             helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
@@ -784,6 +819,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onPlayCardButtonPressed() {
+        soundService.button();
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
@@ -821,11 +857,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
-            notice.setVisible(true);
-            disableButtonStates();
-            roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
-            gameService.playRoadBuildingCard(lobbyName);
+            eventBus.post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -932,6 +964,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onReturnToLobbyButtonPressed() {
+        soundService.button();
         buildingCosts.setVisible(false);
         inGame = false;
         lobbyService.returnToPreGameLobby(lobbyName);
@@ -939,6 +972,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Handles a RobberAllTaxPayedMessage
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @param msg The RobberAllTaxPayedMessage found on the EventBus
      *
@@ -1065,6 +1099,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onRollDiceButtonPressed() {
+        soundService.dice();
         gameService.rollDice(lobbyName);
         rollDice.setDisable(true);
         diceRolled = true;
@@ -1102,6 +1137,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onTradeWithBankButtonPressed() {
+        soundService.button();
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
         tradeService.tradeWithBank(lobbyName);
@@ -1113,7 +1149,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * If another player of the lobby-member-list is selected and the button gets pressed,
      * this button gets disabled, this method calls on the TradeService to show the Trade
      * with User window and request the inventory overview for the selected user.
-     * It also posts a new PauseTimerRequest onto the EventBus.
      *
      * @author Maximilian Lindner
      * @author Finn Haase
@@ -1121,6 +1156,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onTradeWithUserButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
@@ -1131,7 +1167,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
             tradeService.tradeWithUser(lobbyName, user, false);
-            eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
 
@@ -1140,7 +1175,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * If a TradeWithUserCancelResponse is posted onto the EventBus the
      * the possible options for the active player are re-enabled.
-     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
@@ -1153,7 +1187,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

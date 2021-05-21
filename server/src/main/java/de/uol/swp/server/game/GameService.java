@@ -94,6 +94,43 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a PlayRoadBuildingCardAllowedRequest found on the eventBus
+     * <p>
+     * If a PlayRoadBuildingCardAllowedRequest is found on the event bus,
+     * this method checks if the user has more than zero RoadBuildingCards.
+     * If there is atleast one card, this method posts a
+     * new PlayRoadBuildingCardAllowedResponse onto the eventBus.
+     *
+     * @param req The request found on the event bus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.PlayCardRequest.PlayRoadBuildingCardAllowedRequest
+     * @since 2021-05-16
+     */
+    @Subscribe
+    public void onPlayRoadBuildingCardAllowedRequest(PlayRoadBuildingCardAllowedRequest req) {
+        LOG.debug("Received PlayRoadBuildingCardRequest for Lobby {}", req.getOriginLobby());
+
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
+            return;
+        Inventory inv = game.getInventory(req.getUser());
+
+        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
+            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
+                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
+            returnMessage.initWithMessage(req);
+            post(returnMessage);
+            LOG.debug("Sending PlayCardFailureResponse");
+            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
+            return;
+        }
+        ResponseMessage returnMessage = new PlayRoadBuildingCardAllowedResponse(req.getOriginLobby(), req.getUser());
+        returnMessage.initWithMessage(req);
+        post(returnMessage);
+    }
+
+    /**
      * Helper function
      * <p>
      * Checks if there are enough resources in the needed Inventory.
@@ -478,7 +515,7 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
         BankInventory bankInventory = game.getBankInventory();
-        if (bankInventory != null) {
+        if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards().isEmpty()) {
             DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
             if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
                 bankInventory.decrease(developmentCard);
@@ -494,7 +531,7 @@ public class GameService extends AbstractService {
                 endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
-        }
+        } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
     }
 
     /**
@@ -1043,21 +1080,9 @@ public class GameService extends AbstractService {
             return;
         Inventory inv = game.getInventory(req.getUser());
 
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
-            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending PlayCardFailureResponse");
-            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
-            return;
-        }
-
         LOG.debug("---- RoadBuildingCardPhase phase starts");
         game.setRoadBuildingCardPhase(WAITING_FOR_FIRST_ROAD);
-
         inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
-
         I18nWrapper roadBuildingCard = new I18nWrapper("game.resources.cards.roadbuilding");
         ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
                                                                                     roadBuildingCard);
@@ -1693,7 +1718,7 @@ public class GameService extends AbstractService {
     private boolean updatePlayersInventoryWithDevelopmentCard(DevelopmentCardType developmentCard, UserOrDummy user,
                                                               LobbyName lobbyName) {
         Inventory inventory = gameManagement.getGame(lobbyName).getInventory(user);
-        if (inventory == null) return false;
+        if (inventory == null || developmentCard == null) return false;
         if (inventory.get(ORE) >= 1 && inventory.get(GRAIN) >= 1 && inventory.get(WOOL) >= 1) {
             inventory.decrease(ORE);
             inventory.decrease(GRAIN);

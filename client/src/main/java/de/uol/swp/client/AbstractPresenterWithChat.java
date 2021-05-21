@@ -134,6 +134,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onDeleteMessageButtonPressed() {
+        soundService.button();
         ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
         ChatMessage chatMsg;
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
@@ -192,6 +193,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onEditMessageButtonPressed() {
+        soundService.button();
         ChatOrSystemMessage chatOrSystemMessage = chatView.getSelectionModel().getSelectedItem();
         ChatMessage chatMsg;
         if (chatOrSystemMessage instanceof ChatMessage) chatMsg = (ChatMessage) chatOrSystemMessage;
@@ -245,6 +247,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     @FXML
     protected void onSendMessageButtonPressed() {
+        soundService.button();
         String msg = messageField.getText();
         messageField.clear();
         if (lobbyName != null) {
@@ -491,9 +494,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                     setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
                 else setFont(Font.getDefault());
                 setText(empty || item == null ? "" : item.toString());
-                setMaxWidth(chatView.getWidth() - 5);
-                setPrefWidth(chatView.getWidth() - 5);
-                setWidth(chatView.getWidth() - 5);
+                prefWidthProperty().bind(widthProperty().divide(1.1));
+                setMaxWidth(Control.USE_PREF_SIZE);
                 setWrapText(true);
             }
         });

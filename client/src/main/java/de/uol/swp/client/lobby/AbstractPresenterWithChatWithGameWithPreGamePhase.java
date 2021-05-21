@@ -113,6 +113,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (lobbyName != null || !kicked) {
             lobbyService.leaveLobby(lobbyName);
         }
+        moveTimeTimer.cancel();
         ((Stage) window).close();
         clearEventBus();
     }
@@ -220,6 +221,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onChangeOwnerButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
@@ -239,6 +241,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onKickUserButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
@@ -286,13 +289,51 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         winner = msg.getUser();
+        uniqueCardView.setMaxHeight(0);
+        uniqueCardView.setMinHeight(0);
+        uniqueCardView.setPrefHeight(0);
+        uniqueCardView.setVisible(false);
+        resourceTableView.setMaxHeight(0);
+        resourceTableView.setMinHeight(0);
+        resourceTableView.setPrefHeight(0);
+        resourceTableView.setVisible(false);
+        developmentCardTableView.setMaxHeight(0);
+        developmentCardTableView.setMinHeight(0);
+        developmentCardTableView.setPrefHeight(0);
+        developmentCardTableView.setVisible(false);
+        rollDice.setVisible(false);
+        autoRoll.setVisible(false);
+        endTurn.setVisible(false);
+        tradeWithUserButton.setVisible(false);
+        tradeWithUserButton.setDisable(false);
+        tradeWithBankButton.setVisible(false);
+        turnIndicator.setVisible(false);
+        pauseButton.setVisible(false);
+        playCard.setVisible(false);
+        timerLabel.setVisible(false);
+        helpCheckBox.setDisable(true);
+        helpCheckBox.setVisible(false);
+        turnIndicator.setAccessibleText("");
+        buildingCosts.setVisible(false);
+        cardAmountsList.clear();
+        moveTimeTimer.cancel();
+        moveTimerLabel.setVisible(false);
+        for (ChatOrSystemMessage m : chatMessages)
+            if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+        currentRound.setVisible(false);
+        roundCounter = 0;
+        this.elapsedTimer.stop();
         if (Objects.equals(owner, userService.getLoggedInUser())) {
             returnToLobby.setVisible(true);
             returnToLobby.setPrefHeight(30);
             returnToLobby.setPrefWidth(250);
-            this.elapsedTimer.stop();
         }
+        gameMapDescription.clear();
+        gameMapDescription.setCenterText(
+                winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
+                String.format(resourceBundle.getString("game.won.info"), winner));
         fitCanvasToSize();
+        soundService.victory();
     }
 
     /**
@@ -339,46 +380,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             preGameSettingBox.setVisible(true);
             preGameSettingBox.setPrefHeight(190);
             preGameSettingBox.setMaxHeight(190);
-            turnIndicator.setAccessibleText("");
             preGameSettingBox.setMinHeight(190);
-            uniqueCardView.setMaxHeight(0);
-            uniqueCardView.setMinHeight(0);
-            uniqueCardView.setPrefHeight(0);
-            uniqueCardView.setVisible(false);
-            resourceTableView.setMaxHeight(0);
-            resourceTableView.setMinHeight(0);
-            resourceTableView.setPrefHeight(0);
-            resourceTableView.setVisible(false);
-            developmentCardTableView.setMaxHeight(0);
-            developmentCardTableView.setMinHeight(0);
-            developmentCardTableView.setPrefHeight(0);
-            developmentCardTableView.setVisible(false);
             readyCheckBox.setVisible(true);
             readyCheckBox.setSelected(false);
             lobbyService.retrieveAllLobbyMembers(this.lobbyName);
             setStartSessionButtonState();
-            rollDice.setVisible(false);
-            autoRoll.setVisible(false);
-            endTurn.setVisible(false);
-            tradeWithUserButton.setVisible(false);
-            tradeWithUserButton.setDisable(false);
-            tradeWithBankButton.setVisible(false);
-            turnIndicator.setVisible(false);
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
-            playCard.setVisible(false);
-            timerLabel.setVisible(false);
-            infoMenu.setVisible(false);
-            helpCheckBox.setDisable(true);
-            helpCheckBox.setVisible(false);
-            cardAmountsList.clear();
-            pauseButton.setVisible(false);
-            moveTimeTimer.cancel();
-            moveTimerLabel.setVisible(false);
-            for (ChatOrSystemMessage m : chatMessages)
-                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
-            currentRound.setVisible(false);
-            roundCounter = 0;
         });
     }
 
@@ -395,6 +403,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onStartSessionButtonPressed() {
+        soundService.button();
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
@@ -432,6 +441,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
+            buildingCosts.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);
