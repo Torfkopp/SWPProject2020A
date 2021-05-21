@@ -195,6 +195,23 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a AddAIRequest found on the EventBus
+     * <p>
+     * If a AddAIRequest is detected on the EventBus, this method is called.
+     * It adds the AI to the lobby.
+     *
+     * @param req The AddAIRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.AddAIRequest
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onAddAIRequest(AddAIRequest req) {
+        post(new JoinLobbyRequest(req.getName(), req.getUser()));
+    }
+
+    /**
      * Handles a CreateLobbyRequest found on the EventBus
      * <p>
      * If a CreateLobbyRequest is detected on the EventBus, this method is called.
