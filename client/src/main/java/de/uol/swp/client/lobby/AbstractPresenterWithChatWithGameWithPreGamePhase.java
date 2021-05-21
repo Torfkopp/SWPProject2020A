@@ -3,6 +3,8 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
+import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
+import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -116,7 +118,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyService.leaveLobby(lobbyName);
         }
         moveTimeTimer.cancel();
-        ((Stage) window).close();
+        eventBus.post(new TradeCancelEvent(lobbyName));
+        eventBus.post(new CloseTradeResponseEvent(lobbyName));
         clearEventBus();
     }
 
