@@ -71,7 +71,6 @@ public class Game {
         autoRollEnabled = new HashMap<>();
         {
             List<UserOrDummy> playerList = new ArrayList<>(lobby.getUserOrDummies());
-            System.err.println("Game wird gestartet");
             preparePausedMembers();
             startUpPlayerOrder.addLast(first);
             playersStartUpBuiltMap.put(first, StartUpPhaseBuiltStructures.NONE_BUILT);
@@ -368,8 +367,7 @@ public class Game {
     public int getPausedMembers() {
         int pausedMemebers = 0;
         for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
-            System.err.println(entry.getValue());
-            if (entry.getValue() == true) pausedMemebers++;
+            if (entry.getValue()) pausedMemebers++;
         }
         return pausedMemebers;
     }
