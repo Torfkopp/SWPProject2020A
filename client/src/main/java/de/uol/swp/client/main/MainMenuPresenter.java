@@ -79,6 +79,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private CheckBox lobbyListFilteredInGameBox;
     @FXML
+    private CheckBox lobbyListFilteredFullBox;
+    @FXML
     private TextField lobbyFilterTextField;
 
     private FilteredList<Pair<ISimpleLobby, String>> filteredLobbyList;
@@ -117,6 +119,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> nameFilter = new SimpleObjectProperty<>();
         ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> passwordFilter = new SimpleObjectProperty<>();
         ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> inGameFilter = new SimpleObjectProperty<>();
+        ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> fullFilter = new SimpleObjectProperty<>();
 
         nameFilter.bind(Bindings.createObjectBinding(
                 () -> lobby -> lobby.getValue().toLowerCase().contains(lobbyFilterTextField.getText().toLowerCase()),
@@ -132,9 +135,15 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                                                                                  .isInGame()) || (!lobbyListFilteredInGameBox
                         .isSelected()), lobbyListFilteredInGameBox.selectedProperty()));
 
+        fullFilter.bind(Bindings.createObjectBinding(
+                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey()
+                                                                                .getUserOrDummies().size() == lobby.getKey()
+                                                                                                                   .getMaxPlayers())) || (!lobbyListFilteredFullBox
+                        .isSelected()), lobbyListFilteredFullBox.selectedProperty()));
+
         filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
-                () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get()), nameFilter, passwordFilter,
-                inGameFilter));
+                () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
+                nameFilter, passwordFilter, inGameFilter, fullFilter));
         lobbyView.setItems(new SortedList<>(filteredLobbyList));
     }
 

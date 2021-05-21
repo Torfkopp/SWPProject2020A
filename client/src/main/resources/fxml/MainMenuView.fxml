@@ -72,6 +72,8 @@
                       text="%lobbylist.filtered.protected" wrapText="true"/>
             <CheckBox fx:id="lobbyListFilteredInGameBox" mnemonicParsing="false"
                       text="%lobbylist.filtered.ingame" wrapText="true"/>
+            <CheckBox fx:id="lobbyListFilteredFullBox" mnemonicParsing="false"
+                      text="%lobbylist.filtered.full" wrapText="true"/>
             <padding>
                 <Insets left="5.0"/>
             </padding>
