@@ -706,6 +706,14 @@ public class GameService extends AbstractService {
                 }
             } else {
                 nextPlayer = game.nextPlayer();
+
+                ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+
+                LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
+                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+                game.setDiceRolledAlready(false);
+
                 if (nextPlayer instanceof Dummy) {
                     IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
                     for (int pointer1 = 0; pointer1 < intersections.length; pointer1++) {
@@ -736,14 +744,9 @@ public class GameService extends AbstractService {
                             break;
                         }
                     }
+                    onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+                    endTurnDummy(game);
                 }
-                ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
-
-                LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-
-                game.setDiceRolledAlready(false);
-                endTurnDummy(game);
             }
         }
     }
