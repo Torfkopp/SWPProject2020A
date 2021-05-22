@@ -115,6 +115,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (lobbyName != null || !kicked) {
             lobbyService.leaveLobby(lobbyName);
         }
+        moveTimeTimer.cancel();
         ((Stage) window).close();
         clearEventBus();
     }
@@ -132,6 +133,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     protected void onKickUserButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
@@ -155,6 +157,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             LOG.trace("onStartSessionButtonPressed called with disabled button, returning");
             return;
         }
+        soundService.button();
         buildingCosts.setVisible(true);
         gameService.startSession(lobbyName, moveTime);
         timerLabel.setVisible(true);
@@ -264,6 +267,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onChangeOwnerButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
@@ -354,6 +358,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
                 String.format(resourceBundle.getString("game.won.info"), winner));
         fitCanvasToSize();
+        soundService.victory();
     }
 
     /**
@@ -441,6 +446,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
+            buildingCosts.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
             tradeWithBankButton.setVisible(true);

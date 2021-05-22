@@ -224,6 +224,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             LOG.trace("onEndTurnButtonPressed called with disabled button, returning");
             return;
         }
+        soundService.button();
         disableButtonsAfterTurn();
         gameService.endTurn(lobbyName);
         diceRolled = false;
@@ -242,6 +243,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onHelpButtonPressed() {
+        soundService.button();
         if (!helpActivated) {
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
             helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
@@ -323,6 +325,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onReturnToLobbyButtonPressed() {
+        soundService.button();
         buildingCosts.setVisible(false);
         inGame = false;
         lobbyService.returnToPreGameLobby(lobbyName);
@@ -345,6 +348,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             LOG.trace("onRollDiceButtonPressed called with disabled button, returning");
             return;
         }
+        soundService.dice();
         gameService.rollDice(lobbyName);
         rollDice.setDisable(true);
         diceRolled = true;
@@ -364,6 +368,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onTradeWithBankButtonPressed() {
+        soundService.button();
         disableButtonStates();
         tradeService.showBankTradeWindow(lobbyName);
         tradeService.tradeWithBank(lobbyName);
@@ -383,6 +388,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onTradeWithUserButtonPressed() {
+        soundService.button();
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
@@ -703,8 +709,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null) Platform.runLater(
-                    () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"))));
+            if (finalAttr != null) Platform.runLater(() -> {
+                soundService.building();
+                chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you")));
+            });
         } else {
             if (finalAttr != null) Platform.runLater(() -> chatMessages
                     .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
@@ -947,6 +955,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Handles a RobberAllTaxPayedMessage
+     * It also posts a new UnpauseTimerRequest onto the EventBus.
      *
      * @param msg The RobberAllTaxPayedMessage found on the EventBus
      *
@@ -1083,7 +1092,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * <p>
      * If a TradeWithUserCancelResponse is posted onto the EventBus the
      * the possible options for the active player are re-enabled.
-     * It also posts a new UnpauseTimerRequest onto the EventBus
      *
      * @param rsp The TradeWithUserCancelResponse seen on the EventBus
      *
@@ -1096,7 +1104,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

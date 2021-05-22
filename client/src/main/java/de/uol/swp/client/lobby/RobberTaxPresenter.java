@@ -193,6 +193,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
             LOG.trace("onTaxPayButton called with disabled button, returning");
             return;
         }
+        soundService.button();
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);

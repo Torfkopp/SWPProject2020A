@@ -26,6 +26,7 @@ import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
 import de.uol.swp.client.rules.RulesOverviewPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.TradeWithBankPresenter;
 import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
@@ -37,7 +38,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
@@ -85,6 +86,9 @@ public class SceneManager {
 
     @Inject
     private IUserService userService;
+
+    @Inject
+    private ISoundService soundService;
 
     private Scene loginScene;
     private String lastTitle;
@@ -164,6 +168,7 @@ public class SceneManager {
      */
     public void showError(String message, String e) {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(resourceBundle.getString("error.title"));
             alert.setHeaderText(resourceBundle.getString("error.header"));
@@ -203,6 +208,7 @@ public class SceneManager {
      */
     public void showLogOldSessionOutScreen(User user) {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
             alert.setTitle(resourceBundle.getString("confirmation.title"));
             alert.setHeaderText(resourceBundle.getString("confirmation.header"));
@@ -228,6 +234,7 @@ public class SceneManager {
      */
     public void showLoginErrorScreen() {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
                                                 ButtonBar.ButtonData.OK_DONE);
@@ -324,6 +331,7 @@ public class SceneManager {
      */
     public void showTimeoutErrorScreen() {
         Platform.runLater(() -> {
+            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
             alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
             ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
@@ -591,6 +599,26 @@ public class SceneManager {
     }
 
     /**
+     * Handles an old session
+     * <p>
+     * If an AlreadyLoggedInResponse object is found on the EventBus this method
+     * is called. If a client attempts to log in but the user is already
+     * logged in elsewhere this method tells the SceneManager to open a popup
+     * which prompts the user to log the old session out.
+     *
+     * @param rsp The AlreadyLoggedInResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
+        LOG.debug("Received AlreadyLoggedInResponse for User {}", rsp.getLoggedInUser());
+        showLogOldSessionOutScreen(rsp.getLoggedInUser());
+    }
+
+    /**
      * Handles the ChangeAccountDetailsCanceledEvent detected on the EventBus
      * <p>
      * If a ChangeAccountDetailsCanceledEvent is detected on the EventBus, this method gets
@@ -618,6 +646,24 @@ public class SceneManager {
     @Subscribe
     private void onChangeAccountDetailsErrorEvent(ChangeAccountDetailsErrorEvent event) {
         showError(event.getMessage());
+    }
+
+    /**
+     * Handles a successful account detail changing process
+     * <p>
+     * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
+     *
+     * @param rsp The ChangeAccountDetailsSuccessfulResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @since 2020-12-03
+     */
+    @Subscribe
+    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        LOG.debug("Account Details change was successful.");
+        showMainScreen(rsp.getUser());
     }
 
     /**
@@ -718,6 +764,26 @@ public class SceneManager {
     }
 
     /**
+     * Handles a successful login
+     * <p>
+     * If an LoginSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the main menu, and sets
+     * this clients user to the user found in the object. If the loglevel is set
+     * to DEBUG or higher, "User logged in successfully " and the username of the
+     * logged in user are written to the log.
+     *
+     * @param rsp The LoginSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2017-03-17
+     */
+    @Subscribe
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
+        LOG.debug("Received LoginSuccessfulResponse for User {}", rsp.getUser().getUsername());
+        showMainScreen(rsp.getUser());
+    }
+
+    /**
      * Handles the NukeUsersSessionsResponse detected on the EventBus
      * <p>
      * If this method is called, it means all sessions belonging to a
@@ -804,6 +870,25 @@ public class SceneManager {
     @Subscribe
     private void onRegistrationErrorEvent(RegistrationErrorEvent event) {
         showError(event.getMessage());
+    }
+
+    /**
+     * Handles a successful registration
+     * <p>
+     * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
+     * method is called. It tells the SceneManager to show the login window. If
+     * the loglevel is set to INFO or higher, "Registration Successful." is written
+     * to the log.
+     *
+     * @param rsp The RegistrationSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2019-09-02
+     */
+    @Subscribe
+    private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
+        LOG.debug("Registration was successful.");
+        showLoginScreen();
     }
 
     /**

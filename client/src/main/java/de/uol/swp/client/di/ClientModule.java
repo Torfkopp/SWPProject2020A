@@ -14,6 +14,8 @@ import de.uol.swp.client.lobby.AbstractPresenterWithChatWithGame;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.main.MainMenuPresenter;
+import de.uol.swp.client.sound.ISoundService;
+import de.uol.swp.client.sound.SoundService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.TradeService;
 import de.uol.swp.client.user.IUserService;
@@ -59,6 +61,9 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("owner_ready_notifs_on", "true");
         defaultProps.setProperty("owner_transfer_notifs_on", "true");
         defaultProps.setProperty("theme", "default");
+        defaultProps.setProperty("soundpack", "default");
+        defaultProps.setProperty("volume", "100");
+        defaultProps.setProperty("backgroundvolume", "50");
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -97,11 +102,30 @@ public class ClientModule extends AbstractModule {
                 locale = Locale.UK;
         }
 
-        LOG.debug("Selected theme in config file: " + properties.getProperty("theme"));
-
         //Setting the theme
-        final String theme = properties.getProperty("theme");
+        LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
+        String theme = properties.getProperty("theme");
+        if (!theme.equals("default") && !theme.equals("dark") && !theme.equals("classic") && !theme.equals("cursed"))
+            theme = "default";
         final String styleSheet = "css/" + theme + ".css";
+
+        //Setting the sound pack and volume
+        LOG.debug("Selected sound pack {} with volume {}", properties.getProperty("soundpack"),
+                  properties.getProperty("volume"));
+        String pack = properties.getProperty("soundpack");
+        if (!pack.equals("default") && !pack.equals("classic") && !pack.equals("cursed")) pack = "default";
+        final String soundPack = "client/src/main/resources/sounds/" + pack + "/";
+        double volume;
+        double backgroundVolume;
+        try {
+            volume = Double.parseDouble(properties.getProperty("volume")) / 100;
+            backgroundVolume = Double.parseDouble(properties.getProperty("backgroundvolume")) / 100;
+            if (volume < 0.0 || volume > 1.0) volume = 1.0;
+            if (backgroundVolume < 0.0 || backgroundVolume > 1.0) backgroundVolume = 0.5;
+        } catch (NumberFormatException ignored) {
+            volume = 1.0;
+            backgroundVolume = 0.5;
+        }
 
         //Setting the language
         final ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
@@ -134,6 +158,9 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("ownerTransferNotificationsOn")).to(ownerTransferNotificationsOn);
         bindConstant().annotatedWith(Names.named("theme")).to(theme);
         bindConstant().annotatedWith(Names.named("styleSheet")).to(styleSheet);
+        bindConstant().annotatedWith(Names.named("soundPack")).to(soundPack);
+        bindConstant().annotatedWith(Names.named("volume")).to(volume);
+        bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
@@ -141,6 +168,7 @@ public class ClientModule extends AbstractModule {
         bind(IGameService.class).to(GameService.class).in(Scopes.SINGLETON);
         bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
         bind(ITradeService.class).to(TradeService.class).in(Scopes.SINGLETON);
+        bind(ISoundService.class).to(SoundService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(ResourceType.class);
@@ -150,5 +178,6 @@ public class ClientModule extends AbstractModule {
         requestStaticInjection(MainMenuPresenter.class);
         requestStaticInjection(AbstractPresenterWithChat.class);
         requestStaticInjection(AbstractPresenterWithChatWithGame.class);
+        requestStaticInjection(SoundService.class);
     }
 }

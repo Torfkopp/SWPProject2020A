@@ -10,6 +10,7 @@ import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -117,6 +118,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
             LOG.trace("onBuyDevelopmentCardButtonPressed with disabled button, returning");
             return;
         }
+        soundService.button();
         for (IResource item : ownResourceTableView.getItems()) {
             if (item.getType() == ResourceType.GRAIN && item.getAmount() <= 0) return;
             if (item.getType() == ResourceType.ORE && item.getAmount() <= 0) return;
@@ -156,6 +158,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
+        soundService.button();
         tradeService.closeBankTradeWindow(lobbyName);
     }
 
@@ -202,6 +205,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
             LOG.trace("onTradeResourceWithBankButtonPressed called with disabled button, returning");
             return;
         }
+        soundService.button();
         IResource bankResource;
         IResource giveResource;
         ownResourcesToTradeWith.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -270,6 +274,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
+        Platform.runLater(() -> soundService.coins());
     }
 
     /**

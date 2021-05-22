@@ -155,6 +155,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
+        soundService.button();
         eventBus.post(changeAccountDetailsCanceledEvent);
     }
 
@@ -180,6 +181,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
             LOG.trace("onChangeAccountDetailsButtonPressed called with disabled button, returning");
             return;
         }
+        soundService.button();
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
             eventBus.post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changepw")));
