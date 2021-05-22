@@ -13,6 +13,10 @@ import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeProperties.ChangePropertiesPresenter;
+import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
+import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
+import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.RobberTaxPresenter;
@@ -96,6 +100,7 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene changeAccountDetailsScene;
+    private Scene changePropertiesScene;
     private Scene rulesScene;
     private boolean devMenuIsOpen;
     private boolean rulesOverviewIsOpen;
@@ -153,6 +158,11 @@ public class SceneManager {
     public void showChangeAccountDetailsScreen() {
         showScene(changeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
+    }
+
+    public void showChangePropertiesScreen() {
+        showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
+                  ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -360,6 +370,14 @@ public class SceneManager {
         }
     }
 
+    private void initChangePropertiesView() {
+        if (changePropertiesScene == null) {
+            Parent rootPane = initPresenter(ChangePropertiesPresenter.fxml);
+            changePropertiesScene = new Scene(rootPane, 400, 200);
+            changePropertiesScene.getStylesheets().add(styleSheet);
+        }
+    }
+
     /**
      * Initialises the login view
      * <p>
@@ -472,6 +490,7 @@ public class SceneManager {
         initRegistrationView();
         initRulesOverviewView();
         initChangeAccountDetailsView();
+        initChangePropertiesView();
     }
 
     /**
@@ -628,6 +647,16 @@ public class SceneManager {
      */
     @Subscribe
     private void onChangeAccountDetailsCanceledEvent(ChangeAccountDetailsCanceledEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+    }
+
+    @Subscribe
+    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+    }
+
+    @Subscribe
+    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
@@ -924,6 +953,15 @@ public class SceneManager {
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
         showChangeAccountDetailsScreen();
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            windowEvent.consume();
+            showMainScreen(userService.getLoggedInUser());
+        });
+    }
+
+    @Subscribe
+    private void onShowChangePropertiesViewEvent(ShowChangePropertiesViewEvent event) {
+        showChangePropertiesScreen();
         primaryStage.setOnCloseRequest(windowEvent -> {
             windowEvent.consume();
             showMainScreen(userService.getLoggedInUser());

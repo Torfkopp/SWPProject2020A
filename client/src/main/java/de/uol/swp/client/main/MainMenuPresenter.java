@@ -7,6 +7,7 @@ import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
@@ -211,6 +212,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onChangeAccountDetailsButtonPressed() {
         soundService.button();
         lobbyService.checkUserInLobby();
+    }
+
+    /**
+     * Method called when the ChangePropertiesButton is pressed
+     * <p>
+     * This method is called when the ChangePropertiesButton is pressed.
+     * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @since 2021-05-22
+     */
+    @FXML
+    private void onChangePropertiesButtonPressed() {
+        eventBus.post(new ShowChangePropertiesViewEvent());
     }
 
     /**
