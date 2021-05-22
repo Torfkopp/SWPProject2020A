@@ -24,6 +24,7 @@ public interface IUserService {
      *
      * @param user The user to create
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2019-09-02
      */
     void createUser(User user);
@@ -38,6 +39,7 @@ public interface IUserService {
      *
      * @implNote The User object has to contain a unique identifier in order to
      * remove the correct user
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2019-10-10
      */
     void dropUser(User user, String password);
@@ -47,6 +49,7 @@ public interface IUserService {
      *
      * @return The user that is currently logged in
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @author Phillip-André Suhr
      * @author Steven Luong
      * @since 2021-04-04
@@ -60,6 +63,7 @@ public interface IUserService {
      *
      * @author Phillip-André Suhr
      * @author Steven Luong
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-04
      */
     void setLoggedInUser(User loggedInUser);
@@ -73,6 +77,7 @@ public interface IUserService {
      *
      * @implSpec The hash method used is sha256
      * @author Phillip-André Suhr
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-16
      */
     default String hash(String toHash) {
@@ -88,6 +93,7 @@ public interface IUserService {
      * @param passwordHash the user's hashed password
      * @param rememberMe   whether to remember the user details for automatic login on start up
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2017-03-17
      */
     void login(String username, String passwordHash, boolean rememberMe);
@@ -99,6 +105,7 @@ public interface IUserService {
      *
      * @param resetRememberMe Whether to reset the stored user details
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2017-03-17
      */
     void logout(boolean resetRememberMe);
@@ -106,6 +113,7 @@ public interface IUserService {
     /**
      * Retrieve the list of all currently logged in users
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2017-03-17
      */
     void retrieveAllUsers();
@@ -120,6 +128,7 @@ public interface IUserService {
      *
      * @author Eric Vuong
      * @author Steven Luong
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2020-12-17
      */
     void updateAccountDetails(User user, String oldHashedPassword, String oldUsername, String oldEMail);

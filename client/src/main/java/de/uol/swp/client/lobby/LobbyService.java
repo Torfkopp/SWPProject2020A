@@ -13,6 +13,7 @@ import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
+import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,112 +50,240 @@ public class LobbyService implements ILobbyService {
 
     @Override
     public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
-        LOG.debug("Sending ChangeOwnerRequest");
-        Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
-        eventBus.post(req);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending ChangeOwnerRequest");
+                Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
+                eventBus.post(req);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void checkForGame(LobbyName lobbyName) {
-        LOG.debug("Sending CheckForGameRequest");
-        Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());
-        eventBus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending CheckForGameRequest");
+                Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());
+                eventBus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void checkUserInLobby() {
-        LOG.debug("Sending CheckUserInLobbyRequest");
-        Message msg = new CheckUserInLobbyRequest(userService.getLoggedInUser());
-        eventBus.post(msg);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending CheckUserInLobbyRequest");
+                Message msg = new CheckUserInLobbyRequest(userService.getLoggedInUser());
+                eventBus.post(msg);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void createNewLobby(LobbyName name, String password) {
-        LOG.debug("Sending CreateLobbyRequest");
-        Message createLobbyRequest = new CreateLobbyRequest(name, userService.getLoggedInUser(), password);
-        eventBus.post(createLobbyRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending CreateLobbyRequest");
+                Message createLobbyRequest = new CreateLobbyRequest(name, userService.getLoggedInUser(), password);
+                eventBus.post(createLobbyRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void joinLobby(LobbyName lobbyName) {
-        LOG.debug("Sending LobbyJoinUserRequest");
-        Message joinUserRequest = new JoinLobbyRequest(lobbyName, userService.getLoggedInUser());
-        eventBus.post(joinUserRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending LobbyJoinUserRequest");
+                Message joinUserRequest = new JoinLobbyRequest(lobbyName, userService.getLoggedInUser());
+                eventBus.post(joinUserRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void joinRandomLobby() {
-        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
-        eventBus.post(joinRandomLobbyRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
+                eventBus.post(joinRandomLobbyRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void kickUser(LobbyName lobbyName, UserOrDummy userToKick) {
-        LOG.debug("Sending KickUserRequest");
-        Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
-        eventBus.post(kickUserRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending KickUserRequest");
+                Message kickUserRequest = new KickUserRequest(lobbyName, userService.getLoggedInUser(), userToKick);
+                eventBus.post(kickUserRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void leaveLobby(LobbyName lobbyName) {
-        LOG.debug("Sending LobbyLeaveUserRequest");
-        Message lobbyLeaveUserRequest = new LeaveLobbyRequest(lobbyName, userService.getLoggedInUser());
-        eventBus.post(lobbyLeaveUserRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending LobbyLeaveUserRequest");
+                Message lobbyLeaveUserRequest = new LeaveLobbyRequest(lobbyName, userService.getLoggedInUser());
+                eventBus.post(lobbyLeaveUserRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void refreshLobbyPresenterFields(ISimpleLobby lobby) {
-        LOG.debug("Sending LobbyUpdateEvent");
-        eventBus.post(new LobbyUpdateEvent(lobby));
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending LobbyUpdateEvent");
+                eventBus.post(new LobbyUpdateEvent(lobby));
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void removeFromAllLobbies() {
-        LOG.debug("Sending RemoveFromLobbiesRequest");
-        Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(userService.getLoggedInUser());
-        eventBus.post(removeFromLobbiesRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending RemoveFromLobbiesRequest");
+                Message removeFromLobbiesRequest = new RemoveFromLobbiesRequest(userService.getLoggedInUser());
+                eventBus.post(removeFromLobbiesRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void retrieveAllLobbies() {
-        LOG.debug("Sending RetrieveAllLobbiesRequest");
-        Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
-        eventBus.post(retrieveAllLobbiesRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending RetrieveAllLobbiesRequest");
+                Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
+                eventBus.post(retrieveAllLobbiesRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void retrieveAllLobbyMembers(LobbyName lobbyName) {
-        LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby {}", lobbyName);
-        Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
-        eventBus.post(retrieveAllLobbyMembersRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending RetrieveAllLobbyMembersRequest for Lobby {}", lobbyName);
+                Message retrieveAllLobbyMembersRequest = new RetrieveAllLobbyMembersRequest(lobbyName);
+                eventBus.post(retrieveAllLobbyMembersRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void returnToPreGameLobby(LobbyName lobbyName) {
-        LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby {}", lobbyName);
-        Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
-        eventBus.post(returnToPreGameLobbyRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending ReturnToPreGameLobbyRequest for Lobby {}", lobbyName);
+                Message returnToPreGameLobbyRequest = new ReturnToPreGameLobbyRequest(lobbyName);
+                eventBus.post(returnToPreGameLobbyRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void showLobbyError(String message) {
-        LOG.debug("Sending LobbyErrorEvent");
-        eventBus.post(new LobbyErrorEvent(message));
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending LobbyErrorEvent");
+                eventBus.post(new LobbyErrorEvent(message));
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
                                     boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
-        LOG.debug("Sending ChangeLobbySettingsRequest");
-        eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
-                                                     startUpPhaseEnabled, commandsAllowed, moveTime,
-                                                     randomPlayFieldEnabled));
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending ChangeLobbySettingsRequest");
+                eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
+                                                             startUpPhaseEnabled, commandsAllowed, moveTime,
+                                                             randomPlayFieldEnabled));
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void userReady(LobbyName lobbyName, boolean isReady) {
-        LOG.debug("Sending UserReadyRequest");
-        Message userReadyRequest = new UserReadyRequest(lobbyName, userService.getLoggedInUser(), isReady);
-        eventBus.post(userReadyRequest);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending UserReadyRequest");
+                Message userReadyRequest = new UserReadyRequest(lobbyName, userService.getLoggedInUser(), isReady);
+                eventBus.post(userReadyRequest);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 }

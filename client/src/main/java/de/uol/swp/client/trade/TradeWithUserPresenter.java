@@ -10,6 +10,7 @@ import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -61,7 +62,15 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @FXML
     public void initialize() {
         super.initialize();
-        LOG.debug("TradeWithUserPresenter initialised");
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("TradeWithUserPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -147,13 +156,15 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         }
         if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
             setSliders(resourceList);
-            Platform.runLater(() -> statusLabel
-                    .setText(String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser)));
+            String status = String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser);
+            Platform.runLater(() -> statusLabel.setText(status));
         } else {
-            offerTradeButton.setDisable(true);
-            tradingHBox.setVisible(false);
-            Platform.runLater(() -> statusLabel
-                    .setText(String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser)));
+            String text = String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser);
+            Platform.runLater(() -> {
+                offerTradeButton.setDisable(true);
+                tradingHBox.setVisible(false);
+                statusLabel.setText(text);
+            });
         }
     }
 
@@ -183,7 +194,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
                                 counterOffer);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -201,9 +212,10 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
         LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
+        String text = String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
-            statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
+            statusLabel.setText(text);
         });
     }
 
@@ -219,7 +231,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
-        Platform.runLater(() -> soundService.coins());
+        soundService.coins();
         closeWindow();
     }
 

@@ -5,10 +5,16 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.di.ClientModule;
+import de.uol.swp.client.game.IGameService;
+import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.sound.ISoundService;
+import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.user.IUserService;
 import io.netty.channel.Channel;
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +38,7 @@ public class ClientApp extends Application implements ConnectionListener {
 
     private static final Logger LOG = LogManager.getLogger(ClientApp.class);
     private static final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
+    private static Injector injector;
     private String host;
     private int port;
     private IUserService userService;
@@ -45,6 +52,28 @@ public class ClientApp extends Application implements ConnectionListener {
     // ----------------------------------------------------
 
     /**
+     * Helper method to instantiate all services.
+     * <p>
+     * This method is called from the main method of the application and handles
+     * preparation of all client-side services so that their first instantiation
+     * doesn't take place on the JavaFX Application Thread.
+     * <p>
+     * This is analogous to how service creation is handled on ServerApp start.
+     *
+     * @author Phillip-André Suhr
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @since 2021-05-22
+     */
+    private static void createServices() {
+        injector.getInstance(IUserService.class);
+        injector.getInstance(ILobbyService.class);
+        injector.getInstance(IChatService.class);
+        injector.getInstance(IGameService.class);
+        injector.getInstance(ITradeService.class);
+        injector.getInstance(ISoundService.class);
+    }
+
+    /**
      * Default startup method for javafx applications
      *
      * @param args Any arguments given when starting the application
@@ -52,6 +81,8 @@ public class ClientApp extends Application implements ConnectionListener {
      * @since 2017-03-17
      */
     public static void main(String[] args) {
+        injector = Guice.createInjector(new ClientModule());
+        createServices();
         launch(args);
     }
 
@@ -76,11 +107,6 @@ public class ClientApp extends Application implements ConnectionListener {
 
     @Override
     public void start(Stage primaryStage) {
-
-        // Client app is created by Java, so injection must
-        // be handled here manually
-        Injector injector = Guice.createInjector(new ClientModule());
-
         // get user service from guice; is needed for logout
         this.userService = injector.getInstance(IUserService.class);
 
@@ -115,11 +141,24 @@ public class ClientApp extends Application implements ConnectionListener {
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
-        LOG.trace("Trying to shutting down client ...");
-        if (clientConnection != null) {
-            clientConnection.close();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.trace("Trying to shutting down client ...");
+                if (clientConnection != null) {
+                    clientConnection.close();
+                }
+                LOG.info("ClientConnection shutdown");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task, "Shutdown");
+        thread.start();
+        try {
+            thread.join(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        LOG.info("ClientConnection shutdown");
     }
 
     @Override

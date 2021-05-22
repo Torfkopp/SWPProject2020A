@@ -14,6 +14,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
@@ -131,7 +132,15 @@ public class RobberTaxPresenter extends AbstractPresenter {
         oreSlider.valueProperty().bindBidirectional(oreField.valueProperty());
         woolSlider.valueProperty().bindBidirectional(woolField.valueProperty());
 
-        LOG.debug("RobberTaxPresenter initialised");
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("RobberTaxPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -154,14 +163,22 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onShowRobberTaxUpdateEvent(ShowRobberTaxUpdateEvent event) {
-        LOG.debug("Received ShowRobberTaxUpdateEvent");
-        lobbyName = event.getLobbyName();
-        taxAmount = event.getTaxAmount();
-        inventory = event.getInventory();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Received ShowRobberTaxUpdateEvent");
+                lobbyName = event.getLobbyName();
+                taxAmount = event.getTaxAmount();
+                inventory = event.getInventory();
 
-        resourceAmount.setText(String.valueOf(taxAmount));
-        setInventoryList();
-        setSliders(event.getInventory());
+                resourceAmount.setText(String.valueOf(taxAmount));
+                setInventoryList();
+                setSliders(event.getInventory());
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -174,10 +191,18 @@ public class RobberTaxPresenter extends AbstractPresenter {
     @FXML
     private void onTaxPayButtonPressed() {
         soundService.button();
-        LOG.debug("Sending RobberTaxChosenRequest");
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending RobberTaxChosenRequest");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

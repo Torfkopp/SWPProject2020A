@@ -11,6 +11,7 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -39,23 +40,39 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
     protected Timer tradeAcceptTimer;
-
+    @FXML
+    protected Label acceptTradeTimerLabel;
+    protected boolean paused;
     @FXML
     private Button acceptTradeButton;
     @FXML
     private Label tradeNotPossibleLabel;
     @FXML
     private Label tradeResponseLabel;
-    @FXML
-    protected Label acceptTradeTimerLabel;
-
     private LobbyName lobbyName;
     private UserOrDummy offeringUser;
     private ResourceList offeringResourceMap;
     private ResourceList respondingResourceMap;
 
-    protected boolean paused;
-    protected int remainingMoveTime;
+    /**
+     * Initialises the Presenter using the superclass.
+     *
+     * @implNote Called automatically by JavaFX
+     */
+    @FXML
+    public void initialize() {
+        super.initialize();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("TradeWithUserAcceptPresenter initialised");
+                setAcceptTradeTimer(30);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
+    }
 
     /**
      * Helper method to set the timer for the players round.
@@ -72,31 +89,20 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         tradeAcceptTimer = new Timer();
         AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         tradeAcceptTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
             public void run() {
                 if (!paused) {
-                    Platform.runLater(() -> acceptTradeTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
+                    int i = moveTimeToDecrement.getAndDecrement();
+                    String moveTimeText = String.format(resourceBundle.getString("game.labels.movetime"), i);
+                    Platform.runLater(() -> acceptTradeTimerLabel.setText(moveTimeText));
                     if (moveTimeToDecrement.get() == 0) {
                         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
                         tradeService.closeTradeResponseWindow(lobbyName);
-                        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+                        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
                     }
-                } else {remainingMoveTime = moveTimeToDecrement.get();}
+                }
             }
         }, 0, 1000);
-    }
-
-    /**
-     * Initialises the Presenter using the superclass.
-     *
-     * @implNote Called automatically by JavaFX
-     */
-    @FXML
-    public void initialize() {
-        super.initialize();
-        LOG.debug("TradeWithUserAcceptPresenter initialised");
-        setAcceptTradeTimer(30);
     }
 
     /**
@@ -121,10 +127,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
         LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
+        String invalid = String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser());
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(
-                    String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
+            tradeNotPossibleLabel.setText(invalid);
         });
     }
 
@@ -148,7 +154,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         soundService.button();
         tradeService.showUserTradeWindow(lobbyName, offeringUser);
         tradeService.tradeWithUser(lobbyName, offeringUser, true);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -165,7 +171,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         soundService.button();
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -181,7 +187,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -219,8 +225,9 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void setOfferLabel() {
         String offered = tallyUpOfferOrDemand(offeringResourceMap);
         String demanded = tallyUpOfferOrDemand(respondingResourceMap);
-        Platform.runLater(() -> tradeResponseLabel.setText(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser, offered, demanded)));
+        String bundleString = resourceBundle.getString("game.trade.offer.proposed");
+        String text = String.format(bundleString, offeringUser, offered, demanded);
+        Platform.runLater(() -> tradeResponseLabel.setText(text));
     }
 
     /**

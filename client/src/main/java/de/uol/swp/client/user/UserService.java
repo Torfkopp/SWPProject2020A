@@ -9,6 +9,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.*;
 import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,9 +53,17 @@ public class UserService implements IUserService {
      */
     @Override
     public void createUser(User user) {
-        LOG.debug("Sending RegisterUserRequest");
-        Message request = new RegisterUserRequest(user);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending RegisterUserRequest");
+                Message request = new RegisterUserRequest(user);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -71,9 +80,17 @@ public class UserService implements IUserService {
      */
     @Override
     public void dropUser(User user, String password) {
-        LOG.debug("Sending DeleteUserRequest");
-        Message request = new DeleteUserRequest(user, password);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending DeleteUserRequest");
+                Message request = new DeleteUserRequest(user, password);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
@@ -91,18 +108,26 @@ public class UserService implements IUserService {
      *
      * @param username     The user's name
      * @param passwordHash The user's hashed password
-     * @param rememberMe   whether to remember the user details for automatic login
+     * @param rememberMe   Whether to remember the user details for automatic login
      *
      * @since 2017-03-17
      */
     @Override
     public void login(String username, String passwordHash, boolean rememberMe) {
-        preferences.putBoolean("rememberMeEnabled", rememberMe);
-        preferences.put("username", username);
-        preferences.put("password", passwordHash);
-        LOG.debug("Sending LoginRequest");
-        Message msg = new LoginRequest(username, passwordHash);
-        bus.post(msg);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                preferences.putBoolean("rememberMeEnabled", rememberMe);
+                preferences.put("username", username);
+                preferences.put("password", passwordHash);
+                LOG.debug("Sending LoginRequest");
+                Message msg = new LoginRequest(username, passwordHash);
+                bus.post(msg);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -114,15 +139,23 @@ public class UserService implements IUserService {
      */
     @Override
     public void logout(boolean resetRememberMe) {
-        if (resetRememberMe) {
-            preferences.putBoolean("rememberMeEnabled", false);
-            preferences.put("username", "");
-            preferences.put("password", "");
-        }
-        LOG.debug("Sending LogoutRequest");
-        Message msg = new LogoutRequest();
-        bus.post(msg);
-        setLoggedInUser(null);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                if (resetRememberMe) {
+                    preferences.putBoolean("rememberMeEnabled", false);
+                    preferences.put("username", "");
+                    preferences.put("password", "");
+                }
+                LOG.debug("Sending LogoutRequest");
+                Message msg = new LogoutRequest();
+                bus.post(msg);
+                setLoggedInUser(null);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -130,9 +163,17 @@ public class UserService implements IUserService {
      */
     @Override
     public void retrieveAllUsers() {
-        LOG.debug("Sending RetrieveAllOnlineUsersRequest");
-        Message cmd = new RetrieveAllOnlineUsersRequest();
-        bus.post(cmd);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending RetrieveAllOnlineUsersRequest");
+                Message cmd = new RetrieveAllOnlineUsersRequest();
+                bus.post(cmd);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -153,9 +194,17 @@ public class UserService implements IUserService {
      */
     @Override
     public void updateAccountDetails(User user, String oldHashedPassword, String oldUsername, String oldEMail) {
-        LOG.debug("Sending UpdateAccountDetailsRequest");
-        Message request = new UpdateUserAccountDetailsRequest(user, oldHashedPassword, oldUsername, oldEMail);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending UpdateAccountDetailsRequest");
+                Message request = new UpdateUserAccountDetailsRequest(user, oldHashedPassword, oldUsername, oldEMail);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -175,8 +224,16 @@ public class UserService implements IUserService {
     @Subscribe
     protected void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
         if (getLoggedInUser().getID() != rsp.getUser().getID()) return;
-        LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
-        setLoggedInUser(rsp.getUser());
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Received ChangeAccountDetailsSuccessfulResponse");
+                setLoggedInUser(rsp.getUser());
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**

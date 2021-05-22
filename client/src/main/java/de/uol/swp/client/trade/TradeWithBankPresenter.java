@@ -11,6 +11,7 @@ import de.uol.swp.common.game.response.InventoryForTradeResponse;
 import de.uol.swp.common.game.response.TradeWithBankAcceptedResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -96,7 +97,15 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         bankResourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
         bankResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        LOG.debug("TradeWithBankPresenter initialised");
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("TradeWithBankPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -175,8 +184,9 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         ResourceList resourceList = rsp.getResourceList();
         ResourceList tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
         setInventories(resourceList, tradingRatios);
-        buyDevelopmentButton.setDisable(resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
-                ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0);
+        Platform.runLater(() -> buyDevelopmentButton.setDisable(
+                resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
+                        ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0));
     }
 
     /**
@@ -250,7 +260,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
-        Platform.runLater(() -> soundService.coins());
+        soundService.coins();
     }
 
     /**

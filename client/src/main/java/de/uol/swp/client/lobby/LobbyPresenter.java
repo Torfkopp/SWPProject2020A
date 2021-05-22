@@ -20,6 +20,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import org.apache.logging.log4j.LogManager;
@@ -83,7 +84,15 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public void initialize() {
         super.initialize();
         prepareMembersView();
-        LOG.debug("LobbyPresenter initialised");
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("LobbyPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -180,22 +189,25 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
-        kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-        changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-        tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
 
         addSizeChangeListener();
         fitCanvasToSize();
 
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
+        startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
+        moveTime = event.getLobby().getMoveTime();
         commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
-        startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
-        moveTime = event.getLobby().getMoveTime();
-        moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
-        moveTimeTextField.setText(String.valueOf(moveTime));
+
+        Platform.runLater(() -> {
+            kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+            changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
+            tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+            moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
+            moveTimeTextField.setText(String.valueOf(moveTime));
+        });
         setPreGameSettings();
         lobbyService.checkForGame(lobbyName);
     }
@@ -234,8 +246,16 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onRulesMenuClicked() {
-        LOG.debug("Sending ShowRulesOverviewViewEvent");
-        eventBus.post(new ShowRulesOverviewViewEvent());
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending ShowRulesOverviewViewEvent");
+                post(new ShowRulesOverviewViewEvent());
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**

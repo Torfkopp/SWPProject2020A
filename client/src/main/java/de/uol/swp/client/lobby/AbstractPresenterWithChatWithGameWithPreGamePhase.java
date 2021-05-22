@@ -17,6 +17,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -83,6 +84,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -115,7 +125,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (lobbyName != null || !kicked) {
             lobbyService.leaveLobby(lobbyName);
         }
-        moveTimeTimer.cancel();
+        if (moveTimeTimer != null) moveTimeTimer.cancel();
         ((Stage) window).close();
         clearEventBus();
     }
@@ -621,7 +631,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
 
             if (moveTime < 30 || moveTime > 500) {
-                eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+                post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
 
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
@@ -629,7 +639,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                                                  randomPlayFieldCheckbox.isSelected());
             }
         } catch (NumberFormatException ignored) {
-            eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
         }
     }
 

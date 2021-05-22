@@ -36,6 +36,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -168,6 +169,15 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("AbstractPresenterWithChatWithGame initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -790,7 +800,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
             playMonopolyCard(ore, grain, brick, lumber, wool, choices);
         } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            eventBus.post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
+            post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
         } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
             playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
         }
@@ -919,7 +929,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (helpActivated) setHelpText();
         }
         if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -1012,9 +1022,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
-                eventBus.post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                         msg.getInventories().get(user).create()));
-                eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+                post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                msg.getInventories().get(user).create()));
+                post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
     }
@@ -1054,7 +1064,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         gameService.updateInventory(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**

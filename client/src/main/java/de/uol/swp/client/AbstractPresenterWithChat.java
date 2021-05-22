@@ -15,6 +15,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
@@ -60,9 +61,19 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Called by the constructor of inheriting classes to set the Logger
      *
      * @param log The Logger of the inheriting class
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     public void init(Logger log) {
-        LOG = log;
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG = log;
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -73,6 +84,15 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareChatVars();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("AbstractPresenterWithChat initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -490,13 +510,15 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             @Override
             protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item instanceof SystemMessage)
-                    setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
-                else setFont(Font.getDefault());
-                setText(empty || item == null ? "" : item.toString());
-                prefWidthProperty().bind(widthProperty().divide(1.1));
-                setMaxWidth(Control.USE_PREF_SIZE);
-                setWrapText(true);
+                Platform.runLater(() -> {
+                    if (item instanceof SystemMessage)
+                        setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
+                    else setFont(Font.getDefault());
+                    setText(empty || item == null ? "" : item.toString());
+                    prefWidthProperty().bind(widthProperty().divide(1.1));
+                    setMaxWidth(Control.USE_PREF_SIZE);
+                    setWrapText(true);
+                });
             }
         });
         chatView.setItems(chatMessages);
@@ -513,10 +535,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      */
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
-        Platform.runLater(() -> {
-            if (chatMessages == null) prepareChatVars();
-            chatMessages.clear();
-            chatMessages.addAll(chatMessageList);
-        });
+        if (chatMessages == null) prepareChatVars();
+        chatMessages.clear();
+        Platform.runLater(() -> chatMessages.addAll(chatMessageList));
     }
 }

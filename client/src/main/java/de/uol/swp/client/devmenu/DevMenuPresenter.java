@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -64,7 +65,7 @@ public class DevMenuPresenter extends AbstractPresenter {
      */
     @FXML
     private void initialize() {
-        eventBus.post(new DevMenuClassesRequest());
+        post(new DevMenuClassesRequest());
         if (classNameObservableList == null) classNameObservableList = FXCollections.observableArrayList();
         filteredClassNameList = new FilteredList<>(classNameObservableList, p -> true);
 
@@ -92,7 +93,15 @@ public class DevMenuPresenter extends AbstractPresenter {
             }
         });
         constructorList.setItems(constructorObservableList);
-        LOG.debug("DevMenuPresenter initialised");
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("DevMenuPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -136,11 +145,19 @@ public class DevMenuPresenter extends AbstractPresenter {
     private void onSendButtonPressed() {
         soundService.button();
         List<String> args = new LinkedList<>();
-        for (TextField tf : textFields) {
-            args.add(tf.getText());
-        }
-        LOG.debug("Sending DevMenuCommandRequest");
-        eventBus.post(new DevMenuCommandRequest(classListView.getSelectionModel().getSelectedItem(), args));
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                for (TextField tf : textFields) {
+                    args.add(tf.getText());
+                }
+                LOG.debug("Sending DevMenuCommandRequest");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
+        post(new DevMenuCommandRequest(classListView.getSelectionModel().getSelectedItem(), args));
     }
 
     /**

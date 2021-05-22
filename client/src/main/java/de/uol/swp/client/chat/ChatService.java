@@ -6,6 +6,7 @@ import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.Message;
+import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,57 +42,122 @@ public class ChatService implements IChatService {
 
     @Override
     public void askLatestMessages(int amount) {
-        LOG.debug("Sending AskLatestMessagesRequest");
-        Message request = new AskLatestChatMessageRequest(amount);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending AskLatestMessagesRequest");
+                Message request = new AskLatestChatMessageRequest(amount);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void askLatestMessages(int amount, LobbyName originLobby) {
-        LOG.debug("Sending AskLatestMessagesRequest for Lobby {}", originLobby);
-        Message request = new AskLatestChatMessageRequest(amount, originLobby);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending AskLatestMessagesRequest for Lobby {}", originLobby);
+                Message request = new AskLatestChatMessageRequest(amount, originLobby);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void deleteMessage(int id) {
-        LOG.debug("Sending DeleteChatMessageRequest");
-        Message request = new DeleteChatMessageRequest(id, userService.getLoggedInUser());
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending DeleteChatMessageRequest");
+                Message request = new DeleteChatMessageRequest(id, userService.getLoggedInUser());
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void deleteMessage(int id, LobbyName originLobby) {
-        LOG.debug("Sending DeleteChatMessageRequest for Lobby {}", originLobby);
-        Message request = new DeleteChatMessageRequest(id, userService.getLoggedInUser(), originLobby);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending DeleteChatMessageRequest for Lobby {}", originLobby);
+                Message request = new DeleteChatMessageRequest(id, userService.getLoggedInUser(), originLobby);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void editMessage(int id, String newContent) {
-        LOG.debug("Sending EditChatMessageRequest");
-        Message request = new EditChatMessageRequest(id, newContent, userService.getLoggedInUser());
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending EditChatMessageRequest");
+                Message request = new EditChatMessageRequest(id, newContent, userService.getLoggedInUser());
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void editMessage(int id, String newContent, LobbyName originLobby) {
-        LOG.debug("Sending EditChatMessageRequest for Lobby {}", originLobby);
-        Message request = new EditChatMessageRequest(id, newContent, userService.getLoggedInUser(), originLobby);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending EditChatMessageRequest for Lobby {}", originLobby);
+                Message request = new EditChatMessageRequest(id, newContent, userService.getLoggedInUser(),
+                                                             originLobby);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void newMessage(String msg) {
-        LOG.debug("Sending NewChatMessageRequest");
-        Message request = new NewChatMessageRequest(userService.getLoggedInUser(), msg);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending NewChatMessageRequest");
+                Message request = new NewChatMessageRequest(userService.getLoggedInUser(), msg);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
     public void newMessage(String msg, LobbyName originLobby) {
-        LOG.debug("Sending NewChatMessageRequest for Lobby {}", originLobby);
-        Message request = new NewChatMessageRequest(userService.getLoggedInUser(), msg, originLobby);
-        bus.post(request);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("Sending NewChatMessageRequest for Lobby {}", originLobby);
+                Message request = new NewChatMessageRequest(userService.getLoggedInUser(), msg, originLobby);
+                bus.post(request);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 }

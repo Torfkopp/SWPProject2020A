@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.user.IUserService;
+import javafx.concurrent.Task;
 
 import java.util.ResourceBundle;
 
@@ -32,7 +33,7 @@ public abstract class AbstractPresenter {
     @Inject
     protected ResourceBundle resourceBundle;
 
-    protected EventBus eventBus;
+    private EventBus eventBus;
 
     /**
      * Clears the field EventBus
@@ -47,6 +48,29 @@ public abstract class AbstractPresenter {
     public void clearEventBus() {
         this.eventBus.unregister(this);
         this.eventBus = null;
+    }
+
+    /**
+     * Posts an Object to the EventBus
+     * <p>
+     * This method posts the provided object onto the EventBus.
+     *
+     * @param obj the obj
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Phillip-André Suhr
+     * @since 2021-05-22
+     */
+    public void post(Object obj) {
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                eventBus.post(obj);
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**

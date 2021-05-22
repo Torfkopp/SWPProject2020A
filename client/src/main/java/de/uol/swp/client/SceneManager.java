@@ -14,6 +14,7 @@ import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceled
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
+import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyPresenter;
 import de.uol.swp.client.lobby.RobberTaxPresenter;
 import de.uol.swp.client.lobby.event.*;
@@ -34,12 +35,15 @@ import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -87,6 +91,9 @@ public class SceneManager {
     private IUserService userService;
 
     @Inject
+    private ILobbyService lobbyService;
+
+    @Inject
     private ISoundService soundService;
 
     private Scene loginScene;
@@ -119,11 +126,12 @@ public class SceneManager {
      *
      * @author Finn Haase
      * @author Aldin Dervisi
+     * @implNote The closing of the Stages is executed on the JavaFX Application Thread
      * @since 2021-01-28
      */
     public void closeLobbies() {
         for (Stage lobbyStage : lobbyStages) {
-            lobbyStage.close();
+            Platform.runLater(lobbyStage::close);
         }
         lobbyStages.clear();
     }
@@ -133,10 +141,11 @@ public class SceneManager {
      *
      * @author Aldin Dervisi
      * @author Marvin Drees
+     * @implNote The closing of the Main Screen is executed on the JavaFX Application Thread
      * @since 2021-03-25
      */
     public void closeMainScreen() {
-        primaryStage.close();
+        Platform.runLater(primaryStage::close);
     }
 
     /**
@@ -163,18 +172,21 @@ public class SceneManager {
      *
      * @author Mario Fokken
      * @author Marvin Drees
+     * @implNote The method contents are executed on the JavaFX Application Thread
      * @since 2021-03-12
      */
     public void showError(String message, String e) {
+        soundService.popup();
+        String title = resourceBundle.getString("error.title");
+        String headerText = resourceBundle.getString("error.header");
+        String confirmText = resourceBundle.getString("button.confirm");
+        String content = message + internationaliseServerMessage(e);
         Platform.runLater(() -> {
-            soundService.popup();
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(resourceBundle.getString("error.title"));
-            alert.setHeaderText(resourceBundle.getString("error.header"));
-            String context = internationaliseServerMessage(e);
-            alert.setContentText(message + context);
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
+            alert.setContentText(content);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
@@ -206,20 +218,32 @@ public class SceneManager {
      * @since 2021-03-03
      */
     public void showLogOldSessionOutScreen(User user) {
+        soundService.popup();
+        String content = resourceBundle.getString("logoldsessionout.error");
+        String title = resourceBundle.getString("confirmation.title");
+        String headerText = resourceBundle.getString("confirmation.header");
+        String confirmText = resourceBundle.getString("button.confirm");
+        String cancelText = resourceBundle.getString("button.cancel");
         Platform.runLater(() -> {
-            soundService.popup();
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, resourceBundle.getString("logoldsessionout.error"));
-            alert.setTitle(resourceBundle.getString("confirmation.title"));
-            alert.setHeaderText(resourceBundle.getString("confirmation.header"));
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
             alert.getButtonTypes().setAll(confirm, cancel);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == confirm) {
-                eventBus.post(new NukeUsersSessionsRequest(user));
+                Task<Boolean> task = new Task<>() {
+                    @Override
+                    protected Boolean call() {
+                        LOG.debug("Sending NukeUsersSessionsRequest");
+                        eventBus.post(new NukeUsersSessionsRequest(user));
+                        return true;
+                    }
+                };
+                Thread thread = new Thread(task);
+                thread.start();
             }
         });
     }
@@ -232,16 +256,17 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginErrorScreen() {
+        soundService.popup();
+        String contentText = resourceBundle.getString("login.error");
+        String confirmText = resourceBundle.getString("button.confirm");
         Platform.runLater(() -> {
-            soundService.popup();
-            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("login.error"));
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
+            Alert alert = new Alert(Alert.AlertType.ERROR, contentText);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
-            showLoginScreen();
         });
+        showLoginScreen();
     }
 
     /**
@@ -329,12 +354,14 @@ public class SceneManager {
      * @since 2021-03-26
      */
     public void showTimeoutErrorScreen() {
+        soundService.popup();
+        String contentText = resourceBundle.getString("error.context.disconnected");
+        String headerText = resourceBundle.getString("error.header.disconnected");
+        String confirmText = resourceBundle.getString("button.confirm");
         Platform.runLater(() -> {
-            soundService.popup();
-            Alert alert = new Alert(Alert.AlertType.ERROR, resourceBundle.getString("error.context.disconnected"));
-            alert.setHeaderText(resourceBundle.getString("error.header.disconnected"));
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
+            Alert alert = new Alert(Alert.AlertType.ERROR, contentText);
+            alert.setHeaderText(headerText);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
@@ -681,7 +708,7 @@ public class SceneManager {
     private void onClientDisconnectedFromServer(ClientDisconnectedFromServerEvent msg) {
         LOG.debug("Client disconnected from server");
         showTimeoutErrorScreen();
-        Platform.runLater(this::closeMainScreen);
+        closeMainScreen();
     }
 
     /**
@@ -717,8 +744,10 @@ public class SceneManager {
         LOG.debug("Received CloseRobberTaxViewEvent");
         LobbyName lobby = event.getLobbyName();
         if (robberTaxStages.containsKey(lobby)) {
-            robberTaxStages.get(lobby).close();
-            robberTaxStages.remove(lobby);
+            Platform.runLater(() -> {
+                robberTaxStages.get(lobby).close();
+                robberTaxStages.remove(lobby);
+            });
         }
     }
 
@@ -818,10 +847,14 @@ public class SceneManager {
     private void onOpenDevMenuResponse(OpenDevMenuResponse rsp) {
         LOG.debug("Received OpenDevMenuResponse");
         if (devMenuIsOpen) return;
+        devMenuIsOpen = true;
+        String title = resourceBundle.getString("devmenu.window.title");
+        double xPos = primaryStage.getX() + 100;
+        double yPos = primaryStage.getY();
         Platform.runLater(() -> {
-            devMenuIsOpen = true;
+            //IllegalStateException - thrown if this constructor is not called on the JavaFX Application Thread.
             Stage devMenuStage = new Stage();
-            devMenuStage.setTitle(resourceBundle.getString("devmenu.window.title"));
+            devMenuStage.setTitle(title);
             devMenuStage.setHeight(DevMenuPresenter.MIN_HEIGHT);
             devMenuStage.setMinHeight(DevMenuPresenter.MIN_HEIGHT);
             devMenuStage.setWidth(DevMenuPresenter.MIN_WIDTH);
@@ -831,8 +864,8 @@ public class SceneManager {
             devMenuScene.getStylesheets().add(styleSheet);
             devMenuStage.setScene(devMenuScene);
             devMenuStage.initOwner(primaryStage);
-            devMenuStage.setX(primaryStage.getX() + 100);
-            devMenuStage.setY(primaryStage.getY());
+            devMenuStage.setX(xPos);
+            devMenuStage.setY(yPos);
             devMenuStage.show();
             devMenuStage.setOnCloseRequest(event -> devMenuIsOpen = false);
         });
@@ -943,32 +976,38 @@ public class SceneManager {
      */
     @Subscribe
     private void onShowLobbyViewEvent(ShowLobbyViewEvent event) {
+        LOG.debug("Received ShowLobbyViewEvent");
         //gets the lobby's name
-        LobbyName lobbyName = event.getName();
+        ISimpleLobby lobby = event.getLobby();
+        LobbyName lobbyName = lobby.getName();
+        double xPos = primaryStage.getX() + 100;
         //New window (Stage)
-        Stage lobbyStage = new Stage();
-        lobbyStage.setTitle(lobbyName.toString());
-        lobbyStage.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
-        lobbyStage.setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
-        lobbyStage.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
-        lobbyStage.setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
-        //Initialises a new lobbyScene
-        Parent rootPane = initPresenter(LobbyPresenter.fxml);
-        Scene lobbyScene = new Scene(rootPane);
-        lobbyScene.getStylesheets().add(styleSheet);
-        lobbyScenes.put(lobbyName, lobbyScene);
-        //Sets the stage to the newly created scene
-        lobbyStage.setScene(lobbyScenes.get(lobbyName));
-        //Specifies the modality for new window
-        lobbyStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        lobbyStage.initOwner(primaryStage);
-        //Set position of second window, related to primary window
-        lobbyStage.setX(primaryStage.getX() + 100);
-        lobbyStage.setY(10);
-        //Shows the window
-        lobbyStage.show();
-        lobbyStages.add(lobbyStage);
+        Platform.runLater(() -> {
+            Stage lobbyStage = new Stage();
+            lobbyStage.setTitle(lobbyName.toString());
+            lobbyStage.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+            lobbyStage.setMinHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
+            lobbyStage.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            lobbyStage.setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
+            //Initialises a new lobbyScene
+            Parent rootPane = initPresenter(LobbyPresenter.fxml);
+            Scene lobbyScene = new Scene(rootPane);
+            lobbyScene.getStylesheets().add(styleSheet);
+            lobbyScenes.put(lobbyName, lobbyScene);
+            //Sets the stage to the newly created scene
+            lobbyStage.setScene(lobbyScenes.get(lobbyName));
+            //Specifies the modality for new window
+            lobbyStage.initModality(Modality.NONE);
+            //Specifies the owner Window (parent) for new window
+            lobbyStage.initOwner(primaryStage);
+            //Set position of second window, related to primary window
+            lobbyStage.setX(xPos);
+            lobbyStage.setY(10);
+            //Shows the window
+            lobbyStage.show();
+            lobbyStages.add(lobbyStage);
+            lobbyService.refreshLobbyPresenterFields(lobby);
+        });
     }
 
     /**
@@ -1023,28 +1062,29 @@ public class SceneManager {
     private void onShowRobberTaxViewEvent(ShowRobberTaxViewEvent event) {
         LOG.debug("Received ShowRobberTaxViewEvent");
         LobbyName lobbyName = event.getLobbyName();
+        Parent rootPane = initPresenter(RobberTaxPresenter.fxml);
+        Scene robberTaxScene = new Scene(rootPane);
+        robberTaxScene.getStylesheets().add(styleSheet);
+        String title = resourceBundle.getString("game.robber.tax.title");
         Platform.runLater(() -> {
             Stage robberTaxStage = new Stage();
             robberTaxStages.put(event.getLobbyName(), robberTaxStage);
-            robberTaxStage.setTitle(resourceBundle.getString("game.robber.tax.title"));
+            robberTaxStage.setTitle(title);
             robberTaxStage.setHeight(RobberTaxPresenter.MIN_HEIGHT);
             robberTaxStage.setMinHeight(RobberTaxPresenter.MIN_HEIGHT);
             robberTaxStage.setWidth(RobberTaxPresenter.MIN_WIDTH);
             robberTaxStage.setMinWidth(RobberTaxPresenter.MIN_WIDTH);
-            Parent rootPane = initPresenter(RobberTaxPresenter.fxml);
-            Scene robberTaxScene = new Scene(rootPane);
-            robberTaxScene.getStylesheets().add(styleSheet);
             robberTaxStage.setScene(robberTaxScene);
             robberTaxStage.initModality(Modality.NONE);
             robberTaxStage.initOwner(primaryStage);
             robberTaxStage.initStyle(StageStyle.UNDECORATED);
             robberTaxStage.show();
-            LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
-            eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(),
-                                                       event.getInventory().create()));
             Platform.setImplicitExit(false);
-            robberTaxStages.get(lobbyName).setOnCloseRequest(windowEvent -> windowEvent.consume());
+            robberTaxStages.get(lobbyName).setOnCloseRequest(Event::consume);
         });
+        LOG.debug("Sending ShowRobberTaxUpdateEvent to Lobby {}", lobbyName);
+        eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(),
+                                                   event.getInventory().create()));
     }
 
     /**
@@ -1061,10 +1101,11 @@ public class SceneManager {
     @Subscribe
     private void onShowRulesOverviewViewEvent(ShowRulesOverviewViewEvent event) {
         if (rulesOverviewIsOpen) return;
+        String title = resourceBundle.getString("rules.window.title");
         Platform.runLater(() -> {
             Stage rulesStage = new Stage();
             rulesOverviewIsOpen = true;
-            rulesStage.setTitle(resourceBundle.getString("rules.window.title"));
+            rulesStage.setTitle(title);
             rulesStage.setHeight(RulesOverviewPresenter.MIN_HEIGHT);
             rulesStage.setMinHeight(RulesOverviewPresenter.MIN_HEIGHT);
             rulesStage.setWidth(RulesOverviewPresenter.MIN_WIDTH);
@@ -1075,8 +1116,16 @@ public class SceneManager {
             rulesStage.show();
             rulesStage.toFront();
             rulesStage.setOnCloseRequest(windowEvent -> {
-                rulesOverviewIsOpen = false;
-                eventBus.post(new ResetRulesOverviewEvent());
+                Task<Boolean> task = new Task<>() {
+                    @Override
+                    protected Boolean call() {
+                        rulesOverviewIsOpen = false;
+                        eventBus.post(new ResetRulesOverviewEvent());
+                        return true;
+                    }
+                };
+                Thread thread = new Thread(task);
+                thread.start();
             });
         });
     }
@@ -1098,24 +1147,27 @@ public class SceneManager {
         //gets the lobby's name
         LobbyName lobbyName = event.getLobbyName();
         //New window (Stage)
-        Stage bankStage = new Stage();
-        bankStage.setTitle(resourceBundle.getString("game.trade.window.bank.title"));
-        bankStage.setHeight(TradeWithBankPresenter.MIN_HEIGHT);
-        bankStage.setMinHeight(TradeWithBankPresenter.MIN_HEIGHT);
-        bankStage.setWidth(TradeWithBankPresenter.MIN_WIDTH);
-        bankStage.setMinWidth(TradeWithBankPresenter.MIN_WIDTH);
-        //Initialises a new lobbyScene
         Parent rootPane = initPresenter(TradeWithBankPresenter.fxml);
         Scene bankScene = new Scene(rootPane);
         bankScene.getStylesheets().add(styleSheet);
-        bankStage.setScene(bankScene);
-        tradingStages.put(lobbyName, bankStage);
-        //Specifies the modality for new window
-        bankStage.initModality(Modality.NONE);
-        //Specifies the owner Window (parent) for new window
-        bankStage.initOwner(primaryStage);
-        //Shows the window
-        bankStage.show();
+        String title = resourceBundle.getString("game.trade.window.bank.title");
+        Platform.runLater(() -> {
+            Stage bankStage = new Stage();
+            bankStage.setTitle(title);
+            bankStage.setHeight(TradeWithBankPresenter.MIN_HEIGHT);
+            bankStage.setMinHeight(TradeWithBankPresenter.MIN_HEIGHT);
+            bankStage.setWidth(TradeWithBankPresenter.MIN_WIDTH);
+            bankStage.setMinWidth(TradeWithBankPresenter.MIN_WIDTH);
+            //Initialises a new lobbyScene
+            bankStage.setScene(bankScene);
+            tradingStages.put(lobbyName, bankStage);
+            //Specifies the modality for new window
+            bankStage.initModality(Modality.NONE);
+            //Specifies the owner Window (parent) for new window
+            bankStage.initOwner(primaryStage);
+            //Shows the window
+            bankStage.show();
+        });
         LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
         eventBus.post(new TradeUpdateEvent(lobbyName));
     }
@@ -1138,14 +1190,15 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserRespondViewEvent(ShowTradeWithUserRespondViewEvent event) {
         LobbyName lobbyName = event.getLobbyName();
+        String bundleString = resourceBundle.getString("game.trade.window.receiving.title");
+        String title = String.format(bundleString, event.getOfferingUser());
         Platform.runLater(() -> {
             if (tradingStages.containsKey(lobbyName)) {
                 tradingStages.get(lobbyName).close();
                 tradingStages.remove(lobbyName);
             }
             Stage tradingResponseStage = new Stage();
-            tradingResponseStage.setTitle(String.format(resourceBundle.getString("game.trade.window.receiving.title"),
-                                                        event.getOfferingUser()));
+            tradingResponseStage.setTitle(title);
             tradingResponseStage.setHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
             tradingResponseStage.setMinHeight(TradeWithUserAcceptPresenter.MIN_HEIGHT);
             tradingResponseStage.setWidth(TradeWithUserAcceptPresenter.MIN_WIDTH);
@@ -1158,8 +1211,16 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
-            eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
+            Task<Boolean> task = new Task<>() {
+                @Override
+                protected Boolean call() {
+                    LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
+                    eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
+                    return true;
+                }
+            };
+            Thread thread = new Thread(task);
+            thread.start();
         });
     }
 
@@ -1181,23 +1242,34 @@ public class SceneManager {
     @Subscribe
     private void onShowTradeWithUserViewEvent(ShowTradeWithUserViewEvent event) {
         LobbyName lobbyName = event.getLobbyName();
-        Stage tradingStage = new Stage();
-        tradingStage.setTitle(
-                String.format(resourceBundle.getString("game.trade.window.offering.title"), event.getRespondingUser()));
-        tradingStage.setHeight(TradeWithUserPresenter.MIN_HEIGHT);
-        tradingStage.setMinHeight(TradeWithUserPresenter.MIN_HEIGHT);
-        tradingStage.setWidth(TradeWithUserPresenter.MIN_WIDTH);
-        tradingStage.setMinWidth(TradeWithUserPresenter.MIN_WIDTH);
         Parent rootPane = initPresenter(TradeWithUserPresenter.fxml);
         Scene tradeScene = new Scene(rootPane);
         tradeScene.getStylesheets().add(styleSheet);
-        tradingStage.setScene(tradeScene);
-        tradingStages.put(lobbyName, tradingStage);
-        tradingStage.initModality(Modality.NONE);
-        tradingStage.initOwner(primaryStage);
-        tradingStage.show();
-        eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
-        LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
+        String bundleString = resourceBundle.getString("game.trade.window.offering.title");
+        String title = String.format(bundleString, event.getRespondingUser());
+        Platform.runLater(() -> {
+            Stage tradingStage = new Stage();
+            tradingStage.setTitle(title);
+            tradingStage.setHeight(TradeWithUserPresenter.MIN_HEIGHT);
+            tradingStage.setMinHeight(TradeWithUserPresenter.MIN_HEIGHT);
+            tradingStage.setWidth(TradeWithUserPresenter.MIN_WIDTH);
+            tradingStage.setMinWidth(TradeWithUserPresenter.MIN_WIDTH);
+            tradingStage.setScene(tradeScene);
+            tradingStages.put(lobbyName, tradingStage);
+            tradingStage.initModality(Modality.NONE);
+            tradingStage.initOwner(primaryStage);
+            tradingStage.show();
+            Task<Boolean> task = new Task<>() {
+                @Override
+                protected Boolean call() {
+                    LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
+                    eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
+                    return true;
+                }
+            };
+            Thread thread = new Thread(task);
+            thread.start();
+        });
     }
 
     /**
@@ -1215,12 +1287,12 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         LobbyName lobby = event.getLobbyName();
-        Platform.runLater(() -> {
-            if (tradingStages.containsKey(lobby)) {
+        if (tradingStages.containsKey(lobby)) {
+            Platform.runLater(() -> {
                 tradingStages.get(lobby).close();
                 tradingStages.remove(lobby);
-            }
-        });
+            });
+        }
     }
 
     /**

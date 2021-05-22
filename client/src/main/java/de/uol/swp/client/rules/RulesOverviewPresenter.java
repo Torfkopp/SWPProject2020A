@@ -3,9 +3,13 @@ package de.uol.swp.client.rules;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Manages display of the Rules Overview
@@ -23,6 +27,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
 
     private static final int MIN_LONG_TEXT_HEIGHT = 700;
     private static final int MIN_BANK_TAB_WIDTH = 650;
+    private static final Logger LOG = LogManager.getLogger(RulesOverviewPresenter.class);
 
     @FXML
     private Tab standardDevCardTab;
@@ -74,6 +79,15 @@ public class RulesOverviewPresenter extends AbstractPresenter {
                         .setHeight(newValue.equals(resourceExchangeTab) ? MIN_LONG_TEXT_HEIGHT : MIN_HEIGHT);
             rulesTabPane.getScene().getWindow().setWidth(MIN_BANK_TAB_WIDTH);
         });
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("RulesOverviewPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -88,6 +102,6 @@ public class RulesOverviewPresenter extends AbstractPresenter {
      */
     @Subscribe
     private void onResetRulesOverviewEvent(ResetRulesOverviewEvent event) {
-        rulesTabPane.getSelectionModel().select(basicsTab);
+        Platform.runLater(() -> rulesTabPane.getSelectionModel().select(basicsTab));
     }
 }

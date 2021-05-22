@@ -7,6 +7,7 @@ import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEve
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +25,6 @@ import java.util.regex.Pattern;
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2020-11-25
  */
-@SuppressWarnings("UnstableApiUsage")
 public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangeAccountDetailsView.fxml";
@@ -49,6 +49,15 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareNewUsernameField();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                LOG.debug("ChangeAccountDetailsPresenter initialised");
+                return true;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     /**
@@ -120,7 +129,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        eventBus.post(changeAccountDetailsCanceledEvent);
+        post(changeAccountDetailsCanceledEvent);
     }
 
     /**
@@ -143,8 +152,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     private void onChangeAccountDetailsButtonPressed() {
         soundService.button();
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
-            eventBus.post(new ChangeAccountDetailsErrorEvent(
-                    resourceBundle.getString("changeaccdetails.error.empty.changepw")));
+            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.changepw")));
         }
 
         User user = userService.getLoggedInUser();
@@ -157,20 +165,18 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         if (Strings.isNullOrEmpty(newUsernameField.getText()) && Strings
                 .isNullOrEmpty(newEMailField.getText()) && Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                     .isNullOrEmpty(newPasswordField2.getText())) {
-            eventBus.post(new ChangeAccountDetailsErrorEvent(
+            post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.changeaccdetails")));
         } else if (!checkMailFormat(newEMailField.getText()) && !newEMailField.getText().isEmpty()) {
-            eventBus.post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
+            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else if (Strings.isNullOrEmpty(newPasswordField.getText()) && !Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            eventBus.post(
-                    new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
+            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
         } else if (!Strings.isNullOrEmpty(newPasswordField.getText()) && Strings
                 .isNullOrEmpty(newPasswordField2.getText())) {
-            eventBus.post(
-                    new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
+            post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.newpw")));
         } else if (!newHashedPassword.equals(newConfirmHashedPassword)) {
-            eventBus.post(new ChangeAccountDetailsErrorEvent(
+            post(new ChangeAccountDetailsErrorEvent(
                     resourceBundle.getString("changeaccdetails.error.empty.newpasswordconfirm")));
         } else {
             if (!Strings.isNullOrEmpty(newPasswordField.getText())) {
