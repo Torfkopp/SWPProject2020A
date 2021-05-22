@@ -421,13 +421,6 @@ public class LobbyService extends AbstractService {
         if (req.getToBeKickedUser().equals(req.getUser())) return;
         if (lobby.isEmpty() || !lobby.get().getOwner().equals(req.getUser())) return;
         UserOrDummy toBeKickedUser = req.getToBeKickedUser();
-        System.out.println(toBeKickedUser.getUsername());
-        System.out.println(toBeKickedUser.getID());
-        System.out.println(lobby.get().getUserOrDummies());
-        System.out.println(lobby.get().getUserOrDummies().contains(toBeKickedUser));
-        UserOrDummy bla = (UserOrDummy) lobby.get().getUserOrDummies().toArray()[1];
-        System.out.println(bla.getUsername());
-        System.out.println(bla.getID());
         lobby.get().leaveUser(toBeKickedUser);
         ResponseMessage kickResponse = new KickUserResponse(req.getName(), toBeKickedUser);
         post(new ForwardToUserInternalRequest(toBeKickedUser, kickResponse));

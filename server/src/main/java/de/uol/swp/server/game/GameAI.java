@@ -1019,14 +1019,11 @@ public class GameAI {
             if (map.getIntersection(mp).getState() == IIntersection.IntersectionState.SETTLEMENT)
                 settlements.put(mp, aiBuildPriority.get(game).get(mapPoint));
         }
-        System.err.println(settlements.keySet());
-        System.err.println(settlements.values());
 
         //Pick most lucrative spot and upgrade the settlement
         for (int i = 0; i < 15; i++) {
             if (settlements.containsValue(i)) for (MapPoint mp : settlements.keySet())
                 if (settlements.get(mp) == i) {
-                    System.err.println(mp);
                     map.upgradeSettlement(ai, mp);
                     inv.decrease(GRAIN, 2);
                     inv.decrease(ORE, 3);
