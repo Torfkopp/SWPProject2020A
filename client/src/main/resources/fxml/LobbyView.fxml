@@ -59,14 +59,16 @@
 
     <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" prefWidth="250.0" spacing="10.0">
         <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="190" spacing="10.0">
-            <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0">
+            <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true"
+                   prefHeight="25.0">
                 <labelFor>
-                    <TextField fx:id="moveTimeTextField" prefHeight="25.0" prefWidth="80.0"/>
+                    <TextField fx:id="moveTimeTextField" onAction="#prepareLobbyUpdate" prefHeight="25.0"
+                               prefWidth="80.0"/>
                 </labelFor>
             </Label>
             <HBox spacing="5.0">
                 <fx:reference source="moveTimeTextField"/>
-                <Button fx:id="changeMoveTimeButton" onAction="#prepareLobbyUpdate"
+                <Button disable="true" fx:id="changeMoveTimeButton" onAction="#prepareLobbyUpdate"
                         text="%lobby.buttons.changemovetime"/>
                 <VBox.margin>
                     <Insets top="-10.0"/>
@@ -129,10 +131,10 @@
             <Button disable="true" fx:id="startSession" maxWidth="-Infinity" minWidth="-Infinity"
                     onAction="#onStartSessionButtonPressed" prefWidth="120.0" text="%lobby.game.buttons.startsession"/>
         </HBox>
-        <HBox prefHeight="30.0" prefWidth="230.0">
+        <HBox prefHeight="30.0" prefWidth="230.0" spacing="10">
             <Button disable="true" fx:id="rollDice" onAction="#onRollDiceButtonPressed" prefHeight="30.0"
                     prefWidth="115.0" text="%lobby.game.buttons.rolldice" visible="false"/>
-            <CheckBox fx:id="autoRoll" nodeOrientation="RIGHT_TO_LEFT" onAction="#onAutoRollCheckBoxClicked"
+            <CheckBox fx:id="autoRoll" nodeOrientation="LEFT_TO_RIGHT" onAction="#onAutoRollCheckBoxClicked"
                       prefHeight="30.0" prefWidth="115.0" text="%lobby.game.autorollcheckbox" visible="false"/>
         </HBox>
         <Button disable="true" fx:id="endTurn" onAction="#onEndTurnButtonPressed" prefHeight="30.0" prefWidth="230.0"
@@ -142,7 +144,7 @@
         <Button disable="true" fx:id="tradeWithBankButton" onAction="#onTradeWithBankButtonPressed" prefHeight="30.0"
                 prefWidth="230.0" text="%lobby.game.buttons.banktrade" visible="false"/>
         <Button disable="true" fx:id="playCard" onAction="#onPlayCardButtonPressed" prefHeight="30.0" prefWidth="230.0"
-                text="%game.playcards.button" visible="false"/>
+                text="%lobby.game.buttons.playcard" visible="false"/>
         <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
                prefWidth="230" text="%game.robber.position" visible="false" wrapText="true"/>
         <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>

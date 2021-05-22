@@ -29,7 +29,7 @@
                 </labelFor>
             </Label>
             <Label maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
-                   text="%register.labels.pw">
+                   text="%register.labels.confirmpw">
                 <labelFor>
                     <PasswordField fx:id="passwordField2" promptText="%register.prompts.pw.repeat"/>
                 </labelFor>

@@ -253,21 +253,24 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"),
                                     userService.getLoggedInUser().getUsername());
 
-        //create Dialogue, disallow any use of § in the name (used for command parsing)
+        //create Dialogue, only allow alphanumeric characters plus _',- and space
         UnaryOperator<TextFormatter.Change> filter = s ->
                 s.getControlNewText().matches("[ A-Za-z0-9_',-]+") || s.isDeleted() ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
-        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
-        Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password"));
         TextField lobbyName = new TextField(name);
         lobbyName.setTextFormatter(new TextFormatter<>(filter));
+        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
+        lbl.setPrefHeight(25);
+        lbl.setLabelFor(lobbyName);
+        lbl.setMnemonicParsing(true);
         HBox box = new HBox(10, lbl, lobbyName);
-        CheckBox lobbyPasswordCheckBox = new CheckBox();
+        CheckBox lobbyPasswordCheckBox = new CheckBox(resourceBundle.getString("lobby.dialog.password"));
+        lobbyPasswordCheckBox.setPrefHeight(25);
         PasswordField lobbyPassword = new PasswordField();
-        HBox box1 = new HBox(10, lobbyPasswordCheckBox, lbl1, lobbyPassword);
+        HBox box1 = new HBox(10, lobbyPasswordCheckBox, lobbyPassword);
         VBox vBox = new VBox(10, box, box1);
         lobbyPassword.disableProperty().bind(Bindings.createBooleanBinding(() -> !lobbyPasswordCheckBox.isSelected(),
                                                                            lobbyPasswordCheckBox.selectedProperty()));
@@ -356,10 +359,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
         dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
-        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
         PasswordField confirmPasswordField = new PasswordField();
+        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
+        lbl.setPrefHeight(25);
+        lbl.setLabelFor(confirmPasswordField);
+        lbl.setMnemonicParsing(true);
         CheckBox userDeletionConfirmCheckBox = new CheckBox(
                 resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
+        userDeletionConfirmCheckBox.setMnemonicParsing(true);
         HBox hbox = new HBox(10, lbl, confirmPasswordField);
         VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
         dialogue.getDialogPane().setContent(box);
@@ -459,8 +466,11 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             TextInputDialog dialogue = new TextInputDialog();
             dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
-            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
             PasswordField lobbyPasswordField = new PasswordField();
+            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
+            confirmPasswordLabel.setPrefHeight(25);
+            confirmPasswordLabel.setLabelFor(lobbyPasswordField);
+            confirmPasswordLabel.setMnemonicParsing(true);
             HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
             VBox box = new VBox(10, box3);
             dialogue.getDialogPane().setContent(box);
@@ -469,6 +479,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
                                                ButtonBar.ButtonData.CANCEL_CLOSE);
             dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+            dialogue.getDialogPane().getStylesheets().add(styleSheet);
 
             //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
             Optional<String> result = dialogue.showAndWait();
