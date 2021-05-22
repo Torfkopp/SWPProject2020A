@@ -911,7 +911,8 @@ public class GameService extends AbstractService {
         game.changePauseStatus(req.getUserOrDummy());
         int pausingPlayers = game.getPausedMembers();
         game.checkToChangePauseStatus();
-        ServerMessage msg = new UpdatePauseStatusMessage(req.getOriginLobby(), game.isPaused(), pausingPlayers);
+        ServerMessage msg = new UpdatePauseStatusMessage(req.getOriginLobby(), game.isPaused(), pausingPlayers,
+                                                         game.getActivePlayer());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
     }
 

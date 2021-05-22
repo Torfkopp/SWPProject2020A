@@ -800,9 +800,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             timerPaused = true;
         } else {
             Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.pause")));
-            if (diceRolled) resetButtonStates(userService.getLoggedInUser());
-            else setRollDiceButtonState(userService.getLoggedInUser());
             timerPaused = false;
+            if (userService.getLoggedInUser().equals(msg.getActivePlayer())) {
+                if (diceRolled) resetButtonStates(userService.getLoggedInUser());
+                else setRollDiceButtonState(userService.getLoggedInUser());
+            }
         }
     }
 
