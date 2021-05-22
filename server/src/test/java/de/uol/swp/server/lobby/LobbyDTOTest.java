@@ -147,25 +147,6 @@ class LobbyDTOTest {
     }
 
     /**
-     * Test to check whether the commandsAllowed setting of a lobby
-     * is updated correctly.
-     * <p>
-     * This test fails if the commandsAllowed setting is not updated.
-     *
-     * @author Maximilian Lindner
-     * @author Aldin Dervisi
-     * @since 2021-03-15
-     */
-    @Test
-    void updateCommandsAllowedTest() {
-        ILobby lobby = LobbyDTO.create(defaultLobby);
-        assertTrue(lobby.areCommandsAllowed());
-
-        lobby.setCommandsAllowed(false);
-        assertFalse(lobby.areCommandsAllowed());
-    }
-
-    /**
      * Test to check whether the maxPlayers setting of a lobby
      * is updated correctly.
      * <p>

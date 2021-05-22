@@ -74,10 +74,9 @@ public class LobbyManagement implements ILobbyManagement {
     }
 
     @Override
-    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
-                                    boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled) {
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
+                                    boolean randomPlayfieldEnabled) {
         lobbies.get(lobbyName).setMaxPlayers(maxPlayers);
-        lobbies.get(lobbyName).setCommandsAllowed(commandsAllowed);
         lobbies.get(lobbyName).setMoveTime(moveTime);
         lobbies.get(lobbyName).setStartUpPhaseEnabled(startUpPhaseEnabled);
         lobbies.get(lobbyName).setRandomPlayFieldEnabled(randomPlayfieldEnabled);

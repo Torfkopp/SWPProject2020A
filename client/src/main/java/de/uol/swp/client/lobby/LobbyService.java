@@ -143,12 +143,11 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
-                                    boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
+                                    boolean randomPlayFieldEnabled) {
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
-                                                     startUpPhaseEnabled, commandsAllowed, moveTime,
-                                                     randomPlayFieldEnabled));
+                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled));
     }
 
     @Override

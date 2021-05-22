@@ -72,8 +72,6 @@
             <CheckBox fx:id="setStartUpPhaseCheckBox" maxHeight="-Infinity" minHeight="-Infinity"
                       mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.startupphase"/>
-            <CheckBox fx:id="commandsActivated" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
-                      onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.commandsallowed"/>
             <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity"
                       mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
                       text="%lobby.checkboxes.randomplayfield"/>

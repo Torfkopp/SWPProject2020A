@@ -3,6 +3,7 @@ package de.uol.swp.server.di;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 import de.uol.swp.server.chat.ChatManagement;
 import de.uol.swp.server.chat.ChatService;
 import de.uol.swp.server.chat.IChatManagement;
@@ -49,6 +50,7 @@ public class ServerModule extends AbstractModule {
         //Default language
         defaultProps.setProperty("db", "h2");
         defaultProps.setProperty("debug.loglevel", "DEBUG");
+        defaultProps.setProperty("debug.commands", "false");
 
         //Reading properties-file
         final Properties serverProperties = new Properties(defaultProps);
@@ -61,12 +63,14 @@ public class ServerModule extends AbstractModule {
             System.out.println("Error reading config file");
         }
 
+        // Set loglevel according to server config
         Level loglevel = Level.toLevel(serverProperties.getProperty("debug.loglevel"));
         LOG.info("Switching to selected LOG-Level: {}", loglevel);
         Configurator.setAllLevels(LogManager.getRootLogger().getName(), loglevel);
-        // override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
+        // Override io.netty Logger to WARN level (has always been the standard in the log4j2.xml configuration)
         Configurator.setLevel("io.netty", Level.WARN);
 
+        // Set database according to server config
         LOG.debug("Selected database backend: {}", serverProperties.getProperty("db"));
         switch (serverProperties.getProperty("db")) {
             case "h2":
@@ -83,10 +87,17 @@ public class ServerModule extends AbstractModule {
                 store = new H2BasedUserStore();
         }
 
+        // Set permission of elevated commands according to server config
+        LOG.debug("Server allows elevated commands: {}", serverProperties.getProperty("debug.commands"));
+        final boolean commandsAllowed = Boolean.parseBoolean(serverProperties.getProperty("debug.commands"));
+
         bind(IChatMessageStore.class).toInstance(chatMessageStore);
         bind(EventBus.class).toInstance(bus);
         bind(Properties.class).toInstance(serverProperties);
         bind(UserStore.class).toInstance(store);
+
+        bindConstant().annotatedWith(Names.named("commandsAllowed")).to(commandsAllowed);
+        requestStaticInjection(ChatService.class);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IChatManagement.class).to(ChatManagement.class).in(Scopes.SINGLETON);
