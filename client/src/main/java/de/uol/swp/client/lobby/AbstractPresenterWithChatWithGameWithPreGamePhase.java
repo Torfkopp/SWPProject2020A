@@ -461,6 +461,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {

@@ -96,7 +96,7 @@ public class UserDTO implements User {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(username);
+        return Objects.hashCode(getUsername());
     }
 
     @Override

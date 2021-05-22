@@ -38,7 +38,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
+import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -597,6 +597,26 @@ public class SceneManager {
     }
 
     /**
+     * Handles an old session
+     * <p>
+     * If an AlreadyLoggedInResponse object is found on the EventBus this method
+     * is called. If a client attempts to log in but the user is already
+     * logged in elsewhere this method tells the SceneManager to open a popup
+     * which prompts the user to log the old session out.
+     *
+     * @param rsp The AlreadyLoggedInResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Marvin Drees
+     * @since 2021-03-03
+     */
+    @Subscribe
+    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
+        LOG.debug("Received AlreadyLoggedInResponse for User {}", rsp.getLoggedInUser());
+        showLogOldSessionOutScreen(rsp.getLoggedInUser());
+    }
+
+    /**
      * Handles the ChangeAccountDetailsCanceledEvent detected on the EventBus
      * <p>
      * If a ChangeAccountDetailsCanceledEvent is detected on the EventBus, this method gets
@@ -624,6 +644,24 @@ public class SceneManager {
     @Subscribe
     private void onChangeAccountDetailsErrorEvent(ChangeAccountDetailsErrorEvent event) {
         showError(event.getMessage());
+    }
+
+    /**
+     * Handles a successful account detail changing process
+     * <p>
+     * If an ChangeAccountDetailsSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
+     *
+     * @param rsp The ChangeAccountDetailsSuccessfulResponse object detected on the EventBus
+     *
+     * @author Eric Vuong
+     * @author Steven Luong
+     * @since 2020-12-03
+     */
+    @Subscribe
+    private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
+        LOG.debug("Account Details change was successful.");
+        showMainScreen(rsp.getUser());
     }
 
     /**
@@ -724,6 +762,26 @@ public class SceneManager {
     }
 
     /**
+     * Handles a successful login
+     * <p>
+     * If an LoginSuccessfulResponse object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the main menu, and sets
+     * this clients user to the user found in the object. If the loglevel is set
+     * to DEBUG or higher, "User logged in successfully " and the username of the
+     * logged in user are written to the log.
+     *
+     * @param rsp The LoginSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2017-03-17
+     */
+    @Subscribe
+    private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
+        LOG.debug("Received LoginSuccessfulResponse for User {}", rsp.getUser().getUsername());
+        showMainScreen(rsp.getUser());
+    }
+
+    /**
      * Handles the NukeUsersSessionsResponse detected on the EventBus
      * <p>
      * If this method is called, it means all sessions belonging to a
@@ -810,6 +868,25 @@ public class SceneManager {
     @Subscribe
     private void onRegistrationErrorEvent(RegistrationErrorEvent event) {
         showError(event.getMessage());
+    }
+
+    /**
+     * Handles a successful registration
+     * <p>
+     * If a RegistrationSuccessfulResponse object is detected on the EventBus, this
+     * method is called. It tells the SceneManager to show the login window. If
+     * the loglevel is set to INFO or higher, "Registration Successful." is written
+     * to the log.
+     *
+     * @param rsp The RegistrationSuccessfulResponse object detected on the EventBus
+     *
+     * @see de.uol.swp.client.SceneManager
+     * @since 2019-09-02
+     */
+    @Subscribe
+    private void onRegistrationSuccessfulResponse(RegistrationSuccessfulResponse rsp) {
+        LOG.debug("Registration was successful.");
+        showLoginScreen();
     }
 
     /**
