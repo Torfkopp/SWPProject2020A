@@ -3,10 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity"
-      prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:id="mainMenuView" fx:controller="de.uol.swp.client.main.MainMenuPresenter">
+<HBox fx:id="mainMenuView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="550.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.uol.swp.client.main.MainMenuPresenter">
     <GridPane vgap="10.0" HBox.hgrow="ALWAYS">
         <columnConstraints>
             <ColumnConstraints percentWidth="17.5"/>
@@ -26,13 +25,14 @@
         <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
         <VBox spacing="15.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.create"/>
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCreateLobbyButtonPressed" prefHeight="45.0"
+                    prefWidth="99.0" text="%mainmenu.buttons.lobby.create" textAlignment="CENTER" wrapText="true"/>
 
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.join"/>
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinLobbyButtonPressed" prefHeight="45.0"
+                    prefWidth="99.0" text="%mainmenu.buttons.lobby.join" textAlignment="CENTER" wrapText="true"/>
             <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onJoinRandomLobbyButtonPressed"
-                    text="%mainmenu.buttons.lobby.joinRandom"/>
+                    prefHeight="45.0" prefWidth="99.0" text="%mainmenu.buttons.lobby.joinRandom" textAlignment="CENTER"
+                    wrapText="true"/>
             <Label fx:id="randomLobbyState" text="%mainmenu.labels.lobby.randomLobbyState" visible="false"
                    wrapText="true"/>
         </VBox>
@@ -61,7 +61,7 @@
                           text="%mainmenu.settings.buttons.changeproperties"/>
             </Menu>
             <Menu mnemonicParsing="false" text="%lobby.menu.rules">
-                <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview" onAction="#onRulesMenuClicked"/>
+                <MenuItem mnemonicParsing="false" onAction="#onRulesMenuClicked" text="%lobby.menu.rules.overview"/>
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>
