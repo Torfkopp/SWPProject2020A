@@ -1,8 +1,11 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
+
+import java.util.Map;
 
 /**
  * Message sent by the server when a game session was started.
@@ -15,22 +18,25 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class StartSessionMessage extends AbstractLobbyMessage {
 
+    private final Map<UserOrDummy, Player> userOrDummyPlayerMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
 
     /**
      * Constructor
      *
-     * @param name                The Name of the Lobby
-     * @param user                The User who started the Session
-     * @param configuration       The field configuration used in the game
-     * @param startUpPhaseEnabled Whether the game has the startup phase enabled
+     * @param name                 The Name of the Lobby
+     * @param user                 The User who started the Session
+     * @param configuration        The field configuration used in the game
+     * @param startUpPhaseEnabled  Whether the game has the startup phase enabled
+     * @param userOrDummyPlayerMap The Map with userOrDummyPlayer
      */
     public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
-                               boolean startUpPhaseEnabled) {
+                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
+        this.userOrDummyPlayerMap = userOrDummyPlayerMap;
     }
 
     /**
@@ -47,6 +53,13 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      */
     public IConfiguration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * Gets the Map of UserOrDummies and Players
+     */
+    public Map<UserOrDummy, Player> getUserOrDummyPlayerMap() {
+        return userOrDummyPlayerMap;
     }
 
     /**
