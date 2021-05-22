@@ -589,10 +589,12 @@ public class GameService extends AbstractService {
             UserOrDummy firstPlayer = playerArray[randomNbr];
             gameManagement.createGame(msg.getLobby(), firstPlayer, gameMap, msg.getMoveTime());
             LOG.debug("Sending GameCreatedMessage");
+            Game game = gameManagement.getGame(msg.getLobby().getName());
             post(new GameCreatedMessage(msg.getLobby().getName(), firstPlayer));
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
             StartSessionMessage message = new StartSessionMessage(lobbyName, firstPlayer, configuration,
-                                                                  msg.getLobby().isStartUpPhaseEnabled());
+                                                                  msg.getLobby().isStartUpPhaseEnabled(),
+                                                                  game.getUserToPlayerMap());
             lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
             ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());

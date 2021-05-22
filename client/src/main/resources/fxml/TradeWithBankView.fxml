@@ -3,10 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity"
+<VBox fx:id="bankView" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
       minWidth="-Infinity" prefHeight="400" prefWidth="595.0" xmlns="http://javafx.com/javafx/11.0.1"
-      fx:id="bankView" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.trade.TradeWithBankPresenter">
     <padding>
         <Insets topRightBottomLeft="20.0"/>
     </padding>
@@ -20,7 +19,8 @@
                     prefHeight="25.0" text="%button.cancel"/>
             <VBox alignment="CENTER" layoutX="229.0" layoutY="30.0" prefHeight="145.0" prefWidth="125.0">
                 <Button fx:id="tradeResourceWithBankButton" mnemonicParsing="false"
-                        onAction="#onTradeResourceWithBankButtonPressed" text="%game.trade.buttons.tradefor"/>
+                        onAction="#onTradeResourceWithBankButtonPressed" prefHeight="45.0" prefWidth="105.0"
+                        text="%game.trade.buttons.tradefor" textAlignment="CENTER" wrapText="true"/>
                 <padding>
                     <Insets left="10.0" right="10.0"/>
                 </padding>
