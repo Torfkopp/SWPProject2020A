@@ -380,6 +380,17 @@ public class SceneManager {
         }
     }
 
+    /**
+     * Initialises the ChangePropertiesView
+     * <p>
+     * If the ChangePropertiesScene is null, it gets set to a new scene containing the
+     * pane showing the ChangePropertiesView as specified by the ChangePropertiesView
+     * FXML file.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.ChangePropertiesPresenter
+     * @since 2021-05-22
+     */
     private void initChangePropertiesView() {
         if (changePropertiesScene == null) {
             Parent rootPane = initPresenter(ChangePropertiesPresenter.fxml);
@@ -990,6 +1001,20 @@ public class SceneManager {
         });
     }
 
+    /**
+     * Handles the ShowChangePropertiesViewEvent detected on the EventBus
+     * <p>
+     * If a ShowChangePropertiesViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the Change Properties
+     * screen.
+     * If the user wants to close this window, the user gets redirected to the Main Menu.
+     *
+     * @param event The ShowChangePropertiesViewEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @since 2021-05-22
+     */
     @Subscribe
     private void onShowChangePropertiesViewEvent(ShowChangePropertiesViewEvent event) {
         showChangePropertiesScreen();
