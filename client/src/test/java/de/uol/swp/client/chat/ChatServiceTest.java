@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @see de.uol.swp.client.chat.ChatService
  * @since 2020-12-19
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class ChatServiceTest {
 
     private static final String defaultContent = "I am intelligent content";
