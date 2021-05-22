@@ -11,9 +11,11 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
+import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
+import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -720,19 +722,29 @@ public class GameService extends AbstractService {
                         }
                         break;
                     }
-                    // Bauen der passenden Straßen
+                    IGameHex[][] gameHexes = game.getMap().getHexesAsJaggedArray();
+                    for (int pointer1 = 0; pointer1 < gameHexes.length; pointer1++) {
+                        for (int pointer2 = 0; pointer2 < gameHexes[0].length; pointer2++) {
+                            Set<IEdge> edges = game.getMap().getEdgesFromHex(MapPoint.HexMapPoint(pointer1, pointer2));
+                            for (IEdge edge : edges) {
+                                if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
+                                    game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
+                                    break;
+                                }
+                                break;
+                            }
+                            break;
+                        }
+                    }
                 }
+                ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+
+                LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
+                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+                game.setDiceRolledAlready(false);
+                endTurnDummy(game);
             }
-        }
-        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
-
-        LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
-        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-
-        game.setDiceRolledAlready(false);
-        if (nextPlayer instanceof Dummy) {
-            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            endTurnDummy(game);
         }
     }
 
