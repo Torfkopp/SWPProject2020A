@@ -39,23 +39,32 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
     protected Timer tradeAcceptTimer;
-
+    @FXML
+    protected Label acceptTradeTimerLabel;
+    protected boolean paused;
+    protected int remainingMoveTime;
     @FXML
     private Button acceptTradeButton;
     @FXML
     private Label tradeNotPossibleLabel;
     @FXML
     private Label tradeResponseLabel;
-    @FXML
-    protected Label acceptTradeTimerLabel;
-
     private LobbyName lobbyName;
     private UserOrDummy offeringUser;
     private ResourceList offeringResourceMap;
     private ResourceList respondingResourceMap;
 
-    protected boolean paused;
-    protected int remainingMoveTime;
+    /**
+     * Initialises the Presenter using the superclass.
+     *
+     * @implNote Called automatically by JavaFX
+     */
+    @FXML
+    public void initialize() {
+        super.initialize();
+        LOG.debug("TradeWithUserAcceptPresenter initialised");
+        setAcceptTradeTimer(30);
+    }
 
     /**
      * Helper method to set the timer for the players round.
@@ -85,18 +94,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
                 } else {remainingMoveTime = moveTimeToDecrement.get();}
             }
         }, 0, 1000);
-    }
-
-    /**
-     * Initialises the Presenter using the superclass.
-     *
-     * @implNote Called automatically by JavaFX
-     */
-    @FXML
-    public void initialize() {
-        super.initialize();
-        LOG.debug("TradeWithUserAcceptPresenter initialised");
-        setAcceptTradeTimer(30);
     }
 
     /**
@@ -208,7 +205,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             ownResourceTableView.getItems().add(resource);
         setOfferLabel();
         Window window = ownResourceTableView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
+        window.setOnCloseRequest(windowEvent -> {
+            tradeService.resetOfferTradeButton(lobbyName, offeringUser);
+            tradeService.closeTradeResponseWindow(lobbyName);
+        });
     }
 
     /**
