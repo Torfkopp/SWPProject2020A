@@ -4,9 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" fillWidth="false" spacing="25.0"
-      xmlns="http://javafx.com/javafx/11.0.1" fx:id="tradeUserView"
-      fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
+<VBox fx:id="tradeUserView" alignment="CENTER" fillWidth="false" spacing="25.0" xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
     <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" text="%game.trade.status.makingoffer"
            textAlignment="CENTER">
         <font>
@@ -46,7 +45,7 @@
 
         <VBox alignment="CENTER" spacing="20.0">
             <Button fx:id="offerTradeButton" mnemonicParsing="false" onAction="#onOfferTradeButtonPressed"
-                    text="%game.trade.buttons.makeoffer"/>
+                    text="%game.trade.buttons.makeoffer" textAlignment="CENTER" wrapText="true"/>
             <Button mnemonicParsing="false" onAction="#onCancelTradeButtonPressed" text="%button.cancel"/>
         </VBox>
 
@@ -87,8 +86,8 @@
         <Label text="%game.trade.labels.owninventory"/>
         <TableView fx:id="ownResourceTableView" layoutY="210.0" prefHeight="150.0" prefWidth="230.0">
             <columns>
-                <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
-                             prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
+                <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0"
+                             resizable="false" text="%game.inventories.amountcol"/>
                 <TableColumn fx:id="resourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
                              minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
             </columns>
