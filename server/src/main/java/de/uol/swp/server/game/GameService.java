@@ -672,7 +672,7 @@ public class GameService extends AbstractService {
             return;
         }
         game.setBuildingAllowed(false);
-        UserOrDummy nextPlayer;
+        UserOrDummy nextPlayer = null;
         UserOrDummy user;
         Optional<ILobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
         if (optionalLobby.isEmpty()) return;
@@ -702,9 +702,25 @@ public class GameService extends AbstractService {
                 }
             } else {
                 nextPlayer = game.nextPlayer();
+                if (nextPlayer instanceof Dummy) {
+                    IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
+                    for (int pointer1 = 0; pointer1 < intersections.length; pointer1++) {
+                        for (int pointer2 = 0; pointer2 < intersections[0].length; pointer2++) {
+                            IIntersection intersection = intersections[pointer1][pointer2];
+                            if (intersection.getState().equals(IIntersection.IntersectionState.FREE)) {
+                                game.getMap().placeFoundingSettlement(game.getPlayer(nextPlayer),
+                                                                      MapPoint.IntersectionMapPoint(pointer1,
+                                                                                                    pointer2));
+
+                                break;
+                            }
+                            break;
+                        }
+                        break;
+                    }
+                    // Bauen der passenden Straßen
+                }
             }
-        } else {
-            nextPlayer = game.nextPlayer();
         }
         ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
 
