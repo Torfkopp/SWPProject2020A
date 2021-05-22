@@ -1,14 +1,13 @@
 package de.uol.swp.server.game;
 
 import com.google.common.eventbus.EventBus;
+import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.request.AcceptUserTradeRequest;
 import de.uol.swp.common.game.request.BuyDevelopmentCardRequest;
 import de.uol.swp.common.game.request.ExecuteTradeWithBankRequest;
-import de.uol.swp.common.game.request.PlayCardRequest.PlayKnightCardRequest;
-import de.uol.swp.common.game.request.PlayCardRequest.PlayMonopolyCardRequest;
-import de.uol.swp.common.game.request.PlayCardRequest.PlayYearOfPlentyCardRequest;
+import de.uol.swp.common.game.request.PlayCardRequest.*;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.BankInventory;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.Inventory;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard.DevelopmentCardType;
@@ -445,7 +444,29 @@ public class GameServiceTest {
 
     @Test
     void onRoadBuildingCardRequestTest() {
-        //Methode noch nicht fertig
+        User[] user = new User[4];
+        user[0] = new UserDTO(0, "Johnny", "NailsGoSpin", "JoestarJohnny@jojo.jp");
+        user[1] = new UserDTO(1, "Jolyne", "IloveDaddyJoJo", "CujohJolyne@jojo.jp");
+        user[2] = new UserDTO(2, "Josuke", "4BallsBetterThan2", "HigashikataJosuke@jojo.jp");
+        UserOrDummy dummy = new DummyDTO();
+        ILobby lobby = new LobbyDTO(defaultLobby, user[0], null);
+        lobby.joinUser(user[1]);
+        lobby.joinUser(user[2]);
+        lobby.joinUser(dummy);
+        IGameMapManagement gameMap = new GameMapManagement();
+        gameMap = gameMap.createMapFromConfiguration(gameMap.getBeginnerConfiguration());
+        gameManagement.createGame(lobby, user[0], gameMap, 0);
+        Game game = gameManagement.getGame(lobby.getName());
+        game.setDiceRolledAlready(true);
+        game.setBuildingAllowed(true);
+        Inventory[] inventories = game.getAllInventories();
+        assertEquals(0, inventories[0].get(ROAD_BUILDING_CARD));
+        inventories[0].set(ROAD_BUILDING_CARD, 1);
+        assertEquals(1, inventories[0].get(ROAD_BUILDING_CARD));
+        Message request = new PlayRoadBuildingCardRequest(defaultLobby, user[0]);
+        bus.post(request);
+        assertEquals(RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD, game.getRoadBuildingCardPhase());
+        assertEquals(0, inventories[0].get(ROAD_BUILDING_CARD));
     }
 
     @Test
@@ -725,3 +746,4 @@ public class GameServiceTest {
         userManagement.dropUser(userToLogin);
     }
 }
+

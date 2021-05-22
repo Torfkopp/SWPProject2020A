@@ -23,6 +23,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -395,6 +396,26 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
+
+                    //if the background should be in colour you need to use setBackground
+                    if (user != null && userOrDummyPlayerMap == null)
+                        setTextFill(Color.BLACK); // No clue why this is needed, but it is
+                    if (user != null && userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
+                        switch (userOrDummyPlayerMap.get(user)) {
+                            case PLAYER_1:
+                                setTextFill(GameRendering.PLAYER_1_COLOUR);
+                                break;
+                            case PLAYER_2:
+                                setTextFill(GameRendering.PLAYER_2_COLOUR);
+                                break;
+                            case PLAYER_3:
+                                setTextFill(GameRendering.PLAYER_3_COLOUR);
+                                break;
+                            case PLAYER_4:
+                                setTextFill(GameRendering.PLAYER_4_COLOUR);
+                                break;
+                        }
+                    }
                     if (empty || user == null) setText("");
                     else {
                         String name = user.getUsername();
@@ -418,20 +439,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                             }
                         }
                         setText(name);
-                        //if the background should be in colour you need to use setBackground
-                        int i = lobbyMembers.size();
-                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
-                            setTextFill(GameRendering.PLAYER_1_COLOUR);
-                        }
-                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
-                            setTextFill(GameRendering.PLAYER_2_COLOUR);
-                        }
-                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
-                            setTextFill(GameRendering.PLAYER_3_COLOUR);
-                        }
-                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
-                            setTextFill(GameRendering.PLAYER_4_COLOUR);
-                        }
                     }
                 });
             }

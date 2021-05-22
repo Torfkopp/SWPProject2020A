@@ -214,7 +214,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             ownResourceTableView.getItems().add(resource);
         setOfferLabel();
         Window window = ownResourceTableView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
+        window.setOnCloseRequest(windowEvent -> {
+            tradeService.resetOfferTradeButton(lobbyName, offeringUser);
+            tradeService.closeTradeResponseWindow(lobbyName);
+        });
     }
 
     /**

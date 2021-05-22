@@ -514,6 +514,17 @@ public class Game {
     }
 
     /**
+     * Gets a map of users or dummies and their corresponding players
+     *
+     * @return A map containing users or dummies and their corresponding players
+     *
+     * @since 2021-05-20
+     */
+    public Map<UserOrDummy, Player> getUserToPlayerMap() {
+        return players.getUserToPlayerMap();
+    }
+
+    /**
      * Gets whether building is currently allowed or not
      *
      * @return If Building is currently allowed

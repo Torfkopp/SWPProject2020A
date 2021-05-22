@@ -1,5 +1,7 @@
 package de.uol.swp.common.user;
 
+import java.util.Objects;
+
 /**
  * A class for dummy users
  *
@@ -39,6 +41,11 @@ public class DummyDTO implements Dummy {
     public boolean equals(Object o) {
         if (o instanceof UserOrDummy) return compareTo((UserOrDummy) o) == 0;
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(toString());
     }
 
     @Override
