@@ -4,9 +4,7 @@ import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A class to store the mapping of UserOrDummy, Player and Inventory
@@ -92,6 +90,20 @@ public class InventoryMap implements Serializable {
         for (UserPlayerInventoryMapping entry : map)
             if (Objects.equals(player, entry.getPlayer())) return entry.getUser();
         return null;
+    }
+
+    /**
+     * Gets a map of users or dummies and their corresponding players
+     *
+     * @return A map containing users or dummies and their corresponding players
+     *
+     * @since 2021-05-20
+     */
+    public Map<UserOrDummy, Player> getUserToPlayerMap() {
+        Map<UserOrDummy, Player> temp = new HashMap<>();
+        for (UserPlayerInventoryMapping entry : map)
+            temp.put(entry.getUser(), entry.getPlayer());
+        return temp;
     }
 
     /**
