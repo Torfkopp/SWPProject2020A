@@ -160,6 +160,16 @@ public class SceneManager {
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
     }
 
+    /**
+     * Shows the ChangePropertiesScreen
+     * <p>
+     * Sets the scene's UserData to the current user.
+     * Switches the current Scene to the ChangePropertiesScreen
+     * and sets the window's title to "Change Properties"
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-22
+     */
     public void showChangePropertiesScreen() {
         showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
                   ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
@@ -650,16 +660,6 @@ public class SceneManager {
         showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
-    @Subscribe
-    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
-        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
-    }
-
-    @Subscribe
-    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
-        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
-    }
-
     /**
      * Handles the ChangeAccountDetailsErrorEvent detected on the EventBus
      * <p>
@@ -691,6 +691,37 @@ public class SceneManager {
     private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
         LOG.debug("Account Details change was successful.");
         showMainScreen(rsp.getUser());
+    }
+
+    /**
+     * Handles the ChangePropertiesCanceledEvent detected on the EventBus
+     * <p>
+     * If a ChangePropertiesCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the main screen.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
+     * @since 2020-12-19
+     */
+    @Subscribe
+    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+    }
+
+    /**
+     * Handles a successful properties changing process
+     * <p>
+     * If an ChangePropertiesSuccessfulEvent object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
+     *
+     * @param event The ChangePropertiesSuccessfulEvent object detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-22
+     */
+    @Subscribe
+    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
