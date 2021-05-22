@@ -57,6 +57,8 @@
                           text="%mainmenu.settings.buttons.deleteuser"/>
                 <MenuItem mnemonicParsing="false" onAction="#onLogoutButtonPressed"
                           text="%mainmenu.settings.buttons.logout"/>
+                <MenuItem mnemonicParsing="false" onAction="#onChangePropertiesButtonPressed"
+                          text="%mainmenu.settings.buttons.changeproperties"/>
             </Menu>
             <Menu mnemonicParsing="false" text="%lobby.menu.rules">
                 <MenuItem mnemonicParsing="false" text="%lobby.menu.rules.overview" onAction="#onRulesMenuClicked"/>
