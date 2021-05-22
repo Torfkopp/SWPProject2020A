@@ -3,6 +3,8 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
+import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
+import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -119,6 +121,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             moveTimeTimer.cancel();
         } catch (NullPointerException ignored) {}
         ((Stage) window).close();
+        moveTimeTimer.cancel();
+        eventBus.post(new TradeCancelEvent(lobbyName));
+        eventBus.post(new CloseTradeResponseEvent(lobbyName));
         clearEventBus();
     }
 
@@ -433,6 +438,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
