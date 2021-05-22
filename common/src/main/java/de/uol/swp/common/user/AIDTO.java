@@ -1,8 +1,6 @@
 package de.uol.swp.common.user;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * A class for AI users
@@ -144,6 +142,11 @@ public class AIDTO implements AI {
         names.addAll(aiNameHard);
         names.addAll(aiNameHardNoTalk);
         return names;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getUsername());
     }
 
     @Override
