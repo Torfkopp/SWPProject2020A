@@ -319,6 +319,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         helpCheckBox.setVisible(false);
         turnIndicator.setAccessibleText("");
         buildingCosts.setVisible(false);
+        victoryPointsLabel.setVisible(false);
         cardAmountsList.clear();
         moveTimeTimer.cancel();
         moveTimerLabel.setVisible(false);
@@ -452,6 +453,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
             turnIndicator.setVisible(true);
+            victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
             currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1));
             setRollDiceButtonState(msg.getUser());
