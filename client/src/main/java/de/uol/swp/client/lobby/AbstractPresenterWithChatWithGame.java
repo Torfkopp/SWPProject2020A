@@ -702,7 +702,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
-        if (mapPoint.getType() == HEX && robberNewPosition) {
+        if (mapPoint.getType() == HEX && robberNewPosition && !gamePaused) {
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
@@ -807,7 +807,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         } else {
             Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.pause")));
             timerPaused = false;
-            if (userService.getLoggedInUser().equals(msg.getActivePlayer())) {
+            if (userService.getLoggedInUser().equals(msg.getActivePlayer()) && !robberNewPosition && statusChange) {
                 if (diceRolled) resetButtonStates(userService.getLoggedInUser());
                 else setRollDiceButtonState(userService.getLoggedInUser());
             }

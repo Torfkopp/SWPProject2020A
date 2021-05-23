@@ -112,8 +112,8 @@ public class GameService extends AbstractService {
         LOG.debug("Received PlayRoadBuildingCardRequest for Lobby {}", req.getOriginLobby());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
-            return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game
+                .isBuildingAllowed() || game.isPaused()) return;
         Inventory inv = game.getInventory(req.getUser());
 
         if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
@@ -259,7 +259,8 @@ public class GameService extends AbstractService {
     private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
         LOG.debug("Received AcceptUserTradeRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getOfferingUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getOfferingUser()) || !game.isDiceRolledAlready() || game.isPaused())
+            return;
         game.setBuildingAllowed(false);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
@@ -322,7 +323,7 @@ public class GameService extends AbstractService {
         Game.StartUpPhase currentPhase = game.getStartUpPhase();
         Deque<UserOrDummy> startUpPlayerOrder = game.getStartUpPlayerOrder();
         if (currentPhase == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) {
+            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) {
                 return;
             }
         } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
@@ -513,7 +514,7 @@ public class GameService extends AbstractService {
     private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
         LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) return;
         BankInventory bankInventory = game.getBankInventory();
         if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards().isEmpty()) {
             DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
@@ -665,7 +666,7 @@ public class GameService extends AbstractService {
         Game.StartUpPhase currentPhase = game.getStartUpPhase();
         Deque<UserOrDummy> startUpPlayerOrder = game.getStartUpPlayerOrder();
         if (currentPhase == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) {
+            if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) {
                 return;
             }
         } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
@@ -737,7 +738,7 @@ public class GameService extends AbstractService {
     private void onExecuteTradeWithBankRequest(ExecuteTradeWithBankRequest req) {
         LOG.debug("Received ExecuteTradeWithBankRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) return;
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         ResourceList offeredResourcesWrapperMap = new ResourceList();
@@ -872,6 +873,7 @@ public class GameService extends AbstractService {
     private void onOfferingTradeWithUserRequest(OfferingTradeWithUserRequest req) {
         LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
+        if (game.isPaused()) return;
         if (!(req.getRespondingUser() instanceof User && (game.getActivePlayer().equals(req.getOfferingUser()) || req
                 .isCounterOffer()) && game.isDiceRolledAlready())) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
@@ -958,7 +960,7 @@ public class GameService extends AbstractService {
         LOG.debug("---- User {} wants to improve their army", req.getUser().getUsername());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) return;
         Inventory inv = game.getInventory(req.getUser());
 
         if (inv.get(DevelopmentCardType.KNIGHT_CARD) == 0) {
@@ -1010,7 +1012,7 @@ public class GameService extends AbstractService {
         LOG.debug("---- User {} wants to monopolise {}", req.getUser().getUsername(), req.getResource().name());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) return;
         Inventory invMono = game.getInventory(req.getUser());
 
         if (invMono.get(DevelopmentCardType.MONOPOLY_CARD) == 0) {
@@ -1077,8 +1079,8 @@ public class GameService extends AbstractService {
         LOG.debug("---- User {} wants to build a road", req.getUser().getUsername());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game.isBuildingAllowed())
-            return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game
+                .isBuildingAllowed() || game.isPaused()) return;
         Inventory inv = game.getInventory(req.getUser());
 
         LOG.debug("---- RoadBuildingCardPhase phase starts");
@@ -1119,7 +1121,7 @@ public class GameService extends AbstractService {
                   req.getSecondResource().name());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) return;
         Inventory inv = game.getInventory(req.getUser());
 
         if (inv.get(DevelopmentCardType.YEAR_OF_PLENTY_CARD) == 0) {
@@ -1308,7 +1310,7 @@ public class GameService extends AbstractService {
         LOG.debug("---- User {} wants to roll the dices.", req.getUser().getUsername());
 
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || game.isDiceRolledAlready() || game.isPaused()) return;
         int[] result = Game.rollDice();
         int numberOfPips = result[0] + result[1];
         if (numberOfPips == 7) {
@@ -1390,7 +1392,7 @@ public class GameService extends AbstractService {
     private void onTradeWithBankRequest(TradeWithBankRequest req) {
         LOG.debug("Received TradeWithBankRequest for Lobby {}", req.getName());
         Game game = gameManagement.getGame(req.getName());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPaused()) return;
         Inventory inventory = game.getInventory(req.getUser());
         if (inventory == null) return;
         ResourceList resourceMap = inventory.getResources();
@@ -1474,7 +1476,7 @@ public class GameService extends AbstractService {
         LOG.debug("Received TradeWithUserRequest for Lobby {}", req.getName());
         Game game = gameManagement.getGame(req.getName());
         if (!game.isDiceRolledAlready()) return;
-        if (game.getActivePlayer().equals(req.getUser()) || req.isCounterOffer()) {
+        if (game.getActivePlayer().equals(req.getUser()) || req.isCounterOffer() || game.isPaused()) {
             game.setBuildingAllowed(false);
             Inventory inventory = game.getInventory(req.getUser());
             Inventory traderInventory = game.getInventory(req.getRespondingUser());
