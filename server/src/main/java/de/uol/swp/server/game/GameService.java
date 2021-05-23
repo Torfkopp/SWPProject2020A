@@ -577,6 +577,7 @@ public class GameService extends AbstractService {
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
                 endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+                updateVictoryPoints(req.getOriginLobby());
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
         } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
@@ -692,6 +693,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+        updateVictoryPoints(req.getOriginLobby());
     }
 
     /**
@@ -1014,6 +1016,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+        updateVictoryPoints(req.getOriginLobby());
     }
 
     /**
@@ -1122,6 +1125,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+        updateVictoryPoints(req.getOriginLobby());
     }
 
     /**
@@ -1632,6 +1636,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
         endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+        updateVictoryPoints(req.getOriginLobby());
     }
 
     /**
@@ -1756,5 +1761,27 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
+    }
+
+    /**
+     * Helper method to handle the calculation of Victory Points of each User in the Lobby
+     *
+     * @param originLobby The lobby in which the game is taking place
+     *
+     * @author Steven Luong
+     * @see de.uol.swp.common.game.message.UpdateVictoryPointsMessage
+     * @since 2021-05-21
+     */
+    private void updateVictoryPoints(LobbyName originLobby) {
+        Game game = gameManagement.getGame(originLobby);
+        UserOrDummy[] players = game.getPlayers();
+        Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();
+        for (UserOrDummy player : players) {
+            if (player instanceof User) {
+                victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
+            }
+        }
+        ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
+        lobbyService.sendToAllInLobby(originLobby, msg);
     }
 }

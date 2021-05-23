@@ -108,6 +108,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected ListView<UniqueCard> uniqueCardView;
     @FXML
+    protected Label victoryPointsLabel;
+    @FXML
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
@@ -1214,6 +1216,27 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         uniqueCardList.clear();
         uniqueCardList.addAll(msg.getUniqueCardsList());
+    }
+
+    /**
+     * Handles the UpdateVictoryPointsMessage
+     * If an UpdateVictoryPointsMessage is found on the bus this method gets called
+     * and updates the VictoryPoints.
+     *
+     * @param msg The UpdateVictoryPointsMessage found on the bus
+     *
+     * @author Steven Luong
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onUpdateVictoryPointsMessage(UpdateVictoryPointsMessage msg) {
+        if (!msg.getLobbyName().equals(lobbyName)) return;
+        LOG.debug("Received UpdateVictoryPointsMessage for Lobby {}", lobbyName);
+        int victoryPoints = msg.getVictoryPointMap().get(userService.getLoggedInUser());
+        Platform.runLater(() -> {
+            victoryPointsLabel
+                    .setText(String.format(resourceBundle.getString("game.victorypoints.labels"), victoryPoints));
+        });
     }
 
     /**
