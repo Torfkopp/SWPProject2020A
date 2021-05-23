@@ -10,6 +10,8 @@ import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -33,6 +35,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
@@ -62,6 +65,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Inject
     @Named("soundPack")
     private static String soundPack;
+
+    @Inject
+    @Named("loginLogoutMsgsOn")
+    private static boolean loginLogoutMsgsOn;
+    @Inject
+    @Named("lobbyCreateDeleteMsgsOn")
+    private static boolean lobbyCreateDeleteMsgsOn;
 
     @FXML
     private Label randomLobbyState;
@@ -608,6 +618,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
+        prepareChatVars();
         eventBus.post(new GetOldSessionsRequest(rsp.getUser()));
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
@@ -691,6 +702,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * logged in user is appended to the UserList in the main menu.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "New user {@literal
      * <Username>} logged in." is displayed in the log.
+     * If a user logs in, a SystemMessage is added to the chat to display to them who logged in.
      *
      * @param msg The UserLoggedInMessage object seen on the EventBus
      *
@@ -705,6 +717,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         Platform.runLater(() -> {
             if (users != null && !userService.getLoggedInUser().getUsername().equals(msg.getUsername()))
                 users.add(msg.getUsername());
+            if (loginLogoutMsgsOn) {
+                chatMessages.add(new SystemMessageDTO(new I18nWrapper("mainmenu.user.login", msg.getUsername())));
+            }
         });
     }
 
@@ -715,6 +730,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * logged out user is removed from the UserList in the main menu.
      * Furthermore, if the LOG-Level is set to DEBUG, the message "User {@literal
      * <Username>} logged out." is displayed in the log.
+     * If a user logs out, a SystemMessage is added to the chat to display them who logged out.
      *
      * @param msg The UserLoggedOutMessage object seen on the EventBus
      *
@@ -725,8 +741,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserLoggedOutMessage(UserLoggedOutMessage msg) {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received UserLoggedOutMessage");
-        LOG.debug("---- User {} logged out", msg.getUsername());
-        Platform.runLater(() -> users.remove(msg.getUsername()));
+        String username = msg.getUsername();
+        LOG.debug("---- User {} logged out", username);
+        SystemMessageDTO systemMessage = new SystemMessageDTO(new I18nWrapper("mainmenu.user.logout", username));
+        Platform.runLater(() -> {
+            if (loginLogoutMsgsOn && users.remove(username)) {
+                chatMessages.add(systemMessage);
+            }
+        });
     }
 
     /**
@@ -735,6 +757,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * This method clears the entire lobby list and then adds the name of each lobby
      * in the list given to the main menu's LobbyList. If there is no LobbyList,
      * this creates one.
+     * If a user creates a Lobby, a SystemMessage is added to the chat to display to them who created a lobby.
+     * If a lobby is dropped, a SystemMessage is added to the chat to display to them which lobby has been dropped.
      *
      * @param lobbyList A list of LobbyDTO objects including all currently existing
      *                  lobbies
@@ -748,6 +772,27 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             if (lobbies == null) {
                 lobbies = FXCollections.observableArrayList();
                 lobbyView.setItems(lobbies);
+            }
+            List<ISimpleLobby> newLobbies = new ArrayList<>(lobbyList);
+            List<Pair<LobbyName, String>> oldLobbies = new ArrayList<>(lobbies);
+            for (ISimpleLobby lobby : lobbyList) {
+                for (Pair<LobbyName, String> pair : lobbies) {
+                    newLobbies.removeIf(l -> l.getName().equals(pair.getKey()));
+                    oldLobbies.removeIf(p -> p.getKey().equals(lobby.getName()));
+                }
+            }
+            if (!newLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
+                for (ISimpleLobby lobby : newLobbies) {
+                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.create.lobby", lobby.getOwner(),
+                                                                 lobby.getName());
+                    chatMessages.add(new SystemMessageDTO(contentWrapper));
+                }
+            }
+            if (!oldLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
+                for (Pair<LobbyName, String> pair : oldLobbies) {
+                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey());
+                    chatMessages.add(new SystemMessageDTO(contentWrapper));
+                }
             }
             lobbies.clear();
             for (ISimpleLobby l : lobbyList) {

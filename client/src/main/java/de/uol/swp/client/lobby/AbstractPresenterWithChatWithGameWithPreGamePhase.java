@@ -117,6 +117,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (lobbyName != null || !kicked) {
             lobbyService.leaveLobby(lobbyName);
         }
+        if (moveTimeTimer != null) moveTimeTimer.cancel();
+        ((Stage) window).close();
         moveTimeTimer.cancel();
         eventBus.post(new TradeCancelEvent(lobbyName));
         eventBus.post(new CloseTradeResponseEvent(lobbyName));
