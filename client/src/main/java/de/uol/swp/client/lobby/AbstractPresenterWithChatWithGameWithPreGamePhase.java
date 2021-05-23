@@ -223,6 +223,25 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Handles a click on the AddAI Button
+     * <p>
+     * Method called when the AddAIButton is pressed.
+     * This Method calls the lobbyService to post an AddAIRequest
+     *
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    @FXML
+    private void onAddAIButtonPressed() {
+        boolean talking = talkingAICheckBox.isSelected();
+        AI.Difficulty difficulty =
+                difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
+                AI.Difficulty.HARD;
+        AI uehara = new AIDTO(difficulty, talking);
+        lobbyService.addAI(lobbyName, uehara);
+    }
+
+    /**
      * Method called when the ChangeOwnerButtonPressed is pressed
      * <p>
      * If the ChangeOwnerButtonPressed is pressed, this method requests to change
@@ -403,25 +422,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Handles a click on the AddAI Button
-     * <p>
-     * Method called when the AddAIButton is pressed.
-     * This Method calls the lobbyService to post an AddAIRequest
-     *
-     * @author Mario Fokken
-     * @since 2021-05-21
-     */
-    @FXML
-    private void onAddAIButtonPressed() {
-        boolean talking = talkingAICheckBox.isSelected();
-        AI.Difficulty difficulty =
-                difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
-                AI.Difficulty.HARD;
-        AI uehara = new AIDTO(difficulty, talking);
-        lobbyService.addAI(lobbyName, uehara);
-    }
-
-    /**
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
@@ -484,7 +484,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
-            changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);
@@ -510,11 +509,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Sets the play field visible.
      * The startSessionButton and every readyCheckbox are getting invisible for
-     * the user.
+     * the user. <- No, it doesn't
      *
      * @param rsp The StartSessionResponse found on the EventBus
      *
-     * @author MarvinDrees
+     * @author Marvin Drees
      * @author Maximilian Lindner
      * @since 2021-02-04
      */
