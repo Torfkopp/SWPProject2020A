@@ -14,6 +14,7 @@ import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -107,6 +108,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected ListView<UniqueCard> uniqueCardView;
     @FXML
+    protected Label victoryPointsLabel;
+    @FXML
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
@@ -147,6 +150,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
+    protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
 
     @Inject
     private ITradeService tradeService;
@@ -405,19 +409,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Text username = new Text(name);
             username.setFont(Font.font(20.0));
 
-            ObservableList<UserOrDummy> membersList = membersView.getItems();
-            if (membersList.size() > 0 && user.equals(membersList.get(0))) {
-                username.setFill(GameRendering.PLAYER_1_COLOUR);
+            if (userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
+                switch (userOrDummyPlayerMap.get(user)) {
+                    case PLAYER_1:
+                        username.setFill(GameRendering.PLAYER_1_COLOUR);
+                        break;
+                    case PLAYER_2:
+                        username.setFill(GameRendering.PLAYER_2_COLOUR);
+                        break;
+                    case PLAYER_3:
+                        username.setFill(GameRendering.PLAYER_3_COLOUR);
+                        break;
+                    case PLAYER_4:
+                        username.setFill(GameRendering.PLAYER_4_COLOUR);
+                        break;
+                }
             }
-            if (membersList.size() > 1 && user.equals(membersList.get(1))) {
-                username.setFill(GameRendering.PLAYER_2_COLOUR);
-            }
-            if (membersList.size() > 2 && user.equals(membersList.get(2))) {
-                username.setFill(GameRendering.PLAYER_3_COLOUR);
-            }
-            if (membersList.size() == 4 && user.equals(membersList.get(3))) {
-                username.setFill(GameRendering.PLAYER_4_COLOUR);
-            }
+
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
             if (theme.equals("dark")) postUsernameText.setFill(Color.web("#F3F5F3"));
@@ -1208,6 +1216,27 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         uniqueCardList.clear();
         uniqueCardList.addAll(msg.getUniqueCardsList());
+    }
+
+    /**
+     * Handles the UpdateVictoryPointsMessage
+     * If an UpdateVictoryPointsMessage is found on the bus this method gets called
+     * and updates the VictoryPoints.
+     *
+     * @param msg The UpdateVictoryPointsMessage found on the bus
+     *
+     * @author Steven Luong
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onUpdateVictoryPointsMessage(UpdateVictoryPointsMessage msg) {
+        if (!msg.getLobbyName().equals(lobbyName)) return;
+        LOG.debug("Received UpdateVictoryPointsMessage for Lobby {}", lobbyName);
+        int victoryPoints = msg.getVictoryPointMap().get(userService.getLoggedInUser());
+        Platform.runLater(() -> {
+            victoryPointsLabel
+                    .setText(String.format(resourceBundle.getString("game.victorypoints.labels"), victoryPoints));
+        });
     }
 
     /**
