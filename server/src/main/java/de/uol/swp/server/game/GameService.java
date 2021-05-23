@@ -11,7 +11,6 @@ import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
-import de.uol.swp.common.game.map.hexes.IGameHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex;
 import de.uol.swp.common.game.map.hexes.IHarborHex.HarborResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
@@ -210,34 +209,35 @@ public class GameService extends AbstractService {
      */
     private void dummyTurnInFoundingPhase(Game game, UserOrDummy nextPlayer) {
         if (nextPlayer instanceof Dummy) {
-            IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
-            for (int pointer1 = 0; pointer1 < intersections.length; pointer1++) {
-                for (int pointer2 = 0; pointer2 < intersections[0].length; pointer2++) {
-                    IIntersection intersection = intersections[pointer1][pointer2];
-                    if (intersection.getState().equals(IIntersection.IntersectionState.FREE)) {
-                        game.getMap().placeFoundingSettlement(game.getPlayer(nextPlayer),
-                                                              MapPoint.IntersectionMapPoint(pointer1, pointer2));
 
-                        break;
-                    }
-                    break;
+            IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
+
+            boolean settlementPlaced = false;
+            boolean roadPlaced = false;
+
+            int randomXCoordinate = 0;
+            int randomYCoordinate = 0;
+            while (!settlementPlaced) {
+                randomXCoordinate = ((int) (Math.random() * 6));
+                randomYCoordinate = ((int) (Math.random() * 7));
+                if (intersections[randomXCoordinate][randomYCoordinate].getState()
+                                                                       .equals(IIntersection.IntersectionState.FREE)) {
+                    game.getMap().placeFoundingSettlement(game.getPlayer(nextPlayer),
+                                                          MapPoint.IntersectionMapPoint(randomYCoordinate,
+                                                                                        randomXCoordinate));
+                    settlementPlaced = true;
                 }
-                break;
             }
-            IGameHex[][] gameHexes = game.getMap().getHexesAsJaggedArray();
-            for (int pointer1 = 0; pointer1 < gameHexes.length; pointer1++) {
-                for (int pointer2 = 0; pointer2 < gameHexes[0].length; pointer2++) {
-                    Set<IEdge> edges = game.getMap().getEdgesFromHex(MapPoint.HexMapPoint(pointer1, pointer2));
-                    int roadsPlaced = 0;
-                    for (IEdge edge : edges) {
-                        if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge) && roadsPlaced == 0) {
+            Set<IEdge> incidentEdges = game.getMap().incidentEdges(intersections[randomYCoordinate][randomXCoordinate]);
+            while (!roadPlaced) {
+                {
+                    for (IEdge edge : incidentEdges) {
+                        if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
                             game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
-                            roadsPlaced++;
+                            roadPlaced = true;
                             break;
                         }
-                        break;
                     }
-                    break;
                 }
             }
             onEndTurnRequest(new EndTurnRequest(nextPlayer, game.getLobby().getName()));
