@@ -13,6 +13,22 @@ import java.util.List;
  */
 class AINames implements Serializable {
 
+    /**
+     * Enum for an AI's language
+     *
+     * @since 2021-05-20
+     */
+    enum Language {
+        BRITISH,
+        US_AMERICAN,
+        JAPANESE,
+        ITALIAN,
+        ARABIC,
+        AZTEC,
+        SIMPLE_ENGLISH,
+        NONE
+    }
+
     final List<String> aiNameEasy = new ArrayList<>(
             Arrays.asList("Jonathan Joestar", "Robert E. O. Speedwagon", "Erina Pendleton", "George Joestar I.",
                           "Lisa Lisa", "Johnny Joestar", //British
@@ -121,17 +137,17 @@ class AINames implements Serializable {
      *
      * @since 2021-05-20
      */
-    AI.Language getLanguage(String name) {
-        AI.Language language = AI.Language.NONE;
-        if (aiNameEasy.subList(0, 6).contains(name)) language = AI.Language.BRITISH;
-        else if (aiNameEasy.subList(9, 19).contains(name)) language = AI.Language.SIMPLE_ENGLISH;
-        else if (aiNameEasy.subList(18, 28).contains(name)) language = AI.Language.US_AMERICAN;
-        else if (aiNameEasy.subList(31, 38).contains(name)) language = AI.Language.JAPANESE;
-        else if (aiNameEasy.subList(38, aiNameEasy.size()).contains(name)) language = AI.Language.ITALIAN;
-        else if (aiNameHard.subList(0, 6).contains(name)) language = AI.Language.BRITISH;
-        else if (aiNameHard.subList(6, 10).contains(name)) language = AI.Language.AZTEC;
-        else if (aiNameHard.subList(10, 17).contains(name)) language = AI.Language.ARABIC;
-        else if (aiNameHard.subList(17, 23).contains(name)) language = AI.Language.US_AMERICAN;
+    Language getLanguage(String name) {
+        Language language = Language.NONE;
+        if (aiNameEasy.subList(0, 6).contains(name)) language = Language.BRITISH;
+        else if (aiNameEasy.subList(9, 19).contains(name)) language = Language.SIMPLE_ENGLISH;
+        else if (aiNameEasy.subList(18, 28).contains(name)) language = Language.US_AMERICAN;
+        else if (aiNameEasy.subList(31, 38).contains(name)) language = Language.JAPANESE;
+        else if (aiNameEasy.subList(38, aiNameEasy.size()).contains(name)) language = Language.ITALIAN;
+        else if (aiNameHard.subList(0, 6).contains(name)) language = Language.BRITISH;
+        else if (aiNameHard.subList(6, 10).contains(name)) language = Language.AZTEC;
+        else if (aiNameHard.subList(10, 17).contains(name)) language = Language.ARABIC;
+        else if (aiNameHard.subList(17, 23).contains(name)) language = Language.US_AMERICAN;
 
         return language;
     }
@@ -144,13 +160,13 @@ class AINames implements Serializable {
      *
      * @param name       The AI's name5
      * @param difficulty The AI's difficulty
-     * @param language   The AI's language
      * @param type       The type of message
      *
      * @return String
      */
-    String writeMessage(String name, AI.Difficulty difficulty, AI.Language language, AI.WriteType type) {
+    String writeMessage(String name, AI.Difficulty difficulty, AI.WriteType type) {
         String msg = "";
+        Language language = getLanguage(name);
         switch (difficulty) {
             case EASY:
                 switch (type) {

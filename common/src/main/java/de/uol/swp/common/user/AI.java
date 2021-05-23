@@ -20,23 +20,6 @@ public interface AI extends NPC, Serializable {
     }
 
     /**
-     * Enum for an AI's language
-     *
-     * @since 2021-05-20
-     */
-    enum Language {
-        GERMAN,
-        BRITISH,
-        US_AMERICAN,
-        JAPANESE,
-        ITALIAN,
-        ARABIC,
-        AZTEC,
-        SIMPLE_ENGLISH,
-        NONE
-    }
-
-    /**
      * Enum for all types of
      * ChatMessages an AI can write
      *

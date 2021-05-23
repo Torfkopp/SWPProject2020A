@@ -17,7 +17,6 @@ public class AIDTO implements AI {
     private final Difficulty difficulty;
     private final de.uol.swp.common.user.AINames aiNames = new AINames(this);
     private boolean aiTalking;
-    private Language language;
 
     /**
      * Constructor
@@ -29,7 +28,6 @@ public class AIDTO implements AI {
         this.aiTalking = aiTalking;
         this.id = ++idCounter;
         this.name = aiNames.getAIName(difficulty, aiTalking);
-        this.language = aiNames.getLanguage(name);
         this.difficulty = difficulty;
     }
 
@@ -83,7 +81,7 @@ public class AIDTO implements AI {
 
     @Override
     public String writeMessage(WriteType writeType) {
-        return aiNames.writeMessage(name, difficulty, language, writeType);
+        return aiNames.writeMessage(name, difficulty, writeType);
     }
 
     @Override
