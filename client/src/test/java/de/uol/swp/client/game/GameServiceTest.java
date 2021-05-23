@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class GameServiceTest {
 
     private static final User defaultUser = new UserDTO(42, "test", "test123", "test@test.test");
