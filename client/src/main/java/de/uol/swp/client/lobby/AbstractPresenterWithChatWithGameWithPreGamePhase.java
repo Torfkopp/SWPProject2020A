@@ -117,9 +117,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (lobbyName != null || !kicked) {
             lobbyService.leaveLobby(lobbyName);
         }
-        try { // if it doesn't exist, we ignore the NPE and continue closing down
-            moveTimeTimer.cancel();
-        } catch (NullPointerException ignored) {}
+        if (moveTimeTimer != null) moveTimeTimer.cancel();
         ((Stage) window).close();
         moveTimeTimer.cancel();
         eventBus.post(new TradeCancelEvent(lobbyName));
