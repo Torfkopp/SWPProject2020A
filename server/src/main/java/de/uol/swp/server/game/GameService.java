@@ -228,9 +228,11 @@ public class GameService extends AbstractService {
             for (int pointer1 = 0; pointer1 < gameHexes.length; pointer1++) {
                 for (int pointer2 = 0; pointer2 < gameHexes[0].length; pointer2++) {
                     Set<IEdge> edges = game.getMap().getEdgesFromHex(MapPoint.HexMapPoint(pointer1, pointer2));
+                    int roadsPlaced = 0;
                     for (IEdge edge : edges) {
-                        if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
+                        if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge) && roadsPlaced == 0) {
                             game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
+                            roadsPlaced++;
                             break;
                         }
                         break;
@@ -652,8 +654,12 @@ public class GameService extends AbstractService {
         }
         Game game = gameManagement.getGame(lobbyName);
         if (game.getFirst() instanceof Dummy) {
-            onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
-            endTurnDummy(game);
+            if (game.getLobby().isStartUpPhaseEnabled()) {
+                dummyTurnInFoundingPhase(game, game.getFirst());
+            } else {
+                onRollDiceRequest(new RollDiceRequest(game.getFirst(), lobbyName));
+                endTurnDummy(game);
+            }
         }
     }
 
@@ -754,19 +760,19 @@ public class GameService extends AbstractService {
                     nextPlayer = user;
                     dummyTurnInFoundingPhase(game, nextPlayer);
                 }
-            } else {
-                nextPlayer = game.nextPlayer();
-
-                ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
-
-                LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
-
-                game.setDiceRolledAlready(false);
-
-                onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-                endTurnDummy(game);
             }
+        } else {
+            nextPlayer = game.nextPlayer();
+
+            ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+
+            LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
+            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+            game.setDiceRolledAlready(false);
+
+            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+            endTurnDummy(game);
         }
     }
 
