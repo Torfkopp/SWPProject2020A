@@ -87,18 +87,8 @@ public class AIDTO implements AI {
     }
 
     @Override
-    public Language getLanguage() {
-        return language;
-    }
-
-    @Override
     public Difficulty getDifficulty() {
         return difficulty;
-    }
-
-    @Override
-    public void setAiTalking(boolean b) {
-        aiTalking = b;
     }
 
     @Override

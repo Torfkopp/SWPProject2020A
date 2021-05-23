@@ -70,24 +70,9 @@ public interface AI extends NPC, Serializable {
     String writeMessage(WriteType writeType);
 
     /**
-     * Gets the AI's language
-     *
-     * @return Language
-     */
-    Language getLanguage();
-
-    /**
      * Gets the difficulty
      *
      * @return AI's difficulty
      */
     Difficulty getDifficulty();
-
-    /**
-     * Sets if the AI is able
-     * to write chat messages
-     *
-     * @param b Boolean
-     */
-    void setAiTalking(boolean b);
 }
