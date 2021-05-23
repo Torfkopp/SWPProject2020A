@@ -197,6 +197,52 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to realize a dummies turn in the founder phase
+     * Checks whether the next player in the founding phase player queue is a dummy
+     * and builds the founding settlement and road accordingly.
+     * Afterwards it ends the turn of the dummy.
+     *
+     * @param game       the game, the dummy is in
+     * @param nextPlayer the player whose turn the next one is
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-22
+     */
+    private void dummyTurnInFoundingPhase(Game game, UserOrDummy nextPlayer) {
+        if (nextPlayer instanceof Dummy) {
+            IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
+            for (int pointer1 = 0; pointer1 < intersections.length; pointer1++) {
+                for (int pointer2 = 0; pointer2 < intersections[0].length; pointer2++) {
+                    IIntersection intersection = intersections[pointer1][pointer2];
+                    if (intersection.getState().equals(IIntersection.IntersectionState.FREE)) {
+                        game.getMap().placeFoundingSettlement(game.getPlayer(nextPlayer),
+                                                              MapPoint.IntersectionMapPoint(pointer1, pointer2));
+
+                        break;
+                    }
+                    break;
+                }
+                break;
+            }
+            IGameHex[][] gameHexes = game.getMap().getHexesAsJaggedArray();
+            for (int pointer1 = 0; pointer1 < gameHexes.length; pointer1++) {
+                for (int pointer2 = 0; pointer2 < gameHexes[0].length; pointer2++) {
+                    Set<IEdge> edges = game.getMap().getEdgesFromHex(MapPoint.HexMapPoint(pointer1, pointer2));
+                    for (IEdge edge : edges) {
+                        if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
+                            game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
+                            break;
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+            onEndTurnRequest(new EndTurnRequest(nextPlayer, game.getLobby().getName()));
+        }
+    }
+
+    /**
      * Helper method to handle ending the game if the last change to the
      * inventory pushed the player over the edge in terms of Victory Points
      *
@@ -693,6 +739,7 @@ public class GameService extends AbstractService {
                     startUpPlayerOrder.addFirst(nextPlayer);
                 } else {
                     nextPlayer = user;
+                    dummyTurnInFoundingPhase(game, nextPlayer);
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
                 if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
@@ -703,6 +750,7 @@ public class GameService extends AbstractService {
                     user = startUpPlayerOrder.peekFirst();
                     if (user == null) return;
                     nextPlayer = user;
+                    dummyTurnInFoundingPhase(game, nextPlayer);
                 }
             } else {
                 nextPlayer = game.nextPlayer();
@@ -714,39 +762,8 @@ public class GameService extends AbstractService {
 
                 game.setDiceRolledAlready(false);
 
-                if (nextPlayer instanceof Dummy) {
-                    IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
-                    for (int pointer1 = 0; pointer1 < intersections.length; pointer1++) {
-                        for (int pointer2 = 0; pointer2 < intersections[0].length; pointer2++) {
-                            IIntersection intersection = intersections[pointer1][pointer2];
-                            if (intersection.getState().equals(IIntersection.IntersectionState.FREE)) {
-                                game.getMap().placeFoundingSettlement(game.getPlayer(nextPlayer),
-                                                                      MapPoint.IntersectionMapPoint(pointer1,
-                                                                                                    pointer2));
-
-                                break;
-                            }
-                            break;
-                        }
-                        break;
-                    }
-                    IGameHex[][] gameHexes = game.getMap().getHexesAsJaggedArray();
-                    for (int pointer1 = 0; pointer1 < gameHexes.length; pointer1++) {
-                        for (int pointer2 = 0; pointer2 < gameHexes[0].length; pointer2++) {
-                            Set<IEdge> edges = game.getMap().getEdgesFromHex(MapPoint.HexMapPoint(pointer1, pointer2));
-                            for (IEdge edge : edges) {
-                                if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
-                                    game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
-                                    break;
-                                }
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-                    endTurnDummy(game);
-                }
+                onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+                endTurnDummy(game);
             }
         }
     }
