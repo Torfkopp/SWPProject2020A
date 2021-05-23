@@ -1794,7 +1794,7 @@ public class GameService extends AbstractService {
      * @see de.uol.swp.common.game.message.UpdateVictoryPointsMessage
      * @since 2021-05-21
      */
-    private void updateVictoryPoints(LobbyName originLobby) {
+    void updateVictoryPoints(LobbyName originLobby) {
         Game game = gameManagement.getGame(originLobby);
         UserOrDummy[] players = game.getPlayers();
         Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();

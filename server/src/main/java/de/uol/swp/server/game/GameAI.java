@@ -1371,6 +1371,7 @@ public class GameAI {
                 inv.decrease(DevelopmentCardType.KNIGHT_CARD);
                 inv.increaseKnights();
                 gameService.checkLargestArmy(lobbyName, uehara);
+                gameService.updateVictoryPoints(lobbyName);
                 robberMovementAI(uehara, lobbyName);
                 break;
             case ROAD_BUILDING_CARD:
@@ -1480,6 +1481,8 @@ public class GameAI {
         while (inv.get(WOOL) >= 1 && inv.get(GRAIN) >= 1 && inv.get(ORE) >= 1 && !game.getBankInventory()
                                                                                       .getDevelopmentCards().isEmpty())
             gameService.onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(uehara, lobbyName));
+        //Update Victory Points
+        gameService.updateVictoryPoints(lobbyName);
     }
 
     /**
@@ -1504,9 +1507,6 @@ public class GameAI {
             ((int) (Math.random() * 100) < (10 + game.getRound() * 5)))
             gameService.onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(uehara, lobbyName));
 
-        //TEST TEST TEST, JOHNNY TEST
-        buildCity(game, uehara);
-
         //The numbers may not be optimal; not enough data
         if (game.getRound() < 7) {
             //Focus on expanding like crazy
@@ -1528,6 +1528,9 @@ public class GameAI {
             while (buildSettlement(game, uehara)) buildSettlement(game, uehara);
             buildRoad(game, uehara);
         }
+
+        //Update Victory Points
+        gameService.updateVictoryPoints(lobbyName);
     }
 
     /**
