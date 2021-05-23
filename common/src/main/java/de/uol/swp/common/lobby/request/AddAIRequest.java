@@ -14,10 +14,10 @@ public class AddAIRequest extends AbstractLobbyRequest {
     /**
      * Constructor
      *
-     * @param name   The name of the lobby
-     * @param uehara The AI to join
+     * @param name The name of the lobby
+     * @param ai   The AI to join
      */
-    public AddAIRequest(LobbyName name, AI uehara) {
-        super(name, uehara);
+    public AddAIRequest(LobbyName name, AI ai) {
+        super(name, ai);
     }
 }

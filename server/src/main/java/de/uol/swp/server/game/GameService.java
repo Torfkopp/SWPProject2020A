@@ -159,15 +159,15 @@ public class GameService extends AbstractService {
     /**
      * Method to post a message for the AI
      *
-     * @param uehara    The AI to send the message
+     * @param ai        The AI to send the message
      * @param content   The content of said message
      * @param lobbyName The lobby to send the message in
      *
      * @author Mario Fokken
      * @since 2021-05-17
      */
-    void postAI(AI uehara, String content, LobbyName lobbyName) {
-        Message msg = new NewChatMessageRequest(uehara, content, lobbyName);
+    void postAI(AI ai, String content, LobbyName lobbyName) {
+        Message msg = new NewChatMessageRequest(ai, content, lobbyName);
         post(msg);
     }
 
@@ -214,14 +214,14 @@ public class GameService extends AbstractService {
     /**
      * Helper method to end an AI's turn
      *
-     * @param game   The game the AI is in
-     * @param uehara The AI to make its turn
+     * @param game The game the AI is in
+     * @param ai   The AI to make its turn
      *
      * @author Mario Fokken
      * @since 2021-05-13
      */
-    void turnEndAI(Game game, AI uehara) {
-        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(uehara, game.getLobby().getName()));
+    void turnEndAI(Game game, AI ai) {
+        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(ai, game.getLobby().getName()));
     }
 
     /**
@@ -289,11 +289,11 @@ public class GameService extends AbstractService {
             for (UserOrDummy ai : game.getPlayers())
                 if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, originLobby,
                                                                 user.getUsername().equals(ai.getUsername()) ?
-                                                                GameAI.WriteType.GAME_WIN : GameAI.WriteType.GAME_LOSE);
+                                                                AI.WriteType.GAME_WIN : AI.WriteType.GAME_LOSE);
             for (UserOrDummy ai : game.getPlayers())
                 if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, originLobby,
                                                                 user.getUsername().equals(ai.getUsername()) ?
-                                                                GameAI.WriteType.GAME_WIN : GameAI.WriteType.GAME_LOSE);
+                                                                AI.WriteType.GAME_WIN : AI.WriteType.GAME_LOSE);
         }
     }
 
@@ -623,7 +623,7 @@ public class GameService extends AbstractService {
             post(exceptionMessage);
         }
         for (UserOrDummy ai : msg.getLobby().getUserOrDummies())
-            if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, lobbyName, GameAI.WriteType.START);
+            if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, lobbyName, AI.WriteType.START);
         Game game = gameManagement.getGame(lobbyName);
         UserOrDummy first = game.getFirst();
         if (first instanceof NPC) {
@@ -925,13 +925,13 @@ public class GameService extends AbstractService {
                                         req.getDemandedResources());
             if (accepted) {
                 gameAI.writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(),
-                                          GameAI.WriteType.TRADE_ACCEPT);
+                                          AI.WriteType.TRADE_ACCEPT);
                 onAcceptUserTradeRequest(
                         new AcceptUserTradeRequest(req.getRespondingUser(), req.getOfferingUser(), req.getOriginLobby(),
                                                    req.getDemandedResources(), req.getOfferedResources()));
             } else {
                 gameAI.writeChatMessageAI((AI) req.getRespondingUser(), req.getOriginLobby(),
-                                          GameAI.WriteType.TRADE_DECLINE);
+                                          AI.WriteType.TRADE_DECLINE);
                 onResetOfferTradeButtonRequest(
                         new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             }

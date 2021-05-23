@@ -240,8 +240,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         AI.Difficulty difficulty =
                 difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
                 AI.Difficulty.HARD;
-        AI uehara = new AIDTO(difficulty, talking);
-        lobbyService.addAI(lobbyName, uehara);
+        AI ai = new AIDTO(difficulty, talking);
+        lobbyService.addAI(lobbyName, ai);
     }
 
     /**

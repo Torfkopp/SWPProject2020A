@@ -431,7 +431,7 @@ public class CommandService extends AbstractService {
                 for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
                 return new DummyDTO(Integer.parseInt(x.toString()));
             }
-            if (new AIDTO(AI.Difficulty.EASY).getAINames().contains(name)) return new AIDTO(name);
+            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
             return null;
         }
     }
@@ -592,7 +592,7 @@ public class CommandService extends AbstractService {
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
-                        else if (new AIDTO(AI.Difficulty.EASY).getAINames().contains(args.get(i)))
+                        else if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(args.get(i)))
                             argList.add(new AIDTO(args.get(i)));
                         else {
                             // Dummy

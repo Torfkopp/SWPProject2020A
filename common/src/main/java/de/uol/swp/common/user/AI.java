@@ -25,6 +25,7 @@ public interface AI extends NPC, Serializable {
      * @since 2021-05-20
      */
     enum Language {
+        GERMAN,
         BRITISH,
         US_AMERICAN,
         JAPANESE,
@@ -36,11 +37,37 @@ public interface AI extends NPC, Serializable {
     }
 
     /**
+     * Enum for all types of
+     * ChatMessages an AI can write
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    enum WriteType {
+        //Message, when...
+        START, //the game starts
+        TRADE_ACCEPT, //AI accepts a trade
+        TRADE_DECLINE, //AI declines a trade
+        GAME_WIN, //AI wins the game
+        GAME_LOSE, //AI loses
+        MOVE_ROBBER, //AI moves robber
+        TAX, //AI has to pay tax
+        MONOPOLY, //AI plays a monopoly card
+    }
+
+    /**
      * Gets all possible AI names
      *
      * @return List of Strings
      */
-    List<String> getAINames();
+    List<String> getAiNames();
+
+    /**
+     * Gets a message for an AI
+     *
+     * @return String
+     */
+    String writeMessage(WriteType writeType);
 
     /**
      * Gets the AI's language

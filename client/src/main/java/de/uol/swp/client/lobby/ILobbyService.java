@@ -70,13 +70,13 @@ public interface ILobbyService {
      * Posts a AddAIRequest to a specified lobby onto the EventBus
      * in order to let an AI join the lobby
      *
-     * @param name   The name of the lobby
-     * @param uehara The AI to join the lobby
+     * @param name The name of the lobby
+     * @param ai   The AI to join the lobby
      *
      * @author Mario Fokken
      * @since 2021-05-21
      */
-    void addAI(LobbyName name, AI uehara);
+    void addAI(LobbyName name, AI ai);
 
     /**
      * Posts a request to join a random lobby onto the EventBus

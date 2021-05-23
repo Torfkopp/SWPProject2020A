@@ -84,9 +84,9 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void addAI(LobbyName name, AI uehara) {
+    public void addAI(LobbyName name, AI ai) {
         LOG.debug("Sending AddAIRequest");
-        Message addAIRequest = new AddAIRequest(name, uehara);
+        Message addAIRequest = new AddAIRequest(name, ai);
         eventBus.post(addAIRequest);
     }
 
