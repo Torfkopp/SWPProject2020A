@@ -3,6 +3,8 @@ package de.uol.swp.client.lobby;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
+import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
+import de.uol.swp.client.trade.event.TradeCancelEvent;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -126,7 +128,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyService.leaveLobby(lobbyName);
         }
         moveTimeTimer.cancel();
-        ((Stage) window).close();
+        eventBus.post(new TradeCancelEvent(lobbyName));
+        eventBus.post(new CloseTradeResponseEvent(lobbyName));
         clearEventBus();
     }
 
@@ -346,6 +349,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         helpCheckBox.setVisible(false);
         turnIndicator.setAccessibleText("");
         buildingCosts.setVisible(false);
+        victoryPointsLabel.setVisible(false);
         cardAmountsList.clear();
         moveTimeTimer.cancel();
         moveTimerLabel.setVisible(false);
@@ -479,6 +483,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             tradeWithBankButton.setVisible(true);
             tradeWithBankButton.setDisable(true);
             turnIndicator.setVisible(true);
+            victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
             currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1));
             setRollDiceButtonState(msg.getUser());
