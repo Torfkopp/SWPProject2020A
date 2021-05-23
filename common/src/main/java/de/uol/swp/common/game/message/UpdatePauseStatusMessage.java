@@ -24,12 +24,22 @@ public class UpdatePauseStatusMessage extends AbstractServerMessage {
      * @param lobbyName     The name of the lobby that gets updated
      * @param paused        The paused status of the game
      * @param pausedMembers Amount of players who want to change the pause status of the game
+     * @param activePlayer  The user whose turn it is
      */
     public UpdatePauseStatusMessage(LobbyName lobbyName, boolean paused, int pausedMembers, UserOrDummy activePlayer) {
         this.lobbyName = lobbyName;
         this.paused = paused;
         this.pausedMembers = pausedMembers;
         this.activePlayer = activePlayer;
+    }
+
+    /**
+     * Gets the active player of the game
+     *
+     * @return The active player of the game
+     */
+    public UserOrDummy getActivePlayer() {
+        return activePlayer;
     }
 
     /**
@@ -57,9 +67,5 @@ public class UpdatePauseStatusMessage extends AbstractServerMessage {
      */
     public boolean isPaused() {
         return paused;
-    }
-
-    public UserOrDummy getActivePlayer() {
-        return activePlayer;
     }
 }

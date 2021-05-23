@@ -147,7 +147,7 @@ public class Game {
      * @since 2021-05-21
      */
     public void changePauseStatus(UserOrDummy user) {
-        pauseGameMap.replace(user, true);
+        pauseGameMap.replace(user, !pauseGameMap.get(user));
     }
 
     /**
