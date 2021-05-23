@@ -15,8 +15,6 @@ public class AIDTO implements AI {
     private final int id;
     private final String name;
     private final Difficulty difficulty;
-    private final de.uol.swp.common.user.AINames aiNames = new AINames(this);
-    private boolean aiTalking;
 
     /**
      * Constructor
@@ -25,9 +23,8 @@ public class AIDTO implements AI {
      * @param aiTalking  If the AI writes commands
      */
     public AIDTO(Difficulty difficulty, boolean aiTalking) {
-        this.aiTalking = aiTalking;
         this.id = ++idCounter;
-        this.name = aiNames.getAIName(difficulty, aiTalking);
+        this.name = AINames.getAIName(difficulty, aiTalking);
         this.difficulty = difficulty;
     }
 
@@ -47,7 +44,7 @@ public class AIDTO implements AI {
      */
     public AIDTO(String name) {
         this.id = ++idCounter;
-        Difficulty diff = aiNames.getDifficultyFromName(name);
+        Difficulty diff = AINames.getDifficultyFromName(name);
         if (diff == null) {
             this.name = "Man X";
             this.difficulty = Difficulty.EASY;
@@ -66,7 +63,7 @@ public class AIDTO implements AI {
 
     @Override
     public List<String> getAiNames() {
-        return aiNames.getAINames();
+        return AINames.getAINames();
     }
 
     @Override
@@ -81,7 +78,7 @@ public class AIDTO implements AI {
 
     @Override
     public String writeMessage(WriteType writeType) {
-        return aiNames.writeMessage(name, difficulty, writeType);
+        return AINames.writeMessage(name, difficulty, writeType);
     }
 
     @Override

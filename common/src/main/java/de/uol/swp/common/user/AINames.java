@@ -11,7 +11,7 @@ import java.util.List;
  * @author Mario Fokken
  * @since 2021-05-23
  */
-class AINames implements Serializable {
+public class AINames implements Serializable {
 
     /**
      * Enum for an AI's language
@@ -29,7 +29,7 @@ class AINames implements Serializable {
         NONE
     }
 
-    final List<String> aiNameEasy = new ArrayList<>(
+    final static List<String> aiNameEasy = new ArrayList<>(
             Arrays.asList("Jonathan Joestar", "Robert E. O. Speedwagon", "Erina Pendleton", "George Joestar I.",
                           "Lisa Lisa", "Johnny Joestar", //British
                           "Rudol von Stroheim", //German
@@ -46,7 +46,7 @@ class AINames implements Serializable {
                           "Giorno Giovanna", "Bruno Bucciarati", "Leone Abbacchio", "Guido Mista", "Narancia Ghirga",
                           "Pannacotta Fugo", "Trish Una",
                           "Tonio Trussardi")); //Italianprivate final java.util.List<java.lang.String> aiNameHard = new java.util.ArrayList<java.lang.String>(
-    final List<String> aiNameHard = new ArrayList<>(
+    final static List<String> aiNameHard = new ArrayList<>(
             Arrays.asList("Dio Brando", "Bruford", "Tarkus", "Jack the Ripper", "DIO", "Diego Brando", //British
                           "Kars", "Esidisi", "Wamuu", "Santana", //Aztec
                           "Enya the Hag", "Oingo", "Boingo", "Steely Dan", "Kenny G.", "J. Geil", "Vanilla Ice",
@@ -56,7 +56,7 @@ class AINames implements Serializable {
                           "Pet Shop", "Bug-Eaten", "Not Bug-Eaten", "Stray Cat", //Animals
                           "Yoshikage Kira", "Head Doctor", // Japanese
                           "Diavolo", "Polpo", "Doppio")); //Italian
-    final List<String> aiNameEasyNoTalk = new ArrayList<>(
+    final static List<String> aiNameEasyNoTalk = new ArrayList<>(
             Arrays.asList("Star Platinum", "Stone Free", "Soft & Wet", "Tusk", "Silver Chariot", "Crazy Diamond",
                           "Gold Experience", "Sticky Fingers", "Moody Blues", "Sex Pistols", "Aerosmith", "Purple Haze",
                           "Spice Girl", "Kiss", "Magician's Red", "Hermit Purple", "Hierophant Green", "The Fool",
@@ -64,7 +64,7 @@ class AINames implements Serializable {
                           "Mr. President", "Burning Down The House", "Ball Breaker", "Oh! Lonesome Me", "Cream Starter",
                           "Ticket to Ride", "Paisley Park", "Doggy Style", "Nut King Call", "Paper Moon King",
                           "King Nothing"));
-    final List<String> aiNameHardNoTalk = new ArrayList<>(
+    final static List<String> aiNameHardNoTalk = new ArrayList<>(
             Arrays.asList("The World", "Killer Queen", "Metallica", "Oasis", "Whitesnake", "C-Moon", "Scary Monsters",
                           "Speed King", "Bad Company", "Red Hot Chilli Pepper", "Atom Heart Father", "Highway Star",
                           "Super Fly", "Enigma", "Cheap Trick", "Sheer Heart Attack", "Bites the Dust", "Black Sabbath",
@@ -74,9 +74,6 @@ class AINames implements Serializable {
                           "Jail House Lock", "Yo-Yo Ma", "Survivor", "Dirty Deeds Done Dirt Cheap", "Hey Ya!",
                           "Tomb of the Boom", "Catch the Rainbow", "Civil War", "In a Silent Way", "Fun Fun Fun",
                           "I Am a Rock", "Doobie Wah!", "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
-    private final de.uol.swp.common.user.AIDTO AIDTO;
-
-    AINames(de.uol.swp.common.user.AIDTO AIDTO) { this.AIDTO = AIDTO; }
 
     /**
      * Gets an AI name
@@ -86,7 +83,7 @@ class AINames implements Serializable {
      *
      * @return String An AI name
      */
-    String getAIName(AI.Difficulty difficulty, Boolean aiTalking) {
+    static String getAIName(AI.Difficulty difficulty, Boolean aiTalking) {
         String name = "Man X";
         switch (difficulty) {
             case EASY:
@@ -107,7 +104,7 @@ class AINames implements Serializable {
      *
      * @return List of Strings
      */
-    List<String> getAINames() {
+    static List<String> getAINames() {
         List<String> names = new ArrayList<>();
         names.addAll(aiNameEasy);
         names.addAll(aiNameEasyNoTalk);
@@ -124,7 +121,7 @@ class AINames implements Serializable {
      *
      * @return Difficulty or null if name not found
      */
-    AI.Difficulty getDifficultyFromName(String name) {
+    static AI.Difficulty getDifficultyFromName(String name) {
         AI.Difficulty diff = null;
         if (aiNameHardNoTalk.contains(name) || aiNameHard.contains(name)) diff = AI.Difficulty.HARD;
         else if (aiNameEasyNoTalk.contains(name) || aiNameEasy.contains(name)) diff = AI.Difficulty.EASY;
@@ -137,7 +134,7 @@ class AINames implements Serializable {
      *
      * @since 2021-05-20
      */
-    Language getLanguage(String name) {
+    static Language getLanguage(String name) {
         Language language = Language.NONE;
         if (aiNameEasy.subList(0, 6).contains(name)) language = Language.BRITISH;
         else if (aiNameEasy.subList(9, 19).contains(name)) language = Language.SIMPLE_ENGLISH;
@@ -164,7 +161,7 @@ class AINames implements Serializable {
      *
      * @return String
      */
-    String writeMessage(String name, AI.Difficulty difficulty, AI.WriteType type) {
+    static String writeMessage(String name, AI.Difficulty difficulty, AI.WriteType type) {
         String msg = "";
         Language language = getLanguage(name);
         switch (difficulty) {
