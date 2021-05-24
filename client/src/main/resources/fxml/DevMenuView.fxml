@@ -3,8 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1"
-            fx:id="devMenuView" fx:controller="de.uol.swp.client.devmenu.DevMenuPresenter">
+<AnchorPane fx:controller="de.uol.swp.client.devmenu.DevMenuPresenter" id="devMenuView"
+            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <ListView fx:id="classListView" layoutX="10.0" layoutY="10.0" minHeight="200.0" minWidth="200.0" prefHeight="200.0"
               prefWidth="200.0"/>
     <ListView fx:id="constructorList" layoutX="220.0" layoutY="10.0" minHeight="225.0" minWidth="200.0"
@@ -17,19 +17,19 @@
             </Label>
         </placeholder>
     </ListView>
-    <HBox fx:id="parameterBox" layoutX="10.0" layoutY="245.0" prefHeight="145.0" prefWidth="410.0">
-        <spacing>5</spacing>
-    </HBox>
+
+    <HBox fx:id="parameterBox" layoutX="10.0" layoutY="245.0" prefHeight="145.0" prefWidth="410.0" spacing="5"/>
+
     <TextField fx:id="classFilterTextField" layoutX="10.0" layoutY="210.0" prefHeight="25.0" prefWidth="200.0"/>
+
     <VBox alignment="TOP_CENTER" layoutX="430.0" layoutY="10.0" maxHeight="Infinity" prefWidth="190.0">
-        <Button mnemonicParsing="false" onAction="#onSendButtonPressed" text="%devmenu.buttons.send"
-                VBox.vgrow="ALWAYS">
+        <Button VBox.vgrow="ALWAYS" onAction="#onSendButtonPressed" text="%devmenu.buttons.send">
             <VBox.margin>
                 <Insets right="10.0"/>
             </VBox.margin>
         </Button>
-        <Label alignment="TOP_LEFT" maxHeight="Infinity" maxWidth="Infinity" text="%devmenu.labels.legend"
-               wrapText="true" VBox.vgrow="ALWAYS">
+        <Label VBox.vgrow="ALWAYS" alignment="TOP_LEFT" maxHeight="Infinity" maxWidth="Infinity"
+               text="%devmenu.labels.legend" wrapText="true">
             <VBox.margin>
                 <Insets right="10.0" top="20.0"/>
             </VBox.margin>

@@ -16,8 +16,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
@@ -31,7 +37,7 @@ import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.r
 @SuppressWarnings("UnstableApiUsage")
 public class RobberTaxPresenter extends AbstractPresenter {
 
-    public static final String fxml = "/fxml/RobberTaxPresenter.fxml";
+    public static final String fxml = "/fxml/RobberTaxView.fxml";
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
@@ -117,7 +123,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
                 });
             }
         });
-        Platform.runLater(()-> brickSlider.requestFocus());
+        Platform.runLater(() -> brickSlider.requestFocus());
 
         brickSlider.valueProperty().addListener((obs, oldValue, newValue) -> brickSliderListener());
         grainSlider.valueProperty().addListener((obs, oldValue, newValue) -> grainSliderListener());
@@ -146,7 +152,12 @@ public class RobberTaxPresenter extends AbstractPresenter {
     /**
      * Handles a ShowRobberTaxUpdateEvent
      * <p>
-     * The event is sent when a new RobberTaxPresenter is created
+     * The event is sent when a new RobberTaxPresenter is created and
+     * contains the relevant data to be displayed in the RobberTaxPresenter.
+     * <p>
+     * This method also sets the accelerators for the RobberTaxPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + P = Pay Tax button
      *
      * @param event ShowRobberTaxUpdateEvent found on the EventBus
      *
@@ -162,6 +173,11 @@ public class RobberTaxPresenter extends AbstractPresenter {
         resourceAmount.setText(String.valueOf(taxAmount));
         setInventoryList();
         setSliders(event.getInventory());
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
+                         this::onTaxPayButtonPressed);
+        resourceAmount.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
@@ -173,6 +189,10 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void onTaxPayButtonPressed() {
+        if (taxPay.isDisabled()) {
+            LOG.trace("onTaxPayButton called with disabled button, returning");
+            return;
+        }
         soundService.button();
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);

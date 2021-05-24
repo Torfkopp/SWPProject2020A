@@ -145,7 +145,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean timerPaused;
     protected boolean gamePaused = false;
     protected int moveTime;
-    protected int remainingMoveTime;
     protected User owner;
     protected ObservableList<UniqueCard> uniqueCardList;
     protected Window window;
@@ -179,103 +178,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a PauseTimerMessage
-     * <p>
-     * If a new PauseTimerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It sets the boolean paused on true.
-     *
-     * @param msg The PauseTimerMessage object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.message.PauseTimerMessage
-     * @since 2021-05-02
-     */
-    @Subscribe
-    public void onPauseTimerMessage(PauseTimerMessage msg) {
-        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
-        timerPaused = true;
-    }
-
-    /**
-     * Handles a PlayRoadBuildingCardAllowedResponse
-     * <p>
-     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
-     * this method is called.
-     * It disables the Buttons and gives a note to choose
-     * the roads.
-     *
-     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
-     * @since 2021-05-16
-     */
-    @Subscribe
-    public void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
-        Platform.runLater(() -> {
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
-            notice.setVisible(true);
-        });
-        disableButtonStates();
-        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
-        gameService.playRoadBuildingCard(rsp.getLobbyName());
-    }
-
-    /**
-     * Handles a UnpauseTimerMessage
-     * <p>
-     * If a new UnpauseTimerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It sets the boolean paused on false.
-     *
-     * @param msg The UnpauseTimerMessage object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
-     * @since 2021-05-02
-     */
-    @Subscribe
-    public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
-        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
-        timerPaused = false;
-    }
-
-    /**
-     * Helper method to set the timer for the players round.
-     * The user gets forced to end his turn, if the timer gets zero.
-     * It also closes all the opened windows.
-     * If paused is true, the timer is paused.
-     *
-     * @param moveTime The moveTime for the Lobby
-     *
-     * @author Alwin Bossert
-     * @since 2021-05-01
-     */
-    public void setMoveTimer(int moveTime) {
-        moveTimeTimer = new Timer();
-        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
-        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                if (!timerPaused) {
-                    Platform.runLater(() -> moveTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
-                    if (moveTimeToDecrement.get() == 0) {
-                        gameService.rollDice(lobbyName);
-                        tradeService.closeTradeResponseWindow(lobbyName);
-                        tradeService.closeBankTradeWindow(lobbyName);
-                        tradeService.closeUserTradeWindow(lobbyName);
-                        disableButtonStates();
-                        gameService.endTurn(lobbyName);
-                        moveTimeTimer.cancel();
-                    }
-                } else {remainingMoveTime = moveTimeToDecrement.get();}
-            }
-        }, 0, 1000);
-    }
-
-    /**
      * Prepares the change size listener
      * <p>
      * Changes the size of the game map when the window size
@@ -302,8 +204,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-03-29
      */
     protected void fitCanvasToSize() {
-        double heightDiff = 0;
-        if (gameWon && Objects.equals(owner, userService.getLoggedInUser())) heightDiff = 40;
+        double heightDiff = 35; // height of toolbar
+        if (gameWon && Objects.equals(owner, userService.getLoggedInUser())) heightDiff += 40;
         double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
         double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
         double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.MIN_WIDTH_PRE_GAME;
@@ -313,6 +215,217 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameRendering = new GameRendering(gameMapCanvas);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
+    }
+
+    /**
+     * Method called when the EndTurnButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method disables all appropriate
+     * buttons and then requests the LobbyService to end the current turn.
+     *
+     * @see de.uol.swp.client.lobby.ILobbyService
+     * @since 2021-01-15
+     */
+    @FXML
+    protected void onEndTurnButtonPressed() {
+        if (endTurn.isDisabled()) {
+            LOG.trace("onEndTurnButtonPressed called with disabled button, returning");
+            return;
+        }
+        soundService.button();
+        disableButtonsAfterTurn();
+        gameService.endTurn(lobbyName);
+        diceRolled = false;
+    }
+
+    /**
+     * Method called when the HelpButton is pressed
+     * <p>
+     * If the help button gets pressed and help is not activated yet,
+     * this method increases the size of the game window for the help
+     * section and calls a method to fill the help text.
+     * Otherwise the size of the window decreases.
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-01
+     */
+    @FXML
+    protected void onHelpButtonPressed() {
+        soundService.button();
+        if (!helpActivated) {
+            int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
+            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
+            ((Stage) window).setMinWidth(size);
+            window.setWidth(size);
+            setHelpText();
+        } else {
+            helpColumn.setMaxWidth(0);
+            helpColumn.setMinWidth(0);
+            helpLabel.getChildren().clear();
+            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+        }
+        helpActivated = !helpActivated;
+    }
+
+    /**
+     * Handles a click on the Pause/Unpause Button
+     * <p>
+     * Calls the pauseGame method of the gameService to
+     * start or participate in a voting to pause/unpause the
+     * game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    @FXML
+    protected void onPauseButtonPressed() {
+        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
+        else Platform.runLater(
+                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
+    }
+
+    /**
+     * Handles a click on the PlayCardButton
+     * <p>
+     * Method called when the PlayCardButton is pushed
+     * It opens a dialogue to allow the player to choose
+     * which card is to be played.
+     *
+     * @author Eric Vuong
+     * @author Mario Fokken
+     * @since 2021-02-25
+     */
+    @FXML
+    protected void onPlayCardButtonPressed() {
+        //Create a new alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
+        alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
+        alert.setContentText(resourceBundle.getString("game.playcards.alert.content"));
+        //Create the buttons
+        ButtonType btnKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
+        ButtonType btnMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
+        ButtonType btnRoadBuilding = new ButtonType(resourceBundle.getString("game.resources.cards.roadbuilding"));
+        ButtonType btnYearOfPlenty = new ButtonType(resourceBundle.getString("game.resources.cards.yearofplenty"));
+        ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                              ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
+        alert.getDialogPane().getStylesheets().add(styleSheet);
+        //Show the dialogue and get the result
+        Optional<ButtonType> result = alert.showAndWait();
+        //Create Strings based on the languages name for the resources
+        String ore = resourceBundle.getString("game.resources.ore");
+        String grain = resourceBundle.getString("game.resources.grain");
+        String brick = resourceBundle.getString("game.resources.brick");
+        String lumber = resourceBundle.getString("game.resources.lumber");
+        String wool = resourceBundle.getString("game.resources.wool");
+        //Make a list with aforementioned Strings
+        List<String> choices = new ArrayList<>();
+        choices.add(ore);
+        choices.add(grain);
+        choices.add(brick);
+        choices.add(lumber);
+        choices.add(wool);
+        //Result is the button the user has clicked on
+        if (result.isEmpty()) return;
+        if (result.get() == btnKnight) { //Play a Knight Card
+            gameService.playKnightCard(lobbyName);
+            disableButtonStates();
+        } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
+            playMonopolyCard(ore, grain, brick, lumber, wool, choices);
+        } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
+            eventBus.post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
+        } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
+            playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
+        }
+    }
+
+    /**
+     * Handles the click on the ReturnToLobby-Button.
+     *
+     * @author Finn Haase
+     * @author Steven Luong
+     * @since 2021-03-22
+     */
+    @FXML
+    protected void onReturnToLobbyButtonPressed() {
+        soundService.button();
+        buildingCosts.setVisible(false);
+        inGame = false;
+        lobbyService.returnToPreGameLobby(lobbyName);
+    }
+
+    /**
+     * Method called when the rollDice Button is pressed
+     * <p>
+     * If the rollDice Button is pressed, this method requests the LobbyService
+     * to roll the dices.
+     *
+     * @author Mario Fokken
+     * @author Sven Ahrens
+     * @see de.uol.swp.client.lobby.LobbyService
+     * @since 2021-02-22
+     */
+    @FXML
+    protected void onRollDiceButtonPressed() {
+        if (rollDice.isDisabled()) {
+            LOG.trace("onRollDiceButtonPressed called with disabled button, returning");
+            return;
+        }
+        soundService.dice();
+        gameService.rollDice(lobbyName);
+        rollDice.setDisable(true);
+        diceRolled = true;
+        if (helpActivated) setHelpText();
+    }
+
+    /**
+     * Handles a click on the TradeWithBank Button
+     * <p>
+     * Method called when the TradeWithBankButton is pressed. It calls on
+     * the TradeService to show the Trade with Bank window and request the
+     * Bank's inventory.
+     *
+     * @author Alwin Bossert
+     * @author Maximilian Lindner
+     * @since 2021-02-20
+     */
+    @FXML
+    protected void onTradeWithBankButtonPressed() {
+        soundService.button();
+        disableButtonStates();
+        tradeService.showBankTradeWindow(lobbyName);
+        tradeService.tradeWithBank(lobbyName);
+    }
+
+    /**
+     * Handles a Click on the TradeWithUserButton
+     * <p>
+     * If another player of the lobby-member-list is selected and the button gets pressed,
+     * this button gets disabled, this method calls on the TradeService to show the Trade
+     * with User window and request the inventory overview for the selected user.
+     * It also posts a new PauseTimerRequest onto the EventBus.
+     *
+     * @author Maximilian Lindner
+     * @author Finn Haase
+     * @since 2021-02-23
+     */
+    @FXML
+    protected void onTradeWithUserButtonPressed() {
+        soundService.button();
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
+        if (membersView.getSelectionModel().isEmpty() || user == null) {
+            tradeService.showTradeError(resourceBundle.getString("game.trade.error.noplayer"));
+        } else if (Objects.equals(user, userService.getLoggedInUser())) {
+            tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
+        } else {
+            disableButtonStates();
+            tradeService.showUserTradeWindow(lobbyName, user);
+            tradeService.tradeWithUser(lobbyName, user, false);
+            eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        }
     }
 
     /**
@@ -378,6 +491,40 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets zero.
+     * If paused is true, the timer is paused.
+     *
+     * @param moveTime The moveTime for the Lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    protected void setMoveTimer(int moveTime) {
+        moveTimeTimer = new Timer();
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
+        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!timerPaused) {
+                    Platform.runLater(() -> moveTimerLabel.setText(
+                            String.format(resourceBundle.getString("game.labels.movetime"),
+                                          moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
+                        gameService.rollDice(lobbyName);
+                        tradeService.closeTradeResponseWindow(lobbyName);
+                        tradeService.closeBankTradeWindow(lobbyName);
+                        tradeService.closeUserTradeWindow(lobbyName);
+                        disableButtonStates();
+                        gameService.endTurn(lobbyName);
+                        moveTimeTimer.cancel();
+                    }
+                }
+            }
+        }, 0, 1000);
+    }
+
+    /**
      * Helper function that sets the disable state of the rollDiceButton
      *
      * @author Sven Ahrens
@@ -401,7 +548,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
-
         Platform.runLater(() -> {
             turnIndicator.getChildren().clear();
             Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
@@ -639,53 +785,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Method called when the EndTurnButton is pressed
-     * <p>
-     * If the EndTurnButton is pressed, this method disables all appropriate
-     * buttons and then requests the LobbyService to end the current turn.
-     *
-     * @see de.uol.swp.client.lobby.ILobbyService
-     * @since 2021-01-15
-     */
-    @FXML
-    private void onEndTurnButtonPressed() {
-        soundService.button();
-        disableButtonsAfterTurn();
-        gameService.endTurn(lobbyName);
-        diceRolled = false;
-    }
-
-    /**
-     * Method called when the HelpButton is pressed
-     * <p>
-     * If the help button gets pressed and help is not activated yet,
-     * this method increases the size of the game window for the help
-     * section and calls a method to fill the help text.
-     * Otherwise the size of the window decreases.
-     *
-     * @author Maximilian Lindner
-     * @since 2021-05-01
-     */
-    @FXML
-    private void onHelpButtonPressed() {
-        soundService.button();
-        if (!helpActivated) {
-            int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
-            helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
-            ((Stage) window).setMinWidth(size);
-            window.setWidth(size);
-            setHelpText();
-        } else {
-            helpColumn.setMaxWidth(0);
-            helpColumn.setMinWidth(0);
-            helpLabel.getChildren().clear();
-            ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-        }
-        helpActivated = !helpActivated;
-    }
-
-    /**
      * Handles a click on the gameMapCanvas
      * <p>
      * This method calls on the GameRendering to map the x,y coordinates of the
@@ -753,23 +852,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a click on the Pause/Unpause Button
-     * <p>
-     * Calls the pauseGame method of the gameService to
-     * start or participate in a voting to pause/unpause the
-     * game
-     *
-     * @author Maximilian Lindner
-     * @since 2021-05-21
-     */
-    @FXML
-    private void onPauseButtonPressed() {
-        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
-        else Platform.runLater(
-                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
-    }
-
-    /**
      * Handles a PauseGameMessage found on the EventBus
      * <p>
      * If a PauseGameMessage is found on the EventBus, this method
@@ -824,60 +906,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a click on the PlayCardButton
+     * Handles a PauseTimerMessage
      * <p>
-     * Method called when the PlayCardButton is pushed
-     * It opens a dialogue to allow the player to choose
-     * which card is to be played.
+     * If a new PauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on true.
      *
-     * @author Eric Vuong
-     * @author Mario Fokken
-     * @since 2021-02-25
+     * @param msg The PauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
      */
-    @FXML
-    private void onPlayCardButtonPressed() {
-        soundService.button();
-        //Create a new alert
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
-        alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
-        alert.setContentText(resourceBundle.getString("game.playcards.alert.content"));
-        //Create the buttons
-        ButtonType btnKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
-        ButtonType btnMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
-        ButtonType btnRoadBuilding = new ButtonType(resourceBundle.getString("game.resources.cards.roadbuilding"));
-        ButtonType btnYearOfPlenty = new ButtonType(resourceBundle.getString("game.resources.cards.yearofplenty"));
-        ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                              ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
-        alert.getDialogPane().getStylesheets().add(styleSheet);
-        //Show the dialogue and get the result
-        Optional<ButtonType> result = alert.showAndWait();
-        //Create Strings based on the languages name for the resources
-        String ore = resourceBundle.getString("game.resources.ore");
-        String grain = resourceBundle.getString("game.resources.grain");
-        String brick = resourceBundle.getString("game.resources.brick");
-        String lumber = resourceBundle.getString("game.resources.lumber");
-        String wool = resourceBundle.getString("game.resources.wool");
-        //Make a list with aforementioned Strings
-        List<String> choices = new ArrayList<>();
-        choices.add(ore);
-        choices.add(grain);
-        choices.add(brick);
-        choices.add(lumber);
-        choices.add(wool);
-        //Result is the button the user has clicked on
-        if (result.isEmpty()) return;
-        if (result.get() == btnKnight) { //Play a Knight Card
-            gameService.playKnightCard(lobbyName);
-            disableButtonStates();
-        } else if (result.get() == btnMonopoly) { //Play a Monopoly Card
-            playMonopolyCard(ore, grain, brick, lumber, wool, choices);
-        } else if (result.get() == btnRoadBuilding) { //Play a Road Building Card
-            eventBus.post(new PlayRoadBuildingCardAllowedRequest(lobbyName, userService.getLoggedInUser()));
-        } else if (result.get() == btnYearOfPlenty) { //Play a Year Of Plenty Card
-            playYearOfPlentyCard(ore, grain, brick, lumber, wool, choices);
-        }
+    @Subscribe
+    private void onPauseTimerMessage(PauseTimerMessage msg) {
+        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
+        timerPaused = true;
     }
 
     /**
@@ -929,6 +973,31 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a PlayRoadBuildingCardAllowedResponse
+     * <p>
+     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
+     * this method is called.
+     * It disables the Buttons and gives a note to choose
+     * the roads.
+     *
+     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
+     * @since 2021-05-16
+     */
+    @Subscribe
+    private void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
+        Platform.runLater(() -> {
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+        });
+        disableButtonStates();
+        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
+        gameService.playRoadBuildingCard(rsp.getLobbyName());
+    }
+
+    /**
      * Handles a RefreshCardAmountMessage found on the EventBus
      * <p>
      * If a RefreshCardAmountMessage is found on the EventBus, this method
@@ -970,21 +1039,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
         if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
-    }
-
-    /**
-     * Handles the click on the ReturnToLobby-Button.
-     *
-     * @author Finn Haase
-     * @author Steven Luong
-     * @since 2021-03-22
-     */
-    @FXML
-    private void onReturnToLobbyButtonPressed() {
-        soundService.button();
-        buildingCosts.setVisible(false);
-        inGame = false;
-        lobbyService.returnToPreGameLobby(lobbyName);
     }
 
     /**
@@ -1104,26 +1158,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Method called when the rollDice Button is pressed
-     * <p>
-     * If the rollDice Button is pressed, this method requests the LobbyService
-     * to roll the dices.
-     *
-     * @author Mario Fokken
-     * @author Sven Ahrens
-     * @see de.uol.swp.client.lobby.LobbyService
-     * @since 2021-02-22
-     */
-    @FXML
-    private void onRollDiceButtonPressed() {
-        soundService.dice();
-        gameService.rollDice(lobbyName);
-        rollDice.setDisable(true);
-        diceRolled = true;
-        if (helpActivated) setHelpText();
-    }
-
-    /**
      * Handles a TradeOfUsersAcceptedResponse found on the EventBus
      * Updates the Inventories of the trading User.
      * It also posts a new UnpauseTimerRequest onto the EventBus
@@ -1139,52 +1173,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         gameService.updateInventory(lobbyName);
         eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
-    }
-
-    /**
-     * Handles a click on the TradeWithBank Button
-     * <p>
-     * Method called when the TradeWithBankButton is pressed. It calls on
-     * the TradeService to show the Trade with Bank window and request the
-     * Bank's inventory.
-     *
-     * @author Alwin Bossert
-     * @author Maximilian Lindner
-     * @since 2021-02-20
-     */
-    @FXML
-    private void onTradeWithBankButtonPressed() {
-        soundService.button();
-        disableButtonStates();
-        tradeService.showBankTradeWindow(lobbyName);
-        tradeService.tradeWithBank(lobbyName);
-    }
-
-    /**
-     * Handles a Click on the TradeWithUserButton
-     * <p>
-     * If another player of the lobby-member-list is selected and the button gets pressed,
-     * this button gets disabled, this method calls on the TradeService to show the Trade
-     * with User window and request the inventory overview for the selected user.
-     *
-     * @author Maximilian Lindner
-     * @author Finn Haase
-     * @since 2021-02-23
-     */
-    @FXML
-    private void onTradeWithUserButtonPressed() {
-        soundService.button();
-        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
-        if (membersView.getSelectionModel().isEmpty() || user == null) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.noplayer"));
-        } else if (Objects.equals(user, userService.getLoggedInUser())) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
-        } else {
-            disableButtonStates();
-            tradeService.showUserTradeWindow(lobbyName, user);
-            tradeService.tradeWithUser(lobbyName, user, false);
-        }
     }
 
     /**
@@ -1223,6 +1211,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
+    }
+
+    /**
+     * Handles a UnpauseTimerMessage
+     * <p>
+     * If a new UnpauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on false.
+     *
+     * @param msg The UnpauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
+        timerPaused = false;
     }
 
     /**
@@ -1309,10 +1316,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received UpdateVictoryPointsMessage for Lobby {}", lobbyName);
         int victoryPoints = msg.getVictoryPointMap().get(userService.getLoggedInUser());
-        Platform.runLater(() -> {
-            victoryPointsLabel
-                    .setText(String.format(resourceBundle.getString("game.victorypoints.labels"), victoryPoints));
-        });
+        Platform.runLater(() -> victoryPointsLabel
+                .setText(String.format(resourceBundle.getString("game.victorypoints.labels"), victoryPoints)));
     }
 
     /**

@@ -14,12 +14,14 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -38,9 +40,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
-    protected Timer tradeAcceptTimer;
     @FXML
     protected Label acceptTradeTimerLabel;
+
+    protected Timer tradeAcceptTimer;
     protected boolean paused;
     protected int remainingMoveTime;
     @FXML
@@ -103,6 +106,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
+        if (acceptTradeButton.isDisabled()) {
+            LOG.trace("onAcceptTradeButtonPressed called with disabled acceptTradeButton, returning");
+            return;
+        }
         soundService.button();
         tradeService.acceptUserTrade(lobbyName, offeringUser, respondingResourceMap, offeringResourceMap);
     }
@@ -189,6 +196,12 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * gets multiple Parameters and calls the setOfferLabel method to
      * set the offer label according to the offer and show the Users' own
      * inventory.
+     * <p>
+     * This method also sets the accelerators for the TradeWithUserAcceptPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + A = Accept Trade Offer
+     *     <li> CTRL/META + C = Make Counter Offer
+     *     <li> CTRL/META + R = Reject Trade Offer
      *
      * @param event TradeWithUserResponseUpdateEvent found on the EventBus
      */
@@ -209,6 +222,15 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             tradeService.resetOfferTradeButton(lobbyName, offeringUser);
             tradeService.closeTradeResponseWindow(lobbyName);
         });
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN), // CTRL/META + A
+                         this::onAcceptTradeButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onMakeCounterOfferButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN), // CTRL/META + R
+                         this::onRejectTradeButtonPressed);
+        ownResourceTableView.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**

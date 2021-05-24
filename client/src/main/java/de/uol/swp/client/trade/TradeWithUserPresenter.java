@@ -14,10 +14,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages the TradingWithUser window
@@ -173,6 +179,10 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onOfferTradeButtonPressed() {
+        if (offerTradeButton.isDisabled()) {
+            LOG.trace("onOfferTradeButtonPressed called with disabled offerTradeButton, returning");
+            return;
+        }
         setResourceLists();
         if (checkResources()) {
             LOG.debug("Failed sending the offer");
@@ -230,6 +240,11 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithUserPresenter is created. If a window is closed using e.g.
      * X(top-right-Button), the closeWindow method is called.
+     * <p>
+     * This method also sets the accelerators for the TradeWithUserPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + O = Make Offer button
+     *     <li> ESC           = Cancel button
      *
      * @param event TradeUpdateEvent found on the event bus
      *
@@ -241,6 +256,13 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         if (lobbyName == null) lobbyName = event.getLobbyName();
         Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> closeWindow());
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN), // CTRL/META + O
+                         this::onOfferTradeButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.ESCAPE), // ESC to close window
+                         this::onCancelTradeButtonPressed);
+        ownResourceTableView.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
