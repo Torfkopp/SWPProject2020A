@@ -21,9 +21,9 @@
             <RowConstraints maxHeight="50.0" minHeight="25.0" vgrow="NEVER"/>
             <RowConstraints vgrow="ALWAYS"/>
         </rowConstraints>
-        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+        <VBox GridPane.columnIndex="4" GridPane.rowIndex="1" prefHeight="200.0" prefWidth="100.0">
             <TextField fx:id="lobbyFilterTextField"/>
-            <ListView fx:id="lobbyView" VBox.vgrow="ALWAYS"/>
+            <ListView VBox.vgrow="ALWAYS" fx:id="lobbyView"/>
         </VBox>
 
         <ListView GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" fx:id="usersView"/>
@@ -31,7 +31,7 @@
         <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" spacing="15.0">
             <Button maxWidth="Infinity" onAction="#onCreateLobbyButtonPressed" prefHeight="45.0"
                     prefWidth="99.0" text="%mainmenu.buttons.lobby.create" textAlignment="CENTER" wrapText="true"/>
-            <Button maxWidth="Infinity" onAction="#onJoinLobbyButtonPressed"prefHeight="45.0"
+            <Button maxWidth="Infinity" onAction="#onJoinLobbyButtonPressed" prefHeight="45.0"
                     prefWidth="99.0" text="%mainmenu.buttons.lobby.join" textAlignment="CENTER" wrapText="true"/>
             <Button maxWidth="Infinity" onAction="#onJoinRandomLobbyButtonPressed"
                     prefHeight="45.0" prefWidth="99.0" text="%mainmenu.buttons.lobby.joinRandom" textAlignment="CENTER"
@@ -39,7 +39,6 @@
             <Label fx:id="randomLobbyState" text="%mainmenu.labels.lobby.randomLobbyState" visible="false"
                    wrapText="true"/>
         </VBox>
-        <ListView GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" fx:id="lobbyView"/>
 
         <VBox GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" spacing="10.0">
             <ListView GridPane.columnSpan="2" VBox.vgrow="ALWAYS" fx:id="chatView"/>
@@ -57,7 +56,7 @@
                 <MenuItem onAction="#onLogoutButtonPressed" text="%mainmenu.settings.buttons.logout"/>
             </Menu>
             <Menu text="%lobby.menu.rules">
-                <MenuItem onAction="#onRulesMenuClicked" onAction="#onRulesMenuClicked" text="%lobby.menu.rules.overview"/>
+                <MenuItem onAction="#onRulesMenuClicked" text="%lobby.menu.rules.overview"/>
             </Menu>
             <GridPane.margin>
                 <Insets left="-15.0" right="-15.0"/>
