@@ -38,6 +38,20 @@ public interface IGameMapManagement {
     Set<IIntersection> adjacentIntersections(IIntersection intersection);
 
     /**
+     * Builds a Settlement on a random Intersection during the Founding Phase
+     *
+     * @param game       the game, the lobby is set in
+     * @param nextPlayer the dummy, whose about to place a random Settlement
+     *
+     * @return an array of random Integers, that are used as Coordinates for building Roads.
+     * The element at position [0] is the Y Coordinate, the element at position[1] the X Coordinate.
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-24
+     */
+    int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer);
+
+    /**
      * Creates an IGameMap from the provided configuration
      *
      * @param configuration The map configuration used in the current Game
@@ -437,19 +451,6 @@ public interface IGameMapManagement {
     boolean settlementPlaceable(Player player, MapPoint position);
 
     /**
-     * Builds a Settlement on a random Intersection during the Founding Phase
-     *
-     * @param game       the game, the lobby is set in
-     * @param nextPlayer the dummy, whose about to place a random Settlement
-     *
-     * @return an array of random Integers, that are used as Coordinates for building Roads
-     *
-     * @author Sven Ahrens
-     * @since 2021-05-24
-     */
-    int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer);
-
-    /**
      * Checks if a settlement is placeable during the founding phase
      *
      * @param player   The player wanting to place the settlement
@@ -461,19 +462,6 @@ public interface IGameMapManagement {
      * @since 2021-05-24
      */
     boolean settlementPlaceableInFoundingPhase(Player player, MapPoint position);
-
-    /**
-     * Upgrades a settlement
-     *
-     * @param player   The player wanting to upgrade the settlement
-     * @param position The position of the intersection
-     *
-     * @return True if placement was successful; false if not
-     *
-     * @author Mario Fokken
-     * @since 2021-01-16
-     */
-    boolean upgradeSettlement(Player player, MapPoint position);
 
     /**
      * Checks if a settlement is upgradeable
@@ -488,4 +476,17 @@ public interface IGameMapManagement {
      * @since 2021-04-07
      */
     boolean settlementUpgradeable(Player player, MapPoint position);
+
+    /**
+     * Upgrades a settlement
+     *
+     * @param player   The player wanting to upgrade the settlement
+     * @param position The position of the intersection
+     *
+     * @return True if placement was successful; false if not
+     *
+     * @author Mario Fokken
+     * @since 2021-01-16
+     */
+    boolean upgradeSettlement(Player player, MapPoint position);
 }

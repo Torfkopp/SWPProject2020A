@@ -292,10 +292,25 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to end a dummy's turn
+     * AFTER every player has chosen the resources
+     * to give up on.
+     *
+     * @param game  The game
+     * @param dummy The dummy to end it
+     *
+     * @author Mario Fokken
+     * @since 2021-04-09
+     */
+    private void dummyEndTurn(Game game, Dummy dummy) {
+        System.err.println("DDDDDDDDDDDDDDDd");
+        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(dummy, game.getLobby().getName()));
+    }
+
+    /**
      * Helper method to realize a dummies turn in the founder phase
      * Checks whether the next player in the founding phase player queue is a dummy
      * and builds the founding settlement and road accordingly.
-     * Afterwards it ends the turn of the dummy.
      *
      * @param game       the game, the dummy is in
      * @param nextPlayer the player whose turn the next one is
@@ -303,31 +318,28 @@ public class GameService extends AbstractService {
      * @author Sven Ahrens
      * @since 2021-05-22
      */
-    private void dummyTurnInFoundingPhase(Game game, UserOrDummy nextPlayer) {
-        if (nextPlayer instanceof Dummy) {
+    private void dummyTurnInFoundingPhase(Game game, Dummy nextPlayer) {
+        System.err.println("DUMMYTURNINFOUNDINGPHASE" + nextPlayer);
+        IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
 
-            IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
+        boolean roadPlaced = false;
 
-            boolean roadPlaced = false;
+        int[] randomCoordinates;
+        randomCoordinates = game.getMap().buildSettlementOnRandomIntersection(game, game.getPlayer(nextPlayer));
+        int randomYCoordinate = randomCoordinates[0];
+        int randomXCoordinate = randomCoordinates[1];
 
-            int[] randomCoordinates;
-            randomCoordinates = game.getMap().buildSettlementOnRandomIntersection(game, game.getPlayer(nextPlayer));
-            int randomYCoordinate = randomCoordinates[0];
-            int randomXCoordinate = randomCoordinates[1];
-
-            Set<IEdge> incidentEdges = game.getMap().incidentEdges(intersections[randomYCoordinate][randomXCoordinate]);
-            while (!roadPlaced) {
-                {
-                    for (IEdge edge : incidentEdges) {
-                        if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
-                            game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
-                            roadPlaced = true;
-                            break;
-                        }
+        Set<IEdge> incidentEdges = game.getMap().incidentEdges(intersections[randomYCoordinate][randomXCoordinate]);
+        while (!roadPlaced) {
+            {
+                for (IEdge edge : incidentEdges) {
+                    if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
+                        game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
+                        roadPlaced = true;
+                        break;
                     }
                 }
             }
-            onEndTurnRequest(new EndTurnRequest(nextPlayer, game.getLobby().getName()));
         }
     }
 
@@ -693,10 +705,12 @@ public class GameService extends AbstractService {
         Game game = gameManagement.getGame(lobbyName);
         UserOrDummy first = game.getFirst();
         if (first instanceof NPC) {
-            onRollDiceRequest(new RollDiceRequest(first, lobbyName));
+            if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE)
+                onRollDiceRequest(new RollDiceRequest(first, lobbyName));
             if (first instanceof Dummy) {
-                dummyTurnInFoundingPhase(game, game.getFirst());
-                turnEndDummy(game, (Dummy) first);
+                if (game.getStartUpPhase() != Game.StartUpPhase.NOT_IN_STARTUP_PHASE)
+                    dummyTurnInFoundingPhase(game, (Dummy) game.getFirst());
+                dummyEndTurn(game, (Dummy) first);
             }
             if (first instanceof AI) gameAI.turnAI(game, (AI) first);
         }
@@ -765,6 +779,7 @@ public class GameService extends AbstractService {
         if (currentPhase == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
             if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game
                     .isPausedByVoting()) {
+                LOG.debug("Can't end the turn now");
                 return;
             }
         } else if (startUpPlayerOrder.peekFirst() == null || !startUpPlayerOrder.peekFirst().equals(req.getUser())) {
@@ -774,13 +789,13 @@ public class GameService extends AbstractService {
         UserOrDummy nextPlayer = null;
         UserOrDummy user;
         Optional<ILobby> optionalLobby = lobbyManagement.getLobby(req.getOriginLobby());
-        if (optionalLobby.isEmpty()) return;
-        if (optionalLobby.get().isStartUpPhaseEnabled()) {
+        if (optionalLobby.isEmpty()) throw new BadLobbyException();
+        if (currentPhase != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
             if (currentPhase.equals(Game.StartUpPhase.PHASE_1)) {
                 // in phase 1, continue with Deque order
                 startUpPlayerOrder.addLast(startUpPlayerOrder.pollFirst());
                 user = startUpPlayerOrder.peekFirst();
-                if (user == null) return;
+                if (user == null) throw new BadPlayerException();
                 if (user.equals(game.getFirst())) {
                     // first again at the beginning, signals reversal as per rules (2nd phase)
                     game.setStartUpPhase(Game.StartUpPhase.PHASE_2);
@@ -788,40 +803,44 @@ public class GameService extends AbstractService {
                     startUpPlayerOrder.addFirst(nextPlayer);
                 } else {
                     nextPlayer = user;
-                    if (nextPlayer instanceof Dummy) {
-                        dummyTurnInFoundingPhase(game, nextPlayer);
-                        turnEndDummy(game, (Dummy) nextPlayer);
-                    }
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
-                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
+                if (startUpPlayerOrder.isEmpty()) {
+                    System.err.println("BBBBBBBBBBBBBBb");
                     nextPlayer = game.getFirst();
                     game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
+                    if (nextPlayer instanceof Dummy) dummyEndTurn(game, (Dummy) nextPlayer);
                 } else {
                     startUpPlayerOrder.addFirst(startUpPlayerOrder.pollLast());
                     user = startUpPlayerOrder.peekFirst();
-                    if (user == null) return;
+                    if (user == null) throw new BadPlayerException();
                     nextPlayer = user;
-                    dummyTurnInFoundingPhase(game, nextPlayer);
-                    turnEndDummy(game, (Dummy) nextPlayer);
                 }
             }
         } else {
             nextPlayer = game.nextPlayer();
+        }
+        if (game.getStartUpPhase() != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
+            if (nextPlayer instanceof Dummy) {
+                System.err.println("AAAAAAAAAAAAAA" + nextPlayer);
+                dummyTurnInFoundingPhase(game, (Dummy) nextPlayer);
+                dummyEndTurn(game, (Dummy) nextPlayer);
+            }
+        }
 
-            ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
+        ServerMessage returnMessage = new NextPlayerMessage(req.getOriginLobby(), nextPlayer, game.getRound());
 
-            LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
-            lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+        LOG.debug("Sending NextPlayerMessage for Lobby {}", req.getOriginLobby());
+        lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
+
+        if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
 
             game.setDiceRolledAlready(false);
 
-            game.setDiceRolledAlready(false);
             if (nextPlayer instanceof NPC) {
                 onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
                 if (nextPlayer instanceof Dummy) {
-                    dummyTurnInFoundingPhase(game, game.getFirst());
-                    turnEndDummy(game, (Dummy) nextPlayer);
+                    dummyEndTurn(game, (Dummy) nextPlayer);
                 }
                 if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
             }
@@ -1472,7 +1491,7 @@ public class GameService extends AbstractService {
         if (game.getTaxPayers().isEmpty()) lobbyService
                 .sendToAllInLobby(req.getLobby(), new RobberAllTaxPaidMessage(req.getLobby(), game.getActivePlayer()));
         UserOrDummy activePlayer = game.getActivePlayer();
-        if (activePlayer instanceof Dummy) turnEndDummy(game, (Dummy) activePlayer);
+        if (activePlayer instanceof Dummy) dummyEndTurn(game, (Dummy) activePlayer);
         else if (activePlayer instanceof AI) turnEndAI(game, (AI) activePlayer);
     }
 
@@ -1852,21 +1871,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Helper method to end a dummy's turn
-     * AFTER every player has chosen the resources
-     * to give up on.
-     *
-     * @param game  The game
-     * @param dummy The dummy to end it
-     *
-     * @author Mario Fokken
-     * @since 2021-04-09
-     */
-    private void turnEndDummy(Game game, Dummy dummy) {
-        if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(dummy, game.getLobby().getName()));
-    }
-
-    /**
      * Helper method
      * <p>
      * Adds the random chosen development card and deletes the resources
@@ -1899,4 +1903,8 @@ public class GameService extends AbstractService {
         }
         return true;
     }
+
+    static class BadLobbyException extends RuntimeException {}
+
+    static class BadPlayerException extends RuntimeException {}
 }

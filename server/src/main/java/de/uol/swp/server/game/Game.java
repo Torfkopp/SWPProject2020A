@@ -82,12 +82,24 @@ public class Game {
                 int randomNumber = (int) (Math.random() * playerList.size());
                 UserOrDummy randomUser = playerList.get(randomNumber);
                 startUpPlayerOrder.addLast(randomUser);
+
+                //startUpPlayerOrder.addFirst(randomUser);
+
                 playersStartUpBuiltMap.put(randomUser, StartUpPhaseBuiltStructures.NONE_BUILT);
                 players.put(randomUser, counterPlayer, new Inventory());
                 counterPlayer = counterPlayer.nextPlayer(lobby.getUserOrDummies().size());
                 playerList.remove(randomUser);
                 autoRollEnabled.put(randomUser, false);
             }
+            /*
+            startUpPlayerOrder.addLast(first);
+            System.out.println("cccccccccccc");
+            System.out.println(getFirst());
+            System.out.println("aaaaaaaaaaaaaa");
+            for (var x : startUpPlayerOrder)
+                System.out.println(x);
+            System.out.println("bbbbbbbbbbbbb");
+             */
         }
         startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
