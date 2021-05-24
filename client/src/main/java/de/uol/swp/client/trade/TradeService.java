@@ -12,7 +12,6 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
-import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,228 +50,106 @@ public class TradeService implements ITradeService {
     @Override
     public void acceptUserTrade(LobbyName lobbyName, UserOrDummy offeringUser, ResourceList demandedResources,
                                 ResourceList offeredResources) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending AcceptUserTradeRequest");
-                Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
-                                                             demandedResources, offeredResources);
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending AcceptUserTradeRequest");
+        Message request = new AcceptUserTradeRequest(userService.getLoggedInUser(), offeringUser, lobbyName,
+                                                     demandedResources, offeredResources);
+        eventBus.post(request);
     }
 
     @Override
     public void buyDevelopmentCard(LobbyName lobbyName) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending BuyDevelopmentCardRequest");
-                Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(userService.getLoggedInUser(),
-                                                                                  lobbyName);
-                eventBus.post(buyDevelopmentCardRequest);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending BuyDevelopmentCardRequest");
+        Message buyDevelopmentCardRequest = new BuyDevelopmentCardRequest(userService.getLoggedInUser(), lobbyName);
+        eventBus.post(buyDevelopmentCardRequest);
     }
 
     @Override
     public void cancelTrade(LobbyName lobbyName, UserOrDummy respondingUser) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending TradeWithUserCancelRequest");
-                Message request = new TradeWithUserCancelRequest(lobbyName, respondingUser);
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending TradeWithUserCancelRequest");
+        Message request = new TradeWithUserCancelRequest(lobbyName, respondingUser);
+        eventBus.post(request);
     }
 
     @Override
     public void closeBankTradeWindow(LobbyName lobbyName) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending TradeCancelEvent");
-                eventBus.post(new TradeCancelEvent(lobbyName));
-                LOG.debug("Sending ResetTradeWithBankButtonEvent");
-                eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending TradeCancelEvent");
+        eventBus.post(new TradeCancelEvent(lobbyName));
+        LOG.debug("Sending ResetTradeWithBankButtonEvent");
+        eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
     }
 
     @Override
     public void closeTradeResponseWindow(LobbyName lobbyName) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending CloseTradeResponseEvent");
-                eventBus.post(new CloseTradeResponseEvent(lobbyName));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending CloseTradeResponseEvent");
+        eventBus.post(new CloseTradeResponseEvent(lobbyName));
     }
 
     @Override
     public void closeUserTradeWindow(LobbyName lobbyName) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending TradeCancelEvent");
-                eventBus.post(new TradeCancelEvent(lobbyName));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending TradeCancelEvent");
+        eventBus.post(new TradeCancelEvent(lobbyName));
     }
 
     @Override
     public void executeTradeWithBank(LobbyName lobbyName, ResourceType gainedResource, ResourceType lostResource) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending ExecuteTradeWithBankRequest");
-                Message request = new ExecuteTradeWithBankRequest(userService.getLoggedInUser(), lobbyName,
-                                                                  gainedResource, lostResource);
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending ExecuteTradeWithBankRequest");
+        Message request = new ExecuteTradeWithBankRequest(userService.getLoggedInUser(), lobbyName, gainedResource,
+                                                          lostResource);
+        eventBus.post(request);
     }
 
     @Override
     public void offerTrade(LobbyName lobbyName, UserOrDummy respondingUser, ResourceList offeredResources,
                            ResourceList demandedResources, boolean counterOffer) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending OfferingTradeWithUserRequest");
-                Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser,
-                                                                   lobbyName, offeredResources, demandedResources,
-                                                                   counterOffer);
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending OfferingTradeWithUserRequest");
+        Message request = new OfferingTradeWithUserRequest(userService.getLoggedInUser(), respondingUser, lobbyName,
+                                                           offeredResources, demandedResources, counterOffer);
+        eventBus.post(request);
     }
 
     @Override
     public void resetOfferTradeButton(LobbyName lobbyName, UserOrDummy offeringUser) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending ResetOfferTradeButtonRequest");
-                Message request = new ResetOfferTradeButtonRequest(lobbyName, offeringUser);
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending ResetOfferTradeButtonRequest");
+        Message request = new ResetOfferTradeButtonRequest(lobbyName, offeringUser);
+        eventBus.post(request);
     }
 
     @Override
     public void showBankTradeWindow(LobbyName lobbyName) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending ShowTradeWithBankViewEvent");
-                eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending ShowTradeWithBankViewEvent");
+        eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
     }
 
     @Override
     public void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-                eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
+        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
     }
 
     @Override
     public void showTradeError(String message) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending TradeErrorEvent");
-                eventBus.post(new TradeErrorEvent(message));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending TradeErrorEvent");
+        eventBus.post(new TradeErrorEvent(message));
     }
 
     @Override
     public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending ShowTradeWithUserViewEvent");
-                eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser));
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending ShowTradeWithUserViewEvent");
+        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser));
     }
 
     @Override
     public void tradeWithBank(LobbyName lobbyName) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending TradeWithBankRequest");
-                Message request = new TradeWithBankRequest(lobbyName, userService.getLoggedInUser());
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending TradeWithBankRequest");
+        Message request = new TradeWithBankRequest(lobbyName, userService.getLoggedInUser());
+        eventBus.post(request);
     }
 
     @Override
     public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending TradeWithUserRequest");
-                Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser,
-                                                           counterOffer);
-                eventBus.post(request);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        LOG.debug("Sending TradeWithUserRequest");
+        Message request = new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), respondingUser,
+                                                   counterOffer);
+        eventBus.post(request);
     }
 }

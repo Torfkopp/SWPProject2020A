@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
@@ -15,7 +16,6 @@ import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
@@ -65,15 +65,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     public void init(Logger log) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG = log;
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG = log);
     }
 
     /**
@@ -84,15 +76,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareChatVars();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("AbstractPresenterWithChat initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChat initialised"));
     }
 
     /**
@@ -321,13 +305,16 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
             if (msg.getVictim() == null) {
                 if (msg.getUser().equals(userService.getLoggedInUser())) {
+                    String title = resourceBundle.getString("error.title");
+                    String headerText = resourceBundle.getString("error.header");
+                    String contentText = resourceBundle.getString("game.robber.error");
+                    String confirmText = resourceBundle.getString("button.confirm");
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle(resourceBundle.getString("error.title"));
-                        alert.setHeaderText(resourceBundle.getString("error.header"));
-                        alert.setContentText(resourceBundle.getString("game.robber.error"));
-                        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                            ButtonBar.ButtonData.OK_DONE);
+                        alert.setTitle(title);
+                        alert.setHeaderText(headerText);
+                        alert.setContentText(contentText);
+                        ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
                         alert.getButtonTypes().setAll(confirm);
                         alert.getDialogPane().getStylesheets().add(styleSheet);
                         alert.showAndWait();

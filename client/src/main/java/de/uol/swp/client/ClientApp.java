@@ -12,9 +12,9 @@ import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.util.ThreadManager;
 import io.netty.channel.Channel;
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,6 +59,9 @@ public class ClientApp extends Application implements ConnectionListener {
      * doesn't take place on the JavaFX Application Thread.
      * <p>
      * This is analogous to how service creation is handled on ServerApp start.
+     * <p>
+     * Note: The synchronous services are implicitly instantiated as well because
+     * their asynchronous wrappers are bound to the interfaces called here.
      *
      * @author Phillip-André Suhr
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
@@ -141,24 +144,14 @@ public class ClientApp extends Application implements ConnectionListener {
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.trace("Trying to shutting down client ...");
-                if (clientConnection != null) {
-                    clientConnection.close();
-                }
-                LOG.info("ClientConnection shutdown");
-                return true;
+        ThreadManager.runNow(() -> {
+            LOG.trace("Trying to shutting down client ...");
+            if (clientConnection != null) {
+                clientConnection.close();
             }
-        };
-        Thread thread = new Thread(task, "Shutdown");
-        thread.start();
-        try {
-            thread.join(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            LOG.info("ClientConnection shutdown");
+        });
+        ThreadManager.shutdown();
     }
 
     @Override

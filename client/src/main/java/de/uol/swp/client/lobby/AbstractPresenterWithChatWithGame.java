@@ -9,6 +9,7 @@ import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.CardsAmount;
@@ -37,7 +38,6 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -140,7 +140,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean tradingCurrentlyAllowed;
     protected boolean paused;
     protected int moveTime;
-    protected int remainingMoveTime;
     protected User owner;
     protected ObservableList<UniqueCard> uniqueCardList;
     protected Window window;
@@ -171,15 +170,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("AbstractPresenterWithChatWithGame initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChatWithGame initialised"));
     }
 
     /**
@@ -257,14 +248,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-05-01
      */
     public void setMoveTimer(int moveTime) {
+        String moveTimeText = resourceBundle.getString("game.labels.movetime");
         moveTimeTimer = new Timer();
         AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 if (!paused) {
-                    Platform.runLater(() -> moveTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
+                    Platform.runLater(() -> moveTimerLabel
+                            .setText(String.format(moveTimeText, moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
                         tradeService.closeTradeResponseWindow(lobbyName);
@@ -274,7 +265,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                         gameService.endTurn(lobbyName);
                         moveTimeTimer.cancel();
                     }
-                } else {remainingMoveTime = moveTimeToDecrement.get();}
+                }
             }
         }, 0, 1000);
     }
@@ -338,21 +329,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 helpLabel.getChildren().add(wait);
             });
         } else {
+            String cardString = resourceBundle.getString("game.help.labels.playcard");
+            Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
+            Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
+            Text setRobber = new Text(resourceBundle.getString("game.help.labels.setrobber"));
+            Text endTurn = new Text(resourceBundle.getString("game.help.labels.endturn"));
+            Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
+            Text build = new Text(resourceBundle.getString("game.help.labels.build"));
+            Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
             Platform.runLater(() -> {
                 helpLabel.getChildren().clear();
-                Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
-                Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
                 if (!diceRolled) helpLabel.getChildren().addAll(turn, rollDiceText);
                 else {
                     rollDiceText.setStrikethrough(true);
                     if (robberNewPosition) {
-                        Text setRobber = new Text(resourceBundle.getString("game.help.labels.setrobber"));
                         helpLabel.getChildren().addAll(turn, rollDiceText, setRobber);
                     } else {
-                        Text endTurn = new Text(resourceBundle.getString("game.help.labels.endturn"));
-                        Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
-                        Text build = new Text(resourceBundle.getString("game.help.labels.build"));
-                        Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
                         helpLabel.getChildren().addAll(turn, rollDiceText, trade, build);
                         if (playedCard) {
                             playCard.setStrikethrough(true);
@@ -367,9 +359,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                             for (int i = 0; i < 4; i++) {
                                 IDevelopmentCard cardMap = developmentCardTableView.getItems().get(i + 1);
                                 if (cardMap.getAmount() > 0) {
-                                    Text card = new Text(
-                                            String.format(resourceBundle.getString("game.help.labels.playcard"),
-                                                          cardMap.getType()));
+                                    Text card = new Text(String.format(cardString, cardMap.getType()));
                                     helpLabel.getChildren().add(card);
                                 }
                             }
@@ -405,10 +395,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
-
+        Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
+        Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
         Platform.runLater(() -> {
             turnIndicator.getChildren().clear();
-            Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
             preUsernameText.setFont(Font.font(20.0));
             if (theme.equals("dark")) preUsernameText.setFill(Color.web("#F3F5F3"));
 
@@ -434,7 +424,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 }
             }
 
-            Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
             if (theme.equals("dark")) postUsernameText.setFill(Color.web("#F3F5F3"));
             turnIndicator.getChildren().addAll(preUsernameText, username, postUsernameText);
@@ -600,13 +589,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         final String finalAttr = attr;
         if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
-            if (finalAttr != null) Platform.runLater(() -> {
+            if (finalAttr != null) {
+                InGameSystemMessageDTO message = new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"));
                 soundService.building();
-                chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you")));
-            });
+                Platform.runLater(() -> chatMessages.add(message));
+            }
         } else {
-            if (finalAttr != null) Platform.runLater(() -> chatMessages
-                    .add(new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".other", msg.getUser().toString()))));
+            if (finalAttr != null) {
+                InGameSystemMessageDTO message = new InGameSystemMessageDTO(
+                        new I18nWrapper(finalAttr + ".other", msg.getUser().toString()));
+                Platform.runLater(() -> chatMessages.add(message));
+            }
         }
         if (helpActivated) setHelpText();
     }
@@ -751,8 +744,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         setMoveTimer(moveTime);
-        Platform.runLater(
-                () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
+        String roundText = String.format(resourceBundle.getString("lobby.menu.round"), getRound);
+        Platform.runLater(() -> currentRound.setText(roundText));
     }
 
     /**
@@ -827,15 +820,19 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardFailureResponse");
         if (!userService.getLoggedInUser().equals(rsp.getUser())) return;
+        String title = resourceBundle.getString("game.playcards.failure.title");
+        String headerText = resourceBundle.getString("game.playcards.failure.header");
+        String confirmText = resourceBundle.getString("button.confirm");
+        String contentText = resourceBundle.getString("game.playcards.failure.context.noCards");
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(resourceBundle.getString("game.playcards.failure.title"));
-            alert.setHeaderText(resourceBundle.getString("game.playcards.failure.header"));
-            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                ButtonBar.ButtonData.OK_DONE);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
+            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(confirm);
-            if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS))
-                alert.setContentText(resourceBundle.getString("game.playcards.failure.context.noCards"));
+            if (rsp.getReason().equals(PlayCardFailureResponse.Reasons.NO_CARDS)) {
+                alert.setContentText(contentText);
+            }
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
         });
@@ -951,18 +948,21 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberChooseVictimResponse(RobberChooseVictimResponse rsp) {
         LOG.debug("Received RobberChooseVictimResponse");
         if (userService.getLoggedInUser().equals(rsp.getPlayer())) {
+            String title = resourceBundle.getString("game.robber.victim.title");
+            String headerText = resourceBundle.getString("game.robber.victim.header");
+            String contentText = resourceBundle.getString("game.robber.victim.content");
+            String confirmText = resourceBundle.getString("button.confirm");
+            String cancelText = resourceBundle.getString("button.cancel");
             Platform.runLater(() -> {
                 List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
                 ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
-                dialogue.setTitle(resourceBundle.getString("game.robber.victim.title"));
-                dialogue.setHeaderText(resourceBundle.getString("game.robber.victim.header"));
-                dialogue.setContentText(resourceBundle.getString("game.robber.victim.content"));
+                dialogue.setTitle(title);
+                dialogue.setHeaderText(headerText);
+                dialogue.setContentText(contentText);
                 DialogPane pane = new DialogPane();
                 pane.setContent(dialogue.getDialogPane().getContent());
-                ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                    ButtonBar.ButtonData.OK_DONE);
-                ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                                   ButtonBar.ButtonData.CANCEL_CLOSE);
+                ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+                ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
                 dialogue.setDialogPane(pane);
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 dialogue.getDialogPane().getStylesheets().add(styleSheet);
@@ -1249,16 +1249,18 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
-        Optional<String> rst = dialogue.showAndWait();
-        //Convert String to Resources and send the request
-        ResourceType resource = ResourceType.BRICK;
-        if (rst.isPresent()) {
-            if (rst.get().equals(ore)) resource = ResourceType.ORE;
-            else if (rst.get().equals(grain)) resource = ResourceType.GRAIN;
-            else if (rst.get().equals(lumber)) resource = ResourceType.LUMBER;
-            else if (rst.get().equals(wool)) resource = ResourceType.WOOL;
-            gameService.playMonopolyCard(lobbyName, resource);
-        }
+        Platform.runLater(() -> {
+            Optional<String> rst = dialogue.showAndWait();
+            //Convert String to Resources and send the request
+            ResourceType resource = ResourceType.BRICK;
+            if (rst.isPresent()) {
+                if (rst.get().equals(ore)) resource = ResourceType.ORE;
+                else if (rst.get().equals(grain)) resource = ResourceType.GRAIN;
+                else if (rst.get().equals(lumber)) resource = ResourceType.LUMBER;
+                else if (rst.get().equals(wool)) resource = ResourceType.WOOL;
+                gameService.playMonopolyCard(lobbyName, resource);
+            }
+        });
     }
 
     /**
@@ -1302,26 +1304,28 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         dialogue.getDialogPane().setContent(grid);
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //Get the pressed button
-        Optional<String> rst = dialogue.showAndWait();
-        Optional<String> button1 = Optional.of(confirm.toString());
-        //Checks if the pressed button is the same as the confirm button
-        if (rst.toString().equals(button1.toString())) {
-            //Create two resource variables
-            ResourceType resource1 = ResourceType.BRICK;
-            ResourceType resource2 = ResourceType.BRICK;
-            //Convert String to Resource
-            if (c1.getValue().equals(ore)) resource1 = ResourceType.ORE;
-            else if (c1.getValue().equals(grain)) resource1 = ResourceType.GRAIN;
-            else if (c1.getValue().equals(lumber)) resource1 = ResourceType.LUMBER;
-            else if (c1.getValue().equals(wool)) resource1 = ResourceType.WOOL;
-            //Second ChoiceBox's conversion
-            if (c2.getValue().equals(ore)) resource2 = ResourceType.ORE;
-            else if (c2.getValue().equals(grain)) resource2 = ResourceType.GRAIN;
-            else if (c2.getValue().equals(lumber)) resource2 = ResourceType.LUMBER;
-            else if (c2.getValue().equals(wool)) resource2 = ResourceType.WOOL;
-            //Send Request
-            gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
-        }
+        Platform.runLater(() -> {
+            Optional<String> rst = dialogue.showAndWait();
+            Optional<String> button1 = Optional.of(confirm.toString());
+            //Checks if the pressed button is the same as the confirm button
+            if (rst.toString().equals(button1.toString())) {
+                //Create two resource variables
+                ResourceType resource1 = ResourceType.BRICK;
+                ResourceType resource2 = ResourceType.BRICK;
+                //Convert String to Resource
+                if (c1.getValue().equals(ore)) resource1 = ResourceType.ORE;
+                else if (c1.getValue().equals(grain)) resource1 = ResourceType.GRAIN;
+                else if (c1.getValue().equals(lumber)) resource1 = ResourceType.LUMBER;
+                else if (c1.getValue().equals(wool)) resource1 = ResourceType.WOOL;
+                //Second ChoiceBox's conversion
+                if (c2.getValue().equals(ore)) resource2 = ResourceType.ORE;
+                else if (c2.getValue().equals(grain)) resource2 = ResourceType.GRAIN;
+                else if (c2.getValue().equals(lumber)) resource2 = ResourceType.LUMBER;
+                else if (c2.getValue().equals(wool)) resource2 = ResourceType.WOOL;
+                //Send Request
+                gameService.playYearOfPlentyCard(lobbyName, resource1, resource2);
+            }
+        });
     }
 
     /**

@@ -49,7 +49,7 @@ public interface IUserService {
      *
      * @return The user that is currently logged in
      *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @implNote This method is always a synchronous call and will therefore be executed on the Thread it gets called on
      * @author Phillip-André Suhr
      * @author Steven Luong
      * @since 2021-04-04

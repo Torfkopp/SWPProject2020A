@@ -2,6 +2,7 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
@@ -11,7 +12,6 @@ import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -62,16 +62,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     public void initialize() {
         super.initialize();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("TradeWithUserAcceptPresenter initialised");
-                setAcceptTradeTimer(30);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> {
+            LOG.debug("TradeWithUserAcceptPresenter initialised");
+            setAcceptTradeTimer(30);
+        });
     }
 
     /**

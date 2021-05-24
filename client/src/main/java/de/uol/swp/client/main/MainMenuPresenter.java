@@ -10,6 +10,7 @@ import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.message.GameCreatedMessage;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -25,7 +26,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -100,15 +100,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
         });
         if (!soundPack.equals("client/src/main/resources/sounds/default/")) soundService.background();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("MainMenuPresenter initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("MainMenuPresenter initialised"));
     }
 
     /**
@@ -367,29 +359,19 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         PasswordField confirmPasswordField = new PasswordField();
         CheckBox userDeletionConfirmCheckBox = new CheckBox(
                 resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
-                dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
-                HBox hbox = new HBox(10, lbl, confirmPasswordField);
-                VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
-                dialogue.getDialogPane().setContent(box);
-                ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                    ButtonBar.ButtonData.OK_DONE);
-                ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                                   ButtonBar.ButtonData.CANCEL_CLOSE);
-                dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
-                dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
-                        () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
-                        userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
-                dialogue.getDialogPane().getStylesheets().add(styleSheet);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
-
+        dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
+        dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
+        HBox hbox = new HBox(10, lbl, confirmPasswordField);
+        VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
+        dialogue.getDialogPane().setContent(box);
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+        dialogue.getDialogPane().lookupButton(confirm).disableProperty().bind(Bindings.createBooleanBinding(
+                () -> !userDeletionConfirmCheckBox.isSelected() || confirmPasswordField.getText().isBlank(),
+                userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
+        dialogue.getDialogPane().getStylesheets().add(styleSheet);
         Optional<String> result = dialogue.showAndWait();
         result.ifPresent(s -> userService
                 .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
@@ -476,23 +458,14 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         TextInputDialog dialogue = new TextInputDialog();
         Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
         PasswordField lobbyPasswordField = new PasswordField();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
-                HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
-                VBox box = new VBox(10, box3);
-                dialogue.getDialogPane().setContent(box);
-                ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                    ButtonBar.ButtonData.OK_DONE);
-                ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                                   ButtonBar.ButtonData.CANCEL_CLOSE);
-                dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
+        HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
+        VBox box = new VBox(10, box3);
+        dialogue.getDialogPane().setContent(box);
+        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
 
         //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
@@ -691,10 +664,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         ButtonType ok = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         String bundleString = resourceBundle.getString("mainmenu.settings.deleteaccount.success");
         String contentText = String.format(bundleString, username);
+        String title = resourceBundle.getString("information.title");
+        String headerText = resourceBundle.getString("information.header");
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, contentText, ok);
-            alert.setTitle(resourceBundle.getString("information.title"));
-            alert.setHeaderText(resourceBundle.getString("information.header"));
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.show();
         });

@@ -4,10 +4,10 @@ import com.google.common.base.Strings;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
@@ -49,15 +49,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareNewUsernameField();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("ChangeAccountDetailsPresenter initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("ChangeAccountDetailsPresenter initialised"));
     }
 
     /**

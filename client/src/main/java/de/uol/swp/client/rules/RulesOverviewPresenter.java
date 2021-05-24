@@ -3,8 +3,8 @@ package de.uol.swp.client.rules;
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
+import de.uol.swp.client.util.ThreadManager;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -79,15 +79,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
                         .setHeight(newValue.equals(resourceExchangeTab) ? MIN_LONG_TEXT_HEIGHT : MIN_HEIGHT);
             rulesTabPane.getScene().getWindow().setWidth(MIN_BANK_TAB_WIDTH);
         });
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("RulesOverviewPresenter initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("RulesOverviewPresenter initialised"));
     }
 
     /**

@@ -2,7 +2,6 @@ package de.uol.swp.client.sound;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import javafx.concurrent.Task;
 import javafx.scene.media.AudioClip;
 
 import java.io.File;
@@ -29,18 +28,10 @@ public class SoundService implements ISoundService {
 
     @Override
     public void background() {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                AudioClip audio = new AudioClip(new File(soundPack + "background.wav").toURI().toString());
-                audio.setCycleCount(10000);
-                audio.setPriority(-1);
-                audio.play(backgroundVolume);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        AudioClip audio = new AudioClip(new File(soundPack + "background.wav").toURI().toString());
+        audio.setCycleCount(10000);
+        audio.setPriority(-1);
+        audio.play(backgroundVolume);
     }
 
     @Override
@@ -79,15 +70,7 @@ public class SoundService implements ISoundService {
      * @param sound Name of the sound file to play
      */
     private void playSound(String sound) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                AudioClip audio = new AudioClip(new File(soundPack + sound).toURI().toString());
-                audio.play(volume);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        AudioClip audio = new AudioClip(new File(soundPack + sound).toURI().toString());
+        audio.play(volume);
     }
 }

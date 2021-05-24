@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
@@ -11,7 +12,6 @@ import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.MapPoint;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -162,9 +162,6 @@ public class GameRendering {
             showCenterText(gameMapDescription.getCenterText());
         }
         if (gameMapDescription.getBottomText() != null) {
-            clearGameMap();
-            drawGameMap(gameMapDescription.getGameMap());
-            drawDice(gameMapDescription.getFirstDie(), gameMapDescription.getSecondDie());
             showBottomText(gameMapDescription.getBottomText());
             gameMapDescription.setBottomText(null);
             {
@@ -240,24 +237,16 @@ public class GameRendering {
      * If the subroutines have UI-modifying aspects, those will be called with Platform.runLater()
      */
     private void drawGameMap(IGameMap gameMap) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Drawing Game map");
+        ThreadManager.runNow(() -> LOG.debug("Drawing Game map"));
 
-                //Get hexes, intersections, and edges in a usable format from the IGameMap
-                IGameHex[][] hexes = gameMap.getHexes();
-                IIntersectionWithEdges[][] intersections = gameMap.getIntersections();
-                //Call functions to draw hexes, intersections, and edges
-                drawHexTiles(hexes);
-                drawIntersectionsAndEdges(intersections);
+        //Get hexes, intersections, and edges in a usable format from the IGameMap
+        IGameHex[][] hexes = gameMap.getHexes();
+        IIntersectionWithEdges[][] intersections = gameMap.getIntersections();
+        //Call functions to draw hexes, intersections, and edges
+        drawHexTiles(hexes);
+        drawIntersectionsAndEdges(intersections);
 
-                if (drawHitboxGrid) drawHitboxGrid();
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        if (drawHitboxGrid) drawHitboxGrid();
     }
 
     /**

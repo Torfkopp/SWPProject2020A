@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -20,7 +21,6 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
@@ -85,15 +85,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public void initialize() {
         super.initialize();
         prepareMembersView();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("LobbyPresenter initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("LobbyPresenter initialised"));
     }
 
     /**
@@ -126,8 +118,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (this.readyUsers == null) this.readyUsers = new HashSet<>();
         this.readyUsers.clear();
         this.readyUsers.addAll(rsp.getReadyUsers());
+        updateUsersList(rsp.getUsers());
         Platform.runLater(() -> {
-            updateUsersList(rsp.getUsers());
             if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
@@ -247,16 +239,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onRulesMenuClicked() {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("Sending ShowRulesOverviewViewEvent");
-                post(new ShowRulesOverviewViewEvent());
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> {
+            LOG.debug("Sending ShowRulesOverviewViewEvent");
+            post(new ShowRulesOverviewViewEvent());
+        });
     }
 
     /**
@@ -396,7 +382,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
-
                     //if the background should be in colour you need to use setBackground
                     if (user != null && userOrDummyPlayerMap == null)
                         setTextFill(Color.BLACK); // No clue why this is needed, but it is
@@ -489,11 +474,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * @since 2021-01-05
      */
     private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        if (lobbyMembers == null) {
-            lobbyMembers = FXCollections.observableArrayList();
-            membersView.setItems(lobbyMembers);
-        }
-        lobbyMembers.clear();
-        lobbyMembers.addAll(userLobbyList);
+        Platform.runLater(() -> {
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
     }
 }

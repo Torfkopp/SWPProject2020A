@@ -4,9 +4,9 @@ import com.google.common.base.Strings;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
@@ -45,15 +45,7 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareLoginFormat();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("RegistrationPresenter initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("RegistrationPresenter initialised"));
     }
 
     /**

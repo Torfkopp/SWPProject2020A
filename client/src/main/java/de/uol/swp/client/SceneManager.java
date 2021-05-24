@@ -33,6 +33,7 @@ import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
 import de.uol.swp.client.trade.TradeWithUserPresenter;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
@@ -42,7 +43,6 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -232,16 +232,10 @@ public class SceneManager {
             alert.getDialogPane().getStylesheets().add(styleSheet);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == confirm) {
-                Task<Boolean> task = new Task<>() {
-                    @Override
-                    protected Boolean call() {
-                        LOG.debug("Sending NukeUsersSessionsRequest");
-                        eventBus.post(new NukeUsersSessionsRequest(user));
-                        return true;
-                    }
-                };
-                Thread thread = new Thread(task);
-                thread.start();
+                ThreadManager.runNow(() -> {
+                    LOG.debug("Sending NukeUsersSessionsRequest");
+                    eventBus.post(new NukeUsersSessionsRequest(user));
+                });
             }
         });
     }
@@ -1115,18 +1109,10 @@ public class SceneManager {
             rulesStage.initOwner(primaryStage);
             rulesStage.show();
             rulesStage.toFront();
-            rulesStage.setOnCloseRequest(windowEvent -> {
-                Task<Boolean> task = new Task<>() {
-                    @Override
-                    protected Boolean call() {
-                        rulesOverviewIsOpen = false;
-                        eventBus.post(new ResetRulesOverviewEvent());
-                        return true;
-                    }
-                };
-                Thread thread = new Thread(task);
-                thread.start();
-            });
+            rulesStage.setOnCloseRequest(windowEvent -> ThreadManager.runNow(() -> {
+                rulesOverviewIsOpen = false;
+                eventBus.post(new ResetRulesOverviewEvent());
+            }));
         });
     }
 
@@ -1211,16 +1197,10 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            Task<Boolean> task = new Task<>() {
-                @Override
-                protected Boolean call() {
-                    LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
-                    eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
-                    return true;
-                }
-            };
-            Thread thread = new Thread(task);
-            thread.start();
+            ThreadManager.runNow(() -> {
+                LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
+                eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
+            });
         });
     }
 
@@ -1259,16 +1239,10 @@ public class SceneManager {
             tradingStage.initModality(Modality.NONE);
             tradingStage.initOwner(primaryStage);
             tradingStage.show();
-            Task<Boolean> task = new Task<>() {
-                @Override
-                protected Boolean call() {
-                    LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
-                    eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
-                    return true;
-                }
-            };
-            Thread thread = new Thread(task);
-            thread.start();
+            ThreadManager.runNow(() -> {
+                LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
+                eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
+            });
         });
     }
 

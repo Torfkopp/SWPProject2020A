@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.user.IUserService;
-import javafx.concurrent.Task;
+import de.uol.swp.client.util.ThreadManager;
 
 import java.util.ResourceBundle;
 
@@ -62,15 +62,7 @@ public abstract class AbstractPresenter {
      * @since 2021-05-22
      */
     public void post(Object obj) {
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                eventBus.post(obj);
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> eventBus.post(obj));
     }
 
     /**

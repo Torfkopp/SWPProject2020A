@@ -2,6 +2,7 @@ package de.uol.swp.client.devmenu;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
@@ -10,7 +11,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -93,15 +93,7 @@ public class DevMenuPresenter extends AbstractPresenter {
             }
         });
         constructorList.setItems(constructorObservableList);
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                LOG.debug("DevMenuPresenter initialised");
-                return true;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager.runNow(() -> LOG.debug("DevMenuPresenter initialised"));
     }
 
     /**
@@ -145,18 +137,12 @@ public class DevMenuPresenter extends AbstractPresenter {
     private void onSendButtonPressed() {
         soundService.button();
         List<String> args = new LinkedList<>();
-        Task<Boolean> task = new Task<>() {
-            @Override
-            protected Boolean call() {
-                for (TextField tf : textFields) {
-                    args.add(tf.getText());
-                }
-                LOG.debug("Sending DevMenuCommandRequest");
-                return true;
+        ThreadManager.runNow(() -> {
+            for (TextField tf : textFields) {
+                args.add(tf.getText());
             }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
+            LOG.debug("Sending DevMenuCommandRequest");
+        });
         post(new DevMenuCommandRequest(classListView.getSelectionModel().getSelectedItem(), args));
     }
 
