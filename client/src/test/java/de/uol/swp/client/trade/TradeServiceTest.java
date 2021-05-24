@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class TradeServiceTest {
 
     private static final ResourceList defaultOffer = new ResourceList();

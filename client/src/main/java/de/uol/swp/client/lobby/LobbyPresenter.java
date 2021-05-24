@@ -43,7 +43,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 825;
     public static final int HELP_MIN_WIDTH = 250;
-    public static final int MIN_HEIGHT_IN_GAME = 825;
+    public static final int MIN_HEIGHT_IN_GAME = 905;
     public static final int MIN_WIDTH_PRE_GAME = 685;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
@@ -190,7 +190,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setAllowedPlayers(event.getLobby().getMaxPlayers());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
-        commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
 
@@ -285,7 +284,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = msg.getLobby().isStartUpPhaseEnabled();
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
-        commandsActivated.setSelected(msg.getLobby().areCommandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
         Platform.runLater(() -> moveTimeLabel

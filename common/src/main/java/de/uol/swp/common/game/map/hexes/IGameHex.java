@@ -18,7 +18,7 @@ public interface IGameHex extends Serializable {
         WATER,
         DESERT,
         RESOURCE,
-        HARBOR,
+        HARBOUR,
     }
 
     /**

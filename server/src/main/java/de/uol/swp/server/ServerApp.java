@@ -81,11 +81,11 @@ class ServerApp {
             try {
                 port = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                port = 8889;
+                port = 50010;
             }
         }
         if (port < 0) {
-            port = 8889;
+            port = 50010;
         }
         LOG.info("Starting Server on port {}", port);
 

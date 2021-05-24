@@ -13,14 +13,18 @@
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" percentWidth="12.5"/>
             <ColumnConstraints hgrow="NEVER" percentWidth="2.5"/>
             <ColumnConstraints percentWidth="20.0"/>
-            <ColumnConstraints hgrow="NEVER" percentWidth="2.5"/>
-            <ColumnConstraints percentWidth="21.25"/>
+            <ColumnConstraints hgrow="NEVER" percentWidth="11.0"/>
+            <ColumnConstraints percentWidth="12.75"/>
             <ColumnConstraints percentWidth="21.25"/>
         </columnConstraints>
         <rowConstraints>
             <RowConstraints maxHeight="50.0" minHeight="25.0" vgrow="NEVER"/>
             <RowConstraints vgrow="ALWAYS"/>
         </rowConstraints>
+        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+            <TextField fx:id="lobbyFilterTextField"/>
+            <ListView fx:id="lobbyView" VBox.vgrow="ALWAYS"/>
+        </VBox>
 
         <ListView fx:id="usersView" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
@@ -36,7 +40,6 @@
             <Label fx:id="randomLobbyState" text="%mainmenu.labels.lobby.randomLobbyState" visible="false"
                    wrapText="true"/>
         </VBox>
-        <ListView fx:id="lobbyView" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
 
         <VBox spacing="10.0" GridPane.columnIndex="6" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
             <ListView fx:id="chatView" GridPane.columnSpan="2" VBox.vgrow="ALWAYS"/>
@@ -65,6 +68,17 @@
                 <Insets left="-15.0" right="-15.0"/>
             </GridPane.margin>
         </MenuBar>
+        <VBox GridPane.columnIndex="5" GridPane.rowIndex="1" spacing="5.0">
+            <CheckBox fx:id="lobbyListFilteredProtectedBox" mnemonicParsing="false"
+                      text="%lobbylist.filtered.protected" wrapText="true"/>
+            <CheckBox fx:id="lobbyListFilteredInGameBox" mnemonicParsing="false"
+                      text="%lobbylist.filtered.ingame" wrapText="true"/>
+            <CheckBox fx:id="lobbyListFilteredFullBox" mnemonicParsing="false"
+                      text="%lobbylist.filtered.full" wrapText="true"/>
+            <padding>
+                <Insets left="5.0"/>
+            </padding>
+        </VBox>
     </GridPane>
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0"/>

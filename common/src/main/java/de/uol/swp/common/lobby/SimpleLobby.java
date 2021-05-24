@@ -19,7 +19,6 @@ public class SimpleLobby implements ISimpleLobby {
     private final Set<UserOrDummy> readyUsers;
     private final boolean inGame;
     private final User owner;
-    private final boolean commandsAllowed;
     private final int maxPlayers;
     private final int moveTime;
     private final boolean startUpPhaseEnabled;
@@ -32,7 +31,6 @@ public class SimpleLobby implements ISimpleLobby {
      * @param name                   The name
      * @param inGame                 The in game
      * @param owner                  The owner
-     * @param commandsAllowed        Whether commands are allowed or not
      * @param maxPlayers             The max players
      * @param moveTime               The move time
      * @param startUpPhaseEnabled    Whether the start up phase is enabled or not
@@ -41,13 +39,12 @@ public class SimpleLobby implements ISimpleLobby {
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
-    public SimpleLobby(LobbyName name, boolean inGame, User owner, boolean commandsAllowed, int maxPlayers,
-                       int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword,
+    public SimpleLobby(LobbyName name, boolean inGame, User owner, int maxPlayers, int moveTime,
+                       boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword,
                        Set<UserOrDummy> users, Set<UserOrDummy> readyUsers) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
-        this.commandsAllowed = commandsAllowed;
         this.maxPlayers = maxPlayers;
         this.moveTime = moveTime;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
@@ -55,11 +52,6 @@ public class SimpleLobby implements ISimpleLobby {
         this.hasPassword = hasPassword;
         this.users = users;
         this.readyUsers = readyUsers;
-    }
-
-    @Override
-    public boolean areCommandsAllowed() {
-        return commandsAllowed;
     }
 
     @Override

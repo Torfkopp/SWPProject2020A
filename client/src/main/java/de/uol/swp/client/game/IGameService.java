@@ -52,6 +52,17 @@ public interface IGameService {
     void endTurn(LobbyName lobbyName);
 
     /**
+     * Post a request to update the pause status of the game
+     *
+     * @param lobbyName The name of the lobby the user wants to update his pause status
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.request.PauseGameRequest
+     * @since 2021-05-21
+     */
+    void pauseGame(LobbyName lobbyName);
+
+    /**
      * Posts a request to play a KnightCard
      *
      * @param lobbyName The name of the lobby

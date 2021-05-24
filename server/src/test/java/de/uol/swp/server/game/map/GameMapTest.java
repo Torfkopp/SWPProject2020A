@@ -1,7 +1,7 @@
 package de.uol.swp.server.game.map;
 
 import de.uol.swp.common.game.map.hexes.IGameHex;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
@@ -42,19 +42,19 @@ public class GameMapTest {
     }
 
     @Test
-    void getHex_HarborHex_AnyResource_BeginnerMapTest() {
+    void getHex_HarbourHex_AnyResource_BeginnerMapTest() {
         IGameHex hex = map.getHex(HexMapPoint(0, 0));
-        assertEquals(IGameHex.HexType.HARBOR, hex.getType());
-        IHarborHex harborHex = (IHarborHex) hex;
-        assertEquals(IHarborHex.HarborResource.ANY, harborHex.getResource());
+        assertEquals(IGameHex.HexType.HARBOUR, hex.getType());
+        IHarbourHex harbourHex = (IHarbourHex) hex;
+        assertEquals(IHarbourHex.HarbourResource.ANY, harbourHex.getResource());
     }
 
     @Test
-    void getHex_HarborHex_BeginnerMapTest() {
+    void getHex_HarbourHex_BeginnerMapTest() {
         IGameHex hex = map.getHex(HexMapPoint(2, 0));
-        assertEquals(IGameHex.HexType.HARBOR, hex.getType());
-        IHarborHex harborHex = (IHarborHex) hex;
-        assertEquals(IHarborHex.HarborResource.LUMBER, harborHex.getResource());
+        assertEquals(IGameHex.HexType.HARBOUR, hex.getType());
+        IHarbourHex harbourHex = (IHarbourHex) hex;
+        assertEquals(IHarbourHex.HarbourResource.LUMBER, harbourHex.getResource());
     }
 
     @Test

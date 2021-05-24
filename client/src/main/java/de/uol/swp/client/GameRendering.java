@@ -7,7 +7,7 @@ import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -48,7 +48,7 @@ public class GameRendering {
     private static final Color TEXT_COLOUR = Color.BLACK;
     private static final Color BORDER_COLOUR = Color.BLACK;
     private static final Color ROBBER_COLOUR = Color.BLACK;
-    private static final Color HARBOR_COLOUR = Color.rgb(80, 50, 2);
+    private static final Color HARBOUR_COLOUR = Color.rgb(80, 50, 2);
     private static final Color WATER_COLOUR = Color.CORNFLOWERBLUE;
     private static final Color DESERT_COLOUR = Color.rgb(223, 187, 22);
     private static final Color HILLS_COLOUR = Color.rgb(240, 181, 103);
@@ -250,16 +250,19 @@ public class GameRendering {
     }
 
     /**
-     * drawHarbor method
+     * drawHarbour method
      * <p>
-     * This method draws a harbor at the given coordinate in the correct orientation
-     * together with a text indicating which resource the harbor harbors.
+     * This method draws a harbour at the given coordinate in the correct orientation
+     * together with a text indicating which resource the harbour harbours.
      *
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
-     * @param hex      The harbor hex with the information about the harbor
+     * @param hex      The harbour hex with the information about the harbour
      */
-    private void drawHarbor(double currentX, double currentY, IHarborHex hex) {
+    private void drawHarbour(double currentX, double currentY, IHarbourHex hex) {
+        gfxCtx.setStroke(HARBOUR_COLOUR);
+        gfxCtx.setFill(HARBOUR_COLOUR);
+        gfxCtx.setLineWidth(hexWidth / 5.0);
         double yDistance = hexHeight * (1.0 / 64.0);
         double yExtend = hexHeight * (5.0 / 32.0);
         double xDistance = hexWidth * (1.0 / 32.0);
@@ -335,8 +338,8 @@ public class GameRendering {
         double y = currentY + hexHeight / 2.0;
         double maxWidth = hexWidth * (6.0 / 8.0);
         Platform.runLater(() -> {
-            gfxCtx.setStroke(HARBOR_COLOUR);
-            gfxCtx.setFill(HARBOR_COLOUR);
+            gfxCtx.setStroke(HARBOUR_COLOUR);
+            gfxCtx.setFill(HARBOUR_COLOUR);
             gfxCtx.setLineWidth(hexWidth / 5.0);
             gfxCtx.fillPolygon(xCords, yCords, 4);
             gfxCtx.setTextAlign(TextAlignment.CENTER);
@@ -758,7 +761,7 @@ public class GameRendering {
         if (hex.isRobberOnField()) drawRobber(currentX, currentY);
         if (hex instanceof IResourceHex) drawToken(((IResourceHex) hex).getToken(), currentX, currentY);
 
-        if (hex instanceof IHarborHex) drawHarbor(currentX, currentY, (IHarborHex) hex);
+        if (hex instanceof IHarbourHex) drawHarbour(currentX, currentY, (IHarbourHex) hex);
     }
 
     /**
@@ -988,7 +991,7 @@ public class GameRendering {
         if (hex == null) return false;
         switch (hex.getType()) {
             case WATER:
-            case HARBOR:
+            case HARBOUR:
                 Platform.runLater(() -> gfxCtx.setFill(WATER_COLOUR));
                 break;
             case DESERT:

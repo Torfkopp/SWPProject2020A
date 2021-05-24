@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @see de.uol.swp.client.user.UserService
  * @since 2019-10-10
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class UserServiceTest {
 
     private final User defaultUser = new UserDTO(1, "Marco", "test", "marco@test.de");
