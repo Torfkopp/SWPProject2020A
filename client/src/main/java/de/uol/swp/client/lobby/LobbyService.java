@@ -11,6 +11,7 @@ import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
+import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
@@ -80,6 +81,13 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending LobbyJoinUserRequest");
         Message joinUserRequest = new JoinLobbyRequest(lobbyName, userService.getLoggedInUser());
         eventBus.post(joinUserRequest);
+    }
+
+    @Override
+    public void addAI(LobbyName name, AI ai) {
+        LOG.debug("Sending AddAIRequest");
+        Message addAIRequest = new AddAIRequest(name, ai);
+        eventBus.post(addAIRequest);
     }
 
     @Override

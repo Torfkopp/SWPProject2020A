@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -64,6 +65,18 @@ public interface ILobbyService {
      * @since 2019-11-20
      */
     void joinLobby(LobbyName name);
+
+    /**
+     * Posts a AddAIRequest to a specified lobby onto the EventBus
+     * in order to let an AI join the lobby
+     *
+     * @param name The name of the lobby
+     * @param ai   The AI to join the lobby
+     *
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    void addAI(LobbyName name, AI ai);
 
     /**
      * Posts a request to join a random lobby onto the EventBus

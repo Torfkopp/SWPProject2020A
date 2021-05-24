@@ -60,7 +60,8 @@
         </padding>
     </VBox>
     <VBox prefWidth="250.0" spacing="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-        <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="190" spacing="10.0">
+        <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="316.0" prefWidth="230.0"
+              spacing="10.0">
             <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"/>
             <HBox spacing="5.0">
                 <TextField fx:id="moveTimeTextField" prefHeight="25.0" prefWidth="80.0"/>
@@ -94,6 +95,30 @@
                     </toggleGroup>
                 </RadioButton>
             </HBox>
+            <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0"
+                  style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
+                <children>
+                    <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" text="%lobby.ai.checkbox"/>
+                    <HBox spacing="5.0">
+                        <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
+                                     mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
+                                     selected="true" text="%lobby.ai.easy">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="difficultyAIToggleGroup"/>
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="hardAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
+                                     mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
+                                     text="%lobby.ai.hard">
+                            <toggleGroup>
+                                <fx:reference source="difficultyAIToggleGroup"/>
+                            </toggleGroup>
+                        </RadioButton>
+                    </HBox>
+                    <Button fx:id="addAIButton" mnemonicParsing="false" onAction="#onAddAIButtonPressed"
+                            prefHeight="45.0" prefWidth="230.0" text="%lobby.buttons.addai"/>
+                </children>
+            </VBox>
         </VBox>
         <TableView fx:id="resourceTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
                    prefWidth="230.0" visible="false">
