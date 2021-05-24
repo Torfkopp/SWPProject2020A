@@ -269,6 +269,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a click on the Pause/Unpause Button
+     * <p>
+     * Calls the pauseGame method of the gameService to
+     * start or participate in a voting to pause/unpause the
+     * game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    @FXML
+    protected void onPauseButtonPressed() {
+        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
+        else Platform.runLater(
+                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
+    }
+
+    /**
      * Handles a click on the PlayCardButton
      * <p>
      * Method called when the PlayCardButton is pushed
@@ -832,23 +849,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setMoveTimer(moveTime);
         Platform.runLater(
                 () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
-    }
-
-    /**
-     * Handles a click on the Pause/Unpause Button
-     * <p>
-     * Calls the pauseGame method of the gameService to
-     * start or participate in a voting to pause/unpause the
-     * game
-     *
-     * @author Maximilian Lindner
-     * @since 2021-05-21
-     */
-    @FXML
-    private void onPauseButtonPressed() {
-        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
-        else Platform.runLater(
-                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
     }
 
     /**

@@ -43,7 +43,6 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -96,7 +95,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private TextField lobbyFilterTextField;
 
-    private FilteredList<Pair<ISimpleLobby, String>> filteredLobbyList;
     private ObservableList<Pair<ISimpleLobby, String>> lobbies;
     private ObservableList<String> users;
 
@@ -127,7 +125,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         });
         if (!soundPack.equals("client/src/main/resources/sounds/default/")) soundService.background();
         if (lobbies == null) lobbies = FXCollections.observableArrayList();
-        filteredLobbyList = new FilteredList<>(lobbies, p -> true);
+        FilteredList<Pair<ISimpleLobby, String>> filteredLobbyList = new FilteredList<>(lobbies, p -> true);
 
         ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> nameFilter = new SimpleObjectProperty<>();
         ObjectProperty<Predicate<Pair<ISimpleLobby, String>>> passwordFilter = new SimpleObjectProperty<>();
@@ -149,9 +147,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                         .isSelected()), lobbyListFilteredInGameBox.selectedProperty()));
 
         fullFilter.bind(Bindings.createObjectBinding(
-                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey()
-                                                                                .getUserOrDummies().size() == lobby.getKey()
-                                                                                                                   .getMaxPlayers())) || (!lobbyListFilteredFullBox
+                () -> lobby -> (lobbyListFilteredFullBox.isSelected() && !(lobby.getKey().getUserOrDummies()
+                                                                                .size() == lobby.getKey()
+                                                                                                .getMaxPlayers())) || (!lobbyListFilteredFullBox
                         .isSelected()), lobbyListFilteredFullBox.selectedProperty()));
 
         filteredLobbyList.predicateProperty().bind(Bindings.createObjectBinding(
@@ -875,8 +873,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             List<Pair<ISimpleLobby, String>> oldLobbies = new ArrayList<>(lobbies);
             for (ISimpleLobby lobby : lobbyList) {
                 for (Pair<ISimpleLobby, String> pair : lobbies) {
-                    newLobbies.removeIf(l -> l.getName().equals(pair.getKey()));
-                    oldLobbies.removeIf(p -> p.getKey().equals(lobby.getName()));
+                    newLobbies.removeIf(l -> l.getName().equals(pair.getKey().getName()));
+                    oldLobbies.removeIf(p -> p.getKey().getName().equals(lobby.getName()));
                 }
             }
             if (!newLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {

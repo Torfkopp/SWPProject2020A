@@ -99,27 +99,24 @@
             </HBox>
             <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0"
                   style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
-                <children>
-                    <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" text="%lobby.ai.checkbox"/>
-                    <HBox spacing="5.0">
-                        <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                                     mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                                     selected="true" text="%lobby.ai.easy">
-                            <toggleGroup>
-                                <ToggleGroup fx:id="difficultyAIToggleGroup"/>
-                            </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="hardAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                                     mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                                     text="%lobby.ai.hard">
-                            <toggleGroup>
-                                <fx:reference source="difficultyAIToggleGroup"/>
-                            </toggleGroup>
-                        </RadioButton>
-                    </HBox>
-                    <Button fx:id="addAIButton" mnemonicParsing="false" onAction="#onAddAIButtonPressed"
-                            prefHeight="45.0" prefWidth="230.0" text="%lobby.buttons.addai"/>
-                </children>
+                <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" text="%lobby.ai.checkbox"/>
+                <HBox spacing="5.0">
+                    <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
+                                 mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
+                                 selected="true" text="%lobby.ai.easy">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="difficultyAIToggleGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                                 onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.ai.hard">
+                        <toggleGroup>
+                            <fx:reference source="difficultyAIToggleGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                </HBox>
+                <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0"
+                        text="%lobby.buttons.addai"/>
             </VBox>
         </VBox>
 
@@ -190,8 +187,7 @@
             <MenuItem text="%lobby.menu.rules.overview"/>
         </Button>
         <!--fixme needs parsing-->
-        <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#onPauseButtonPressed" text="%game.menu.pause"
-                visible="false"/>
+        <Button fx:id="pauseButton" onAction="#onPauseButtonPressed" text="%game.menu.pause" visible="false"/>
         <Button disable="true" fx:id="helpCheckBox" onAction="#onHelpButtonPressed"
                 text="%game.help.checkbox" visible="false"/>
         <Pane HBox.hgrow="SOMETIMES" prefWidth="20.0"/>

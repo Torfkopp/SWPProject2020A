@@ -44,8 +44,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     protected Label acceptTradeTimerLabel;
 
     protected Timer tradeAcceptTimer;
-    @FXML
-    protected Label acceptTradeTimerLabel;
     protected boolean paused;
     protected int remainingMoveTime;
     @FXML

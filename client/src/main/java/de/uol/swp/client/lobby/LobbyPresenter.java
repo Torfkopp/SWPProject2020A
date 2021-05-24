@@ -169,8 +169,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      *     <li> CTRL/META + R = Roll Dice button
      *     <li> CTRL/META + T = Make Offer to User button
      *     <li> CTRL/META + B = Trade with Bank button
-     *     <li> CTRL/META + P = Play a Card button
+     *     <li> CTRL/META + C = Play a Card button
      *     <li> CTRL/META + H = Return to Lobby button
+     *     <li> CTRL/META + P = Pause button
      *     <li> F1            = Toggle help action list
      *     <li> F2            = Open Rules menu
      *
@@ -211,10 +212,12 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                          this::onTradeWithUserButtonPressed);
         accelerators.put(new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN), // CTRL/META + B
                          this::onTradeWithBankButtonPressed);
-        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
                          this::onPlayCardButtonPressed);
         accelerators.put(new KeyCodeCombination(KeyCode.H, KeyCombination.SHORTCUT_DOWN), // CTRL/META + H
                          this::onReturnToLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
+                         this::onPauseButtonPressed);
         accelerators.put(new KeyCodeCombination(KeyCode.F1), this::onHelpButtonPressed); // F1 for help
         accelerators.put(new KeyCodeCombination(KeyCode.F2), this::onRulesMenuClicked); // F2 for rules
         membersView.getScene().getAccelerators().putAll(accelerators);
