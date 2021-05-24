@@ -2,33 +2,55 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" fillWidth="false" spacing="15.0"
-      xmlns="http://javafx.com/javafx/11.0.1" fx:id="changeAccountView"
-      fx:controller="de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter">
+<VBox alignment="CENTER" fillWidth="false"
+      fx:controller="de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter" id="changeAccountView"
+      spacing="15.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <HBox spacing="10.0">
         <VBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" text="%changeaccdetails.labels.oldpw"/>
-            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
-                   text="%changeaccdetails.labels.newusername"/>
-            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
-                   text="%changeaccdetails.labels.newemail"/>
-            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" text="%changeaccdetails.labels.newpw"/>
-            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
-                   text="%changeaccdetails.labels.newpwconfirm"/>
+            <Label maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true" prefHeight="25.0"
+                   text="%changeaccdetails.labels.oldpw">
+                <labelFor>
+                    <PasswordField fx:id="confirmPasswordField" promptText="%changeaccdetails.prompts.confirmpw"/>
+                </labelFor>
+            </Label>
+            <Label maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true" prefHeight="25.0"
+                   text="%changeaccdetails.labels.newusername">
+                <labelFor>
+                    <TextField fx:id="newUsernameField" promptText="%changeaccdetails.prompts.newusername"/>
+                </labelFor>
+            </Label>
+            <Label maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true" prefHeight="25.0"
+                   text="%changeaccdetails.labels.newemail">
+                <labelFor>
+                    <TextField fx:id="newEMailField" promptText="%changeaccdetails.prompts.newemail"/>
+                </labelFor>
+            </Label>
+            <Label maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true" prefHeight="25.0"
+                   text="%changeaccdetails.labels.newpw">
+                <labelFor>
+                    <PasswordField fx:id="newPasswordField" promptText="%changeaccdetails.prompts.newpw"/>
+                </labelFor>
+            </Label>
+            <Label maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true" prefHeight="25.0"
+                   text="%changeaccdetails.labels.newpwconfirm">
+                <labelFor>
+                    <PasswordField fx:id="newPasswordField2" promptText="%changeaccdetails.prompts.newpw"/>
+                </labelFor>
+            </Label>
         </VBox>
+
         <VBox alignment="CENTER_RIGHT" spacing="10.0">
-            <PasswordField fx:id="confirmPasswordField" promptText="%changeaccdetails.prompts.confirmpw"/>
-            <TextField fx:id="newUsernameField" promptText="%changeaccdetails.prompts.newusername"/>
-            <TextField fx:id="newEMailField" promptText="%changeaccdetails.prompts.newemail"/>
-            <PasswordField fx:id="newPasswordField" promptText="%changeaccdetails.prompts.newpw"/>
-            <PasswordField fx:id="newPasswordField2" promptText="%changeaccdetails.prompts.newpw"/>
+            <fx:reference source="confirmPasswordField"/>
+            <fx:reference source="newUsernameField"/>
+            <fx:reference source="newEMailField"/>
+            <fx:reference source="newPasswordField"/>
+            <fx:reference source="newPasswordField2"/>
         </VBox>
     </HBox>
 
     <HBox alignment="CENTER" spacing="20.0">
-        <Button fx:id="changeButton" defaultButton="true" mnemonicParsing="false"
-                onAction="#onChangeAccountDetailsButtonPressed"
+        <Button defaultButton="true" fx:id="changeButton" onAction="#onChangeAccountDetailsButtonPressed"
                 text="%changeaccdetails.button.change"/>
-        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%button.cancel"/>
+        <Button cancelButton="true" onAction="#onCancelButtonPressed" text="%button.cancel"/>
     </HBox>
 </VBox>

@@ -40,6 +40,7 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -470,6 +471,7 @@ public class SceneManager {
         initRegistrationView();
         initRulesOverviewView();
         initChangeAccountDetailsView();
+        eventBus.post(new SetAcceleratorsEvent());
     }
 
     /**
@@ -1043,7 +1045,7 @@ public class SceneManager {
             eventBus.post(new ShowRobberTaxUpdateEvent(event.getLobbyName(), event.getTaxAmount(),
                                                        event.getInventory().create()));
             Platform.setImplicitExit(false);
-            robberTaxStages.get(lobbyName).setOnCloseRequest(windowEvent -> windowEvent.consume());
+            robberTaxStages.get(lobbyName).setOnCloseRequest(Event::consume);
         });
     }
 
