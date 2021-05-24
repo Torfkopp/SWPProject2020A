@@ -29,7 +29,7 @@
         <ListView GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" fx:id="usersView"/>
 
         <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" spacing="15.0">
-            <Button maxWidth="Infinity" onAction="#onCreateLobbyButtonPressed"prefHeight="45.0"
+            <Button maxWidth="Infinity" onAction="#onCreateLobbyButtonPressed" prefHeight="45.0"
                     prefWidth="99.0" text="%mainmenu.buttons.lobby.create" textAlignment="CENTER" wrapText="true"/>
             <Button maxWidth="Infinity" onAction="#onJoinLobbyButtonPressed"prefHeight="45.0"
                     prefWidth="99.0" text="%mainmenu.buttons.lobby.join" textAlignment="CENTER" wrapText="true"/>
