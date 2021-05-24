@@ -20,7 +20,6 @@ import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -63,7 +62,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
@@ -345,6 +343,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         tradeWithUserButton.setDisable(false);
         tradeWithBankButton.setVisible(false);
         turnIndicator.setVisible(false);
+        pauseButton.setVisible(false);
         playCard.setVisible(false);
         timerLabel.setVisible(false);
         helpCheckBox.setDisable(true);
@@ -607,6 +606,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
+        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
