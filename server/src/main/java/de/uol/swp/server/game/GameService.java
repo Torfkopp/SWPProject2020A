@@ -114,49 +114,6 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Handles a BuyDevelopmentCard found on the event bus
-     * <p>
-     * If a BuyDevelopmentCard is found on the event bus, this method checks
-     * if there are development cards to sell available in the bankInventory.
-     * If there is at least one card, a random card gets chosen and if the
-     * user has enough resources, he gets the new card(happens in helper method).
-     * Afterwards a new BuyDevelopmentCardResponse is posted onto the event bus.
-     *
-     * @param req The request found on the event bus
-     *
-     * @author Maximilian Lindner
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
-     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
-     * @since 2021-02-22
-     */
-    @Subscribe
-    void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
-        LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready()) return;
-        BankInventory bankInventory = game.getBankInventory();
-        if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards().isEmpty()) {
-            DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
-            if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
-                bankInventory.decrease(developmentCard);
-                ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(), req.getOriginLobby(),
-                                                                               developmentCard);
-                returnMessage.initWithMessage(req);
-                LOG.debug("Sending BuyDevelopmentCardResponse for Lobby {}", req.getOriginLobby());
-                post(returnMessage);
-                ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(),
-                                                                 game.getCardAmounts());
-                LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
-                updateVictoryPoints(req.getOriginLobby());
-            } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
-                             req.getUser().getUsername());
-        } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
-    }
-
-    /**
      * Method to post a message for the AI
      *
      * @param ai        The AI to send the message
@@ -191,17 +148,6 @@ public class GameService extends AbstractService {
             LOG.debug("Sending SystemMessageForRobbingMessage for Lobby {}", lobby);
             LOG.debug("---- Victim has no cards to rob");
             lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || !game
-                .isBuildingAllowed() || game.isPausedByVoting()) return;
-        Inventory inv = game.getInventory(req.getUser());
-
-        if (inv.get(DevelopmentCardType.ROAD_BUILDING_CARD) == 0) {
-            ResponseMessage returnMessage = new PlayCardFailureResponse(req.getOriginLobby(), req.getUser(),
-                                                                        PlayCardFailureResponse.Reasons.NO_CARDS);
-            returnMessage.initWithMessage(req);
-            post(returnMessage);
-            LOG.debug("Sending PlayCardFailureResponse");
-            LOG.debug("---- Not enough RoadBuildingCardPhase cards");
             return;
         }
         if (victimInventory.get(BRICK) > 0) victimsResource.add(BRICK);
@@ -221,7 +167,6 @@ public class GameService extends AbstractService {
         LOG.debug("Sending SystemMessageForRobbingMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
     }
-
     /**
      * Helper method to end an AI's turn
      *
@@ -586,7 +531,7 @@ public class GameService extends AbstractService {
      * @since 2021-02-22
      */
     @Subscribe
-    private void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
+    void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
         LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPausedByVoting())
@@ -606,6 +551,7 @@ public class GameService extends AbstractService {
                 LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
                 lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
                 endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+                updateVictoryPoints(req.getOriginLobby());
             } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
                              req.getUser().getUsername());
         } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
@@ -961,7 +907,8 @@ public class GameService extends AbstractService {
         LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (game.isPausedByVoting()) return;
-        if (!(req.getRespondingUser() instanceof User && (game.getActivePlayer().equals(req.getOfferingUser()) || req
+        if (!(req.getRespondingUser() instanceof User && (game.getActivePlayer().equals(req.getOfferingUser()))))
+            return;
         //only false if respondingUser is no Dummy, the dice is rolled already,
         //and the offeringUser is the active user/ it is a counteroffer
         if (!(!(req.getRespondingUser() instanceof User) && (game.getActivePlayer().equals(req.getOfferingUser()) || req
