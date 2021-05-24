@@ -38,20 +38,6 @@ public interface IGameMapManagement {
     Set<IIntersection> adjacentIntersections(IIntersection intersection);
 
     /**
-     * Builds a Settlement on a random Intersection during the Founding Phase
-     *
-     * @param game       the game, the lobby is set in
-     * @param nextPlayer the dummy, whose about to place a random Settlement
-     *
-     * @return an array of random Integers, that are used as Coordinates for building Roads.
-     * The element at position [0] is the Y Coordinate, the element at position[1] the X Coordinate.
-     *
-     * @author Sven Ahrens
-     * @since 2021-05-24
-     */
-    int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer);
-
-    /**
      * Creates an IGameMap from the provided configuration
      *
      * @param configuration The map configuration used in the current Game
@@ -127,6 +113,18 @@ public interface IGameMapManagement {
      * @since 2021-05-19
      */
     Set<IEdge> getEdgesAroundIntersection(IIntersection intersection);
+
+    /**
+     * Gets all edges around an intersection
+     *
+     * @param mapPoint The mappoint of the Intersection
+     *
+     * @return Set of IEdge
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-24
+     */
+    Set<IEdge> getEdgesAroundIntersection(MapPoint mapPoint);
 
     /**
      * Gets all the edges around the hex
@@ -278,6 +276,20 @@ public interface IGameMapManagement {
      * @since 2021-04-07
      */
     Set<Player> getPlayersAroundHex(MapPoint mapPoint);
+
+    /**
+     * Builds a Settlement on a random Intersection during the Founding Phase
+     *
+     * @param game       the game, the lobby is set in
+     * @param nextPlayer the dummy, whose about to place a random Settlement
+     *
+     * @return an array of random Integers, that are used as Coordinates for building Roads.
+     * The element at position [0] is the Y Coordinate, the element at position[1] the X Coordinate.
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-24
+     */
+    MapPoint getRandomFreeIntersection(Game game, Player nextPlayer);
 
     /**
      * Creates a randomised map with the standard tiles

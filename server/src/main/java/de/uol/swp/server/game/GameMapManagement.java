@@ -53,31 +53,6 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
-    public int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer) {
-        boolean settlementPlaced = false;
-
-        int[] randomCoordinates = new int[2];
-        int randomYCoordinate = 0;
-        int randomXCoordinate = 0;
-        while (!settlementPlaced) {
-
-            randomYCoordinate = (int) (Math.random() * intersectionMap.length);
-            randomXCoordinate = (int) (Math.random() * intersectionMap[randomYCoordinate].length);
-
-            if (settlementPlaceableInFoundingPhase(nextPlayer, MapPoint.IntersectionMapPoint(randomYCoordinate,
-                                                                                             randomXCoordinate))) {
-                placeFoundingSettlement(nextPlayer,
-                                        MapPoint.IntersectionMapPoint(randomYCoordinate, randomXCoordinate));
-                randomCoordinates[0] = randomYCoordinate;
-                randomCoordinates[1] = randomXCoordinate;
-                settlementPlaced = true;
-                return randomCoordinates;
-            }
-        }
-        return randomCoordinates;
-    }
-
-    @Override
     public IGameMapManagement createMapFromConfiguration(IConfiguration configuration) {
         this.configuration = configuration;
         // create new LinkedLists because lists are transmitted ordered and read-only in the IConfiguration
@@ -222,6 +197,14 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public Set<IEdge> getEdgesAroundIntersection(MapPoint mapPoint) {
+        if (mapPoint.getType() != Type.INTERSECTION) {
+            return new HashSet<>();
+        }
+        return getEdgesAroundIntersection(getIntersection(mapPoint));
+    }
+
+    @Override
     public Set<IEdge> getEdgesFromHex(MapPoint mapPoint) {
         return hexEdgeNetwork.incidentEdges(hexMap[mapPoint.getY()][mapPoint.getX()]);
     }
@@ -344,6 +327,20 @@ public class GameMapManagement implements IGameMapManagement {
         Set<Player> players = new HashSet<>();
         for (IIntersection i : getIntersectionsFromHex(mapPoint)) if (i.getOwner() != null) players.add(i.getOwner());
         return players;
+    }
+
+    @Override
+    public MapPoint getRandomFreeIntersection(Game game, Player nextPlayer) {
+        int randomYCoordinate = 0;
+        int randomXCoordinate = 0;
+        while (true) {
+            randomYCoordinate = (int) (Math.random() * intersectionMap.length);
+            randomXCoordinate = (int) (Math.random() * intersectionMap[randomYCoordinate].length);
+            if (settlementPlaceableInFoundingPhase(nextPlayer, MapPoint.IntersectionMapPoint(randomYCoordinate,
+                                                                                             randomXCoordinate))) {
+                return MapPoint.IntersectionMapPoint(randomYCoordinate, randomXCoordinate);
+            }
+        }
     }
 
     @Override

@@ -318,21 +318,19 @@ public class GameService extends AbstractService {
      * @since 2021-05-22
      */
     private void dummyTurnInFoundingPhase(Game game, Dummy nextPlayer) {
-        IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
-
         boolean roadPlaced = false;
 
-        int[] randomCoordinates;
-        randomCoordinates = game.getMap().buildSettlementOnRandomIntersection(game, game.getPlayer(nextPlayer));
-        int randomYCoordinate = randomCoordinates[0];
-        int randomXCoordinate = randomCoordinates[1];
+        IGameMapManagement map = game.getMap();
+        MapPoint randomCoordinates = map.getRandomFreeIntersection(game, game.getPlayer(nextPlayer));
+        onBuildRequest(new BuildRequest(game.getLobby().getName(), nextPlayer, randomCoordinates));
 
-        Set<IEdge> incidentEdges = game.getMap().incidentEdges(intersections[randomYCoordinate][randomXCoordinate]);
+        Set<IEdge> incidentEdges = map.getEdgesAroundIntersection(randomCoordinates);
         while (!roadPlaced) {
             {
                 for (IEdge edge : incidentEdges) {
-                    if (game.getMap().roadPlaceable(game.getPlayer(nextPlayer), edge)) {
-                        game.getMap().placeRoad(game.getPlayer(nextPlayer), edge);
+                    if (map.roadPlaceable(game.getPlayer(nextPlayer), edge)) {
+                        onBuildRequest(
+                                new BuildRequest(game.getLobby().getName(), nextPlayer, map.getEdgeMapPoint(edge)));
                         roadPlaced = true;
                         break;
                     }
@@ -763,6 +761,7 @@ public class GameService extends AbstractService {
      * @param req The EndTurnRequest found on the EventBus
      *
      * @author Mario Fokken
+     * @author Sven Ahrens
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @see de.uol.swp.common.game.message.NextPlayerMessage
      * @since 2021-01-15
@@ -803,10 +802,13 @@ public class GameService extends AbstractService {
                     nextPlayer = user;
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
-                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
-                    nextPlayer = game.getFirst();
+                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()).equals(ALL_BUILT)) {
+                    nextPlayer = game.nextPlayer();
                     game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
-                    if (nextPlayer instanceof Dummy) dummyEndTurn(game, (Dummy) nextPlayer);
+                    if (nextPlayer instanceof Dummy) {
+                        onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+                        dummyEndTurn(game, (Dummy) nextPlayer);
+                    }
                 } else {
                     startUpPlayerOrder.addFirst(startUpPlayerOrder.pollLast());
                     user = startUpPlayerOrder.peekFirst();
