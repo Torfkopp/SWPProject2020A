@@ -21,6 +21,7 @@ public interface ILobbyService {
      * @param newOwner  The new owner
      *
      * @author Maximillian Lindner
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-15
      */
     void changeOwner(LobbyName lobbyName, UserOrDummy newOwner);
@@ -32,6 +33,7 @@ public interface ILobbyService {
      *
      * @author Marvin Drees
      * @author Maximilian Lindner
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-09
      */
     void checkForGame(LobbyName lobbyName);
@@ -41,6 +43,7 @@ public interface ILobbyService {
      *
      * @author Alwin Bossert
      * @author Finn Haase
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-09
      */
     void checkUserInLobby();
@@ -51,6 +54,7 @@ public interface ILobbyService {
      * @param name     The name chosen for the new lobby
      * @param password The password chosen for the new lobby
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.CreateLobbyRequest
      * @since 2019-11-20
      */
@@ -61,6 +65,7 @@ public interface ILobbyService {
      *
      * @param name The name of the lobby the user wants to join
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.JoinLobbyRequest
      * @since 2019-11-20
      */
@@ -83,6 +88,7 @@ public interface ILobbyService {
      *
      * @author Finn Haase
      * @author Sven Ahrens
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.JoinRandomLobbyRequest
      * @since 2021-04-08
      */
@@ -96,6 +102,7 @@ public interface ILobbyService {
      *
      * @author Maximillian Lindner
      * @author Temmo Junkhoff
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-23
      */
     void kickUser(LobbyName lobbyName, UserOrDummy userToKick);
@@ -105,6 +112,7 @@ public interface ILobbyService {
      *
      * @param lobbyName The name of the lobby the User wants to leave
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.LeaveLobbyRequest
      * @since 2020-12-05
      */
@@ -118,6 +126,7 @@ public interface ILobbyService {
      *
      * @param lobby The Lobby to present
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2020-12-30
      */
     void refreshLobbyPresenterFields(ISimpleLobby lobby);
@@ -125,6 +134,7 @@ public interface ILobbyService {
     /**
      * Posts a request to remove the user from all lobbies
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.RemoveFromLobbiesRequest
      * @since 2021-01-28
      */
@@ -133,6 +143,7 @@ public interface ILobbyService {
     /**
      * Posts a request to retrieve all lobby names
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.RetrieveAllLobbiesRequest
      * @since 2020-12-12
      */
@@ -144,6 +155,7 @@ public interface ILobbyService {
      * @param lobbyName The name of the lobby whose member list to request
      *
      * @author Alwin Bossert
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.lobby.request.RetrieveAllLobbyMembersRequest
      * @since 2020-12-20
      */
@@ -156,6 +168,7 @@ public interface ILobbyService {
      *
      * @author Steven Luong
      * @author Finn Haase
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest
      * @since 2021-03-22
      */
@@ -165,6 +178,8 @@ public interface ILobbyService {
      * Posts an event to show a Lobby Error alert with the provided message
      *
      * @param message The message to display
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     void showLobbyError(String message);
 
@@ -179,6 +194,7 @@ public interface ILobbyService {
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-15
      */
     void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
@@ -192,6 +208,7 @@ public interface ILobbyService {
      *
      * @author Maximillian Lindner
      * @author Temmo Junkhoff
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-23
      */
     void userReady(LobbyName lobbyName, boolean isReady);

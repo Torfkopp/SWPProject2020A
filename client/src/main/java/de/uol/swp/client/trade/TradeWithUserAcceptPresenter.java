@@ -2,6 +2,7 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
@@ -45,7 +46,6 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
 
     protected Timer tradeAcceptTimer;
     protected boolean paused;
-    protected int remainingMoveTime;
     @FXML
     private Button acceptTradeButton;
     @FXML
@@ -65,8 +65,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     public void initialize() {
         super.initialize();
-        LOG.debug("TradeWithUserAcceptPresenter initialised");
-        setAcceptTradeTimer(30);
+        ThreadManager.runNow(() -> {
+            LOG.debug("TradeWithUserAcceptPresenter initialised");
+            setAcceptTradeTimer(30);
+        });
     }
 
     /**
@@ -84,17 +86,18 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         tradeAcceptTimer = new Timer();
         AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         tradeAcceptTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
             public void run() {
                 if (!paused) {
-                    Platform.runLater(() -> acceptTradeTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
+                    int i = moveTimeToDecrement.getAndDecrement();
+                    String moveTimeText = String.format(resourceBundle.getString("game.labels.movetime"), i);
+                    Platform.runLater(() -> acceptTradeTimerLabel.setText(moveTimeText));
                     if (moveTimeToDecrement.get() == 0) {
                         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
                         tradeService.closeTradeResponseWindow(lobbyName);
-                        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+                        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
                     }
-                } else {remainingMoveTime = moveTimeToDecrement.get();}
+                }
             }
         }, 0, 1000);
     }
@@ -125,10 +128,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
         LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
+        String invalid = String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser());
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(
-                    String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
+            tradeNotPossibleLabel.setText(invalid);
         });
     }
 
@@ -152,7 +155,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         soundService.button();
         tradeService.showUserTradeWindow(lobbyName, offeringUser);
         tradeService.tradeWithUser(lobbyName, offeringUser, true);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -169,7 +172,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         soundService.button();
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -185,7 +188,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -241,8 +244,9 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void setOfferLabel() {
         String offered = tallyUpOfferOrDemand(offeringResourceMap);
         String demanded = tallyUpOfferOrDemand(respondingResourceMap);
-        Platform.runLater(() -> tradeResponseLabel.setText(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser, offered, demanded)));
+        String bundleString = resourceBundle.getString("game.trade.offer.proposed");
+        String text = String.format(bundleString, offeringUser, offered, demanded);
+        Platform.runLater(() -> tradeResponseLabel.setText(text));
     }
 
     /**

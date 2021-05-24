@@ -6,6 +6,7 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -49,6 +50,7 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareLoginFormat();
+        ThreadManager.runNow(() -> LOG.debug("RegistrationPresenter initialised"));
     }
 
     /**
@@ -87,8 +89,8 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        LOG.debug("Sending RegistrationCanceledEvent");
-        eventBus.post(new RegistrationCanceledEvent());
+        ThreadManager.runNow(() -> LOG.debug("Sending RegistrationCanceledEvent"));
+        post(new RegistrationCanceledEvent());
     }
 
     /**
@@ -118,13 +120,13 @@ public class RegistrationPresenter extends AbstractPresenter {
         }
         soundService.button();
         if (Strings.isNullOrEmpty(loginField.getText())) {
-            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
+            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
         } else if (!checkMailFormat(emailField.getText())) {
-            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.email")));
+            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.invalid.email")));
         } else if (!passwordField1.getText().equals(passwordField2.getText())) {
-            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.notequalpw")));
+            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.notequalpw")));
         } else if (Strings.isNullOrEmpty(passwordField1.getText())) {
-            eventBus.post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
+            post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.password")));
         } else {
             userService.createUser(new UserDTO(-1, loginField.getText(), userService.hash(passwordField1.getText()),
                                                emailField.getText()));

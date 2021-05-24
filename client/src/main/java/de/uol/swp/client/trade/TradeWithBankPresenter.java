@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
@@ -101,7 +102,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         bankResourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
         bankResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        LOG.debug("TradeWithBankPresenter initialised");
+        ThreadManager.runNow(() -> LOG.debug("TradeWithBankPresenter initialised"));
     }
 
     /**
@@ -184,8 +185,9 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         ResourceList resourceList = rsp.getResourceList();
         ResourceList tradingRatios = setupHarbourRatios(rsp.getHarbourResourceList());
         setInventories(resourceList, tradingRatios);
-        buyDevelopmentButton.setDisable(resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
-                ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0);
+        Platform.runLater(() -> buyDevelopmentButton.setDisable(
+                resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
+                        ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0));
     }
 
     /**
@@ -274,7 +276,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
-        Platform.runLater(() -> soundService.coins());
+        soundService.coins();
     }
 
     /**
@@ -293,14 +295,16 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * @since 2021-04-20
      */
     private void setInventories(IResourceList ownInventory, IResourceList tradingRatios) {
-        for (ResourceType resource : ResourceType.values()) {
-            bankResourcesView.getItems().add(new Resource(resource, 1));
-        }
-        for (IResource resource : ownInventory) {
-            ownResourceTableView.getItems().add(resource);
-            if (resource.getAmount() >= tradingRatios.getAmount(resource.getType())) {
-                ownResourcesToTradeWith.getItems().add(tradingRatios.get(resource.getType()));
+        Platform.runLater(() -> {
+            for (ResourceType resource : ResourceType.values()) {
+                bankResourcesView.getItems().add(new Resource(resource, 1));
             }
-        }
+            for (IResource resource : ownInventory) {
+                ownResourceTableView.getItems().add(resource);
+                if (resource.getAmount() >= tradingRatios.getAmount(resource.getType())) {
+                    ownResourcesToTradeWith.getItems().add(tradingRatios.get(resource.getType()));
+                }
+            }
+        });
     }
 }
