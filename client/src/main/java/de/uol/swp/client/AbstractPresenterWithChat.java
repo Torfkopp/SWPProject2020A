@@ -413,6 +413,37 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
+     * Prepares the variables used for the chat storage and management
+     * <p>
+     * This method is called on a successful login and ensures that
+     * the used variable chatMessages isn't null,
+     * sets the items of the chatView to the chatMessages observableList,
+     * and sets up the chatView.
+     *
+     * @author Temmo Junkhoff
+     * @author Phillip-André Suhr
+     * @since 2020-12-20
+     */
+    protected void prepareChatVars() {
+        if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
+        chatView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(ChatOrSystemMessage item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item instanceof SystemMessage)
+                    setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
+                else setFont(Font.getDefault());
+                setText(empty || item == null ? "" : item.toString());
+                setMaxWidth(chatView.getWidth() - 5);
+                setPrefWidth(chatView.getWidth() - 5);
+                setWidth(chatView.getWidth() - 5);
+                setWrapText(true);
+            }
+        });
+        chatView.setItems(chatMessages);
+    }
+
+    /**
      * Nulls the chatMessages variable
      * <p>
      * This method is called on pressing the logout or the delete account
@@ -470,36 +501,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                 }
             }
         });
-    }
-
-    /**
-     * Prepares the variables used for the chat storage and management
-     * <p>
-     * This method is called on a successful login and ensures that
-     * the used variable chatMessages isn't null,
-     * sets the items of the chatView to the chatMessages observableList,
-     * and sets up the chatView.
-     *
-     * @author Temmo Junkhoff
-     * @author Phillip-André Suhr
-     * @since 2020-12-20
-     */
-    private void prepareChatVars() {
-        if (chatMessages == null) chatMessages = FXCollections.observableArrayList();
-        chatView.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(ChatOrSystemMessage item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item instanceof SystemMessage)
-                    setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
-                else setFont(Font.getDefault());
-                setText(empty || item == null ? "" : item.toString());
-                prefWidthProperty().bind(widthProperty().divide(1.1));
-                setMaxWidth(Control.USE_PREF_SIZE);
-                setWrapText(true);
-            }
-        });
-        chatView.setItems(chatMessages);
     }
 
     /**

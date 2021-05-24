@@ -120,6 +120,8 @@
             </columnResizePolicy>
         </TableView>
         <TextFlow fx:id="turnIndicator" maxHeight="30" minHeight="30" minWidth="-Infinity" prefWidth="230.0"/>
+        <Label fx:id="victoryPointsLabel" text="game.victorypoints.labels" maxHeight="30" minHeight="30"
+               minWidth="-Infinity" prefWidth="230.0" visible="false"/>
         <HBox maxHeight="25.0" maxWidth="-Infinity" minHeight="45.0" minWidth="-Infinity" prefWidth="230.0"
               spacing="10.0">
             <CheckBox fx:id="readyCheckBox" maxWidth="-Infinity" minHeight="45.0" minWidth="-Infinity"

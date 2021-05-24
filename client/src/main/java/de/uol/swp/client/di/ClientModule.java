@@ -66,6 +66,8 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("soundpack", preferences.get("soundpack", "default"));
         defaultProps.setProperty("volume", preferences.get("volume", "100"));
         defaultProps.setProperty("backgroundvolume", preferences.get("backgroundvolume", "50"));
+        defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
+        defaultProps.setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -135,6 +137,13 @@ public class ClientModule extends AbstractModule {
         //Setting the drawHitboxGrid value
         final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
 
+        //Setting the login_logout_msgs_on value
+        final boolean loginLogoutMsgsOn = Boolean.parseBoolean(properties.getProperty("login_logout_msgs_on"));
+
+        //Setting the lobby_create_delete_msgs_on value
+        final boolean lobbyCreateDeleteMsgsOn = Boolean
+                .parseBoolean(properties.getProperty("lobby_create_delete_msgs_on"));
+
         //Setting the join_leave_msgs_on value
         final boolean joinLeaveMsgsOn = Boolean.parseBoolean(properties.getProperty("join_leave_msgs_on"));
 
@@ -163,6 +172,8 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("soundPack")).to(soundPack);
         bindConstant().annotatedWith(Names.named("volume")).to(volume);
         bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
+        bindConstant().annotatedWith(Names.named("loginLogoutMsgsOn")).to(loginLogoutMsgsOn);
+        bindConstant().annotatedWith(Names.named("lobbyCreateDeleteMsgsOn")).to(lobbyCreateDeleteMsgsOn);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
