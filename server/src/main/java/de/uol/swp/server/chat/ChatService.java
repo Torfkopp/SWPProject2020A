@@ -3,6 +3,7 @@ package de.uol.swp.server.chat;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.message.CreatedChatMessageMessage;
 import de.uol.swp.common.chat.message.DeletedChatMessageMessage;
@@ -10,13 +11,11 @@ import de.uol.swp.common.chat.message.EditedChatMessageMessage;
 import de.uol.swp.common.chat.request.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
-import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
-import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
 import de.uol.swp.server.lobby.LobbyService;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +36,10 @@ import java.util.Optional;
 public class ChatService extends AbstractService {
 
     private static final Logger LOG = LogManager.getLogger(ChatService.class);
+
+    @Inject
+    @Named("commandsAllowed")
+    private static boolean commandsAllowed;
 
     private final IChatManagement chatManagement;
     private final ILobbyManagement lobbyManagement;
@@ -229,14 +232,11 @@ public class ChatService extends AbstractService {
     @Subscribe
     private void onNewChatMessageRequest(NewChatMessageRequest req) {
         if (req.getContent().startsWith("/")) { // this is a command, forward it to the CommandService
-            if (req.isFromLobby()) {
-                Optional<ILobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
-                if (lobby.isPresent() && !lobby.get().areCommandsAllowed()) {
-                    ExceptionMessage msg = new LobbyExceptionMessage("This lobby doesn't allow the use of commands!");
-                    msg.initWithMessage(req);
-                    post(msg);
-                    return;
-                }
+            if (!commandsAllowed) {
+                ExceptionMessage msg = new ExceptionMessage("This server doesn't allow the use of commands!");
+                msg.initWithMessage(req);
+                post(msg);
+                return;
             }
             post(new NewChatCommandMessage(req.getAuthor(), req.getContent().substring(1), req));
             return;

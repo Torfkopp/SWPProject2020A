@@ -190,7 +190,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
-        commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
@@ -279,7 +278,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = msg.getLobby().isStartUpPhaseEnabled();
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
-        commandsActivated.setSelected(msg.getLobby().areCommandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
         Platform.runLater(() -> moveTimeLabel
