@@ -303,7 +303,6 @@ public class GameService extends AbstractService {
      * @since 2021-04-09
      */
     private void dummyEndTurn(Game game, Dummy dummy) {
-        System.err.println("DDDDDDDDDDDDDDDd");
         if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(dummy, game.getLobby().getName()));
     }
 
@@ -319,7 +318,6 @@ public class GameService extends AbstractService {
      * @since 2021-05-22
      */
     private void dummyTurnInFoundingPhase(Game game, Dummy nextPlayer) {
-        System.err.println("DUMMYTURNINFOUNDINGPHASE" + nextPlayer);
         IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
 
         boolean roadPlaced = false;
@@ -806,7 +804,6 @@ public class GameService extends AbstractService {
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
                 if (startUpPlayerOrder.isEmpty()) {
-                    System.err.println("BBBBBBBBBBBBBBb");
                     nextPlayer = game.getFirst();
                     game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
                     if (nextPlayer instanceof Dummy) dummyEndTurn(game, (Dummy) nextPlayer);
@@ -822,7 +819,6 @@ public class GameService extends AbstractService {
         }
         if (game.getStartUpPhase() != Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
             if (nextPlayer instanceof Dummy) {
-                System.err.println("AAAAAAAAAAAAAA" + nextPlayer);
                 dummyTurnInFoundingPhase(game, (Dummy) nextPlayer);
                 dummyEndTurn(game, (Dummy) nextPlayer);
             }
