@@ -491,6 +491,7 @@ public class SceneManager {
         initRegistrationView();
         initRulesOverviewView();
         initChangeAccountDetailsView();
+        eventBus.post(new SetAcceleratorsEvent());
     }
 
     /**

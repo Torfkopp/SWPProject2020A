@@ -1,7 +1,9 @@
 package de.uol.swp.client.changeAccountDetails;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.util.ThreadManager;
@@ -10,9 +12,12 @@ import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -25,6 +30,7 @@ import java.util.regex.Pattern;
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2020-11-25
  */
+@SuppressWarnings("UnstableApiUsage")
 public class ChangeAccountDetailsPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangeAccountDetailsView.fxml";
@@ -49,6 +55,11 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareNewUsernameField();
+        confirmPasswordField.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+        newUsernameField.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+        newEMailField.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+        newPasswordField.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+        newPasswordField2.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
         ThreadManager.runNow(() -> LOG.debug("ChangeAccountDetailsPresenter initialised"));
     }
 
@@ -72,6 +83,32 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         Matcher matcher = pattern.matcher(eMail);
 
         return matcher.matches();
+    }
+
+    /**
+     * Helper method to handle key presses in filtered inputs
+     * <p>
+     * Because of how inputs handle being filtered, this method is used to
+     * intercept certain key presses that happen to be one of the accelerators.
+     * This method consumes the KeyEvent if the pressed Key happens to be the
+     * ESC key or the CTRL/META + C hotkey for Clicking the Change Account Details
+     * button.
+     *
+     * @param event The KeyEvent caused by the user's input
+     *
+     * @author Phillip-André Suhr
+     * @see javafx.scene.input.KeyEvent
+     * @see #onSetAcceleratorsEvent(de.uol.swp.client.SetAcceleratorsEvent)
+     * @since 2021-05-20
+     */
+    private void handleKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            event.consume();
+            onCancelButtonPressed();
+        } else if (event.isShortcutDown() && event.getCode() == KeyCode.C) {
+            event.consume();
+            onChangeAccountDetailsButtonPressed();
+        }
     }
 
     /**
@@ -142,6 +179,10 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      */
     @FXML
     private void onChangeAccountDetailsButtonPressed() {
+        if (changeButton.isDisabled()) {
+            LOG.trace("onChangeAccountDetailsButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         if (Strings.isNullOrEmpty(confirmPasswordField.getText())) {
             post(new ChangeAccountDetailsErrorEvent(resourceBundle.getString("changeaccdetails.error.empty.changepw")));
@@ -187,6 +228,30 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
     }
 
     /**
+     * Handles a SetAcceleratorEvent found on the EventBus
+     * <p>
+     * This method sets the accelerators for the ChangeAccountDetailsPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + C = Click Change Account Details button
+     *     <li> ESC           = Click Cancel button
+     *
+     * @param event The SetAcceleratorEvent found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @since 2021-05-20
+     */
+    @Subscribe
+    private void onSetAcceleratorsEvent(SetAcceleratorsEvent event) {
+        LOG.debug("Received SetAcceleratorsEvent");
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onChangeAccountDetailsButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.ESCAPE), this::onCancelButtonPressed); // ESC
+        changeButton.getScene().getAccelerators().putAll(accelerators);
+    }
+
+    /**
      * Prepares the newUsernameField
      * <p>
      * Helper method, called when the ChangeAccountDetailsPresenter is initialised in order to let the newUsernameField
@@ -196,9 +261,9 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
      * @since 2021-04-22
      */
     private void prepareNewUsernameField() {
-        UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
+        UnaryOperator<TextFormatter.Change> stringFilter = (s) ->
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
-        newUsernameField.setTextFormatter(new TextFormatter<>(StringFilter));
+        newUsernameField.setTextFormatter(new TextFormatter<>(stringFilter));
 
         changeButton.disableProperty()
                     .bind(Bindings.createBooleanBinding(manageChangeButtonState(), newPasswordField.textProperty(),

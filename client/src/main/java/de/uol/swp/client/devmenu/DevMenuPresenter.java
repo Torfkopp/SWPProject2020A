@@ -13,8 +13,11 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,10 +49,30 @@ public class DevMenuPresenter extends AbstractPresenter {
     @FXML
     private HBox parameterBox;
 
-    private Map<String, List<Map<String, Class<?>>>> classes;
     private ObservableList<String> classNameObservableList;
-    private FilteredList<String> filteredClassNameList;
     private ObservableList<Map<String, Class<?>>> constructorObservableList;
+
+    /**
+     * Helper method to handle key presses in filtered inputs
+     * <p>
+     * Because of how inputs handle being filtered, this method is used to
+     * intercept certain key presses that happen to be one of the accelerators.
+     * This method consumes the KeyEvent if the pressed Key happens to be the
+     * ESC key or the CTRL/META + S hotkey for Clicking the Send button.
+     *
+     * @param event The KeyEvent caused by the user's input
+     *
+     * @author Phillip-André Suhr
+     * @see javafx.scene.input.KeyEvent
+     * @since 2021-05-20
+     */
+    private void handleKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            event.consume();
+            Window window = classListView.getScene().getWindow();
+            window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
+        }
+    }
 
     /**
      * Initialises the DevMenu.
@@ -67,7 +90,7 @@ public class DevMenuPresenter extends AbstractPresenter {
     private void initialize() {
         post(new DevMenuClassesRequest());
         if (classNameObservableList == null) classNameObservableList = FXCollections.observableArrayList();
-        filteredClassNameList = new FilteredList<>(classNameObservableList, p -> true);
+        FilteredList<String> filteredClassNameList = new FilteredList<>(classNameObservableList, p -> true);
 
         classFilterTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             parameterBox.getChildren().clear();
@@ -77,6 +100,7 @@ public class DevMenuPresenter extends AbstractPresenter {
             });
         });
         classListView.setItems(new SortedList<>(filteredClassNameList));
+        classListView.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
 
         if (constructorObservableList == null) constructorObservableList = FXCollections.observableArrayList();
         constructorList.setCellFactory(lv -> new ListCell<>() {
@@ -93,6 +117,8 @@ public class DevMenuPresenter extends AbstractPresenter {
             }
         });
         constructorList.setItems(constructorObservableList);
+        constructorList.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+        classFilterTextField.requestFocus();
         ThreadManager.runNow(() -> LOG.debug("DevMenuPresenter initialised"));
     }
 
@@ -105,6 +131,11 @@ public class DevMenuPresenter extends AbstractPresenter {
      * After that, {@link de.uol.swp.client.devmenu.DevMenuPresenter#updateClassList(java.util.Set)}
      * is called to display the classes contained in the
      * {@link de.uol.swp.common.devmenu.response.DevMenuClassesResponse}.
+     * <p>
+     * This method also sets the Developer Menu's hotkeys, namely
+     * <ul>
+     *     <li> CTRL + S = Click Send button
+     *     <li> ESC      = Close Developer Menu
      *
      * @param rsp The {@link de.uol.swp.common.devmenu.response.DevMenuClassesResponse}
      *            found on the EventBus
@@ -114,13 +145,23 @@ public class DevMenuPresenter extends AbstractPresenter {
     @Subscribe
     private void onDevMenuClassesResponse(DevMenuClassesResponse rsp) {
         LOG.debug("Received DevMenuClassesResponse");
-        classes = rsp.getClassesMap();
+        Map<String, List<Map<String, Class<?>>>> classes = rsp.getClassesMap();
         classListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 constructorObservableList.clear();
             } else updateConstructorList(classes.get(newValue));
         });
         updateClassList(rsp.getClassesMap().keySet());
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN), // CTRL/META + S
+                         this::onSendButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.ESCAPE), // ESC to close window
+                         () -> {
+                             Window window = classListView.getScene().getWindow();
+                             window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
+                         });
+        classListView.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
@@ -159,12 +200,13 @@ public class DevMenuPresenter extends AbstractPresenter {
         VBox vBoxLeft = new VBox(5);
         VBox vBoxRight = new VBox(5);
         for (Map.Entry<String, Class<?>> arg : args.entrySet()) {
+            TextField txt = new TextField();
+            textFields.add(txt);
             Label label = new Label();
             label.setMinHeight(25);
             label.setText(arg.getKey() + ": " + arg.getValue().getSimpleName());
+            label.setLabelFor(txt);
             vBoxLeft.getChildren().add(label);
-            TextField txt = new TextField();
-            textFields.add(txt);
             vBoxRight.getChildren().add(txt);
         }
         parameterBox.getChildren().addAll(vBoxLeft, vBoxRight);

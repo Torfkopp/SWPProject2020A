@@ -133,6 +133,50 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Method called when the KickUserButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests to kick
+     * the selected User of the members view.
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @since 2021-03-02
+     */
+    @FXML
+    protected void onKickUserButtonPressed() {
+        soundService.button();
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == userService.getLoggedInUser()) return;
+        lobbyService.kickUser(lobbyName, selectedUser);
+    }
+
+    /**
+     * Handles a click on the StartSession Button
+     * <p>
+     * Method called when the StartSessionButton is pressed.
+     * The Method calls the GameService to start the Session and
+     * makes the buildingCost, timerLabel, and moveTimeLabel visible.
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-20
+     */
+    @FXML
+    protected void onStartSessionButtonPressed() {
+        if (startSession.isDisabled()) {
+            ThreadManager.runNow(() -> LOG.trace("onStartSessionButtonPressed called with disabled button, returning"));
+            return;
+        }
+        soundService.button();
+        buildingCosts.setVisible(true);
+        gameService.startSession(lobbyName, moveTime);
+        timerLabel.setVisible(true);
+        moveTimerLabel.setVisible(true);
+    }
+
+    /**
      * Helper method to set the allowed players RadioButton
      * according to the allowed players attribute of the lobby.
      *
@@ -259,26 +303,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.changeOwner(lobbyName, selectedUser);
-    }
-
-    /**
-     * Method called when the KickUserButton is pressed
-     * <p>
-     * If the EndTurnButton is pressed, this method requests to kick
-     * the selected User of the members view.
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.request.KickUserRequest
-     * @since 2021-03-02
-     */
-    @FXML
-    private void onKickUserButtonPressed() {
-        soundService.button();
-        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if (selectedUser == userService.getLoggedInUser()) return;
-        lobbyService.kickUser(lobbyName, selectedUser);
     }
 
     /**
@@ -424,26 +448,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
         });
-    }
-
-    /**
-     * Handles a click on the StartSession Button
-     * <p>
-     * Method called when the StartSessionButton is pressed.
-     * The Method calls the GameService to start the Session and
-     * makes the buildingCost, timerLabel, and moveTimeLabel visible.
-     *
-     * @author Eric Vuong
-     * @author Maximilian Lindner
-     * @since 2021-01-20
-     */
-    @FXML
-    private void onStartSessionButtonPressed() {
-        soundService.button();
-        buildingCosts.setVisible(true);
-        gameService.startSession(lobbyName, moveTime);
-        timerLabel.setVisible(true);
-        moveTimerLabel.setVisible(true);
     }
 
     /**

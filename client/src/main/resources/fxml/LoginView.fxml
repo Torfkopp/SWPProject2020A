@@ -2,29 +2,38 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="loginView" alignment="CENTER" spacing="20.0"
-      xmlns="http://javafx.com/javafx/11.0.1" fx:controller="de.uol.swp.client.auth.LoginPresenter">
+<VBox alignment="CENTER" fx:controller="de.uol.swp.client.auth.LoginPresenter" id="loginView" spacing="20.0"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
 
     <HBox alignment="CENTER" spacing="10.0">
         <VBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%login.labels.login"/>
-            <Label maxHeight="25.0" minHeight="25.0" prefHeight="25.0" text="%login.labels.password"/>
+            <Label maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
+                   text="%login.labels.login">
+                <labelFor>
+                    <TextField fx:id="loginField" id="loginField" promptText="%login.prompts.username">
+                        <tooltip>
+                            <Tooltip text="%login.tooltips.login"/>
+                        </tooltip>
+                    </TextField>
+                </labelFor>
+            </Label>
+            <Label labelFor="$passwordField" maxHeight="25.0" minHeight="25.0" mnemonicParsing="true" prefHeight="25.0"
+                   text="%login.labels.password">
+                <labelFor>
+                    <PasswordField fx:id="passwordField" id="passwordField" promptText="%login.prompts.password"/>
+                </labelFor>
+            </Label>
         </VBox>
 
         <VBox alignment="CENTER_RIGHT" spacing="10.0">
-            <TextField fx:id="loginField" promptText="%login.prompts.username">
-                <tooltip>
-                    <Tooltip text="%login.tooltips.login"/>
-                </tooltip>
-            </TextField>
-            <PasswordField fx:id="passwordField" promptText="%login.prompts.password"/>
+            <fx:reference source="loginField"/>
+            <fx:reference source="passwordField"/>
         </VBox>
     </HBox>
-    <CheckBox fx:id="rememberMeCheckbox" mnemonicParsing="false" text="%login.check.rememberme"/>
+    <CheckBox fx:id="rememberMeCheckbox" text="%login.check.rememberme"/>
 
     <HBox alignment="CENTER" spacing="10.0">
-        <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#onLoginButtonPressed"
-                text="%login.buttons.login"/>
-        <Button mnemonicParsing="false" onAction="#onRegisterButtonPressed" text="%login.buttons.register"/>
+        <Button defaultButton="true" fx:id="loginButton" onAction="#onLoginButtonPressed" text="%login.buttons.login"/>
+        <Button onAction="#onRegisterButtonPressed" text="%login.buttons.register"/>
     </HBox>
 </VBox>

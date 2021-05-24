@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
+import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
@@ -34,15 +35,16 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -314,21 +316,24 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         String name = String.format(resourceBundle.getString("lobby.window.defaulttitle"),
                                     userService.getLoggedInUser().getUsername());
 
-        //create Dialogue, disallow any use of § in the name (used for command parsing)
+        //create Dialogue, only allow alphanumeric characters plus _',- and space
         UnaryOperator<TextFormatter.Change> filter = s ->
                 s.getControlNewText().matches("[ A-Za-z0-9_',-]+") || s.isDeleted() ? s : null;
 
         TextInputDialog dialogue = new TextInputDialog();
         dialogue.setTitle(resourceBundle.getString("lobby.dialog.title"));
         dialogue.setHeaderText(resourceBundle.getString("lobby.dialog.header"));
-        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
-        Label lbl1 = new Label(resourceBundle.getString("lobby.dialog.password"));
         TextField lobbyName = new TextField(name);
         lobbyName.setTextFormatter(new TextFormatter<>(filter));
+        Label lbl = new Label(resourceBundle.getString("lobby.dialog.content"));
+        lbl.setPrefHeight(25);
+        lbl.setLabelFor(lobbyName);
+        lbl.setMnemonicParsing(true);
         HBox box = new HBox(10, lbl, lobbyName);
-        CheckBox lobbyPasswordCheckBox = new CheckBox();
+        CheckBox lobbyPasswordCheckBox = new CheckBox(resourceBundle.getString("lobby.dialog.password"));
+        lobbyPasswordCheckBox.setPrefHeight(25);
         PasswordField lobbyPassword = new PasswordField();
-        HBox box1 = new HBox(10, lobbyPasswordCheckBox, lbl1, lobbyPassword);
+        HBox box1 = new HBox(10, lobbyPasswordCheckBox, lobbyPassword);
         VBox vBox = new VBox(10, box, box1);
         lobbyPassword.disableProperty().bind(Bindings.createBooleanBinding(() -> !lobbyPasswordCheckBox.isSelected(),
                                                                            lobbyPasswordCheckBox.selectedProperty()));
@@ -410,12 +415,16 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onDeleteButtonPressed() {
         soundService.button();
         TextInputDialog dialogue = new TextInputDialog();
-        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
-        PasswordField confirmPasswordField = new PasswordField();
-        CheckBox userDeletionConfirmCheckBox = new CheckBox(
-                resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
         dialogue.setTitle(resourceBundle.getString("mainmenu.settings.deleteaccount.title"));
         dialogue.setHeaderText(resourceBundle.getString("mainmenu.settings.deleteaccount.header"));
+        PasswordField confirmPasswordField = new PasswordField();
+        Label lbl = new Label(resourceBundle.getString("mainmenu.settings.deleteaccount.content"));
+        lbl.setPrefHeight(25);
+        lbl.setLabelFor(confirmPasswordField);
+        lbl.setMnemonicParsing(true);
+        CheckBox userDeletionConfirmCheckBox = new CheckBox(
+                resourceBundle.getString("mainmenu.settings.deleteaccount.confirm"));
+        userDeletionConfirmCheckBox.setMnemonicParsing(true);
         HBox hbox = new HBox(10, lbl, confirmPasswordField);
         VBox box = new VBox(10, hbox, userDeletionConfirmCheckBox);
         dialogue.getDialogPane().setContent(box);
@@ -510,29 +519,35 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinLobbyWithPasswordResponse(JoinLobbyWithPasswordResponse response) {
         LOG.debug("Received a JoinLobbyWithPasswordResponse for Lobby {}", response.getLobby());
-        TextInputDialog dialogue = new TextInputDialog();
-        Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
-        PasswordField lobbyPasswordField = new PasswordField();
-        dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
-        HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
-        VBox box = new VBox(10, box3);
-        dialogue.getDialogPane().setContent(box);
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialogue.getDialogPane().getStylesheets().add(styleSheet);
-        dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
-
-        //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
-        Optional<String> result = dialogue.showAndWait();
-        String lobbyPassword = lobbyPasswordField.getText();
-        if (!Strings.isNullOrEmpty(lobbyPasswordField.getText())) {
-            lobbyPassword = userService.hash(lobbyPasswordField.getText());
-        }
-        String finalLobbyPassword = lobbyPassword;
-        result.ifPresent(s -> post(
-                new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(), userService.getLoggedInUser(),
-                                                             finalLobbyPassword)));
+        Platform.runLater(() -> {
+            TextInputDialog dialogue = new TextInputDialog();
+            dialogue.setTitle(resourceBundle.getString("lobby.dialog.password.title"));
+            PasswordField lobbyPasswordField = new PasswordField();
+            Label confirmPasswordLabel = new Label(resourceBundle.getString("lobby.dialog.password.confirmation"));
+            confirmPasswordLabel.setPrefHeight(25);
+            confirmPasswordLabel.setLabelFor(lobbyPasswordField);
+            confirmPasswordLabel.setMnemonicParsing(true);
+            HBox box3 = new HBox(10, confirmPasswordLabel, lobbyPasswordField);
+            VBox box = new VBox(10, box3);
+            dialogue.getDialogPane().setContent(box);
+            ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
+                                                ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
+                                               ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialogue.getDialogPane().getStylesheets().add(styleSheet);
+            dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
+            dialogue.getDialogPane().getStylesheets().add(styleSheet);
+            //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
+            Optional<String> result = dialogue.showAndWait();
+            String lobbyPassword = lobbyPasswordField.getText();
+            if (!Strings.isNullOrEmpty(lobbyPasswordField.getText())) {
+                lobbyPassword = userService.hash(lobbyPasswordField.getText());
+            }
+            String finalLobbyPassword = lobbyPassword;
+            result.ifPresent(s -> post(
+                    new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(), userService.getLoggedInUser(),
+                                                                 finalLobbyPassword)));
+        });
     }
 
     /**
@@ -699,6 +714,43 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @FXML
     private void onRulesMenuClicked() {
         post(new ShowRulesOverviewViewEvent());
+    }
+
+    /**
+     * Handles a SetAcceleratorEvent found on the EventBus
+     * <p>
+     * This method sets the accelerators for the MainMenuPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + N = Create Lobby button
+     *     <li> CTRL/META + J = Join Lobby button
+     *     <li> CTRL/META + C = Open Change Account Details window
+     *     <li> CTRL/META + L = Logout button
+     *     <li> CTRL/META + D = Delete Account
+     *     <li> F2            = Open Rules menu
+     *
+     * @param event The SetAcceleratorEvent found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @since 2021-05-20
+     */
+    @Subscribe
+    private void onSetAcceleratorsEvent(SetAcceleratorsEvent event) {
+        LOG.debug("Received SetAcceleratorsEvent");
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), // CTRL/META + N
+                         this::onCreateLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.J, KeyCombination.SHORTCUT_DOWN), // CTRL/META + J
+                         this::onJoinLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onChangeAccountDetailsButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN), // CTRL/META + L
+                         this::onLogoutButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
+                         this::onDeleteButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.F2), // F2 for Rules
+                         this::onRulesMenuClicked);
+        usersView.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**

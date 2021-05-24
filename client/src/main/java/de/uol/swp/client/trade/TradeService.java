@@ -2,7 +2,6 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.request.*;
@@ -27,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 @SuppressWarnings("UnstableApiUsage")
 public class TradeService implements ITradeService {
 
-    private static final Logger LOG = LogManager.getLogger(LobbyService.class);
+    private static final Logger LOG = LogManager.getLogger(TradeService.class);
     private final EventBus eventBus;
     private final IUserService userService;
 

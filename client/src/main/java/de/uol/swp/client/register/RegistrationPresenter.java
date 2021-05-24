@@ -1,7 +1,9 @@
 package de.uol.swp.client.register;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
+import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
 import de.uol.swp.client.util.ThreadManager;
@@ -9,9 +11,12 @@ import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,13 +28,13 @@ import java.util.regex.Pattern;
  * @see de.uol.swp.client.AbstractPresenter
  * @since 2019-08-29
  */
+@SuppressWarnings("UnstableApiUsage")
 public class RegistrationPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/RegistrationView.fxml";
     public static final int MIN_HEIGHT = 250;
     public static final int MIN_WIDTH = 410;
-    private static final RegistrationCanceledEvent registrationCanceledEvent = new RegistrationCanceledEvent();
-    private final Logger LOG = LogManager.getLogger(RegistrationPresenter.class);
+    private static final Logger LOG = LogManager.getLogger(RegistrationPresenter.class);
 
     @FXML
     private TextField loginField;
@@ -84,7 +89,8 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        post(registrationCanceledEvent);
+        ThreadManager.runNow(() -> LOG.debug("Sending RegistrationCanceledEvent"));
+        post(new RegistrationCanceledEvent());
     }
 
     /**
@@ -108,6 +114,10 @@ public class RegistrationPresenter extends AbstractPresenter {
      */
     @FXML
     private void onRegisterButtonPressed() {
+        if (registerButton.isDisabled()) {
+            LOG.trace("onRegisterButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         if (Strings.isNullOrEmpty(loginField.getText())) {
             post(new RegistrationErrorEvent(resourceBundle.getString("register.error.empty.username")));
@@ -124,6 +134,31 @@ public class RegistrationPresenter extends AbstractPresenter {
     }
 
     /**
+     * Handles a SetAcceleratorEvent found on the EventBus
+     * <p>
+     * This method sets the accelerators for the RegistrationPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + R = Register button
+     *     <li> ESC           = Cancel button
+     *
+     * @param event The SetAcceleratorEvent found on the EventBus
+     *
+     * @author Phillip-André Suhr
+     * @see de.uol.swp.client.SetAcceleratorsEvent
+     * @since 2021-05-20
+     */
+    @Subscribe
+    private void onSetAcceleratorsEvent(SetAcceleratorsEvent event) {
+        LOG.debug("Received SetAcceleratorsEvent");
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN), // CTRL/META + R
+                         this::onRegisterButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.ESCAPE), // ESC
+                         this::onCancelButtonPressed);
+        registerButton.getScene().getAccelerators().putAll(accelerators);
+    }
+
+    /**
      * Prepares the loginField
      * <p>
      * Helper method, called when the RegistrationPresenter is initialised in order to let the loginField
@@ -133,9 +168,16 @@ public class RegistrationPresenter extends AbstractPresenter {
      * @since 2021-04-21
      */
     private void prepareLoginFormat() {
-        UnaryOperator<TextFormatter.Change> StringFilter = (s) ->
+        UnaryOperator<TextFormatter.Change> stringFilter = (s) ->
                 s.getText().matches("[A-Za-z0-9_-]+") || s.isDeleted() || s.getText().equals("") ? s : null;
-        loginField.setTextFormatter(new TextFormatter<>(StringFilter));
+        loginField.setTextFormatter(new TextFormatter<>(stringFilter));
+        // EventFilter to let a filtered input handle the ESC hotkey because filtered inputs suppress the Key Combo
+        loginField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                event.consume();
+                onCancelButtonPressed();
+            }
+        });
         //@formatter:off
         registerButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             boolean name = loginField.getText().isBlank() || !loginField.getText().matches("[A-Za-z0-9_-]+");
@@ -147,10 +189,7 @@ public class RegistrationPresenter extends AbstractPresenter {
             },
         loginField.textProperty(), emailField.textProperty(), passwordField1.textProperty(), passwordField2.textProperty()));
         //@formatter:on
-        Pattern pattern = Pattern.compile(".{0,20}");
-        TextFormatter formatter = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
-            return pattern.matcher(change.getControlNewText()).matches() ? change : null;
-        });
+        TextFormatter<String> formatter = new TextFormatter<>(c -> c.getControlNewText().length() <= 20 ? c : null);
         loginField.setTextFormatter(formatter);
     }
 }

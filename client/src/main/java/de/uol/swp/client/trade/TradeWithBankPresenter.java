@@ -15,11 +15,16 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages the TradingWithBank window
@@ -110,6 +115,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
+        if (buyDevelopmentButton.isDisabled()) {
+            LOG.trace("onBuyDevelopmentCardButtonPressed with disabled button, returning");
+            return;
+        }
         soundService.button();
         for (IResource item : ownResourceTableView.getItems()) {
             if (item.getType() == ResourceType.GRAIN && item.getAmount() <= 0) return;
@@ -194,6 +203,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
+        if (tradeResourceWithBankButton.isDisabled()) {
+            LOG.trace("onTradeResourceWithBankButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         IResource bankResource;
         IResource giveResource;
@@ -224,6 +237,11 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithBankPresenter is created. If a window is closed using the
      * X(top-right-Button), the closeWindow method is called.
+     * <p>
+     * This method also sets the accelerators for the TradeWithBankPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + D = Buy Development Card button
+     *     <li> CTRL/META + T = Trade button
      *
      * @param event TradeUpdateEvent found on the event bus
      *
@@ -235,6 +253,12 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
         Window window = ownResourcesToTradeWith.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName));
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
+                         this::onBuyDevelopmentCardButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN), // CTRL/META + T
+                         this::onTradeResourceWithBankButtonPressed);
+        ownResourcesToTradeWith.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**

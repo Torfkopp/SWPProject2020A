@@ -23,6 +23,9 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -152,12 +155,26 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Handles LobbyUpdateEvents on the EventBus
      * <p>
      * If a new LobbyUpdateEvent is posted to the EventBus, this method checks
-     * whether the lobbyName, loggedInUser, or readyUsers attributes of the current
+     * whether the lobbyName, window, or readyUsers attributes of the current
      * LobbyPresenter are null. If they are, it sets these attributes to the
      * values found in the LobbyUpdateEvent or creates a new, empty instance.
      * Also makes sure that the lobby will be left gracefully should the window
      * be closed without using the Leave Lobby button.
      * It also sets the pre-game Setting according to the Lobby.
+     * <p>
+     * Additionally, this method sets the accelerators for the LobbyPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + S = Start Session button
+     *     <li> CTRL/META + K = Kick User button
+     *     <li> CTRL/META + E = End Turn button
+     *     <li> CTRL/META + R = Roll Dice button
+     *     <li> CTRL/META + T = Make Offer to User button
+     *     <li> CTRL/META + B = Trade with Bank button
+     *     <li> CTRL/META + C = Play a Card button
+     *     <li> CTRL/META + H = Return to Lobby button
+     *     <li> CTRL/META + P = Pause button
+     *     <li> F1            = Toggle help action list
+     *     <li> F2            = Open Rules menu
      *
      * @param event The LobbyUpdateEvent found on the EventBus
      *
@@ -180,6 +197,31 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             readyUsers = new HashSet<>();
         }
         if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        // pre-game hotkeys
+        accelerators.put(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN), // CTRL/META + S
+                         this::onStartSessionButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN), // CTRL/META + K
+                         this::onKickUserButtonPressed);
+        // in-game hotkeys
+        accelerators.put(new KeyCodeCombination(KeyCode.E, KeyCombination.SHORTCUT_DOWN), // CTRL/META + E
+                         this::onEndTurnButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN), // CTRL/META + R
+                         this::onRollDiceButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN), // CTRL/META + T
+                         this::onTradeWithUserButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN), // CTRL/META + B
+                         this::onTradeWithBankButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onPlayCardButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.H, KeyCombination.SHORTCUT_DOWN), // CTRL/META + H
+                         this::onReturnToLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
+                         this::onPauseButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.F1), this::onHelpButtonPressed); // F1 for help
+        accelerators.put(new KeyCodeCombination(KeyCode.F2), this::onRulesMenuClicked); // F2 for rules
+        membersView.getScene().getAccelerators().putAll(accelerators);
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
