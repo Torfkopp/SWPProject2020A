@@ -21,9 +21,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.JoinLobbyRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
-import de.uol.swp.common.user.DummyDTO;
-import de.uol.swp.common.user.User;
-import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.devmenu.message.NewChatCommandMessage;
 import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
@@ -80,7 +78,55 @@ public class CommandService extends AbstractService {
         commandMap.put("remove", this::command_Remove);
         commandMap.put("adddummy", this::command_AddDummy);
         commandMap.put("d", this::command_AddDummy);
+        commandMap.put("addai", this::command_AddAI);
+        commandMap.put("ai", this::command_AddAI);
         LOG.debug("CommandService started");
+    }
+
+    /**
+     * Handles the /addai command
+     * <p>
+     * Usage: {@code /addai}
+     *
+     * @param args            List of Strings to be used as arguments
+     * @param originalMessage The {@link de.uol.swp.common.chat.request.NewChatMessageRequest}
+     *                        used to invoke the command
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.chat.request.NewChatMessageRequest
+     * @since 2021-05-11
+     */
+    private void command_AddAI(List<String> args, NewChatMessageRequest originalMessage) {
+        LOG.debug("Received /addai command");
+        AIDTO.Difficulty difficulty = AI.Difficulty.EASY;
+        boolean diffExists = false;
+        if (args.size() > 0) {
+            switch (args.get(0).toLowerCase()) {
+                case "easy":
+                    difficulty = AI.Difficulty.EASY;
+                    diffExists = true;
+                    break;
+                case "hard":
+                    difficulty = AI.Difficulty.HARD;
+                    diffExists = true;
+                    break;
+            }
+        }
+        int aiAmount = 1;
+        if (!diffExists && args.size() > 0) aiAmount = Integer.parseInt(args.get(0));
+        else if (args.size() > 1) aiAmount = Integer.parseInt(args.get(1));
+        if (originalMessage.isFromLobby()) {
+            LobbyName lobbyName = originalMessage.getOriginLobby();
+            Optional<ILobby> optLobby = lobbyManagement.getLobby(lobbyName);
+            if (optLobby.isPresent()) {
+                ILobby lobby = optLobby.get();
+                int freeUsers = lobby.getMaxPlayers() - lobby.getUserOrDummies().size();
+                if (aiAmount > freeUsers) aiAmount = freeUsers;
+                for (; aiAmount > 0; aiAmount--) post(new JoinLobbyRequest(lobbyName, new AIDTO(difficulty)));
+            }
+        } else {
+            command_Invalid(args, originalMessage);
+        }
     }
 
     /**
@@ -384,7 +430,9 @@ public class CommandService extends AbstractService {
                 StringBuilder x = new StringBuilder();
                 for (Character c : name.toCharArray()) if (Character.isDigit(c)) x.append(c);
                 return new DummyDTO(Integer.parseInt(x.toString()));
-            } else return null;
+            }
+            if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(name)) return new AIDTO(name);
+            return null;
         }
     }
 
@@ -531,7 +579,7 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.server.usermanagement.IUserManagement
      */
     private Message parseArguments(List<String> args, Constructor<?> constr,
-                                   Optional<User> currentUser) throws ReflectiveOperationException {
+                                   Optional<UserOrDummy> currentUser) throws ReflectiveOperationException {
         List<Object> argList = new ArrayList<>();
         Class<?>[] parameters = constr.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
@@ -540,10 +588,12 @@ public class CommandService extends AbstractService {
                 case "de.uol.swp.common.user.User":
                 case "de.uol.swp.common.user.UserOrDummy":
                     if (args.get(i).equals(".") || args.get(i).equals("me")) {
-                        currentUser.ifPresent(argList::add);
+                        if (currentUser.get() instanceof User) currentUser.ifPresent(argList::add);
                     } else {
                         Optional<User> foundUser = userManagement.getUser(args.get(i));
                         if (foundUser.isPresent()) argList.add(foundUser.get());
+                        else if (new AIDTO(AI.Difficulty.EASY).getAiNames().contains(args.get(i)))
+                            argList.add(new AIDTO(args.get(i)));
                         else {
                             // Dummy
                             // Dummies aren't saved anywhere, so we parse the integer at the end of the name
