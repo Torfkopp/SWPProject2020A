@@ -44,6 +44,11 @@ public class AsyncGameService implements IGameService {
     }
 
     @Override
+    public void pauseGame(LobbyName lobbyName) {
+        ThreadManager.runNow(() -> syncGameService.pauseGame(lobbyName));
+    }
+
+    @Override
     public void playKnightCard(LobbyName lobbyName) {
         ThreadManager.runNow(() -> syncGameService.playKnightCard(lobbyName));
     }

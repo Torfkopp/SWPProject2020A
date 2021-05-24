@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -52,6 +53,11 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
+    public void addAI(LobbyName name, AI ai) {
+        ThreadManager.runNow(() -> syncLobbyService.addAI(name, ai));
+    }
+
+    @Override
     public void joinRandomLobby() {
         ThreadManager.runNow(syncLobbyService::joinRandomLobby);
     }
@@ -97,11 +103,10 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
-                                    boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
+                                    boolean randomPlayFieldEnabled) {
         ThreadManager.runNow(() -> syncLobbyService
-                .updateLobbySettings(lobbyName, maxPlayers, startUpPhaseEnabled, commandsAllowed, moveTime,
-                                     randomPlayFieldEnabled));
+                .updateLobbySettings(lobbyName, maxPlayers, startUpPhaseEnabled, moveTime, randomPlayFieldEnabled));
     }
 
     @Override
