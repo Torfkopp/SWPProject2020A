@@ -803,7 +803,7 @@ public class GameService extends AbstractService {
                     nextPlayer = user;
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
-                if (startUpPlayerOrder.isEmpty()) {
+                if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
                     nextPlayer = game.getFirst();
                     game.setStartUpPhase(Game.StartUpPhase.NOT_IN_STARTUP_PHASE);
                     if (nextPlayer instanceof Dummy) dummyEndTurn(game, (Dummy) nextPlayer);
