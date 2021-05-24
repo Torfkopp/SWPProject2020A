@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
 
 /**
@@ -64,6 +65,18 @@ public interface ILobbyService {
      * @since 2019-11-20
      */
     void joinLobby(LobbyName name);
+
+    /**
+     * Posts a AddAIRequest to a specified lobby onto the EventBus
+     * in order to let an AI join the lobby
+     *
+     * @param name The name of the lobby
+     * @param ai   The AI to join the lobby
+     *
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    void addAI(LobbyName name, AI ai);
 
     /**
      * Posts a request to join a random lobby onto the EventBus
@@ -161,7 +174,6 @@ public interface ILobbyService {
      * @param lobbyName              The name of the lobby
      * @param maxPlayers             The maximum amount of players for a lobby
      * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
-     * @param commandsAllowed        Whether commands are allowed or not
      * @param moveTime               The maximum time of a move
      * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
      *
@@ -169,8 +181,8 @@ public interface ILobbyService {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, boolean commandsAllowed,
-                             int moveTime, boolean randomPlayFieldEnabled);
+    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
+                             boolean randomPlayFieldEnabled);
 
     /**
      * Posts a request to change the ready status of a user

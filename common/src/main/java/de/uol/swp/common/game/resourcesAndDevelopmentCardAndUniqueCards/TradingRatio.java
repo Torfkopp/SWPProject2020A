@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards;
 
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 
 import java.io.Serializable;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class TradingRatio implements Serializable {
 
-    private final IHarborHex.HarborResource resource;
+    private final IHarbourHex.HarbourResource resource;
     private final int amount;
 
     /**
@@ -24,7 +24,7 @@ public class TradingRatio implements Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
-    public TradingRatio(IHarborHex.HarborResource resource, int amount) {
+    public TradingRatio(IHarbourHex.HarbourResource resource, int amount) {
         this.resource = resource;
         this.amount = amount;
     }
@@ -49,7 +49,7 @@ public class TradingRatio implements Serializable {
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
-    public IHarborHex.HarborResource getResource() {
+    public IHarbourHex.HarbourResource getResource() {
         return resource;
     }
 }

@@ -44,9 +44,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     protected Label acceptTradeTimerLabel;
 
     protected Timer tradeAcceptTimer;
+    @FXML
+    protected Label acceptTradeTimerLabel;
     protected boolean paused;
     protected int remainingMoveTime;
-
     @FXML
     private Button acceptTradeButton;
     @FXML
@@ -219,7 +220,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             ownResourceTableView.getItems().add(resource);
         setOfferLabel();
         Window window = ownResourceTableView.getScene().getWindow();
-        window.setOnCloseRequest(windowEvent -> tradeService.closeTradeResponseWindow(lobbyName));
+        window.setOnCloseRequest(windowEvent -> {
+            tradeService.resetOfferTradeButton(lobbyName, offeringUser);
+            tradeService.closeTradeResponseWindow(lobbyName);
+        });
 
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();
         accelerators.put(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN), // CTRL/META + A

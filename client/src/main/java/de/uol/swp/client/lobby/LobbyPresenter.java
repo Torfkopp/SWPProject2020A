@@ -25,6 +25,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,7 +45,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 825;
     public static final int HELP_MIN_WIDTH = 250;
-    public static final int MIN_HEIGHT_IN_GAME = 825;
+    public static final int MIN_HEIGHT_IN_GAME = 905;
     public static final int MIN_WIDTH_PRE_GAME = 685;
     public static final int MIN_WIDTH_IN_GAME = 1435;
 
@@ -228,7 +229,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
-        commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
@@ -317,7 +317,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = msg.getLobby().isStartUpPhaseEnabled();
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
-        commandsActivated.setSelected(msg.getLobby().areCommandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
         Platform.runLater(() -> moveTimeLabel
@@ -414,6 +413,26 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
+
+                    //if the background should be in colour you need to use setBackground
+                    if (user != null && userOrDummyPlayerMap == null)
+                        setTextFill(Color.BLACK); // No clue why this is needed, but it is
+                    if (user != null && userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
+                        switch (userOrDummyPlayerMap.get(user)) {
+                            case PLAYER_1:
+                                setTextFill(GameRendering.PLAYER_1_COLOUR);
+                                break;
+                            case PLAYER_2:
+                                setTextFill(GameRendering.PLAYER_2_COLOUR);
+                                break;
+                            case PLAYER_3:
+                                setTextFill(GameRendering.PLAYER_3_COLOUR);
+                                break;
+                            case PLAYER_4:
+                                setTextFill(GameRendering.PLAYER_4_COLOUR);
+                                break;
+                        }
+                    }
                     if (empty || user == null) setText("");
                     else {
                         String name = user.getUsername();
@@ -437,20 +456,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                             }
                         }
                         setText(name);
-                        //if the background should be in colour you need to use setBackground
-                        int i = lobbyMembers.size();
-                        if (i >= 1 && user.equals(lobbyMembers.get(0))) {
-                            setTextFill(GameRendering.PLAYER_1_COLOUR);
-                        }
-                        if (i >= 2 && user.equals(lobbyMembers.get(1))) {
-                            setTextFill(GameRendering.PLAYER_2_COLOUR);
-                        }
-                        if (i >= 3 && user.equals(lobbyMembers.get(2))) {
-                            setTextFill(GameRendering.PLAYER_3_COLOUR);
-                        }
-                        if (i >= 4 && user.equals(lobbyMembers.get(3))) {
-                            setTextFill(GameRendering.PLAYER_4_COLOUR);
-                        }
                     }
                 });
             }

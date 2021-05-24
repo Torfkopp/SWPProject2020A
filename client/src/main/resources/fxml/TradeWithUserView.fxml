@@ -61,7 +61,7 @@
 
         <VBox alignment="CENTER" spacing="20.0">
             <Button fx:id="offerTradeButton" onAction="#onOfferTradeButtonPressed"
-                    text="%game.trade.buttons.makeoffer"/>
+                    text="%game.trade.buttons.makeoffer" textAlignment="CENTER" wrapText="true"/>
             <Button cancelButton="true" onAction="#onCancelTradeButtonPressed" text="%button.cancel"/>
         </VBox>
 

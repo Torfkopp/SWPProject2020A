@@ -1,8 +1,7 @@
 package de.uol.swp.server.lobby;
 
-import com.google.common.base.Strings;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.user.Dummy;
+import de.uol.swp.common.user.NPC;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -31,7 +30,6 @@ public class LobbyDTO implements ILobby {
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
-    private boolean commandsAllowed;
     private int maxPlayers;
     private int moveTime;
     private boolean startUpPhaseEnabled;
@@ -53,7 +51,6 @@ public class LobbyDTO implements ILobby {
         this.users.add(creator);
         this.inGame = false;
         this.maxPlayers = 3;
-        this.commandsAllowed = true;
         this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
@@ -79,7 +76,6 @@ public class LobbyDTO implements ILobby {
      * @param inGame                 The in game
      * @param hasPassword            The has password
      * @param owner                  The owner
-     * @param commandsAllowed        The commands allowed
      * @param maxPlayers             The max players
      * @param moveTime               The move time
      * @param startUpPhaseEnabled    The start up phase enabled
@@ -88,15 +84,14 @@ public class LobbyDTO implements ILobby {
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
-    private LobbyDTO(LobbyName name, String password, boolean inGame, boolean hasPassword, User owner,
-                     boolean commandsAllowed, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
-                     boolean randomPlayFieldEnabled) {
+    private LobbyDTO(LobbyName name, String password, boolean inGame, boolean hasPassword, User owner, int maxPlayers,
+                     int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled) {
         this.name = name;
         this.password = password;
         this.inGame = inGame;
+        this.hasPassword = hasPassword;
         this.owner = owner;
         this.users.add(owner);
-        this.commandsAllowed = commandsAllowed;
         this.maxPlayers = maxPlayers;
         this.moveTime = moveTime;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
@@ -114,13 +109,8 @@ public class LobbyDTO implements ILobby {
      */
     public static ILobby create(ILobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getPassword(), lobby.isInGame(), lobby.hasPassword(),
-                            lobby.getOwner(), lobby.areCommandsAllowed(), lobby.getMaxPlayers(), lobby.getMoveTime(),
-                            lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled());
-    }
-
-    @Override
-    public boolean areCommandsAllowed() {
-        return commandsAllowed;
+                            lobby.getOwner(), lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(),
+                            lobby.isRandomPlayFieldEnabled());
     }
 
     @Override
@@ -181,7 +171,7 @@ public class LobbyDTO implements ILobby {
 
     @Override
     public boolean hasPassword() {
-        return !Strings.isNullOrEmpty(password);
+        return hasPassword;
     }
 
     @Override
@@ -217,7 +207,7 @@ public class LobbyDTO implements ILobby {
     @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
-        if (user instanceof Dummy) {
+        if (user instanceof NPC) {
             readyUsers.add(user);
         }
     }
@@ -242,11 +232,6 @@ public class LobbyDTO implements ILobby {
                 if (!foundUser) throw new IllegalArgumentException("Lobby must contain at least one real user!");
             }
         }
-    }
-
-    @Override
-    public void setCommandsAllowed(boolean commandsAllowed) {
-        this.commandsAllowed = commandsAllowed;
     }
 
     @Override

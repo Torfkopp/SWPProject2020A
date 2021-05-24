@@ -14,6 +14,7 @@ import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -107,6 +108,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected ListView<UniqueCard> uniqueCardView;
     @FXML
+    protected Label victoryPointsLabel;
+    @FXML
     protected Label buildingCosts;
     @FXML
     protected CheckBox autoRoll;
@@ -120,7 +123,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label currentRound;
     @FXML
     protected Button helpCheckBox;
+    @FXML
+    protected Button pauseButton;
 
+    protected ObservableList<UserOrDummy> lobbyMembers;
     protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
@@ -136,7 +142,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean startUpPhaseEnabled;
     protected boolean ownTurn;
     protected boolean tradingCurrentlyAllowed;
-    protected boolean paused;
+    protected boolean timerPaused;
+    protected boolean gamePaused = false;
     protected int moveTime;
     protected User owner;
     protected ObservableList<UniqueCard> uniqueCardList;
@@ -146,6 +153,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Timer moveTimeTimer;
     protected int roundCounter = 0;
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
+    protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
 
     @Inject
     private ITradeService tradeService;
@@ -167,99 +175,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         super.initialize();
         prepareInventoryTables();
         prepareUniqueCardView();
-    }
-
-    /**
-     * Handles a PauseTimerMessage
-     * <p>
-     * If a new PauseTimerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It sets the boolean paused on true.
-     *
-     * @param msg The PauseTimerMessage object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.message.PauseTimerMessage
-     * @since 2021-05-02
-     */
-    @Subscribe
-    public void onPauseTimerMessage(PauseTimerMessage msg) {
-        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
-        paused = true;
-    }
-
-    /**
-     * Handles a PlayRoadBuildingCardAllowedResponse
-     * <p>
-     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
-     * this method is called.
-     * It disables the Buttons and gives a note to choose
-     * the roads.
-     *
-     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
-     * @since 2021-05-16
-     */
-    @Subscribe
-    public void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
-        Platform.runLater(() -> {
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
-            notice.setVisible(true);
-        });
-        disableButtonStates();
-        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
-        gameService.playRoadBuildingCard(rsp.getLobbyName());
-    }
-
-    /**
-     * Handles a UnpauseTimerMessage
-     * <p>
-     * If a new UnpauseTimerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It sets the boolean paused on false.
-     *
-     * @param msg The UnpauseTimerMessage object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
-     * @since 2021-05-02
-     */
-    @Subscribe
-    public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
-        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
-        paused = false;
-    }
-
-    /**
-     * Helper method to set the timer for the players round.
-     * The user gets forced to end his turn, if the timer gets zero.
-     * If paused is true, the timer is paused.
-     *
-     * @param moveTime The moveTime for the Lobby
-     *
-     * @author Alwin Bossert
-     * @since 2021-05-01
-     */
-    public void setMoveTimer(int moveTime) {
-        moveTimeTimer = new Timer();
-        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
-        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (!paused) {
-                    Platform.runLater(() -> moveTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
-                    if (moveTimeToDecrement.get() == 0) {
-                        gameService.rollDice(lobbyName);
-                        tradeService.closeBankTradeWindow(lobbyName);
-                        gameService.endTurn(lobbyName);
-                    }
-                }
-            }
-        }, 0, 1000);
     }
 
     /**
@@ -559,6 +474,40 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets zero.
+     * If paused is true, the timer is paused.
+     *
+     * @param moveTime The moveTime for the Lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    protected void setMoveTimer(int moveTime) {
+        moveTimeTimer = new Timer();
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
+        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!timerPaused) {
+                    Platform.runLater(() -> moveTimerLabel.setText(
+                            String.format(resourceBundle.getString("game.labels.movetime"),
+                                          moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
+                        gameService.rollDice(lobbyName);
+                        tradeService.closeTradeResponseWindow(lobbyName);
+                        tradeService.closeBankTradeWindow(lobbyName);
+                        tradeService.closeUserTradeWindow(lobbyName);
+                        disableButtonStates();
+                        gameService.endTurn(lobbyName);
+                        moveTimeTimer.cancel();
+                    }
+                }
+            }
+        }, 0, 1000);
+    }
+
+    /**
      * Helper function that sets the disable state of the rollDiceButton
      *
      * @author Sven Ahrens
@@ -566,7 +515,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-02-22
      */
     protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
+        if (!gamePaused) rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
     }
 
     /**
@@ -593,19 +542,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Text username = new Text(name);
             username.setFont(Font.font(20.0));
 
-            ObservableList<UserOrDummy> membersList = membersView.getItems();
-            if (membersList.size() > 0 && user.equals(membersList.get(0))) {
-                username.setFill(GameRendering.PLAYER_1_COLOUR);
+            if (userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
+                switch (userOrDummyPlayerMap.get(user)) {
+                    case PLAYER_1:
+                        username.setFill(GameRendering.PLAYER_1_COLOUR);
+                        break;
+                    case PLAYER_2:
+                        username.setFill(GameRendering.PLAYER_2_COLOUR);
+                        break;
+                    case PLAYER_3:
+                        username.setFill(GameRendering.PLAYER_3_COLOUR);
+                        break;
+                    case PLAYER_4:
+                        username.setFill(GameRendering.PLAYER_4_COLOUR);
+                        break;
+                }
             }
-            if (membersList.size() > 1 && user.equals(membersList.get(1))) {
-                username.setFill(GameRendering.PLAYER_2_COLOUR);
-            }
-            if (membersList.size() > 2 && user.equals(membersList.get(2))) {
-                username.setFill(GameRendering.PLAYER_3_COLOUR);
-            }
-            if (membersList.size() == 4 && user.equals(membersList.get(3))) {
-                username.setFill(GameRendering.PLAYER_4_COLOUR);
-            }
+
             Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
             postUsernameText.setFont(Font.font(20.0));
             if (theme.equals("dark")) postUsernameText.setFill(Color.web("#F3F5F3"));
@@ -714,6 +667,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        gameRendering.redraw();
         LOG.debug("Received BuildingSuccessfulMessage");
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
@@ -839,7 +793,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
-        if (mapPoint.getType() == HEX && robberNewPosition) {
+        if (mapPoint.getType() == HEX && robberNewPosition && !gamePaused) {
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
@@ -878,6 +832,96 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setMoveTimer(moveTime);
         Platform.runLater(
                 () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
+    }
+
+    /**
+     * Handles a click on the Pause/Unpause Button
+     * <p>
+     * Calls the pauseGame method of the gameService to
+     * start or participate in a voting to pause/unpause the
+     * game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    @FXML
+    private void onPauseButtonPressed() {
+        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
+        else Platform.runLater(
+                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
+    }
+
+    /**
+     * Handles a PauseGameMessage found on the EventBus
+     * <p>
+     * If a PauseGameMessage is found on the EventBus, this method
+     * checks the current state of the game and posts the
+     * information of the pause status and according voting in the
+     * chat.
+     *
+     * @param msg The PauseGameMessage found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.message.UpdatePauseStatusMessage
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onPauseGameMessage(UpdatePauseStatusMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        LOG.debug("Received PauseGameMessage");
+
+        boolean statusChange = msg.getPausedMembers() == lobbyMembers.size();
+        if (!gamePaused) {
+            Platform.runLater(() -> {
+                chatMessages.add(new InGameSystemMessageDTO(
+                        new I18nWrapper("game.menu.pausemessage", msg.getPausedMembers(), lobbyMembers.size())));
+                if (statusChange)
+                    chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.changetopause")));
+            });
+        } else {
+            Platform.runLater(() -> {
+                chatMessages.add(new InGameSystemMessageDTO(
+                        new I18nWrapper("game.menu.unpausemessage", msg.getPausedMembers(), lobbyMembers.size())));
+                if (statusChange)
+                    chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.changetounpause")));
+            });
+        }
+        gamePaused = msg.isPaused();
+        if (gamePaused) {
+            Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.unpause")));
+            timerPaused = true;
+            tradeService.closeBankTradeWindow(lobbyName);
+            tradeService.closeTradeResponseWindow(lobbyName);
+            tradeService.closeUserTradeWindow(lobbyName);
+            disableButtonStates();
+            rollDice.setDisable(true);
+        } else {
+            Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.pause")));
+            timerPaused = false;
+            if (userService.getLoggedInUser().equals(msg.getActivePlayer()) && !robberNewPosition && statusChange) {
+                if (diceRolled) resetButtonStates(userService.getLoggedInUser());
+                else setRollDiceButtonState(userService.getLoggedInUser());
+            }
+        }
+    }
+
+    /**
+     * Handles a PauseTimerMessage
+     * <p>
+     * If a new PauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on true.
+     *
+     * @param msg The PauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onPauseTimerMessage(PauseTimerMessage msg) {
+        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
+        timerPaused = true;
     }
 
     /**
@@ -929,6 +973,31 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a PlayRoadBuildingCardAllowedResponse
+     * <p>
+     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
+     * this method is called.
+     * It disables the Buttons and gives a note to choose
+     * the roads.
+     *
+     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
+     * @since 2021-05-16
+     */
+    @Subscribe
+    private void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
+        Platform.runLater(() -> {
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+        });
+        disableButtonStates();
+        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
+        gameService.playRoadBuildingCard(rsp.getLobbyName());
+    }
+
+    /**
      * Handles a RefreshCardAmountMessage found on the EventBus
      * <p>
      * If a RefreshCardAmountMessage is found on the EventBus, this method
@@ -969,7 +1038,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
-        resetButtonStates(userService.getLoggedInUser());
+        if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -1121,7 +1190,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
-        resetButtonStates(userService.getLoggedInUser());
+        if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
     }
 
@@ -1142,6 +1211,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
+    }
+
+    /**
+     * Handles a UnpauseTimerMessage
+     * <p>
+     * If a new UnpauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on false.
+     *
+     * @param msg The UnpauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    private void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
+        timerPaused = false;
     }
 
     /**
@@ -1211,6 +1299,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         uniqueCardList.clear();
         uniqueCardList.addAll(msg.getUniqueCardsList());
+    }
+
+    /**
+     * Handles the UpdateVictoryPointsMessage
+     * If an UpdateVictoryPointsMessage is found on the bus this method gets called
+     * and updates the VictoryPoints.
+     *
+     * @param msg The UpdateVictoryPointsMessage found on the bus
+     *
+     * @author Steven Luong
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onUpdateVictoryPointsMessage(UpdateVictoryPointsMessage msg) {
+        if (!msg.getLobbyName().equals(lobbyName)) return;
+        LOG.debug("Received UpdateVictoryPointsMessage for Lobby {}", lobbyName);
+        int victoryPoints = msg.getVictoryPointMap().get(userService.getLoggedInUser());
+        Platform.runLater(() -> victoryPointsLabel
+                .setText(String.format(resourceBundle.getString("game.victorypoints.labels"), victoryPoints)));
     }
 
     /**
@@ -1371,11 +1478,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-03-23
      */
     private void resetButtonStates(UserOrDummy user) {
-        tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
-        endTurn.setDisable(!userService.getLoggedInUser().equals(user));
-        tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
-        buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
-        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        if (!gamePaused) {
+            tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
+            endTurn.setDisable(!userService.getLoggedInUser().equals(user));
+            tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
+            playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
+            buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+            tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        }
     }
 }

@@ -47,9 +47,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -738,10 +736,12 @@ public class SceneManager {
      */
     @Subscribe
     private void onCloseTradeResponseEvent(CloseTradeResponseEvent event) {
+        LOG.debug("Received CloseTradeResponseEvent");
         LobbyName lobbyName = event.getLobbyName();
         if (tradingResponseStages.containsKey(lobbyName)) {
             Platform.runLater(() -> {
-                tradingResponseStages.get(lobbyName).close();
+                Window window = tradingResponseStages.get(lobbyName);
+                if (window != null) window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
                 tradingResponseStages.remove(lobbyName);
             });
         }

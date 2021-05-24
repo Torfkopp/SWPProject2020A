@@ -71,7 +71,7 @@ public abstract class AbstractInventory implements Serializable {
     }
 
     /**
-     * Gets the amount of a resource that is in the inventory
+     * Gets the amount of a resource in this inventory
      *
      * @return The amount of the resource
      *

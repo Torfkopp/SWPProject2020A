@@ -11,6 +11,7 @@ import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.request.*;
 import de.uol.swp.common.message.Message;
+import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
 import org.apache.logging.log4j.LogManager;
@@ -83,6 +84,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void addAI(LobbyName name, AI ai) {
+        LOG.debug("Sending AddAIRequest");
+        Message addAIRequest = new AddAIRequest(name, ai);
+        eventBus.post(addAIRequest);
+    }
+
+    @Override
     public void joinRandomLobby() {
         Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
         eventBus.post(joinRandomLobbyRequest);
@@ -143,12 +151,11 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled,
-                                    boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
+    public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
+                                    boolean randomPlayFieldEnabled) {
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
-                                                     startUpPhaseEnabled, commandsAllowed, moveTime,
-                                                     randomPlayFieldEnabled));
+                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled));
     }
 
     @Override
