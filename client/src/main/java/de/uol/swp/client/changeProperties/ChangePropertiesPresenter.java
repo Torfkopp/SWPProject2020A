@@ -27,6 +27,13 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
     @FXML
     private ComboBox<String> languageBox;
 
+    @FXML
+    private void initialize() {
+        themeBox.getItems().setAll("Bars", "Classic", "Cursed", "Dark", "Default", "Palette");
+        languageBox.getItems()
+                   .addAll("German", "English", "Blind", "Blank", "Hearing-Impaired", "Improved", "Lowercase", "UwU");
+    }
+
     /**
      * Method called when the CancelButton is pressed
      * <p>
@@ -36,7 +43,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
      */
     @FXML
-    public void onCancelButtonPressed() {
+    private void onCancelButtonPressed() {
         eventBus.post(new ChangePropertiesCanceledEvent());
     }
 
@@ -50,18 +57,38 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      * @see de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent
      */
     @FXML
-    public void onChangePropertiesButtonPressed() {
+    private void onChangePropertiesButtonPressed() {
         String theme = themeBox.getValue();
         String language = languageBox.getValue();
         if (theme != null) preferences.put("theme", theme.toLowerCase());
-        if (language != null) preferences.put("lang", language.toLowerCase());
+        if (language != null) {
+            switch (language) {
+                case "German":
+                    preferences.put("lang", "de_DE");
+                    break;
+                case "English":
+                    preferences.put("lang", "en_GB");
+                    break;
+                case "Blind":
+                    preferences.put("lang", "en_GB_blind");
+                    break;
+                case "Blank":
+                    preferences.put("lang", "en_GB_blank");
+                    break;
+                case "Hearing-Impaired":
+                    preferences.put("lang", "en_GB_hearing_impaired");
+                    break;
+                case "Improved":
+                    preferences.put("lang", "en_GB_improved");
+                    break;
+                case "Lowercase":
+                    preferences.put("lang", "en_GB_lowercase");
+                    break;
+                case "UwU":
+                    preferences.put("lang", "en_GB_UwU");
+                    break;
+            }
+        }
         eventBus.post(new ChangePropertiesSuccessfulEvent());
-    }
-
-    @FXML
-    private void initialize() {
-        themeBox.getItems().setAll("Bars", "Classic", "Cursed", "Dark", "Default", "Palette");
-        languageBox.getItems()
-                   .addAll("German", "English", "Blind", "Blank", "Hearing-Impaired", "Improved", "Lowercase", "UwU");
     }
 }
