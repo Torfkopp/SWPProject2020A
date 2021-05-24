@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.response;
 
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
@@ -20,35 +20,35 @@ public class InventoryForTradeResponse extends AbstractLobbyResponse {
 
     private final UserOrDummy user;
     private final ResourceList resourceList;
-    private final List<IHarborHex.HarborResource> harborResourceList;
+    private final List<IHarbourHex.HarbourResource> harbourResourceList;
 
     /**
      * Constructor
      *
-     * @param user               The user wanting to update the inventory
-     * @param lobbyName          The lobby for which the update is supposed to happen in
-     * @param resourceList       The resource list
-     * @param harborResourceList The List containing all the types of harbors the Player owns
+     * @param user                The user wanting to update the inventory
+     * @param lobbyName           The lobby for which the update is supposed to happen in
+     * @param resourceList        The resource list
+     * @param harbourResourceList The List containing all the types of harbours the Player owns
      */
     public InventoryForTradeResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
-                                     List<IHarborHex.HarborResource> harborResourceList) {
+                                     List<IHarbourHex.HarbourResource> harbourResourceList) {
         super(lobbyName);
         this.user = user;
         this.resourceList = resourceList;
-        this.harborResourceList = harborResourceList;
+        this.harbourResourceList = harbourResourceList;
     }
 
     /**
-     * Gets the List of the Harbors of the User
+     * Gets the List of the Harbours of the User
      *
-     * @return List of Harbors
+     * @return List of Harbours
      *
      * @author Steven Luong
      * @author Maximilian Lindner
      * @since 2021-04-07
      */
-    public List<IHarborHex.HarborResource> getHarborResourceList() {
-        return harborResourceList;
+    public List<IHarbourHex.HarbourResource> getHarbourResourceList() {
+        return harbourResourceList;
     }
 
     /**

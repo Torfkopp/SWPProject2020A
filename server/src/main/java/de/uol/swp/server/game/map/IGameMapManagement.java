@@ -4,7 +4,7 @@ import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.gamemapDTO.IGameMap;
 import de.uol.swp.common.game.map.hexes.IGameHex;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -23,6 +23,18 @@ import java.util.Set;
  * @since 2021-01-16
  */
 public interface IGameMapManagement {
+
+    /**
+     * Gets the incident intersections of a given intersection
+     *
+     * @param intersection The intersection of which the intersection should be returned
+     *
+     * @return A Set<> containing all intersection objects
+     *
+     * @author Mario Fokken
+     * @since 2021-05-14
+     */
+    Set<IIntersection> adjacentIntersections(IIntersection intersection);
 
     /**
      * Creates an IGameMap from the provided configuration
@@ -78,6 +90,30 @@ public interface IGameMapManagement {
     IEdge getEdge(MapPoint position);
 
     /**
+     * Gets the MapPoint of an edge
+     *
+     * @param edge The edge to get the MapPoint from
+     *
+     * @return EdgeMapPoint
+     *
+     * @author Mario Fokken
+     * @since 2021-05-19
+     */
+    MapPoint getEdgeMapPoint(IEdge edge);
+
+    /**
+     * Gets all edges around an intersection
+     *
+     * @param intersection The intersection
+     *
+     * @return Set of IEdge
+     *
+     * @author Mario Fokken
+     * @since 2021-05-19
+     */
+    Set<IEdge> getEdgesAroundIntersection(IIntersection intersection);
+
+    /**
      * Gets all the edges around the hex
      *
      * @param mapPoint The hex's mapPoint
@@ -100,19 +136,19 @@ public interface IGameMapManagement {
     IGameMap getGameMapDTO(Map<Player, UserOrDummy> playerUserMapping);
 
     /**
-     * Gets the HarborResourceType of a specific Intersection MapPoint
+     * Gets the HarbourResourceType of a specific Intersection MapPoint
      * <p>
-     * If the point does not have a harbor, NONE is returned
+     * If the point does not have a harbour, NONE is returned
      *
      * @param point specific Intersection MapPoint
      *
-     * @return HarborResourceType
+     * @return HarbourResourceType
      *
      * @author Steven Luong
      * @author Maximilian Lindner
      * @since 2021-04-07
      */
-    IHarborHex.HarborResource getHarborResource(MapPoint point);
+    IHarbourHex.HarbourResource getHarbourResource(MapPoint point);
 
     /**
      * Gets the hex at a specified place
@@ -159,6 +195,18 @@ public interface IGameMapManagement {
      * @since 2021-03-05
      */
     IIntersection getIntersection(MapPoint position);
+
+    /**
+     * Gets the MapPoint of an intersection
+     *
+     * @param intersection The intersection
+     *
+     * @return IntersectionMapPoint
+     *
+     * @author Mario Fokken
+     * @since 2021-05-19
+     */
+    MapPoint getIntersectionMapPoint(IIntersection intersection);
 
     /**
      * Gets the intersections in a usable format for rendering them as a jagged array
@@ -298,7 +346,7 @@ public interface IGameMapManagement {
      * @param player   The player wanting to build the settlement (1-4)
      * @param position The position of the intersection
      *
-     * @return
+     * @return If placing was successful
      *
      * @author Sven Ahrens
      * @author Phillip-André Suhr

@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
@@ -58,27 +58,27 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private Button tradeResourceWithBankButton;
 
     /**
-     * Helper method to set the tradingRatio Map according to the provided harborMap
+     * Helper method to set the tradingRatio Map according to the provided harbourMap
      * <p>
-     * This method checks for which harbors the User owns and sets the entry in the
+     * This method checks for which harbours the User owns and sets the entry in the
      * tradingRation Map accordingly.
      *
-     * @param harborMap Map of HarborResource the User has access to
+     * @param harbourMap Map of HarbourResource the User has access to
      *
-     * @return Map of HarborResource to trading ratio
+     * @return Map of HarbourResource to trading ratio
      *
      * @author Phillip-André Suhr
      * @since 2021-04-20
      */
-    private static ResourceList setupHarborRatios(List<IHarborHex.HarborResource> harborMap) {
+    private static ResourceList setupHarbourRatios(List<IHarbourHex.HarbourResource> harbourMap) {
         ResourceList tradingRatio = new ResourceList();
         int prepareTradingRatio = 4;
-        if (harborMap.contains(IHarborHex.HarborResource.ANY)) {
+        if (harbourMap.contains(IHarbourHex.HarbourResource.ANY)) {
             prepareTradingRatio = 3;
         }
         for (ResourceType resourceType : ResourceType.values()) {
-            tradingRatio.set(resourceType,
-                             harborMap.contains(IHarborHex.getHarborResource(resourceType)) ? 2 : prepareTradingRatio);
+            tradingRatio.set(resourceType, harbourMap.contains(IHarbourHex.getHarbourResource(resourceType)) ? 2 :
+                                           prepareTradingRatio);
         }
         return tradingRatio;
     }
@@ -158,8 +158,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * <p>
      * If the InventoryForTradeResponse is directed to this lobby,
      * the TradeWithBankPresenter gets the inventory of the player
-     * as a List of resourceMaps. Calls setupHarborRatios to calculate
-     * the harbor trading ratios and calls setInventories to fill the
+     * as a List of resourceMaps. Calls setupHarbourRatios to calculate
+     * the harbour trading ratios and calls setInventories to fill the
      * inventories of the Bank and the trading selection.
      * If the user has enough resources, the buyDevelopmentButton
      * gets enabled.
@@ -173,7 +173,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
         ResourceList resourceList = rsp.getResourceList();
-        ResourceList tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
+        ResourceList tradingRatios = setupHarbourRatios(rsp.getHarbourResourceList());
         setInventories(resourceList, tradingRatios);
         buyDevelopmentButton.setDisable(resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
                 ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0);
@@ -261,7 +261,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * accordingly.
      *
      * @param ownInventory  The inventory of the User trading with the Bank
-     * @param tradingRatios Map of HarborResources to Integer expressing which harbors
+     * @param tradingRatios Map of HarbourResources to Integer expressing which harbours
      *                      the User possesses and therefore to which trading ratios
      *                      they are entitled
      *

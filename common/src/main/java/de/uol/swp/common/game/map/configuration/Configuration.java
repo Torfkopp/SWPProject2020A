@@ -1,6 +1,6 @@
 package de.uol.swp.common.game.map.configuration;
 
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
@@ -20,28 +20,28 @@ import java.util.List;
 public class Configuration implements IConfiguration {
 
     private final List<ResourceType> hexList;
-    private final List<IHarborHex.HarborResource> harborList;
+    private final List<IHarbourHex.HarbourResource> harbourList;
     private final List<Integer> tokenList;
     private final MapPoint robberPosition;
 
     /**
      * Constructor
      *
-     * @param harborList Unmodifiable, ordered List of Harbor resources
-     * @param hexList    Unmodifiable, ordered List of Hex resource types
-     * @param tokenList  Unmodifiable, ordered List of Tokens to be placed on Hexes
+     * @param harbourList Unmodifiable, ordered List of Harbour resources
+     * @param hexList     Unmodifiable, ordered List of Hex resource types
+     * @param tokenList   Unmodifiable, ordered List of Tokens to be placed on Hexes
      */
-    public Configuration(List<IHarborHex.HarborResource> harborList, List<ResourceType> hexList,
+    public Configuration(List<IHarbourHex.HarbourResource> harbourList, List<ResourceType> hexList,
                          List<Integer> tokenList, MapPoint robberPosition) {
-        this.harborList = harborList;
+        this.harbourList = harbourList;
         this.hexList = hexList;
         this.tokenList = tokenList;
         this.robberPosition = robberPosition;
     }
 
     @Override
-    public List<IHarborHex.HarborResource> getHarborList() {
-        return harborList;
+    public List<IHarbourHex.HarbourResource> getHarbourList() {
+        return harbourList;
     }
 
     @Override

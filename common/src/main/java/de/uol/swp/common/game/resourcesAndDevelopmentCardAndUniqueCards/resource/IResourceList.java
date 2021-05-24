@@ -70,6 +70,16 @@ public interface IResourceList extends Iterable<IResource>, Serializable {
     int getAmount(ResourceType resource);
 
     /**
+     * Gets the total amount of resources
+     *
+     * @return Int Total amount
+     *
+     * @author Mario Fokken
+     * @since 2021-05-13
+     */
+    int getTotal();
+
+    /**
      * Increase a resource.
      *
      * @param resource the resource
