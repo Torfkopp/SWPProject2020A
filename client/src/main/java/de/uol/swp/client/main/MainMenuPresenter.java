@@ -820,9 +820,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 lobbyView.setItems(lobbies);
             }
             List<ISimpleLobby> newLobbies = new ArrayList<>(lobbyList);
-            List<Pair<LobbyName, String>> oldLobbies = new ArrayList<>(lobbies);
+            List<Pair<ISimpleLobby, String>> oldLobbies = new ArrayList<>(lobbies);
             for (ISimpleLobby lobby : lobbyList) {
-                for (Pair<LobbyName, String> pair : lobbies) {
+                for (Pair<ISimpleLobby, String> pair : lobbies) {
                     newLobbies.removeIf(l -> l.getName().equals(pair.getKey()));
                     oldLobbies.removeIf(p -> p.getKey().equals(lobby.getName()));
                 }
@@ -835,7 +835,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 }
             }
             if (!oldLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
-                for (Pair<LobbyName, String> pair : oldLobbies) {
+                for (Pair<ISimpleLobby, String> pair : oldLobbies) {
                     I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey());
                     chatMessages.add(new SystemMessageDTO(contentWrapper));
                 }
