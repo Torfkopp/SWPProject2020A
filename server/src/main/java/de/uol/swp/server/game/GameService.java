@@ -803,7 +803,7 @@ public class GameService extends AbstractService {
                 turnEndDummy(game, (Dummy) nextPlayer);
             }
             if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
-        }
+        }}
     }
 
     /**
