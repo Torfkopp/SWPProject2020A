@@ -170,6 +170,99 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a PauseTimerMessage
+     * <p>
+     * If a new PauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on true.
+     *
+     * @param msg The PauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.PauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    public void onPauseTimerMessage(PauseTimerMessage msg) {
+        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
+        paused = true;
+    }
+
+    /**
+     * Handles a PlayRoadBuildingCardAllowedResponse
+     * <p>
+     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
+     * this method is called.
+     * It disables the Buttons and gives a note to choose
+     * the roads.
+     *
+     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
+     * @since 2021-05-16
+     */
+    @Subscribe
+    public void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
+        Platform.runLater(() -> {
+            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setVisible(true);
+        });
+        disableButtonStates();
+        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
+        gameService.playRoadBuildingCard(rsp.getLobbyName());
+    }
+
+    /**
+     * Handles a UnpauseTimerMessage
+     * <p>
+     * If a new UnpauseTimerMessage object is posted onto the EventBus,
+     * this method is called.
+     * It sets the boolean paused on false.
+     *
+     * @param msg The UnpauseTimerMessage object seen on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
+     * @since 2021-05-02
+     */
+    @Subscribe
+    public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
+        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
+        paused = false;
+    }
+
+    /**
+     * Helper method to set the timer for the players round.
+     * The user gets forced to end his turn, if the timer gets zero.
+     * If paused is true, the timer is paused.
+     *
+     * @param moveTime The moveTime for the Lobby
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-01
+     */
+    public void setMoveTimer(int moveTime) {
+        moveTimeTimer = new Timer();
+        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
+        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!paused) {
+                    Platform.runLater(() -> moveTimerLabel.setText(
+                            String.format(resourceBundle.getString("game.labels.movetime"),
+                                          moveTimeToDecrement.getAndDecrement())));
+                    if (moveTimeToDecrement.get() == 0) {
+                        gameService.rollDice(lobbyName);
+                        tradeService.closeBankTradeWindow(lobbyName);
+                        gameService.endTurn(lobbyName);
+                    }
+                }
+            }
+        }, 0, 1000);
+    }
+
+    /**
      * Prepares the change size listener
      * <p>
      * Changes the size of the game map when the window size
@@ -463,36 +556,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 }
             });
         }
-    }
-
-    /**
-     * Helper method to set the timer for the players round.
-     * The user gets forced to end his turn, if the timer gets zero.
-     * If paused is true, the timer is paused.
-     *
-     * @param moveTime The moveTime for the Lobby
-     *
-     * @author Alwin Bossert
-     * @since 2021-05-01
-     */
-    protected void setMoveTimer(int moveTime) {
-        moveTimeTimer = new Timer();
-        AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
-        moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (!paused) {
-                    Platform.runLater(() -> moveTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
-                    if (moveTimeToDecrement.get() == 0) {
-                        gameService.rollDice(lobbyName);
-                        tradeService.closeBankTradeWindow(lobbyName);
-                        gameService.endTurn(lobbyName);
-                    }
-                }
-            }
-        }, 0, 1000);
     }
 
     /**
@@ -818,25 +881,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Handles a PauseTimerMessage
-     * <p>
-     * If a new PauseTimerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It sets the boolean paused on true.
-     *
-     * @param msg The PauseTimerMessage object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.message.PauseTimerMessage
-     * @since 2021-05-02
-     */
-    @Subscribe
-    private void onPauseTimerMessage(PauseTimerMessage msg) {
-        LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
-        paused = true;
-    }
-
-    /**
      * Handles a PlayCardFailureResponse found on the EventBus
      *
      * @param rsp The PlayCardFailureResponse found on the EventBus
@@ -882,31 +926,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         playCard.setDisable(true);
         playedCard = true;
         if (helpActivated) setHelpText();
-    }
-
-    /**
-     * Handles a PlayRoadBuildingCardAllowedResponse
-     * <p>
-     * If a new PlayRoadBuildingCardAllowedResponse object is posted onto the EventBus,
-     * this method is called.
-     * It disables the Buttons and gives a note to choose
-     * the roads.
-     *
-     * @param rsp The PlayRoadBuildingCardResponse object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.response.PlayRoadBuildingCardAllowedResponse
-     * @since 2021-05-16
-     */
-    @Subscribe
-    private void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
-        Platform.runLater(() -> {
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
-            notice.setVisible(true);
-        });
-        disableButtonStates();
-        roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD;
-        gameService.playRoadBuildingCard(rsp.getLobbyName());
     }
 
     /**
@@ -1123,25 +1142,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rsp.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
-    }
-
-    /**
-     * Handles a UnpauseTimerMessage
-     * <p>
-     * If a new UnpauseTimerMessage object is posted onto the EventBus,
-     * this method is called.
-     * It sets the boolean paused on false.
-     *
-     * @param msg The UnpauseTimerMessage object seen on the EventBus
-     *
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.message.UnpauseTimerMessage
-     * @since 2021-05-02
-     */
-    @Subscribe
-    private void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
-        LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
-        paused = false;
     }
 
     /**
