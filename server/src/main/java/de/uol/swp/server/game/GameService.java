@@ -934,8 +934,8 @@ public class GameService extends AbstractService {
             return;
         //only false if respondingUser is no Dummy, the dice is rolled already,
         //and the offeringUser is the active user/ it is a counteroffer
-        if (!(!(req.getRespondingUser() instanceof User) && (game.getActivePlayer().equals(req.getOfferingUser()) || req
-                .isCounterOffer()) && game.isDiceRolledAlready())) {
+        if (!(req.getRespondingUser() instanceof User) && (game.getActivePlayer().equals(req.getOfferingUser()) || req
+                .isCounterOffer()) && game.isDiceRolledAlready()) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
@@ -1000,7 +1000,6 @@ public class GameService extends AbstractService {
         game.changePauseStatus(req.getUserOrDummy());
         int pausingPlayers = game.getPausedMembers();
         game.updatePauseByVotingStatus();
-        System.err.println(game.isPausedByVoting());
         ServerMessage msg = new UpdatePauseStatusMessage(req.getOriginLobby(), game.isPausedByVoting(), pausingPlayers,
                                                          game.getActivePlayer());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
