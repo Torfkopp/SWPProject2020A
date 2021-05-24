@@ -226,6 +226,28 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to handle the calculation of Victory Points of each User in the Lobby
+     *
+     * @param originLobby The lobby in which the game is taking place
+     *
+     * @author Steven Luong
+     * @see de.uol.swp.common.game.message.UpdateVictoryPointsMessage
+     * @since 2021-05-21
+     */
+    void updateVictoryPoints(LobbyName originLobby) {
+        Game game = gameManagement.getGame(originLobby);
+        UserOrDummy[] players = game.getPlayers();
+        Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();
+        for (UserOrDummy player : players) {
+            if (player instanceof User) {
+                victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
+            }
+        }
+        ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
+        lobbyService.sendToAllInLobby(originLobby, msg);
+    }
+
+    /**
      * Helper function
      * <p>
      * Checks if there are enough resources in the needed Inventory.
@@ -285,22 +307,13 @@ public class GameService extends AbstractService {
 
             IIntersection[][] intersections = game.getMap().getIntersectionsAsJaggedArray();
 
-            boolean settlementPlaced = false;
             boolean roadPlaced = false;
 
-            int randomXCoordinate = 0;
-            int randomYCoordinate = 0;
-            while (!settlementPlaced) {
-                randomXCoordinate = ((int) (Math.random() * 6));
-                randomYCoordinate = ((int) (Math.random() * 7));
-                if (intersections[randomXCoordinate][randomYCoordinate].getState()
-                                                                       .equals(IIntersection.IntersectionState.FREE)) {
-                    game.getMap().placeFoundingSettlement(game.getPlayer(nextPlayer),
-                                                          MapPoint.IntersectionMapPoint(randomYCoordinate,
-                                                                                        randomXCoordinate));
-                    settlementPlaced = true;
-                }
-            }
+            int[] randomCoordinates;
+            randomCoordinates = game.getMap().buildSettlementOnRandomIntersection(game, game.getPlayer(nextPlayer));
+            int randomYCoordinate = randomCoordinates[0];
+            int randomXCoordinate = randomCoordinates[1];
+
             Set<IEdge> incidentEdges = game.getMap().incidentEdges(intersections[randomYCoordinate][randomXCoordinate]);
             while (!roadPlaced) {
                 {
@@ -678,7 +691,7 @@ public class GameService extends AbstractService {
         UserOrDummy first = game.getFirst();
         if (first instanceof NPC) {
             onRollDiceRequest(new RollDiceRequest(first, lobbyName));
-            if (first instanceof Dummy)  {
+            if (first instanceof Dummy) {
                 dummyTurnInFoundingPhase(game, game.getFirst());
                 turnEndDummy(game, (Dummy) first);
             }
@@ -795,15 +808,16 @@ public class GameService extends AbstractService {
 
             game.setDiceRolledAlready(false);
 
-        game.setDiceRolledAlready(false);
-        if (nextPlayer instanceof NPC) {
-            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            if (nextPlayer instanceof Dummy)  {
-                dummyTurnInFoundingPhase(game, game.getFirst());
-                turnEndDummy(game, (Dummy) nextPlayer);
+            game.setDiceRolledAlready(false);
+            if (nextPlayer instanceof NPC) {
+                onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
+                if (nextPlayer instanceof Dummy) {
+                    dummyTurnInFoundingPhase(game, game.getFirst());
+                    turnEndDummy(game, (Dummy) nextPlayer);
+                }
+                if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
             }
-            if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
-        }}
+        }
     }
 
     /**
@@ -1841,27 +1855,5 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
-    }
-
-    /**
-     * Helper method to handle the calculation of Victory Points of each User in the Lobby
-     *
-     * @param originLobby The lobby in which the game is taking place
-     *
-     * @author Steven Luong
-     * @see de.uol.swp.common.game.message.UpdateVictoryPointsMessage
-     * @since 2021-05-21
-     */
-    void updateVictoryPoints(LobbyName originLobby) {
-        Game game = gameManagement.getGame(originLobby);
-        UserOrDummy[] players = game.getPlayers();
-        Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();
-        for (UserOrDummy player : players) {
-            if (player instanceof User) {
-                victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
-            }
-        }
-        ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
-        lobbyService.sendToAllInLobby(originLobby, msg);
     }
 }

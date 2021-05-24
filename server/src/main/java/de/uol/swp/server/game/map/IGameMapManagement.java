@@ -9,6 +9,7 @@ import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.server.game.Game;
 import de.uol.swp.server.game.GameMapManagement;
 
 import java.util.List;
@@ -436,18 +437,27 @@ public interface IGameMapManagement {
     boolean settlementPlaceable(Player player, MapPoint position);
 
     /**
-     * Checks if a settlement is upgradeable
+     * Builds a Settlement on a random Intersection during the Founding Phase
      *
-     * @param player   The player wanting to upgrade the settlement
+     * @param game       the game, the lobby is set in
+     * @param nextPlayer the dummy, whose about to place a random Settlement
+     *
+     * @return an array of random Integers, that are used as Coordinates for building Roads
+     */
+    int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer);
+
+    /**
+     * Checks if a settlement is placeable during the founding phase
+     *
+     * @param player   The player wanting to place the settlement
      * @param position The position of the intersection
      *
      * @return True if placement is possible; false if not
      *
-     * @author Temmo Junkhoff
-     * @author Aldin Dervisi
-     * @since 2021-04-07
+     * @author Sven Ahrens
+     * @since 2021-05-24
      */
-    boolean settlementUpgradeable(Player player, MapPoint position);
+    boolean settlementPlaceableInFoundingPhase(Player player, MapPoint position);
 
     /**
      * Upgrades a settlement
@@ -461,4 +471,18 @@ public interface IGameMapManagement {
      * @since 2021-01-16
      */
     boolean upgradeSettlement(Player player, MapPoint position);
+
+    /**
+     * Checks if a settlement is upgradeable
+     *
+     * @param player   The player wanting to upgrade the settlement
+     * @param position The position of the intersection
+     *
+     * @return True if placement is possible; false if not
+     *
+     * @author Temmo Junkhoff
+     * @author Aldin Dervisi
+     * @since 2021-04-07
+     */
+    boolean settlementUpgradeable(Player player, MapPoint position);
 }
