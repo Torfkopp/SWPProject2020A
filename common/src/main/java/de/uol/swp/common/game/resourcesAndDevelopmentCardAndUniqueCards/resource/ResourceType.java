@@ -11,10 +11,10 @@ import java.util.ResourceBundle;
  */
 public enum ResourceType implements Serializable {
 
-    LUMBER("game.resources.lumber"),
     BRICK("game.resources.brick"),
-    ORE("game.resources.ore"),
     GRAIN("game.resources.grain"),
+    LUMBER("game.resources.lumber"),
+    ORE("game.resources.ore"),
     WOOL("game.resources.wool");
 
     @Inject

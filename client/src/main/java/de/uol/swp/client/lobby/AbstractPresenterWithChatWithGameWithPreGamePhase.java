@@ -15,10 +15,11 @@ import de.uol.swp.common.game.response.RecoverSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.user.AI;
+import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -61,7 +62,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox readyCheckBox;
 
-    protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
@@ -77,6 +77,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton threePlayerRadioButton;
     @FXML
     private RadioButton fourPlayerRadioButton;
+    @FXML
+    private VBox aiVBox;
+    @FXML
+    private CheckBox talkingAICheckBox;
+    @FXML
+    private ToggleGroup difficultyAIToggleGroup;
+    @FXML
+    private RadioButton easyAIRadioButton;
     @FXML
     private VBox preGameSettingBox;
 
@@ -193,6 +201,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
         fourPlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner));
         threePlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner) || lobbyMembers.size() == 4);
+        aiVBox.setVisible(userService.getLoggedInUser().equals(owner));
     }
 
     /**
@@ -214,6 +223,25 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             startSession.setDisable(true);
             startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Handles a click on the AddAI Button
+     * <p>
+     * Method called when the AddAIButton is pressed.
+     * This Method calls the lobbyService to post an AddAIRequest
+     *
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    @FXML
+    private void onAddAIButtonPressed() {
+        boolean talking = talkingAICheckBox.isSelected();
+        AI.Difficulty difficulty =
+                difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
+                AI.Difficulty.HARD;
+        AI ai = new AIDTO(difficulty, talking);
+        lobbyService.addAI(lobbyName, ai);
     }
 
     /**
@@ -315,6 +343,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         tradeWithUserButton.setDisable(false);
         tradeWithBankButton.setVisible(false);
         turnIndicator.setVisible(false);
+        pauseButton.setVisible(false);
         playCard.setVisible(false);
         timerLabel.setVisible(false);
         helpCheckBox.setDisable(true);
@@ -402,7 +431,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Method called when the StartSessionButton is pressed.
      * The Method posts a StartSessionRequest including the lobby name and the
-     * logged in user onto the EventBus.
+     * logged in user onto the EventBus. <- No, it doesn't.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
@@ -461,7 +490,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
-            changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);
@@ -487,11 +515,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Sets the play field visible.
      * The startSessionButton and every readyCheckbox are getting invisible for
-     * the user.
+     * the user. <- No, it doesn't
      *
      * @param rsp The StartSessionResponse found on the EventBus
      *
-     * @author MarvinDrees
+     * @author Marvin Drees
      * @author Maximilian Lindner
      * @since 2021-02-04
      */
@@ -578,6 +606,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
+        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);

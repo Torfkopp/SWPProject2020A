@@ -123,7 +123,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Label currentRound;
     @FXML
     protected Button helpCheckBox;
+    @FXML
+    protected Button pauseButton;
 
+    protected ObservableList<UserOrDummy> lobbyMembers;
     protected List<CardsAmount> cardAmountsList;
     protected Integer dice1;
     protected Integer dice2;
@@ -139,7 +142,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean startUpPhaseEnabled;
     protected boolean ownTurn;
     protected boolean tradingCurrentlyAllowed;
-    protected boolean paused;
+    protected boolean timerPaused;
+    protected boolean gamePaused = false;
     protected int moveTime;
     protected int remainingMoveTime;
     protected User owner;
@@ -190,7 +194,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     public void onPauseTimerMessage(PauseTimerMessage msg) {
         LOG.debug("Received PauseTimerMessage for Lobby {}", msg.getName());
-        paused = true;
+        timerPaused = true;
     }
 
     /**
@@ -234,7 +238,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     public void onUnpauseTimerResponse(UnpauseTimerMessage msg) {
         LOG.debug("Received UnpauseTimerMessage for Lobby {}", msg.getName());
-        paused = false;
+        timerPaused = false;
     }
 
     /**
@@ -253,7 +257,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                if (!paused) {
+                if (!timerPaused) {
                     Platform.runLater(() -> moveTimerLabel.setText(
                             String.format(resourceBundle.getString("game.labels.movetime"),
                                           moveTimeToDecrement.getAndDecrement())));
@@ -381,7 +385,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-02-22
      */
     protected void setRollDiceButtonState(UserOrDummy user) {
-        rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
+        if (!gamePaused) rollDice.setDisable(startUpPhaseEnabled || !userService.getLoggedInUser().equals(user));
     }
 
     /**
@@ -534,6 +538,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        gameRendering.redraw();
         LOG.debug("Received BuildingSuccessfulMessage");
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
@@ -706,7 +711,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
             gameService.buildRequest(lobbyName, mapPoint);
-        if (mapPoint.getType() == HEX && robberNewPosition) {
+        if (mapPoint.getType() == HEX && robberNewPosition && !gamePaused) {
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
             notice.setVisible(false);
@@ -745,6 +750,77 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setMoveTimer(moveTime);
         Platform.runLater(
                 () -> currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), getRound)));
+    }
+
+    /**
+     * Handles a click on the Pause/Unpause Button
+     * <p>
+     * Calls the pauseGame method of the gameService to
+     * start or participate in a voting to pause/unpause the
+     * game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    @FXML
+    private void onPauseButtonPressed() {
+        if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
+        else Platform.runLater(
+                () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
+    }
+
+    /**
+     * Handles a PauseGameMessage found on the EventBus
+     * <p>
+     * If a PauseGameMessage is found on the EventBus, this method
+     * checks the current state of the game and posts the
+     * information of the pause status and according voting in the
+     * chat.
+     *
+     * @param msg The PauseGameMessage found on the EventBus
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.message.UpdatePauseStatusMessage
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onPauseGameMessage(UpdatePauseStatusMessage msg) {
+        if (!lobbyName.equals(msg.getLobbyName())) return;
+        LOG.debug("Received PauseGameMessage");
+
+        boolean statusChange = msg.getPausedMembers() == lobbyMembers.size();
+        if (!gamePaused) {
+            Platform.runLater(() -> {
+                chatMessages.add(new InGameSystemMessageDTO(
+                        new I18nWrapper("game.menu.pausemessage", msg.getPausedMembers(), lobbyMembers.size())));
+                if (statusChange)
+                    chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.changetopause")));
+            });
+        } else {
+            Platform.runLater(() -> {
+                chatMessages.add(new InGameSystemMessageDTO(
+                        new I18nWrapper("game.menu.unpausemessage", msg.getPausedMembers(), lobbyMembers.size())));
+                if (statusChange)
+                    chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.changetounpause")));
+            });
+        }
+        gamePaused = msg.isPaused();
+        if (gamePaused) {
+            Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.unpause")));
+            timerPaused = true;
+            tradeService.closeBankTradeWindow(lobbyName);
+            tradeService.closeTradeResponseWindow(lobbyName);
+            tradeService.closeUserTradeWindow(lobbyName);
+            disableButtonStates();
+            rollDice.setDisable(true);
+        } else {
+            Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.pause")));
+            timerPaused = false;
+            if (userService.getLoggedInUser().equals(msg.getActivePlayer()) && !robberNewPosition && statusChange) {
+                if (diceRolled) resetButtonStates(userService.getLoggedInUser());
+                else setRollDiceButtonState(userService.getLoggedInUser());
+            }
+        }
     }
 
     /**
@@ -893,7 +969,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
-        resetButtonStates(userService.getLoggedInUser());
+        if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -1126,7 +1202,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
-        resetButtonStates(userService.getLoggedInUser());
+        if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
     }
 
@@ -1397,11 +1473,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-03-23
      */
     private void resetButtonStates(UserOrDummy user) {
-        tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
-        endTurn.setDisable(!userService.getLoggedInUser().equals(user));
-        tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
-        playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
-        buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
-        tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        if (!gamePaused) {
+            tradeWithBankButton.setDisable(!userService.getLoggedInUser().equals(user));
+            endTurn.setDisable(!userService.getLoggedInUser().equals(user));
+            tradeWithUserButton.setDisable(!userService.getLoggedInUser().equals(user));
+            playCard.setDisable(playedCard || !userService.getLoggedInUser().equals(user));
+            buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+            tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
+        }
     }
 }
