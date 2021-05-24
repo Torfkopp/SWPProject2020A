@@ -798,12 +798,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gamePaused = msg.isPaused();
         if (gamePaused) {
             Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.unpause")));
+            timerPaused = true;
             tradeService.closeBankTradeWindow(lobbyName);
             tradeService.closeTradeResponseWindow(lobbyName);
             tradeService.closeUserTradeWindow(lobbyName);
             disableButtonStates();
             rollDice.setDisable(true);
-            timerPaused = true;
         } else {
             Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.pause")));
             timerPaused = false;
@@ -960,7 +960,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onResetTradeWithBankButtonEvent(ResetTradeWithBankButtonEvent event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
-        resetButtonStates(userService.getLoggedInUser());
+        if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
     }
 
     /**
@@ -1193,7 +1193,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
-        resetButtonStates(userService.getLoggedInUser());
+        if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
     }
 

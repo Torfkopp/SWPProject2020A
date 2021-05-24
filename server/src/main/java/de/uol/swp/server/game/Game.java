@@ -47,7 +47,8 @@ public class Game {
     private Player playerWithLongestRoad = null;
     private Player playerWithLargestArmy = null;
     private int longestRoadLength = 0;
-    private boolean paused = false;
+    private boolean pausedByTrade = false;
+    private boolean pausedByVoting = false;
     private int round = 1;
 
     public enum StartUpPhase {
@@ -151,23 +152,15 @@ public class Game {
     }
 
     /**
-     * Checks if all player want to change the pause status of the game.
-     * Returns false if not everyone want to change the status. Otherwise
-     * the pause status gets changed and the preparePausedMembers method is
-     * called.
+     * Gets the paused status
      *
-     * @return Whether the paused status of the game has changed
+     * @return Whether the game is paused or not
      *
      * @author Maximilian Lindner
      * @since 2021-05-21
      */
-    public boolean checkToChangePauseStatus() {
-        for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
-            if (!entry.getValue()) return paused;
-        }
-        paused = !paused;
-        preparePausedMembers();
-        return paused;
+    public boolean isPausedByVoting() {
+        return pausedByVoting;
     }
 
     /**
@@ -618,27 +611,34 @@ public class Game {
     }
 
     /**
-     * Gets the paused status
-     *
-     * @return Whether the game is paused or not
-     *
-     * @author Maximilian Lindner
-     * @since 2021-05-21
-     */
-    public boolean isPaused() {
-        return paused;
-    }
-
-    /**
      * Sets the boolean paused for the game.
      *
-     * @param paused
+     * @param pausedByTrade
      *
      * @author Alwin Bossert
      * @since 2021-05-02
      */
-    public void setPaused(boolean paused) {
-        this.paused = paused;
+    public void setPausedByTrade(boolean pausedByTrade) {
+        this.pausedByTrade = pausedByTrade;
+    }
+
+    /**
+     * Checks if all player want to change the pause status of the game.
+     * Returns false if not everyone want to change the status. Otherwise
+     * the pause status gets changed and the preparePausedMembers method is
+     * called.
+     *
+     * @return Whether the paused status of the game has changed
+     *
+     * @author Maximilian Lindner
+     * @since 2021-05-21
+     */
+    public void updatePauseByVotingStatus() {
+        for (Map.Entry<UserOrDummy, Boolean> entry : pauseGameMap.entrySet()) {
+            if (!entry.getValue()) return;
+        }
+        pausedByVoting = !pausedByVoting;
+        preparePausedMembers();
     }
 
     /**
