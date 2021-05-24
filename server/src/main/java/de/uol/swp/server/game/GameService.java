@@ -114,6 +114,50 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Handles a BuyDevelopmentCard found on the event bus
+     * <p>
+     * If a BuyDevelopmentCard is found on the event bus, this method checks
+     * if there are development cards to sell available in the bankInventory.
+     * If there is at least one card, a random card gets chosen and if the
+     * user has enough resources, he gets the new card(happens in helper method).
+     * Afterwards a new BuyDevelopmentCardResponse is posted onto the event bus.
+     *
+     * @param req The request found on the event bus
+     *
+     * @author Maximilian Lindner
+     * @author Alwin Bossert
+     * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
+     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
+     * @since 2021-02-22
+     */
+    @Subscribe
+    void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
+        LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
+        Game game = gameManagement.getGame(req.getOriginLobby());
+        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPausedByVoting())
+            return;
+        BankInventory bankInventory = game.getBankInventory();
+        if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards().isEmpty()) {
+            DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
+            if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
+                bankInventory.decrease(developmentCard);
+                ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(), req.getOriginLobby(),
+                                                                               developmentCard);
+                returnMessage.initWithMessage(req);
+                LOG.debug("Sending BuyDevelopmentCardResponse for Lobby {}", req.getOriginLobby());
+                post(returnMessage);
+                ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(),
+                                                                 game.getCardAmounts());
+                LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
+                lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
+                updateVictoryPoints(req.getOriginLobby());
+            } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
+                             req.getUser().getUsername());
+        } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
+    }
+
+    /**
      * Method to post a message for the AI
      *
      * @param ai        The AI to send the message
@@ -167,6 +211,7 @@ public class GameService extends AbstractService {
         LOG.debug("Sending SystemMessageForRobbingMessage for Lobby {}", lobby);
         lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
     }
+
     /**
      * Helper method to end an AI's turn
      *
@@ -178,6 +223,28 @@ public class GameService extends AbstractService {
      */
     void turnEndAI(Game game, AI ai) {
         if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(ai, game.getLobby().getName()));
+    }
+
+    /**
+     * Helper method to handle the calculation of Victory Points of each User in the Lobby
+     *
+     * @param originLobby The lobby in which the game is taking place
+     *
+     * @author Steven Luong
+     * @see de.uol.swp.common.game.message.UpdateVictoryPointsMessage
+     * @since 2021-05-21
+     */
+    void updateVictoryPoints(LobbyName originLobby) {
+        Game game = gameManagement.getGame(originLobby);
+        UserOrDummy[] players = game.getPlayers();
+        Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();
+        for (UserOrDummy player : players) {
+            if (player instanceof User) {
+                victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
+            }
+        }
+        ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
+        lobbyService.sendToAllInLobby(originLobby, msg);
     }
 
     /**
@@ -511,50 +578,6 @@ public class GameService extends AbstractService {
                 sendFailResponse.accept(NOTHING_HERE);
             }
         }
-    }
-
-    /**
-     * Handles a BuyDevelopmentCard found on the event bus
-     * <p>
-     * If a BuyDevelopmentCard is found on the event bus, this method checks
-     * if there are development cards to sell available in the bankInventory.
-     * If there is at least one card, a random card gets chosen and if the
-     * user has enough resources, he gets the new card(happens in helper method).
-     * Afterwards a new BuyDevelopmentCardResponse is posted onto the event bus.
-     *
-     * @param req The request found on the event bus
-     *
-     * @author Maximilian Lindner
-     * @author Alwin Bossert
-     * @see de.uol.swp.common.game.request.BuyDevelopmentCardRequest
-     * @see de.uol.swp.common.game.response.BuyDevelopmentCardResponse
-     * @since 2021-02-22
-     */
-    @Subscribe
-    void onBuyDevelopmentCardRequest(BuyDevelopmentCardRequest req) {
-        LOG.debug("Received BuyDevelopmentCardRequest for Lobby {}", req.getOriginLobby());
-        Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getUser()) || !game.isDiceRolledAlready() || game.isPausedByVoting())
-            return;
-        BankInventory bankInventory = game.getBankInventory();
-        if (bankInventory.getDevelopmentCards() != null && !bankInventory.getDevelopmentCards().isEmpty()) {
-            DevelopmentCardType developmentCard = bankInventory.getRandomDevelopmentCard();
-            if (updatePlayersInventoryWithDevelopmentCard(developmentCard, req.getUser(), req.getOriginLobby())) {
-                bankInventory.decrease(developmentCard);
-                ResponseMessage returnMessage = new BuyDevelopmentCardResponse(req.getUser(), req.getOriginLobby(),
-                                                                               developmentCard);
-                returnMessage.initWithMessage(req);
-                LOG.debug("Sending BuyDevelopmentCardResponse for Lobby {}", req.getOriginLobby());
-                post(returnMessage);
-                ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(),
-                                                                 game.getCardAmounts());
-                LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
-                lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
-                endGameIfPlayerWon(game, req.getOriginLobby(), req.getUser());
-                updateVictoryPoints(req.getOriginLobby());
-            } else LOG.debug("In the Lobby {} the User {} couldn't buy a Development Card", req.getOriginLobby(),
-                             req.getUser().getUsername());
-        } else LOG.debug("No Development Cards left in Inventory for Lobby {}", req.getOriginLobby());
     }
 
     /**
@@ -1822,27 +1845,5 @@ public class GameService extends AbstractService {
             lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
         }
         return true;
-    }
-
-    /**
-     * Helper method to handle the calculation of Victory Points of each User in the Lobby
-     *
-     * @param originLobby The lobby in which the game is taking place
-     *
-     * @author Steven Luong
-     * @see de.uol.swp.common.game.message.UpdateVictoryPointsMessage
-     * @since 2021-05-21
-     */
-    void updateVictoryPoints(LobbyName originLobby) {
-        Game game = gameManagement.getGame(originLobby);
-        UserOrDummy[] players = game.getPlayers();
-        Map<UserOrDummy, Integer> victoryPointsMap = new HashMap<>();
-        for (UserOrDummy player : players) {
-            if (player instanceof User) {
-                victoryPointsMap.put(player, game.calculateVictoryPoints(game.getPlayer(player)));
-            }
-        }
-        ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
-        lobbyService.sendToAllInLobby(originLobby, msg);
     }
 }
