@@ -443,6 +443,9 @@ public interface IGameMapManagement {
      * @param nextPlayer the dummy, whose about to place a random Settlement
      *
      * @return an array of random Integers, that are used as Coordinates for building Roads
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-24
      */
     int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer);
 

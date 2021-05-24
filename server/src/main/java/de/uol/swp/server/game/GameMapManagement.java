@@ -681,13 +681,34 @@ public class GameMapManagement implements IGameMapManagement {
     }
 
     @Override
+    public int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer) {
+        boolean settlementPlaced = false;
+
+        int[] randomCoordinates = new int[2];
+        int randomYCoordinate = 0;
+        int randomXCoordinate = 0;
+        while (!settlementPlaced) {
+
+            randomYCoordinate = (int) (Math.random() * intersectionMap.length);
+            randomXCoordinate = (int) (Math.random() * intersectionMap[randomYCoordinate].length);
+
+            if (settlementPlaceableInFoundingPhase(nextPlayer, MapPoint.IntersectionMapPoint(randomYCoordinate,
+                                                                                             randomXCoordinate))) {
+                placeFoundingSettlement(nextPlayer,
+                                        MapPoint.IntersectionMapPoint(randomYCoordinate, randomXCoordinate));
+                randomCoordinates[0] = randomYCoordinate;
+                randomCoordinates[1] = randomXCoordinate;
+                settlementPlaced = true;
+                return randomCoordinates;
+            }
+        }
+        return randomCoordinates;
+    }
+
+    @Override
     public boolean settlementPlaceableInFoundingPhase(Player player, MapPoint position) {
         boolean neighbouringIntersectionsFree = true;
         if (position.getType() != MapPoint.Type.INTERSECTION) return false;
-        for (IEdge edge : intersectionEdgeNetwork.incidentEdges(intersectionMap[position.getY()][position.getX()]))
-            if (edge.getOwner() == player) {
-                break;
-            }
         for (IIntersection intersection : intersectionEdgeNetwork
                 .adjacentNodes(intersectionMap[position.getY()][position.getX()]))
             if (intersection.getState() != IIntersection.IntersectionState.FREE) {
@@ -697,13 +718,6 @@ public class GameMapManagement implements IGameMapManagement {
 
         return intersectionMap[position.getY()][position.getX()].getState()
                                                                 .equals(IIntersection.IntersectionState.FREE) && neighbouringIntersectionsFree;
-    }
-
-    @Override
-    public boolean settlementUpgradeable(Player player, MapPoint position) {
-        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
-        return (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
-                .getY()][position.getX()].getOwner() == player);
     }
 
     @Override
@@ -718,40 +732,17 @@ public class GameMapManagement implements IGameMapManagement {
         return false;
     }
 
+    @Override
+    public boolean settlementUpgradeable(Player player, MapPoint position) {
+        if (position.getType() != MapPoint.Type.INTERSECTION) return false;
+        return (intersectionMap[position.getY()][position.getX()].getState() == SETTLEMENT && intersectionMap[position
+                .getY()][position.getX()].getOwner() == player);
+    }
+
     void setHex(MapPoint position, IGameHex newHex) {
         if (position.getType() != MapPoint.Type.HEX)
             throw new IllegalArgumentException("MapPoint should point to a hex");
         hexMap[position.getY()][position.getX()].set(newHex);
-    }
-
-    @Override
-    public int[] buildSettlementOnRandomIntersection(Game game, Player nextPlayer) {
-        boolean settlementPlaced = false;
-
-        int[] randomCoordinates = new int[2];
-        int randomYCoordinate = 0;
-        int randomXCoordinate = 0;
-        while (!settlementPlaced) {
-
-            randomYCoordinate = (int) (Math.random() * intersectionMap.length);
-            randomXCoordinate = (int) (Math.random() * intersectionMap[randomYCoordinate].length);
-
-            if ((intersectionMap[randomYCoordinate][randomXCoordinate].getState()
-                                                                      .equals(IIntersection.IntersectionState.FREE) && (game.getMap()
-                                                                                                                            .settlementPlaceableInFoundingPhase(
-                                                                                                                                    nextPlayer,
-                                                                                                                                    MapPoint.IntersectionMapPoint(
-                                                                                                                                            randomYCoordinate,
-                                                                                                                                            randomXCoordinate))))) {
-                game.getMap().placeFoundingSettlement(nextPlayer, MapPoint.IntersectionMapPoint(randomYCoordinate,
-                                                                                                randomXCoordinate));
-                randomCoordinates[0] = randomYCoordinate;
-                randomCoordinates[1] = randomXCoordinate;
-                settlementPlaced = true;
-                return randomCoordinates;
-            }
-        }
-        return randomCoordinates;
     }
 
     /**

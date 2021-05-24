@@ -784,7 +784,10 @@ public class GameService extends AbstractService {
                     startUpPlayerOrder.addFirst(nextPlayer);
                 } else {
                     nextPlayer = user;
-                    dummyTurnInFoundingPhase(game, nextPlayer);
+                    if (nextPlayer instanceof Dummy) {
+                        dummyTurnInFoundingPhase(game, nextPlayer);
+                        turnEndDummy(game, (Dummy) nextPlayer);
+                    }
                 }
             } else if (currentPhase.equals(Game.StartUpPhase.PHASE_2)) {
                 if (game.getPlayersStartUpBuiltMap().get(game.getFirst()) == ALL_BUILT) {
@@ -796,6 +799,7 @@ public class GameService extends AbstractService {
                     if (user == null) return;
                     nextPlayer = user;
                     dummyTurnInFoundingPhase(game, nextPlayer);
+                    turnEndDummy(game, (Dummy) nextPlayer);
                 }
             }
         } else {
