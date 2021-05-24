@@ -94,6 +94,11 @@ public class ResourceList implements IResourceList {
     }
 
     @Override
+    public int getTotal() {
+        return Arrays.stream(ResourceType.values()).mapToInt(this::getAmount).sum();
+    }
+
+    @Override
     public void increase(ResourceType resource, int amount) {
         for (IResource resource1 : list) {
             if (Objects.equals(resource, resource1.getType())) resource1.increase(amount);
