@@ -58,8 +58,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox randomPlayFieldCheckbox;
     @FXML
-    protected CheckBox commandsActivated;
-    @FXML
     protected CheckBox readyCheckBox;
 
     protected Set<UserOrDummy> readyUsers;
@@ -197,7 +195,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
-        commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
         fourPlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner));
         threePlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner) || lobbyMembers.size() == 4);
@@ -660,9 +657,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             if (moveTime < 30 || moveTime > 500) {
                 eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
-
-                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                                 commandsActivated.isSelected(), moveTime,
+                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }
         } catch (NumberFormatException ignored) {
