@@ -11,6 +11,7 @@ import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsView
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
@@ -156,6 +157,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
                 nameFilter, passwordFilter, inGameFilter, fullFilter));
         lobbyView.setItems(new SortedList<>(filteredLobbyList));
+        ThreadManager.runNow(() -> LOG.debug("MainMenuPresenter initialised"));
     }
 
     /**
@@ -192,7 +194,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (userService.getLoggedInUser() == null) return;
         LOG.debug("Received AllLobbiesMessage");
         updateLobbyList(msg.getLobbies());
-        randomLobbyState.setVisible(false);
+        Platform.runLater(() -> randomLobbyState.setVisible(false));
     }
 
     /**
@@ -210,7 +212,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onAllLobbiesResponse(AllLobbiesResponse rsp) {
         LOG.debug("Received AllLobbiesResponse");
         updateLobbyList(rsp.getLobbies());
-        randomLobbyState.setVisible(false);
+        Platform.runLater(() -> randomLobbyState.setVisible(false));
     }
 
     /**
@@ -290,7 +292,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         if (rsp.getIsInLobby()) {
             lobbyService.showLobbyError(resourceBundle.getString("lobby.error.in.lobby"));
         } else {
-            eventBus.post(new ShowChangeAccountDetailsViewEvent());
+            post(new ShowChangeAccountDetailsViewEvent());
         }
     }
 
@@ -373,10 +375,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
         LOG.debug("Received CreateLobbyResponse");
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
-        });
+        post(new ShowLobbyViewEvent(rsp.getLobby()));
     }
 
     /**
@@ -398,10 +397,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
         LOG.debug("Received CreateLobbyWithPasswordResponse");
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
-        });
+        post(new ShowLobbyViewEvent(rsp.getLobby()));
     }
 
     /**
@@ -507,10 +503,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
         LOG.debug("Received JoinLobbyResponse");
-        Platform.runLater(() -> {
-            eventBus.post(new ShowLobbyViewEvent(rsp.getLobbyName()));
-            lobbyService.refreshLobbyPresenterFields(rsp.getLobby());
-        });
+        post(new ShowLobbyViewEvent(rsp.getLobby()));
     }
 
     /**
@@ -544,7 +537,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             dialogue.getDialogPane().getStylesheets().add(styleSheet);
             dialogue.getDialogPane().getButtonTypes().setAll(confirm, cancel);
             dialogue.getDialogPane().getStylesheets().add(styleSheet);
-
             //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
             Optional<String> result = dialogue.showAndWait();
             String lobbyPassword = lobbyPasswordField.getText();
@@ -552,10 +544,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 lobbyPassword = userService.hash(lobbyPasswordField.getText());
             }
             String finalLobbyPassword = lobbyPassword;
-            result.ifPresent(s -> eventBus.post(new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(),
-                                                                                             userService
-                                                                                                     .getLoggedInUser(),
-                                                                                             finalLobbyPassword)));
+            result.ifPresent(s -> post(
+                    new JoinLobbyWithPasswordConfirmationRequest(response.getLobbyName(), userService.getLoggedInUser(),
+                                                                 finalLobbyPassword)));
         });
     }
 
@@ -589,7 +580,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @Subscribe
     private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
-        randomLobbyState.setVisible(true);
+        Platform.runLater(() -> randomLobbyState.setVisible(true));
     }
 
     /**
@@ -614,8 +605,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onKillOldClientResponse(KillOldClientResponse rsp) {
         resetChatVars();
-        eventBus.post(showLoginViewMessage);
-        Platform.runLater(() -> eventBus.post(closeLobbiesViewEvent));
+        post(showLoginViewMessage);
+        post(closeLobbiesViewEvent);
     }
 
     /**
@@ -678,7 +669,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
         prepareChatVars();
-        eventBus.post(new GetOldSessionsRequest(rsp.getUser()));
+        post(new GetOldSessionsRequest(rsp.getUser()));
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
@@ -706,8 +697,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLogoutButtonPressed() {
         soundService.button();
         logout();
-        eventBus.post(showLoginViewMessage);
-        eventBus.post(closeLobbiesViewEvent);
+        post(showLoginViewMessage);
+        post(closeLobbiesViewEvent);
     }
 
     /**
@@ -722,7 +713,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onRulesMenuClicked() {
-        eventBus.post(new ShowRulesOverviewViewEvent());
+        post(new ShowRulesOverviewViewEvent());
     }
 
     /**
@@ -777,15 +768,17 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
         LOG.info("User deletion successful");
         String username = userService.getLoggedInUser().getUsername();
-        eventBus.post(showLoginViewMessage);
+        post(showLoginViewMessage);
         logout();
         ButtonType ok = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        String bundleString = resourceBundle.getString("mainmenu.settings.deleteaccount.success");
+        String contentText = String.format(bundleString, username);
+        String title = resourceBundle.getString("information.title");
+        String headerText = resourceBundle.getString("information.header");
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                                    String.format(resourceBundle.getString("mainmenu.settings.deleteaccount.success"),
-                                                  username), ok);
-            alert.setTitle(resourceBundle.getString("information.title"));
-            alert.setHeaderText(resourceBundle.getString("information.header"));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, contentText, ok);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.show();
         });

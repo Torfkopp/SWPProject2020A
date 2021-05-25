@@ -91,7 +91,7 @@ public class UserService implements IUserService {
      *
      * @param username     The user's name
      * @param passwordHash The user's hashed password
-     * @param rememberMe   whether to remember the user details for automatic login
+     * @param rememberMe   Whether to remember the user details for automatic login
      *
      * @since 2017-03-17
      */

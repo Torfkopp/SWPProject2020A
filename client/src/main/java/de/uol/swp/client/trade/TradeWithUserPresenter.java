@@ -2,6 +2,7 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.TradeWithUserUpdateEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.request.PauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.InventoryForTradeWithUserResponse;
@@ -67,7 +68,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     @FXML
     public void initialize() {
         super.initialize();
-        LOG.debug("TradeWithUserPresenter initialised");
+        ThreadManager.runNow(() -> LOG.debug("TradeWithUserPresenter initialised"));
     }
 
     /**
@@ -153,13 +154,15 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         }
         if (!(traderInventorySize == 0 && ownInventorySize == 0)) {
             setSliders(resourceList);
-            Platform.runLater(() -> statusLabel
-                    .setText(String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser)));
+            String status = String.format(resourceBundle.getString("game.trade.status.makingoffer"), respondingUser);
+            Platform.runLater(() -> statusLabel.setText(status));
         } else {
-            offerTradeButton.setDisable(true);
-            tradingHBox.setVisible(false);
-            Platform.runLater(() -> statusLabel
-                    .setText(String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser)));
+            String text = String.format(resourceBundle.getString("game.trade.error.noresources"), respondingUser);
+            Platform.runLater(() -> {
+                offerTradeButton.setDisable(true);
+                tradingHBox.setVisible(false);
+                statusLabel.setText(text);
+            });
         }
     }
 
@@ -193,7 +196,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
                                 counterOffer);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -211,9 +214,10 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
         if (!lobbyName.equals(event.getLobbyName())) return;
         LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
+        String text = String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
-            statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser));
+            statusLabel.setText(text);
         });
     }
 
@@ -229,7 +233,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         if (!rsp.getLobbyName().equals(this.lobbyName)) return;
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
-        Platform.runLater(() -> soundService.coins());
+        soundService.coins();
         closeWindow();
     }
 
@@ -274,21 +278,22 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * @author Phillip-André Suhr
      * @since 2021-04-20
      */
-    @FXML
     private void setResourceLists() {
-        selectedOwnResourceList = new ResourceList();
-        selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
-        selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));
-        selectedOwnResourceList.set(ResourceType.LUMBER, ((int) (ownLumberSlider.getValue())));
-        selectedOwnResourceList.set(ResourceType.GRAIN, ((int) (ownGrainSlider.getValue())));
-        selectedOwnResourceList.set(ResourceType.WOOL, ((int) (ownWoolSlider.getValue())));
+        Platform.runLater(() -> {
+            selectedOwnResourceList = new ResourceList();
+            selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
+            selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));
+            selectedOwnResourceList.set(ResourceType.LUMBER, ((int) (ownLumberSlider.getValue())));
+            selectedOwnResourceList.set(ResourceType.GRAIN, ((int) (ownGrainSlider.getValue())));
+            selectedOwnResourceList.set(ResourceType.WOOL, ((int) (ownWoolSlider.getValue())));
 
-        selectedPartnersResourceList = new ResourceList();
-        selectedPartnersResourceList.set(ResourceType.BRICK, ((int) (tradingPartnerBrickSlider.getValue())));
-        selectedPartnersResourceList.set(ResourceType.ORE, ((int) (tradingPartnerOreSlider.getValue())));
-        selectedPartnersResourceList.set(ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
-        selectedPartnersResourceList.set(ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
-        selectedPartnersResourceList.set(ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
+            selectedPartnersResourceList = new ResourceList();
+            selectedPartnersResourceList.set(ResourceType.BRICK, ((int) (tradingPartnerBrickSlider.getValue())));
+            selectedPartnersResourceList.set(ResourceType.ORE, ((int) (tradingPartnerOreSlider.getValue())));
+            selectedPartnersResourceList.set(ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
+            selectedPartnersResourceList.set(ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
+            selectedPartnersResourceList.set(ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
+        });
     }
 
     /**
@@ -296,18 +301,19 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      *
      * @param resourceList List of resourceMaps to determine the Slider values
      */
-    @FXML
     private void setSliders(IResourceList resourceList) {
-        tradingPartnerBrickSlider.setMax(traderInventorySize);
-        tradingPartnerOreSlider.setMax(traderInventorySize);
-        tradingPartnerLumberSlider.setMax(traderInventorySize);
-        tradingPartnerWoolSlider.setMax(traderInventorySize);
-        tradingPartnerGrainSlider.setMax(traderInventorySize);
+        Platform.runLater(() -> {
+            tradingPartnerBrickSlider.setMax(traderInventorySize);
+            tradingPartnerOreSlider.setMax(traderInventorySize);
+            tradingPartnerLumberSlider.setMax(traderInventorySize);
+            tradingPartnerWoolSlider.setMax(traderInventorySize);
+            tradingPartnerGrainSlider.setMax(traderInventorySize);
 
-        ownGrainSlider.setMax(resourceList.getAmount(ResourceType.GRAIN));
-        ownOreSlider.setMax(resourceList.getAmount(ResourceType.ORE));
-        ownLumberSlider.setMax(resourceList.getAmount(ResourceType.LUMBER));
-        ownWoolSlider.setMax(resourceList.getAmount(ResourceType.WOOL));
-        ownBrickSlider.setMax(resourceList.getAmount(ResourceType.BRICK));
+            ownGrainSlider.setMax(resourceList.getAmount(ResourceType.GRAIN));
+            ownOreSlider.setMax(resourceList.getAmount(ResourceType.ORE));
+            ownLumberSlider.setMax(resourceList.getAmount(ResourceType.LUMBER));
+            ownWoolSlider.setMax(resourceList.getAmount(ResourceType.WOOL));
+            ownBrickSlider.setMax(resourceList.getAmount(ResourceType.BRICK));
+        });
     }
 }

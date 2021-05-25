@@ -5,6 +5,8 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
+import de.uol.swp.client.util.ThreadManager;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -49,6 +51,7 @@ public class LoginPresenter extends AbstractPresenter {
             boolean passwordInvalid = passwordField.getText().isEmpty();
             return nameInvalid || passwordInvalid;
         }, loginField.textProperty(), passwordField.textProperty()));
+        ThreadManager.runNow(() -> LOG.debug("LoginPresenter initialised"));
     }
 
     /**
@@ -87,7 +90,7 @@ public class LoginPresenter extends AbstractPresenter {
     @FXML
     private void onRegisterButtonPressed() {
         soundService.button();
-        eventBus.post(showRegViewMessage);
+        post(showRegViewMessage);
     }
 
     /**
@@ -104,7 +107,7 @@ public class LoginPresenter extends AbstractPresenter {
     @Subscribe
     private void onRetryLoginEvent(RetryLoginEvent event) {
         LOG.debug("Received RetryLoginEvent");
-        onLoginButtonPressed();
+        Platform.runLater(this::onLoginButtonPressed);
     }
 
     /**

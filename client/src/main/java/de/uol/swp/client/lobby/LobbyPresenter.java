@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -87,7 +88,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public void initialize() {
         super.initialize();
         prepareMembersView();
-        LOG.debug("LobbyPresenter initialised");
+        ThreadManager.runNow(() -> LOG.debug("LobbyPresenter initialised"));
     }
 
     /**
@@ -120,8 +121,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (this.readyUsers == null) this.readyUsers = new HashSet<>();
         this.readyUsers.clear();
         this.readyUsers.addAll(rsp.getReadyUsers());
+        updateUsersList(rsp.getUsers());
         Platform.runLater(() -> {
-            updateUsersList(rsp.getUsers());
             if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
@@ -223,21 +224,24 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         membersView.getScene().getAccelerators().putAll(accelerators);
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
-        kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-        changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-        tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
 
         addSizeChangeListener();
         fitCanvasToSize();
 
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
-        randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
-        setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
-        moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
-        moveTimeTextField.setText(String.valueOf(moveTime));
+        randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
+        setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
+
+        Platform.runLater(() -> {
+            kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+            changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
+            tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+            moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
+            moveTimeTextField.setText(String.valueOf(moveTime));
+        });
         setPreGameSettings();
         lobbyService.checkForGame(lobbyName);
     }
@@ -276,8 +280,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onRulesMenuClicked() {
-        LOG.debug("Sending ShowRulesOverviewViewEvent");
-        eventBus.post(new ShowRulesOverviewViewEvent());
+        ThreadManager.runNow(() -> {
+            LOG.debug("Sending ShowRulesOverviewViewEvent");
+            post(new ShowRulesOverviewViewEvent());
+        });
     }
 
     /**
@@ -416,7 +422,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
-
                     //if the background should be in colour you need to use setBackground
                     if (user != null && userOrDummyPlayerMap == null)
                         setTextFill(Color.BLACK); // No clue why this is needed, but it is
@@ -509,11 +514,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * @since 2021-01-05
      */
     private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        if (lobbyMembers == null) {
-            lobbyMembers = FXCollections.observableArrayList();
-            membersView.setItems(lobbyMembers);
-        }
-        lobbyMembers.clear();
-        lobbyMembers.addAll(userLobbyList);
+        Platform.runLater(() -> {
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
     }
 }

@@ -5,6 +5,7 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -91,6 +92,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised"));
     }
 
     /**
@@ -125,8 +127,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         }
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         ((Stage) window).close();
-        eventBus.post(new TradeCancelEvent(lobbyName));
-        eventBus.post(new CloseTradeResponseEvent(lobbyName));
+        post(new TradeCancelEvent(lobbyName));
+        post(new CloseTradeResponseEvent(lobbyName));
         clearEventBus();
     }
 
@@ -154,8 +156,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * Handles a click on the StartSession Button
      * <p>
      * Method called when the StartSessionButton is pressed.
-     * The Method posts a StartSessionRequest including the lobby name and the
-     * logged in user onto the EventBus. <- No, it doesn't.
+     * The Method calls the GameService to start the Session and
+     * makes the buildingCost, timerLabel, and moveTimeLabel visible.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
@@ -164,7 +166,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected void onStartSessionButtonPressed() {
         if (startSession.isDisabled()) {
-            LOG.trace("onStartSessionButtonPressed called with disabled button, returning");
+            ThreadManager.runNow(() -> LOG.trace("onStartSessionButtonPressed called with disabled button, returning"));
             return;
         }
         soundService.button();
@@ -344,50 +346,52 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         winner = msg.getUser();
-        uniqueCardView.setMaxHeight(0);
-        uniqueCardView.setMinHeight(0);
-        uniqueCardView.setPrefHeight(0);
-        uniqueCardView.setVisible(false);
-        resourceTableView.setMaxHeight(0);
-        resourceTableView.setMinHeight(0);
-        resourceTableView.setPrefHeight(0);
-        resourceTableView.setVisible(false);
-        developmentCardTableView.setMaxHeight(0);
-        developmentCardTableView.setMinHeight(0);
-        developmentCardTableView.setPrefHeight(0);
-        developmentCardTableView.setVisible(false);
-        rollDice.setVisible(false);
-        autoRoll.setVisible(false);
-        endTurn.setVisible(false);
-        tradeWithUserButton.setVisible(false);
-        tradeWithUserButton.setDisable(false);
-        tradeWithBankButton.setVisible(false);
-        turnIndicator.setVisible(false);
-        pauseButton.setVisible(false);
-        playCard.setVisible(false);
-        timerLabel.setVisible(false);
-        helpCheckBox.setDisable(true);
-        helpCheckBox.setVisible(false);
-        turnIndicator.setAccessibleText("");
-        buildingCosts.setVisible(false);
-        victoryPointsLabel.setVisible(false);
-        cardAmountsList.clear();
-        moveTimeTimer.cancel();
-        moveTimerLabel.setVisible(false);
-        for (ChatOrSystemMessage m : chatMessages)
-            if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
-        currentRound.setVisible(false);
-        roundCounter = 0;
-        this.elapsedTimer.stop();
-        if (Objects.equals(owner, userService.getLoggedInUser())) {
-            returnToLobby.setVisible(true);
-            returnToLobby.setPrefHeight(30);
-            returnToLobby.setPrefWidth(250);
-        }
-        gameMapDescription.clear();
-        gameMapDescription.setCenterText(
-                winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
-                String.format(resourceBundle.getString("game.won.info"), winner));
+        Platform.runLater(() -> {
+            uniqueCardView.setMaxHeight(0);
+            uniqueCardView.setMinHeight(0);
+            uniqueCardView.setPrefHeight(0);
+            uniqueCardView.setVisible(false);
+            resourceTableView.setMaxHeight(0);
+            resourceTableView.setMinHeight(0);
+            resourceTableView.setPrefHeight(0);
+            resourceTableView.setVisible(false);
+            developmentCardTableView.setMaxHeight(0);
+            developmentCardTableView.setMinHeight(0);
+            developmentCardTableView.setPrefHeight(0);
+            developmentCardTableView.setVisible(false);
+            rollDice.setVisible(false);
+            autoRoll.setVisible(false);
+            endTurn.setVisible(false);
+            tradeWithUserButton.setVisible(false);
+            tradeWithUserButton.setDisable(false);
+            tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
+            pauseButton.setVisible(false);
+            playCard.setVisible(false);
+            timerLabel.setVisible(false);
+            helpCheckBox.setDisable(true);
+            helpCheckBox.setVisible(false);
+            turnIndicator.setAccessibleText("");
+            buildingCosts.setVisible(false);
+            victoryPointsLabel.setVisible(false);
+            cardAmountsList.clear();
+            moveTimeTimer.cancel();
+            moveTimerLabel.setVisible(false);
+            for (ChatOrSystemMessage m : chatMessages)
+                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+            currentRound.setVisible(false);
+            roundCounter = 0;
+            this.elapsedTimer.stop();
+            if (Objects.equals(owner, userService.getLoggedInUser())) {
+                returnToLobby.setVisible(true);
+                returnToLobby.setPrefHeight(30);
+                returnToLobby.setPrefWidth(250);
+            }
+            gameMapDescription.clear();
+            gameMapDescription.setCenterText(
+                    winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
+                    String.format(resourceBundle.getString("game.won.info"), winner));
+        });
         fitCanvasToSize();
         soundService.victory();
     }
@@ -424,8 +428,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
-            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
@@ -658,13 +662,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
 
             if (moveTime < 30 || moveTime > 500) {
-                eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+                post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }
         } catch (NumberFormatException ignored) {
-            eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
         }
     }
 
