@@ -45,7 +45,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
-        eventBus.post(new ChangePropertiesCanceledEvent());
+        post(new ChangePropertiesCanceledEvent());
     }
 
     /**
@@ -90,6 +90,6 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
                     break;
             }
         }
-        eventBus.post(new ChangePropertiesSuccessfulEvent());
+        post(new ChangePropertiesSuccessfulEvent());
     }
 }

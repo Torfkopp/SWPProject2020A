@@ -285,7 +285,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
-        eventBus.post(new ShowChangePropertiesViewEvent());
+        post(new ShowChangePropertiesViewEvent());
     }
 
     /**
