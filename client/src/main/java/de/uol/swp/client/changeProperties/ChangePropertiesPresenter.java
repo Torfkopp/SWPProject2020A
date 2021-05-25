@@ -31,8 +31,8 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
     private void initialize() {
         themeBox.getItems().setAll("Bars", "Classic", "Cursed", "Dark", "Default", "Palette");
         languageBox.getItems()
-                   .addAll("Deutsch", "English", "Blind", "Blank", "Hearing-Impaired", "Improved", "lowercase",
-                           "UwU Engwish");
+                   .addAll("Deutsch - Du", "Deutsch - Sie", "English", "Blind", "Blank", "Hearing-Impaired", "Improved",
+                           "lowercase", "UwU Engwish");
     }
 
     /**
@@ -64,8 +64,11 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
         if (theme != null) preferences.put("theme", theme.toLowerCase());
         if (language != null) {
             switch (language) {
-                case "Deutsch":
-                    preferences.put("lang", "de_DE");
+                case "Deutsch - Du":
+                    preferences.put("lang", "de_DE_du");
+                    break;
+                case "Deutsch - Sie":
+                    preferences.put("lang", "de_DE_sie");
                     break;
                 case "English":
                     preferences.put("lang", "en_GB");
