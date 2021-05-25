@@ -3,19 +3,19 @@ package de.uol.swp.common.game.map.hexes;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 
 /**
- * Interface for a harbor hex
+ * Interface for a harbour hex
  *
  * @author Mario Fokken
  * @author Steven Luong
  * @since 2021-01-16
  */
-public interface IHarborHex extends IWaterHex {
+public interface IHarbourHex extends IWaterHex {
 
     /**
-     * Enum for the five resources a harbor can trade
+     * Enum for the five resources a harbour can trade
      * and 'any' if every resource is tradeable
      */
-    enum HarborResource {
+    enum HarbourResource {
         BRICK,
         LUMBER,
         ORE,
@@ -25,9 +25,9 @@ public interface IHarborHex extends IWaterHex {
     }
 
     /**
-     * Enum for the sides the harbor can face
+     * Enum for the sides the harbour can face
      */
-    enum HarborSide {
+    enum HarbourSide {
         WEST,
         NORTHWEST,
         NORTHEAST,
@@ -36,24 +36,24 @@ public interface IHarborHex extends IWaterHex {
         SOUTHWEST,
     }
 
-    static HarborResource getHarborResource(ResourceType resource) {
+    static HarbourResource getHarbourResource(ResourceType resource) {
         switch (resource) {
             case LUMBER:
-                return HarborResource.LUMBER;
+                return HarbourResource.LUMBER;
             case BRICK:
-                return HarborResource.BRICK;
+                return HarbourResource.BRICK;
             case ORE:
-                return HarborResource.ORE;
+                return HarbourResource.ORE;
             case GRAIN:
-                return HarborResource.GRAIN;
+                return HarbourResource.GRAIN;
             case WOOL:
-                return HarborResource.WOOL;
+                return HarbourResource.WOOL;
         }
         return null;
     }
 
     /**
-     * Gets the hex the harbor is belonging to
+     * Gets the hex the harbour is belonging to
      *
      * @return The belonging hex
      *
@@ -64,16 +64,16 @@ public interface IHarborHex extends IWaterHex {
     GameHexWrapper getBelongingHex();
 
     /**
-     * Gets the harbor's resource
+     * Gets the harbour's resource
      *
      * @return Resource
      */
-    HarborResource getResource();
+    HarbourResource getResource();
 
     /**
-     * Gets the side to which the harbor faces
+     * Gets the side to which the harbour faces
      *
      * @return Side
      */
-    HarborSide getSide();
+    HarbourSide getSide();
 }

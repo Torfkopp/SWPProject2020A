@@ -103,7 +103,6 @@ public interface ILobbyManagement {
      *
      * @param lobbyName              The name of the lobby
      * @param maxPlayers             The maximum amount of players for a lobby
-     * @param commandsAllowed        Whether commands are allowed or not
      * @param moveTime               The maximum time of a move
      * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
      * @param randomPlayfieldEnabled Whether the randomPlayfield is enabled or not
@@ -112,6 +111,6 @@ public interface ILobbyManagement {
      * @author Aldin Dervisi
      * @since 2021-03-15
      */
-    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean commandsAllowed, int moveTime,
-                             boolean startUpPhaseEnabled, boolean randomPlayfieldEnabled);
+    void updateLobbySettings(LobbyName lobbyName, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
+                             boolean randomPlayfieldEnabled);
 }

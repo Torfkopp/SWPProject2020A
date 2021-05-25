@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
@@ -60,9 +61,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * Called by the constructor of inheriting classes to set the Logger
      *
      * @param log The Logger of the inheriting class
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     public void init(Logger log) {
-        LOG = log;
+        ThreadManager.runNow(() -> LOG = log);
     }
 
     /**
@@ -73,6 +76,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareChatVars();
+        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChat initialised"));
     }
 
     /**
@@ -301,13 +305,16 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
             if (msg.getVictim() == null) {
                 if (msg.getUser().equals(userService.getLoggedInUser())) {
+                    String title = resourceBundle.getString("error.title");
+                    String headerText = resourceBundle.getString("error.header");
+                    String contentText = resourceBundle.getString("game.robber.error");
+                    String confirmText = resourceBundle.getString("button.confirm");
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle(resourceBundle.getString("error.title"));
-                        alert.setHeaderText(resourceBundle.getString("error.header"));
-                        alert.setContentText(resourceBundle.getString("game.robber.error"));
-                        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"),
-                                                            ButtonBar.ButtonData.OK_DONE);
+                        alert.setTitle(title);
+                        alert.setHeaderText(headerText);
+                        alert.setContentText(contentText);
+                        ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
                         alert.getButtonTypes().setAll(confirm);
                         alert.getDialogPane().getStylesheets().add(styleSheet);
                         alert.showAndWait();
@@ -430,14 +437,17 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             @Override
             protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item instanceof SystemMessage)
-                    setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
-                else setFont(Font.getDefault());
-                setText(empty || item == null ? "" : item.toString());
-                setMaxWidth(chatView.getWidth() - 5);
-                setPrefWidth(chatView.getWidth() - 5);
-                setWidth(chatView.getWidth() - 5);
-                setWrapText(true);
+                //fixme me this on runlater
+                Platform.runLater(() -> {
+                    if (item instanceof SystemMessage)
+                        setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
+                    else setFont(Font.getDefault());
+                    setText(empty || item == null ? "" : item.toString());
+                    setMaxWidth(chatView.getWidth() - 5);
+                    setPrefWidth(chatView.getWidth() - 5);
+                    setWidth(chatView.getWidth() - 5);
+                    setWrapText(true);
+                });
             }
         });
         chatView.setItems(chatMessages);
@@ -514,10 +524,8 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
      */
     private void updateChatMessageList(List<ChatMessage> chatMessageList) {
-        Platform.runLater(() -> {
-            if (chatMessages == null) prepareChatVars();
-            chatMessages.clear();
-            chatMessages.addAll(chatMessageList);
-        });
+        if (chatMessages == null) prepareChatVars();
+        chatMessages.clear();
+        Platform.runLater(() -> chatMessages.addAll(chatMessageList));
     }
 }

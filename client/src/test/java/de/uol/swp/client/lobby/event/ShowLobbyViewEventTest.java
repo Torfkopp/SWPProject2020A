@@ -1,7 +1,13 @@
 package de.uol.swp.client.lobby.event;
 
+import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.lobby.SimpleLobby;
+import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.UserDTO;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ShowLobbyViewEventTest {
 
     private static final LobbyName defaultLobbyName = new LobbyName("Test");
+    private static final User owner = new UserDTO(1, "test", "test123", "test@test.test");
+    private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, owner, 4, 120, false,
+                                                                     false, false, new HashSet<>(), new HashSet<>());
 
     /**
      * Test for the creation of ShowLobbyViewEvents
@@ -25,8 +34,8 @@ class ShowLobbyViewEventTest {
      */
     @Test
     void createShowLobbyViewEventTest() {
-        ShowLobbyViewEvent event = new ShowLobbyViewEvent(defaultLobbyName);
+        ShowLobbyViewEvent event = new ShowLobbyViewEvent(defaultLobby);
 
-        assertEquals(defaultLobbyName, event.getName());
+        assertEquals(defaultLobby, event.getLobby());
     }
 }

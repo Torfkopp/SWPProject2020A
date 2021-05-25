@@ -4,77 +4,113 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<VBox fx:id="tradeUserView" alignment="CENTER" fillWidth="false" spacing="25.0" xmlns="http://javafx.com/javafx/11.0.1"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter">
-    <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" text="%game.trade.status.makingoffer"
+<VBox alignment="CENTER" fillWidth="false" fx:controller="de.uol.swp.client.trade.TradeWithUserPresenter"
+      id="tradeUserView" spacing="25.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <Label alignment="CENTER" contentDisplay="CENTER" fx:id="statusLabel" text="%game.trade.status.makingoffer"
            textAlignment="CENTER">
         <font>
             <Font size="18.0"/>
         </font>
     </Label>
 
-    <HBox fx:id="tradingHBox" alignment="CENTER" spacing="40.0">
+    <HBox alignment="CENTER" fx:id="tradingHBox" spacing="40.0">
         <VBox alignment="CENTER" spacing="15.0">
             <Label text="%game.trade.labels.yougive"/>
             <VBox>
-                <Label text="%game.resources.brick"/>
-                <Slider fx:id="ownBrickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
-                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.brick">
+                    <Slider blockIncrement="1.0" fx:id="ownBrickSlider" majorTickUnit="1" minWidth="150"
+                            minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                </Label>
+                <fx:reference source="ownBrickSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.ore"/>
-                <Slider fx:id="ownOreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
-                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.ore">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="ownOreSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="ownOreSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.grain"/>
-                <Slider fx:id="ownGrainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
-                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.grain">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="ownGrainSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="ownGrainSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.wool"/>
-                <Slider fx:id="ownWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150" minorTickCount="0"
-                        showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.wool">
+                    <Slider blockIncrement="1.0" fx:id="ownWoolSlider" majorTickUnit="1" minWidth="150"
+                            minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                </Label>
+                <fx:reference source="ownWoolSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.lumber"/>
-                <Slider fx:id="ownLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150.0"
-                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.lumber">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="ownLumberSlider" majorTickUnit="1" minWidth="150.0"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="ownLumberSlider"/>
             </VBox>
         </VBox>
 
         <VBox alignment="CENTER" spacing="20.0">
-            <Button fx:id="offerTradeButton" mnemonicParsing="false" onAction="#onOfferTradeButtonPressed"
+            <Button fx:id="offerTradeButton" onAction="#onOfferTradeButtonPressed"
                     text="%game.trade.buttons.makeoffer" textAlignment="CENTER" wrapText="true"/>
-            <Button mnemonicParsing="false" onAction="#onCancelTradeButtonPressed" text="%button.cancel"/>
+            <Button cancelButton="true" onAction="#onCancelTradeButtonPressed" text="%button.cancel"/>
         </VBox>
 
         <VBox alignment="CENTER" spacing="15.0">
             <Label text="%game.trade.labels.youget"/>
             <VBox>
-                <Label text="%game.resources.brick"/>
-                <Slider fx:id="tradingPartnerBrickSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
-                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.brick">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="tradingPartnerBrickSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="tradingPartnerBrickSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.ore"/>
-                <Slider fx:id="tradingPartnerOreSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
-                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.ore">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="tradingPartnerOreSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="tradingPartnerOreSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.grain"/>
-                <Slider fx:id="tradingPartnerGrainSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
-                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.grain">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="tradingPartnerGrainSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="tradingPartnerGrainSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.wool"/>
-                <Slider fx:id="tradingPartnerWoolSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
-                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.wool">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="tradingPartnerWoolSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="tradingPartnerWoolSlider"/>
             </VBox>
             <VBox>
-                <Label text="%game.resources.lumber"/>
-                <Slider fx:id="tradingPartnerLumberSlider" blockIncrement="1.0" majorTickUnit="1" minWidth="150"
-                        minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                <Label text="%game.resources.lumber">
+                    <labelFor>
+                        <Slider blockIncrement="1.0" fx:id="tradingPartnerLumberSlider" majorTickUnit="1" minWidth="150"
+                                minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    </labelFor>
+                </Label>
+                <fx:reference source="tradingPartnerLumberSlider"/>
             </VBox>
         </VBox>
         <VBox.margin>
@@ -83,18 +119,22 @@
     </HBox>
 
     <VBox alignment="CENTER" spacing="10.0">
-        <Label text="%game.trade.labels.owninventory"/>
-        <TableView fx:id="ownResourceTableView" layoutY="210.0" prefHeight="150.0" prefWidth="230.0">
-            <columns>
-                <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0"
-                             resizable="false" text="%game.inventories.amountcol"/>
-                <TableColumn fx:id="resourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
-                             minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
-            </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-            </columnResizePolicy>
-        </TableView>
+        <Label text="%game.trade.labels.owninventory">
+            <labelFor>
+                <TableView fx:id="ownResourceTableView" layoutY="210.0" prefHeight="150.0" prefWidth="230.0">
+                    <columns>
+                        <TableColumn editable="false" fx:id="resourceAmountCol" maxWidth="75.0" minWidth="75.0"
+                                     prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
+                        <TableColumn editable="false" fx:id="resourceNameCol" maxWidth="1.7976931348623157E308"
+                                     minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </labelFor>
+        </Label>
+        <fx:reference source="ownResourceTableView"/>
         <VBox.margin>
             <Insets bottom="10.0" left="10.0"/>
         </VBox.margin>

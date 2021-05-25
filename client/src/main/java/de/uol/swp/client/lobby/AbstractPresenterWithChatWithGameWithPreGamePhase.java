@@ -5,6 +5,7 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -15,10 +16,11 @@ import de.uol.swp.common.game.response.RecoverSessionResponse;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
+import de.uol.swp.common.user.AI;
+import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -57,11 +59,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected CheckBox randomPlayFieldCheckbox;
     @FXML
-    protected CheckBox commandsActivated;
-    @FXML
     protected CheckBox readyCheckBox;
 
-    protected ObservableList<UserOrDummy> lobbyMembers;
     protected Set<UserOrDummy> readyUsers;
     @FXML
     protected AnimationTimer elapsedTimer;
@@ -78,6 +77,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private RadioButton fourPlayerRadioButton;
     @FXML
+    private VBox aiVBox;
+    @FXML
+    private CheckBox talkingAICheckBox;
+    @FXML
+    private ToggleGroup difficultyAIToggleGroup;
+    @FXML
+    private RadioButton easyAIRadioButton;
+    @FXML
     private VBox preGameSettingBox;
 
     @FXML
@@ -85,6 +92,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised"));
     }
 
     /**
@@ -119,10 +127,53 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         }
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         ((Stage) window).close();
-        moveTimeTimer.cancel();
-        eventBus.post(new TradeCancelEvent(lobbyName));
-        eventBus.post(new CloseTradeResponseEvent(lobbyName));
+        post(new TradeCancelEvent(lobbyName));
+        post(new CloseTradeResponseEvent(lobbyName));
         clearEventBus();
+    }
+
+    /**
+     * Method called when the KickUserButton is pressed
+     * <p>
+     * If the EndTurnButton is pressed, this method requests to kick
+     * the selected User of the members view.
+     *
+     * @author Maximilian Lindner
+     * @author Sven Ahrens
+     * @see de.uol.swp.common.lobby.request.KickUserRequest
+     * @since 2021-03-02
+     */
+    @FXML
+    protected void onKickUserButtonPressed() {
+        soundService.button();
+        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
+        if (selectedUser == userService.getLoggedInUser()) return;
+        lobbyService.kickUser(lobbyName, selectedUser);
+    }
+
+    /**
+     * Handles a click on the StartSession Button
+     * <p>
+     * Method called when the StartSessionButton is pressed.
+     * The Method calls the GameService to start the Session and
+     * makes the buildingCost, timerLabel, and moveTimeLabel visible.
+     *
+     * @author Eric Vuong
+     * @author Maximilian Lindner
+     * @since 2021-01-20
+     */
+    @FXML
+    protected void onStartSessionButtonPressed() {
+        if (startSession.isDisabled()) {
+            ThreadManager.runNow(() -> LOG.trace("onStartSessionButtonPressed called with disabled button, returning"));
+            return;
+        }
+        soundService.button();
+        buildingCosts.setVisible(true);
+        gameService.startSession(lobbyName, moveTime);
+        timerLabel.setVisible(true);
+        moveTimerLabel.setVisible(true);
     }
 
     /**
@@ -189,10 +240,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
-        commandsActivated.setDisable(!userService.getLoggedInUser().equals(owner));
         randomPlayFieldCheckbox.setDisable(!userService.getLoggedInUser().equals(owner));
         fourPlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner));
         threePlayerRadioButton.setDisable(!userService.getLoggedInUser().equals(owner) || lobbyMembers.size() == 4);
+        aiVBox.setVisible(userService.getLoggedInUser().equals(owner));
     }
 
     /**
@@ -217,6 +268,25 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Handles a click on the AddAI Button
+     * <p>
+     * Method called when the AddAIButton is pressed.
+     * This Method calls the lobbyService to post an AddAIRequest
+     *
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    @FXML
+    private void onAddAIButtonPressed() {
+        boolean talking = talkingAICheckBox.isSelected();
+        AI.Difficulty difficulty =
+                difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
+                AI.Difficulty.HARD;
+        AI ai = new AIDTO(difficulty, talking);
+        lobbyService.addAI(lobbyName, ai);
+    }
+
+    /**
      * Method called when the ChangeOwnerButtonPressed is pressed
      * <p>
      * If the ChangeOwnerButtonPressed is pressed, this method requests to change
@@ -233,26 +303,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.changeOwner(lobbyName, selectedUser);
-    }
-
-    /**
-     * Method called when the KickUserButton is pressed
-     * <p>
-     * If the EndTurnButton is pressed, this method requests to kick
-     * the selected User of the members view.
-     *
-     * @author Maximilian Lindner
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.lobby.request.KickUserRequest
-     * @since 2021-03-02
-     */
-    @FXML
-    private void onKickUserButtonPressed() {
-        soundService.button();
-        membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
-        if (selectedUser == userService.getLoggedInUser()) return;
-        lobbyService.kickUser(lobbyName, selectedUser);
     }
 
     /**
@@ -296,49 +346,52 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameMap = null;
         gameWon = true;
         winner = msg.getUser();
-        uniqueCardView.setMaxHeight(0);
-        uniqueCardView.setMinHeight(0);
-        uniqueCardView.setPrefHeight(0);
-        uniqueCardView.setVisible(false);
-        resourceTableView.setMaxHeight(0);
-        resourceTableView.setMinHeight(0);
-        resourceTableView.setPrefHeight(0);
-        resourceTableView.setVisible(false);
-        developmentCardTableView.setMaxHeight(0);
-        developmentCardTableView.setMinHeight(0);
-        developmentCardTableView.setPrefHeight(0);
-        developmentCardTableView.setVisible(false);
-        rollDice.setVisible(false);
-        autoRoll.setVisible(false);
-        endTurn.setVisible(false);
-        tradeWithUserButton.setVisible(false);
-        tradeWithUserButton.setDisable(false);
-        tradeWithBankButton.setVisible(false);
-        turnIndicator.setVisible(false);
-        playCard.setVisible(false);
-        timerLabel.setVisible(false);
-        helpCheckBox.setDisable(true);
-        helpCheckBox.setVisible(false);
-        turnIndicator.setAccessibleText("");
-        buildingCosts.setVisible(false);
-        victoryPointsLabel.setVisible(false);
-        cardAmountsList.clear();
-        moveTimeTimer.cancel();
-        moveTimerLabel.setVisible(false);
-        for (ChatOrSystemMessage m : chatMessages)
-            if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
-        currentRound.setVisible(false);
-        roundCounter = 0;
-        this.elapsedTimer.stop();
-        if (Objects.equals(owner, userService.getLoggedInUser())) {
-            returnToLobby.setVisible(true);
-            returnToLobby.setPrefHeight(30);
-            returnToLobby.setPrefWidth(250);
-        }
-        gameMapDescription.clear();
-        gameMapDescription.setCenterText(
-                winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
-                String.format(resourceBundle.getString("game.won.info"), winner));
+        Platform.runLater(() -> {
+            uniqueCardView.setMaxHeight(0);
+            uniqueCardView.setMinHeight(0);
+            uniqueCardView.setPrefHeight(0);
+            uniqueCardView.setVisible(false);
+            resourceTableView.setMaxHeight(0);
+            resourceTableView.setMinHeight(0);
+            resourceTableView.setPrefHeight(0);
+            resourceTableView.setVisible(false);
+            developmentCardTableView.setMaxHeight(0);
+            developmentCardTableView.setMinHeight(0);
+            developmentCardTableView.setPrefHeight(0);
+            developmentCardTableView.setVisible(false);
+            rollDice.setVisible(false);
+            autoRoll.setVisible(false);
+            endTurn.setVisible(false);
+            tradeWithUserButton.setVisible(false);
+            tradeWithUserButton.setDisable(false);
+            tradeWithBankButton.setVisible(false);
+            turnIndicator.setVisible(false);
+            pauseButton.setVisible(false);
+            playCard.setVisible(false);
+            timerLabel.setVisible(false);
+            helpCheckBox.setDisable(true);
+            helpCheckBox.setVisible(false);
+            turnIndicator.setAccessibleText("");
+            buildingCosts.setVisible(false);
+            victoryPointsLabel.setVisible(false);
+            cardAmountsList.clear();
+            moveTimeTimer.cancel();
+            moveTimerLabel.setVisible(false);
+            for (ChatOrSystemMessage m : chatMessages)
+                if (m instanceof InGameSystemMessageDTO) Platform.runLater(() -> chatMessages.remove(m));
+            currentRound.setVisible(false);
+            roundCounter = 0;
+            this.elapsedTimer.stop();
+            if (Objects.equals(owner, userService.getLoggedInUser())) {
+                returnToLobby.setVisible(true);
+                returnToLobby.setPrefHeight(30);
+                returnToLobby.setPrefWidth(250);
+            }
+            gameMapDescription.clear();
+            gameMapDescription.setCenterText(
+                    winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
+                    String.format(resourceBundle.getString("game.won.info"), winner));
+        });
         fitCanvasToSize();
         soundService.victory();
     }
@@ -375,8 +428,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @Subscribe
     private void onReturnToPreGameLobbyMessage(ReturnToPreGameLobbyMessage msg) {
+        LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
         Platform.runLater(() -> {
-            LOG.debug("Received ReturnToPreGameLobbyMessage for Lobby {}", lobbyName);
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
@@ -395,26 +448,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             kickUserButton.setVisible(true);
             changeOwnerButton.setVisible(true);
         });
-    }
-
-    /**
-     * Handles a click on the StartSession Button
-     * <p>
-     * Method called when the StartSessionButton is pressed.
-     * The Method posts a StartSessionRequest including the lobby name and the
-     * logged in user onto the EventBus.
-     *
-     * @author Eric Vuong
-     * @author Maximilian Lindner
-     * @since 2021-01-20
-     */
-    @FXML
-    private void onStartSessionButtonPressed() {
-        soundService.button();
-        buildingCosts.setVisible(true);
-        gameService.startSession(lobbyName, moveTime);
-        timerLabel.setVisible(true);
-        moveTimerLabel.setVisible(true);
     }
 
     /**
@@ -461,7 +494,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
-            changeOwnerButton.setVisible(false);
             playCard.setVisible(true);
             playCard.setDisable(true);
             setMoveTimer(moveTime);
@@ -487,11 +519,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Sets the play field visible.
      * The startSessionButton and every readyCheckbox are getting invisible for
-     * the user.
+     * the user. <- No, it doesn't
      *
      * @param rsp The StartSessionResponse found on the EventBus
      *
-     * @author MarvinDrees
+     * @author Marvin Drees
      * @author Maximilian Lindner
      * @since 2021-02-04
      */
@@ -578,6 +610,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-04-11
      */
     private void prepareInGameArrangement() {
+        pauseButton.setVisible(true);
         preGameSettingBox.setVisible(false);
         preGameSettingBox.setPrefHeight(0);
         preGameSettingBox.setMaxHeight(0);
@@ -629,15 +662,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
 
             if (moveTime < 30 || moveTime > 500) {
-                eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+                post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
-
-                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(),
-                                                 commandsActivated.isSelected(), moveTime,
+                lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }
         } catch (NumberFormatException ignored) {
-            eventBus.post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
         }
     }
 

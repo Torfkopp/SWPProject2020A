@@ -16,7 +16,6 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
 
     private final int allowedPlayers;
     private final boolean startUpPhaseEnabled;
-    private final boolean commandsAllowed;
     private final int moveTime;
     private final boolean randomPlayFieldEnabled;
 
@@ -27,16 +26,14 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
      * @param user                   User responsible for the creation of this message
      * @param allowedPlayers         New allowed players amount.
      * @param startUpPhaseEnabled    Whether the startup phase is enabled or not
-     * @param commandsAllowed        Whether commands are enabled or not
      * @param moveTime               The maximum move time in seconds
      * @param randomPlayFieldEnabled Whether a randomly generated play field will be used
      */
     public ChangeLobbySettingsRequest(LobbyName name, User user, int allowedPlayers, boolean startUpPhaseEnabled,
-                                      boolean commandsAllowed, int moveTime, boolean randomPlayFieldEnabled) {
+                                      int moveTime, boolean randomPlayFieldEnabled) {
         super(name, user);
         this.allowedPlayers = allowedPlayers;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
-        this.commandsAllowed = commandsAllowed;
         this.moveTime = moveTime;
         this.randomPlayFieldEnabled = randomPlayFieldEnabled;
     }
@@ -57,15 +54,6 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
      */
     public int getMoveTime() {
         return moveTime;
-    }
-
-    /**
-     * Gets whether commands are allowed or not
-     *
-     * @return true if commands are allowed, false if not
-     */
-    public boolean isCommandsAllowed() {
-        return commandsAllowed;
     }
 
     /**

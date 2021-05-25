@@ -4,7 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
-import de.uol.swp.common.game.map.hexes.IHarborHex;
+import de.uol.swp.client.util.ThreadManager;
+import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
 import de.uol.swp.common.game.response.InventoryForTradeResponse;
@@ -14,11 +15,16 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages the TradingWithBank window
@@ -58,27 +64,27 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     private Button tradeResourceWithBankButton;
 
     /**
-     * Helper method to set the tradingRatio Map according to the provided harborMap
+     * Helper method to set the tradingRatio Map according to the provided harbourMap
      * <p>
-     * This method checks for which harbors the User owns and sets the entry in the
+     * This method checks for which harbours the User owns and sets the entry in the
      * tradingRation Map accordingly.
      *
-     * @param harborMap Map of HarborResource the User has access to
+     * @param harbourMap Map of HarbourResource the User has access to
      *
-     * @return Map of HarborResource to trading ratio
+     * @return Map of HarbourResource to trading ratio
      *
      * @author Phillip-André Suhr
      * @since 2021-04-20
      */
-    private static ResourceList setupHarborRatios(List<IHarborHex.HarborResource> harborMap) {
+    private static ResourceList setupHarbourRatios(List<IHarbourHex.HarbourResource> harbourMap) {
         ResourceList tradingRatio = new ResourceList();
         int prepareTradingRatio = 4;
-        if (harborMap.contains(IHarborHex.HarborResource.ANY)) {
+        if (harbourMap.contains(IHarbourHex.HarbourResource.ANY)) {
             prepareTradingRatio = 3;
         }
         for (ResourceType resourceType : ResourceType.values()) {
-            tradingRatio.set(resourceType,
-                             harborMap.contains(IHarborHex.getHarborResource(resourceType)) ? 2 : prepareTradingRatio);
+            tradingRatio.set(resourceType, harbourMap.contains(IHarbourHex.getHarbourResource(resourceType)) ? 2 :
+                                           prepareTradingRatio);
         }
         return tradingRatio;
     }
@@ -96,7 +102,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         bankResourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
         bankResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        LOG.debug("TradeWithBankPresenter initialised");
+        ThreadManager.runNow(() -> LOG.debug("TradeWithBankPresenter initialised"));
     }
 
     /**
@@ -109,6 +115,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onBuyDevelopmentCardButtonPressed() {
+        if (buyDevelopmentButton.isDisabled()) {
+            LOG.trace("onBuyDevelopmentCardButtonPressed with disabled button, returning");
+            return;
+        }
         soundService.button();
         for (IResource item : ownResourceTableView.getItems()) {
             if (item.getType() == ResourceType.GRAIN && item.getAmount() <= 0) return;
@@ -158,8 +168,8 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * <p>
      * If the InventoryForTradeResponse is directed to this lobby,
      * the TradeWithBankPresenter gets the inventory of the player
-     * as a List of resourceMaps. Calls setupHarborRatios to calculate
-     * the harbor trading ratios and calls setInventories to fill the
+     * as a List of resourceMaps. Calls setupHarbourRatios to calculate
+     * the harbour trading ratios and calls setInventories to fill the
      * inventories of the Bank and the trading selection.
      * If the user has enough resources, the buyDevelopmentButton
      * gets enabled.
@@ -173,10 +183,11 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", lobbyName);
         ResourceList resourceList = rsp.getResourceList();
-        ResourceList tradingRatios = setupHarborRatios(rsp.getHarborResourceList());
+        ResourceList tradingRatios = setupHarbourRatios(rsp.getHarbourResourceList());
         setInventories(resourceList, tradingRatios);
-        buyDevelopmentButton.setDisable(resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
-                ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0);
+        Platform.runLater(() -> buyDevelopmentButton.setDisable(
+                resourceList.getAmount(ResourceType.GRAIN) <= 0 || resourceList.getAmount(
+                        ResourceType.ORE) <= 0 || resourceList.getAmount(ResourceType.WOOL) <= 0));
     }
 
     /**
@@ -192,6 +203,10 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onTradeResourceWithBankButtonPressed() {
+        if (tradeResourceWithBankButton.isDisabled()) {
+            LOG.trace("onTradeResourceWithBankButtonPressed called with disabled button, returning");
+            return;
+        }
         soundService.button();
         IResource bankResource;
         IResource giveResource;
@@ -222,6 +237,11 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * null, they get the parameters of the event. This Event is sent when a new
      * TradeWithBankPresenter is created. If a window is closed using the
      * X(top-right-Button), the closeWindow method is called.
+     * <p>
+     * This method also sets the accelerators for the TradeWithBankPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + D = Buy Development Card button
+     *     <li> CTRL/META + T = Trade button
      *
      * @param event TradeUpdateEvent found on the event bus
      *
@@ -233,6 +253,12 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeUpdateEvent for Lobby {}", lobbyName);
         Window window = ownResourcesToTradeWith.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> tradeService.closeBankTradeWindow(lobbyName));
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), // CTRL/META + D
+                         this::onBuyDevelopmentCardButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN), // CTRL/META + T
+                         this::onTradeResourceWithBankButtonPressed);
+        ownResourcesToTradeWith.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
@@ -250,7 +276,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         LOG.debug("Received TradeWithBankAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
-        Platform.runLater(() -> soundService.coins());
+        soundService.coins();
     }
 
     /**
@@ -261,7 +287,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * accordingly.
      *
      * @param ownInventory  The inventory of the User trading with the Bank
-     * @param tradingRatios Map of HarborResources to Integer expressing which harbors
+     * @param tradingRatios Map of HarbourResources to Integer expressing which harbours
      *                      the User possesses and therefore to which trading ratios
      *                      they are entitled
      *
@@ -269,14 +295,16 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * @since 2021-04-20
      */
     private void setInventories(IResourceList ownInventory, IResourceList tradingRatios) {
-        for (ResourceType resource : ResourceType.values()) {
-            bankResourcesView.getItems().add(new Resource(resource, 1));
-        }
-        for (IResource resource : ownInventory) {
-            ownResourceTableView.getItems().add(resource);
-            if (resource.getAmount() >= tradingRatios.getAmount(resource.getType())) {
-                ownResourcesToTradeWith.getItems().add(tradingRatios.get(resource.getType()));
+        Platform.runLater(() -> {
+            for (ResourceType resource : ResourceType.values()) {
+                bankResourcesView.getItems().add(new Resource(resource, 1));
             }
-        }
+            for (IResource resource : ownInventory) {
+                ownResourceTableView.getItems().add(resource);
+                if (resource.getAmount() >= tradingRatios.getAmount(resource.getType())) {
+                    ownResourcesToTradeWith.getItems().add(tradingRatios.get(resource.getType()));
+                }
+            }
+        });
     }
 }

@@ -151,4 +151,11 @@ public class GameService implements IGameService {
         Message request = new UpdateInventoryRequest(userService.getLoggedInUser(), lobbyName);
         eventBus.post(request);
     }
+
+    @Override
+    public void pauseGame(LobbyName lobbyName) {
+        LOG.debug("Sending PauseGameRequest");
+        Message request = new PauseGameRequest(lobbyName, userService.getLoggedInUser());
+        eventBus.post(request);
+    }
 }
