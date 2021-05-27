@@ -437,15 +437,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             @Override
             protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
-                //fixme me this on runlater
                 Platform.runLater(() -> {
                     if (item instanceof SystemMessage)
                         setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
                     else setFont(Font.getDefault());
                     setText(empty || item == null ? "" : item.toString());
-                    setMaxWidth(chatView.getWidth() - 5);
-                    setPrefWidth(chatView.getWidth() - 5);
-                    setWidth(chatView.getWidth() - 5);
+                    prefWidthProperty().bind(widthProperty().divide(1.1));
+                    setMaxWidth(Control.USE_PREF_SIZE);
                     setWrapText(true);
                 });
             }
