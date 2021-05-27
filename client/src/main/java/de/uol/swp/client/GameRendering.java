@@ -260,9 +260,6 @@ public class GameRendering {
      * @param hex      The harbour hex with the information about the harbour
      */
     private void drawHarbour(double currentX, double currentY, IHarbourHex hex) {
-        gfxCtx.setStroke(HARBOUR_COLOUR);
-        gfxCtx.setFill(HARBOUR_COLOUR);
-        gfxCtx.setLineWidth(hexWidth / 5.0);
         double yDistance = hexHeight * (1.0 / 64.0);
         double yExtend = hexHeight * (5.0 / 32.0);
         double xDistance = hexWidth * (1.0 / 32.0);
