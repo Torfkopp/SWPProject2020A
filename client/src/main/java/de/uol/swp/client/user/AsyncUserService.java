@@ -3,6 +3,8 @@ package de.uol.swp.client.user;
 import com.google.inject.Inject;
 import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.user.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An asynchronous wrapper for the IUserService implementation
@@ -17,11 +19,13 @@ import de.uol.swp.common.user.User;
  */
 public class AsyncUserService implements IUserService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncUserService.class);
     private final UserService syncUserService;
 
     @Inject
     public AsyncUserService(UserService syncUserService) {
         this.syncUserService = syncUserService;
+        LOG.debug("AsyncUserService initialised");
     }
 
     @Override

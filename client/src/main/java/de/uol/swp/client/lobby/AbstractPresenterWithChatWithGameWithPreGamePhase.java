@@ -5,7 +5,6 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
@@ -92,7 +91,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
-        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised"));
+        LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
     }
 
     /**
@@ -166,7 +165,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected void onStartSessionButtonPressed() {
         if (startSession.isDisabled()) {
-            ThreadManager.runNow(() -> LOG.trace("onStartSessionButtonPressed called with disabled button, returning"));
+            LOG.trace("onStartSessionButtonPressed called with disabled button, returning");
             return;
         }
         soundService.button();

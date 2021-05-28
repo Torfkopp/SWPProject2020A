@@ -7,6 +7,8 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An asynchronous wrapper for the ITradeService implementation
@@ -21,11 +23,13 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class AsyncTradeService implements ITradeService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncTradeService.class);
     private final TradeService syncTradeService;
 
     @Inject
     public AsyncTradeService(TradeService syncTradeService) {
         this.syncTradeService = syncTradeService;
+        LOG.debug("AsyncTradeService initialised");
     }
 
     @Override

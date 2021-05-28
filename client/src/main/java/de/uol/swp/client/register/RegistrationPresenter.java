@@ -6,7 +6,6 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.register.event.RegistrationCanceledEvent;
 import de.uol.swp.client.register.event.RegistrationErrorEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -50,7 +49,7 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareLoginFormat();
-        ThreadManager.runNow(() -> LOG.debug("RegistrationPresenter initialised"));
+        LOG.debug("RegistrationPresenter initialised");
     }
 
     /**
@@ -89,7 +88,7 @@ public class RegistrationPresenter extends AbstractPresenter {
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        ThreadManager.runNow(() -> LOG.debug("Sending RegistrationCanceledEvent"));
+        LOG.debug("Sending RegistrationCanceledEvent");
         post(new RegistrationCanceledEvent());
     }
 

@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
-import de.uol.swp.client.util.ThreadManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
@@ -88,7 +87,7 @@ public class RulesOverviewPresenter extends AbstractPresenter {
                         .setHeight(newValue.equals(resourceExchangeTab) ? MIN_LONG_TEXT_HEIGHT : MIN_HEIGHT);
             rulesTabPane.getScene().getWindow().setWidth(MIN_BANK_TAB_WIDTH);
         });
-        ThreadManager.runNow(() -> LOG.debug("RulesOverviewPresenter initialised"));
+        LOG.debug("RulesOverviewPresenter initialised");
     }
 
     /**

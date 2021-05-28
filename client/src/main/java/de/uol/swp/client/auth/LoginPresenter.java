@@ -5,7 +5,6 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.register.event.ShowRegistrationViewEvent;
-import de.uol.swp.client.util.ThreadManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -51,7 +50,7 @@ public class LoginPresenter extends AbstractPresenter {
             boolean passwordInvalid = passwordField.getText().isEmpty();
             return nameInvalid || passwordInvalid;
         }, loginField.textProperty(), passwordField.textProperty()));
-        ThreadManager.runNow(() -> LOG.debug("LoginPresenter initialised"));
+        LOG.debug("LoginPresenter initialised");
     }
 
     /**
