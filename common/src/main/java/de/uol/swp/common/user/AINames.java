@@ -13,22 +13,6 @@ import java.util.List;
  */
 public class AINames implements Serializable {
 
-    /**
-     * Enum for an AI's language
-     *
-     * @since 2021-05-20
-     */
-    enum Language {
-        BRITISH,
-        US_AMERICAN,
-        JAPANESE,
-        ITALIAN,
-        ARABIC,
-        AZTEC,
-        SIMPLE_ENGLISH,
-        NONE
-    }
-
     final static List<String> aiNameEasy = new ArrayList<>(
             Arrays.asList("Jonathan Joestar", "Robert E. O. Speedwagon", "Erina Pendleton", "George Joestar I.",
                           "Lisa Lisa", "Johnny Joestar", //British
@@ -44,8 +28,7 @@ public class AINames implements Serializable {
                           "Josuke Higashikata", "Koichi Hirose", "Okuyasu Nijimura", "Rohan Kishibe", "Shigechi",
                           "Yasuho Hirose", "Rai Mamezuku", //Japanese
                           "Giorno Giovanna", "Bruno Bucciarati", "Leone Abbacchio", "Guido Mista", "Narancia Ghirga",
-                          "Pannacotta Fugo", "Trish Una",
-                          "Tonio Trussardi")); //Italianprivate final java.util.List<java.lang.String> aiNameHard = new java.util.ArrayList<java.lang.String>(
+                          "Pannacotta Fugo", "Trish Una", "Tonio Trussardi")); //Italian
     final static List<String> aiNameHard = new ArrayList<>(
             Arrays.asList("Dio Brando", "Bruford", "Tarkus", "Jack the Ripper", "DIO", "Diego Brando", //British
                           "Kars", "Esidisi", "Wamuu", "Santana", //Aztec
@@ -74,6 +57,22 @@ public class AINames implements Serializable {
                           "Jail House Lock", "Yo-Yo Ma", "Survivor", "Dirty Deeds Done Dirt Cheap", "Hey Ya!",
                           "Tomb of the Boom", "Catch the Rainbow", "Civil War", "In a Silent Way", "Fun Fun Fun",
                           "I Am a Rock", "Doobie Wah!", "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
+
+    /**
+     * Enum for an AI's language
+     *
+     * @since 2021-05-20
+     */
+    enum Language {
+        BRITISH,
+        US_AMERICAN,
+        JAPANESE,
+        ITALIAN,
+        ARABIC,
+        AZTEC,
+        SIMPLE_ENGLISH,
+        NONE
+    }
 
     /**
      * Gets an AI name
@@ -137,14 +136,14 @@ public class AINames implements Serializable {
     static Language getLanguage(String name) {
         Language language = Language.NONE;
         if (aiNameEasy.subList(0, 6).contains(name)) language = Language.BRITISH;
-        else if (aiNameEasy.subList(9, 19).contains(name)) language = Language.SIMPLE_ENGLISH;
+        else if (aiNameEasy.subList(9, 18).contains(name)) language = Language.SIMPLE_ENGLISH;
         else if (aiNameEasy.subList(18, 28).contains(name)) language = Language.US_AMERICAN;
         else if (aiNameEasy.subList(31, 38).contains(name)) language = Language.JAPANESE;
         else if (aiNameEasy.subList(38, aiNameEasy.size()).contains(name)) language = Language.ITALIAN;
         else if (aiNameHard.subList(0, 6).contains(name)) language = Language.BRITISH;
         else if (aiNameHard.subList(6, 10).contains(name)) language = Language.AZTEC;
         else if (aiNameHard.subList(10, 17).contains(name)) language = Language.ARABIC;
-        else if (aiNameHard.subList(17, 23).contains(name)) language = Language.US_AMERICAN;
+        else if (aiNameHard.subList(17, 22).contains(name)) language = Language.US_AMERICAN;
 
         return language;
     }
@@ -186,6 +185,33 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Jonathan Joestar":
+                                msg = "I strive to be a true gentleman! There are times when a gentleman has to be courageous and fight, even when his opponent is bigger than he is and he knows he's going to lose!";
+                                break;
+                            case "Will A. Zeppeli":
+                                msg = "Hey, Baby!";
+                                break;
+                            case "Gyro Zeppeli":
+                                msg = "I’ll tell you (and only you) my real name. “Gyro” is a pet name, or rather a nickname. My real name is “Julius Caesar Zeppeli” My father gave it to me… even my younger brothers don’t know that name… you’d better not tell anyone.";
+                                break;
+                            case "Dire":
+                                msg = "My name is Dire.";
+                                break;
+                            case "Straizo":
+                                msg = "I, Straizo, will show you no mercy!";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "I, Jotaro Kujo, will end you myself";
+                                break;
+                            case "Joseph Joestar":
+                                msg = "Joestar. Joseph Joestar. You can call me JoJo";
+                                break;
+                            case "Foo Fighters":
+                                msg = "Foo Fighters! If you're going to refer to me, call me by that name!";
+                                break;
+                            case "Hot Pants":
+                                msg = "Good day to you. Let's skip the chit-caht and get straight to the point. I will now hang you from this tree.";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Mein Körper ist das Ergebnis der höchsten Technologie der Deutschen und ich bin stolz darauf. In anderen Worten: Ich stehe über jedem anderen menschlichen Wesen!";
                                 break;
@@ -231,6 +257,24 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Jonathan Joestar":
+                                msg = "I even feel a bizarre friendship between us. And now, our fates are truly intertwined...";
+                                break;
+                            case "Robert E. O. Speedwagon":
+                                msg = "Stop, everyone! If you touch this gentleman, I, Speedwagon won't forgive you!";
+                                break;
+                            case "Will A. Zeppeli":
+                                msg = "The stern northern winds gave birth to the hardy, gritty Vikings! Will this trade create a Viking?";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "It's nice to meet one of me, but if you keep this up... you die.";
+                                break;
+                            case "Joseph Joestar":
+                                msg = "God, I think I got some cavities from all that sweet-talking!";
+                                break;
+                            case "Josuke Higashikata":
+                                msg = "グレートだぜ!";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Darauf war ich schon vorbereitet, als ich diese Mission annahm!";
                                 break;
@@ -270,6 +314,27 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Lisa Lisa":
+                                msg = "A crude individual like you... I don't want to either talk to nor see.";
+                                break;
+                            case "Johnny Joestar":
+                                msg = "I will never hand over this corpse! This has become my hope!";
+                                break;
+                            case "Gyro Zeppeli":
+                                msg = "Did you say something? Were you talking into my ass? Because I can't hear anything with my ass.";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "Hmph, are you mad? Did I hurt that pride of yours? No..! That's impossible since orangutans don't have andy pride!";
+                                break;
+                            case "Foo Fighters":
+                                msg = "Look at me. This is my 'spirit'... This is my 'intellect'";
+                                break;
+                            case "Rohan Kishibe":
+                                msg = "だが断る";
+                                break;
+                            case "Bruno Bucciarati":
+                                msg = "Questo sapore... è il sapore di un bugiardo!";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Ich mag zwar nicht so aussehen, aber ich bin ein stolzer Deutscher Soldat und dein Angebot beleidigt mich.";
                                 break;
@@ -310,6 +375,27 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Robert E. O. Speedwagon":
+                                msg = "*Speedwagon withdraws coolly.*";
+                                break;
+                            case "Johnny Joestar":
+                                msg = "In this situation... I wanna say something tough... like Gyro would.";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "There's only one reason you lost... just one simple reason. You pissed me off.";
+                                break;
+                            case "Gyro Zeppeli":
+                                msg = "Eat shit, asshole! Fall off your horse!";
+                                break;
+                            case "Jolyne Cujoh":
+                                msg = "Game set!";
+                                break;
+                            case "Yasuho Hirose":
+                                msg = "タマが「2つ」ない⋯こ⋯これつて一体";
+                                break;
+                            case "Bruno Bucciarati":
+                                msg = "Non puoi tirarmi una fregatura, canaglia. ARIARIARIARIARIARIARIARIARIARIARIARIARIARIARIARIARI! Arrivederci!";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "DEUTSCHE WISSENSCHAFT IST DIE BESTE DER WELT";
                                 break;
@@ -350,6 +436,39 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Jonathan Joestar":
+                                msg = "Be happy... Erina...";
+                                break;
+                            case "Johnny Joestar":
+                                msg = "It's truly, truly been... a very long roundabout path...";
+                                break;
+                            case "Robert E. O. Speedwagon":
+                                msg = "This is so great! I wish you nothing but happiness! I'll always be there for you guys. If you need me, I'll come no matter where it is! Though, I might just get in the way...";
+                                break;
+                            case "Will A. Zeppeli":
+                                msg = "JoJo, continue my will! Supreme Deep Pass Overdrive!";
+                                break;
+                            case "Gyro Zeppeli":
+                                msg = "If that's how it is... I'm okay with it... my real name... you promised, right...? Don't tell anybody. See ya... take care.";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "Next time we meet, I'm gonna land a thousand strikes on that face of yours.";
+                                break;
+                            case "Noriaki Kakyoin":
+                                msg = "The side which survives is good and how they do it is beside the point. The loser is the evil one";
+                                break;
+                            case "Joseph Joestar":
+                                msg = "He-llo? Could you say that again? More slowly? In a language I understand? Depending on what you said, I might kick your ass!";
+                                break;
+                            case "Foo Fightes":
+                                msg = "I'm glad I was able to say my goodbyes to you...";
+                                break;
+                            case "Weather Report":
+                                msg = "The kind of evil that doesn't realise that it's evil... is the worst kind there is...";
+                                break;
+                            case "Yasuho Hirose":
+                                msg = "絶対に嫌い⋯こいつマヅバカ";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Junge! Unsere Rassen mögen verschieden sein, aber ich respektiere solche wie dich, die Mut haben! Nur der Große sollte leben!... Tötet alle außer ihm.";
                                 break;
@@ -388,6 +507,15 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Gyro Zeppeli":
+                                msg = "Pizza mozzarella, pizza mozzarella, rella rella rella rella rella";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "Gimme a break...";
+                                break;
+                            case "Joseph Joestar":
+                                msg = "The phrase I hate the most is \"hard work\" and my second most hated phrase is \"work hard\"!";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Ich würde ohne Probleme 2 oder 3 Gliedmaßen für mein Land geben!";
                                 break;
@@ -425,6 +553,24 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Jonathan Joestar":
+                                msg = "This is not a \"plan\"! This is \"courage\"!";
+                                break;
+                            case "Lisa Lisa":
+                                msg = "Hey the big guy on the left. I don't like your face. I'm gonna have to hurt you.";
+                                break;
+                            case "Gyro Zeppeli":
+                                msg = "Whatever I can get, I'll take. Except for diseases... but especially resources... nyo ho!";
+                                break;
+                            case "Dire":
+                                msg = "You fell for it, fool! Thunder Cross Split Attack!";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "You gotta carve your own path in life";
+                                break;
+                            case "Joseph Joestar":
+                                msg = "I played a dirty trick on yooooooou";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Ich bin anders als ihr feigen britischen Weicheier.";
                                 break;
@@ -463,6 +609,18 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Jonathan Joestar":
+                                msg = "My heart is resonating! With the heat of a raging fire! Feel the pounding beat of my pulse! Sunlight Yellow Overdrive!";
+                                break;
+                            case "Gyro Zeppeli":
+                                msg = "Pizza gorgonzola, pizza gorgonzola, zola zola zola zola zola";
+                                break;
+                            case "Jotaro Kujo":
+                                msg = "I can't kick your ass unless I come closer";
+                                break;
+                            case "Joseph Joestar":
+                                msg = "You may have lived a long time, but you're not nearly as smart as me when it comes to coming up with plans!";
+                                break;
                             case "Rudol von Stroheim":
                                 msg = "Die Größe der Menschen ist, wenn sie der Angst mit Stolz begegnen.";
                                 break;
@@ -501,6 +659,24 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "I'll beat you once and for all! Fair and square! I'll teach you so your whole body will remember: you can't beat Dio! In Catan or in life!";
+                                break;
+                            case "DIO":
+                                msg = "You think like a mortal, with such a short time to live... Phrases like \"a bad taste in one's mouth\" or \"kill without regret\"... That reasoning is as compelling as rat shit in the bathroom, and it'll be your demise! I, DIO, don't think like that... All I have is one simple goal... Just one! To win and to dominate! That's it... That's all that can fulfill me! The process... How I do it... doesn't matter at all!";
+                                break;
+                            case "Bruford":
+                                msg = "You''ll be perfect for my first warm-up in three hundred years!";
+                                break;
+                            case "Diego Brando":
+                                msg = "The winds of victory are blowing at the back of me, Dio...";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "The difference between man and animal... it's the desire to \"go to Heaven\". Humans think about it...However, dogs and parrots can't grasp this concept. The idea of \"Heaven\". Humans should spend their lives trying to attain \"Heaven\". That is the beauty of humans.";
+                                break;
+                            case "Daniel J. D'Arby":
+                                msg = "My name is D'Arby. D'-A-R-B-Y. The \"D\" has an apostrophe.";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*squeak*";
@@ -547,6 +723,24 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "Rework your strategy all you want. There is a limit to what you humans can do";
+                                break;
+                            case "DIO":
+                                msg = "Now that we know, I'm satisfied... The playtime service is now over... I'll put an end to this quickly";
+                                break;
+                            case "Diego Brando":
+                                msg = "It's a win-win situation! Give me Manhattan Island!";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "Do you believe in gravitational forces between humans? That certain people attract certain others? I believe this, now";
+                                break;
+                            case "Terence T. D'Arby":
+                                msg = "Exactly";
+                                break;
+                            case "Daniel J. D'Arby":
+                                msg = "All right... we have a deal. Give it to me! Your soul.";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*high squeak*";
@@ -593,6 +787,18 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "Can a monkey reach a human? Compared to me, Dio... you are but a monkey!";
+                                break;
+                            case "DIO":
+                                msg = "MUDA MUDA MUDA MUDA!";
+                                break;
+                            case "Tarkus":
+                                msg = "You coward! You make a mockery of the knights that have completed the 77 Rings!";
+                                break;
+                            case "Diego Brando":
+                                msg = "Useless, useless!";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*low squeak*";
@@ -639,6 +845,24 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "Weakling, weakling! Did you think you ever stood a chance?! Fool!";
+                                break;
+                            case "DIO":
+                                msg = "Puny humans! I will rule you all! Bow before my power and knowledge!";
+                                break;
+                            case "Daniel J. D'Arby":
+                                msg = "Cheating? Didn't you know? If you can't detect when someone is cheating, you can't detect failure. I think gambling is the same as social relations... it's a game of fakes and cheats. The one who cries first is the loser";
+                                break;
+                            case "Diego Brando":
+                                msg = "The one who was victorious was... me!";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "A new world! Humanity has finally reached a common end... a new dawn!";
+                                break;
+                            case "Terence T. D'Arby":
+                                msg = "I got his soul. He admitted defeat in his heart. But he was the first to make me sweat like this.";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*squeak* *squeak*";
@@ -685,6 +909,24 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "H- How? H- How?! How could scum like you do this to me, Dio?!";
+                                break;
+                            case "DIO":
+                                msg = "What?! I- Impossible! I... I am DIO! I am DIO!";
+                                break;
+                            case "Bruford":
+                                msg = "Heheh... this pain is proof of life. If you feel pain, you can feel joy. That's what humanity means";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "You insignificant brat!!!";
+                                break;
+                            case "Terence T. D'Arby":
+                                msg = "The man who can conquer his fear... He's the first one that's played a game against me without making a mistake mentally.";
+                                break;
+                            case "Daniel J. D'Arby":
+                                msg = "My name is D'Arby! Not barbie! Not obi! D'Arby! Don't make that mistake again!";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "...";
@@ -732,6 +974,15 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "Do you remember how many loaves of bread you've eaten in your life";
+                                break;
+                            case "DIO":
+                                msg = "It's a road roller!";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "2...3...5...7...11...13...17...19.... prime numbers are solitary numbers that can only be divided by 1 and themselves... they give me strength.";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*squeak*";
@@ -778,6 +1029,18 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "You want me to be rich? Ha! I'll do it, then!";
+                                break;
+                            case "DIO":
+                                msg = "Invulnerability! Eternal life! Stand Power! Here lies the proof that none shall surpass the mighty DIO!";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "A bit closer to heaven!";
+                                break;
+                            case "Daniel J. D'Arby":
+                                msg = "Open the game!";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*high squeak*";
@@ -825,6 +1088,18 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
+                            case "Dio Brando":
+                                msg = "The sun has set... It's time for your lives to sink as well!";
+                                break;
+                            case "DIO":
+                                msg = "WRYYYYYYYYYYYYYYYYYYYY!";
+                                break;
+                            case "Enrico Pucci":
+                                msg = "\"Domine quo vadis?\" You're going to be crucified!!!";
+                                break;
+                            case "Daniel J. D'Arby":
+                                msg = "Go ahead!";
+                                break;
                             case "Bug-Eaten":
                             case "Not Bug-Eaten":
                                 msg = "*squeak*";

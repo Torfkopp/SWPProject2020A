@@ -1,9 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.game.map.Player;
-import de.uol.swp.common.game.map.hexes.IGameHex;
-import de.uol.swp.common.game.map.hexes.IHarbourHex;
-import de.uol.swp.common.game.map.hexes.IResourceHex;
+import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
@@ -84,9 +82,10 @@ public class GameAI {
                     ((y == 2 || y == 4) ? ((int) (Math.random() * 4 + 1)) : ((int) (Math.random() * 5 + 1)));
                 break;
             case HARD:
-                Map<MapPoint, Integer> position = new HashMap<>() {};
+                Map<MapPoint, Integer> position = new HashMap<>();
                 Player player = game.getPlayer(ai);
                 int rating;
+
                 //Get every hex and give them a rating depending on the amount of players around it
                 for (int i = 1; i < 6; i++) {
                     for (int j = 1; j < 6; j++) {
@@ -103,13 +102,33 @@ public class GameAI {
                         position.put(mapPoint, rating);
                     }
                 }
+
+                //Filter every hex with a rating lower than the highest
                 if (position.containsValue(3)) rating = 3;
                 else if (position.containsValue(2)) rating = 2;
                 else if (position.containsValue(1)) rating = 1;
                 else rating = 0;
-                //Filter every hex with a rating lower than the highest
                 List<MapPoint> points = new ArrayList<>(position.keySet());
                 for (MapPoint mp : points) if (position.get(mp) < rating) position.remove(mp);
+
+                //Pick the one(s) with the highest likeability to give resources (token nearest to 7)
+                Map<MapPoint, Integer> tokens = new HashMap<>();
+                IResourceHex resHex;
+                for (MapPoint mp : position.keySet()) {
+                    if (map.getHex(mp) instanceof DesertHex) {
+                        tokens.put(mp, 13);
+                        continue;
+                    }
+                    resHex = (IResourceHex) map.getHex(mp);
+                    tokens.put(mp, resHex.getToken());
+                }
+                int token = 5;
+                if (tokens.containsValue(6) || tokens.containsValue(8)) token = 1;
+                else if (tokens.containsValue(5) || tokens.containsValue(9)) token = 2;
+                else if (tokens.containsValue(4) || tokens.containsValue(10)) token = 3;
+                else if (tokens.containsValue(3) || tokens.containsValue(11)) token = 4;
+                for (MapPoint mp : tokens.keySet()) if (Math.abs(tokens.get(mp) - 7) > token) position.remove(mp);
+
                 //Pick a random hex from the survivors
                 if (!position.isEmpty()) {
                     mapPoint = new ArrayList<>(position.keySet()).get((int) (Math.random() * position.keySet().size()));
@@ -207,7 +226,7 @@ public class GameAI {
                 //Difference:4-100%, 3-92%, 2-84%, 1-76%, 0-68%
                 if (difference >= 0 && ((int) (Math.random() * 100) < (68 + difference * 8))) return true;
                     //Difference:4-0%, 3-8%, 2-16%, 1-24%
-                else return difference < 0 && ((int) (Math.random() * 100) < (32 - difference * 8));
+                else return difference < 0 && ((int) (Math.random() * 100) < (32 + difference * 8));
             case HARD:
                 if (demanded.getTotal() == 0 || difference > 2) return true;
                 if (offered.getTotal() == 0 || difference < -2) return false;
@@ -271,7 +290,8 @@ public class GameAI {
      * @since 2021-05-13
      */
     void writeChatMessageAI(AI ai, LobbyName lobbyName, AI.WriteType type) {
-        gameService.postAI(ai, ai.writeMessage(type), lobbyName);
+        String msg = ai.writeMessage(type);
+        if (!msg.equals("")) gameService.postAI(ai, msg, lobbyName);
     }
 
     /**
@@ -773,6 +793,7 @@ public class GameAI {
         while (inv.get(WOOL) >= 1 && inv.get(GRAIN) >= 1 && inv.get(ORE) >= 1 && !game.getBankInventory()
                                                                                       .getDevelopmentCards().isEmpty())
             gameService.onBuyDevelopmentCardRequest(new BuyDevelopmentCardRequest(ai, lobbyName));
+
         //Update Victory Points
         gameService.updateVictoryPoints(lobbyName);
     }
