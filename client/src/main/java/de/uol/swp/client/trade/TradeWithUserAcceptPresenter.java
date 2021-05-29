@@ -2,7 +2,6 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
@@ -65,10 +64,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     public void initialize() {
         super.initialize();
-        ThreadManager.runNow(() -> {
-            LOG.debug("TradeWithUserAcceptPresenter initialised");
-            setAcceptTradeTimer(30);
-        });
+        LOG.debug("TradeWithUserAcceptPresenter initialised");
+        setAcceptTradeTimer(30);
     }
 
     /**

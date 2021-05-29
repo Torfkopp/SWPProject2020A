@@ -144,13 +144,11 @@ public class ClientApp extends Application implements ConnectionListener {
         eventBus.unregister(this);
         // Important: Close the connection, so the connection thread can terminate.
         //            Else the client application will not stop
-        ThreadManager.runNow(() -> {
-            LOG.trace("Trying to shutting down client ...");
-            if (clientConnection != null) {
-                clientConnection.close();
-            }
-            LOG.info("ClientConnection shutdown");
-        });
+        LOG.trace("Trying to shutting down client ...");
+        if (clientConnection != null) {
+            clientConnection.close();
+        }
+        LOG.info("ClientConnection shutdown");
         ThreadManager.shutdown();
     }
 

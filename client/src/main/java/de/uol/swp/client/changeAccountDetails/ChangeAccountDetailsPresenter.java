@@ -6,7 +6,6 @@ import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import javafx.beans.binding.Bindings;
@@ -60,7 +59,7 @@ public class ChangeAccountDetailsPresenter extends AbstractPresenter {
         newEMailField.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
         newPasswordField.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
         newPasswordField2.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
-        ThreadManager.runNow(() -> LOG.debug("ChangeAccountDetailsPresenter initialised"));
+        LOG.debug("ChangeAccountDetailsPresenter initialised");
     }
 
     /**
