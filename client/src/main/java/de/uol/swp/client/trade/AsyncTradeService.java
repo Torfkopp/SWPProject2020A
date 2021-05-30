@@ -82,11 +82,6 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void showBankTradeWindow(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncTradeService.showBankTradeWindow(lobbyName));
-    }
-
-    @Override
     public void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
         ThreadManager.runNow(() -> syncTradeService.showOfferWindow(lobbyName, offeringUser, rsp));
     }
@@ -97,8 +92,8 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser) {
-        ThreadManager.runNow(() -> syncTradeService.showUserTradeWindow(lobbyName, respondingUser));
+    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
+        ThreadManager.runNow(() -> syncTradeService.showUserTradeWindow(lobbyName, respondingUser, isCounterOffer));
     }
 
     @Override

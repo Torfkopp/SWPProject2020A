@@ -114,12 +114,6 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showBankTradeWindow(LobbyName lobbyName) {
-        LOG.debug("Sending ShowTradeWithBankViewEvent");
-        eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
-    }
-
-    @Override
     public void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
@@ -132,9 +126,9 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser) {
+    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser));
+        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser, isCounterOffer));
     }
 
     @Override

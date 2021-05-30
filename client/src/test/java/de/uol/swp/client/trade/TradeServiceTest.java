@@ -210,7 +210,7 @@ class TradeServiceTest {
 
     @Test
     void showBankTradeWindow() throws InterruptedException {
-        tradeService.showBankTradeWindow(defaultLobbyName);
+        tradeService.tradeWithBank(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -256,7 +256,7 @@ class TradeServiceTest {
 
     @Test
     void showUserTradeWindow() throws InterruptedException {
-        tradeService.showUserTradeWindow(defaultLobbyName, secondUser);
+        tradeService.showUserTradeWindow(defaultLobbyName, secondUser, false);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

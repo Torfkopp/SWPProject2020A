@@ -396,7 +396,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void onTradeWithBankButtonPressed() {
         soundService.button();
         disableButtonStates();
-        tradeService.showBankTradeWindow(lobbyName);
         tradeService.tradeWithBank(lobbyName);
     }
 
@@ -423,8 +422,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            tradeService.showUserTradeWindow(lobbyName, user);
-            tradeService.tradeWithUser(lobbyName, user, false);
+            tradeService.showUserTradeWindow(lobbyName, user, false);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }

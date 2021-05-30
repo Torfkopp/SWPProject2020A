@@ -35,6 +35,7 @@ import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
+import de.uol.swp.common.game.request.TradeWithUserRequest;
 import de.uol.swp.common.game.response.TradeWithUserCancelResponse;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -1238,6 +1239,9 @@ public class SceneManager {
             tradingStage.show();
             LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
             ThreadManager.runNow(() -> eventBus.post(new TradeWithUserUpdateEvent(lobbyName)));
+            ThreadManager.runNow(() -> eventBus
+                    .post(new TradeWithUserRequest(lobbyName, userService.getLoggedInUser(), event.getRespondingUser(),
+                                                   event.isCounterOffer())));
         });
     }
 

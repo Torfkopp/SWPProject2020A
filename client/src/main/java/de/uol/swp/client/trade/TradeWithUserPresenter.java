@@ -278,7 +278,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * @since 2021-04-20
      */
     private void setResourceLists() {
-        Platform.runLater(() -> {
             selectedOwnResourceList = new ResourceList();
             selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
             selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));
@@ -292,7 +291,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             selectedPartnersResourceList.set(ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
             selectedPartnersResourceList.set(ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
             selectedPartnersResourceList.set(ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
-        });
     }
 
     /**
