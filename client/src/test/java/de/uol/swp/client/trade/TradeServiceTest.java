@@ -214,11 +214,10 @@ class TradeServiceTest {
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof ShowTradeWithBankViewEvent);
+        assertTrue(event instanceof TradeWithBankRequest);
+        TradeWithBankRequest eve = (TradeWithBankRequest) event;
 
-        ShowTradeWithBankViewEvent eve = (ShowTradeWithBankViewEvent) event;
-
-        assertEquals(defaultLobbyName, eve.getLobbyName());
+        assertEquals(defaultLobbyName, eve.getName());
     }
 
     @Test
