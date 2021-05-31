@@ -19,7 +19,6 @@ import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
-import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.*;
@@ -246,35 +245,6 @@ public class LobbyService extends AbstractService {
             exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a GetOldSessionRequest found on the EventBus
-     * <p>
-     * When a GetOldSessionRequest is found on the EventBus, this method
-     * is called. It checks the LobbyManagement for all the lobbies
-     * the requesting user is in and posts JoinLobbyResponses for each.
-     * This method is used to reopen lobby windows on a new client.
-     *
-     * @param req The GetOldSessionRequest on the EventBus
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-04-09
-     */
-    @Subscribe
-    private void onGetOldSessionsRequest(GetOldSessionsRequest req) {
-        LOG.debug("Received GetOldSessionsRequest");
-        User user = req.getUser();
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<LobbyName, ILobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUserOrDummies().contains(user)) {
-                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(),
-                                                                        ILobby.getSimpleLobby(entry.getValue()));
-                responseMessage.initWithMessage(req);
-                post(responseMessage);
-            }
         }
     }
 
