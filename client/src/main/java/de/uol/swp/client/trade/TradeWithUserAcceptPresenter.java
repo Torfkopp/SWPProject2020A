@@ -6,6 +6,7 @@ import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
+import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
@@ -276,5 +277,18 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         if (content.substring(content.length() - 2, content.length()).equals(", "))
             content.delete(content.length() - 2, content.length());
         return content.toString();
+    }
+    private void isTradeFair() {
+        String tooManyResources = String.format(resourceBundle.getString("game.trade.status.toomanyresources"));
+        int offeringAmount = offeringResourceMap.getTotal();
+        int demandingAmount = respondingResourceMap.getTotal();
+        if (offeringAmount - demandingAmount > 2) {
+            acceptTradeButton.setDisable(true);
+            tradeNotPossibleLabel.setText(tooManyResources);
+        }
+        if (demandingAmount - offeringAmount > 2) {
+            acceptTradeButton.setDisable(true);
+            tradeNotPossibleLabel.setText(tooManyResources);
+        }
     }
 }
