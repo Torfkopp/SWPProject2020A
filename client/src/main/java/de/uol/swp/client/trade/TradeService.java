@@ -114,6 +114,12 @@ public class TradeService implements ITradeService {
     }
 
     @Override
+    public void showBankTradeWindow(LobbyName lobbyName) {
+        LOG.debug("Sending ShowTradeWithBankViewEvent");
+        eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
+    }
+
+    @Override
     public void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
         LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
         eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));

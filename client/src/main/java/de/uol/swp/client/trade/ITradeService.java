@@ -112,6 +112,15 @@ public interface ITradeService {
     void resetOfferTradeButton(LobbyName lobbyName, UserOrDummy offeringUser);
 
     /**
+     * Posts an event to show the Bank trade window
+     *
+     * @param lobbyName The name of the lobby
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     */
+    void showBankTradeWindow(LobbyName lobbyName);
+
+    /**
      * Posts an event to show the Trade Offered window displaying a trade offer
      * from another user
      *

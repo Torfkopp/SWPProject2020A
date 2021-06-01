@@ -102,6 +102,11 @@ public class AsyncTradeService implements ITradeService {
     }
 
     @Override
+    public void showBankTradeWindow(LobbyName lobbyName) {
+        ThreadManager.runNow(() -> syncTradeService.showBankTradeWindow(lobbyName));
+    }
+
+    @Override
     public void tradeWithUser(LobbyName lobbyName, UserOrDummy respondingUser, boolean counterOffer) {
         ThreadManager.runNow(() -> syncTradeService.tradeWithUser(lobbyName, respondingUser, counterOffer));
     }

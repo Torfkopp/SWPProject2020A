@@ -396,7 +396,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void onTradeWithBankButtonPressed() {
         soundService.button();
         disableButtonStates();
-        tradeService.tradeWithBank(lobbyName);
+        tradeService.showBankTradeWindow(lobbyName);
     }
 
     /**

@@ -210,14 +210,14 @@ class TradeServiceTest {
 
     @Test
     void showBankTradeWindow() throws InterruptedException {
-        tradeService.tradeWithBank(defaultLobbyName);
+        tradeService.showBankTradeWindow(defaultLobbyName);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof TradeWithBankRequest);
-        TradeWithBankRequest eve = (TradeWithBankRequest) event;
+        assertTrue(event instanceof ShowTradeWithUserViewEvent);
+        ShowTradeWithUserViewEvent eve = (ShowTradeWithUserViewEvent) event;
 
-        assertEquals(defaultLobbyName, eve.getName());
+        assertEquals(defaultLobbyName, eve.getLobbyName());
     }
 
     @Test
