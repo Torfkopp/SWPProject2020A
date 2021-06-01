@@ -18,6 +18,7 @@ import de.uol.swp.common.lobby.response.AllLobbyMembersResponse;
 import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -235,10 +236,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
 
         Platform.runLater(() -> {
-            kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-            changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-            tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
-            moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
+            kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
+            changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
+            tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
+            moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
         });
         setPreGameSettings();
@@ -325,8 +326,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
-        Platform.runLater(() -> moveTimeLabel
-                .setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime)));
+        Platform.runLater(() -> moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime)));
     }
 
     /**
@@ -441,10 +441,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                     if (empty || user == null) setText("");
                     else {
                         String name = user.getUsername();
-                        if (readyUsers.contains(user))
-                            name = String.format(resourceBundle.getString("lobby.members.ready"), name);
-                        if (user.equals(owner))
-                            name = String.format(resourceBundle.getString("lobby.members.owner"), name);
+                        if (readyUsers.contains(user)) name = ResourceManager.get("lobby.members.ready", name);
+                        if (user.equals(owner)) name = ResourceManager.get("lobby.members.owner", name);
                         if (inGame) {
                             if (cardAmountsList == null) {
                                 cardAmountsList = new ArrayList<>();
@@ -453,9 +451,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                             }
                             for (CardsAmount cardsAmount : cardAmountsList) {
                                 if (Objects.equals(cardsAmount.getUser(), user)) {
-                                    name = String.format(resourceBundle.getString("lobby.members.amount"), name,
-                                                         cardsAmount.getResourceCardsAmount(),
-                                                         cardsAmount.getDevelopmentCardsAmount());
+                                    name = ResourceManager
+                                            .get("lobby.members.amount", name, cardsAmount.getResourceCardsAmount(),
+                                                 cardsAmount.getDevelopmentCardsAmount());
                                     break;
                                 }
                             }
@@ -468,8 +466,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         membersView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
+                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
+                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
                 return;
             }
             String name = newValue.getUsername();
@@ -478,14 +476,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             changeOwnerButton.setDisable(isSelf);
             tradeWithUserButton.setDisable(isSelf || !tradingCurrentlyAllowed);
             if (isSelf) {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-                tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", ""));
+                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", ""));
+                tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
             } else {
-                kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), name));
-                changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), name));
-                tradeWithUserButton
-                        .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
+                kickUserButton.setText(ResourceManager.get("lobby.buttons.kickuser", name));
+                changeOwnerButton.setText(ResourceManager.get("lobby.buttons.changeowner", name));
+                tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade", name));
             }
         });
     }

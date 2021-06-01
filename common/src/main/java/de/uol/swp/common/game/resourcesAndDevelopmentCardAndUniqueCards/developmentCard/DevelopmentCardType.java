@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard;
 
-import javax.inject.Inject;
+import de.uol.swp.common.util.ResourceManager;
+
 import java.io.Serializable;
-import java.util.ResourceBundle;
 
 /**
  * The enum Development card type.
@@ -18,8 +18,6 @@ public enum DevelopmentCardType implements Serializable {
     MONOPOLY_CARD("game.resources.cards.monopoly"),
     VICTORY_POINT_CARD("game.resources.cards.victorypoints");
 
-    @Inject
-    private static ResourceBundle resourceBundle;
 
     private final String attribute;
 
@@ -37,7 +35,7 @@ public enum DevelopmentCardType implements Serializable {
 
     @Override
     public String toString() {
-        return resourceBundle.getString(getAttributeName());
+        return ResourceManager.get(getAttributeName());
     }
 
     /**

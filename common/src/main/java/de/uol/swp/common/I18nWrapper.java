@@ -1,10 +1,8 @@
 package de.uol.swp.common;
 
-import com.google.inject.Inject;
+import de.uol.swp.common.util.ResourceManager;
 
 import java.io.Serializable;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /**
  * A wrapper to delegate the internationalisation of text to the client side.
@@ -17,8 +15,6 @@ import java.util.ResourceBundle;
 public class I18nWrapper implements Serializable {
 
     //Will only be injected on the client side with a static injection requested in the ClientModule
-    @Inject
-    private static ResourceBundle resourceBundle;
     private final String attributeName;
     private final String insertString;
     private final Object[] insertStrings;
@@ -31,18 +27,6 @@ public class I18nWrapper implements Serializable {
     public I18nWrapper(String attributeName) {
         this.attributeName = attributeName;
         this.insertString = null;
-        this.insertStrings = null;
-    }
-
-    /**
-     * Constructor taking an attribute name and a string that should be embedded in the text
-     *
-     * @param attributeName The name of the attribute
-     * @param insertString  The String to insert
-     */
-    public I18nWrapper(String attributeName, String insertString) {
-        this.attributeName = attributeName;
-        this.insertString = insertString;
         this.insertStrings = null;
     }
 
@@ -65,19 +49,6 @@ public class I18nWrapper implements Serializable {
 
     @Override
     public String toString() {
-        try {
-            if (resourceBundle != null) {
-                if (insertString == null && insertStrings == null) return resourceBundle.getString(attributeName);
-                else if (insertStrings == null)
-                    return String.format(resourceBundle.getString(attributeName), insertString);
-                else return String.format(resourceBundle.getString(attributeName), insertStrings);
-            } else return null;
-        } catch (MissingResourceException exception1) {
-            try {
-                return resourceBundle.getString("missingproperty");
-            } catch (MissingResourceException exception2) {
-                return "Missing language property";
-            }
-        }
+        return ResourceManager.get(attributeName, insertStrings);
     }
 }

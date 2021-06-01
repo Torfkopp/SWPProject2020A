@@ -1,8 +1,8 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource;
 
-import javax.inject.Inject;
+import de.uol.swp.common.util.ResourceManager;
+
 import java.io.Serializable;
-import java.util.ResourceBundle;
 
 /**
  * The enum for the type of a resource.
@@ -17,8 +17,6 @@ public enum ResourceType implements Serializable {
     ORE("game.resources.ore"),
     WOOL("game.resources.wool");
 
-    @Inject
-    private static ResourceBundle resourceBundle;
 
     private final String InternationalizationPropertyName;
 
@@ -35,10 +33,7 @@ public enum ResourceType implements Serializable {
 
     @Override
     public String toString() {
-        try {
-            return resourceBundle.getString(getInternationalizationPropertyName());
-        } catch (NullPointerException ignored) {}
-        return "Something went wrong";
+        return ResourceManager.get(getInternationalizationPropertyName());
     }
 
     /**

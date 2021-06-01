@@ -33,6 +33,7 @@ import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -301,26 +302,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void onPlayCardButtonPressed() {
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
-        alert.setHeaderText(resourceBundle.getString("game.playcards.alert.header"));
-        alert.setContentText(resourceBundle.getString("game.playcards.alert.content"));
+        alert.setTitle(ResourceManager.get("game.playcards.alert.title"));
+        alert.setHeaderText(ResourceManager.get("game.playcards.alert.header"));
+        alert.setContentText(ResourceManager.get("game.playcards.alert.content"));
         //Create the buttons
-        ButtonType btnKnight = new ButtonType(resourceBundle.getString("game.resources.cards.knight"));
-        ButtonType btnMonopoly = new ButtonType(resourceBundle.getString("game.resources.cards.monopoly"));
-        ButtonType btnRoadBuilding = new ButtonType(resourceBundle.getString("game.resources.cards.roadbuilding"));
-        ButtonType btnYearOfPlenty = new ButtonType(resourceBundle.getString("game.resources.cards.yearofplenty"));
-        ButtonType btnCancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                              ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType btnKnight = new ButtonType(ResourceManager.get("game.resources.cards.knight"));
+        ButtonType btnMonopoly = new ButtonType(ResourceManager.get("game.resources.cards.monopoly"));
+        ButtonType btnRoadBuilding = new ButtonType(ResourceManager.get("game.resources.cards.roadbuilding"));
+        ButtonType btnYearOfPlenty = new ButtonType(ResourceManager.get("game.resources.cards.yearofplenty"));
+        ButtonType btnCancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(btnKnight, btnMonopoly, btnRoadBuilding, btnYearOfPlenty, btnCancel);
         alert.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<ButtonType> result = alert.showAndWait();
         //Create Strings based on the languages name for the resources
-        String ore = resourceBundle.getString("game.resources.ore");
-        String grain = resourceBundle.getString("game.resources.grain");
-        String brick = resourceBundle.getString("game.resources.brick");
-        String lumber = resourceBundle.getString("game.resources.lumber");
-        String wool = resourceBundle.getString("game.resources.wool");
+        String ore = ResourceManager.get("game.resources.ore");
+        String grain = ResourceManager.get("game.resources.grain");
+        String brick = ResourceManager.get("game.resources.brick");
+        String lumber = ResourceManager.get("game.resources.lumber");
+        String wool = ResourceManager.get("game.resources.wool");
         //Make a list with aforementioned Strings
         List<String> choices = new ArrayList<>();
         choices.add(ore);
@@ -418,9 +418,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.noplayer"));
+            tradeService.showTradeError(ResourceManager.get("game.trade.error.noplayer"));
         } else if (Objects.equals(user, userService.getLoggedInUser())) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
+            tradeService.showTradeError(ResourceManager.get("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
             tradeService.showUserTradeWindow(lobbyName, user);
@@ -442,20 +442,20 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void setHelpText() {
         if (gameWon) return;
         if (!ownTurn) {
-            Text wait = new Text(resourceBundle.getString("game.help.labels.waitforturn"));
+            Text wait = new Text(ResourceManager.get("game.help.labels.waitforturn"));
             Platform.runLater(() -> {
                 helpLabel.getChildren().clear();
                 helpLabel.getChildren().add(wait);
             });
         } else {
-            String cardString = resourceBundle.getString("game.help.labels.playcard");
-            Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
-            Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
-            Text setRobber = new Text(resourceBundle.getString("game.help.labels.setrobber"));
-            Text endTurn = new Text(resourceBundle.getString("game.help.labels.endturn"));
-            Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
-            Text build = new Text(resourceBundle.getString("game.help.labels.build"));
-            Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
+            String cardString = ResourceManager.get("game.help.labels.playcard");
+            Text turn = new Text(ResourceManager.get("game.help.labels.turn"));
+            Text rollDiceText = new Text(ResourceManager.get("game.help.labels.rolldice"));
+            Text setRobber = new Text(ResourceManager.get("game.help.labels.setrobber"));
+            Text endTurn = new Text(ResourceManager.get("game.help.labels.endturn"));
+            Text trade = new Text(ResourceManager.get("game.help.labels.trade"));
+            Text build = new Text(ResourceManager.get("game.help.labels.build"));
+            Text playCard = new Text(ResourceManager.get("game.help.labels.playacard"));
             Platform.runLater(() -> {
                 helpLabel.getChildren().clear();
                 if (!diceRolled) helpLabel.getChildren().addAll(turn, rollDiceText);
@@ -502,7 +502,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-05-01
      */
     protected void setMoveTimer(int moveTime) {
-        String moveTimeText = resourceBundle.getString("game.labels.movetime");
+        String moveTimeText = ResourceManager.get("game.labels.movetime");
         moveTimeTimer = new Timer();
         AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         moveTimeTimer.scheduleAtFixedRate(new TimerTask() {
@@ -549,8 +549,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-01-23
      */
     protected void setTurnIndicatorText(UserOrDummy user) {
-        Text preUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator1"));
-        Text postUsernameText = new Text(resourceBundle.getString("lobby.game.text.turnindicator2"));
+        Text preUsernameText = new Text(ResourceManager.get("lobby.game.text.turnindicator1"));
+        Text postUsernameText = new Text(ResourceManager.get("lobby.game.text.turnindicator2"));
         Platform.runLater(() -> {
             turnIndicator.getChildren().clear();
             preUsernameText.setFont(Font.font(20.0));
@@ -650,22 +650,22 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         LOG.debug("Received BuildingFailedResponse");
         switch (rsp.getReason()) {
             case ALREADY_BUILT_HERE:
-                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.alreadybuildhere"));
+                gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.alreadybuildhere"));
                 break;
             case BAD_GROUND:
-                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.badground"));
+                gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.badground"));
                 break;
             case CANT_BUILD_HERE:
-                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.cantbuildhere"));
+                gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.cantbuildhere"));
                 break;
             case NOTHING_HERE:
-                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.nothinghere"));
+                gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.nothinghere"));
                 break;
             case NOT_ENOUGH_RESOURCES:
-                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.notenoughresources"));
+                gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.notenoughresources"));
                 break;
             case NOT_THE_RIGHT_TIME:
-                gameMapDescription.setBottomText(resourceBundle.getString("game.building.failed.nottherighttime"));
+                gameMapDescription.setBottomText(ResourceManager.get("game.building.failed.nottherighttime"));
                 break;
         }
         gameRendering.redraw();
@@ -690,7 +690,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
             LOG.debug("---- First road successfully built");
-            Platform.runLater(() -> notice.setText(resourceBundle.getString("game.playcards.roadbuilding.second")));
+            Platform.runLater(() -> notice.setText(ResourceManager.get("game.playcards.roadbuilding.second")));
         } else if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.NO_ROAD_BUILDING_CARD_PLAYED;
             LOG.debug("---- Second road successfully built");
@@ -703,19 +703,17 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 LOG.debug("--- First founding Settlement successfully built");
                 Platform.runLater(() -> {
                     notice.setVisible(true);
-                    notice.setText(resourceBundle.getString("game.setupphase.building.firstroad"));
+                    notice.setText(ResourceManager.get("game.setupphase.building.firstroad"));
                 });
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_SETTLEMENT_BUILT)) {
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT;
                 endTurn.setDisable(false);
                 LOG.debug("--- First founding road successfully built");
-                Platform.runLater(
-                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.firstroundend")));
+                Platform.runLater(() -> notice.setText(ResourceManager.get("game.setupphase.building.firstroundend")));
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.FIRST_BOTH_BUILT)) {
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT;
                 LOG.debug("--- Second founding Settlement successfully built");
-                Platform.runLater(
-                        () -> notice.setText(resourceBundle.getString("game.setupphase.building.secondroad")));
+                Platform.runLater(() -> notice.setText(ResourceManager.get("game.setupphase.building.secondroad")));
             } else if (startUpPhaseBuiltStructures.equals(StartUpPhaseBuiltStructures.SECOND_SETTLEMENT_BUILT)) {
                 // startup phase over because player must have just built the second founding road
                 startUpPhaseBuiltStructures = StartUpPhaseBuiltStructures.ALL_BUILT;
@@ -724,7 +722,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 LOG.debug("--- Second founding road successfully built");
                 Platform.runLater(() -> {
                     notice.setText("");
-                    endTurn.setText(resourceBundle.getString("game.setupphase.ended"));
+                    endTurn.setText(ResourceManager.get("game.setupphase.ended"));
                 });
             }
         }
@@ -843,7 +841,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         setTurnIndicatorText(msg.getActivePlayer());
         if (!startUpPhaseEnabled) {
             // needed to reverse the labeling done in onBuildingSuccessfulMessage
-            String endTurnText = resourceBundle.getString("lobby.game.buttons.endturn");
+            String endTurnText = ResourceManager.get("lobby.game.buttons.endturn");
             if (!endTurn.getText().equals(endTurnText)) Platform.runLater(() -> endTurn.setText(endTurnText));
         }
         setRollDiceButtonState(msg.getActivePlayer());
@@ -852,7 +850,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!rollDice.isDisabled() && autoRollEnabled) onRollDiceButtonPressed();
         if (moveTimeTimer != null) moveTimeTimer.cancel();
         setMoveTimer(moveTime);
-        String roundText = String.format(resourceBundle.getString("lobby.menu.round"), getRound);
+        String roundText = String.format(ResourceManager.get("lobby.menu.round"), getRound);
         Platform.runLater(() -> currentRound.setText(roundText));
     }
 
@@ -893,7 +891,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         gamePaused = msg.isPaused();
         if (gamePaused) {
-            Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.unpause")));
+            Platform.runLater(() -> pauseButton.setText(ResourceManager.get("game.menu.unpause")));
             timerPaused = true;
             tradeService.closeBankTradeWindow(lobbyName);
             tradeService.closeTradeResponseWindow(lobbyName);
@@ -901,7 +899,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             disableButtonStates();
             rollDice.setDisable(true);
         } else {
-            Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.pause")));
+            Platform.runLater(() -> pauseButton.setText(ResourceManager.get("game.menu.pause")));
             timerPaused = false;
             if (userService.getLoggedInUser().equals(msg.getActivePlayer()) && !robberNewPosition && statusChange) {
                 if (diceRolled) resetButtonStates(userService.getLoggedInUser());
@@ -944,10 +942,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received PlayCardFailureResponse");
         if (!userService.getLoggedInUser().equals(rsp.getUser())) return;
-        String title = resourceBundle.getString("game.playcards.failure.title");
-        String headerText = resourceBundle.getString("game.playcards.failure.header");
-        String confirmText = resourceBundle.getString("button.confirm");
-        String contentText = resourceBundle.getString("game.playcards.failure.context.noCards");
+        String title = ResourceManager.get("game.playcards.failure.title");
+        String headerText = ResourceManager.get("game.playcards.failure.header");
+        String confirmText = ResourceManager.get("button.confirm");
+        String contentText = ResourceManager.get("game.playcards.failure.context.noCards");
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(title);
@@ -998,7 +996,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onPlayRoadBuildingCardAllowedResponse(PlayRoadBuildingCardAllowedResponse rsp) {
         Platform.runLater(() -> {
-            notice.setText(resourceBundle.getString("game.playcards.roadbuilding.first"));
+            notice.setText(ResourceManager.get("game.playcards.roadbuilding.first"));
             notice.setVisible(true);
         });
         disableButtonStates();
@@ -1082,11 +1080,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onRobberChooseVictimResponse(RobberChooseVictimResponse rsp) {
         LOG.debug("Received RobberChooseVictimResponse");
         if (userService.getLoggedInUser().equals(rsp.getPlayer())) {
-            String title = resourceBundle.getString("game.robber.victim.title");
-            String headerText = resourceBundle.getString("game.robber.victim.header");
-            String contentText = resourceBundle.getString("game.robber.victim.content");
-            String confirmText = resourceBundle.getString("button.confirm");
-            String cancelText = resourceBundle.getString("button.cancel");
+            String title = ResourceManager.get("game.robber.victim.title");
+            String headerText = ResourceManager.get("game.robber.victim.header");
+            String contentText = ResourceManager.get("game.robber.victim.content");
+            String confirmText = ResourceManager.get("button.confirm");
+            String cancelText = ResourceManager.get("button.cancel");
             Platform.runLater(() -> {
                 List<UserOrDummy> victims = new ArrayList<>(rsp.getVictims());
                 ChoiceDialog<UserOrDummy> dialogue = new ChoiceDialog<>(victims.get(0), victims);
@@ -1118,7 +1116,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @Subscribe
     private void onRobberNewPositionResponse(RobberNewPositionResponse rsp) {
         LOG.debug("Received RobberNewPositionResponse");
-        Platform.runLater(() -> notice.setText(resourceBundle.getString("game.robber.position")));
+        Platform.runLater(() -> notice.setText(ResourceManager.get("game.robber.position")));
         notice.setVisible(true);
         robberNewPosition = true;
         if (helpActivated) setHelpText();
@@ -1328,8 +1326,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (!msg.getLobbyName().equals(lobbyName)) return;
         LOG.debug("Received UpdateVictoryPointsMessage for Lobby {}", lobbyName);
         int victoryPoints = msg.getVictoryPointMap().get(userService.getLoggedInUser());
-        Platform.runLater(() -> victoryPointsLabel
-                .setText(String.format(resourceBundle.getString("game.victorypoints.labels"), victoryPoints)));
+        Platform.runLater(
+                () -> victoryPointsLabel.setText(ResourceManager.get("game.victorypoints.labels", victoryPoints)));
     }
 
     /**
@@ -1342,15 +1340,14 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                   List<String> choices) {
         //Creating a dialogue
         ChoiceDialog<String> dialogue = new ChoiceDialog<>(brick, choices);
-        dialogue.setTitle(resourceBundle.getString("game.playcards.monopoly.title"));
-        dialogue.setHeaderText(resourceBundle.getString("game.playcards.monopoly.header"));
-        dialogue.setContentText(resourceBundle.getString("game.playcards.monopoly.context"));
+        dialogue.setTitle(ResourceManager.get("game.playcards.monopoly.title"));
+        dialogue.setHeaderText(ResourceManager.get("game.playcards.monopoly.header"));
+        dialogue.setContentText(ResourceManager.get("game.playcards.monopoly.context"));
         //Creating a new DialogPane so the button text can be customised
         DialogPane pane = new DialogPane();
         pane.setContent(dialogue.getDialogPane().getContent());
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType confirm = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.setDialogPane(pane);
         dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
@@ -1379,12 +1376,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                                       List<String> choices) {
         //Create a dialogue
         Dialog<String> dialogue = new Dialog<>();
-        dialogue.setTitle(resourceBundle.getString("game.playcards.yearofplenty.title"));
-        dialogue.setHeaderText(resourceBundle.getString("game.playcards.yearofplenty.header"));
+        dialogue.setTitle(ResourceManager.get("game.playcards.yearofplenty.title"));
+        dialogue.setHeaderText(ResourceManager.get("game.playcards.yearofplenty.header"));
         //Create its buttons
-        ButtonType confirm = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(resourceBundle.getString("button.cancel"),
-                                           ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType confirm = new ButtonType(ResourceManager.get("button.confirm"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType(ResourceManager.get("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
         //Make a grid to put the ChoiceBoxes and labels on
         GridPane grid = new GridPane();
@@ -1402,9 +1398,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         c1.setValue(brick);
         c2.setValue(brick);
         //Add ChoiceBoxes and labels to the grid
-        grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label1")), 0, 0);
+        grid.add(new Label(ResourceManager.get("game.playcards.yearofplenty.label1")), 0, 0);
         grid.add(c1, 1, 0);
-        grid.add(new Label(resourceBundle.getString("game.playcards.yearofplenty.label2")), 0, 1);
+        grid.add(new Label(ResourceManager.get("game.playcards.yearofplenty.label2")), 0, 1);
         grid.add(c2, 1, 1);
         //Put the grid into the dialogue and let it appear
         dialogue.getDialogPane().setContent(grid);

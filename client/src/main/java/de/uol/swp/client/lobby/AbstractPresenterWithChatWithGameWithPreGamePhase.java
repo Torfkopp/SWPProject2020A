@@ -18,6 +18,7 @@ import de.uol.swp.common.lobby.response.KickUserResponse;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
+import de.uol.swp.common.util.ResourceManager;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -388,8 +389,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             }
             gameMapDescription.clear();
             gameMapDescription.setCenterText(
-                    winner == userService.getLoggedInUser() ? resourceBundle.getString("game.won.you") :
-                    String.format(resourceBundle.getString("game.won.info"), winner));
+                    winner == userService.getLoggedInUser() ? ResourceManager.get("game.won.you") :
+                    ResourceManager.get("game.won.info", winner));
         });
         fitCanvasToSize();
         soundService.victory();
@@ -475,7 +476,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         Platform.runLater(() -> {
             if (startUpPhaseEnabled) {
                 notice.setVisible(true);
-                notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+                notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
             }
             setTurnIndicatorText(msg.getUser());
             prepareInGameArrangement();
@@ -489,7 +490,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             turnIndicator.setVisible(true);
             victoryPointsLabel.setVisible(true);
             currentRound.setVisible(true);
-            currentRound.setText(String.format(resourceBundle.getString("lobby.menu.round"), 1));
+            currentRound.setText(ResourceManager.get("lobby.menu.round", 1));
             setRollDiceButtonState(msg.getUser());
             if (msg.getUser().equals(userService.getLoggedInUser())) ownTurn = true;
             kickUserButton.setVisible(false);
@@ -543,16 +544,16 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 switch (startUpPhaseBuiltStructures) {
                     case NONE_BUILT:
                         notice.setVisible(true);
-                        notice.setText(resourceBundle.getString("game.setupphase.building.firstsettlement"));
+                        notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
                         break;
                     case FIRST_SETTLEMENT_BUILT:
-                        notice.setText(resourceBundle.getString("game.setupphase.building.firstroad"));
+                        notice.setText(ResourceManager.get("game.setupphase.building.firstroad"));
                         break;
                     case FIRST_BOTH_BUILT:
-                        notice.setText(resourceBundle.getString("game.setupphase.building.secondsettlement"));
+                        notice.setText(ResourceManager.get("game.setupphase.building.secondsettlement"));
                         break;
                     case SECOND_SETTLEMENT_BUILT:
-                        notice.setText(resourceBundle.getString("game.setupphase.building.secondroad"));
+                        notice.setText(ResourceManager.get("game.setupphase.building.secondroad"));
                         break;
                 }
             }
@@ -661,13 +662,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
 
             if (moveTime < 30 || moveTime > 500) {
-                post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+                post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
             } else {
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }
         } catch (NumberFormatException ignored) {
-            post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
+            post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
         }
     }
 
