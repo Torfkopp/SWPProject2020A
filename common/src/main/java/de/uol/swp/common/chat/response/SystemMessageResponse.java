@@ -1,8 +1,6 @@
 package de.uol.swp.common.chat.response;
 
-import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
-import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.AbstractResponseMessage;
 
@@ -28,14 +26,14 @@ public class SystemMessageResponse extends AbstractResponseMessage {
     /**
      * Constructor
      *
-     * @param lobbyName      The name of the lobby to send this SystemMessage to
-     * @param contentWrapper The content wrapper with the content of the SystemMessage
+     * @param lobbyName     The name of the lobby to send this SystemMessage to
+     * @param systemMessage The SystemMessage that should be send
      *
      * @since 2021-03-07
      */
-    public SystemMessageResponse(LobbyName lobbyName, I18nWrapper contentWrapper) {
+    public SystemMessageResponse(LobbyName lobbyName, SystemMessage systemMessage) {
         this.lobbyName = lobbyName;
-        this.msg = new SystemMessageDTO(contentWrapper);
+        this.msg = systemMessage;
     }
 
     /**

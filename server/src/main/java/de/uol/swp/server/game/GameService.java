@@ -4,9 +4,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.chat.message.*;
+import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
+import de.uol.swp.common.chat.message.SystemMessageMessage;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
-import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
+import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -188,7 +189,7 @@ public class GameService extends AbstractService {
         Inventory victimInventory = gameManagement.getGame(lobby).getInventory(victim);
         List<ResourceType> victimsResource = new ArrayList<>();
         if (victimInventory.getResourceAmount() == 0) {
-            ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, null);
+            ServerMessage returnSystemMessage = new RobbingMessage(lobby, receiver, null);
             LOG.debug("Sending SystemMessageForRobbingMessage for Lobby {}", lobby);
             LOG.debug("---- Victim has no cards to rob");
             lobbyService.sendToAllInLobby(lobby, returnSystemMessage);
@@ -203,7 +204,7 @@ public class GameService extends AbstractService {
         victimInventory.decrease(stolenResource);
         receiverInventory.increase(stolenResource);
 
-        ServerMessage returnSystemMessage = new SystemMessageForRobbingMessage(lobby, receiver, victim);
+        ServerMessage returnSystemMessage = new RobbingMessage(lobby, receiver, victim);
         ServerMessage msg = new RefreshCardAmountMessage(lobby, receiver,
                                                          gameManagement.getGame(lobby).getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", lobby);
@@ -245,6 +246,28 @@ public class GameService extends AbstractService {
         }
         ServerMessage msg = new UpdateVictoryPointsMessage(originLobby, victoryPointsMap);
         lobbyService.sendToAllInLobby(originLobby, msg);
+    }
+
+    /**
+     * Helper method to transform a resource list into the corresponding string.
+     *
+     * @param resourceMap The resource list containing the traded resources
+     *
+     * @return The string containing the traded resources
+     *
+     * @author Marvin Drees
+     * @since 2021-05-11
+     */
+    private String buildTradeString(IResourceList resourceMap) {
+        StringBuilder tradeString = new StringBuilder();
+        for (IResource entry : resourceMap) {
+            if (entry.getAmount() > 0) {
+                tradeString.append(", ");
+                tradeString.append(entry.getAmount()).append(" ");
+                tradeString.append(entry.getType().toString());
+            }
+        }
+        return tradeString.toString().replaceFirst("^, ", "");
     }
 
     /**
@@ -321,6 +344,28 @@ public class GameService extends AbstractService {
     }
 
     /**
+     * Helper method to create a singular I18nWrapper from the resource maps
+     *
+     * @param offeringUser          The name of the offering user
+     * @param respondingUser        The name of the responding user
+     * @param offeringResourceMap   The Map of resources that were offered as a
+     *                              Map of I18nWrappers to amount
+     * @param respondingResourceMap The Map of resources that were demanded as
+     *                              a Map of I18nWrappers to amount
+     *
+     * @return An I18nWrapper that contains all the details provided and will
+     * be displayed in the client's chosen language
+     */
+    private I18nWrapper makeSingularI18nWrapper(UserOrDummy offeringUser, String respondingUser,
+                                                IResourceList offeringResourceMap,
+                                                IResourceList respondingResourceMap) {
+        String offerString = buildTradeString(offeringResourceMap);
+        String demandString = buildTradeString(respondingResourceMap);
+        return new I18nWrapper("lobby.trade.resources.systemmessage", offeringUser.getUsername(), respondingUser,
+                               offerString, demandString);
+    }
+
+    /**
      * Handles an AcceptUserTradeRequest found on the EventBus
      * <p>
      * If an AcceptUserTradeRequest is found on the EventBus, this method
@@ -364,11 +409,16 @@ public class GameService extends AbstractService {
                 respondingInventory.decrease(resource.getType(), resource.getAmount());
             }
 
-            ServerMessage returnSystemMessage = new SystemMessageForTradeMessage(req.getOriginLobby(),
-                                                                                 req.getOfferingUser(),
-                                                                                 req.getRespondingUser(),
-                                                                                 req.getOfferedResources(),
-                                                                                 req.getDemandedResources());
+            ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(),
+                                                                         new InGameSystemMessageDTO(
+                                                                                 makeSingularI18nWrapper(
+                                                                                         req.getOfferingUser(),
+                                                                                         req.getRespondingUser() == null ?
+                                                                                         "bank" :
+                                                                                         req.getRespondingUser()
+                                                                                            .getUsername(),
+                                                                                         req.getOfferedResources(),
+                                                                                         req.getDemandedResources())));
             LOG.debug("Sending SystemMessageForTradeMessage for Lobby {}", req.getOriginLobby());
             lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
             ResponseMessage returnMessage = new TradeOfUsersAcceptedResponse(req.getOriginLobby());
@@ -839,9 +889,9 @@ public class GameService extends AbstractService {
         returnMessage.initWithMessage(req);
         post(returnMessage);
         LOG.debug("Received SystemMessageForTradeMessage");
-        ServerMessage serverMessage = new SystemMessageForTradeMessage(req.getOriginLobby(), req.getUser(), null,
-                                                                       offeredResourcesWrapperMap,
-                                                                       respondingResourcesWrapperMap);
+        ServerMessage serverMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
+                makeSingularI18nWrapper(req.getUser(), null, offeredResourcesWrapperMap,
+                                        respondingResourcesWrapperMap)));
         LOG.debug("Sending TradeWithBankAcceptedResponse to Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), serverMessage);
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
@@ -1066,9 +1116,8 @@ public class GameService extends AbstractService {
 
         robberMovementPlayer(req, req.getUser());
 
-        I18nWrapper knightCard = new I18nWrapper("game.resources.cards.knight");
-        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
-                                                                                    knightCard);
+        ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
+                new I18nWrapper("game.play.card.knightcard", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1124,9 +1173,8 @@ public class GameService extends AbstractService {
 
         invMono.decrease(DevelopmentCardType.MONOPOLY_CARD);
 
-        I18nWrapper monopolyCard = new I18nWrapper("game.resources.cards.monopoly");
-        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
-                                                                                    monopolyCard);
+        ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
+                new I18nWrapper("game.card.play.monopoly", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
         ResponseMessage returnMessage = new PlayCardSuccessResponse(req.getOriginLobby(), req.getUser());
@@ -1213,9 +1261,8 @@ public class GameService extends AbstractService {
         LOG.debug("---- RoadBuildingCardPhase phase starts");
         game.setRoadBuildingCardPhase(WAITING_FOR_FIRST_ROAD);
         inv.decrease(DevelopmentCardType.ROAD_BUILDING_CARD);
-        I18nWrapper roadBuildingCard = new I18nWrapper("game.resources.cards.roadbuilding");
-        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
-                                                                                    roadBuildingCard);
+        ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
+                new I18nWrapper("game.card.play.roadbuilding", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1268,9 +1315,8 @@ public class GameService extends AbstractService {
 
         inv.decrease(DevelopmentCardType.YEAR_OF_PLENTY_CARD);
 
-        I18nWrapper yearOfPlentyCard = new I18nWrapper("game.resources.cards.yearofplenty");
-        ServerMessage returnSystemMessage = new SystemMessageForPlayingCardsMessage(req.getOriginLobby(), req.getUser(),
-                                                                                    yearOfPlentyCard);
+        ServerMessage returnSystemMessage = new SystemMessageMessage(req.getOriginLobby(), new InGameSystemMessageDTO(
+                new I18nWrapper("game.card.play.yearofplenty", req.getUser())));
         LOG.debug("Sending SystemMessageForPlayingCardsMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnSystemMessage);
 
@@ -1837,11 +1883,13 @@ public class GameService extends AbstractService {
             inventory.decrease(GRAIN);
             inventory.decrease(WOOL);
             inventory.increase(developmentCard);
-            ResponseMessage serverMessage = new SystemMessageForTradeWithBankResponse(lobbyName, developmentCard);
+            ResponseMessage serverMessage = new SystemMessageResponse(lobbyName, new InGameSystemMessageDTO(
+                    new I18nWrapper("lobby.trade.withbank.systemresponse", developmentCard)));
             LOG.debug("Sending SystemMessageForTradeWithBankResponse for Lobby {}", lobbyName);
             post(new ForwardToUserInternalRequest(user, serverMessage));
             LOG.debug("Sending SystemMessageForTradeWithBankMessage for Lobby {}", lobbyName);
-            lobbyService.sendToAllInLobby(lobbyName, new SystemMessageForTradeWithBankMessage(lobbyName, user));
+            lobbyService.sendToAllInLobby(lobbyName, new SystemMessageMessage(lobbyName, new InGameSystemMessageDTO(
+                    new I18nWrapper("lobby.trade.withbank.systemmessage", user))));
         }
         return true;
     }
