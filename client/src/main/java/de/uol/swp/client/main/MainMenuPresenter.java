@@ -850,7 +850,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             if (!oldLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
                 for (Pair<ISimpleLobby, String> pair : oldLobbies) {
-                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey());
+                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey().getName());
                     chatMessages.add(new SystemMessageDTO(contentWrapper));
                 }
             }
