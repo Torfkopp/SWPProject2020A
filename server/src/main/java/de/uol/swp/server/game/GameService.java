@@ -941,6 +941,12 @@ public class GameService extends AbstractService {
         if (respondingInventory == null) return;
 
         if (req.getRespondingUser() instanceof AI) {
+            for (ResourceType r : ResourceType.values())
+                if (respondingInventory.get(r) - req.getDemandedResources().getAmount(r) < 0) {
+                    onResetOfferTradeButtonRequest(
+                            new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+                    return;
+                }
             boolean accepted = gameAI
                     .tradeAcceptationAI(((AI) req.getRespondingUser()), req.getOriginLobby(), req.getOfferedResources(),
                                         req.getDemandedResources());
