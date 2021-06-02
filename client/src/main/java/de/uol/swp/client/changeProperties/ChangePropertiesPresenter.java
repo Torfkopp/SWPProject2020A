@@ -65,7 +65,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
         if (language != null) {
             switch (language) {
                 case "Deutsch - Du":
-                    preferences.put("lang", "de_DE_du");
+                    preferences.put("lang", "de_DE");
                     break;
                 case "Deutsch - Sie":
                     preferences.put("lang", "de_DE_sie");
