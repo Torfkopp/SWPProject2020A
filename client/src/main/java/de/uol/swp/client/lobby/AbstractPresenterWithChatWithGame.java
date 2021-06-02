@@ -43,8 +43,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -252,6 +251,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onHelpButtonPressed() {
+        //TODO change me maybe
         soundService.button();
         if (!helpActivated) {
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
@@ -440,9 +440,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-05-01
      */
     protected void setHelpText() {
+        //TODO change me maybe
         if (gameWon) return;
         if (!ownTurn) {
             Text wait = new Text(resourceBundle.getString("game.help.labels.waitforturn"));
+            if (theme.equals("dark")) wait.setFill(Color.web("#F3F5F3"));
             Platform.runLater(() -> {
                 helpLabel.getChildren().clear();
                 helpLabel.getChildren().add(wait);
@@ -456,8 +458,20 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
             Text build = new Text(resourceBundle.getString("game.help.labels.build"));
             Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
+            if (theme.equals("dark")) {
+                turn.setFill(Color.web("#F3F5F3"));
+                rollDiceText.setFill(Color.web("#F3F5F3"));
+                setRobber.setFill(Color.web("#F3F5F3"));
+                endTurn.setFill(Color.web("#F3F5F3"));
+                trade.setFill(Color.web("#F3F5F3"));
+                build.setFill(Color.web("#F3F5F3"));
+                playCard.setFill(Color.web("#F3F5F3"));
+            }
             Platform.runLater(() -> {
                 helpLabel.getChildren().clear();
+                helpLabel.setBorder(new Border(
+                        new BorderStroke(Color.web("#D83339"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
+                                         BorderWidths.DEFAULT)));
                 if (!diceRolled) helpLabel.getChildren().addAll(turn, rollDiceText);
                 else {
                     rollDiceText.setStrikethrough(true);
