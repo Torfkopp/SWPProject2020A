@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.trade.event.TradeUpdateEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.*;
 import de.uol.swp.common.game.response.BuyDevelopmentCardResponse;
@@ -102,7 +101,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         bankResourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
         bankResourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        ThreadManager.runNow(() -> LOG.debug("TradeWithBankPresenter initialised"));
+        LOG.debug("TradeWithBankPresenter initialised");
     }
 
     /**

@@ -12,7 +12,6 @@ import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
@@ -158,7 +157,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
                 nameFilter, passwordFilter, inGameFilter, fullFilter));
         lobbyView.setItems(new SortedList<>(filteredLobbyList));
-        ThreadManager.runNow(() -> LOG.debug("MainMenuPresenter initialised"));
+        LOG.debug("MainMenuPresenter initialised");
     }
 
     /**
@@ -895,7 +894,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             if (!oldLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
                 for (Pair<ISimpleLobby, String> pair : oldLobbies) {
-                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey());
+                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey().getName());
                     chatMessages.add(new SystemMessageDTO(contentWrapper));
                 }
             }

@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.chat.IChatService;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
@@ -65,7 +64,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     public void init(Logger log) {
-        ThreadManager.runNow(() -> LOG = log);
+        LOG = log;
     }
 
     /**
@@ -76,7 +75,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareChatVars();
-        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChat initialised"));
+        LOG.debug("AbstractPresenterWithChat initialised");
     }
 
     /**
@@ -437,15 +436,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             @Override
             protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
-                //fixme me this on runlater
                 Platform.runLater(() -> {
                     if (item instanceof SystemMessage)
                         setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
                     else setFont(Font.getDefault());
                     setText(empty || item == null ? "" : item.toString());
-                    setMaxWidth(chatView.getWidth() - 5);
-                    setPrefWidth(chatView.getWidth() - 5);
-                    setWidth(chatView.getWidth() - 5);
+                    prefWidthProperty().bind(widthProperty().divide(1.1));
+                    setMaxWidth(Control.USE_PREF_SIZE);
                     setWrapText(true);
                 });
             }

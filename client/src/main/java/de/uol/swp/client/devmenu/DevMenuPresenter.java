@@ -2,7 +2,6 @@ package de.uol.swp.client.devmenu;
 
 import com.google.common.eventbus.Subscribe;
 import de.uol.swp.client.AbstractPresenter;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
 import de.uol.swp.common.devmenu.request.DevMenuCommandRequest;
 import de.uol.swp.common.devmenu.response.DevMenuClassesResponse;
@@ -119,7 +118,7 @@ public class DevMenuPresenter extends AbstractPresenter {
         constructorList.setItems(constructorObservableList);
         constructorList.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPress);
         classFilterTextField.requestFocus();
-        ThreadManager.runNow(() -> LOG.debug("DevMenuPresenter initialised"));
+        LOG.debug("DevMenuPresenter initialised");
     }
 
     /**
@@ -178,12 +177,10 @@ public class DevMenuPresenter extends AbstractPresenter {
     private void onSendButtonPressed() {
         soundService.button();
         List<String> args = new LinkedList<>();
-        ThreadManager.runNow(() -> {
-            for (TextField tf : textFields) {
-                args.add(tf.getText());
-            }
-            LOG.debug("Sending DevMenuCommandRequest");
-        });
+        for (TextField tf : textFields) {
+            args.add(tf.getText());
+        }
+        LOG.debug("Sending DevMenuCommandRequest");
         post(new DevMenuCommandRequest(classListView.getSelectionModel().getSelectedItem(), args));
     }
 

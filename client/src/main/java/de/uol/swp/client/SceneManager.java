@@ -252,10 +252,8 @@ public class SceneManager {
             alert.getDialogPane().getStylesheets().add(styleSheet);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == confirm) {
-                ThreadManager.runNow(() -> {
-                    LOG.debug("Sending NukeUsersSessionsRequest");
-                    eventBus.post(new NukeUsersSessionsRequest(user));
-                });
+                LOG.debug("Sending NukeUsersSessionsRequest");
+                ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
             }
         });
     }
@@ -1204,10 +1202,10 @@ public class SceneManager {
             rulesStage.initOwner(primaryStage);
             rulesStage.show();
             rulesStage.toFront();
-            rulesStage.setOnCloseRequest(windowEvent -> ThreadManager.runNow(() -> {
+            rulesStage.setOnCloseRequest(windowEvent -> {
                 rulesOverviewIsOpen = false;
-                eventBus.post(new ResetRulesOverviewEvent());
-            }));
+                ThreadManager.runNow(() -> eventBus.post(new ResetRulesOverviewEvent()));
+            });
         });
     }
 
@@ -1292,10 +1290,8 @@ public class SceneManager {
             tradingResponseStage.initModality(Modality.NONE);
             tradingResponseStage.initOwner(primaryStage);
             tradingResponseStage.show();
-            ThreadManager.runNow(() -> {
-                LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
-                eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp()));
-            });
+            LOG.debug("Sending TradeWithUserResponseUpdateEvent to Lobby {}", lobbyName);
+            ThreadManager.runNow(() -> eventBus.post(new TradeWithUserResponseUpdateEvent(event.getRsp())));
         });
     }
 
@@ -1334,10 +1330,8 @@ public class SceneManager {
             tradingStage.initModality(Modality.NONE);
             tradingStage.initOwner(primaryStage);
             tradingStage.show();
-            ThreadManager.runNow(() -> {
-                LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
-                eventBus.post(new TradeWithUserUpdateEvent(lobbyName));
-            });
+            LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
+            ThreadManager.runNow(() -> eventBus.post(new TradeWithUserUpdateEvent(lobbyName)));
         });
     }
 

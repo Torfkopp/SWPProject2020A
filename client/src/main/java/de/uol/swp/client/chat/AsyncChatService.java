@@ -3,6 +3,8 @@ package de.uol.swp.client.chat;
 import com.google.inject.Inject;
 import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.lobby.LobbyName;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An asynchronous wrapper for the IChatService implementation
@@ -17,11 +19,13 @@ import de.uol.swp.common.lobby.LobbyName;
  */
 public class AsyncChatService implements IChatService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncChatService.class);
     private final ChatService syncChatService;
 
     @Inject
     public AsyncChatService(ChatService chatService) {
         this.syncChatService = chatService;
+        LOG.debug("AsyncChatService initialised");
     }
 
     @Override

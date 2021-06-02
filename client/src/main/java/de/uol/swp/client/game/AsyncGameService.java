@@ -7,6 +7,8 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An asynchronous wrapper for the IGameService implementation
@@ -21,11 +23,13 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class AsyncGameService implements IGameService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncGameService.class);
     private final GameService syncGameService;
 
     @Inject
     public AsyncGameService(GameService syncGameService) {
         this.syncGameService = syncGameService;
+        LOG.debug("AsyncGameService initialised");
     }
 
     @Override

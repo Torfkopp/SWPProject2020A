@@ -6,7 +6,6 @@ import com.sun.javafx.scene.control.IntegerField;
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.event.ShowRobberTaxUpdateEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.Resource;
@@ -138,7 +137,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
         oreSlider.valueProperty().bindBidirectional(oreField.valueProperty());
         woolSlider.valueProperty().bindBidirectional(woolField.valueProperty());
 
-        ThreadManager.runNow(() -> LOG.debug("RobberTaxPresenter initialised"));
+        LOG.debug("RobberTaxPresenter initialised");
     }
 
     /**
@@ -194,7 +193,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
             return;
         }
         soundService.button();
-        ThreadManager.runNow(() -> LOG.debug("Sending RobberTaxChosenRequest"));
+        LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
