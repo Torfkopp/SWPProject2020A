@@ -214,8 +214,8 @@ class TradeServiceTest {
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
-        assertTrue(event instanceof ShowTradeWithUserViewEvent);
-        ShowTradeWithUserViewEvent eve = (ShowTradeWithUserViewEvent) event;
+        assertTrue(event instanceof ShowTradeWithBankViewEvent);
+        ShowTradeWithBankViewEvent eve = (ShowTradeWithBankViewEvent) event;
 
         assertEquals(defaultLobbyName, eve.getLobbyName());
     }
