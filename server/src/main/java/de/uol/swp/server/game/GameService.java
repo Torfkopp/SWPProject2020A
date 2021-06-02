@@ -32,10 +32,14 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.request.KickUserRequest;
-import de.uol.swp.common.message.*;
+import de.uol.swp.common.message.Message;
+import de.uol.swp.common.message.ResponseMessage;
+import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.event.*;
+import de.uol.swp.server.game.event.CreateGameInternalRequest;
+import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
+import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.ILobby;
 import de.uol.swp.server.lobby.ILobbyManagement;
@@ -1614,42 +1618,6 @@ public class GameService extends AbstractService {
                                                                   req.getRespondingUser(), req.isCounterOffer());
             LOG.debug("Sending InventoryForTradeWithUserResponse for Lobby {}", req.getName());
             returnMessage.initWithMessage(req);
-            post(returnMessage);
-        }
-    }
-
-    /**
-     * Handles an TransferLobbyStateEvent found on the EventBus
-     * <p>
-     * If an TransferLobbyStateEvent is found on the EventBus, this method
-     * is called. It crafts a StartSessionResponse with the lobby
-     * provided by the event, its active player, the game configuration
-     * and the previously rolled dice and posts it on the EventBus.
-     *
-     * @param event The TransferLobbyStateEvent found on the EventBus
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-04-09
-     */
-    @Subscribe
-    private void onTransferLobbyStateEvent(TransferLobbyStateEvent event) {
-        ILobby lobby = event.getLobby();
-        Game game = gameManagement.getGame(lobby.getName());
-        Map<Player, UserOrDummy> playerUserOrDummyMap = game.getPlayerUserMapping();
-        Optional<MessageContext> ctx = event.getMessageContext();
-        if (ctx.isPresent()) {
-            ResponseMessage returnMessage = new RecoverSessionResponse(ILobby.getSimpleLobby(lobby),
-                                                                       game.getActivePlayer(), game.getMap()
-                                                                                                   .getGameMapDTO(
-                                                                                                           playerUserOrDummyMap),
-                                                                       game.getDices(), game.isDiceRolledAlready(),
-                                                                       game.getAutoRollEnabled(event.getUser()),
-                                                                       game.getLobby().getMoveTime(),
-                                                                       game.getPlayersStartUpBuiltMap()
-                                                                           .get(event.getUser()));
-            returnMessage.setMessageContext(ctx.get());
-            LOG.debug("Sending StartSessionResponse");
             post(returnMessage);
         }
     }
