@@ -313,10 +313,6 @@ public class GameService extends AbstractService {
                 if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, originLobby,
                                                                 user.getUsername().equals(ai.getUsername()) ?
                                                                 AI.WriteType.GAME_WIN : AI.WriteType.GAME_LOSE);
-            for (UserOrDummy ai : game.getPlayers())
-                if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, originLobby,
-                                                                user.getUsername().equals(ai.getUsername()) ?
-                                                                AI.WriteType.GAME_WIN : AI.WriteType.GAME_LOSE);
         }
     }
 
