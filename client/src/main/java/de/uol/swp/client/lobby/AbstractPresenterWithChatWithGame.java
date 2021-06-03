@@ -262,7 +262,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             helpLabel.setBorder(null);
             helpLabel.getChildren().clear();
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            if (!((Stage) window).isMaximized() || !((Stage) window).isFullScreen()) window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen()) window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
     }
