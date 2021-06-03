@@ -37,11 +37,6 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
-    public void checkForGame(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncLobbyService.checkForGame(lobbyName));
-    }
-
-    @Override
     public void checkUserInLobby() {
         ThreadManager.runNow(syncLobbyService::checkUserInLobby);
     }

@@ -18,20 +18,17 @@ import de.uol.swp.common.user.User;
 public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
 
     private final User user;
-    private final boolean oldSession;
 
     /**
      * Constructor
      *
-     * @param user       User whose client authorised successfully
-     * @param oldSession Boolean whether an old session exists
+     * @param user User whose client authorised successfully
      *
      * @see de.uol.swp.common.user.User
      * @since 2021-03-03
      */
-    public ClientAuthorisedMessage(User user, boolean oldSession) {
+    public ClientAuthorisedMessage(User user) {
         this.user = user;
-        this.oldSession = oldSession;
     }
 
     /**
@@ -44,18 +41,5 @@ public class ClientAuthorisedMessage extends AbstractServerInternalMessage {
      */
     public User getUser() {
         return user;
-    }
-
-    /**
-     * Gets the oldSession attribute
-     *
-     * @return Whether or not a user has an old session
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-02
-     */
-    public boolean hasOldSession() {
-        return oldSession;
     }
 }

@@ -242,7 +242,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             moveTimeTextField.setText(String.valueOf(moveTime));
         });
         setPreGameSettings();
-        lobbyService.checkForGame(lobbyName);
     }
 
     /**
