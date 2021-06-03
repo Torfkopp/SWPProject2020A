@@ -4,20 +4,16 @@ import de.uol.swp.common.lobby.LobbyName;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class AsyncChatServiceTest {
 
-    private final LobbyName lobbyName = new LobbyName("default lobby");
-    @Mock
-    ChatService syncChatService;
+    private static final long DURATION = 200L;
+    private final LobbyName lobbyName = mock(LobbyName.class);
+    private final ChatService syncChatService = mock(ChatService.class);
     private AsyncChatService chatService;
 
     @BeforeEach
@@ -37,7 +33,7 @@ class AsyncChatServiceTest {
 
         chatService.askLatestMessages(1);
 
-        verify(syncChatService, after(75L)).askLatestMessages(1);
+        verify(syncChatService, after(DURATION)).askLatestMessages(1);
     }
 
     @Test
@@ -46,7 +42,7 @@ class AsyncChatServiceTest {
 
         chatService.deleteMessage(1);
 
-        verify(syncChatService, after(75L)).deleteMessage(1);
+        verify(syncChatService, after(DURATION)).deleteMessage(1);
     }
 
     @Test
@@ -55,7 +51,7 @@ class AsyncChatServiceTest {
 
         chatService.editMessage(1, "test");
 
-        verify(syncChatService, after(75L)).editMessage(1, "test");
+        verify(syncChatService, after(DURATION)).editMessage(1, "test");
     }
 
     @Test
@@ -64,7 +60,7 @@ class AsyncChatServiceTest {
 
         chatService.newMessage("test message");
 
-        verify(syncChatService, after(75L)).newMessage("test message");
+        verify(syncChatService, after(DURATION)).newMessage("test message");
     }
 
     @Test
@@ -73,7 +69,7 @@ class AsyncChatServiceTest {
 
         chatService.askLatestMessages(1, lobbyName);
 
-        verify(syncChatService, after(75L)).askLatestMessages(1, lobbyName);
+        verify(syncChatService, after(DURATION)).askLatestMessages(1, lobbyName);
     }
 
     @Test
@@ -82,7 +78,7 @@ class AsyncChatServiceTest {
 
         chatService.deleteMessage(1, lobbyName);
 
-        verify(syncChatService, after(75L)).deleteMessage(1, lobbyName);
+        verify(syncChatService, after(DURATION)).deleteMessage(1, lobbyName);
     }
 
     @Test
@@ -91,7 +87,7 @@ class AsyncChatServiceTest {
 
         chatService.editMessage(1, "test", lobbyName);
 
-        verify(syncChatService, after(75L)).editMessage(1, "test", lobbyName);
+        verify(syncChatService, after(DURATION)).editMessage(1, "test", lobbyName);
     }
 
     @Test
@@ -100,6 +96,6 @@ class AsyncChatServiceTest {
 
         chatService.newMessage("test message", lobbyName);
 
-        verify(syncChatService, after(75L)).newMessage("test message", lobbyName);
+        verify(syncChatService, after(DURATION)).newMessage("test message", lobbyName);
     }
 }
