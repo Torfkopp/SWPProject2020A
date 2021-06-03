@@ -13,6 +13,10 @@ import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeProperties.ChangePropertiesPresenter;
+import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
+import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
+import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -101,6 +105,7 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene changeAccountDetailsScene;
+    private Scene changePropertiesScene;
     private Scene rulesScene;
     private boolean devMenuIsOpen;
     private boolean rulesOverviewIsOpen;
@@ -160,6 +165,21 @@ public class SceneManager {
     public void showChangeAccountDetailsScreen() {
         showScene(changeAccountDetailsScene, resourceBundle.getString("changeaccdetails.window.title"),
                   ChangeAccountDetailsPresenter.MIN_WIDTH, ChangeAccountDetailsPresenter.MIN_HEIGHT);
+    }
+
+    /**
+     * Shows the ChangePropertiesScreen
+     * <p>
+     * Sets the scene's UserData to the current user.
+     * Switches the current Scene to the ChangePropertiesScreen
+     * and sets the window's title to "Change Properties"
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-22
+     */
+    public void showChangePropertiesScreen() {
+        showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
+                  ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -378,6 +398,25 @@ public class SceneManager {
     }
 
     /**
+     * Initialises the ChangePropertiesView
+     * <p>
+     * If the ChangePropertiesScene is null, it gets set to a new scene containing the
+     * pane showing the ChangePropertiesView as specified by the ChangePropertiesView
+     * FXML file.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.ChangePropertiesPresenter
+     * @since 2021-05-22
+     */
+    private void initChangePropertiesView() {
+        if (changePropertiesScene == null) {
+            Parent rootPane = initPresenter(ChangePropertiesPresenter.fxml);
+            changePropertiesScene = new Scene(rootPane, 400, 200);
+            changePropertiesScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
      * Initialises the login view
      * <p>
      * If the loginScene is null, it gets set to a new scene containing the
@@ -489,6 +528,7 @@ public class SceneManager {
         initRegistrationView();
         initRulesOverviewView();
         initChangeAccountDetailsView();
+        initChangePropertiesView();
         eventBus.post(new SetAcceleratorsEvent());
     }
 
@@ -680,6 +720,37 @@ public class SceneManager {
     private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
         LOG.debug("Account Details change was successful.");
         showMainScreen(rsp.getUser());
+    }
+
+    /**
+     * Handles the ChangePropertiesCanceledEvent detected on the EventBus
+     * <p>
+     * If a ChangePropertiesCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the main screen.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
+     * @since 2020-12-19
+     */
+    @Subscribe
+    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+    }
+
+    /**
+     * Handles a successful properties changing process
+     * <p>
+     * If an ChangePropertiesSuccessfulEvent object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
+     *
+     * @param event The ChangePropertiesSuccessfulEvent object detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-22
+     */
+    @Subscribe
+    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -950,6 +1021,29 @@ public class SceneManager {
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
         showChangeAccountDetailsScreen();
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            windowEvent.consume();
+            showMainScreen(userService.getLoggedInUser());
+        });
+    }
+
+    /**
+     * Handles the ShowChangePropertiesViewEvent detected on the EventBus
+     * <p>
+     * If a ShowChangePropertiesViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the Change Properties
+     * screen.
+     * If the user wants to close this window, the user gets redirected to the Main Menu.
+     *
+     * @param event The ShowChangePropertiesViewEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @since 2021-05-22
+     */
+    @Subscribe
+    private void onShowChangePropertiesViewEvent(ShowChangePropertiesViewEvent event) {
+        showChangePropertiesScreen();
         primaryStage.setOnCloseRequest(windowEvent -> {
             windowEvent.consume();
             showMainScreen(userService.getLoggedInUser());
