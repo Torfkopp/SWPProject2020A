@@ -43,8 +43,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -257,14 +256,13 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
             helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
             ((Stage) window).setMinWidth(size);
-            window.setWidth(size);
             setHelpText();
         } else {
-            helpColumn.setMaxWidth(0);
             helpColumn.setMinWidth(0);
+            helpLabel.setBorder(null);
             helpLabel.getChildren().clear();
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen()) window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
     }
@@ -437,57 +435,56 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * currently.
      *
      * @author Maximilian Lindner
+     * @author Marvin Drees
      * @since 2021-05-01
      */
     protected void setHelpText() {
+        int cardAmount = 0;
+        for (int i = 0; i < 4; i++) {
+            cardAmount += developmentCardTableView.getItems().get(i + 1).getAmount();
+        }
+        String cardString = resourceBundle.getString("game.help.labels.playcard");
+        Text wait, turn, rollDiceText, setRobber, playCard, endTurn, trade, build;
+        wait = setLabel("waitforturn");
+        turn = setLabel("turn");
+        rollDiceText = setLabel("rolldice");
+        setRobber = setLabel("setrobber");
+        playCard = setLabel("playacard");
+        endTurn = setLabel("endturn");
+        trade = setLabel("trade");
+        build = setLabel("build");
+
         if (gameWon) return;
         if (!ownTurn) {
-            Text wait = new Text(resourceBundle.getString("game.help.labels.waitforturn"));
-            Platform.runLater(() -> {
-                helpLabel.getChildren().clear();
-                helpLabel.getChildren().add(wait);
-            });
-        } else {
-            String cardString = resourceBundle.getString("game.help.labels.playcard");
-            Text turn = new Text(resourceBundle.getString("game.help.labels.turn"));
-            Text rollDiceText = new Text(resourceBundle.getString("game.help.labels.rolldice"));
-            Text setRobber = new Text(resourceBundle.getString("game.help.labels.setrobber"));
-            Text endTurn = new Text(resourceBundle.getString("game.help.labels.endturn"));
-            Text trade = new Text(resourceBundle.getString("game.help.labels.trade"));
-            Text build = new Text(resourceBundle.getString("game.help.labels.build"));
-            Text playCard = new Text(resourceBundle.getString("game.help.labels.playacard"));
-            Platform.runLater(() -> {
-                helpLabel.getChildren().clear();
-                if (!diceRolled) helpLabel.getChildren().addAll(turn, rollDiceText);
-                else {
-                    rollDiceText.setStrikethrough(true);
-                    if (robberNewPosition) {
-                        helpLabel.getChildren().addAll(turn, rollDiceText, setRobber);
-                    } else {
-                        helpLabel.getChildren().addAll(turn, rollDiceText, trade, build);
-                        if (playedCard) {
-                            playCard.setStrikethrough(true);
-                            helpLabel.getChildren().add(playCard);
-                        } else {
-                            int cardAmount = 0;
-                            for (int i = 0; i < 4; i++) {
-                                cardAmount += developmentCardTableView.getItems().get(i + 1).getAmount();
-                            }
-                            if (cardAmount == 0) playCard.setStrikethrough(true);
-                            helpLabel.getChildren().add(playCard);
-                            for (int i = 0; i < 4; i++) {
-                                IDevelopmentCard cardMap = developmentCardTableView.getItems().get(i + 1);
-                                if (cardMap.getAmount() > 0) {
-                                    Text card = new Text(String.format(cardString, cardMap.getType()));
-                                    helpLabel.getChildren().add(card);
-                                }
-                            }
-                        }
-                        helpLabel.getChildren().add(endTurn);
-                    }
-                }
-            });
+            refreshHelpLabel(wait);
+            return;
         }
+        if (!diceRolled) {
+            refreshHelpLabel(turn, rollDiceText);
+            return;
+        }
+        if (robberNewPosition) {
+            refreshHelpLabel(turn, setRobber);
+            return;
+        }
+        if (!(playedCard || cardAmount == 0)) {
+            rollDiceText.setStrikethrough(true);
+            refreshHelpLabel(turn, rollDiceText, trade, build, endTurn);
+            for (int i = 0; i < 4; i++) {
+                IDevelopmentCard cardMap = developmentCardTableView.getItems().get(i + 1);
+                Platform.runLater(() -> {
+                    if (cardMap.getAmount() > 0) {
+                        var card = new Text(String.format(cardString, cardMap.getType()));
+                        if (theme.equals("dark") || theme.equals("classic")) card.setFill(Color.web("#F3F5F3"));
+                        helpLabel.getChildren().add(card);
+                    }
+                });
+            }
+            return;
+        }
+        playCard.setStrikethrough(true);
+        rollDiceText.setStrikethrough(true);
+        refreshHelpLabel(turn, rollDiceText, playCard, trade, build, endTurn);
     }
 
     /**
@@ -1485,6 +1482,28 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Method used to update the Help Label
+     * <p>
+     * This method clears the current helpLabel, then sets a red
+     * border to aid visibility and adds all provided labels to it.
+     *
+     * @param labels Any amount of Text objects to be displayed.
+     *
+     * @implNote This method runs on the FX thread
+     * @author Marvin Drees
+     * @since 2021-06-03
+     */
+    private void refreshHelpLabel(Text... labels) {
+        Platform.runLater(() -> {
+            helpLabel.getChildren().clear();
+            helpLabel.setBorder(new Border(
+                    new BorderStroke(Color.web("#D83339"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
+                                     BorderWidths.DEFAULT)));
+            for (Text t : labels) helpLabel.getChildren().add(t);
+        });
+    }
+
+    /**
      * Helper Method to reset all game related states
      *
      * @param user The user who is currently active
@@ -1502,5 +1521,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
             tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
         }
+    }
+
+    /**
+     * Method used to create a Text object.
+     * <p>
+     * This method is used to map a label type to its
+     * internationalized string in the resource bundle,
+     * colors it accordingly and return the Text object.
+     *
+     * @param type Label type as identified in the resource bundle.
+     *
+     * @return Text object based on the provided label type.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-03
+     */
+    private Text setLabel(String type) {
+        Text text = new Text(resourceBundle.getString("game.help.labels." + type));
+        if (theme.equals("dark") || theme.equals("classic")) text.setFill(Color.web("#F3F5F3"));
+        return text;
     }
 }
