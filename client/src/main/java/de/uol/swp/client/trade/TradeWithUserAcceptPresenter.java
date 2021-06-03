@@ -274,17 +274,4 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             content.delete(content.length() - 2, content.length());
         return content.toString();
     }
-    private void isTradeFair() {
-        String tooManyResources = String.format(resourceBundle.getString("game.trade.status.toomanyresources"));
-        int offeringAmount = offeringResourceMap.getTotal();
-        int demandingAmount = respondingResourceMap.getTotal();
-        if (offeringAmount - demandingAmount > 2) {
-            acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(tooManyResources);
-        }
-        if (demandingAmount - offeringAmount > 2) {
-            acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(tooManyResources);
-        }
-    }
 }

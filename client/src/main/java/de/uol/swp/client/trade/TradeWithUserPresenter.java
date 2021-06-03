@@ -40,8 +40,9 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     public static final int MIN_HEIGHT = 680;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+    private static final int MAX_TRADE_DIFF = 2;
 
-    @FXML
+    ;@FXML
     private Label statusLabel;
     @FXML
     private HBox tradingHBox;
@@ -190,12 +191,23 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             LOG.debug("Failed sending the offer");
             return;
         }
-        offerTradeButton.setDisable(true);
-        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
-        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
-                                counterOffer);
-        tradeService.closeTradeResponseWindow(lobbyName);
-        post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        if (tradeIsFair()) {
+            offerTradeButton.setDisable(true);
+            statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
+            tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
+                                    counterOffer);
+            tradeService.closeTradeResponseWindow(lobbyName);
+            post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        }
+    }
+
+    private boolean tradeIsFair(){
+        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
+        int counterOwnResource = selectedOwnResourceList.getTotal();
+        int counterPartnersResource = selectedPartnersResourceList.getTotal();
+
+        if(Math.abs(counterOwnResource - counterPartnersResource) > MAX_TRADE_DIFF) return false;
+        else return true;
     }
 
     /**
