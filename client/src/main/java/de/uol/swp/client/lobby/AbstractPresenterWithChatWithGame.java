@@ -256,14 +256,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             int size = LobbyPresenter.MIN_WIDTH_IN_GAME + LobbyPresenter.HELP_MIN_WIDTH;
             helpColumn.setMinWidth(LobbyPresenter.HELP_MIN_WIDTH);
             ((Stage) window).setMinWidth(size);
-            window.setWidth(size);
             setHelpText();
         } else {
-            helpColumn.setMaxWidth(0);
             helpColumn.setMinWidth(0);
+            helpLabel.setBorder(null);
             helpLabel.getChildren().clear();
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
     }
