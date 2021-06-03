@@ -27,18 +27,6 @@ public interface ILobbyService {
     void changeOwner(LobbyName lobbyName, UserOrDummy newOwner);
 
     /**
-     * Checks if the lobby is in a game
-     *
-     * @param lobbyName LobbyName to check
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     * @since 2021-04-09
-     */
-    void checkForGame(LobbyName lobbyName);
-
-    /**
      * Posts a request to check if the user is currently in a lobby
      *
      * @author Alwin Bossert

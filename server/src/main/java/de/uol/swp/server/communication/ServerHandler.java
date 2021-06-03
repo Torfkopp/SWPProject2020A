@@ -11,7 +11,6 @@ import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
 import de.uol.swp.common.user.request.LogoutRequest;
-import de.uol.swp.common.user.response.AlreadyLoggedInResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.server.message.*;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
@@ -195,16 +194,12 @@ public class ServerHandler implements ServerHandlerDelegate {
     private void onClientAuthorisedMessage(ClientAuthorisedMessage msg) {
         Optional<MessageContext> ctx = getCtx(msg);
         if (ctx.isPresent()) {
-            if (msg.hasOldSession()) {
-                sendToClient(ctx.get(), new AlreadyLoggedInResponse(msg.getUser()));
-            } else {
-                if (msg.getSession().isPresent()) try {
-                    sessionManagement.putSession(ctx.get(), msg.getSession().get());
-                    sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
-                    sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
-                } catch (SessionManagementException e) {
-                    LOG.error(e);
-                }
+            if (msg.getSession().isPresent()) try {
+                sessionManagement.putSession(ctx.get(), msg.getSession().get());
+                sendToClient(ctx.get(), new LoginSuccessfulResponse(msg.getUser()));
+                sendMessage(new UserLoggedInMessage(msg.getUser().getUsername()));
+            } catch (SessionManagementException e) {
+                LOG.error(e);
             }
         } else {
             LOG.warn("No context for {}", msg);
