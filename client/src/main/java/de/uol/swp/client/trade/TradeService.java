@@ -132,9 +132,9 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser) {
+    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
         LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser));
+        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser, isCounterOffer));
     }
 
     @Override

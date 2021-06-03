@@ -976,26 +976,23 @@ public class GameService extends AbstractService {
         LOG.debug("Received OfferingTradeWithUserRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (game.isPausedByVoting()) return;
-        if (!(req.getRespondingUser() instanceof User && (game.getActivePlayer().equals(req.getOfferingUser()))))
-            return;
         //only false if respondingUser is no Dummy, the dice is rolled already,
         //and the offeringUser is the active user/ it is a counteroffer
-        if (!(req.getRespondingUser() instanceof User) && (game.getActivePlayer().equals(req.getOfferingUser()) || req
-                .isCounterOffer()) && game.isDiceRolledAlready()) {
+        if (req.getRespondingUser() instanceof Dummy || !game.isDiceRolledAlready()) return;
+        if (!(game.getActivePlayer().equals(req.getOfferingUser()) || req.isCounterOffer())) {
             post(new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
             return;
         }
         Inventory respondingInventory = game.getInventory(game.getPlayer(req.getRespondingUser()));
         if (respondingInventory == null) return;
-        //Checks if trade is possible
-        for (ResourceType r : ResourceType.values())
-            if (respondingInventory.get(r) - req.getDemandedResources().getAmount(r) < 0) {
-                onResetOfferTradeButtonRequest(
-                        new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
-                return;
-            }
 
         if (req.getRespondingUser() instanceof AI) {
+            for (ResourceType r : ResourceType.values())
+                if (respondingInventory.get(r) - req.getDemandedResources().getAmount(r) < 0) {
+                    onResetOfferTradeButtonRequest(
+                            new ResetOfferTradeButtonRequest(req.getOriginLobby(), req.getOfferingUser()));
+                    return;
+                }
             boolean accepted = gameAI
                     .tradeAcceptationAI(((AI) req.getRespondingUser()), req.getOriginLobby(), req.getOfferedResources(),
                                         req.getDemandedResources());

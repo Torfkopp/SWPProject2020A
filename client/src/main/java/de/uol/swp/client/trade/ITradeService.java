@@ -147,10 +147,11 @@ public interface ITradeService {
      *
      * @param lobbyName      The name of the lobby
      * @param respondingUser The user to whom the offer is being made
+     * @param isCounterOffer Whether the trade is a counter offer or not
      *
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
-    void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser);
+    void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer);
 
     /**
      * Posts a request for the Bank's inventory in order to trade with the Bank

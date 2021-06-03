@@ -32,9 +32,7 @@ import de.uol.swp.client.rules.RulesOverviewPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.client.sound.ISoundService;
-import de.uol.swp.client.trade.TradeWithBankPresenter;
-import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
-import de.uol.swp.client.trade.TradeWithUserPresenter;
+import de.uol.swp.client.trade.*;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.util.ThreadManager;
@@ -94,6 +92,9 @@ public class SceneManager {
 
     @Inject
     private ILobbyService lobbyService;
+
+    @Inject
+    private ITradeService tradeService;
 
     @Inject
     private ISoundService soundService;
@@ -1249,6 +1250,7 @@ public class SceneManager {
         });
         LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
         eventBus.post(new TradeUpdateEvent(lobbyName));
+        tradeService.tradeWithBank(lobbyName);
     }
 
     /**
@@ -1332,6 +1334,7 @@ public class SceneManager {
             tradingStage.show();
             LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
             ThreadManager.runNow(() -> eventBus.post(new TradeWithUserUpdateEvent(lobbyName)));
+            tradeService.tradeWithUser(lobbyName, event.getRespondingUser(), event.isCounterOffer());
         });
     }
 
