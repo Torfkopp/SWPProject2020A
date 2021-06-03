@@ -37,6 +37,7 @@ import java.io.*;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 /**
  * Module that provides classes needed by the client.
@@ -49,6 +50,7 @@ public class ClientModule extends AbstractModule {
 
     final EventBus eventBus = new EventBus();
     final Logger LOG = LogManager.getLogger(ClientModule.class);
+    final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
 
     @Override
     protected void configure() {
@@ -57,18 +59,18 @@ public class ClientModule extends AbstractModule {
         Properties defaultProps = new Properties();
 
         //Default settings
-        defaultProps.setProperty("lang", "en_GB");
-        defaultProps.setProperty("debug.draw_hitbox_grid", "false");
-        defaultProps.setProperty("debug.loglevel", "DEBUG");
-        defaultProps.setProperty("join_leave_msgs_on", "true");
-        defaultProps.setProperty("owner_ready_notifs_on", "true");
-        defaultProps.setProperty("owner_transfer_notifs_on", "true");
-        defaultProps.setProperty("theme", "default");
-        defaultProps.setProperty("soundpack", "default");
-        defaultProps.setProperty("volume", "100");
-        defaultProps.setProperty("backgroundvolume", "50");
-        defaultProps.setProperty("login_logout_msgs_on", "false");
-        defaultProps.setProperty("lobby_create_delete_msgs_on", "false");
+        defaultProps.setProperty("lang", preferences.get("lang", "en_GB"));
+        defaultProps.setProperty("debug.draw_hitbox_grid", preferences.get("debug.draw_hitbox_grid", "false"));
+        defaultProps.setProperty("debug.loglevel", preferences.get("debug.loglevel", "DEBUG"));
+        defaultProps.setProperty("join_leave_msgs_on", preferences.get("join_leave_msgs_on", "true"));
+        defaultProps.setProperty("owner_ready_notifs_on", preferences.get("owner_ready_notifs_on", "true"));
+        defaultProps.setProperty("owner_transfer_notifs_on", preferences.get("owner_transfer_notifs_on", "true"));
+        defaultProps.setProperty("theme", preferences.get("theme", "default"));
+        defaultProps.setProperty("soundpack", preferences.get("soundpack", "default"));
+        defaultProps.setProperty("volume", preferences.get("volume", "100"));
+        defaultProps.setProperty("backgroundvolume", preferences.get("backgroundvolume", "50"));
+        defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
+        defaultProps.setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);

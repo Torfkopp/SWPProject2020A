@@ -20,8 +20,8 @@ import org.apache.logging.log4j.Logger;
 @SuppressWarnings("UnstableApiUsage")
 public class ChatService implements IChatService {
 
+    private static final Logger LOG = LogManager.getLogger(ChatService.class);
     private final EventBus bus;
-    private final Logger LOG = LogManager.getLogger(ChatService.class);
     private final IUserService userService;
 
     /**

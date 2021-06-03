@@ -8,10 +8,10 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
@@ -23,7 +23,6 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -157,7 +156,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 () -> nameFilter.get().and(passwordFilter.get()).and(inGameFilter.get().and(fullFilter.get())),
                 nameFilter, passwordFilter, inGameFilter, fullFilter));
         lobbyView.setItems(new SortedList<>(filteredLobbyList));
-        ThreadManager.runNow(() -> LOG.debug("MainMenuPresenter initialised"));
+        LOG.debug("MainMenuPresenter initialised");
     }
 
     /**
@@ -270,6 +269,21 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onChangeAccountDetailsButtonPressed() {
         soundService.button();
         lobbyService.checkUserInLobby();
+    }
+
+    /**
+     * Method called when the ChangePropertiesButton is pressed
+     * <p>
+     * This method is called when the ChangePropertiesButton is pressed.
+     * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @since 2021-05-22
+     */
+    @FXML
+    private void onChangePropertiesButtonPressed() {
+        post(new ShowChangePropertiesViewEvent());
     }
 
     /**
@@ -584,32 +598,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
-     * Handles a KillOldClientResponse found on the EventBus
-     * <p>
-     * If a new KillOldClientResponse object is found on the EventBus, this
-     * method removes the user from all lobbies and resets the users chat vars.
-     * After that it posts a new showLoginViewMessage on the bus,
-     * so the old client gets reset to the login screen. The final step is
-     * to post a CloseLobbiesViewEvent on the bus so the remaining lobby
-     * windows get closed as well.
-     *
-     * @param rsp TheKillOldClientResponse object fount on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @see de.uol.swp.common.user.response.KillOldClientResponse
-     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
-     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        resetChatVars();
-        post(showLoginViewMessage);
-        post(closeLobbiesViewEvent);
-    }
-
-    /**
      * Adds a newly created lobby to LobbyList
      * <p>
      * If a new LobbyCreatedMessage object is posted onto the EventBus, the name
@@ -669,7 +657,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
         prepareChatVars();
-        post(new GetOldSessionsRequest(rsp.getUser()));
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
@@ -879,7 +866,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             }
             if (!oldLobbies.isEmpty() && lobbyCreateDeleteMsgsOn) {
                 for (Pair<ISimpleLobby, String> pair : oldLobbies) {
-                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey());
+                    I18nWrapper contentWrapper = new I18nWrapper("mainmenu.user.delete.lobby", pair.getKey().getName());
                     chatMessages.add(new SystemMessageDTO(contentWrapper));
                 }
             }

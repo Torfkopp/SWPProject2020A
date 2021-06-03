@@ -1,4 +1,4 @@
-package de.uol.swp.common.chat.message;
+package de.uol.swp.common.game.robber;
 
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
@@ -16,7 +16,7 @@ import de.uol.swp.common.user.UserOrDummy;
  * @see de.uol.swp.common.message.AbstractServerMessage
  * @since 2021-04-07
  */
-public class SystemMessageForRobbingMessage extends AbstractLobbyMessage {
+public class RobbingMessage extends AbstractLobbyMessage {
 
     private final UserOrDummy victim;
 
@@ -27,7 +27,7 @@ public class SystemMessageForRobbingMessage extends AbstractLobbyMessage {
      * @param robber    User getting the card
      * @param victim    User losing the card
      */
-    public SystemMessageForRobbingMessage(LobbyName lobbyName, UserOrDummy robber, UserOrDummy victim) {
+    public RobbingMessage(LobbyName lobbyName, UserOrDummy robber, UserOrDummy victim) {
         super(lobbyName, robber);
         this.victim = victim;
     }

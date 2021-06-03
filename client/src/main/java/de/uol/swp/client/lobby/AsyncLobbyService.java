@@ -6,6 +6,8 @@ import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.UserOrDummy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An asynchronous wrapper for the ILobbyService implementation
@@ -20,21 +22,18 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class AsyncLobbyService implements ILobbyService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncLobbyService.class);
     private final LobbyService syncLobbyService;
 
     @Inject
     public AsyncLobbyService(LobbyService syncLobbyService) {
         this.syncLobbyService = syncLobbyService;
+        LOG.debug("AsyncLobbyService initialised");
     }
 
     @Override
     public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
         ThreadManager.runNow(() -> syncLobbyService.changeOwner(lobbyName, newOwner));
-    }
-
-    @Override
-    public void checkForGame(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncLobbyService.checkForGame(lobbyName));
     }
 
     @Override

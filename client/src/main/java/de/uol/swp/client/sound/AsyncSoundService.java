@@ -2,6 +2,8 @@ package de.uol.swp.client.sound;
 
 import com.google.inject.Inject;
 import de.uol.swp.client.util.ThreadManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An asynchronous wrapper for the ISoundService implementation
@@ -16,11 +18,13 @@ import de.uol.swp.client.util.ThreadManager;
  */
 public class AsyncSoundService implements ISoundService {
 
+    private static final Logger LOG = LogManager.getLogger(AsyncSoundService.class);
     private final SoundService syncSoundService;
 
     @Inject
     public AsyncSoundService(SoundService syncSoundService) {
         this.syncSoundService = syncSoundService;
+        LOG.debug("AsyncSoundService initialised");
     }
 
     @Override
