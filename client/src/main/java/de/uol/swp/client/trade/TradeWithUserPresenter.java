@@ -42,7 +42,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
     private static final int MAX_TRADE_DIFF = 2;
 
-    ;@FXML
+    @FXML
     private Label statusLabel;
     @FXML
     private HBox tradingHBox;

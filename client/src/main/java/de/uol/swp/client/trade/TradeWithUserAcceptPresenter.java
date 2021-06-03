@@ -5,7 +5,6 @@ import de.uol.swp.client.trade.event.TradeWithUserResponseUpdateEvent;
 import de.uol.swp.common.game.request.UnpauseTimerRequest;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.IResource;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
-import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
 import de.uol.swp.common.game.response.InvalidTradeOfUsersResponse;
 import de.uol.swp.common.game.response.TradeOfUsersAcceptedResponse;
 import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
