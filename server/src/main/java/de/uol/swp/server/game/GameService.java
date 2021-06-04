@@ -639,7 +639,7 @@ public class GameService extends AbstractService {
             LOG.debug("Sending StartSessionMessage for Lobby {}", lobbyName);
             StartSessionMessage message = new StartSessionMessage(lobbyName, firstPlayer, configuration,
                                                                   msg.getLobby().isStartUpPhaseEnabled(),
-                                                                  game.getUserToPlayerMap());
+                                                                  game.getUserToPlayerMap(), game.getUserColoursMap());
             lobbyService.sendToAllInLobby(lobbyName, message);
         } catch (IllegalArgumentException e) {
             ExceptionMessage exceptionMessage = new ExceptionMessage(e.getMessage());

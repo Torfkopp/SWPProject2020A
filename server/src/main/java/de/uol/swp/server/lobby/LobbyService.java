@@ -79,6 +79,23 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a AddAIRequest found on the EventBus
+     * <p>
+     * If a AddAIRequest is detected on the EventBus, this method is called.
+     * It adds the AI to the lobby.
+     *
+     * @param req The AddAIRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.AddAIRequest
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onAddAIRequest(AddAIRequest req) {
+        post(new JoinLobbyRequest(req.getName(), req.getUser()));
+    }
+
+    /**
      * Handles a ChangeLobbySettingsRequest found on the EventBus
      * <p>
      * If a ChangeLobbySettingsRequest is detected on the EventBus this method
@@ -191,23 +208,6 @@ public class LobbyService extends AbstractService {
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);
         post(responseMessage);
-    }
-
-    /**
-     * Handles a AddAIRequest found on the EventBus
-     * <p>
-     * If a AddAIRequest is detected on the EventBus, this method is called.
-     * It adds the AI to the lobby.
-     *
-     * @param req The AddAIRequest found on the EventBus
-     *
-     * @author Mario Fokken
-     * @see de.uol.swp.common.lobby.request.AddAIRequest
-     * @since 2021-05-21
-     */
-    @Subscribe
-    private void onAddAIRequest(AddAIRequest req) {
-        post(new JoinLobbyRequest(req.getName(), req.getUser()));
     }
 
     /**
@@ -325,6 +325,7 @@ public class LobbyService extends AbstractService {
                             post(responseMessage);
                             sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), user));
                             post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+                            sendColourChangedMessage(lobby.get(), user);
                         }
                     } else {
                         ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
@@ -378,6 +379,7 @@ public class LobbyService extends AbstractService {
                 post(responseMessage);
                 sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
                 post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+                sendColourChangedMessage(lobby.get(), req.getUser());
             } else {
                 ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Wrong Password!");
                 exceptionMessage.initWithMessage(req);
@@ -465,6 +467,7 @@ public class LobbyService extends AbstractService {
             post(responseMessage);
             sendToAllInLobby(randomLobby.getName(), new UserJoinedLobbyMessage(randomLobby.getName(), req.getUser()));
             post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+            sendColourChangedMessage(randomLobby, req.getUser());
         } else {
             Message responseMessage = new JoinRandomLobbyFailedResponse();
             responseMessage.initWithMessage(req);
@@ -622,6 +625,27 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a SetColourRequest found on the EventBus
+     * <p>
+     * This request gets sent in the lobby, after the user changes the desired colour.
+     * It calls setUserColour method of the user's lobby and sends a ColourChangedMessage
+     * back to the aforementioned lobby.
+     *
+     * @param req The SetColourRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.SetColourRequest
+     * @since 2021-06-02
+     */
+    @Subscribe
+    private void onSetColourRequest(SetColourRequest req) {
+        LOG.debug("Received SetColourRequest for Lobby {}", req.getName());
+        ILobby lobby = lobbyManagement.getLobby(req.getName()).get();
+        if (req.getColour() != null) lobby.setUserColour(req.getUser(), req.getColour());
+        sendColourChangedMessage(lobby, req.getUser());
+    }
+
+    /**
      * Handles a StartSessionRequest found on the EventBus
      * <p>
      * If a StartSessionRequest is detected on the EventBus, this method is called.
@@ -675,5 +699,26 @@ public class LobbyService extends AbstractService {
         }
         ServerMessage msg = new UserReadyMessage(req.getName(), req.getUser());
         sendToAllInLobby(req.getName(), msg);
+    }
+
+    /**
+     * Helper method to send a ColourChangedMessage
+     * <p>
+     * To let the Client show the right colours, a
+     * ColourChangedMessage has to be sent everytime
+     * a Lobby is created, a User joins, or a User changes
+     * the colour
+     *
+     * @param lobby The affected lobby
+     * @param user  The user triggering this message
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.message.ColourChangedMessage
+     * @since 2021-06-04
+     */
+    private void sendColourChangedMessage(ILobby lobby, UserOrDummy user) {
+        LobbyName name = lobby.getName();
+        LOG.debug("Sending a ColourChangedMessage for {}", name);
+        sendToAllInLobby(name, new ColourChangedMessage(name, user, lobby.getUserColourMap()));
     }
 }

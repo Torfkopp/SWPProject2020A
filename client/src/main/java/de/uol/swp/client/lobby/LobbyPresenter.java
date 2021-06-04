@@ -224,6 +224,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        lobbyService.setColour(lobbyName, null);
 
         addSizeChangeListener();
         fitCanvasToSize();
