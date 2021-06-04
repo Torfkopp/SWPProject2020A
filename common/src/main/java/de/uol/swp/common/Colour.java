@@ -16,6 +16,7 @@ public enum Colour {
     DARK_BLUE(new Color(0, 0, 100)),
     CRIMSON(new Color(128, 0, 0)),
     DARK_GREEN(new Color(0, 100, 0)),
+    FOREST_GREEN(new Color(34, 139, 34)),
     ORANGE(new Color(255, 69, 0)),
     PURPLE(new Color(128, 0, 128)),
     HOT_PINK(new Color(255, 105, 180)),
