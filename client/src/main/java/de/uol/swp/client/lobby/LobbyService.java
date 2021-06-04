@@ -6,7 +6,6 @@ import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.Colour;
-import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -54,13 +53,6 @@ public class LobbyService implements ILobbyService {
         LOG.debug("Sending ChangeOwnerRequest");
         Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
         eventBus.post(req);
-    }
-
-    @Override
-    public void checkForGame(LobbyName lobbyName) {
-        LOG.debug("Sending CheckForGameRequest");
-        Message request = new CheckForGameRequest(lobbyName, userService.getLoggedInUser());
-        eventBus.post(request);
     }
 
     @Override
