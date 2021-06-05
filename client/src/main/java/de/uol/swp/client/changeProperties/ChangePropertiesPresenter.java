@@ -22,7 +22,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangePropertiesView.fxml";
     public static final int MIN_HEIGHT = 500;
-    public static final int MIN_WIDTH = 900;
+    public static final int MIN_WIDTH = 1300;
     private static final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
     @FXML
     private ComboBox<String> themeBox;
