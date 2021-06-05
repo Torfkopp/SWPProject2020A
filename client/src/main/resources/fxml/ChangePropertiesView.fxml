@@ -19,17 +19,99 @@
                     <ComboBox fx:id="languageBox" promptText="%changeproperties.combobox.language"/>
                 </labelFor>
             </Label>
-
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.loginlogoutmsg">
+                <labelFor>
+                    <ComboBox fx:id="loginLogoutMsgBox" promptText="%changeproperties.combobox.loginlogoutmsg"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.createdeletelobbymsg">
+                <labelFor>
+                    <ComboBox fx:id="createDeleteLobbyMsgBox"
+                              promptText="%changeproperties.combobox.createdeletelobbymsg"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.joinleavelobbymsg">
+                <labelFor>
+                    <ComboBox fx:id="joinLeaveLobbyMsgBox" promptText="%changeproperties.combobox.joinleavelobbymsg"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.ownerrdynotification">
+                <labelFor>
+                    <ComboBox fx:id="ownerRdyNotificationBox"
+                              promptText="%changeproperties.combobox.ownerrdynotification"/>
+                </labelFor>
+            </Label>
         </VBox>
-        <VBox alignment="CENTER_RIGHT" spacing="10.0">
+
+        <VBox alignment="CENTER_LEFT" spacing="10.0">
             <fx:reference source="themeBox"/>
             <fx:reference source="languageBox"/>
+            <fx:reference source="loginLogoutMsgBox"/>
+            <fx:reference source="createDeleteLobbyMsgBox"/>
+            <fx:reference source="joinLeaveLobbyMsgBox"/>
+            <fx:reference source="ownerRdyNotificationBox"/>
+        </VBox>
+        <VBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.ownertransfernotification">
+                <labelFor>
+                    <ComboBox fx:id="ownerTransferNotificationBox"
+                              promptText="%changeproperties.combobox.ownertransfernotification"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.soundpack">
+                <labelFor>
+                    <ComboBox fx:id="soundpackBox"
+                              promptText="%changeproperties.combobox.soundpack"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.volume">
+                <labelFor>
+                    <TextField fx:id="volumeField"
+                               promptText="%changeproperties.textfield.volume"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.backgroundvolume">
+                <labelFor>
+                    <TextField fx:id="backgroundVolumeField"
+                               promptText="%changeproperties.textfield.backgroundvolume"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.gridhitboxes">
+                <labelFor>
+                    <ComboBox fx:id="gridHitboxesBox"
+                              promptText="%changeproperties.combobox.gridhitboxes"/>
+                </labelFor>
+            </Label>
+            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                   text="%changeproperties.labels.loglevel">
+                <labelFor>
+                    <ComboBox fx:id="loglevelBox"
+                              promptText="%changeproperties.combobox.loglevel"/>
+                </labelFor>
+            </Label>
+        </VBox>
+        <VBox alignment="CENTER_LEFT" spacing="10.0">
+            <fx:reference source="ownerTransferNotificationBox"/>
+            <fx:reference source="soundpackBox"/>
+            <fx:reference source="volumeField"/>
+            <fx:reference source="backgroundVolumeField"/>
+            <fx:reference source="gridHitboxesBox"/>
+            <fx:reference source="loglevelBox"/>
         </VBox>
     </HBox>
     <HBox alignment="CENTER" spacing="20.0">
         <Button fx:id="changeButton" defaultButton="true" mnemonicParsing="false"
                 onAction="#onChangePropertiesButtonPressed"
                 text="%changeproperties.button.change"/>
-        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%button.cancel"/>
+        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%changeproperties.button.cancel"/>
     </HBox>
 </VBox>

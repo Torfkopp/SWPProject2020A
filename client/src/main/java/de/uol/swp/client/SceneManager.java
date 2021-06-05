@@ -13,9 +13,7 @@ import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceled
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
 import de.uol.swp.client.changeProperties.ChangePropertiesPresenter;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
-import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
+import de.uol.swp.client.changeProperties.event.*;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -929,6 +927,24 @@ public class SceneManager {
      */
     @Subscribe
     private void onSetMoveTimeErrorEvent(SetMoveTimeErrorEvent event) {
+        showError(event.getMessage());
+    }
+
+    /**
+     * Handles the SetVolumeErrorEvent detected on the EventBus
+     * <p>
+     * If a SetVolumeErrorEvent is detected on the EventBus,
+     * this method gets called. It shows the error message of
+     * the event in a error alert.
+     *
+     * @param event The SetVolumeErrorEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent
+     * @since 2021-06-05
+     */
+    @Subscribe
+    private void onSetVolumeErrorEvent(SetVolumeErrorEvent event) {
         showError(event.getMessage());
     }
 
