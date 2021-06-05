@@ -155,7 +155,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Method called when the StartSessionButton is pressed.
      * The Method calls the GameService to start the Session and
-     * makes the BuildingCosts, TimerLabel, and MoveTimerLabel visible.
+     * makes the BuildingCosts, TimerLabel, and MoveTimeLabel visible.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
