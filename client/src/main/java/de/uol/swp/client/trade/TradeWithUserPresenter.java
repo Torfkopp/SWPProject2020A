@@ -201,6 +201,16 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         }
     }
 
+    /**
+     * Method which blocks unfair trades
+     * <p>
+     * If the onOfferTradeButtonPressed Method has been called, this
+     * method checks if the difference in the amount of Ressources between
+     * offering and demanding Trade is two or lower.
+     * If not, the Method will return false and with that, the onOfferTradeButtonPressed
+     * will not send the offer
+     */
+
     private boolean tradeIsFair(){
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
         int counterOwnResource = selectedOwnResourceList.getTotal();
