@@ -22,6 +22,8 @@ import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
@@ -41,8 +43,6 @@ public class GameAI {
     private final Map<AI, List<IHarbourHex.HarbourResource>> harbours = new HashMap<>();
     private final Map<Game, Map<MapPoint, Integer>> aiBuildPriority = new HashMap<>();
 
-
-
     /**
      * Constructor
      *
@@ -59,7 +59,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to move the robber when
+     * Method to move the robber when
      * an AI gets a seven.
      *
      * @author Mario Fokken
@@ -167,7 +167,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to pay the tax for an AI
+     * Method to pay the tax for an AI
      *
      * @param game The game the AI is in
      * @param ai   The AI to pay the tax
@@ -205,7 +205,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to calculate if the AI
+     * Method to calculate if the AI
      * wants to accept the trade offer
      *
      * @param ai       The AI to decide
@@ -254,7 +254,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method for an AI's turn
+     * Method for an AI's turn
      *
      * @param game The game the AI is in
      * @param ai   The AI to make its turn
@@ -263,23 +263,34 @@ public class GameAI {
      * @since 2021-05-11
      */
     void turnAI(Game game, AI ai) {
-        switch (ai.getDifficulty()) {
-            case EASY:
-                turnPlayCardsAIEasy(game, ai);
-                turnBuildAIEasy(game, ai);
-                break;
-            case HARD:
-                if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
-                    playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
-                turnBuildAIHard(game, ai);
-                break;
+        if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
+            switch (ai.getDifficulty()) {
+                case EASY:
+                    turnPlayCardsAIEasy(game, ai);
+                    turnBuildAIEasy(game, ai);
+                    break;
+                case HARD:
+                    if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
+                        playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
+                    turnBuildAIHard(game, ai);
+                    break;
+            }
+        } else {
+            switch (ai.getDifficulty()) {
+                case EASY:
+                    startUpPhaseAIEasy(game, ai);
+                    break;
+                case HARD:
+                    startUpPhaseAIHard(game, ai);
+                    break;
+            }
         }
         //Trying to end the turn
         gameService.turnEndAI(game, ai);
     }
 
     /**
-     * Helper method to make a chat
+     * Method to make a chat
      * message for an AI
      *
      * @param ai        The AI to send the message
@@ -295,7 +306,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to build a
+     * Method to build a
      * city for a hard AI
      * <p>
      * It upgrades the settlement on the most
@@ -349,7 +360,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to build a
+     * Method to build a
      * road for a hard AI
      * <p>
      * It builds roads to reach
@@ -426,7 +437,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to build the roads
+     * Method to build the roads
      * on a path
      *
      * @param game The game the AI is in
@@ -453,7 +464,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to build a
+     * Method to build a
      * settlement for a hard AI
      * <p>
      * It builds a settlement on the most
@@ -525,9 +536,9 @@ public class GameAI {
     }
 
     /**
-     * Helper method to fill the
-     * aiBuildPriority map used by the
-     * hard AI
+     * Method to fill the aiBuildPriority map
+     * used by the hard AI.
+     * It gives every intersection a rating
      *
      * @param game The game the AI is in
      *
@@ -551,13 +562,19 @@ public class GameAI {
                     IResourceHex hex = (IResourceHex) game.getMap().getHex(mp);
                     rating += Math.abs(hex.getToken() - 7);
                 }
-                //Special rating for coast intersections
-                if (i == 0 || i == 5 || j == 0 || j > 9 || ((i == 1 || i == 4) && j > 7)) {
+                //↓ Special rating for coast intersections
+                if (j == 0 || ((i == 0 || i == 5) && (j == 1 || j == 3 || j == 5)) //
+                    || ((i == 1 || i == 4) && j == 8) || ((i == 2 || i == 3) && j == 10))
+                    //Two Water Hexes
+                    if (map.getHarbourResource(mapPoint) == null) rating += 20;
+                    else rating += 15;
+                else if (i == 0 || i == 5 || j == 1 || ((i == 1 || i == 4) && j == 7) || ((i == 2 || i == 3) && j == 9))
+                    //One Water Hex
                     if (map.getHarbourResource(mapPoint) == null) rating += 10;
                     else rating += 5;
-                } else if (i == 3 && j == 3 && map.getHex(MapPoint.HexMapPoint(3, 3))
-                                                  .getType() == IGameHex.HexType.DESERT) rating += 7;
-                //↑ Special rating for the desert field (only if desert field is the on in the middle)
+                else if (map.getHex(MapPoint.HexMapPoint(3, 3)).getType() == IGameHex.HexType.DESERT //
+                         && (i == 2 || i == 3) && (j == 4 || j == 5 || j == 6)) rating += 7;
+                //↑ Special rating for the desert field (only if desert field is the in the middle)
                 priority.put(mapPoint, rating);
             }
         }
@@ -584,7 +601,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method for the helper method
+     * Method for the helper method
      * to find a path between two Intersections
      *
      * @param map    The IGameMapManagement
@@ -663,7 +680,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method to let a hard AI
+     * Method to let a hard AI
      * play a card
      *
      * @param game The game the AI is in
@@ -710,7 +727,92 @@ public class GameAI {
     }
 
     /**
-     * Helper method for an easy AI's
+     * Method to let an Easy AI build
+     * in the start up phase
+     *
+     * @param game The game the AI is in
+     * @param ai   The AI building
+     *
+     * @author Mario Fokken
+     * @since 2021-06-05
+     */
+    private void startUpPhaseAIEasy(Game game, AI ai) {
+        Player player = game.getPlayer(ai);
+        IGameMapManagement map = game.getMap();
+        LobbyName lobbyName = game.getLobby().getName();
+
+        System.err.println(game.getStartUpPhase());
+
+        boolean built = false;
+        int y, xmax, x;
+        MapPoint mp = null;
+
+        //Choose random place to build settlement upon
+        while (!built && mp == null) {
+            y = (int) (Math.random() * 5);
+            xmax = (y == 0 || y == 5) ? 6 : (y == 1 || y == 4) ? 8 : 10;
+            x = (int) (Math.random() * xmax);
+            mp = MapPoint.IntersectionMapPoint(y, x);
+            built = map.placeFoundingSettlement(player, mp);
+        }
+
+        lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
+
+        List<IEdge> edges = new ArrayList<>(map.getEdgesAroundIntersection(map.getIntersection(mp)));
+        built = false;
+
+        //Choose random place to build road upon
+        while (!built) {
+            mp = map.getEdgeMapPoint(edges.get((int) (Math.random() * edges.size())));
+            built = map.placeRoad(player, mp);
+        }
+
+        lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, ROAD));
+    }
+
+    /**
+     * Method to let a Hard AI build
+     * in the start up phase
+     *
+     * @param game The game the AI is in
+     * @param ai   The AI building
+     *
+     * @author Mario Fokken
+     * @since 2021-06-05
+     */
+    private void startUpPhaseAIHard(Game game, AI ai) {
+        if (!aiBuildPriority.containsValue(game)) createBuildPriority(game);
+        Player player = game.getPlayer(ai);
+        IGameMapManagement map = game.getMap();
+        LobbyName lobbyName = game.getLobby().getName();
+
+        //Sorts the aiBuildPriority map by Value
+        List<Entry<MapPoint, Integer>> list = new LinkedList<>(aiBuildPriority.get(game).entrySet());
+        list.sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()) == 0 //
+                              ? o1.getKey().getY() == o2.getKey().getY() //
+                                ? Integer.compare(o1.getKey().getX(), o2.getKey().getX()) //
+                                : Integer.compare(o1.getKey().getY(), o2.getKey().getY()) //
+                              : o1.getValue().compareTo(o2.getValue()));
+        Map<MapPoint, Integer> priority = list.stream().collect(
+                Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
+
+        System.err.println(priority.keySet());
+        System.err.println(priority.values());
+
+        MapPoint mapPoint = null;
+        //Goes from best to worst priority to choose the settlement point
+        for (MapPoint mp : priority.keySet())
+            if (map.placeFoundingSettlement(player, mp)) {
+                mapPoint = mp;
+                break;
+            }
+        lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, SETTLEMENT));
+
+        //todo Straßenbauplan
+    }
+
+    /**
+     * Method for an easy AI's
      * building phase
      *
      * @param game The game the AI is in
@@ -799,7 +901,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method for a hard AI's
+     * Method for a hard AI's
      * building phase
      *
      * @param game The game the AI is in
@@ -847,7 +949,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method for an easy AI's
+     * Method for an easy AI's
      * card playing phase
      *
      * @param game The game the AI is in
@@ -935,7 +1037,7 @@ public class GameAI {
     }
 
     /**
-     * Helper method for a hard AI's
+     * Method for a hard AI's
      * harbour usage
      *
      * @param game The game the AI is in
