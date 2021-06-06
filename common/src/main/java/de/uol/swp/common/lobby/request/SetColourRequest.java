@@ -21,8 +21,6 @@ public class SetColourRequest extends AbstractLobbyRequest {
      *
      * @param name Name of the lobby
      * @param user User responsible for the creation of this message
-     *
-     * @since 2019-10-08
      */
     public SetColourRequest(LobbyName name, UserOrDummy user, Colour colour) {
         super(name, user);

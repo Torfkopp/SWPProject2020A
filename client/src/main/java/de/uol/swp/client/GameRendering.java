@@ -55,10 +55,10 @@ public class GameRendering {
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
 
-    public static Color PLAYER_1_COLOUR;
-    public static Color PLAYER_2_COLOUR;
-    public static Color PLAYER_3_COLOUR;
-    public static Color PLAYER_4_COLOUR;
+    public static Color PLAYER_1_COLOUR = Color.BLACK;
+    public static Color PLAYER_2_COLOUR = Color.BLACK;
+    public static Color PLAYER_3_COLOUR = Color.BLACK;
+    public static Color PLAYER_4_COLOUR = Color.BLACK;
 
     @Inject
     private static ResourceBundle resourceBundle;

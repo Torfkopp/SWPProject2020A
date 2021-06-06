@@ -606,12 +606,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private void prepareColourComboBox() {
         Colour[] colours = new Colour[Colour.values().length - 1];
         System.arraycopy(Colour.values(), 0, colours, 0, colours.length);
+
         colourComboBox.getItems().addAll(colours);
         colourComboBox.setCellFactory(new Callback<>() {
             @Override
             public ListCell<Colour> call(ListView<Colour> param) {
                 return new ListCell<>() {
-                    { super.setPrefWidth(100); }
+                    //{ super.setPrefWidth(100); }
 
                     @Override
                     protected void updateItem(Colour item, boolean empty) {
@@ -620,6 +621,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                             setText(resourceBundle.getString("colours." + item));
                             int[] colourCode = item.getColourCode();
                             setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
+                            if (userColoursMap.containsValue(item)) setDisable(true);
                         } else setText(null);
                     }
                 };

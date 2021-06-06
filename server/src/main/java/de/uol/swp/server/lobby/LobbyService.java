@@ -593,7 +593,8 @@ public class LobbyService extends AbstractService {
     private void onSetColourRequest(SetColourRequest req) {
         LOG.debug("Received SetColourRequest for Lobby {}", req.getName());
         ILobby lobby = lobbyManagement.getLobby(req.getName()).get();
-        if (req.getColour() != null) lobby.setUserColour(req.getUser(), req.getColour());
+        if (req.getColour() != null && !lobby.getUserColourMap().containsValue(req.getColour()))
+            lobby.setUserColour(req.getUser(), req.getColour());
         sendColourChangedMessage(lobby, req.getUser());
     }
 
