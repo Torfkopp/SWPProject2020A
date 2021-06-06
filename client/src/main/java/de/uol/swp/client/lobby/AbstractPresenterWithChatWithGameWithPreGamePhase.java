@@ -29,9 +29,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 /**
- * This class is the base for creating a new Presenter that uses the game and needs the pre game phase.
+ * This class is the base for creating a new Presenter that uses the game and needs the pre-game phase.
  * <p>
- * This class prepares the child classes to have methods and attributes related to the pre game phase.
+ * This class prepares the child classes to have methods and attributes related to the pre-game phase.
  *
  * @author Temmo Junkhoff
  * @author Maximillian Lindner
@@ -96,7 +96,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * Helper method to clean chat history of old owner notices
      * <p>
      * This method removes all SystemMessages from the chat history
-     * that match the text used notify the owner that every player
+     * that match the text used to notify the owner that every player
      * (or every player except the owner) is ready to play and that
      * the owner should press the "Start Session" button to proceed
      * to the game.
@@ -110,6 +110,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     /**
      * Helper function to let the user leave the lobby and close the window
+     * <p>
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
      * @param kicked Whether the user was kicked (true) or is leaving
@@ -132,8 +133,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Method called when the KickUserButton is pressed
      * <p>
-     * If the EndTurnButton is pressed, this method requests to kick
-     * the selected User of the members view.
+     * If the KickUserButton is pressed, this method requests to kick
+     * the selected User inside the MembersView.
      *
      * @author Maximilian Lindner
      * @author Sven Ahrens
@@ -154,7 +155,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Method called when the StartSessionButton is pressed.
      * The Method calls the GameService to start the Session and
-     * makes the buildingCost, timerLabel, and moveTimeLabel visible.
+     * makes the BuildingCosts, TimerLabel, and MoveTimeLabel visible.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
@@ -189,11 +190,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the disable and visible state of the changeOwnerButton.
+     * Helper function that sets the visibility and state of the changeOwnerButton.
      * <p>
-     * The button is only enabled the lobby owner when a game
-     * has not started yet and if the logged in user is the
-     * owner
+     * The button is only enabled for the lobby owner when a game
+     * has not started yet and if the logged in user is the owner
      *
      * @author Maximilian Lindner
      * @since 2021-04-13
@@ -206,11 +206,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the disable and visible state of the kickUserButton.
+     * Helper function that sets the visibility and state of the kickUserButton.
      * <p>
-     * The button is only enabled the lobby owner when a game
-     * has not started yet and if the logged in user is the
-     * owner
+     * The button is only enabled for the lobby owner when a game
+     * has not started yet and if the logged in user is the owner
      *
      * @author Maximilian Lindner
      * @author Sven Ahrens
@@ -224,8 +223,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method that sets the visibility for the lobby owner and disables pre-game Buttons and Checkboxes
-     * for everyone, expect the owner.
+     * Helper method that sets the visibility and state of buttons and checkboxes for the
+     * pre-game settings. The pre-game settings are disabled for everyone, except the
+     * owner of the lobby.
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
@@ -244,11 +244,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the Visible and Disable states of the "Start
-     * Session" button.
+     * Helper function that sets the visibility and state of the StartSessionButton.
      * <p>
-     * The button is only ever visible to the lobby owner, and is only enabled
-     * if there are 3 or more lobby members, and all members are marked as ready.
+     * The button is only visible to the lobby owner and only enabled
+     * if there are 3 or more lobby members and all members are marked as ready.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
@@ -268,7 +267,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * Handles a click on the AddAI Button
      * <p>
      * Method called when the AddAIButton is pressed.
-     * This Method calls the lobbyService to post an AddAIRequest
+     * This Method calls the lobbyService to post an AddAIRequest.
      *
      * @author Mario Fokken
      * @since 2021-05-21
@@ -286,8 +285,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Method called when the ChangeOwnerButtonPressed is pressed
      * <p>
-     * If the ChangeOwnerButtonPressed is pressed, this method requests to change
-     * the owner status of the selected User of the members view .
+     * If the ChangeOwnerButton is pressed, this method requests to change
+     * the owner status to the selected User of the members view.
      *
      * @author Maximilian Lindner
      * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
@@ -305,7 +304,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Handles a KickUserResponse found on the EventBus
      * <p>
-     * If a KickUserResponse is detected on the EventBus and its
+     * If a KickUserResponse is detected on the EventBus and it is
      * directed to this lobby and this player, the according lobby
      * window is closed.
      *
@@ -450,7 +449,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Handles a StartSessionMessage found on the EventBus
      * <p>
-     * Sets the play field visible.
+     * Sets the play field to visible.
      * The startSessionButton and every readyCheckbox are getting invisible for
      * the lobby members.
      *
@@ -602,7 +601,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Prepare the MoveTimeTextField
+     * Prepares the MoveTimeTextField
      * <p>
      * Lets the moveTimeTextField only accept numbers.
      *
