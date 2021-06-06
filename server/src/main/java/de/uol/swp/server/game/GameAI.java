@@ -796,9 +796,6 @@ public class GameAI {
         Map<MapPoint, Integer> priority = list.stream().collect(
                 Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
 
-        System.err.println(priority.keySet());
-        System.err.println(priority.values());
-
         MapPoint mapPoint = null;
         //Goes from best to worst priority to choose the settlement point
         for (MapPoint mp : priority.keySet())
@@ -808,7 +805,16 @@ public class GameAI {
             }
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mapPoint, SETTLEMENT));
 
-        //todo Straßenbauplan
+        //Build road in the direction of the next best rated point
+        List<MapPoint> roads = new LinkedList<>(priority.keySet());
+        MapPoint road = roads.get(roads.indexOf(mapPoint) + 1);
+
+        roads = findPath(game, ai, mapPoint, road);
+
+        road = MapPoint.EdgeMapPoint(roads.get(0), roads.get(1));
+        map.placeRoad(player, road);
+
+        lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, road, ROAD));
     }
 
     /**
