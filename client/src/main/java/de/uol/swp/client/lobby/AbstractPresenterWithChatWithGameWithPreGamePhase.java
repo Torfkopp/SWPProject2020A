@@ -274,6 +274,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onAddAIButtonPressed() {
+        soundService.button();
         boolean talking = talkingAICheckBox.isSelected();
         AI.Difficulty difficulty =
                 difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
@@ -405,6 +406,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onReadyCheckBoxClicked() {
+        soundService.button();
         boolean isReady = readyCheckBox.isSelected();
         lobbyService.userReady(lobbyName, isReady);
     }
@@ -592,6 +594,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
+                soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }
