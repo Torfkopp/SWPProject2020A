@@ -279,6 +279,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @FXML
     private void onRulesMenuClicked() {
         LOG.debug("Sending ShowRulesOverviewViewEvent");
+        soundService.button();
         post(new ShowRulesOverviewViewEvent());
     }
 
