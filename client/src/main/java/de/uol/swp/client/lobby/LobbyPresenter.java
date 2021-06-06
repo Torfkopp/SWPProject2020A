@@ -21,6 +21,8 @@ import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -146,8 +148,21 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onLeaveLobbyButtonPressed() {
+        //Create new alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resourceBundle.getString("lobby.leave.confirmation.window"));
+        alert.setHeaderText(resourceBundle.getString("lobby.leave.confirmation.question"));
+        //Create the buttons
+        ButtonType lConfirm = new ButtonType(resourceBundle.getString("button.confirm"));
+        ButtonType lCancel = new ButtonType(resourceBundle.getString("button.cancel"));
+        //Show the dialogue and get the result
+        alert.getButtonTypes().setAll(lConfirm, lCancel);
+        Optional<ButtonType> result = alert.showAndWait();
+        //Result is the button the user has clicked on
+        if (result.get() == lConfirm) {
+            closeWindow(false);
+        }
         soundService.button();
-        closeWindow(false);
     }
 
     /**
