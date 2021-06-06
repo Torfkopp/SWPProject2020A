@@ -40,7 +40,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     public static final int MIN_HEIGHT = 680;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
-    private static final int MAX_TRADE_DIFF = 2;
+    private static int MAX_TRADE_DIFF;
 
     @FXML
     private Label statusLabel;
