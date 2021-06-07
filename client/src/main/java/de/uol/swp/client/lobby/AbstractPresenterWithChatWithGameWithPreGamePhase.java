@@ -361,7 +361,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         userOrDummyPlayerMap = map;
         userColoursMap = msg.getUserColours();
         gameRendering.setPlayerColours(getPlayerColourMap());
-        lobbyService.retrieveAllLobbyMembers(lobbyName); //for updating the list
+        lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
+        Platform.runLater(this::prepareColourComboBox);
     }
 
     /**
@@ -605,6 +606,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-06-04
      */
     private void prepareColourComboBox() {
+        colourComboBox.getItems().clear();
         Colour[] colours = new Colour[Colour.values().length - 1];
         System.arraycopy(Colour.values(), 0, colours, 0, colours.length);
 
@@ -620,7 +622,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                             setText(resourceBundle.getString("colours." + item));
                             int[] colourCode = item.getColourCode();
                             setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
-                            if (userColoursMap.containsValue(item)) setDisable(true);
+                            setDisable(userColoursMap.containsValue(item));
                         } else setText(null);
                     }
                 };
