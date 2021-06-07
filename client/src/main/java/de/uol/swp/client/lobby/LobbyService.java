@@ -48,6 +48,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void addAI(LobbyName name, AI ai) {
+        LOG.debug("Sending AddAIRequest");
+        Message addAIRequest = new AddAIRequest(name, ai);
+        eventBus.post(addAIRequest);
+    }
+
+    @Override
     public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
         LOG.debug("Sending ChangeOwnerRequest");
         Message req = new ChangeOwnerRequest(lobbyName, userService.getLoggedInUser(), newOwner);
@@ -76,16 +83,9 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void addAI(LobbyName name, AI ai) {
-        LOG.debug("Sending AddAIRequest");
-        Message addAIRequest = new AddAIRequest(name, ai);
-        eventBus.post(addAIRequest);
-    }
-
-    @Override
     public void joinRandomLobby() {
         LOG.debug("Sending JoinRandomLobbyRequest");
-        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(null, userService.getLoggedInUser());
+        Message joinRandomLobbyRequest = new JoinRandomLobbyRequest(new LobbyName(""), userService.getLoggedInUser());
         eventBus.post(joinRandomLobbyRequest);
     }
 
