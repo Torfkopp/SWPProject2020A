@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.hexes.*;
 import de.uol.swp.common.game.map.management.IEdge;
@@ -18,6 +19,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.robber.RobberPositionMessage;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
+import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 
@@ -25,6 +27,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static de.uol.swp.common.game.StartUpPhaseBuiltStructures.*;
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
@@ -263,29 +266,43 @@ public class GameAI {
      * @since 2021-05-11
      */
     void turnAI(Game game, AI ai) {
-        if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
-            switch (ai.getDifficulty()) {
-                case EASY:
-                    turnPlayCardsAIEasy(game, ai);
-                    turnBuildAIEasy(game, ai);
-                    break;
-                case HARD:
-                    if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
-                        playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
-                    turnBuildAIHard(game, ai);
-                    break;
-            }
-        } else {
-            switch (ai.getDifficulty()) {
-                case EASY:
-                    startUpPhaseAIEasy(game, ai);
-                    break;
-                case HARD:
-                    startUpPhaseAIHard(game, ai);
-                    break;
-            }
+        switch (ai.getDifficulty()) {
+            case EASY:
+                turnPlayCardsAIEasy(game, ai);
+                turnBuildAIEasy(game, ai);
+                break;
+            case HARD:
+                if (game.getInventory(ai).get(DevelopmentCardType.KNIGHT_CARD) > 0)
+                    playCardAI(game, ai, DevelopmentCardType.KNIGHT_CARD, null, null);
+                turnBuildAIHard(game, ai);
+                break;
         }
         //Trying to end the turn
+        gameService.turnEndAI(game, ai);
+    }
+
+    /**
+     * Method for an AI's turn in the set up phase
+     *
+     * @param game The game the AI is in
+     * @param ai   The AI to make its turn
+     *
+     * @author Mario Fokken
+     * @since 2021-06-07
+     */
+    void turnAISetUp(Game game, AI ai) {
+        switch (ai.getDifficulty()) {
+            case EASY:
+                startUpPhaseAIEasy(game, ai);
+                break;
+            case HARD:
+                startUpPhaseAIHard(game, ai);
+                break;
+        }
+        Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+        if (startUpBuiltMap.get(ai) == NONE_BUILT) startUpBuiltMap.put(ai, FIRST_BOTH_BUILT);
+        else startUpBuiltMap.put(ai, ALL_BUILT);
+
         gameService.turnEndAI(game, ai);
     }
 
@@ -590,7 +607,7 @@ public class GameAI {
      * @param start The road's start
      * @param end   The road's end
      *
-     * @return List of MapPoints; empty if no path is found
+     * @return List of MapPoints; null if no path is found
      *
      * @author Mario Fokken
      * @since 2021-05-16
@@ -609,7 +626,7 @@ public class GameAI {
      * @param path   The taken path
      * @param end    The end point
      *
-     * @return List of MapPoints
+     * @return List of MapPoints (null if no path is found)
      *
      * @author Mario Fokken
      * @since 2021-05-16
@@ -741,8 +758,6 @@ public class GameAI {
         IGameMapManagement map = game.getMap();
         LobbyName lobbyName = game.getLobby().getName();
 
-        System.err.println(game.getStartUpPhase());
-
         boolean built = false;
         int y, xmax, x;
         MapPoint mp = null;
@@ -755,7 +770,6 @@ public class GameAI {
             mp = MapPoint.IntersectionMapPoint(y, x);
             built = map.placeFoundingSettlement(player, mp);
         }
-
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
 
         List<IEdge> edges = new ArrayList<>(map.getEdgesAroundIntersection(map.getIntersection(mp)));
@@ -807,11 +821,17 @@ public class GameAI {
 
         //Build road in the direction of the next best rated point
         List<MapPoint> roads = new LinkedList<>(priority.keySet());
-        MapPoint road = roads.get(roads.indexOf(mapPoint) + 1);
+        List<MapPoint> path = null;
 
-        roads = findPath(game, ai, mapPoint, road);
+        MapPoint road;
+        int i = 1;
+        while (path == null) {
+            road = roads.get(roads.indexOf(mapPoint) + i++);
+            path = findPath(game, ai, mapPoint, road);
+        }
 
-        road = MapPoint.EdgeMapPoint(roads.get(0), roads.get(1));
+        road = MapPoint.EdgeMapPoint(path.get(0), path.get(1));
+
         map.placeRoad(player, road);
 
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, road, ROAD));
