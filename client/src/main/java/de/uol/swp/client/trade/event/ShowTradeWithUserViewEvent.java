@@ -18,16 +18,19 @@ public class ShowTradeWithUserViewEvent {
 
     private final LobbyName lobbyName;
     private final UserOrDummy respondingUser;
+    private final boolean isCounterOffer;
 
     /**
      * Constructor
      *
      * @param lobbyName      Lobby name of the lobby where the player wants to trade
      * @param respondingUser User who the offer will be made to
+     * @param isCounterOffer Whether the trade is a counter offer or not
      */
-    public ShowTradeWithUserViewEvent(LobbyName lobbyName, UserOrDummy respondingUser) {
+    public ShowTradeWithUserViewEvent(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
         this.lobbyName = lobbyName;
         this.respondingUser = respondingUser;
+        this.isCounterOffer = isCounterOffer;
     }
 
     /**
@@ -47,5 +50,14 @@ public class ShowTradeWithUserViewEvent {
      */
     public UserOrDummy getRespondingUser() {
         return respondingUser;
+    }
+
+    /**
+     * Gets the isCounterOffer attribute
+     *
+     * @return Whether the trade is a counter offer or not
+     */
+    public boolean isCounterOffer() {
+        return isCounterOffer;
     }
 }

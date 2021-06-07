@@ -3,7 +3,6 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.user.IUserService;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
@@ -237,7 +236,7 @@ public class GameRendering {
      * If the subroutines have UI-modifying aspects, those will be called with Platform.runLater()
      */
     private void drawGameMap(IGameMap gameMap) {
-        ThreadManager.runNow(() -> LOG.debug("Drawing Game map"));
+        LOG.debug("Drawing Game map");
 
         //Get hexes, intersections, and edges in a usable format from the IGameMap
         IGameHex[][] hexes = gameMap.getHexes();
@@ -260,9 +259,6 @@ public class GameRendering {
      * @param hex      The harbour hex with the information about the harbour
      */
     private void drawHarbour(double currentX, double currentY, IHarbourHex hex) {
-        gfxCtx.setStroke(HARBOUR_COLOUR);
-        gfxCtx.setFill(HARBOUR_COLOUR);
-        gfxCtx.setLineWidth(hexWidth / 5.0);
         double yDistance = hexHeight * (1.0 / 64.0);
         double yExtend = hexHeight * (5.0 / 32.0);
         double xDistance = hexWidth * (1.0 / 32.0);

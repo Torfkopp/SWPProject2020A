@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
+import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
 import de.uol.swp.common.devmenu.request.DevMenuClassesRequest;
@@ -759,7 +760,8 @@ public class CommandService extends AbstractService {
      * @see de.uol.swp.common.chat.response.SystemMessageResponse
      */
     private void sendSystemMessageResponse(NewChatMessageRequest originalMessage, I18nWrapper content) {
-        ResponseMessage response = new SystemMessageResponse(originalMessage.getOriginLobby(), content);
+        ResponseMessage response = new SystemMessageResponse(originalMessage.getOriginLobby(),
+                                                             new SystemMessageDTO(content));
         response.initWithMessage(originalMessage);
         LOG.debug("Sending SystemMessageResponse");
         post(response);

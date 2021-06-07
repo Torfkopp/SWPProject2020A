@@ -4,14 +4,13 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.chat.IChatService;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.chat.ChatMessage;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.message.*;
 import de.uol.swp.common.chat.response.AskLatestChatMessageResponse;
-import de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse;
 import de.uol.swp.common.chat.response.SystemMessageResponse;
+import de.uol.swp.common.game.robber.RobbingMessage;
 import de.uol.swp.common.lobby.LobbyName;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -65,7 +64,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     public void init(Logger log) {
-        ThreadManager.runNow(() -> LOG = log);
+        LOG = log;
     }
 
     /**
@@ -76,7 +75,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     @FXML
     protected void initialize() {
         prepareChatVars();
-        ThreadManager.runNow(() -> LOG.debug("AbstractPresenterWithChat initialised"));
+        LOG.debug("AbstractPresenterWithChat initialised");
     }
 
     /**
@@ -273,11 +272,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @author Alwin Bossert
      * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageForPlayingCardsMessage
+     * @see de.uol.swp.common.chat.message.SystemMessageMessage
      * @since 2021-03-23
      */
     @Subscribe
-    protected void onSystemMessageForPlayingCardsMessage(SystemMessageForPlayingCardsMessage msg) {
+    protected void onSystemMessageForPlayingCardsMessage(SystemMessageMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForPlayingCardsMessage for Lobby {}", msg.getName());
             Platform.runLater(() -> chatMessages.add(msg.getMsg()));
@@ -296,11 +295,11 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      *
      * @author Mario Fokken
      * @author Timo Gerken
-     * @see de.uol.swp.common.chat.message.SystemMessageForRobbingMessage
+     * @see de.uol.swp.common.game.robber.RobbingMessage
      * @since 2021-04-07
      */
     @Subscribe
-    protected void onSystemMessageForRobbingMessage(SystemMessageForRobbingMessage msg) {
+    protected void onSystemMessageForRobbingMessage(RobbingMessage msg) {
         if (msg.getName().equals(this.lobbyName)) {
             LOG.debug("Received SystemMessageForRobbingMessage for Lobby {}", msg.getName());
             if (msg.getVictim() == null) {
@@ -318,80 +317,12 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                         alert.getButtonTypes().setAll(confirm);
                         alert.getDialogPane().getStylesheets().add(styleSheet);
                         alert.showAndWait();
+                        soundService.button();
                     });
                 }
             } else {
                 Platform.runLater(() -> chatMessages.add(msg.getMsg()));
             }
-        }
-    }
-
-    /**
-     * Handles new incoming SystemMessageForTradeMessage
-     * <p>
-     * If a SystemMessageForTradeMessage is posted onto the EventBus, this method
-     * places the incoming SystemMessageForTradeMessage into the chatMessages list.
-     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeMessage for Lobby
-     * {@code <lobbyName>}" is displayed in the log.
-     *
-     * @param msg The SystemMessageForTradeMessage found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageForTradeMessage
-     * @since 2021-03-23
-     */
-    @Subscribe
-    protected void onSystemMessageForTradeMessage(SystemMessageForTradeMessage msg) {
-        if (msg.getName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeResponse for Lobby {}", msg.getName());
-            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
-        }
-    }
-
-    /**
-     * Handles new incoming SystemMessageForTradeWithBankMessage
-     * <p>
-     * If a SystemMessageForTradeWithBankMessage is posted onto the EventBus, this method
-     * places the incoming SystemMessageForTradeWithBankMessage into the chatMessages list.
-     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeWithBankMessage for Lobby
-     * {@code <lobbyName>}" is displayed in the log.
-     *
-     * @param msg The SystemMessageForTradeWithBankMessage found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.message.SystemMessageForTradeWithBankMessage
-     * @since 2021-03-23
-     */
-    @Subscribe
-    protected void onSystemMessageForTradeWithBankMessage(SystemMessageForTradeWithBankMessage msg) {
-        if (msg.getName().equals(this.lobbyName) && !userService.getLoggedInUser().equals(msg.getUser())) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby {}", msg.getName());
-            Platform.runLater(() -> chatMessages.add(msg.getMsg()));
-        }
-    }
-
-    /**
-     * Handles an incoming SystemMessageForTradeWithBankResponse
-     * <p>
-     * If a SystemMessageForTradeWithBankResponse is posted onto the EventBus, this method
-     * places the incoming SystemMessageForTradeWithBankResponse into the chatMessages list.
-     * If the loglevel is set to DEBUG, the message "Received SystemMessageForTradeWithBankResponse for Lobby
-     * {@code <lobbyName>}" is displayed in the log.
-     *
-     * @param rsp The SystemMessageForTradeWithBankResponse found on the EventBus
-     *
-     * @author Alwin Bossert
-     * @author Sven Ahrens
-     * @see de.uol.swp.common.chat.response.SystemMessageForTradeWithBankResponse
-     * @since 2021-03-25
-     */
-    @Subscribe
-    protected void onSystemMessageForTradeWithBankResponse(SystemMessageForTradeWithBankResponse rsp) {
-        if (rsp.getLobbyName().equals(this.lobbyName)) {
-            LOG.debug("Received SystemMessageForTradeWithBankResponse for Lobby {}", rsp.getLobbyName());
-            Platform.runLater(() -> chatMessages.add(rsp.getMsg()));
         }
     }
 
@@ -437,15 +368,13 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
             @Override
             protected void updateItem(ChatOrSystemMessage item, boolean empty) {
                 super.updateItem(item, empty);
-                //fixme me this on runlater
                 Platform.runLater(() -> {
                     if (item instanceof SystemMessage)
                         setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, Font.getDefault().getSize()));
                     else setFont(Font.getDefault());
                     setText(empty || item == null ? "" : item.toString());
-                    setMaxWidth(chatView.getWidth() - 5);
-                    setPrefWidth(chatView.getWidth() - 5);
-                    setWidth(chatView.getWidth() - 5);
+                    prefWidthProperty().bind(widthProperty().divide(1.1));
+                    setMaxWidth(Control.USE_PREF_SIZE);
                     setWrapText(true);
                 });
             }

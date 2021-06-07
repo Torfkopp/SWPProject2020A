@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.SystemMessage;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
@@ -45,7 +44,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 825;
-    public static final int HELP_MIN_WIDTH = 250;
+    public static final int HELP_MIN_WIDTH = 350;
     public static final int MIN_HEIGHT_IN_GAME = 905;
     public static final int MIN_WIDTH_PRE_GAME = 685;
     public static final int MIN_WIDTH_IN_GAME = 1435;
@@ -88,7 +87,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     public void initialize() {
         super.initialize();
         prepareMembersView();
-        ThreadManager.runNow(() -> LOG.debug("LobbyPresenter initialised"));
+        LOG.debug("LobbyPresenter initialised");
     }
 
     /**
@@ -243,7 +242,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             moveTimeTextField.setText(String.valueOf(moveTime));
         });
         setPreGameSettings();
-        lobbyService.checkForGame(lobbyName);
     }
 
     /**
@@ -280,10 +278,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onRulesMenuClicked() {
-        ThreadManager.runNow(() -> {
-            LOG.debug("Sending ShowRulesOverviewViewEvent");
-            post(new ShowRulesOverviewViewEvent());
-        });
+        LOG.debug("Sending ShowRulesOverviewViewEvent");
+        soundService.button();
+        post(new ShowRulesOverviewViewEvent());
     }
 
     /**
