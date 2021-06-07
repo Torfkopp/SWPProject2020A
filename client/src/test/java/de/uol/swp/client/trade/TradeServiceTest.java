@@ -42,6 +42,7 @@ class TradeServiceTest {
     private ITradeService tradeService;
     private IUserService userService;
     private Object event;
+    private Object event2;
 
     @BeforeAll
     static void fillLists() {
@@ -125,6 +126,25 @@ class TradeServiceTest {
         assertEquals(secondUser, request.getRespondingUser());
         assertEquals(secondUser.getID(), request.getRespondingUser().getID());
         assertEquals(secondUser.getUsername(), request.getRespondingUser().getUsername());
+    }
+
+    @Test
+    void closeBankTradeWindow() throws InterruptedException {
+        tradeService.closeBankTradeWindow(defaultLobbyName);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof TradeCancelEvent);
+
+        TradeCancelEvent tradeCancelEvent = (TradeCancelEvent) event;
+
+        assertEquals(defaultLobbyName, tradeCancelEvent.getLobbyName());
+
+        assertTrue(event2 instanceof ResetTradeWithBankButtonEvent);
+
+        ResetTradeWithBankButtonEvent resetTradeWithBankButtonEvent = (ResetTradeWithBankButtonEvent) event2;
+
+        assertEquals(defaultLobbyName, resetTradeWithBankButtonEvent.getLobbyName());
     }
 
     @Test
@@ -307,7 +327,11 @@ class TradeServiceTest {
 
     @Subscribe
     private void onDeadEvent(DeadEvent e) {
-        this.event = e.getEvent();
+        if (this.event == null) {
+            this.event = e.getEvent();
+        } else {
+            this.event2 = e.getEvent();
+        }
         System.out.print(e.getEvent());
         lock.countDown();
     }
