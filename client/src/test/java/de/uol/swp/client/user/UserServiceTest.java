@@ -231,6 +231,9 @@ class UserServiceTest {
         LogoutRequest request = (LogoutRequest) event;
 
         assertTrue(request.authorisationNeeded());
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
         verify(mockPreferences, times(2)).putBoolean("rememberMeEnabled", false);
         verify(mockPreferences).put("username", "");
         verify(mockPreferences).put("password", "");
