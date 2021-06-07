@@ -117,7 +117,7 @@
                         text="%lobby.buttons.addai"/>
             </VBox>
             <HBox prefHeight="100.0" prefWidth="200.0">
-                <ComboBox fx:id="colourComboBox" prefHeight="25.0" prefWidth="140.0"/>
+                <ComboBox fx:id="colourComboBox" promptText="%colours.boxtext" prefHeight="25.0" prefWidth="140.0"/>
                 <Button mnemonicParsing="false" onAction="#onColourChangeButtonPressed" prefHeight="25.0"
                         prefWidth="90.0" text="%colours.button"/>
             </HBox>
