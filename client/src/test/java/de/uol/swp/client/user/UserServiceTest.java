@@ -4,18 +4,24 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.Hashing;
+import de.uol.swp.client.ClientApp;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserDTO;
 import de.uol.swp.common.user.request.*;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
+import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * This a test of the class is used to hide the communication details
@@ -33,6 +39,8 @@ class UserServiceTest {
     private final CountDownLatch lock = new CountDownLatch(1);
     private Object event;
     private IUserService userService;
+    private Preferences mockPreferences;
+    private MockedStatic<Preferences> mockedPreferences;
 
     /**
      * Helper method run before each test case
@@ -46,6 +54,12 @@ class UserServiceTest {
     protected void setUp() {
         event = null;
         bus.register(this);
+        mockPreferences = mock(Preferences.class);
+        assertNotNull(mockPreferences);
+        mockedPreferences = mockStatic(Preferences.class);
+        mockedPreferences.when(() -> Preferences.userNodeForPackage(ClientApp.class)).thenReturn(mockPreferences);
+        doNothing().when(mockPreferences).put(isA(String.class), isA(String.class));
+        doNothing().when(mockPreferences).putBoolean(isA(String.class), isA(Boolean.class));
         userService = new UserService(bus);
     }
 
@@ -60,6 +74,7 @@ class UserServiceTest {
     protected void tearDown() {
         bus.unregister(this);
         userService = null;
+        mockedPreferences.close();
     }
 
     /**
@@ -200,6 +215,47 @@ class UserServiceTest {
         LogoutRequest request = (LogoutRequest) event;
 
         assertTrue(request.authorisationNeeded());
+    }
+
+    @Test
+    void logoutTest_WithResetRememberMe() throws InterruptedException {
+        loginUser();
+        event = null;
+
+        userService.logout(true);
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertTrue(event instanceof LogoutRequest);
+
+        LogoutRequest request = (LogoutRequest) event;
+
+        assertTrue(request.authorisationNeeded());
+        verify(mockPreferences, times(2)).putBoolean("rememberMeEnabled", false);
+        verify(mockPreferences).put("username", "");
+        verify(mockPreferences).put("password", "");
+    }
+
+    @Test
+    void onChangeAccountDetailsSuccessfulResponseTest() throws InterruptedException {
+        User secondUser = new UserDTO(1, "second", "s2", "mail@mail.second");
+        userService.setLoggedInUser(defaultUser);
+
+        bus.post(new ChangeAccountDetailsSuccessfulResponse(secondUser));
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+        assertEquals(secondUser, userService.getLoggedInUser());
+    }
+
+    @Test
+    void onLoginSuccessfulResponseTest() throws InterruptedException {
+        assertNull(userService.getLoggedInUser());
+        bus.post(new LoginSuccessfulResponse(defaultUser));
+
+        lock.await(250, TimeUnit.MILLISECONDS);
+
+        assertNotNull(userService.getLoggedInUser());
+        assertEquals(defaultUser, userService.getLoggedInUser());
     }
 
     /**
