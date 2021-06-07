@@ -613,8 +613,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             @Override
             public ListCell<Colour> call(ListView<Colour> param) {
                 return new ListCell<>() {
-                    //{ super.setPrefWidth(100); }
-
                     @Override
                     protected void updateItem(Colour item, boolean empty) {
                         super.updateItem(item, empty);
