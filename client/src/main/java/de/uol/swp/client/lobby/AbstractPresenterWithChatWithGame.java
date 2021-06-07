@@ -1067,6 +1067,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        endTurn.setDisable(true);
+        tradeWithUserButton.setDisable(true);
+        tradeWithBankButton.setDisable(true);
+        playCard.setDisable(true);
     }
 
     /**
