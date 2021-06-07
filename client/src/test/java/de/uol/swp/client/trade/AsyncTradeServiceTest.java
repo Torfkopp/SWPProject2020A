@@ -155,11 +155,12 @@ class AsyncTradeServiceTest {
 
     @Test
     void showUserTradeWindow() {
-        doNothing().when(syncTradeService).showUserTradeWindow(isA(LobbyName.class), isA(UserOrDummy.class));
+        doNothing().when(syncTradeService)
+                   .showUserTradeWindow(isA(LobbyName.class), isA(UserOrDummy.class), isA(Boolean.class));
 
-        tradeService.showUserTradeWindow(defaultLobby, otherUser);
+        tradeService.showUserTradeWindow(defaultLobby, otherUser, false);
 
-        verify(syncTradeService, after(DURATION)).showUserTradeWindow(defaultLobby, otherUser);
+        verify(syncTradeService, after(DURATION)).showUserTradeWindow(defaultLobby, otherUser, false);
     }
 
     @Test
