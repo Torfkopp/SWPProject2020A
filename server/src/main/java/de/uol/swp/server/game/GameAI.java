@@ -763,25 +763,28 @@ public class GameAI {
         MapPoint mp = null;
 
         //Choose random place to build settlement upon
-        while (!built && mp == null) {
+        while (mp == null || !built) {
             y = (int) (Math.random() * 5);
             xmax = (y == 0 || y == 5) ? 6 : (y == 1 || y == 4) ? 8 : 10;
             x = (int) (Math.random() * xmax);
             mp = MapPoint.IntersectionMapPoint(y, x);
+            System.err.println(mp.getY() + " " + mp.getX());
             built = map.placeFoundingSettlement(player, mp);
         }
         lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, SETTLEMENT));
 
         List<IEdge> edges = new ArrayList<>(map.getEdgesAroundIntersection(map.getIntersection(mp)));
         built = false;
+        IEdge edge = null;
 
         //Choose random place to build road upon
         while (!built) {
-            mp = map.getEdgeMapPoint(edges.get((int) (Math.random() * edges.size())));
-            built = map.placeRoad(player, mp);
+            edge = edges.get((int) (Math.random() * edges.size()));
+            built = map.placeRoad(player, edge);
         }
 
-        lobbyService.sendToAllInLobby(lobbyName, new BuildingSuccessfulMessage(lobbyName, ai, mp, ROAD));
+        lobbyService.sendToAllInLobby(lobbyName,
+                                      new BuildingSuccessfulMessage(lobbyName, ai, map.getEdgeMapPoint(edge), ROAD));
     }
 
     /**
