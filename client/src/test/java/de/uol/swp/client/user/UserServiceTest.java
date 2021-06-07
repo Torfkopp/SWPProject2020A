@@ -232,9 +232,7 @@ class UserServiceTest {
 
         assertTrue(request.authorisationNeeded());
 
-        lock.await(250, TimeUnit.MILLISECONDS);
-
-        verify(mockPreferences, times(2)).putBoolean("rememberMeEnabled", false);
+        verify(mockPreferences, timeout(250).times(2)).putBoolean("rememberMeEnabled", false);
         verify(mockPreferences).put("username", "");
         verify(mockPreferences).put("password", "");
     }
