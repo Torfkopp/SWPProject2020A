@@ -224,6 +224,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        lobbyService.setColour(lobbyName, null);
 
         addSizeChangeListener();
         fitCanvasToSize();
@@ -420,8 +421,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
                     //if the background should be in colour you need to use setBackground
-                    if (user != null && userOrDummyPlayerMap == null)
-                        setTextFill(Color.BLACK); // No clue why this is needed, but it is
+                    setTextFill(Color.BLACK); // No clue why this is needed, but it is (It really is)
                     if (user != null && userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
                         switch (userOrDummyPlayerMap.get(user)) {
                             case PLAYER_1:
