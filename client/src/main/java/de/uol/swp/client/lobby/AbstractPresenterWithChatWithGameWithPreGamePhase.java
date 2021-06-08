@@ -64,6 +64,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected Label timerLabel;
     @FXML
+    protected Label maxTradeDiffLabel;
+    @FXML
     private Button changeMoveTimeButton;
     @FXML
     private Button startSession;
@@ -86,8 +88,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     private TextField maxTradeDiffTextField;
     @FXML
-    protected Label maxTradeDiffLabel;
-
+    private Button maxTradeChangeButton;
 
     @FXML
     @Override
@@ -240,6 +241,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
         moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
+        maxTradeChangeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        maxTradeChangeButton.setVisible(userService.getLoggedInUser().equals(owner));
         maxTradeDiffTextField.setDisable(!userService.getLoggedInUser().equals(owner));
         maxTradeDiffTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
@@ -597,8 +600,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
                            this.moveTime;
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
-            int newMaxTradeDiff = !maxTradeDiffTextField.getText().equals("") ? Integer.parseInt(maxTradeDiffTextField.getText()) :
-                                 this.maxTradeDiff;
+            int newMaxTradeDiff =
+                    !maxTradeDiffTextField.getText().equals("") ? Integer.parseInt(maxTradeDiffTextField.getText()) :
+                    this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
@@ -612,6 +616,19 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         }
     }
 
+    /**
+     * Prepare the MaxTradeTextfield
+     * <p>
+     * Lets the maxTradeTextfield only accept positive numbers.
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-08
+     */
+    private void prepareMaxTradeDiffTextfield() {
+        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
+                s.getText().matches("^[0-9]\\d*(\\.\\d+)?$") || s.isDeleted() || s.getText().equals("") ? s : null;
+        maxTradeDiffTextField.setTextFormatter(new TextFormatter<>(integerFilter));
+    }
 
     /**
      * Prepare the MoveTimeTextField
@@ -626,11 +643,5 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
-    }
-
-    private void prepareMaxTradeDiffTextfield() {
-        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
-                s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
-        maxTradeDiffTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 }

@@ -39,6 +39,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     public static final int MIN_HEIGHT = 680;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+    private int maxTradeDiff;
 
 
     @FXML
@@ -145,6 +146,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
         counterOffer = rsp.isCounterOffer();
+        maxTradeDiff = rsp.getMaxTradeDiff();
         IResourceList resourceList = rsp.getResourceMap();
         for (IResource resource : resourceList)
             ownResourceTableView.getItems().add(resource);
@@ -216,9 +218,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
         int counterOwnResource = selectedOwnResourceList.getTotal();
         int counterPartnersResource = selectedPartnersResourceList.getTotal();
-        int MAX_TRADE_DIFF = 2;
-
-        if(Math.abs(counterOwnResource - counterPartnersResource) > MAX_TRADE_DIFF) return false;
+        if(Math.abs(counterOwnResource - counterPartnersResource) > maxTradeDiff) return false;
         else return true;
     }
 

@@ -67,7 +67,6 @@
             </HBox>
             <CheckBox fx:id="setStartUpPhaseCheckBox" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.startupphase" />
             <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.randomplayfield" />
-         <CheckBox mnemonicParsing="false" text="%game.trade.buttons.unfair.enable" />
             <HBox spacing="5.0">
                 <RadioButton fx:id="threePlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" selected="true" text="%lobby.radio.threeplayers">
                     <toggleGroup>
@@ -97,11 +96,10 @@
                 <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0" text="%lobby.buttons.addai" />
             </VBox>
          <Label fx:id="maxTradeDiffLabel" prefHeight="17.0" prefWidth="234.0" text="%game.trade.change.select.diff" />
-         <HBox prefHeight="100.0" prefWidth="200.0">
+         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
             <children>
-
-               <TextField fx:id="maxTradeDiffTextField" promptText="%game.trade.change.max.diff" />
-               <Button onAction="#prepareLobbyUpdate"  text="%game.trade.change.max.diff.button" />
+               <TextField fx:id="maxTradeDiffTextField" prefHeight="25.0" prefWidth="131.0" promptText="%game.trade.change.max.diff" />
+               <Button fx:id="maxTradeChangeButton" onAction="#prepareLobbyUpdate" prefHeight="25.0" prefWidth="98.0" text="%game.trade.change.max.diff.button" />
             </children>
          </HBox>
         </VBox>

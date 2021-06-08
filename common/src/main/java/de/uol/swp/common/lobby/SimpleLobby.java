@@ -36,8 +36,7 @@ public class SimpleLobby implements ISimpleLobby {
      * @param moveTime               The move time
      * @param startUpPhaseEnabled    Whether the start up phase is enabled or not
      * @param randomPlayFieldEnabled Whether the random play field is enabled or not
-     *
-     * @param maxTradeDiff
+     * @param maxTradeDiff           The maximum Ressource Difference a Trade can have
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
