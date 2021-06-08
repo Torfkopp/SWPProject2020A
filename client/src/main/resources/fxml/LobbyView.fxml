@@ -96,6 +96,14 @@
                 </HBox>
                 <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0" text="%lobby.buttons.addai" />
             </VBox>
+         <Label fx:id="maxTradeDiffLabel" prefHeight="17.0" prefWidth="234.0" text="%game.trade.change.select.diff" />
+         <HBox prefHeight="100.0" prefWidth="200.0">
+            <children>
+
+               <TextField fx:id="maxTradeDiffTextField" promptText="%game.trade.change.max.diff" />
+               <Button onAction="#prepareLobbyUpdate"  text="%game.trade.change.max.diff.button" />
+            </children>
+         </HBox>
         </VBox>
 
         <TableView fx:id="resourceTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0" prefWidth="230.0" visible="false">
@@ -155,7 +163,7 @@
         <Label fx:id="currentRound" text="%lobby.menu.round" visible="false" />
     </ToolBar>
 
-    <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
+    <VBox fx:id="changeMaxTradeDiffButton" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
         <TextFlow fx:id="helpLabel" />
     </VBox>
 </GridPane>

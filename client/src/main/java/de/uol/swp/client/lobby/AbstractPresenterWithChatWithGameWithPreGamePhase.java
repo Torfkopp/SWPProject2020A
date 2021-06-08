@@ -83,12 +83,18 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton easyAIRadioButton;
     @FXML
     private VBox preGameSettingBox;
+    @FXML
+    private TextField maxTradeDiffTextField;
+    @FXML
+    protected Label maxTradeDiffLabel;
+
 
     @FXML
     @Override
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        prepareMaxTradeDiffTextfield();
         LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
     }
 
@@ -234,6 +240,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
         moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
+        maxTradeDiffTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        maxTradeDiffTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
@@ -589,17 +597,21 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
                            this.moveTime;
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+            int newMaxTradeDiff = !maxTradeDiffTextField.getText().equals("") ? Integer.parseInt(maxTradeDiffTextField.getText()) :
+                                 this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
+                System.out.println(newMaxTradeDiff);
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
-                                                 randomPlayFieldCheckbox.isSelected());
+                                                 randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
             post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
         }
     }
+
 
     /**
      * Prepare the MoveTimeTextField
@@ -614,5 +626,11 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
                 s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
         moveTimeTextField.setTextFormatter(new TextFormatter<>(integerFilter));
+    }
+
+    private void prepareMaxTradeDiffTextfield() {
+        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
+                s.getText().matches("\\d") || s.isDeleted() || s.getText().equals("") ? s : null;
+        maxTradeDiffTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 }

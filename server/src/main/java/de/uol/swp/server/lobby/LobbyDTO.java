@@ -34,6 +34,7 @@ public class LobbyDTO implements ILobby {
     private int moveTime;
     private boolean startUpPhaseEnabled;
     private boolean randomPlayFieldEnabled;
+    private int maxTradeDiff;
 
     /**
      * Constructor
@@ -54,6 +55,7 @@ public class LobbyDTO implements ILobby {
         this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
+        this.maxTradeDiff = 2;
     }
 
     /**
@@ -81,11 +83,12 @@ public class LobbyDTO implements ILobby {
      * @param startUpPhaseEnabled    The start up phase enabled
      * @param randomPlayFieldEnabled The random playfield enabled
      *
+     * @param maxTradeDiff
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
     private LobbyDTO(LobbyName name, String password, boolean inGame, boolean hasPassword, User owner, int maxPlayers,
-                     int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled) {
+                     int moveTime, boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, int maxTradeDiff) {
         this.name = name;
         this.password = password;
         this.inGame = inGame;
@@ -96,6 +99,7 @@ public class LobbyDTO implements ILobby {
         this.moveTime = moveTime;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.randomPlayFieldEnabled = randomPlayFieldEnabled;
+        this.maxTradeDiff = maxTradeDiff;
     }
 
     /**
@@ -110,7 +114,7 @@ public class LobbyDTO implements ILobby {
     public static ILobby create(ILobby lobby) {
         return new LobbyDTO(lobby.getName(), lobby.getPassword(), lobby.isInGame(), lobby.hasPassword(),
                             lobby.getOwner(), lobby.getMaxPlayers(), lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(),
-                            lobby.isRandomPlayFieldEnabled());
+                            lobby.isRandomPlayFieldEnabled(), 2);
     }
 
     @Override
@@ -256,5 +260,16 @@ public class LobbyDTO implements ILobby {
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");
         }
         this.owner = user;
+    }
+
+    @Override
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
+    }
+
+    @Override
+    public void setMaxTradeDiff(int newTradeDiff) {
+        this.maxTradeDiff = newTradeDiff;
+
     }
 }

@@ -11,9 +11,7 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -21,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     public static final int MIN_HEIGHT = 680;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
-    private static int MAX_TRADE_DIFF;
+
 
     @FXML
     private Label statusLabel;
@@ -52,6 +51,8 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     @FXML
     private Button offerTradeButton;
+
+
 
     private LobbyName lobbyName;
     private UserOrDummy respondingUser;
@@ -206,7 +207,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * <p>
      * If the onOfferTradeButtonPressed Method has been called, this
      * method checks if the difference in the amount of Ressources between
-     * offering and demanding Trade is two or lower.
+     * offering and demanding Trade is the current MAX_TRADE_DIFF or lower.
      * If not, the Method will return false and with that, the onOfferTradeButtonPressed
      * will not send the offer
      */
@@ -215,6 +216,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
         int counterOwnResource = selectedOwnResourceList.getTotal();
         int counterPartnersResource = selectedPartnersResourceList.getTotal();
+        int MAX_TRADE_DIFF = 2;
 
         if(Math.abs(counterOwnResource - counterPartnersResource) > MAX_TRADE_DIFF) return false;
         else return true;

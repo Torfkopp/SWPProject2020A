@@ -18,6 +18,11 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
     private final boolean startUpPhaseEnabled;
     private final int moveTime;
     private final boolean randomPlayFieldEnabled;
+    private final int maxTradeDiff;
+
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
+    }
 
     /**
      * Constructor
@@ -30,12 +35,13 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
      * @param randomPlayFieldEnabled Whether a randomly generated play field will be used
      */
     public ChangeLobbySettingsRequest(LobbyName name, User user, int allowedPlayers, boolean startUpPhaseEnabled,
-                                      int moveTime, boolean randomPlayFieldEnabled) {
+                                      int moveTime, boolean randomPlayFieldEnabled, int maxTradeDiff) {
         super(name, user);
         this.allowedPlayers = allowedPlayers;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.moveTime = moveTime;
         this.randomPlayFieldEnabled = randomPlayFieldEnabled;
+        this.maxTradeDiff = maxTradeDiff;
     }
 
     /**

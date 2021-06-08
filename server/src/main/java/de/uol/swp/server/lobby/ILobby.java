@@ -33,7 +33,7 @@ public interface ILobby extends Serializable {
     static SimpleLobby getSimpleLobby(ILobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.getMaxPlayers(),
                                lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled(),
-                               lobby.hasPassword(), lobby.getUserOrDummies(), lobby.getReadyUsers());
+                               lobby.hasPassword(), lobby.getUserOrDummies(), lobby.getReadyUsers(), lobby.getMaxTradeDiff());
     }
 
     /**
@@ -273,4 +273,8 @@ public interface ILobby extends Serializable {
      * @since 2019-10-08
      */
     void updateOwner(User user);
+
+    int getMaxTradeDiff();
+
+    void setMaxTradeDiff(int maxTradeDiff);
 }

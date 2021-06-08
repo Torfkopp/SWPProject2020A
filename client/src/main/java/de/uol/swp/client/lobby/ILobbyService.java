@@ -179,14 +179,14 @@ public interface ILobbyService {
      * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
      * @param moveTime               The maximum time of a move
      * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
-     *
+     * @param maxTradeDiff
      * @author Maximilian Lindner
      * @author Aldin Dervisi
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-15
      */
     void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
-                             boolean randomPlayFieldEnabled);
+                             boolean randomPlayFieldEnabled, int maxTradeDiff);
 
     /**
      * Posts a request to change the ready status of a user

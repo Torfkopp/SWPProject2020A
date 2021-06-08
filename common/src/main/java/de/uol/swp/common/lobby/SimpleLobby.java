@@ -24,6 +24,7 @@ public class SimpleLobby implements ISimpleLobby {
     private final boolean startUpPhaseEnabled;
     private final boolean randomPlayFieldEnabled;
     private final boolean hasPassword;
+    private int maxTradeDiff;
 
     /**
      * Constructor.
@@ -36,12 +37,13 @@ public class SimpleLobby implements ISimpleLobby {
      * @param startUpPhaseEnabled    Whether the start up phase is enabled or not
      * @param randomPlayFieldEnabled Whether the random play field is enabled or not
      *
+     * @param maxTradeDiff
      * @author Temmo Junkhoff
      * @since 2021-05-03
      */
     public SimpleLobby(LobbyName name, boolean inGame, User owner, int maxPlayers, int moveTime,
                        boolean startUpPhaseEnabled, boolean randomPlayFieldEnabled, boolean hasPassword,
-                       Set<UserOrDummy> users, Set<UserOrDummy> readyUsers) {
+                       Set<UserOrDummy> users, Set<UserOrDummy> readyUsers, int maxTradeDiff) {
         this.name = name;
         this.inGame = inGame;
         this.owner = owner;
@@ -52,6 +54,8 @@ public class SimpleLobby implements ISimpleLobby {
         this.hasPassword = hasPassword;
         this.users = users;
         this.readyUsers = readyUsers;
+        this.maxTradeDiff = maxTradeDiff;
+
     }
 
     @Override
@@ -83,6 +87,9 @@ public class SimpleLobby implements ISimpleLobby {
     public Set<UserOrDummy> getUserOrDummies() {
         return users;
     }
+
+    @Override
+    public int getMaxTradeDiff() {return maxTradeDiff;}
 
     @Override
     public boolean hasPassword() {

@@ -105,13 +105,14 @@ public class LobbyService extends AbstractService {
         if (lobby.get().getUserOrDummies().size() > req.getAllowedPlayers()) return;
         if (lobby.get().isInGame()) return;
         lobbyManagement.updateLobbySettings(req.getName(), req.getAllowedPlayers(), req.getMoveTime(),
-                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled());
+                                            req.isStartUpPhaseEnabled(), req.isRandomPlayFieldEnabled(), req.getMaxTradeDiff());
         post(new AllowedAmountOfPlayersChangedMessage(req.getName(), req.getUser()));
         Optional<ILobby> updatedLobby = lobbyManagement.getLobby(req.getName());
         if (updatedLobby.isEmpty()) return;
         ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(),
                                                    ILobby.getSimpleLobby(updatedLobby.get()));
         sendToAllInLobby(req.getName(), msg);
+        System.err.println(req.getMaxTradeDiff() + "  lelele");
     }
 
     /**

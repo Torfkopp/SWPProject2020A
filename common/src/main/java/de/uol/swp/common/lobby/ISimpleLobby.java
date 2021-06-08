@@ -73,6 +73,8 @@ public interface ISimpleLobby extends Serializable {
      */
     Set<UserOrDummy> getUserOrDummies();
 
+    int getMaxTradeDiff();
+
     /**
      * Returns if the lobby has a password
      *
