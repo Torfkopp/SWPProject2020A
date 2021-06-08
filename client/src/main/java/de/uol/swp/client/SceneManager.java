@@ -207,6 +207,7 @@ public class SceneManager {
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
     }
 
@@ -229,6 +230,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginErrorScreen() {
+        // Will we ever use this?
         soundService.popup();
         String contentText = resourceBundle.getString("login.error");
         String confirmText = resourceBundle.getString("button.confirm");
@@ -238,6 +240,7 @@ public class SceneManager {
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
         showLoginScreen();
     }
@@ -338,6 +341,7 @@ public class SceneManager {
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
     }
 

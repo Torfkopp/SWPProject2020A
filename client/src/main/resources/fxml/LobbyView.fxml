@@ -5,8 +5,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.TextFlow?>
-<GridPane fx:controller="de.uol.swp.client.lobby.LobbyPresenter" id="lobbyPane" vgap="10.0"
-          xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane xmlns:fx="http://javafx.com/fxml/1" id="lobbyPane" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1"
+          fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <columnConstraints>
         <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
@@ -19,12 +19,12 @@
         <RowConstraints maxHeight="1337.0" minHeight="825.0" percentHeight="100.0" prefHeight="1330.0" vgrow="ALWAYS"/>
     </rowConstraints>
 
-    <VBox GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" maxWidth="400.0" spacing="10.0">
-        <VBox VBox.vgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="380.0" spacing="5.0">
+    <VBox maxWidth="400.0" spacing="10.0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="380.0" spacing="5.0" VBox.vgrow="ALWAYS">
             <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0"/>
             <ListView fx:id="uniqueCardView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
                       visible="false"/>
-            <ListView VBox.vgrow="ALWAYS" fx:id="chatView" maxHeight="Infinity"/>
+            <ListView fx:id="chatView" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
             <TextField fx:id="messageField" onAction="#onSendMessageButtonPressed">
                 <VBox.margin>
                     <Insets top="-5.0"/>
@@ -35,11 +35,10 @@
             <Button onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage"/>
         </VBox>
         <VBox minHeight="150.0" spacing="5.0">
-            <Button fx:id="kickUserButton" onAction="#onKickUserButtonPressed" prefHeight="25.0"
-                    prefWidth="150.0" text="%lobby.buttons.kickuser" visible="false"/>
+            <Button fx:id="kickUserButton" onAction="#onKickUserButtonPressed" prefHeight="25.0" prefWidth="150.0"
+                    text="%lobby.buttons.kickuser" visible="false"/>
             <Button fx:id="changeOwnerButton" onAction="#onChangeOwnerButtonPressed" prefWidth="150.0"
-                    text="%lobby.buttons.changeowner" textAlignment="CENTER" visible="false"
-                    wrapText="true"/>
+                    text="%lobby.buttons.changeowner" textAlignment="CENTER" visible="false" wrapText="true"/>
             <Button onAction="#onLeaveLobbyButtonPressed" prefHeight="25.0" prefWidth="150.0"
                     text="%lobby.buttons.leavelobby"/>
         </VBox>
@@ -48,8 +47,8 @@
         </padding>
     </VBox>
 
-    <VBox GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"
-          alignment="TOP_CENTER" spacing="10">
+    <VBox alignment="TOP_CENTER" spacing="10" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
+          GridPane.vgrow="ALWAYS">
         <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                 minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
                 text="%game.won.button.returnPreLobby" visible="false"/>
@@ -59,7 +58,7 @@
         </padding>
     </VBox>
 
-    <VBox GridPane.columnIndex="2" GridPane.rowIndex="1" prefWidth="250.0" spacing="10.0">
+    <VBox prefWidth="250.0" spacing="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
         <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="316.0" prefWidth="230.0"
               spacing="10.0">
             <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true"
@@ -71,15 +70,14 @@
             </Label>
             <HBox spacing="5.0">
                 <fx:reference source="moveTimeTextField"/>
-                <Button disable="true" fx:id="changeMoveTimeButton" onAction="#prepareLobbyUpdate"
+                <Button fx:id="changeMoveTimeButton" disable="true" onAction="#prepareLobbyUpdate"
                         text="%lobby.buttons.changemovetime"/>
                 <VBox.margin>
                     <Insets top="-10.0"/>
                 </VBox.margin>
             </HBox>
             <CheckBox fx:id="setStartUpPhaseCheckBox" maxHeight="-Infinity" minHeight="-Infinity"
-                      onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                      text="%lobby.checkboxes.startupphase"/>
+                      onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.startupphase"/>
             <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity"
                       onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.randomplayfield"/>
             <HBox spacing="5.0">
@@ -99,7 +97,8 @@
             </HBox>
             <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0"
                   style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
-                <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" text="%lobby.ai.checkbox"/>
+                <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" onAction="#prepareLobbyUpdate"
+                          text="%lobby.ai.checkbox"/>
                 <HBox spacing="5.0">
                     <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
                                  mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
@@ -118,14 +117,19 @@
                 <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0"
                         text="%lobby.buttons.addai"/>
             </VBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+                <ComboBox fx:id="colourComboBox" promptText="%colours.boxtext" prefHeight="25.0" prefWidth="140.0"/>
+                <Button mnemonicParsing="false" onAction="#onColourChangeButtonPressed" prefHeight="25.0"
+                        prefWidth="90.0" text="%colours.button"/>
+            </HBox>
         </VBox>
 
         <TableView fx:id="resourceTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
                    prefWidth="230.0" visible="false">
             <columns>
-                <TableColumn editable="false" fx:id="resourceAmountCol" maxWidth="75.0" minWidth="75.0" prefWidth="75.0"
+                <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0"
                              resizable="false" text="%game.inventories.amountcol"/>
-                <TableColumn editable="false" fx:id="resourceNameCol" maxWidth="1.7976931348623157E308"
+                <TableColumn fx:id="resourceNameCol" editable="false" maxWidth="1.7976931348623157E308"
                              minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
             </columns>
             <columnResizePolicy>
@@ -136,9 +140,9 @@
         <TableView fx:id="developmentCardTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
                    prefWidth="230.0" visible="false">
             <columns>
-                <TableColumn editable="false" fx:id="developmentCardAmountCol" maxWidth="75.0" minWidth="75.0"
+                <TableColumn fx:id="developmentCardAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
                              prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
-                <TableColumn editable="false" fx:id="developmentCardNameCol" maxWidth="1.7976931348623157E308"
+                <TableColumn fx:id="developmentCardNameCol" editable="false" maxWidth="1.7976931348623157E308"
                              minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.cardcol"/>
             </columns>
             <columnResizePolicy>
@@ -147,31 +151,31 @@
         </TableView>
 
         <TextFlow fx:id="turnIndicator" maxHeight="30" minHeight="30" minWidth="-Infinity" prefWidth="230.0"/>
-        <Label fx:id="victoryPointsLabel" maxHeight="30" minHeight="30" minWidth="-Infinity"
-               prefWidth="230.0" text="game.victorypoints.labels" visible="false"/>
+        <Label fx:id="victoryPointsLabel" maxHeight="30" minHeight="30" minWidth="-Infinity" prefWidth="230.0"
+               text="game.victorypoints.labels" visible="false"/>
         <HBox maxHeight="25.0" maxWidth="-Infinity" minHeight="45.0" minWidth="-Infinity" prefWidth="230.0"
               spacing="10.0">
             <CheckBox fx:id="readyCheckBox" maxWidth="-Infinity" minHeight="45.0" minWidth="-Infinity"
                       onAction="#onReadyCheckBoxClicked" prefWidth="100.0" text="%lobby.game.readycheckbox"/>
-            <Button disable="true" fx:id="startSession" maxWidth="-Infinity" minWidth="-Infinity"
+            <Button fx:id="startSession" disable="true" maxWidth="-Infinity" minWidth="-Infinity"
                     onAction="#onStartSessionButtonPressed" prefWidth="120.0" text="%lobby.game.buttons.startsession"
                     textAlignment="CENTER" wrapText="true"/>
         </HBox>
         <HBox prefHeight="50.0" prefWidth="230.0" spacing="10">
-            <Button disable="true" fx:id="rollDice" onAction="#onRollDiceButtonPressed" prefHeight="50.0"
-                    prefWidth="115.0" text="%lobby.game.buttons.rolldice" textAlignment="CENTER"
-                    visible="false" wrapText="true"/>
+            <Button fx:id="rollDice" disable="true" onAction="#onRollDiceButtonPressed" prefHeight="50.0"
+                    prefWidth="115.0" text="%lobby.game.buttons.rolldice" textAlignment="CENTER" visible="false"
+                    wrapText="true"/>
             <CheckBox fx:id="autoRoll" nodeOrientation="LEFT_TO_RIGHT" onAction="#onAutoRollCheckBoxClicked"
                       prefHeight="50.0" prefWidth="115.0" text="%lobby.game.autorollcheckbox" textAlignment="CENTER"
                       visible="false" wrapText="true"/>
         </HBox>
-        <Button disable="true" fx:id="endTurn" onAction="#onEndTurnButtonPressed" prefHeight="30.0" prefWidth="230.0"
+        <Button fx:id="endTurn" disable="true" onAction="#onEndTurnButtonPressed" prefHeight="30.0" prefWidth="230.0"
                 text="%lobby.game.buttons.endturn" visible="false"/>
-        <Button disable="true" fx:id="tradeWithUserButton" onAction="#onTradeWithUserButtonPressed" prefHeight="30.0"
+        <Button fx:id="tradeWithUserButton" disable="true" onAction="#onTradeWithUserButtonPressed" prefHeight="30.0"
                 prefWidth="230.0" text="%lobby.game.buttons.playertrade" visible="false"/>
-        <Button disable="true" fx:id="tradeWithBankButton" onAction="#onTradeWithBankButtonPressed" prefHeight="30.0"
+        <Button fx:id="tradeWithBankButton" disable="true" onAction="#onTradeWithBankButtonPressed" prefHeight="30.0"
                 prefWidth="230.0" text="%lobby.game.buttons.banktrade" visible="false"/>
-        <Button disable="true" fx:id="playCard" onAction="#onPlayCardButtonPressed" prefHeight="30.0" prefWidth="230.0"
+        <Button fx:id="playCard" disable="true" onAction="#onPlayCardButtonPressed" prefHeight="30.0" prefWidth="230.0"
                 text="%lobby.game.buttons.playcard" visible="false"/>
         <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
                prefWidth="230" text="%game.robber.position" visible="false" wrapText="true"/>
@@ -181,25 +185,36 @@
         </padding>
     </VBox>
 
-    <ToolBar GridPane.columnSpan="3" prefHeight="35.0">
+    <ToolBar prefHeight="35.0" GridPane.columnSpan="3">
         <Button text="%lobby.menu.settings"/>
         <Button onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
             <MenuItem text="%lobby.menu.rules.overview"/>
         </Button>
         <!--fixme needs parsing-->
         <Button fx:id="pauseButton" onAction="#onPauseButtonPressed" text="%game.menu.pause" visible="false"/>
-        <Button disable="true" fx:id="helpCheckBox" onAction="#onHelpButtonPressed"
-                text="%game.help.checkbox" visible="false"/>
-        <Pane HBox.hgrow="SOMETIMES" prefWidth="20.0"/>
+        <Button fx:id="helpCheckBox" disable="true" onAction="#onHelpButtonPressed" text="%game.help.checkbox"
+                visible="false"/>
+        <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>
         <Label fx:id="moveTimerLabel"/>
-        <Pane HBox.hgrow="SOMETIMES" prefWidth="20.0"/>
+        <Pane prefWidth="20.0" HBox.hgrow="SOMETIMES"/>
         <Label fx:id="timerLabel"/>
         <Separator/>
         <Label fx:id="currentRound" text="%lobby.menu.round" visible="false"/>
     </ToolBar>
 
-    <VBox GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.rowSpan="2147483647" prefHeight="200.0"
-          prefWidth="200.0">
+    <VBox prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
+          GridPane.rowSpan="2147483647">
         <TextFlow fx:id="helpLabel"/>
     </VBox>
+    <GridPane>
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+    </GridPane>
 </GridPane>

@@ -65,11 +65,11 @@
             </GridPane.margin>
         </MenuBar>
         <VBox GridPane.columnIndex="5" GridPane.rowIndex="1" spacing="5.0">
-            <CheckBox fx:id="lobbyListFilteredProtectedBox" mnemonicParsing="false"
+            <CheckBox fx:id="lobbyListFilteredProtectedBox" mnemonicParsing="false" onAction="#uiElementClicked"
                       text="%lobbylist.filtered.protected" wrapText="true"/>
-            <CheckBox fx:id="lobbyListFilteredInGameBox" mnemonicParsing="false"
+            <CheckBox fx:id="lobbyListFilteredInGameBox" mnemonicParsing="false" onAction="#uiElementClicked"
                       text="%lobbylist.filtered.ingame" wrapText="true"/>
-            <CheckBox fx:id="lobbyListFilteredFullBox" mnemonicParsing="false"
+            <CheckBox fx:id="lobbyListFilteredFullBox" mnemonicParsing="false" onAction="#uiElementClicked"
                       text="%lobbylist.filtered.full" wrapText="true"/>
             <padding>
                 <Insets left="5.0"/>

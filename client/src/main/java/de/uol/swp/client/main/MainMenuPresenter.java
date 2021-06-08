@@ -283,6 +283,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
+        soundService.button();
         post(new ShowChangePropertiesViewEvent());
     }
 
@@ -362,6 +363,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
+        soundService.button();
         String lobbyPasswordHash = lobbyPassword.getText();
         if (!Strings.isNullOrEmpty(lobbyPassword.getText())) {
             lobbyPasswordHash = userService.hash(lobbyPassword.getText());
@@ -451,6 +453,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         Optional<String> result = dialogue.showAndWait();
+        soundService.button();
         result.ifPresent(s -> userService
                 .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
     }
@@ -553,6 +556,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             dialogue.getDialogPane().getStylesheets().add(styleSheet);
             //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
             Optional<String> result = dialogue.showAndWait();
+            soundService.button();
             String lobbyPassword = lobbyPasswordField.getText();
             if (!Strings.isNullOrEmpty(lobbyPasswordField.getText())) {
                 lobbyPassword = userService.hash(lobbyPasswordField.getText());
@@ -700,6 +704,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onRulesMenuClicked() {
+        soundService.button();
         post(new ShowRulesOverviewViewEvent());
     }
 
@@ -825,6 +830,22 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 chatMessages.add(systemMessage);
             }
         });
+    }
+
+    /**
+     * Generic method being called by UI Elements
+     * <p>
+     * This method is called by UI Elements which don't
+     * have or need a dedicated method. So far it only
+     * plays the button sound and is primarily being
+     * used by checkboxes.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-06
+     */
+    @FXML
+    private void uiElementClicked() {
+        soundService.button();
     }
 
     /**

@@ -5,11 +5,14 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
+import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
@@ -21,10 +24,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -83,12 +87,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton easyAIRadioButton;
     @FXML
     private VBox preGameSettingBox;
+    @FXML
+    private ComboBox<Colour> colourComboBox;
 
     @FXML
     @Override
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        prepareColourComboBox();
         LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
     }
 
@@ -264,6 +271,22 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Helper method to create a PlayerColourMap from
+     * the UserColourMap and the UserOrDummyPlayerMap
+     *
+     * @return PlayerColourMap
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    private Map<Player, Colour> getPlayerColourMap() {
+        Map<Player, Colour> map = new HashMap<>();
+        for (UserOrDummy u : userColoursMap.keySet())
+            map.put(userOrDummyPlayerMap.get(u), userColoursMap.get(u));
+        return map;
+    }
+
+    /**
      * Handles a click on the AddAI Button
      * <p>
      * Method called when the AddAIButton is pressed.
@@ -274,6 +297,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onAddAIButtonPressed() {
+        soundService.button();
         boolean talking = talkingAICheckBox.isSelected();
         AI.Difficulty difficulty =
                 difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
@@ -299,6 +323,46 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.changeOwner(lobbyName, selectedUser);
+    }
+
+    /**
+     * Handles a click on the ColourChangeButton
+     * <p>
+     * Method called when the ColourChangeButton is pressed.
+     * This method calls the lobbyService to post a setColourRequest.
+     *
+     * @author Mario Fokken
+     * @since 2021-06-04
+     */
+    @FXML
+    private void onColourChangeButtonPressed() {
+        Colour colour = colourComboBox.getValue();
+        lobbyService.setColour(lobbyName, colour);
+    }
+
+    /**
+     * Handles a ColourChangedMessage found on the EventBus
+     * <p>
+     * The message gets sent by the server if a user changed their colour.
+     * It tells the gameRendering to adapt those new colours.
+     *
+     * @param msg The ColourChangedMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    @Subscribe
+    private void onColourChangedMessage(ColourChangedMessage msg) {
+        LOG.debug("Received ColourChangedMessage for {}", msg.getName());
+        Map<UserOrDummy, Player> map = new HashMap<>();
+        int i = 0;
+        for (UserOrDummy u : msg.getUserColours().keySet())
+            map.put(u, Player.byIndex(i++));
+        userOrDummyPlayerMap = map;
+        userColoursMap = msg.getUserColours();
+        gameRendering.setPlayerColours(getPlayerColourMap());
+        lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
+        Platform.runLater(this::prepareColourComboBox);
     }
 
     /**
@@ -405,6 +469,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onReadyCheckBoxClicked() {
+        soundService.button();
         boolean isReady = readyCheckBox.isSelected();
         lobbyService.userReady(lobbyName, isReady);
     }
@@ -467,6 +532,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
+        userColoursMap = msg.getUserOrDummyColourMap();
+        gameRendering.setPlayerColours(getPlayerColourMap());
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -531,6 +598,39 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Prepares the ColourComboBox
+     * <p>
+     * Colours the text in the right colour.
+     *
+     * @author Mario Fokken
+     * @since 2021-06-04
+     */
+    private void prepareColourComboBox() {
+        colourComboBox.getItems().clear();
+        Colour[] colours = new Colour[Colour.values().length - 1];
+        System.arraycopy(Colour.values(), 0, colours, 0, colours.length);
+
+        colourComboBox.getItems().addAll(colours);
+        colourComboBox.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<Colour> call(ListView<Colour> param) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(Colour item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(resourceBundle.getString("colours." + item));
+                            int[] colourCode = item.getColourCode();
+                            setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
+                            setDisable(userColoursMap.containsValue(item));
+                        } else setText(null);
+                    }
+                };
+            }
+        });
+    }
+
+    /**
      * Helper method to set the in-game Buttons and Lists
      *
      * @author Marvin Drees
@@ -592,6 +692,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
+                soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }

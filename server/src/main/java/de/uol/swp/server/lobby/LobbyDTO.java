@@ -1,13 +1,12 @@
 package de.uol.swp.server.lobby;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.NPC;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Object to transfer the information of a game lobby
@@ -27,6 +26,7 @@ public class LobbyDTO implements ILobby {
     private final Set<UserOrDummy> users = new TreeSet<>();
     private final Set<UserOrDummy> readyUsers = new TreeSet<>();
     private final String password;
+    private final Map<UserOrDummy, Colour> userColours = new LinkedHashMap<>();
     private boolean inGame;
     private boolean hasPassword;
     private User owner;
@@ -54,6 +54,7 @@ public class LobbyDTO implements ILobby {
         this.moveTime = 120;
         this.startUpPhaseEnabled = false;
         this.randomPlayFieldEnabled = false;
+        userColours.put(creator, Colour.values()[(int) (Math.random() * (Colour.values().length - 1))]);
     }
 
     /**
@@ -165,6 +166,16 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
+    public Map<UserOrDummy, Colour> getUserColourMap() {
+        return userColours;
+    }
+
+    @Override
+    public void setUserColour(UserOrDummy user, Colour colour) {
+        userColours.put(user, colour);
+    }
+
+    @Override
     public Set<UserOrDummy> getUserOrDummies() {
         return Collections.unmodifiableSet(users);
     }
@@ -207,7 +218,13 @@ public class LobbyDTO implements ILobby {
     @Override
     public void joinUser(UserOrDummy user) {
         this.users.add(user);
+        //Give a new user a random colour (except Gold)
+        Colour colour = Colour.values()[(int) (Math.random() * (Colour.values().length - 1))];
+        while (userColours.containsValue(colour))
+            colour = Colour.values()[(int) (Math.random() * (Colour.values().length - 1))];
+        userColours.put(user, colour);
         if (user instanceof NPC) {
+            if (user.getUsername().equals("Temmo")) userColours.put(user, Colour.TEMMO);
             readyUsers.add(user);
         }
     }
@@ -219,6 +236,7 @@ public class LobbyDTO implements ILobby {
         }
         if (users.contains(user)) {
             this.users.remove(user);
+            userColours.remove(user);
             unsetUserReady(user);
             if (this.owner.equals(user)) {
                 boolean foundUser = false;

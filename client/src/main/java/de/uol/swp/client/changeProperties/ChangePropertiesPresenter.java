@@ -17,7 +17,6 @@ import java.util.prefs.Preferences;
  * @author Alwin Bossert
  * @since 2021-05-22
  */
-@SuppressWarnings("UnstableApiUsage")
 public class ChangePropertiesPresenter extends AbstractPresenter {
 
     public static final String fxml = "/fxml/ChangePropertiesView.fxml";
@@ -51,7 +50,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
 
     @FXML
     private void initialize() {
-        themeBox.getItems().setAll("Bars", "Classic", "Cursed", "Dark", "Default", "Palette");
+        themeBox.getItems().setAll("Classic", "Cursed", "Dark", "Default");
         languageBox.getItems()
                    .addAll("Deutsch - Du", "Deutsch - Sie", "English", "Blind", "Blank", "Hearing-Impaired", "Improved",
                            "lowercase", "UwU Engwish");
@@ -75,6 +74,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      */
     @FXML
     private void onCancelButtonPressed() {
+        soundService.button();
         post(new ChangePropertiesCanceledEvent());
     }
 
@@ -89,6 +89,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
+        soundService.button();
         String theme = themeBox.getValue();
         String language = languageBox.getValue();
         String loginLogoutMsg = loginLogoutMsgBox.getValue();
