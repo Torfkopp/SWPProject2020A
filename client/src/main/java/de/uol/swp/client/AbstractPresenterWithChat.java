@@ -317,6 +317,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                         alert.getButtonTypes().setAll(confirm);
                         alert.getDialogPane().getStylesheets().add(styleSheet);
                         alert.showAndWait();
+                        soundService.button();
                     });
                 }
             } else {

@@ -81,6 +81,10 @@
             </HBox>
             <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0" style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
                 <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" text="%lobby.ai.checkbox" />
+            <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0"
+                  style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
+                <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" onAction="#prepareLobbyUpdate"
+                          text="%lobby.ai.checkbox"/>
                 <HBox spacing="5.0">
                     <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0" selected="true" text="%lobby.ai.easy">
                         <toggleGroup>

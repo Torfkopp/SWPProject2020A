@@ -122,6 +122,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onCancelTradeButtonPressed() {
+        soundService.button();
         closeWindow();
     }
 
@@ -189,6 +190,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             LOG.trace("onOfferTradeButtonPressed called with disabled offerTradeButton, returning");
             return;
         }
+        soundService.button();
         setResourceLists();
         if (checkResources()) {
             LOG.debug("Failed sending the offer");

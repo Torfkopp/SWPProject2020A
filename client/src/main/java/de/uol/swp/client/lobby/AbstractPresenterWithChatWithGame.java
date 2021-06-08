@@ -280,6 +280,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onPauseButtonPressed() {
+        soundService.button();
         if (!startUpPhaseEnabled) gameService.pauseGame(lobbyName);
         else Platform.runLater(
                 () -> chatMessages.add(new InGameSystemMessageDTO(new I18nWrapper("game.menu.cantpause"))));
@@ -298,6 +299,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     protected void onPlayCardButtonPressed() {
+        soundService.button();
         //Create a new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("game.playcards.alert.title"));
@@ -314,6 +316,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         alert.getDialogPane().getStylesheets().add(styleSheet);
         //Show the dialogue and get the result
         Optional<ButtonType> result = alert.showAndWait();
+        soundService.button();
         //Create Strings based on the languages name for the resources
         String ore = resourceBundle.getString("game.resources.ore");
         String grain = resourceBundle.getString("game.resources.grain");
@@ -625,6 +628,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @FXML
     private void onAutoRollCheckBoxClicked() {
+        soundService.button();
         autoRollEnabled = autoRoll.isSelected();
         gameService.changeAutoRollState(lobbyName, autoRoll.isSelected());
     }
@@ -682,6 +686,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
         if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
         gameRendering.redraw();
+        soundService.building();
         LOG.debug("Received BuildingSuccessfulMessage");
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD) {
             roadBuildingCardPhase = RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD;
@@ -742,7 +747,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             gameService.updateInventory(lobbyName);
             if (finalAttr != null) {
                 InGameSystemMessageDTO message = new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"));
-                soundService.building();
                 Platform.runLater(() -> chatMessages.add(message));
             }
         } else {
@@ -955,6 +959,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             }
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
     }
 
@@ -1063,6 +1068,10 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         }
         if (msg.getLobbyName().equals(lobbyName)) resetButtonStates(msg.getUser());
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        endTurn.setDisable(true);
+        tradeWithUserButton.setDisable(true);
+        tradeWithBankButton.setDisable(true);
+        playCard.setDisable(true);
     }
 
     /**
@@ -1097,6 +1106,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 dialogue.getDialogPane().getButtonTypes().addAll(confirm, cancel);
                 dialogue.getDialogPane().getStylesheets().add(styleSheet);
                 Optional<UserOrDummy> rst = dialogue.showAndWait();
+                soundService.button();
                 rst.ifPresent(userOrDummy -> gameService.robberChooseVictim(lobbyName, userOrDummy));
             });
         }
@@ -1353,6 +1363,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Show the dialogue and get the result
         Platform.runLater(() -> {
             Optional<String> rst = dialogue.showAndWait();
+            soundService.button();
             //Convert String to Resources and send the request
             ResourceType resource = ResourceType.BRICK;
             if (rst.isPresent()) {
@@ -1408,6 +1419,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         //Get the pressed button
         Platform.runLater(() -> {
             Optional<String> rst = dialogue.showAndWait();
+            soundService.button();
             Optional<String> button1 = Optional.of(confirm.toString());
             //Checks if the pressed button is the same as the confirm button
             if (rst.toString().equals(button1.toString())) {
