@@ -133,18 +133,10 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
             }
         }
         if (loginLogoutMsg != null) {
-            if (loginLogoutMsgBox.getValue().equals("On")) {
-                preferences.put("login_logout_msgs_on", "true");
-            } else if (loginLogoutMsgBox.getValue().equals("Off")) {
-                preferences.put("login_logout_msgs_on", "false");
-            }
+            preferences.putBoolean("login_logout_msgs_on", loginLogoutMsgBox.getValue().equals("On"));
         }
         if (createDeleteLobbyMsg != null) {
-            if (createDeleteLobbyMsgBox.getValue().equals("On")) {
-                preferences.put("lobby_create_delete_msgs_on", "true");
-            } else if (createDeleteLobbyMsgBox.getValue().equals("Off")) {
-                preferences.put("lobby_create_delete_msgs_on", "false");
-            }
+            preferences.putBoolean("lobby_create_delete_msgs_on", createDeleteLobbyMsgBox.getValue().equals("On"));
         }
         if (joinLeaveLobbyMsg != null) {
             if (joinLeaveLobbyMsgBox.getValue().equals("On")) {

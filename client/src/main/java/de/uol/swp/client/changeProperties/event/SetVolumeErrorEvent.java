@@ -17,7 +17,6 @@ public class SetVolumeErrorEvent {
     /**
      * Constructor
      *
-     * @since 2021-06-05
      */
     public SetVolumeErrorEvent(String message) {
         this.message = message;
@@ -26,7 +25,6 @@ public class SetVolumeErrorEvent {
     /**
      * Gets the error message
      *
-     * @since 2021-06-05
      */
     public String getMessage() {
         return message;

@@ -112,6 +112,6 @@
         <Button fx:id="changeButton" defaultButton="true"
                 onAction="#onChangePropertiesButtonPressed"
                 text="%changeproperties.button.change"/>
-        <Button mnemonicParsing="false" onAction="#onCancelButtonPressed" text="%changeproperties.button.cancel"/>
+        <Button onAction="#onCancelButtonPressed" text="%button.cancel"/>
     </HBox>
 </VBox>
