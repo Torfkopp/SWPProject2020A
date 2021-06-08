@@ -79,8 +79,6 @@
                     </toggleGroup>
                 </RadioButton>
             </HBox>
-            <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0" style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
-                <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" text="%lobby.ai.checkbox" />
             <VBox fx:id="aiVBox" prefHeight="87.0" prefWidth="230.0"
                   style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style:solid" visible="false">
                 <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" onAction="#prepareLobbyUpdate"

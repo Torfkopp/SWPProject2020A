@@ -112,7 +112,6 @@ public class LobbyService extends AbstractService {
         ServerMessage msg = new UpdateLobbyMessage(req.getName(), req.getUser(),
                                                    ILobby.getSimpleLobby(updatedLobby.get()));
         sendToAllInLobby(req.getName(), msg);
-        System.err.println(req.getMaxTradeDiff() + "  lelele");
     }
 
     /**

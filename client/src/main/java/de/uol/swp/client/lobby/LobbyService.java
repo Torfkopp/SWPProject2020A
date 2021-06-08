@@ -146,7 +146,6 @@ public class LobbyService implements ILobbyService {
     @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
                                     boolean randomPlayFieldEnabled, int maxTradeDiff) {
-        System.err.println(maxTradeDiff);
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
                                                      startUpPhaseEnabled, moveTime, randomPlayFieldEnabled, maxTradeDiff));

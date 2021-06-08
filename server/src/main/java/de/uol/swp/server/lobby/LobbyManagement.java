@@ -81,6 +81,5 @@ public class LobbyManagement implements ILobbyManagement {
         lobbies.get(lobbyName).setStartUpPhaseEnabled(startUpPhaseEnabled);
         lobbies.get(lobbyName).setRandomPlayFieldEnabled(randomPlayfieldEnabled);
         lobbies.get(lobbyName).setMaxTradeDiff(maxTradeDiff);
-        System.err.println(lobbies.get(lobbyName).getMaxTradeDiff());
     }
 }
