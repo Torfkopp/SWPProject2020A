@@ -83,7 +83,7 @@ public class LobbyDTO implements ILobby {
      * @param moveTime               The move time
      * @param startUpPhaseEnabled    The start up phase enabled
      * @param randomPlayFieldEnabled The random playfield enabled
-     * @param maxTradeDiff           The maximum Ressource difference
+     * @param maxTradeDiff           The maximum Resource difference
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */

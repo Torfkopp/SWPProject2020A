@@ -20,7 +20,6 @@ import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
     private int maxTradeDiff;
 
-
     @FXML
     private Label statusLabel;
     @FXML
@@ -52,8 +50,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     private Slider ownLumberSlider, ownWoolSlider, ownGrainSlider, ownOreSlider, ownBrickSlider;
     @FXML
     private Button offerTradeButton;
-
-
 
     private LobbyName lobbyName;
     private UserOrDummy respondingUser;
@@ -207,24 +203,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     }
 
     /**
-     * Method which blocks unfair trades
-     * <p>
-     * If the onOfferTradeButtonPressed Method has been called, this
-     * method checks if the difference in the amount of Ressources between
-     * offering and demanding Trade is the current MAX_TRADE_DIFF or lower.
-     * If not, the Method will return false and with that, the onOfferTradeButtonPressed
-     * will not send the offer
-     */
-
-    private boolean tradeIsFair(){
-        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
-        int counterOwnResource = selectedOwnResourceList.getTotal();
-        int counterPartnersResource = selectedPartnersResourceList.getTotal();
-        if(Math.abs(counterOwnResource - counterPartnersResource) > maxTradeDiff) return false;
-        else return true;
-    }
-
-    /**
      * Handles a ResetOfferTradeButtonResponse found on the EventBus
      * <p>
      * If a ResetOfferTradeButtonResponse is found on the EventBus, the offer trade button
@@ -338,5 +316,22 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             ownWoolSlider.setMax(resourceList.getAmount(ResourceType.WOOL));
             ownBrickSlider.setMax(resourceList.getAmount(ResourceType.BRICK));
         });
+    }
+
+    /**
+     * Method which blocks unfair trades
+     * <p>
+     * If the onOfferTradeButtonPressed Method has been called, this
+     * method checks if the difference in the amount of Ressources between
+     * offering and demanding Trade is the current MAX_TRADE_DIFF or lower.
+     * If not, the Method will return false and with that, the onOfferTradeButtonPressed
+     * will not send the offer
+     */
+    private boolean tradeIsFair() {
+        statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
+        int counterOwnResource = selectedOwnResourceList.getTotal();
+        int counterPartnersResource = selectedPartnersResourceList.getTotal();
+        if (Math.abs(counterOwnResource - counterPartnersResource) > maxTradeDiff) return false;
+        else return true;
     }
 }

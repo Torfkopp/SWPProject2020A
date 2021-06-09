@@ -20,10 +20,6 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
     private final boolean randomPlayFieldEnabled;
     private final int maxTradeDiff;
 
-    public int getMaxTradeDiff() {
-        return maxTradeDiff;
-    }
-
     /**
      * Constructor
      *
@@ -51,6 +47,15 @@ public class ChangeLobbySettingsRequest extends AbstractLobbyRequest {
      */
     public int getAllowedPlayers() {
         return allowedPlayers;
+    }
+
+    /**
+     * Gets the maximum resource difference within a trade
+     *
+     * @return Difference in resources allowed
+     */
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
     }
 
     /**

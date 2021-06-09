@@ -329,6 +329,11 @@ public class Game {
         return map;
     }
 
+    /**
+     * Gets this game's maximum resource difference
+     *
+     * @return The Games maximum difference
+     */
     public int getMaxTradeDiff() {
         return maxTradeDiff;
     }

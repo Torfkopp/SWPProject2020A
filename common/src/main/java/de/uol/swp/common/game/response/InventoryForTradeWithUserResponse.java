@@ -33,7 +33,7 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * @param tradingUsersInventorySize Amount of resource cards the other User has
      * @param tradingUser               The User to whom an offer is going to be made
      * @param counterOffer              Whether the offer is a counter offer or not
-     * @param maxTradeDiff
+     * @param maxTradeDiff              Maximum Resource difference for a trade
      */
     public InventoryForTradeWithUserResponse(UserOrDummy user, LobbyName lobbyName, ResourceList resourceList,
                                              int tradingUsersInventorySize, UserOrDummy tradingUser,
@@ -51,9 +51,10 @@ public class InventoryForTradeWithUserResponse extends AbstractLobbyResponse {
      * Gets the maximum Trade Difference for a lobby
      *
      * @return Difference of acceptable Ressource
+     *
      * @author Aldin Dervisi
      * @since 2021-06-08
-    */
+     */
     public int getMaxTradeDiff() {
         return maxTradeDiff;
     }

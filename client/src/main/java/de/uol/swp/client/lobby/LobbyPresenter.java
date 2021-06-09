@@ -242,7 +242,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
             moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
-            maxTradeDiffLabel.setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
+            maxTradeDiffLabel
+                    .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
         });
         setPreGameSettings();
     }
@@ -331,8 +332,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         maxTradeDiff = msg.getLobby().getMaxTradeDiff();
         Platform.runLater(() -> moveTimeLabel
                 .setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime)));
-        Platform.runLater(() -> maxTradeDiffLabel
-                .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff)));
+        maxTradeDiffLabel
+                .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
     }
 
     /**

@@ -24,6 +24,17 @@ public interface ISimpleLobby extends Serializable {
     int getMaxPlayers();
 
     /**
+     * Gets the max resource difference
+     *
+     * @return The max difference
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-09
+     *
+     */
+    int getMaxTradeDiff();
+
+    /**
      * Gets the move time.
      *
      * @return The move time
@@ -72,8 +83,6 @@ public interface ISimpleLobby extends Serializable {
      * @since 2021-05-03
      */
     Set<UserOrDummy> getUserOrDummies();
-
-    int getMaxTradeDiff();
 
     /**
      * Returns if the lobby has a password
