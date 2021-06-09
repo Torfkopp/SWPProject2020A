@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -65,6 +66,9 @@ public class GameRendering {
     @Inject
     @Named("drawHitboxGrid")
     private static boolean drawHitboxGrid;
+    @Inject
+    @Named("renderingStyle")
+    private static String renderingStyle;
 
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
@@ -356,13 +360,17 @@ public class GameRendering {
      *
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
-    private void drawHex(double currentX, double currentY) {
+    private void drawHex(String type, double currentX, double currentY) {
+        //TODO Change me maybe
         double[] xCords = {currentX, currentX + hexWidth / 2, currentX + hexWidth, currentX + hexWidth,
                            currentX + hexWidth / 2, currentX};
         double[] yCords = {currentY + (hexHeight / 4), currentY, currentY + (hexHeight / 4),
                            currentY + (hexHeight / 4) * 3, currentY + hexHeight, currentY + (hexHeight / 4) * 3};
         Platform.runLater(() -> {
             gfxCtx.fillPolygon(xCords, yCords, 6);
+            if (!renderingStyle.equals("plain"))
+                gfxCtx.drawImage(new Image("images/hexes/" + renderingStyle + "/" + type + ".png", false), currentX,
+                                 currentY, hexWidth, hexHeight);
             gfxCtx.setStroke(BORDER_COLOUR);
             gfxCtx.setLineWidth(2);
             gfxCtx.strokePolygon(xCords, yCords, 6);
@@ -447,9 +455,14 @@ public class GameRendering {
         double[] yPoints = {currentY + hexHeight * (2.75 / 4.0), currentY + hexHeight * (2.75 / 4.0),
                             currentY + hexHeight * (1.125 / 4.0)};
         Platform.runLater(() -> {
-            gfxCtx.setLineWidth(robberLineWidth);
-            gfxCtx.setStroke(ROBBER_COLOUR);
-            gfxCtx.strokePolygon(xPoints, yPoints, 3);
+            if (!renderingStyle.equals("plain"))
+                gfxCtx.drawImage(new Image("images/hexes/" + renderingStyle + "/robber.png", false), currentX * 1.05,
+                                 currentY * 1.05, hexWidth * 0.6, hexHeight * 0.6);
+            else {
+                gfxCtx.setLineWidth(robberLineWidth);
+                gfxCtx.setStroke(ROBBER_COLOUR);
+                gfxCtx.strokePolygon(xPoints, yPoints, 3);
+            }
         });
     }
 
@@ -750,9 +763,9 @@ public class GameRendering {
      */
     private void renderHex(IGameHex hex, double currentX, double currentY) {
         if (hex == null) return;
-        if (!setHexColour(hex)) return;
+        if (setHexColour(hex).isEmpty()) return;
 
-        drawHex(currentX, currentY);
+        drawHex(setHexColour(hex), currentX, currentY);
 
         if (hex.isRobberOnField()) drawRobber(currentX, currentY);
         if (hex instanceof IResourceHex) drawToken(((IResourceHex) hex).getToken(), currentX, currentY);
@@ -983,41 +996,39 @@ public class GameRendering {
      *
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
-    private boolean setHexColour(IGameHex hex) {
-        if (hex == null) return false;
+    private String setHexColour(IGameHex hex) {
+        if (hex == null) return "";
         switch (hex.getType()) {
             case WATER:
             case HARBOUR:
                 Platform.runLater(() -> gfxCtx.setFill(WATER_COLOUR));
-                break;
+                return "water";
             case DESERT:
                 Platform.runLater(() -> gfxCtx.setFill(DESERT_COLOUR));
-                break;
+                return "desert";
             case RESOURCE:
                 switch (((IResourceHex) hex).getResource()) {
                     case BRICK:
                         Platform.runLater(() -> gfxCtx.setFill(HILLS_COLOUR));
-                        break;
+                        return "hills";
                     case LUMBER:
                         Platform.runLater(() -> gfxCtx.setFill(FOREST_COLOUR));
-                        break;
+                        return "forest";
                     case ORE:
                         Platform.runLater(() -> gfxCtx.setFill(MOUNTAINS_COLOUR));
-                        break;
+                        return "mountains";
                     case GRAIN:
                         Platform.runLater(() -> gfxCtx.setFill(FIELDS_COLOUR));
-                        break;
+                        return "fields";
                     case WOOL:
                         Platform.runLater(() -> gfxCtx.setFill(PASTURE_COLOUR));
-                        break;
+                        return "pasture";
                     default:
-                        return false;
+                        return "";
                 }
-                break;
             default:
-                return false;
+                return "";
         }
-        return true;
     }
 
     /**

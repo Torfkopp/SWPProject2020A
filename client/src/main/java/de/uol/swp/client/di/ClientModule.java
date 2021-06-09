@@ -70,7 +70,9 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("volume", preferences.get("volume", "100"));
         defaultProps.setProperty("backgroundvolume", preferences.get("backgroundvolume", "50"));
         defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
-        defaultProps.setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
+        defaultProps
+                .setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
+        defaultProps.setProperty("renderingStyle", preferences.get("renderingStyle", "plain"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -108,6 +110,9 @@ public class ClientModule extends AbstractModule {
                 System.out.println("Invalid Argument in config option \"lang\"" + "\n----Using UK english");
                 locale = Locale.UK;
         }
+
+        //Setting the rendering style
+        final String renderingStyle = properties.getProperty("renderingStyle");
 
         //Setting the theme
         LOG.debug("Selected theme in config file: {}", properties.getProperty("theme"));
@@ -177,6 +182,7 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
         bindConstant().annotatedWith(Names.named("loginLogoutMsgsOn")).to(loginLogoutMsgsOn);
         bindConstant().annotatedWith(Names.named("lobbyCreateDeleteMsgsOn")).to(lobbyCreateDeleteMsgsOn);
+        bindConstant().annotatedWith(Names.named("renderingStyle")).to(renderingStyle);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IUserService.class).to(AsyncUserService.class).in(Scopes.SINGLETON);
