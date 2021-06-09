@@ -51,7 +51,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
-    private int maxTradeDiff;
+    private final int maxTradeDiff;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -332,7 +332,7 @@ public class Game {
     /**
      * Gets this game's maximum resource difference
      *
-     * @return The Games maximum difference
+     * @return The Game's maximum resource difference
      */
     public int getMaxTradeDiff() {
         return maxTradeDiff;
