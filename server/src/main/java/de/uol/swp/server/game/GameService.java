@@ -16,6 +16,7 @@ import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IHarbourHex.HarbourResource;
 import de.uol.swp.common.game.map.hexes.ResourceHex;
+import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.IIntersection;
 import de.uol.swp.common.game.map.management.MapPoint;
 import de.uol.swp.common.game.message.*;
@@ -315,6 +316,38 @@ public class GameService extends AbstractService {
         }
         lobbyService
                 .sendToAllInLobby(lobbyName, new UpdateUniqueCardsListMessage(lobbyName, game.getUniqueCardsList()));
+    }
+
+    /**
+     * Helper method to realize a dummies turn in the founder phase
+     * Checks whether the next player in the founding phase player queue is a dummy
+     * and builds the founding settlement and road accordingly.
+     *
+     * @param game the game, the dummy is in
+     * @param npc  the player whose turn the next one is
+     *
+     * @author Sven Ahrens
+     * @since 2021-05-22
+     */
+    private void dummyTurnInFoundingPhase(Game game, NPC npc) {
+        boolean roadPlaced = false;
+
+        IGameMapManagement map = game.getMap();
+        MapPoint randomCoordinates = map.getRandomFreeIntersection(game, game.getPlayer(npc));
+        onBuildRequest(new BuildRequest(game.getLobby().getName(), npc, randomCoordinates));
+
+        Set<IEdge> incidentEdges = map.getEdgesAroundIntersection(randomCoordinates);
+        while (!roadPlaced) {
+            {
+                for (IEdge edge : incidentEdges) {
+                    if (map.roadPlaceable(game.getPlayer(npc), edge)) {
+                        onBuildRequest(new BuildRequest(game.getLobby().getName(), npc, map.getEdgeMapPoint(edge)));
+                        roadPlaced = true;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1832,8 +1865,13 @@ public class GameService extends AbstractService {
                 onRollDiceRequest(new RollDiceRequest(npc, game.getLobby().getName()));
             else {
                 Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
-                if (startUpBuiltMap.get(npc) == NONE_BUILT) startUpBuiltMap.put(npc, FIRST_BOTH_BUILT);
-                else startUpBuiltMap.put(npc, ALL_BUILT);
+                if (startUpBuiltMap.get(npc) == NONE_BUILT) {
+                    dummyTurnInFoundingPhase(game, npc);
+                    startUpBuiltMap.put(npc, FIRST_BOTH_BUILT);
+                } else {
+                    dummyTurnInFoundingPhase(game, npc);
+                    startUpBuiltMap.put(npc, ALL_BUILT);
+                }
             }
             turnEndDummy(game, (Dummy) npc);
         }
