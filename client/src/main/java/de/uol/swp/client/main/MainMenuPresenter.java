@@ -65,20 +65,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
     private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
-    @Inject
-    @Named("styleSheet")
-    private static String styleSheet;
-
-    @Inject
-    @Named("soundPack")
-    private static String soundPack;
-
-    @Inject
-    @Named("loginLogoutMsgsOn")
-    private static boolean loginLogoutMsgsOn;
-    @Inject
-    @Named("lobbyCreateDeleteMsgsOn")
-    private static boolean lobbyCreateDeleteMsgsOn;
+    private final String soundPack;
+    private final boolean loginLogoutMsgsOn;
+    private final boolean lobbyCreateDeleteMsgsOn;
 
     @FXML
     private Label randomLobbyState;
@@ -102,12 +91,22 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * Constructor
      * <p>
      * This constructor calls the init method of the AbstractPresenterWithChat
-     * to set the appropriate logger.
+     * to set the appropriate logger. It also sets some variables via Injection.
+     *
+     * @param soundPack               The used SoundPack.
+     * @param loginLogoutMsgsOn       Boolean whether to show login/logout messages.
+     * @param lobbyCreateDeleteMsgsOn Boolean whether to show lobby realted messages.
      *
      * @since 2021-01-02
      */
-    public MainMenuPresenter() {
+    @Inject
+    public MainMenuPresenter(@Named("soundPack") String soundPack,
+                             @Named("loginLogoutMsgsOn") boolean loginLogoutMsgsOn,
+                             @Named("lobbyCreateDeleteMsgsOn") boolean lobbyCreateDeleteMsgsOn) {
         super.init(LogManager.getLogger(MainMenuPresenter.class));
+        this.soundPack = soundPack;
+        this.loginLogoutMsgsOn = loginLogoutMsgsOn;
+        this.lobbyCreateDeleteMsgsOn = lobbyCreateDeleteMsgsOn;
     }
 
     @Override

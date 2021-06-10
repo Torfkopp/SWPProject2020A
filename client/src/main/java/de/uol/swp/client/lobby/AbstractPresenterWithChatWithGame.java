@@ -71,14 +71,6 @@ import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
-    @Inject
-    @Named("theme")
-    private static String theme;
-    @Inject
-    @Named("styleSheet")
-    private static String styleSheet;
-    @Inject
-    protected IGameService gameService;
     @FXML
     protected Button endTurn;
     @FXML
@@ -155,9 +147,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
     protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
     protected Map<UserOrDummy, Colour> userColoursMap = null;
+    protected IGameService gameService;
 
-    @Inject
-    private ITradeService tradeService;
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
     @FXML
@@ -169,6 +160,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
+    private ITradeService tradeService;
+    private String theme;
 
     @Override
     @FXML
@@ -177,6 +170,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         prepareInventoryTables();
         prepareUniqueCardView();
         LOG.debug("AbstractPresenterWithChatWithGame initialised");
+    }
+
+    /**
+     * Sets the injected fields
+     * <p>
+     * This method sets the injected fields via parameters.
+     *
+     * @param tradeService The TradeService this class should use.
+     * @param gameService  The GameService this class should use.
+     * @param theme        The theme this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    public void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
+        this.tradeService = tradeService;
+        this.gameService = gameService;
+        this.theme = theme;
     }
 
     /**
@@ -264,7 +276,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             helpLabel.setBorder(null);
             helpLabel.getChildren().clear();
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen()) window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen())
+                window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
     }

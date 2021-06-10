@@ -42,19 +42,15 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
 
     protected static Logger LOG;
 
-    @Inject
-    @Named("styleSheet")
-    private static String styleSheet;
-    @Inject
-    protected IChatService chatService;
-
     @FXML
     protected ListView<ChatOrSystemMessage> chatView;
     @FXML
     protected TextField messageField;
 
+    protected IChatService chatService;
     protected LobbyName lobbyName;
     protected ObservableList<ChatOrSystemMessage> chatMessages;
+    protected String styleSheet;
 
     /**
      * Called by the constructor of inheriting classes to set the Logger
@@ -65,6 +61,23 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      */
     public void init(Logger log) {
         LOG = log;
+    }
+
+    /**
+     * Sets the injected fields
+     * <p>
+     * This method sets the injected fields via parameters.
+     *
+     * @param chatService The ChatService this class should use.
+     * @param styleSheet  The styleSheet this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    public void setInjects(IChatService chatService, @Named("styleSheet") String styleSheet) {
+        this.chatService = chatService;
+        this.styleSheet = styleSheet;
     }
 
     /**

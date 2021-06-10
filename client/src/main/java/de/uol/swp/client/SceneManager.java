@@ -73,11 +73,6 @@ public class SceneManager {
 
     @Inject
     private static Injector injector;
-    @Inject
-    private static ResourceBundle resourceBundle;
-    @Inject
-    @Named("styleSheet")
-    private static String styleSheet;
 
     private final Stage primaryStage;
     private final Map<LobbyName, Stage> tradingStages = new HashMap<>();
@@ -86,18 +81,12 @@ public class SceneManager {
     private final Map<LobbyName, Scene> lobbyScenes = new HashMap<>();
     private final List<Stage> lobbyStages = new ArrayList<>();
     private final EventBus eventBus;
-
-    @Inject
-    private IUserService userService;
-
-    @Inject
-    private ILobbyService lobbyService;
-
-    @Inject
-    private ITradeService tradeService;
-
-    @Inject
-    private ISoundService soundService;
+    private final IUserService userService;
+    private final ILobbyService lobbyService;
+    private final ITradeService tradeService;
+    private final ISoundService soundService;
+    private final ResourceBundle resourceBundle;
+    private final String styleSheet;
 
     private Scene loginScene;
     private String lastTitle;
@@ -114,14 +103,28 @@ public class SceneManager {
     /**
      * Constructor
      *
-     * @param eventBus     The EventBus
-     * @param primaryStage The primary Stage
+     * @param userService    The UserService this class should use.
+     * @param lobbyService   The LobbyService this class should use.
+     * @param tradeService   The TradeService this class should use.
+     * @param soundService   The SoundService this class should use.
+     * @param eventBus       The EventBus this class should use.
+     * @param primaryStage   The created PrimaryStage.
+     * @param resourceBundle The used ResourceBundle.
+     * @param styleSheet     The used StyleSheet.
      */
     @Inject
-    public SceneManager(EventBus eventBus, @Assisted Stage primaryStage) {
+    public SceneManager(IUserService userService, ILobbyService lobbyService, ITradeService tradeService,
+                        ISoundService soundService, EventBus eventBus, @Assisted Stage primaryStage,
+                        ResourceBundle resourceBundle, @Named("styleSheet") String styleSheet) {
         eventBus.register(this);
+        this.userService = userService;
+        this.lobbyService = lobbyService;
+        this.tradeService = tradeService;
+        this.soundService = soundService;
         this.eventBus = eventBus;
         this.primaryStage = primaryStage;
+        this.resourceBundle = resourceBundle;
+        this.styleSheet = styleSheet;
         initViews();
     }
 
