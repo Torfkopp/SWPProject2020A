@@ -701,11 +701,7 @@ public class GameService extends AbstractService {
             if (ai instanceof AI) gameAI.writeChatMessageAI((AI) ai, lobbyName, AI.WriteType.START);
         Game game = gameManagement.getGame(lobbyName);
         UserOrDummy first = game.getFirst();
-        if (first instanceof NPC) {
-            onRollDiceRequest(new RollDiceRequest(first, lobbyName));
-            if (first instanceof Dummy) turnEndDummy(game, (Dummy) first);
-            if (first instanceof AI) gameAI.turnAI(game, (AI) first);
-        }
+        if (first instanceof NPC) turnNPC(game, (NPC) first);
     }
 
     /**
@@ -817,11 +813,7 @@ public class GameService extends AbstractService {
         lobbyService.sendToAllInLobby(req.getOriginLobby(), returnMessage);
 
         game.setDiceRolledAlready(false);
-        if (nextPlayer instanceof NPC) {
-            onRollDiceRequest(new RollDiceRequest(nextPlayer, req.getOriginLobby()));
-            if (nextPlayer instanceof Dummy) turnEndDummy(game, (Dummy) nextPlayer);
-            if (nextPlayer instanceof AI) gameAI.turnAI(game, (AI) nextPlayer);
-        }
+        if (nextPlayer instanceof NPC) turnNPC(game, (NPC) nextPlayer);
     }
 
     /**
@@ -1482,7 +1474,6 @@ public class GameService extends AbstractService {
     private void onRollDiceRequest(RollDiceRequest req) {
         LOG.debug("Received RollDiceRequest for Lobby {}", req.getOriginLobby());
         LOG.debug("---- User {} wants to roll the dices.", req.getUser().getUsername());
-
         Game game = gameManagement.getGame(req.getOriginLobby());
         if (!game.getActivePlayer().equals(req.getUser()) || game.isDiceRolledAlready() || game.isPausedByVoting())
             return;
@@ -1817,6 +1808,33 @@ public class GameService extends AbstractService {
      */
     private void turnEndDummy(Game game, Dummy dummy) {
         if (game.getTaxPayers().isEmpty()) onEndTurnRequest(new EndTurnRequest(dummy, game.getLobby().getName()));
+    }
+
+    /**
+     * Method to end an NPC's turn
+     *
+     * @param game The game the NPC is in
+     * @param npc  The npc to make the turn
+     *
+     * @author Mario Fokken
+     * @since 2021-06-07
+     */
+    private void turnNPC(Game game, NPC npc) {
+        if (npc instanceof AI) {
+            if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE) {
+                onRollDiceRequest(new RollDiceRequest(npc, game.getLobby().getName()));
+                gameAI.turnAI(game, (AI) npc);
+            } else gameAI.turnAISetUp(game, (AI) npc);
+        } else if (npc instanceof Dummy) {
+            if (game.getStartUpPhase() == Game.StartUpPhase.NOT_IN_STARTUP_PHASE)
+                onRollDiceRequest(new RollDiceRequest(npc, game.getLobby().getName()));
+            else {
+                Map<UserOrDummy, StartUpPhaseBuiltStructures> startUpBuiltMap = game.getPlayersStartUpBuiltMap();
+                if (startUpBuiltMap.get(npc) == NONE_BUILT) startUpBuiltMap.put(npc, FIRST_BOTH_BUILT);
+                else startUpBuiltMap.put(npc, ALL_BUILT);
+            }
+            turnEndDummy(game, (Dummy) npc);
+        }
     }
 
     /**
