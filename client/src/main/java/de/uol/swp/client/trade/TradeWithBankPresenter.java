@@ -95,7 +95,7 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
      * @since 2021-06-09
      */
     @Inject
-    public void setGameService(IGameService gameService) {
+    private void setGameService(IGameService gameService) {
         this.gameService = gameService;
     }
 

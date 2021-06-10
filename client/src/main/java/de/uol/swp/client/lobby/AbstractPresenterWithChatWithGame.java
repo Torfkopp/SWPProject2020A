@@ -185,7 +185,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-06-09
      */
     @Inject
-    public void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
+    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
         this.tradeService = tradeService;
         this.gameService = gameService;
         this.theme = theme;

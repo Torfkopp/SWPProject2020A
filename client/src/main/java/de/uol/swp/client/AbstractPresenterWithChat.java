@@ -75,7 +75,7 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
      * @since 2021-06-09
      */
     @Inject
-    public void setInjects(IChatService chatService, @Named("styleSheet") String styleSheet) {
+    private void setInjects(IChatService chatService, @Named("styleSheet") String styleSheet) {
         this.chatService = chatService;
         this.styleSheet = styleSheet;
     }

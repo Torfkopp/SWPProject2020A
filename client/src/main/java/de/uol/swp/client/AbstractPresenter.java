@@ -76,8 +76,8 @@ public abstract class AbstractPresenter {
      * @since 2021-06-09
      */
     @Inject
-    public void setInjects(ISoundService soundService, IUserService userService, ILobbyService lobbyService,
-                           ResourceBundle resourceBundle, EventBus eventBus) {
+    private void setInjects(ISoundService soundService, IUserService userService, ILobbyService lobbyService,
+                            ResourceBundle resourceBundle, EventBus eventBus) {
         this.soundService = soundService;
         this.userService = userService;
         this.lobbyService = lobbyService;

@@ -46,7 +46,7 @@ public abstract class AbstractTradePresenter extends AbstractPresenter {
      * @since 2021-06-09
      */
     @Inject
-    public void setTradeService(ITradeService tradeService) {
+    private void setTradeService(ITradeService tradeService) {
         this.tradeService = tradeService;
     }
 }
