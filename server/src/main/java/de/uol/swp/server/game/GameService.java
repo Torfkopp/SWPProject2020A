@@ -1645,7 +1645,8 @@ public class GameService extends AbstractService {
             ResponseMessage returnMessage;
             returnMessage = new InventoryForTradeWithUserResponse(req.getUser(), req.getName(),
                                                                   offeringInventory.create(), traderInventorySize,
-                                                                  req.getRespondingUser(), req.isCounterOffer());
+                                                                  req.getRespondingUser(), req.isCounterOffer(),
+                                                                  game.getMaxTradeDiff());
             LOG.debug("Sending InventoryForTradeWithUserResponse for Lobby {}", req.getName());
             returnMessage.initWithMessage(req);
             post(returnMessage);
