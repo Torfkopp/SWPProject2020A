@@ -1,5 +1,6 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class StartSessionMessage extends AbstractLobbyMessage {
 
     private final Map<UserOrDummy, Player> userOrDummyPlayerMap;
+    private final Map<UserOrDummy, Colour> userOrDummyColourMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
 
@@ -30,13 +32,16 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param configuration        The field configuration used in the game
      * @param startUpPhaseEnabled  Whether the game has the startup phase enabled
      * @param userOrDummyPlayerMap The Map with userOrDummyPlayer
+     * @param userOrDummyColourMap The Map with userOrDummyColour
      */
     public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
-                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap) {
+                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap,
+                               Map<UserOrDummy, Colour> userOrDummyColourMap) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.userOrDummyPlayerMap = userOrDummyPlayerMap;
+        this.userOrDummyColourMap = userOrDummyColourMap;
     }
 
     /**
@@ -53,6 +58,13 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      */
     public IConfiguration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * Gets the Map of UserOrDummies and Colours
+     */
+    public Map<UserOrDummy, Colour> getUserOrDummyColourMap() {
+        return userOrDummyColourMap;
     }
 
     /**

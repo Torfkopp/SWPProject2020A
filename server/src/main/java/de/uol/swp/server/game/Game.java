@@ -1,5 +1,6 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -50,6 +51,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
+    private final int maxTradeDiff;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -68,6 +70,7 @@ public class Game {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
+        this.maxTradeDiff = getLobby().getMaxTradeDiff();
         playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
@@ -327,6 +330,15 @@ public class Game {
     }
 
     /**
+     * Gets this game's maximum resource difference
+     *
+     * @return The Game's maximum resource difference
+     */
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
+    }
+
+    /**
      * Gets the next player
      *
      * @return User object of the next player
@@ -536,6 +548,18 @@ public class Game {
     }
 
     /**
+     * Gets a map of users or dummies and their chosen colour
+     *
+     * @return A map containing users or dummies and their chosen colour
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    public Map<UserOrDummy, Colour> getUserColoursMap() {
+        return lobby.getUserColourMap();
+    }
+
+    /**
      * Returns the user corresponding with the given player
      *
      * @param player The player whose User is required
@@ -660,7 +684,7 @@ public class Game {
     /**
      * Sets the boolean paused for the game.
      *
-     * @param pausedByTrade
+     * @param pausedByTrade True if paused by trade
      *
      * @author Alwin Bossert
      * @since 2021-05-02
@@ -674,8 +698,6 @@ public class Game {
      * Returns false if not everyone want to change the status. Otherwise
      * the pause status gets changed and the preparePausedMembers method is
      * called.
-     *
-     * @return Whether the paused status of the game has changed
      *
      * @author Maximilian Lindner
      * @since 2021-05-21

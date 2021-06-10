@@ -239,6 +239,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
+        lobbyService.setColour(lobbyName, null);
 
         addSizeChangeListener();
         fitCanvasToSize();
@@ -246,6 +247,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setAllowedPlayers(event.getLobby().getMaxPlayers());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
+        maxTradeDiff = event.getLobby().getMaxTradeDiff();
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
 
@@ -255,6 +257,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
             moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
+            maxTradeDiffLabel
+                    .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
         });
         setPreGameSettings();
     }
@@ -340,8 +344,11 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
+        maxTradeDiff = msg.getLobby().getMaxTradeDiff();
         Platform.runLater(() -> moveTimeLabel
                 .setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime)));
+        maxTradeDiffLabel
+                .setText(String.format(resourceBundle.getString("game.trade.change.select.diff"), maxTradeDiff));
     }
 
     /**
@@ -435,8 +442,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
                     //if the background should be in colour you need to use setBackground
-                    if (user != null && userOrDummyPlayerMap == null)
-                        setTextFill(Color.BLACK); // No clue why this is needed, but it is
+                    setTextFill(Color.BLACK); // No clue why this is needed, but it is (It really is)
                     if (user != null && userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
                         switch (userOrDummyPlayerMap.get(user)) {
                             case PLAYER_1:

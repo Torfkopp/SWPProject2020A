@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import de.uol.swp.client.lobby.event.LobbyErrorEvent;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -117,6 +118,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void setColour(LobbyName lobbyName, Colour colour) {
+        LOG.debug("Sending SetColourRequest");
+        Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
+        eventBus.post(setColourRequest);
+    }
+
+    @Override
     public void retrieveAllLobbies() {
         LOG.debug("Sending RetrieveAllLobbiesRequest");
         Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
@@ -145,10 +153,10 @@ public class LobbyService implements ILobbyService {
 
     @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
-                                    boolean randomPlayFieldEnabled) {
+                                    boolean randomPlayFieldEnabled, int maxTradeDiff) {
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
-                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled));
+                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled, maxTradeDiff));
     }
 
     @Override
