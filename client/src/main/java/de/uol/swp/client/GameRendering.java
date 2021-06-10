@@ -79,6 +79,7 @@ public class GameRendering {
     private final double tokenTextFontSize;
     private final double centerTextFontSize;
     private final double bottomTextFontSize;
+    private final Map<String, Image> hexTiles = new HashMap<>();
     private GameMapDescription gameMapDescription = new GameMapDescription();
 
     /**
@@ -106,13 +107,27 @@ public class GameRendering {
         this.citySize = settlementSize * 1.25;
         this.roadWidth = settlementSize / 2.0;
         this.robberLineWidth = roadWidth / 2.0;
-        this.tokenSize = hexHeight / 3.0;
+        this.tokenSize = hexHeight / 3.5;
         this.diceSize = effectiveHeight / 12.0;
         this.diceLineWidth = diceSize / 16.0;
         this.diceDotSize = diceSize / 4.0;
         this.tokenTextFontSize = (20.0 / 750.0) * effectiveWidth;
         this.bottomTextFontSize = (25.0 / 750.0) * effectiveWidth;
         this.centerTextFontSize = (30.0 / 750.0) * effectiveWidth;
+        this.hexTiles.put("water", new Image("images/hexes/" + renderingStyle + "/water.png"));
+        this.hexTiles.put("desert", new Image("images/hexes/" + renderingStyle + "/desert.png"));
+        this.hexTiles.put("fields", new Image("images/hexes/" + renderingStyle + "/fields.png"));
+        this.hexTiles.put("hills", new Image("images/hexes/" + renderingStyle + "/hills.png"));
+        this.hexTiles.put("mountains", new Image("images/hexes/" + renderingStyle + "/mountains.png"));
+        this.hexTiles.put("pasture", new Image("images/hexes/" + renderingStyle + "/pasture.png"));
+        this.hexTiles.put("forest", new Image("images/hexes/" + renderingStyle + "/forest.png"));
+        this.hexTiles.put("robber", new Image("images/hexes/" + renderingStyle + "/robber.png"));
+        this.hexTiles.put("harbour_east", new Image("images/hexes/" + renderingStyle + "/harbour_east.png"));
+        this.hexTiles.put("harbour_northeast", new Image("images/hexes/" + renderingStyle + "/harbour_northeast.png"));
+        this.hexTiles.put("harbour_northwest", new Image("images/hexes/" + renderingStyle + "/harbour_northwest.png"));
+        this.hexTiles.put("harbour_west", new Image("images/hexes/" + renderingStyle + "/harbour_west.png"));
+        this.hexTiles.put("harbour_southwest", new Image("images/hexes/" + renderingStyle + "/harbour_southwest.png"));
+        this.hexTiles.put("harbour_southeast", new Image("images/hexes/" + renderingStyle + "/harbour_southeast.png"));
     }
 
     /**
@@ -235,6 +250,7 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawCity(Optional<Player> owner, double currentX, double currentY) {
+        //TODO change this
         if (owner.isEmpty()) Platform.runLater(() -> gfxCtx.setFill(BUILDABLE_COLOUR));
         else Platform.runLater(() -> gfxCtx.setFill(getPlayerColour(owner.get())));
         double halfCitySize = citySize / 2.0;
@@ -300,6 +316,7 @@ public class GameRendering {
         double xDistance = hexWidth * (1.0 / 32.0);
         double xExtend = hexWidth * (5.0 / 16.0);
         double[] xCords, yCords;
+        String harbourType = "";
         switch (hex.getSide()) {
             case WEST:
                 xCords = new double[]{currentX + xDistance, currentX + xExtend / 2.0, currentX + xExtend / 2.0,
@@ -307,18 +324,21 @@ public class GameRendering {
                 yCords = new double[]{currentY + hexHeight * (1.0 / 4.0), currentY + hexHeight * (1.0 / 4.0) + yExtend,
                                       currentY + hexHeight * (3.0 / 4.0) - yExtend,
                                       currentY + hexHeight * (3.0 / 4.0),};
+                harbourType = "harbour_west";
                 break;
             case NORTHWEST:
                 xCords = new double[]{currentX + xDistance, currentX + xExtend, currentX + hexWidth / 2.0,
                                       currentX + hexWidth / 2.0,};
                 yCords = new double[]{currentY + hexHeight * (1.0 / 4.0), currentY + hexHeight * (1.0 / 4.0),
                                       currentY + yExtend, currentY + yDistance,};
+                harbourType = "harbour_northwest";
                 break;
             case NORTHEAST:
                 xCords = new double[]{currentX + hexWidth * (1.0 / 2.0), currentX + hexWidth * (1.0 / 2.0),
                                       currentX + hexWidth - xExtend, currentX + hexWidth - xDistance,};
                 yCords = new double[]{currentY + yDistance, currentY + yExtend, currentY + hexHeight * (1.0 / 4.0),
                                       currentY + hexHeight * (1.0 / 4.0),};
+                harbourType = "harbour_northeast";
                 break;
             case EAST:
                 xCords = new double[]{currentX + hexWidth - xDistance, currentX + hexWidth - xExtend / 2.0,
@@ -326,18 +346,21 @@ public class GameRendering {
                 yCords = new double[]{currentY + hexHeight * (1.0 / 4.0), currentY + hexHeight * (1.0 / 4.0) + yExtend,
                                       currentY + hexHeight * (3.0 / 4.0) - yExtend,
                                       currentY + hexHeight * (3.0 / 4.0),};
+                harbourType = "harbour_east";
                 break;
             case SOUTHEAST:
                 xCords = new double[]{currentX + hexWidth - xDistance, currentX + hexWidth - xExtend,
                                       currentX + hexWidth * (1.0 / 2.0), currentX + hexWidth * (1.0 / 2.0)};
                 yCords = new double[]{currentY + hexHeight * (3.0 / 4.0), currentY + hexHeight * (3.0 / 4.0),
                                       currentY + hexHeight - yExtend, currentY + hexHeight - yDistance,};
+                harbourType = "harbour_southeast";
                 break;
             case SOUTHWEST:
                 xCords = new double[]{currentX + xDistance, currentX + xExtend, currentX + hexWidth * (1.0 / 2.0),
                                       currentX + hexWidth * (1.0 / 2.0)};
                 yCords = new double[]{currentY + hexHeight * (3.0 / 4.0), currentY + hexHeight * (3.0 / 4.0),
                                       currentY + hexHeight - yExtend, currentY + hexHeight - yDistance,};
+                harbourType = "harbour_southwest";
                 break;
             default:
                 xCords = null;
@@ -366,14 +389,19 @@ public class GameRendering {
                 break;
         }
         String finalText = text;
+        String finalHarbourType = harbourType;
         double x = currentX + hexWidth / 2.0;
         double y = currentY + hexHeight / 2.0;
         double maxWidth = hexWidth * (6.0 / 8.0);
         Platform.runLater(() -> {
-            gfxCtx.setStroke(HARBOUR_COLOUR);
-            gfxCtx.setFill(HARBOUR_COLOUR);
-            gfxCtx.setLineWidth(hexWidth / 5.0);
-            gfxCtx.fillPolygon(xCords, yCords, 4);
+            if (!renderingStyle.equals("plain"))
+                gfxCtx.drawImage(hexTiles.get(finalHarbourType), currentX, currentY, hexWidth, hexHeight);
+            else {
+                gfxCtx.setStroke(HARBOUR_COLOUR);
+                gfxCtx.setFill(HARBOUR_COLOUR);
+                gfxCtx.setLineWidth(hexWidth / 5.0);
+                gfxCtx.fillPolygon(xCords, yCords, 4);
+            }
             gfxCtx.setTextAlign(TextAlignment.CENTER);
             gfxCtx.setTextBaseline(VPos.CENTER);
             gfxCtx.setFill(TEXT_COLOUR);
@@ -400,8 +428,7 @@ public class GameRendering {
         Platform.runLater(() -> {
             gfxCtx.fillPolygon(xCords, yCords, 6);
             if (!renderingStyle.equals("plain"))
-                gfxCtx.drawImage(new Image("images/hexes/" + renderingStyle + "/" + type + ".png", false), currentX,
-                                 currentY, hexWidth, hexHeight);
+                gfxCtx.drawImage(hexTiles.get(type), currentX, currentY, hexWidth, hexHeight);
             gfxCtx.setStroke(BORDER_COLOUR);
             gfxCtx.setLineWidth(2);
             gfxCtx.strokePolygon(xCords, yCords, 6);
@@ -487,8 +514,7 @@ public class GameRendering {
                             currentY + hexHeight * (1.125 / 4.0)};
         Platform.runLater(() -> {
             if (!renderingStyle.equals("plain"))
-                gfxCtx.drawImage(new Image("images/hexes/" + renderingStyle + "/robber.png", false), currentX * 1.05,
-                                 currentY * 1.05, hexWidth * 0.6, hexHeight * 0.6);
+                gfxCtx.drawImage(hexTiles.get("robber"), currentX, currentY * 1.1, hexWidth * 0.5, hexHeight * 0.5);
             else {
                 gfxCtx.setLineWidth(robberLineWidth);
                 gfxCtx.setStroke(ROBBER_COLOUR);
@@ -509,6 +535,7 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawSettlement(Optional<Player> owner, double currentX, double currentY) {
+        //TODO change this
         double x = currentX - (settlementSize / 2.0);
         double y = currentY - (settlementSize / 2.0);
 
@@ -531,7 +558,7 @@ public class GameRendering {
         double xPos = currentX + (hexWidth - tokenSize) / 2.0;
         double yPos = currentY + (hexHeight - tokenSize) / 2.0;
         double x = currentX + hexWidth / 2.0;
-        double y = currentY + hexWidth / 2.0;
+        double y = currentY + hexWidth / 1.75;
         double maxWidth = tokenSize * (7.0 / 8.0);
         String tokenLabel = resourceBundle.getString("game.token." + token);
         Font tokenFont = Font.font(tokenTextFontSize);
@@ -749,6 +776,7 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
+        //TODO change this
         Platform.runLater(() -> gfxCtx.setLineWidth(roadWidth));
         if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
@@ -794,13 +822,12 @@ public class GameRendering {
      */
     private void renderHex(IGameHex hex, double currentX, double currentY) {
         if (hex == null) return;
-        if (setHexColour(hex).isEmpty()) return;
+        if (setHexType(hex).isEmpty()) return;
 
-        drawHex(setHexColour(hex), currentX, currentY);
+        drawHex(setHexType(hex), currentX, currentY);
 
-        if (hex.isRobberOnField()) drawRobber(currentX, currentY);
         if (hex instanceof IResourceHex) drawToken(((IResourceHex) hex).getToken(), currentX, currentY);
-
+        if (hex.isRobberOnField()) drawRobber(currentX, currentY);
         if (hex instanceof IHarbourHex) drawHarbour(currentX, currentY, (IHarbourHex) hex);
     }
 
@@ -1017,17 +1044,17 @@ public class GameRendering {
     }
 
     /**
-     * setHexColour Method
+     * setHexType Method
      * <p>
-     * This method sets the colour according to a hex tile.
+     * This method sets the colour according to a hex tile and returns its type.
      *
      * @param hex The hex tile the colour should be set accordingly to
      *
-     * @return True if the colour couldn't be set, false otherwise
+     * @return The type of the hex
      *
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
-    private String setHexColour(IGameHex hex) {
+    private String setHexType(IGameHex hex) {
         if (hex == null) return "";
         switch (hex.getType()) {
             case WATER:
