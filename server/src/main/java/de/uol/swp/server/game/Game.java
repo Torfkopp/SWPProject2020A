@@ -34,12 +34,13 @@ public class Game {
     private final IGameMapManagement map;
     private final InventoryMap players = new InventoryMap();
     private final BankInventory bankInventory;
-    private final Deque<UserOrDummy> startUpPlayerOrder = new ArrayDeque<>();
+    private final LinkedList<UserOrDummy> startUpPlayerOrder = new LinkedList<>();
     private final Set<User> taxPayers = new HashSet<>();
     private final Map<UserOrDummy, Boolean> autoRollEnabled;
     private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
+    private final int maxTradeDiff;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -51,7 +52,6 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
-    private final int maxTradeDiff;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -195,6 +195,18 @@ public class Game {
      */
     public UserOrDummy getActivePlayer() {
         return activePlayer;
+    }
+
+    /**
+     * Sets the active player
+     *
+     * @param newActivePlayer The active player who gets set
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    private void setActivePlayer(UserOrDummy newActivePlayer) {
+        activePlayer = newActivePlayer;
     }
 
     /**
@@ -666,6 +678,31 @@ public class Game {
      */
     public void removeTaxPayer(User user) {
         taxPayers.remove(user);
+    }
+
+    /**
+     * Replace a User who leaves a lobby in Game with an AI
+     *
+     * @param userToReplace     The user who left the lobby and should be replace
+     * @param userToReplaceWith The AI that replace the user who left the lobby
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    public void replaceUser(UserOrDummy userToReplace, UserOrDummy userToReplaceWith) {
+        if (Objects.equals(getActivePlayer(), userToReplace)) setActivePlayer(userToReplaceWith);
+        players.replace(userToReplace, userToReplaceWith);
+        pauseGameMap.remove(userToReplace);
+        pauseGameMap.put(userToReplaceWith, true);
+        StartUpPhaseBuiltStructures build = playersStartUpBuiltMap.remove(userToReplace);
+        playersStartUpBuiltMap.put(userToReplaceWith, build);
+        for (int i = 0; i < startUpPlayerOrder.size(); i++) {
+            UserOrDummy user = startUpPlayerOrder.get(i);
+            if (Objects.equals(user, userToReplace)) {
+                startUpPlayerOrder.remove(user);
+                startUpPlayerOrder.add(i, userToReplaceWith);
+            }
+        }
     }
 
     /**

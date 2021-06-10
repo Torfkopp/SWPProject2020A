@@ -84,6 +84,7 @@ public class LobbyDTO implements ILobby {
      * @param startUpPhaseEnabled    The start up phase enabled
      * @param randomPlayFieldEnabled The random playfield enabled
      * @param maxTradeDiff           The maximum Resource difference
+     *
      * @author Temmo Junkhoff
      * @since 2021-05-04
      */
@@ -125,6 +126,16 @@ public class LobbyDTO implements ILobby {
     @Override
     public void setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
+    }
+
+    @Override
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
+    }
+
+    @Override
+    public void setMaxTradeDiff(int newTradeDiff) {
+        this.maxTradeDiff = newTradeDiff;
     }
 
     @Override
@@ -171,11 +182,6 @@ public class LobbyDTO implements ILobby {
     @Override
     public Map<UserOrDummy, Colour> getUserColourMap() {
         return userColours;
-    }
-
-    @Override
-    public void setUserColour(UserOrDummy user, Colour colour) {
-        userColours.put(user, colour);
     }
 
     @Override
@@ -256,8 +262,22 @@ public class LobbyDTO implements ILobby {
     }
 
     @Override
+    public void replaceUser(UserOrDummy userToReplace, UserOrDummy userToReplaceWith, Colour oldColour) {
+        users.remove(userToReplace);
+        users.add(userToReplaceWith);
+        readyUsers.remove(userToReplace);
+        readyUsers.add(userToReplaceWith);
+        userColours.put(userToReplaceWith, oldColour);
+    }
+
+    @Override
     public void setHasPassword(boolean hasPassword) {
         this.hasPassword = hasPassword;
+    }
+
+    @Override
+    public void setUserColour(UserOrDummy user, Colour colour) {
+        userColours.put(user, colour);
     }
 
     @Override
@@ -277,16 +297,5 @@ public class LobbyDTO implements ILobby {
                     "User " + user.getUsername() + " not found. Owner must be member of lobby!");
         }
         this.owner = user;
-    }
-
-    @Override
-    public int getMaxTradeDiff() {
-        return maxTradeDiff;
-    }
-
-    @Override
-    public void setMaxTradeDiff(int newTradeDiff) {
-        this.maxTradeDiff = newTradeDiff;
-
     }
 }

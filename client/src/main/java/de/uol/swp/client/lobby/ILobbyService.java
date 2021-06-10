@@ -16,6 +16,19 @@ import de.uol.swp.common.user.UserOrDummy;
 public interface ILobbyService {
 
     /**
+     * Posts a AddAIRequest to a specified lobby onto the EventBus
+     * in order to let an AI join the lobby
+     *
+     * @param name The name of the lobby
+     * @param ai   The AI to join the lobby
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Mario Fokken
+     * @since 2021-05-21
+     */
+    void addAI(LobbyName name, AI ai);
+
+    /**
      * Posts a request to change the owner status of a user in a lobby
      *
      * @param lobbyName The name of the lobby the user wants to change the owner
@@ -59,19 +72,6 @@ public interface ILobbyService {
      * @since 2019-11-20
      */
     void joinLobby(LobbyName name);
-
-    /**
-     * Posts a AddAIRequest to a specified lobby onto the EventBus
-     * in order to let an AI join the lobby
-     *
-     * @param name The name of the lobby
-     * @param ai   The AI to join the lobby
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     * @author Mario Fokken
-     * @since 2021-05-21
-     */
-    void addAI(LobbyName name, AI ai);
 
     /**
      * Posts a request to join a random lobby onto the EventBus
@@ -131,19 +131,14 @@ public interface ILobbyService {
     void removeFromAllLobbies();
 
     /**
-     * Posts a request to change a user's colour.
-     * If colour is null, the colour won't be changed,
-     * but the response will be sent nevertheless.
+     * This method request to replace the User who left a lobby with an AI
      *
-     * @param lobbyName The lobby's name
-     * @param colour    The colour the user desires
+     * @param lobbyName The name of the lobby the user gets replace with the AI
+     * @param oldColour The Colour of the User who left the lobby
      *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     * @author Mario Fokken
-     * @see de.uol.swp.common.lobby.request.SetColourRequest
-     * @since 2021-06-04
+     * @since 2021-06-10
      */
-    void setColour(LobbyName lobbyName, Colour colour);
+    void replaceUserWithAI(LobbyName lobbyName, Colour oldColour);
 
     /**
      * Posts a request to retrieve all lobby names
@@ -180,6 +175,21 @@ public interface ILobbyService {
     void returnToPreGameLobby(LobbyName lobbyName);
 
     /**
+     * Posts a request to change a user's colour.
+     * If colour is null, the colour won't be changed,
+     * but the response will be sent nevertheless.
+     *
+     * @param lobbyName The lobby's name
+     * @param colour    The colour the user desires
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.SetColourRequest
+     * @since 2021-06-04
+     */
+    void setColour(LobbyName lobbyName, Colour colour);
+
+    /**
      * Posts an event to show a Lobby Error alert with the provided message
      *
      * @param message The message to display
@@ -197,6 +207,7 @@ public interface ILobbyService {
      * @param moveTime               The maximum time of a move
      * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
      * @param maxTradeDiff
+     *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
      * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread

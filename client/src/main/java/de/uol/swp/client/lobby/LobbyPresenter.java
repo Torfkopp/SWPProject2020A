@@ -141,8 +141,10 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Handles a click on the LeaveLobby button
      * <p>
      * Method called when the leaveLobby button is pressed.
-     * If the leaveLobby button is pressed this method requests
-     * the lobby service to leave the lobby.
+     * If the leaveLobby button is pressed this method requests the lobby service
+     * through an ConfirmationAlert if the user wants to leave the lobby.
+     * If the User press Confirm while he is in a Lobby which is not in a Game, the User leaves the Lobby.
+     * If the User press Confirm while he is in a Lobby that is in a Game, he leaves the lobby and gets replaced by an AI.
      *
      * @since 2020-12-14
      */
@@ -159,8 +161,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         alert.getButtonTypes().setAll(lConfirm, lCancel);
         Optional<ButtonType> result = alert.showAndWait();
         //Result is the button the user has clicked on
-        if (result.get() == lConfirm) {
+        if (result.isPresent() && result.get() == lConfirm) {
             closeWindow(false);
+            lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser()));
         }
         soundService.button();
     }

@@ -30,8 +30,7 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.game.response.*;
 import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.lobby.LobbyName;
-import de.uol.swp.common.lobby.message.LobbyDeletedMessage;
-import de.uol.swp.common.lobby.message.StartSessionMessage;
+import de.uol.swp.common.lobby.message.*;
 import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
@@ -1316,6 +1315,47 @@ public class GameService extends AbstractService {
         ServerMessage msg = new RefreshCardAmountMessage(req.getOriginLobby(), req.getUser(), game.getCardAmounts());
         LOG.debug("Sending RefreshCardAmountMessage for Lobby {}", req.getOriginLobby());
         lobbyService.sendToAllInLobby(req.getOriginLobby(), msg);
+    }
+
+    /**
+     * Handles a ReplaceUserWithAIRequest found on the EventBus
+     * <p>
+     * If a PlayYearOfPlentyCardRequest is detected on the EventBus, this method is called.
+     * It then request the GameManagement to handle the Replace of an User who left a Lobby in Game with an AI.
+     * The Colour of the Player who left, remains as the Colour of the AI who replaced the User.
+     * The AI takes over the game from the moment the user leaves the game.
+     *
+     * @param req The ReplaceUserWithAIRequest found on the EventBus
+     *
+     * @author Eric Vuong
+     * @since 2021-06-10
+     */
+    @Subscribe
+    private void onReplaceUserWithAIRequest(ReplaceUserWithAIRequest req) {
+        LOG.debug("Received ReplaceUserWithAiRequest");
+        LobbyName originLobby = req.getOriginLobby();
+        Game game = gameManagement.getGame(originLobby);
+        if (game == null) return;
+        UserOrDummy activePlayer = game.getActivePlayer();
+        AIDTO userToReplaceWith = new AIDTO(AI.Difficulty.EASY);
+        game.replaceUser(req.getUserToReplace(), userToReplaceWith);
+        Optional<ILobby> lobby = lobbyManagement.getLobby(originLobby);
+        if (lobby.isPresent()) {
+            lobby.get().replaceUser(req.getUserToReplace(), userToReplaceWith, req.getOldColour());
+            ServerMessage message = new UserJoinedLobbyMessage(originLobby, userToReplaceWith);
+            lobbyService.sendToAllInLobby(originLobby, message);
+            if (Objects.equals(req.getUserToReplace(), activePlayer)) {
+                if (!game.isDiceRolledAlready()) onRollDiceRequest(new RollDiceRequest(userToReplaceWith, originLobby));
+                if (game.getTaxPayers().contains((User) req.getUserToReplace())) {
+                    gameAI.taxPayAI(game, userToReplaceWith);
+                    onRobberTaxChosenRequest(
+                            new RobberTaxChosenRequest(new ResourceList(), (User) req.getUserToReplace(), originLobby));
+                }
+                gameAI.turnAI(game, userToReplaceWith);
+            }
+            lobbyService.sendToAllInLobby(originLobby, new ColourChangedMessage(originLobby, userToReplaceWith,
+                                                                                lobby.get().getUserColourMap()));
+        }
     }
 
     /**

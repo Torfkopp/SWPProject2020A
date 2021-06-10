@@ -119,4 +119,9 @@ public class AsyncLobbyService implements ILobbyService {
     public void userReady(LobbyName lobbyName, boolean isReady) {
         ThreadManager.runNow(() -> syncLobbyService.userReady(lobbyName, isReady));
     }
+
+    @Override
+    public void replaceUserWithAI(LobbyName lobbyName, Colour oldColour) {
+        ThreadManager.runNow(() -> syncLobbyService.replaceUserWithAI(lobbyName, oldColour));
+    }
 }
