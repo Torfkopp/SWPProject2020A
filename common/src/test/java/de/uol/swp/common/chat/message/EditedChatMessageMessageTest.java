@@ -12,26 +12,21 @@ class EditedChatMessageMessageTest {
     private final ChatMessage mockedChatMessage = mock(ChatMessage.class);
 
     @Test
-    void getLobbyName() {
-        LobbyName lobbyName = new LobbyName("test");
-        EditedChatMessageMessage msg = new EditedChatMessageMessage(mockedChatMessage, lobbyName);
-
-        assertTrue(msg.isLobbyChatMessage());
-        assertEquals(lobbyName, msg.getLobbyName());
-    }
-
-    @Test
     void getLobbyName_isNull() {
         EditedChatMessageMessage msg = new EditedChatMessageMessage(mockedChatMessage);
 
         assertFalse(msg.isLobbyChatMessage());
         assertNull(msg.getLobbyName());
+        assertEquals(mockedChatMessage, msg.getMsg());
     }
 
     @Test
-    void getMsg() {
-        EditedChatMessageMessage msg = new EditedChatMessageMessage(mockedChatMessage);
+    void testEditedChatMessageMessage() {
+        LobbyName lobbyName = new LobbyName("test");
+        EditedChatMessageMessage msg = new EditedChatMessageMessage(mockedChatMessage, lobbyName);
 
+        assertTrue(msg.isLobbyChatMessage());
+        assertEquals(lobbyName, msg.getLobbyName());
         assertEquals(mockedChatMessage, msg.getMsg());
     }
 }

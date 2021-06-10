@@ -12,15 +12,6 @@ class CreatedChatMessageMessageTest {
     private final ChatMessage mockedChatMessage = mock(ChatMessage.class);
 
     @Test
-    void getLobbyName() {
-        LobbyName lobbyName = new LobbyName("test lobby");
-        CreatedChatMessageMessage msg = new CreatedChatMessageMessage(mockedChatMessage, lobbyName);
-
-        assertTrue(msg.isLobbyChatMessage());
-        assertEquals(lobbyName, msg.getLobbyName());
-    }
-
-    @Test
     void getLobbyName_isNull() {
         CreatedChatMessageMessage msg = new CreatedChatMessageMessage(mockedChatMessage);
 
@@ -29,9 +20,12 @@ class CreatedChatMessageMessageTest {
     }
 
     @Test
-    void getMsg() {
-        CreatedChatMessageMessage msg = new CreatedChatMessageMessage(mockedChatMessage);
+    void testCreatedChatMessageMessage() {
+        LobbyName lobbyName = new LobbyName("test lobby");
+        CreatedChatMessageMessage msg = new CreatedChatMessageMessage(mockedChatMessage, lobbyName);
 
+        assertTrue(msg.isLobbyChatMessage());
+        assertEquals(lobbyName, msg.getLobbyName());
         assertEquals(mockedChatMessage, msg.getMsg());
     }
 }
