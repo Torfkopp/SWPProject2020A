@@ -5,44 +5,49 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" fillWidth="false" spacing="15.0"
       xmlns="http://javafx.com/javafx/11.0.1" id="changePropertiesView"
       fx:controller="de.uol.swp.client.changeProperties.ChangePropertiesPresenter">
-    <HBox spacing="10.0">
+    <HBox spacing="30.0">
         <VBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
-                   text="%changeproperties.labels.theme">
-                <labelFor>
-                    <ComboBox fx:id="themeBox" promptText="%changeproperties.combobox.theme"/>
-                </labelFor>
-            </Label>
-            <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
-                   text="%changeproperties.labels.language">
-                <labelFor>
-                    <ComboBox fx:id="languageBox" promptText="%changeproperties.combobox.language"/>
-                </labelFor>
-            </Label>
+            <HBox>
+                <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                       text="%changeproperties.labels.theme">
+                    <labelFor>
+                        <ComboBox fx:id="themeBox" promptText="%changeproperties.combobox.theme" prefHeight="25.0"/>
+                    </labelFor>
+                </Label>
+            </HBox>
+            <HBox>
+                <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
+                       text="%changeproperties.labels.language">
+                    <labelFor>
+                        <ComboBox fx:id="languageBox" promptText="%changeproperties.combobox.language"
+                                  prefHeight="25.0"/>
+                    </labelFor>
+                </Label>
+            </HBox>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.loginlogoutmsg">
                 <labelFor>
-                    <ComboBox fx:id="loginLogoutMsgBox" promptText="%changeproperties.combobox.loginlogoutmsg"/>
+                    <CheckBox fx:id="loginLogoutMsgBox" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.createdeletelobbymsg">
                 <labelFor>
-                    <ComboBox fx:id="createDeleteLobbyMsgBox"
-                              promptText="%changeproperties.combobox.createdeletelobbymsg"/>
+                    <CheckBox fx:id="createDeleteLobbyMsgBox"
+                              prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.joinleavelobbymsg">
                 <labelFor>
-                    <ComboBox fx:id="joinLeaveLobbyMsgBox" promptText="%changeproperties.combobox.joinleavelobbymsg"/>
+                    <CheckBox fx:id="joinLeaveLobbyMsgBox" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.ownerrdynotification">
                 <labelFor>
-                    <ComboBox fx:id="ownerRdyNotificationBox"
-                              promptText="%changeproperties.combobox.ownerrdynotification"/>
+                    <CheckBox fx:id="ownerRdyNotificationBox"
+                              prefHeight="25.0"/>
                 </labelFor>
             </Label>
         </VBox>
@@ -59,43 +64,40 @@
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.ownertransfernotification">
                 <labelFor>
-                    <ComboBox fx:id="ownerTransferNotificationBox"
-                              promptText="%changeproperties.combobox.ownertransfernotification"/>
+                    <CheckBox fx:id="ownerTransferNotificationBox" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.soundpack">
                 <labelFor>
                     <ComboBox fx:id="soundpackBox"
-                              promptText="%changeproperties.combobox.soundpack"/>
+                              promptText="%changeproperties.combobox.soundpack" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.volume">
                 <labelFor>
-                    <TextField fx:id="volumeField"
-                               promptText="%changeproperties.textfield.volume"/>
+                    <TextField fx:id="volumeField" promptText="%changeproperties.textfield.volume" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.backgroundvolume">
                 <labelFor>
                     <TextField fx:id="backgroundVolumeField"
-                               promptText="%changeproperties.textfield.backgroundvolume"/>
+                               promptText="%changeproperties.textfield.backgroundvolume" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.gridhitboxes">
                 <labelFor>
-                    <ComboBox fx:id="gridHitboxesBox"
-                              promptText="%changeproperties.combobox.gridhitboxes"/>
+                    <CheckBox fx:id="gridHitboxesBox" prefHeight="25.0"/>
                 </labelFor>
             </Label>
             <Label mnemonicParsing="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0"
                    text="%changeproperties.labels.loglevel">
                 <labelFor>
                     <ComboBox fx:id="loglevelBox"
-                              promptText="%changeproperties.combobox.loglevel"/>
+                              promptText="%changeproperties.combobox.loglevel" prefHeight="25.0"/>
                 </labelFor>
             </Label>
         </VBox>

@@ -6,6 +6,7 @@ import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
 import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
 import de.uol.swp.client.changeProperties.event.SetVolumeErrorEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
@@ -28,15 +29,15 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
     @FXML
     private ComboBox<String> languageBox;
     @FXML
-    private ComboBox<String> loginLogoutMsgBox;
+    private CheckBox loginLogoutMsgBox;
     @FXML
-    private ComboBox<String> createDeleteLobbyMsgBox;
+    private CheckBox createDeleteLobbyMsgBox;
     @FXML
-    private ComboBox<String> joinLeaveLobbyMsgBox;
+    private CheckBox joinLeaveLobbyMsgBox;
     @FXML
-    private ComboBox<String> ownerRdyNotificationBox;
+    private CheckBox ownerRdyNotificationBox;
     @FXML
-    private ComboBox<String> ownerTransferNotificationBox;
+    private CheckBox ownerTransferNotificationBox;
     @FXML
     private ComboBox<String> soundpackBox;
     @FXML
@@ -44,7 +45,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
     @FXML
     private TextField backgroundVolumeField;
     @FXML
-    private ComboBox<String> gridHitboxesBox;
+    private CheckBox gridHitboxesBox;
     @FXML
     private ComboBox<String> loglevelBox;
 
@@ -54,13 +55,13 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
         languageBox.getItems()
                    .addAll("Deutsch - Du", "Deutsch - Sie", "English", "Blind", "Blank", "Hearing-Impaired", "Improved",
                            "lowercase", "UwU Engwish");
-        loginLogoutMsgBox.getItems().addAll("On", "Off");
-        createDeleteLobbyMsgBox.getItems().addAll("On", "Off");
-        joinLeaveLobbyMsgBox.getItems().addAll("On", "Off");
-        ownerRdyNotificationBox.getItems().addAll("On", "Off");
-        ownerTransferNotificationBox.getItems().addAll("On", "Off");
+        loginLogoutMsgBox.setSelected(Boolean.parseBoolean(preferences.get("login_logout_msgs_on", "")));
+        createDeleteLobbyMsgBox.setSelected(Boolean.parseBoolean(preferences.get("lobby_create_delete_msgs_on", "")));
+        joinLeaveLobbyMsgBox.setSelected(Boolean.parseBoolean(preferences.get("join_leave_msgs_on", "")));
+        ownerRdyNotificationBox.setSelected(Boolean.parseBoolean(preferences.get("owner_ready_notifs_on", "")));
+        ownerTransferNotificationBox.setSelected(Boolean.parseBoolean(preferences.get("owner_transfer_notifs_on", "")));
         soundpackBox.getItems().addAll("Default", "Classic", "Cursed");
-        gridHitboxesBox.getItems().addAll("On", "Off");
+        gridHitboxesBox.setSelected(Boolean.parseBoolean(preferences.get("debug.draw_hitbox_grid", "")));
         loglevelBox.getItems().addAll("ALL", "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF");
     }
 
@@ -92,13 +93,7 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
         soundService.button();
         String theme = themeBox.getValue();
         String language = languageBox.getValue();
-        String loginLogoutMsg = loginLogoutMsgBox.getValue();
-        String createDeleteLobbyMsg = createDeleteLobbyMsgBox.getValue();
-        String joinLeaveLobbyMsg = joinLeaveLobbyMsgBox.getValue();
-        String ownerRdyNotification = ownerRdyNotificationBox.getValue();
-        String ownerTransferNotification = ownerTransferNotificationBox.getValue();
         String soundpack = soundpackBox.getValue();
-        String gridHitboxes = gridHitboxesBox.getValue();
         String loglevel = loglevelBox.getValue();
         if (theme != null) preferences.put("theme", theme.toLowerCase());
         if (language != null) {
@@ -132,33 +127,11 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
                     break;
             }
         }
-        if (loginLogoutMsg != null) {
-            preferences.putBoolean("login_logout_msgs_on", loginLogoutMsgBox.getValue().equals("On"));
-        }
-        if (createDeleteLobbyMsg != null) {
-            preferences.putBoolean("lobby_create_delete_msgs_on", createDeleteLobbyMsgBox.getValue().equals("On"));
-        }
-        if (joinLeaveLobbyMsg != null) {
-            if (joinLeaveLobbyMsgBox.getValue().equals("On")) {
-                preferences.put("join_leave_msgs_on", "true");
-            } else if (joinLeaveLobbyMsgBox.getValue().equals("Off")) {
-                preferences.put("join_leave_msgs_on", "false");
-            }
-        }
-        if (ownerRdyNotification != null) {
-            if (ownerRdyNotificationBox.getValue().equals("On")) {
-                preferences.put("owner_ready_notifs_on", "true");
-            } else if (ownerRdyNotificationBox.getValue().equals("Off")) {
-                preferences.put("owner_ready_notifs_on", "false");
-            }
-        }
-        if (ownerTransferNotification != null) {
-            if (ownerTransferNotificationBox.getValue().equals("On")) {
-                preferences.put("owner_transfer_notifs_on", "true");
-            } else if (ownerTransferNotificationBox.getValue().equals("Off")) {
-                preferences.put("owner_transfer_notifs_on", "false");
-            }
-        }
+        preferences.putBoolean("login_logout_msgs_on", loginLogoutMsgBox.isSelected());
+        preferences.putBoolean("lobby_create_delete_msgs_on", createDeleteLobbyMsgBox.isSelected());
+        preferences.putBoolean("join_leave_msgs_on", joinLeaveLobbyMsgBox.isSelected());
+        preferences.putBoolean("owner_ready_notifs_on", ownerRdyNotificationBox.isSelected());
+        preferences.putBoolean("owner_transfer_notifs_on", ownerTransferNotificationBox.isSelected());
         if (soundpack != null) preferences.put("soundpack", soundpack.toLowerCase());
         if (!volumeField.getText().equals("")) {
             try {
@@ -186,14 +159,10 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
                 return;
             }
         }
-        if (gridHitboxes != null) {
-            if (gridHitboxesBox.getValue().equals("On")) {
-                preferences.put("debug.draw_hitbox_grid", "true");
-            } else if (gridHitboxesBox.getValue().equals("Off")) {
-                preferences.put("debug.draw_hitbox_grid", "false");
-            }
+        preferences.putBoolean("debug.draw_hitbox_grid", gridHitboxesBox.isSelected());
+        if (loglevel != null) {
+            preferences.put("debug.loglevel", loglevel);
         }
-        if (loglevel != null) preferences.put("debug.loglevel", loglevel);
         post(new ChangePropertiesSuccessfulEvent());
     }
 }
