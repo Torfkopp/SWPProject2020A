@@ -28,18 +28,11 @@ class AskLatestChatMessageResponseTest {
     protected void setUp() {
         history.add(message1);
         history.add(message2);
-        response = new AskLatestChatMessageResponse(history, lobbyName);
     }
 
     @AfterEach
     protected void tearDown() {
         history.clear();
-        response = null;
-    }
-
-    @Test
-    void getChatHistory() {
-        assertEquals(history, response.getChatHistory());
     }
 
     @Test
@@ -47,11 +40,15 @@ class AskLatestChatMessageResponseTest {
         response = new AskLatestChatMessageResponse(history);
 
         assertNull(response.getLobbyName());
+        assertNull(response.getLobbyName());
         assertEquals(history, response.getChatHistory());
     }
 
     @Test
-    void getLobbyName() {
+    void testAskLatestChatMessageResponse() {
+        response = new AskLatestChatMessageResponse(history, lobbyName);
+
         assertEquals(lobbyName, response.getLobbyName());
+        assertEquals(history, response.getChatHistory());
     }
 }

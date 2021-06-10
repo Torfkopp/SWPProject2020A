@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 class SystemMessageMessageTest {
 
     @Test
-    void getMsg() {
+    void testSystemMessage() {
         LobbyName lobbyName = new LobbyName("test");
         SystemMessage systemMessage = mock(SystemMessage.class);
         SystemMessageMessage message = new SystemMessageMessage(lobbyName, systemMessage);
