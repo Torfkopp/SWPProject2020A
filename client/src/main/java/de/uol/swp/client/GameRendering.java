@@ -393,7 +393,6 @@ public class GameRendering {
      * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawHex(String type, double currentX, double currentY) {
-        //TODO Change me maybe
         double[] xCords = {currentX, currentX + hexWidth / 2, currentX + hexWidth, currentX + hexWidth,
                            currentX + hexWidth / 2, currentX};
         double[] yCords = {currentY + (hexHeight / 4), currentY, currentY + (hexHeight / 4),
