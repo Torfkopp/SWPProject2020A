@@ -104,7 +104,7 @@
                <Button fx:id="maxTradeChangeButton" onAction="#prepareLobbyUpdate" prefHeight="25.0" prefWidth="98.0" text="%game.trade.change.max.diff.button" />
             </children>
          </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                 <ComboBox fx:id="colourComboBox" promptText="%colours.boxtext" prefHeight="25.0" prefWidth="140.0"/>
                 <Button mnemonicParsing="false" onAction="#onColourChangeButtonPressed" prefHeight="25.0"
                         prefWidth="90.0" text="%colours.button"/>

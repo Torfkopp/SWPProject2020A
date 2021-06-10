@@ -639,6 +639,14 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 };
             }
         });
+        colourComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Colour item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) setText(resourceBundle.getString("colours." + item));
+                else setText(null);
+            }
+        });
     }
 
     /**
