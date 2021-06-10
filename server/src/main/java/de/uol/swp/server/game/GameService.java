@@ -319,12 +319,12 @@ public class GameService extends AbstractService {
     }
 
     /**
-     * Helper method to realize a dummies turn in the founder phase
+     * Helper method to realise a dummies turn in the founder phase
      * Checks whether the next player in the founding phase player queue is a dummy
      * and builds the founding settlement and road accordingly.
      *
-     * @param game the game, the dummy is in
-     * @param npc  the player whose turn the next one is
+     * @param game The game, the dummy is in
+     * @param npc  The player whose turn the next one is
      *
      * @author Sven Ahrens
      * @since 2021-05-22

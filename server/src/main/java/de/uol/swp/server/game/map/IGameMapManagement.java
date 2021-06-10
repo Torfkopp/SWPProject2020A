@@ -280,8 +280,8 @@ public interface IGameMapManagement {
     /**
      * Builds a Settlement on a random Intersection during the Founding Phase
      *
-     * @param game       the game, the lobby is set in
-     * @param nextPlayer the dummy, whose about to place a random Settlement
+     * @param game       The game, the lobby is set in
+     * @param nextPlayer The dummy, whose about to place a random Settlement
      *
      * @return an array of random Integers, that are used as Coordinates for building Roads.
      * The element at position [0] is the Y Coordinate, the element at position[1] the X Coordinate.
