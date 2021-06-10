@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
@@ -39,10 +40,6 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  */
 public class GameRendering {
 
-    public static final Color PLAYER_1_COLOUR = Color.BLUE;
-    public static final Color PLAYER_2_COLOUR = Color.RED;
-    public static final Color PLAYER_3_COLOUR = Color.rgb(255, 69, 0);
-    public static final Color PLAYER_4_COLOUR = Color.rgb(255, 127, 124);
     //Constants used for the colours
     private static final Color TOKEN_COLOUR = Color.BEIGE;
     private static final Color TEXT_COLOUR = Color.BLACK;
@@ -58,6 +55,11 @@ public class GameRendering {
     private static final Color PASTURE_COLOUR = Color.rgb(197, 240, 103);
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
+
+    public static Color PLAYER_1_COLOUR = Color.BLACK;
+    public static Color PLAYER_2_COLOUR = Color.BLACK;
+    public static Color PLAYER_3_COLOUR = Color.BLACK;
+    public static Color PLAYER_4_COLOUR = Color.BLACK;
 
     @Inject
     private static ResourceBundle resourceBundle;
@@ -176,6 +178,36 @@ public class GameRendering {
                         timer.cancel();
                     }
                 }, 1500);
+            }
+        }
+    }
+
+    /**
+     * Sets the player's colours according
+     * to the given map
+     *
+     * @param playerColourMap Map of player and the colour
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    public void setPlayerColours(Map<Player, Colour> playerColourMap) {
+        int[] colour;
+        for (Player p : playerColourMap.keySet()) {
+            colour = playerColourMap.get(p).getColourCode();
+            switch (p) {
+                case PLAYER_1:
+                    PLAYER_1_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_2:
+                    PLAYER_2_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_3:
+                    PLAYER_3_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_4:
+                    PLAYER_4_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
             }
         }
     }

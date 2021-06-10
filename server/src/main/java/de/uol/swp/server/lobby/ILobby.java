@@ -1,11 +1,13 @@
 package de.uol.swp.server.lobby;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.SimpleLobby;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -129,6 +131,27 @@ public interface ILobby extends Serializable {
      * @since 2021-03-13
      */
     Set<User> getRealUsers();
+
+    /**
+     * Gets a map of UserOrDummies and their chosen colour
+     *
+     * @return A map containing UserOrDummies and their chosen colour
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    Map<UserOrDummy, Colour> getUserColourMap();
+
+    /**
+     * Sets the user's colour to the desired one
+     *
+     * @param user   The user wanting to change the colour
+     * @param colour The chosen colour
+     *
+     * @author Mario Fokken
+     * @since 2012-06-02
+     */
+    void setUserColour(UserOrDummy user, Colour colour);
 
     /**
      * Gets all users and dummies in the lobby
