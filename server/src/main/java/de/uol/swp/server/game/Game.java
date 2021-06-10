@@ -51,6 +51,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
+    private final int maxTradeDiff;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -69,6 +70,7 @@ public class Game {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
+        this.maxTradeDiff = getLobby().getMaxTradeDiff();
         playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
@@ -325,6 +327,15 @@ public class Game {
      */
     public IGameMapManagement getMap() {
         return map;
+    }
+
+    /**
+     * Gets this game's maximum resource difference
+     *
+     * @return The Game's maximum resource difference
+     */
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
     }
 
     /**

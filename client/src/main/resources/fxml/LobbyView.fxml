@@ -1,97 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.TextFlow?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" id="lobbyPane" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1"
-          fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
+<?import javafx.scene.text.*?>
+
+<GridPane id="lobbyPane" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uol.swp.client.lobby.LobbyPresenter">
     <columnConstraints>
-        <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0"/>
-        <ColumnConstraints hgrow="SOMETIMES"/>
-        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
-        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0"/>
-        <ColumnConstraints fx:id="helpColumn" hgrow="NEVER" maxWidth="200" minWidth="0" prefWidth="0"/>
+        <ColumnConstraints hgrow="NEVER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0" />
+        <ColumnConstraints hgrow="SOMETIMES" />
+        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" />
+        <ColumnConstraints hgrow="NEVER" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" />
+        <ColumnConstraints fx:id="helpColumn" hgrow="NEVER" maxWidth="200" minWidth="0" prefWidth="0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints maxHeight="25" minHeight="25.0" vgrow="ALWAYS"/>
-        <RowConstraints maxHeight="1337.0" minHeight="825.0" percentHeight="100.0" prefHeight="1330.0" vgrow="ALWAYS"/>
+        <RowConstraints maxHeight="25" minHeight="25.0" vgrow="ALWAYS" />
+        <RowConstraints maxHeight="1337.0" minHeight="825.0" percentHeight="100.0" prefHeight="1330.0" vgrow="ALWAYS" />
     </rowConstraints>
 
     <VBox maxWidth="400.0" spacing="10.0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
         <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="380.0" spacing="5.0" VBox.vgrow="ALWAYS">
-            <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0"/>
-            <ListView fx:id="uniqueCardView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
-                      visible="false"/>
-            <ListView fx:id="chatView" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
+            <ListView fx:id="membersView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0" />
+            <ListView fx:id="uniqueCardView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0" visible="false" />
+            <ListView fx:id="chatView" maxHeight="Infinity" VBox.vgrow="ALWAYS" />
             <TextField fx:id="messageField" onAction="#onSendMessageButtonPressed">
                 <VBox.margin>
-                    <Insets top="-5.0"/>
+                    <Insets top="-5.0" />
                 </VBox.margin>
             </TextField>
-            <Button onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.sendmessage"/>
-            <Button onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.deletemessage"/>
-            <Button onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage"/>
+            <Button onAction="#onSendMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.sendmessage" />
+            <Button onAction="#onDeleteMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.deletemessage" />
+            <Button onAction="#onEditMessageButtonPressed" prefWidth="150.0" text="%chat.buttons.editmessage" />
         </VBox>
         <VBox minHeight="150.0" spacing="5.0">
-            <Button fx:id="kickUserButton" onAction="#onKickUserButtonPressed" prefHeight="25.0" prefWidth="150.0"
-                    text="%lobby.buttons.kickuser" visible="false"/>
-            <Button fx:id="changeOwnerButton" onAction="#onChangeOwnerButtonPressed" prefWidth="150.0"
-                    text="%lobby.buttons.changeowner" textAlignment="CENTER" visible="false" wrapText="true"/>
-            <Button onAction="#onLeaveLobbyButtonPressed" prefHeight="25.0" prefWidth="150.0"
-                    text="%lobby.buttons.leavelobby"/>
+            <Button fx:id="kickUserButton" onAction="#onKickUserButtonPressed" prefHeight="25.0" prefWidth="150.0" text="%lobby.buttons.kickuser" visible="false" />
+            <Button fx:id="changeOwnerButton" onAction="#onChangeOwnerButtonPressed" prefWidth="150.0" text="%lobby.buttons.changeowner" textAlignment="CENTER" visible="false" wrapText="true" />
+            <Button onAction="#onLeaveLobbyButtonPressed" prefHeight="25.0" prefWidth="150.0" text="%lobby.buttons.leavelobby" />
         </VBox>
         <padding>
-            <Insets topRightBottomLeft="10.0"/>
+            <Insets topRightBottomLeft="10.0" />
         </padding>
     </VBox>
 
-    <VBox alignment="TOP_CENTER" spacing="10" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
-          GridPane.vgrow="ALWAYS">
-        <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
-                text="%game.won.button.returnPreLobby" visible="false"/>
-        <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas"/>
+    <VBox alignment="TOP_CENTER" spacing="10" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+        <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0" text="%game.won.button.returnPreLobby" visible="false" />
+        <Canvas fx:id="gameMapCanvas" onMouseClicked="#onMouseClickedOnCanvas" />
         <padding>
-            <Insets topRightBottomLeft="10.0"/>
+            <Insets topRightBottomLeft="10.0" />
         </padding>
     </VBox>
 
     <VBox prefWidth="250.0" spacing="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-        <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="316.0" prefWidth="230.0"
-              spacing="10.0">
-            <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true"
-                   prefHeight="25.0">
+        <VBox fx:id="preGameSettingBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="316.0" prefWidth="230.0" spacing="10.0">
+            <Label fx:id="moveTimeLabel" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="true" prefHeight="25.0">
                 <labelFor>
-                    <TextField fx:id="moveTimeTextField" onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                               prefWidth="80.0"/>
+                    <TextField fx:id="moveTimeTextField" onAction="#prepareLobbyUpdate" prefHeight="25.0" prefWidth="80.0" />
                 </labelFor>
             </Label>
             <HBox spacing="5.0">
-                <fx:reference source="moveTimeTextField"/>
-                <Button fx:id="changeMoveTimeButton" disable="true" onAction="#prepareLobbyUpdate"
-                        text="%lobby.buttons.changemovetime"/>
+                <fx:reference source="moveTimeTextField" />
+                <Button fx:id="changeMoveTimeButton" disable="true" onAction="#prepareLobbyUpdate" text="%lobby.buttons.changemovetime" />
                 <VBox.margin>
-                    <Insets top="-10.0"/>
+                    <Insets top="-10.0" />
                 </VBox.margin>
             </HBox>
-            <CheckBox fx:id="setStartUpPhaseCheckBox" maxHeight="-Infinity" minHeight="-Infinity"
-                      onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.startupphase"/>
-            <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity"
-                      onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.randomplayfield"/>
+            <CheckBox fx:id="setStartUpPhaseCheckBox" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.startupphase" />
+            <CheckBox fx:id="randomPlayFieldCheckbox" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.checkboxes.randomplayfield" />
             <HBox spacing="5.0">
-                <RadioButton fx:id="threePlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                             onAction="#prepareLobbyUpdate" prefHeight="25.0" selected="true"
-                             text="%lobby.radio.threeplayers">
+                <RadioButton fx:id="threePlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" selected="true" text="%lobby.radio.threeplayers">
                     <toggleGroup>
-                        <ToggleGroup fx:id="maxPlayersToggleGroup"/>
+                        <ToggleGroup fx:id="maxPlayersToggleGroup" />
                     </toggleGroup>
                 </RadioButton>
-                <RadioButton fx:id="fourPlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                             onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.radio.fourplayers">
+                <RadioButton fx:id="fourPlayerRadioButton" maxHeight="-Infinity" minHeight="-Infinity" onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.radio.fourplayers">
                     <toggleGroup>
-                        <fx:reference source="maxPlayersToggleGroup"/>
+                        <fx:reference source="maxPlayersToggleGroup" />
                     </toggleGroup>
                 </RadioButton>
             </HBox>
@@ -100,23 +84,26 @@
                 <CheckBox fx:id="talkingAICheckBox" mnemonicParsing="false" onAction="#prepareLobbyUpdate"
                           text="%lobby.ai.checkbox"/>
                 <HBox spacing="5.0">
-                    <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity"
-                                 mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0"
-                                 selected="true" text="%lobby.ai.easy">
+                    <RadioButton fx:id="easyAIRadioButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0" selected="true" text="%lobby.ai.easy">
                         <toggleGroup>
-                            <ToggleGroup fx:id="difficultyAIToggleGroup"/>
+                            <ToggleGroup fx:id="difficultyAIToggleGroup" />
                         </toggleGroup>
                     </RadioButton>
-                    <RadioButton maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
-                                 onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.ai.hard">
+                    <RadioButton maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#prepareLobbyUpdate" prefHeight="25.0" text="%lobby.ai.hard">
                         <toggleGroup>
-                            <fx:reference source="difficultyAIToggleGroup"/>
+                            <fx:reference source="difficultyAIToggleGroup" />
                         </toggleGroup>
                     </RadioButton>
                 </HBox>
-                <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0"
-                        text="%lobby.buttons.addai"/>
+                <Button onAction="#onAddAIButtonPressed" prefHeight="45.0" prefWidth="230.0" text="%lobby.buttons.addai" />
             </VBox>
+         <Label fx:id="maxTradeDiffLabel" prefHeight="17.0" prefWidth="234.0" text="%game.trade.change.select.diff" />
+         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+            <children>
+               <TextField fx:id="maxTradeDiffTextField" prefHeight="25.0" prefWidth="131.0" promptText="%game.trade.change.max.diff" />
+               <Button fx:id="maxTradeChangeButton" onAction="#prepareLobbyUpdate" prefHeight="25.0" prefWidth="98.0" text="%game.trade.change.max.diff.button" />
+            </children>
+         </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                 <ComboBox fx:id="colourComboBox" promptText="%colours.boxtext" prefHeight="25.0" prefWidth="140.0"/>
                 <Button mnemonicParsing="false" onAction="#onColourChangeButtonPressed" prefHeight="25.0"
@@ -124,8 +111,7 @@
             </HBox>
         </VBox>
 
-        <TableView fx:id="resourceTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
-                   prefWidth="230.0" visible="false">
+        <TableView fx:id="resourceTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0" prefWidth="230.0" visible="false">
             <columns>
                 <TableColumn fx:id="resourceAmountCol" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0"
                              resizable="false" text="%game.inventories.amountcol"/>
@@ -133,12 +119,11 @@
                              minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.resourcecol"/>
             </columns>
             <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
 
-        <TableView fx:id="developmentCardTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0"
-                   prefWidth="230.0" visible="false">
+        <TableView fx:id="developmentCardTableView" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="0.0" prefWidth="230.0" visible="false">
             <columns>
                 <TableColumn fx:id="developmentCardAmountCol" editable="false" maxWidth="75.0" minWidth="75.0"
                              prefWidth="75.0" resizable="false" text="%game.inventories.amountcol"/>
@@ -146,7 +131,7 @@
                              minWidth="-Infinity" prefWidth="-1.0" text="%game.inventories.cardcol"/>
             </columns>
             <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
 
@@ -181,14 +166,14 @@
                prefWidth="230" text="%game.robber.position" visible="false" wrapText="true"/>
         <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>
         <padding>
-            <Insets topRightBottomLeft="10.0"/>
+            <Insets topRightBottomLeft="10.0" />
         </padding>
     </VBox>
 
     <ToolBar prefHeight="35.0" GridPane.columnSpan="3">
         <Button text="%lobby.menu.settings"/>
         <Button onAction="#onRulesMenuClicked" text="%lobby.menu.rules">
-            <MenuItem text="%lobby.menu.rules.overview"/>
+            <MenuItem text="%lobby.menu.rules.overview" />
         </Button>
         <!--fixme needs parsing-->
         <Button fx:id="pauseButton" onAction="#onPauseButtonPressed" text="%game.menu.pause" visible="false"/>

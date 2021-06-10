@@ -155,6 +155,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
     protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
     protected Map<UserOrDummy, Colour> userColoursMap = null;
+    protected int maxTradeDiff;
 
     @Inject
     private ITradeService tradeService;
