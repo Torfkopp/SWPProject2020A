@@ -24,6 +24,7 @@ import de.uol.swp.server.game.map.IGameMapManagement;
 import de.uol.swp.server.lobby.LobbyService;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static de.uol.swp.common.game.message.BuildingSuccessfulMessage.Type.*;
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
@@ -42,8 +43,6 @@ public class GameAI {
 
     private final Map<AI, List<IHarbourHex.HarbourResource>> harbours = new HashMap<>();
     private final Map<Game, Map<MapPoint, Integer>> aiBuildPriority = new HashMap<>();
-
-
 
     /**
      * Constructor
@@ -840,38 +839,24 @@ public class GameAI {
         LobbyName lobbyName = game.getLobby().getName();
         Inventory inv = game.getInventory(ai);
 
-        /**
-         * Local class
-         *
-         * @author Mario Fokken
-         * @since 2021-05-13
-         */
-        class randomResource {
+        Supplier<ResourceType> getRandomResource = () -> {
 
-            /**
-             * Returns a random resource
-             *
-             * @return random Resource
-             */
-            private ResourceType getRandomResource() {
-                switch ((int) (Math.random() * 4)) {
-                    case 0:
-                        return BRICK;
-                    case 1:
-                        return GRAIN;
-                    case 2:
-                        return LUMBER;
-                    case 3:
-                        return ORE;
-                    default:
-                        return WOOL;
-                }
+            switch ((int) (Math.random() * 4)) {
+                case 0:
+                    return BRICK;
+                case 1:
+                    return GRAIN;
+                case 2:
+                    return LUMBER;
+                case 3:
+                    return ORE;
+                default:
+                    return WOOL;
             }
-        }
-        randomResource r = new randomResource();
+        };
 
         if (cards.getAmount(DevelopmentCardType.MONOPOLY_CARD) > 0) {
-            playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, r.getRandomResource(), null);
+            playCardAI(game, ai, DevelopmentCardType.MONOPOLY_CARD, getRandomResource.get(), null);
             return;
         }
         if (cards.getAmount(DevelopmentCardType.ROAD_BUILDING_CARD) > 0) {
@@ -906,7 +891,8 @@ public class GameAI {
             return;
         }
         if (cards.getAmount(DevelopmentCardType.YEAR_OF_PLENTY_CARD) > 0) {
-            playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, r.getRandomResource(), r.getRandomResource());
+            playCardAI(game, ai, DevelopmentCardType.YEAR_OF_PLENTY_CARD, getRandomResource.get(),
+                       getRandomResource.get());
             return;
         }
         if (cards.getAmount(DevelopmentCardType.KNIGHT_CARD) > 1)
