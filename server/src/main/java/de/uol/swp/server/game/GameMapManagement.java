@@ -670,13 +670,11 @@ public class GameMapManagement implements IGameMapManagement {
     public boolean roadPlaceable(Player player, IEdge edge) {
         if (edge == null) return false;
         if (edge.getOwner() == null) {
-            for (IEdge adjacentEdge : intersectionEdgeNetwork.adjacentEdges(edge)) {
+            for (IEdge adjacentEdge : intersectionEdgeNetwork.adjacentEdges(edge))
                 if (adjacentEdge.getOwner() == player) return true;
-            }
 
-            for (IIntersection incidentIntersection : intersectionEdgeNetwork.incidentNodes(edge)) {
+            for (IIntersection incidentIntersection : intersectionEdgeNetwork.incidentNodes(edge))
                 if (incidentIntersection.getOwner() == player) return true;
-            }
         }
         return false;
     }
