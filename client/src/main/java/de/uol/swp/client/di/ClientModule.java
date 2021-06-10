@@ -6,18 +6,21 @@ import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import de.uol.swp.client.*;
+import de.uol.swp.client.chat.AsyncChatService;
 import de.uol.swp.client.chat.ChatService;
 import de.uol.swp.client.chat.IChatService;
+import de.uol.swp.client.game.AsyncGameService;
 import de.uol.swp.client.game.GameService;
 import de.uol.swp.client.game.IGameService;
-import de.uol.swp.client.lobby.AbstractPresenterWithChatWithGame;
-import de.uol.swp.client.lobby.ILobbyService;
-import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.lobby.*;
 import de.uol.swp.client.main.MainMenuPresenter;
+import de.uol.swp.client.sound.AsyncSoundService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.sound.SoundService;
+import de.uol.swp.client.trade.AsyncTradeService;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.TradeService;
+import de.uol.swp.client.user.AsyncUserService;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.client.user.UserService;
 import de.uol.swp.common.I18nWrapper;
@@ -34,6 +37,7 @@ import java.io.*;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 /**
  * Module that provides classes needed by the client.
@@ -46,6 +50,7 @@ public class ClientModule extends AbstractModule {
 
     final EventBus eventBus = new EventBus();
     final Logger LOG = LogManager.getLogger(ClientModule.class);
+    final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
 
     @Override
     protected void configure() {
@@ -54,16 +59,18 @@ public class ClientModule extends AbstractModule {
         Properties defaultProps = new Properties();
 
         //Default settings
-        defaultProps.setProperty("lang", "en_GB");
-        defaultProps.setProperty("debug.draw_hitbox_grid", "false");
-        defaultProps.setProperty("debug.loglevel", "DEBUG");
-        defaultProps.setProperty("join_leave_msgs_on", "true");
-        defaultProps.setProperty("owner_ready_notifs_on", "true");
-        defaultProps.setProperty("owner_transfer_notifs_on", "true");
-        defaultProps.setProperty("theme", "default");
-        defaultProps.setProperty("soundpack", "default");
-        defaultProps.setProperty("volume", "100");
-        defaultProps.setProperty("backgroundvolume", "50");
+        defaultProps.setProperty("lang", preferences.get("lang", "en_GB"));
+        defaultProps.setProperty("debug.draw_hitbox_grid", preferences.get("debug.draw_hitbox_grid", "false"));
+        defaultProps.setProperty("debug.loglevel", preferences.get("debug.loglevel", "DEBUG"));
+        defaultProps.setProperty("join_leave_msgs_on", preferences.get("join_leave_msgs_on", "true"));
+        defaultProps.setProperty("owner_ready_notifs_on", preferences.get("owner_ready_notifs_on", "true"));
+        defaultProps.setProperty("owner_transfer_notifs_on", preferences.get("owner_transfer_notifs_on", "true"));
+        defaultProps.setProperty("theme", preferences.get("theme", "default"));
+        defaultProps.setProperty("soundpack", preferences.get("soundpack", "default"));
+        defaultProps.setProperty("volume", preferences.get("volume", "100"));
+        defaultProps.setProperty("backgroundvolume", preferences.get("backgroundvolume", "50"));
+        defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
+        defaultProps.setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -133,6 +140,13 @@ public class ClientModule extends AbstractModule {
         //Setting the drawHitboxGrid value
         final boolean drawHitboxGrid = Boolean.parseBoolean(properties.getProperty("debug.draw_hitbox_grid"));
 
+        //Setting the login_logout_msgs_on value
+        final boolean loginLogoutMsgsOn = Boolean.parseBoolean(properties.getProperty("login_logout_msgs_on"));
+
+        //Setting the lobby_create_delete_msgs_on value
+        final boolean lobbyCreateDeleteMsgsOn = Boolean
+                .parseBoolean(properties.getProperty("lobby_create_delete_msgs_on"));
+
         //Setting the join_leave_msgs_on value
         final boolean joinLeaveMsgsOn = Boolean.parseBoolean(properties.getProperty("join_leave_msgs_on"));
 
@@ -161,14 +175,22 @@ public class ClientModule extends AbstractModule {
         bindConstant().annotatedWith(Names.named("soundPack")).to(soundPack);
         bindConstant().annotatedWith(Names.named("volume")).to(volume);
         bindConstant().annotatedWith(Names.named("backgroundVolume")).to(backgroundVolume);
+        bindConstant().annotatedWith(Names.named("loginLogoutMsgsOn")).to(loginLogoutMsgsOn);
+        bindConstant().annotatedWith(Names.named("lobbyCreateDeleteMsgsOn")).to(lobbyCreateDeleteMsgsOn);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
-        bind(IUserService.class).to(UserService.class).in(Scopes.SINGLETON);
-        bind(IChatService.class).to(ChatService.class).in(Scopes.SINGLETON);
-        bind(IGameService.class).to(GameService.class).in(Scopes.SINGLETON);
-        bind(ILobbyService.class).to(LobbyService.class).in(Scopes.SINGLETON);
-        bind(ITradeService.class).to(TradeService.class).in(Scopes.SINGLETON);
-        bind(ISoundService.class).to(SoundService.class).in(Scopes.SINGLETON);
+        bind(IUserService.class).to(AsyncUserService.class).in(Scopes.SINGLETON);
+        bind(UserService.class).in(Scopes.SINGLETON);
+        bind(IChatService.class).to(AsyncChatService.class).in(Scopes.SINGLETON);
+        bind(ChatService.class).in(Scopes.SINGLETON);
+        bind(IGameService.class).to(AsyncGameService.class).in(Scopes.SINGLETON);
+        bind(GameService.class).in(Scopes.SINGLETON);
+        bind(ILobbyService.class).to(AsyncLobbyService.class).in(Scopes.SINGLETON);
+        bind(LobbyService.class).in(Scopes.SINGLETON);
+        bind(ITradeService.class).to(AsyncTradeService.class).in(Scopes.SINGLETON);
+        bind(TradeService.class).in(Scopes.SINGLETON);
+        bind(ISoundService.class).to(AsyncSoundService.class).in(Scopes.SINGLETON);
+        bind(SoundService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(ResourceType.class);

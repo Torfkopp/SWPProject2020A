@@ -24,6 +24,7 @@ public interface IGameService {
      *
      * @author Aldin Dervisi
      * @author Temmo Junkhoff
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-08
      */
     void buildRequest(LobbyName lobbyName, MapPoint mapPoint);
@@ -34,6 +35,7 @@ public interface IGameService {
      * @param lobbyName The name of the lobby where the auto roll status is changed
      *
      * @author Maximillian Lindner
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-26
      */
     void changeAutoRollState(LobbyName lobbyName, boolean autoRollEnabled);
@@ -43,15 +45,29 @@ public interface IGameService {
      *
      * @param lobbyName The name of the lobby in which to end the turn
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.game.request.EndTurnRequest
      * @since 2021-01-15
      */
     void endTurn(LobbyName lobbyName);
 
     /**
+     * Post a request to update the pause status of the game
+     *
+     * @param lobbyName The name of the lobby the user wants to update his pause status
+     *
+     * @author Maximilian Lindner
+     * @see de.uol.swp.common.game.request.PauseGameRequest
+     * @since 2021-05-21
+     */
+    void pauseGame(LobbyName lobbyName);
+
+    /**
      * Posts a request to play a KnightCard
      *
      * @param lobbyName The name of the lobby
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     void playKnightCard(LobbyName lobbyName);
 
@@ -60,6 +76,8 @@ public interface IGameService {
      *
      * @param lobbyName The name of the lobby
      * @param resource  The resource the user wants
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     void playMonopolyCard(LobbyName lobbyName, ResourceType resource);
 
@@ -67,6 +85,8 @@ public interface IGameService {
      * Posts a request to play a RoadBuildingCard
      *
      * @param lobbyName The name of the lobby
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     void playRoadBuildingCard(LobbyName lobbyName);
 
@@ -76,6 +96,8 @@ public interface IGameService {
      * @param lobbyName The name of the lobby
      * @param resource1 The resource the user wants
      * @param resource2 The resource the user wants
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      */
     void playYearOfPlentyCard(LobbyName lobbyName, ResourceType resource1, ResourceType resource2);
 
@@ -87,6 +109,7 @@ public interface IGameService {
      *
      * @author Mario Fokken
      * @author Timo Gerken
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-06
      */
     void robberChooseVictim(LobbyName lobbyName, UserOrDummy victim);
@@ -99,6 +122,7 @@ public interface IGameService {
      *
      * @author Mario Fokken
      * @author Timo Gerken
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-06
      */
     void robberNewPosition(LobbyName lobby, MapPoint mapPoint);
@@ -108,6 +132,7 @@ public interface IGameService {
      *
      * @param lobbyName The Lobby in which to roll the dice
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.game.request.RollDiceRequest
      * @since 2021-02-22
      */
@@ -121,6 +146,7 @@ public interface IGameService {
      *
      * @author Maximillian Lindner
      * @author Temmo Junkhoff
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-03-23
      */
     void startSession(LobbyName lobbyName, int moveTime);
@@ -132,6 +158,7 @@ public interface IGameService {
      * @param selectedResources The user's selected resources
      *
      * @author Mario Fokken
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-12
      */
     void taxPayed(LobbyName lobbyName, ResourceList selectedResources);
@@ -143,6 +170,7 @@ public interface IGameService {
      *
      * @author Aldin Dervisi
      * @author Temmo Junkhoff
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @since 2021-04-08
      */
     void updateGameMap(LobbyName lobbyName);
@@ -154,6 +182,7 @@ public interface IGameService {
      *
      * @author Sven Ahrens
      * @author Finn Haase
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @see de.uol.swp.common.game.request.UpdateInventoryRequest
      * @since 2021-01-25
      */

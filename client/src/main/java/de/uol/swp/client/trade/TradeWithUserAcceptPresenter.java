@@ -14,12 +14,14 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -38,11 +40,11 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     public static final int MIN_WIDTH = 380;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserAcceptPresenter.class);
 
-    protected Timer tradeAcceptTimer;
     @FXML
     protected Label acceptTradeTimerLabel;
+
+    protected Timer tradeAcceptTimer;
     protected boolean paused;
-    protected int remainingMoveTime;
     @FXML
     private Button acceptTradeButton;
     @FXML
@@ -81,17 +83,18 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         tradeAcceptTimer = new Timer();
         AtomicInteger moveTimeToDecrement = new AtomicInteger(moveTime);
         tradeAcceptTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
             public void run() {
                 if (!paused) {
-                    Platform.runLater(() -> acceptTradeTimerLabel.setText(
-                            String.format(resourceBundle.getString("game.labels.movetime"),
-                                          moveTimeToDecrement.getAndDecrement())));
+                    int i = moveTimeToDecrement.getAndDecrement();
+                    String moveTimeText = String.format(resourceBundle.getString("game.labels.movetime"), i);
+                    Platform.runLater(() -> acceptTradeTimerLabel.setText(moveTimeText));
                     if (moveTimeToDecrement.get() == 0) {
                         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
                         tradeService.closeTradeResponseWindow(lobbyName);
-                        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+                        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
                     }
-                } else {remainingMoveTime = moveTimeToDecrement.get();}
+                }
             }
         }, 0, 1000);
     }
@@ -103,6 +106,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onAcceptTradeButtonPressed() {
+        if (acceptTradeButton.isDisabled()) {
+            LOG.trace("onAcceptTradeButtonPressed called with disabled acceptTradeButton, returning");
+            return;
+        }
         soundService.button();
         tradeService.acceptUserTrade(lobbyName, offeringUser, respondingResourceMap, offeringResourceMap);
     }
@@ -118,10 +125,10 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onInvalidTradeOfUsersResponse(InvalidTradeOfUsersResponse rsp) {
         LOG.debug("Received InvalidTradeOfUsersResponse for Lobby {}", lobbyName);
+        String invalid = String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser());
         Platform.runLater(() -> {
             acceptTradeButton.setDisable(true);
-            tradeNotPossibleLabel.setText(
-                    String.format(resourceBundle.getString("game.trade.status.invalid"), rsp.getOfferingUser()));
+            tradeNotPossibleLabel.setText(invalid);
         });
     }
 
@@ -143,9 +150,8 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         soundService.button();
-        tradeService.showUserTradeWindow(lobbyName, offeringUser);
-        tradeService.tradeWithUser(lobbyName, offeringUser, true);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        tradeService.showUserTradeWindow(lobbyName, offeringUser, true);
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -162,7 +168,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         soundService.button();
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -178,7 +184,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
         tradeService.closeTradeResponseWindow(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
@@ -189,6 +195,12 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      * gets multiple Parameters and calls the setOfferLabel method to
      * set the offer label according to the offer and show the Users' own
      * inventory.
+     * <p>
+     * This method also sets the accelerators for the TradeWithUserAcceptPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + A = Accept Trade Offer
+     *     <li> CTRL/META + C = Make Counter Offer
+     *     <li> CTRL/META + R = Reject Trade Offer
      *
      * @param event TradeWithUserResponseUpdateEvent found on the EventBus
      */
@@ -209,6 +221,15 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
             tradeService.resetOfferTradeButton(lobbyName, offeringUser);
             tradeService.closeTradeResponseWindow(lobbyName);
         });
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN), // CTRL/META + A
+                         this::onAcceptTradeButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onMakeCounterOfferButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN), // CTRL/META + R
+                         this::onRejectTradeButtonPressed);
+        ownResourceTableView.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
@@ -219,8 +240,9 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void setOfferLabel() {
         String offered = tallyUpOfferOrDemand(offeringResourceMap);
         String demanded = tallyUpOfferOrDemand(respondingResourceMap);
-        Platform.runLater(() -> tradeResponseLabel.setText(
-                String.format(resourceBundle.getString("game.trade.offer.proposed"), offeringUser, offered, demanded)));
+        String bundleString = resourceBundle.getString("game.trade.offer.proposed");
+        String text = String.format(bundleString, offeringUser, offered, demanded);
+        Platform.runLater(() -> tradeResponseLabel.setText(text));
     }
 
     /**

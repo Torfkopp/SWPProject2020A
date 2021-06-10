@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "ResultOfMethodCallIgnored"})
 class TradeServiceTest {
 
     private static final ResourceList defaultOffer = new ResourceList();
@@ -215,7 +215,6 @@ class TradeServiceTest {
         lock.await(250, TimeUnit.MILLISECONDS);
 
         assertTrue(event instanceof ShowTradeWithBankViewEvent);
-
         ShowTradeWithBankViewEvent eve = (ShowTradeWithBankViewEvent) event;
 
         assertEquals(defaultLobbyName, eve.getLobbyName());
@@ -256,7 +255,7 @@ class TradeServiceTest {
 
     @Test
     void showUserTradeWindow() throws InterruptedException {
-        tradeService.showUserTradeWindow(defaultLobbyName, secondUser);
+        tradeService.showUserTradeWindow(defaultLobbyName, secondUser, false);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

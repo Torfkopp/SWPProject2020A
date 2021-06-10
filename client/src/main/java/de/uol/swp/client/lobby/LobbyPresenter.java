@@ -22,6 +22,9 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +44,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     public static final String fxml = "/fxml/LobbyView.fxml";
     public static final int MIN_HEIGHT_PRE_GAME = 825;
-    public static final int HELP_MIN_WIDTH = 250;
+    public static final int HELP_MIN_WIDTH = 350;
     public static final int MIN_HEIGHT_IN_GAME = 905;
     public static final int MIN_WIDTH_PRE_GAME = 685;
     public static final int MIN_WIDTH_IN_GAME = 1435;
@@ -117,8 +120,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (this.readyUsers == null) this.readyUsers = new HashSet<>();
         this.readyUsers.clear();
         this.readyUsers.addAll(rsp.getReadyUsers());
+        updateUsersList(rsp.getUsers());
         Platform.runLater(() -> {
-            updateUsersList(rsp.getUsers());
             if (!inGame) {
                 setStartSessionButtonState();
                 setKickUserButtonState();
@@ -151,12 +154,26 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Handles LobbyUpdateEvents on the EventBus
      * <p>
      * If a new LobbyUpdateEvent is posted to the EventBus, this method checks
-     * whether the lobbyName, loggedInUser, or readyUsers attributes of the current
+     * whether the lobbyName, window, or readyUsers attributes of the current
      * LobbyPresenter are null. If they are, it sets these attributes to the
      * values found in the LobbyUpdateEvent or creates a new, empty instance.
      * Also makes sure that the lobby will be left gracefully should the window
      * be closed without using the Leave Lobby button.
      * It also sets the pre-game Setting according to the Lobby.
+     * <p>
+     * Additionally, this method sets the accelerators for the LobbyPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + S = Start Session button
+     *     <li> CTRL/META + K = Kick User button
+     *     <li> CTRL/META + E = End Turn button
+     *     <li> CTRL/META + R = Roll Dice button
+     *     <li> CTRL/META + T = Make Offer to User button
+     *     <li> CTRL/META + B = Trade with Bank button
+     *     <li> CTRL/META + C = Play a Card button
+     *     <li> CTRL/META + H = Return to Lobby button
+     *     <li> CTRL/META + P = Pause button
+     *     <li> F1            = Toggle help action list
+     *     <li> F2            = Open Rules menu
      *
      * @param event The LobbyUpdateEvent found on the EventBus
      *
@@ -180,25 +197,52 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         }
         if (event.getLobby().getReadyUsers().contains(userService.getLoggedInUser())) readyCheckBox.setSelected(true);
 
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        // pre-game hotkeys
+        accelerators.put(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN), // CTRL/META + S
+                         this::onStartSessionButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN), // CTRL/META + K
+                         this::onKickUserButtonPressed);
+        // in-game hotkeys
+        accelerators.put(new KeyCodeCombination(KeyCode.E, KeyCombination.SHORTCUT_DOWN), // CTRL/META + E
+                         this::onEndTurnButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN), // CTRL/META + R
+                         this::onRollDiceButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN), // CTRL/META + T
+                         this::onTradeWithUserButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN), // CTRL/META + B
+                         this::onTradeWithBankButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN), // CTRL/META + C
+                         this::onPlayCardButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.H, KeyCombination.SHORTCUT_DOWN), // CTRL/META + H
+                         this::onReturnToLobbyButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
+                         this::onPauseButtonPressed);
+        accelerators.put(new KeyCodeCombination(KeyCode.F1), this::onHelpButtonPressed); // F1 for help
+        accelerators.put(new KeyCodeCombination(KeyCode.F2), this::onRulesMenuClicked); // F2 for rules
+        membersView.getScene().getAccelerators().putAll(accelerators);
+
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
-        kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
-        changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
-        tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+        lobbyService.retrieveAllLobbyMembers(lobbyName);
+        lobbyService.setColour(lobbyName, null);
 
         addSizeChangeListener();
         fitCanvasToSize();
 
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
         setAllowedPlayers(event.getLobby().getMaxPlayers());
-        commandsActivated.setSelected(event.getLobby().areCommandsAllowed());
-        randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
-        setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
-        moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
-        moveTimeTextField.setText(String.valueOf(moveTime));
+        randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
+        setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
+
+        Platform.runLater(() -> {
+            kickUserButton.setText(String.format(resourceBundle.getString("lobby.buttons.kickuser"), ""));
+            changeOwnerButton.setText(String.format(resourceBundle.getString("lobby.buttons.changeowner"), ""));
+            tradeWithUserButton.setText(resourceBundle.getString("lobby.game.buttons.playertrade.noneselected"));
+            moveTimeLabel.setText(String.format(resourceBundle.getString("lobby.labels.movetime"), moveTime));
+            moveTimeTextField.setText(String.valueOf(moveTime));
+        });
         setPreGameSettings();
-        lobbyService.checkForGame(lobbyName);
     }
 
     /**
@@ -236,7 +280,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
     @FXML
     private void onRulesMenuClicked() {
         LOG.debug("Sending ShowRulesOverviewViewEvent");
-        eventBus.post(new ShowRulesOverviewViewEvent());
+        soundService.button();
+        post(new ShowRulesOverviewViewEvent());
     }
 
     /**
@@ -279,7 +324,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setStartUpPhaseCheckBox.setSelected(msg.getLobby().isStartUpPhaseEnabled());
         startUpPhaseEnabled = msg.getLobby().isStartUpPhaseEnabled();
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
-        commandsActivated.setSelected(msg.getLobby().areCommandsAllowed());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
         Platform.runLater(() -> moveTimeLabel
@@ -376,10 +420,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             protected void updateItem(UserOrDummy user, boolean empty) {
                 Platform.runLater(() -> {
                     super.updateItem(user, empty);
-
                     //if the background should be in colour you need to use setBackground
-                    if (user != null && userOrDummyPlayerMap == null)
-                        setTextFill(Color.BLACK); // No clue why this is needed, but it is
+                    setTextFill(Color.BLACK); // No clue why this is needed, but it is (It really is)
                     if (user != null && userOrDummyPlayerMap != null && userOrDummyPlayerMap.containsKey(user)) {
                         switch (userOrDummyPlayerMap.get(user)) {
                             case PLAYER_1:
@@ -469,11 +511,13 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * @since 2021-01-05
      */
     private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        if (lobbyMembers == null) {
-            lobbyMembers = FXCollections.observableArrayList();
-            membersView.setItems(lobbyMembers);
-        }
-        lobbyMembers.clear();
-        lobbyMembers.addAll(userLobbyList);
+        Platform.runLater(() -> {
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
     }
 }

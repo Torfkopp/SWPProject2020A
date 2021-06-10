@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
@@ -10,6 +11,7 @@ import de.uol.swp.common.game.map.hexes.IHarbourHex;
 import de.uol.swp.common.game.map.hexes.IResourceHex;
 import de.uol.swp.common.game.map.management.IEdge;
 import de.uol.swp.common.game.map.management.MapPoint;
+import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -37,10 +39,6 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  */
 public class GameRendering {
 
-    public static final Color PLAYER_1_COLOUR = Color.BLUE;
-    public static final Color PLAYER_2_COLOUR = Color.RED;
-    public static final Color PLAYER_3_COLOUR = Color.rgb(255, 69, 0);
-    public static final Color PLAYER_4_COLOUR = Color.rgb(255, 127, 124);
     //Constants used for the colours
     private static final Color TOKEN_COLOUR = Color.BEIGE;
     private static final Color TEXT_COLOUR = Color.BLACK;
@@ -57,14 +55,19 @@ public class GameRendering {
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
 
+    public static Color PLAYER_1_COLOUR = Color.BLACK;
+    public static Color PLAYER_2_COLOUR = Color.BLACK;
+    public static Color PLAYER_3_COLOUR = Color.BLACK;
+    public static Color PLAYER_4_COLOUR = Color.BLACK;
+
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
     private static IUserService userService;
     @Inject
     @Named("drawHitboxGrid")
-
     private static boolean drawHitboxGrid;
+
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
@@ -160,9 +163,6 @@ public class GameRendering {
             showCenterText(gameMapDescription.getCenterText());
         }
         if (gameMapDescription.getBottomText() != null) {
-            clearGameMap();
-            drawGameMap(gameMapDescription.getGameMap());
-            drawDice(gameMapDescription.getFirstDie(), gameMapDescription.getSecondDie());
             showBottomText(gameMapDescription.getBottomText());
             gameMapDescription.setBottomText(null);
             {
@@ -179,13 +179,44 @@ public class GameRendering {
     }
 
     /**
+     * Sets the player's colours according
+     * to the given map
+     *
+     * @param playerColourMap Map of player and the colour
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    public void setPlayerColours(Map<Player, Colour> playerColourMap) {
+        int[] colour;
+        for (Player p : playerColourMap.keySet()) {
+            colour = playerColourMap.get(p).getColourCode();
+            switch (p) {
+                case PLAYER_1:
+                    PLAYER_1_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_2:
+                    PLAYER_2_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_3:
+                    PLAYER_3_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_4:
+                    PLAYER_4_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+            }
+        }
+    }
+
+    /**
      * Helper method to clear the game map
      *
      * @author Temmo Junkhoff
+     * @implNote The method contents are executed on the JavaFX Application Thread
      * @since 2021-03-29
      */
     private void clearGameMap() {
-        gfxCtx.clearRect(0, 0, width, height);
+        Platform.runLater(() -> gfxCtx.clearRect(0, 0, width, height));
     }
 
     /**
@@ -196,12 +227,16 @@ public class GameRendering {
      * @param owner    Needed to access the color of player
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawCity(Optional<Player> owner, double currentX, double currentY) {
-        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOUR);
-        else gfxCtx.setFill(getPlayerColour(owner.get()));
-        gfxCtx.fillRoundRect(currentX - (citySize / 2.0), currentY - (citySize / 2.0), citySize, citySize,
-                             citySize / 2.0, citySize / 2.0);
+        if (owner.isEmpty()) Platform.runLater(() -> gfxCtx.setFill(BUILDABLE_COLOUR));
+        else Platform.runLater(() -> gfxCtx.setFill(getPlayerColour(owner.get())));
+        double halfCitySize = citySize / 2.0;
+        double x = currentX - halfCitySize;
+        double y = currentY - halfCitySize;
+        Platform.runLater(() -> gfxCtx.fillRoundRect(x, y, citySize, citySize, halfCitySize, halfCitySize));
     }
 
     /**
@@ -228,6 +263,9 @@ public class GameRendering {
      * This method is the only one that ever needs to be accessed from outside this interface.
      *
      * @param gameMap An IGameMap providing the game map to draw
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread.
+     * If the subroutines have UI-modifying aspects, those will be called with Platform.runLater()
      */
     private void drawGameMap(IGameMap gameMap) {
         LOG.debug("Drawing Game map");
@@ -253,9 +291,6 @@ public class GameRendering {
      * @param hex      The harbour hex with the information about the harbour
      */
     private void drawHarbour(double currentX, double currentY, IHarbourHex hex) {
-        gfxCtx.setStroke(HARBOUR_COLOUR);
-        gfxCtx.setFill(HARBOUR_COLOUR);
-        gfxCtx.setLineWidth(hexWidth / 5.0);
         double yDistance = hexHeight * (1.0 / 64.0);
         double yExtend = hexHeight * (5.0 / 32.0);
         double xDistance = hexWidth * (1.0 / 32.0);
@@ -304,7 +339,6 @@ public class GameRendering {
                 xCords = null;
                 yCords = null;
         }
-        gfxCtx.fillPolygon(xCords, yCords, 4);
 
         String text = "";
         switch (hex.getResource()) {
@@ -327,11 +361,21 @@ public class GameRendering {
                 text = resourceBundle.getString("game.resources.any");
                 break;
         }
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.setFont(Font.font(tokenTextFontSize));
-        gfxCtx.fillText(text, currentX + hexWidth / 2.0, currentY + hexHeight / 2.0, hexWidth * (6.0 / 8.0));
+        String finalText = text;
+        double x = currentX + hexWidth / 2.0;
+        double y = currentY + hexHeight / 2.0;
+        double maxWidth = hexWidth * (6.0 / 8.0);
+        Platform.runLater(() -> {
+            gfxCtx.setStroke(HARBOUR_COLOUR);
+            gfxCtx.setFill(HARBOUR_COLOUR);
+            gfxCtx.setLineWidth(hexWidth / 5.0);
+            gfxCtx.fillPolygon(xCords, yCords, 4);
+            gfxCtx.setTextAlign(TextAlignment.CENTER);
+            gfxCtx.setTextBaseline(VPos.CENTER);
+            gfxCtx.setFill(TEXT_COLOUR);
+            gfxCtx.setFont(Font.font(tokenTextFontSize));
+            gfxCtx.fillText(finalText, x, y, maxWidth);
+        });
     }
 
     /**
@@ -341,16 +385,20 @@ public class GameRendering {
      *
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawHex(double currentX, double currentY) {
         double[] xCords = {currentX, currentX + hexWidth / 2, currentX + hexWidth, currentX + hexWidth,
                            currentX + hexWidth / 2, currentX};
         double[] yCords = {currentY + (hexHeight / 4), currentY, currentY + (hexHeight / 4),
                            currentY + (hexHeight / 4) * 3, currentY + hexHeight, currentY + (hexHeight / 4) * 3};
-        gfxCtx.fillPolygon(xCords, yCords, 6);
-        gfxCtx.setStroke(BORDER_COLOUR);
-        gfxCtx.setLineWidth(2);
-        gfxCtx.strokePolygon(xCords, yCords, 6);
+        Platform.runLater(() -> {
+            gfxCtx.fillPolygon(xCords, yCords, 6);
+            gfxCtx.setStroke(BORDER_COLOUR);
+            gfxCtx.setLineWidth(2);
+            gfxCtx.strokePolygon(xCords, yCords, 6);
+        });
     }
 
     /**
@@ -387,16 +435,20 @@ public class GameRendering {
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
+     * @implNote The method contents are executed on the JavaFX Application Thread
      * @since 2021-03-27
      */
     private void drawHitboxGrid() {
-        gfxCtx.setStroke(Color.RED);
-        gfxCtx.setLineWidth(1);
-        for (double cy = OFFSET_Y; cy < height; cy += hexHeight / 8)
-            gfxCtx.strokeLine(0, cy, width, cy);
+        double hexWidthBy8 = hexWidth / 8;
+        Platform.runLater(() -> {
+            gfxCtx.setStroke(Color.RED);
+            gfxCtx.setLineWidth(1);
+            for (double cy = OFFSET_Y; cy < height; cy += hexWidthBy8)
+                gfxCtx.strokeLine(0, cy, width, cy);
 
-        for (double cx = OFFSET_X; cx < width; cx += hexWidth / 8)
-            gfxCtx.strokeLine(cx, 0, cx, height);
+            for (double cx = OFFSET_X; cx < width; cx += hexWidthBy8)
+                gfxCtx.strokeLine(cx, 0, cx, height);
+        });
     }
 
     /**
@@ -418,14 +470,19 @@ public class GameRendering {
      *
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawRobber(double currentX, double currentY) {
-        gfxCtx.setLineWidth(robberLineWidth);
-        gfxCtx.setStroke(ROBBER_COLOUR);
-        gfxCtx.strokePolygon(new double[]{currentX + hexWidth * (1.0 / 4.0), currentX + hexWidth * (3.0 / 4.0),
-                                          currentX + hexWidth * (2.0 / 4.0)},
-                             new double[]{currentY + hexHeight * (2.75 / 4.0), currentY + hexHeight * (2.75 / 4.0),
-                                          currentY + hexHeight * (1.125 / 4.0)}, 3);
+        double[] xPoints = {currentX + hexWidth * (1.0 / 4.0), currentX + hexWidth * (3.0 / 4.0),
+                            currentX + hexWidth * (2.0 / 4.0)};
+        double[] yPoints = {currentY + hexHeight * (2.75 / 4.0), currentY + hexHeight * (2.75 / 4.0),
+                            currentY + hexHeight * (1.125 / 4.0)};
+        Platform.runLater(() -> {
+            gfxCtx.setLineWidth(robberLineWidth);
+            gfxCtx.setStroke(ROBBER_COLOUR);
+            gfxCtx.strokePolygon(xPoints, yPoints, 3);
+        });
     }
 
     /**
@@ -436,12 +493,16 @@ public class GameRendering {
      * @param owner    Needed to access the color of player
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawSettlement(Optional<Player> owner, double currentX, double currentY) {
-        if (owner.isEmpty()) gfxCtx.setFill(BUILDABLE_COLOUR);
-        else gfxCtx.setFill(getPlayerColour(owner.get()));
-        gfxCtx.fillOval(currentX - (settlementSize / 2.0), currentY - (settlementSize / 2.0), settlementSize,
-                        settlementSize);
+        double x = currentX - (settlementSize / 2.0);
+        double y = currentY - (settlementSize / 2.0);
+
+        if (owner.isEmpty()) Platform.runLater(() -> gfxCtx.setFill(BUILDABLE_COLOUR));
+        else Platform.runLater(() -> gfxCtx.setFill(getPlayerColour(owner.get())));
+        Platform.runLater(() -> gfxCtx.fillOval(x, y, settlementSize, settlementSize));
     }
 
     /**
@@ -451,18 +512,27 @@ public class GameRendering {
      * @param token    The value of the token that should be drawn
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void drawToken(int token, double currentX, double currentY) {
-        gfxCtx.setFill(TOKEN_COLOUR);
         double xPos = currentX + (hexWidth - tokenSize) / 2.0;
         double yPos = currentY + (hexHeight - tokenSize) / 2.0;
-        gfxCtx.fillOval(xPos, yPos, tokenSize, tokenSize);
-        gfxCtx.setFill(TEXT_COLOUR);
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFont(Font.font(tokenTextFontSize));
-        gfxCtx.fillText(resourceBundle.getString("game.token." + token), currentX + hexWidth / 2.0,
-                        currentY + hexWidth / 2.0, tokenSize * (7.0 / 8.0));
+        double x = currentX + hexWidth / 2.0;
+        double y = currentY + hexWidth / 2.0;
+        double maxWidth = tokenSize * (7.0 / 8.0);
+        String tokenLabel = resourceBundle.getString("game.token." + token);
+        Font tokenFont = Font.font(tokenTextFontSize);
+
+        Platform.runLater(() -> {
+            gfxCtx.setFill(TOKEN_COLOUR);
+            gfxCtx.fillOval(xPos, yPos, tokenSize, tokenSize);
+            gfxCtx.setFill(TEXT_COLOUR);
+            gfxCtx.setTextAlign(TextAlignment.CENTER);
+            gfxCtx.setTextBaseline(VPos.CENTER);
+            gfxCtx.setFont(tokenFont);
+            gfxCtx.fillText(tokenLabel, x, y, maxWidth);
+        });
     }
 
     /**
@@ -601,54 +671,59 @@ public class GameRendering {
      * @param die      The die to be drawn
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void renderDice(int die, double currentX, double currentY) {
-        gfxCtx.setFill(Color.WHITE);
-        gfxCtx.setStroke(Color.BLACK);
-        gfxCtx.setLineWidth(diceLineWidth);
-        gfxCtx.fillRoundRect(currentX, currentY, diceSize, diceSize, diceSize / 3.0, diceSize / 3.0);
-        gfxCtx.strokeRoundRect(currentX, currentY, diceSize, diceSize, diceSize / 3.0, diceSize / 3.0);
-
         double middleDotPos = diceSize / 2.0 - diceDotSize / 2.0;
         double firstDotPos = diceDotSize / 2.0;
         double secondDotPos = diceSize - diceDotSize / 2.0 - diceDotSize;
+        double arcDimensions = diceSize / 3.0;
 
-        gfxCtx.setFill(Color.BLACK);
-        switch (die) {
-            case 1:
-                gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
-                break;
-            case 2:
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                break;
-            case 3:
-                gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                break;
-            case 4:
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                break;
-            case 5:
-                gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                break;
-            case 6:
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + firstDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
-                gfxCtx.fillOval(currentX + secondDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
-                break;
-        }
+        Platform.runLater(() -> {
+            gfxCtx.setFill(Color.WHITE);
+            gfxCtx.setStroke(Color.BLACK);
+            gfxCtx.setLineWidth(diceLineWidth);
+            gfxCtx.fillRoundRect(currentX, currentY, diceSize, diceSize, arcDimensions, arcDimensions);
+            gfxCtx.strokeRoundRect(currentX, currentY, diceSize, diceSize, arcDimensions, arcDimensions);
+            gfxCtx.setFill(Color.BLACK);
+
+            switch (die) {
+                case 1:
+                    gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                    break;
+                case 2:
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    break;
+                case 3:
+                    gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    break;
+                case 4:
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    break;
+                case 5:
+                    gfxCtx.fillOval(currentX + middleDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    break;
+                case 6:
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + secondDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + firstDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + firstDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                    gfxCtx.fillOval(currentX + secondDotPos, currentY + middleDotPos, diceDotSize, diceDotSize);
+                    break;
+            }
+        });
     }
 
     /**
@@ -658,32 +733,40 @@ public class GameRendering {
      *
      * @param currentX The current x-coordinate
      * @param currentY The current y-coordinate
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private void renderEdges(double currentX, double currentY, IIntersectionWithEdges intersection) {
-        gfxCtx.setLineWidth(roadWidth);
+        Platform.runLater(() -> gfxCtx.setLineWidth(roadWidth));
         if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
             if (edge == null) continue;
             if (edge.isBuildableBy(userService.getLoggedInUser())) {
-                gfxCtx.setStroke(BUILDABLE_COLOUR);
+                Platform.runLater(() -> gfxCtx.setStroke(BUILDABLE_COLOUR));
             } else if (edge.getOwner() == null) {
                 continue;
             } else {
-                gfxCtx.setStroke(getPlayerColour(edge.getOwner()));
+                Color playerColour = getPlayerColour(edge.getOwner());
+                Platform.runLater(() -> gfxCtx.setStroke(playerColour));
             }
             //Northwest road
             if (edge.getOrientation() == IEdge.Orientation.WEST) {
-                gfxCtx.strokeLine(currentX, currentY, currentX - (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+                double x2 = currentX - (hexWidth / 2.0);
+                double y2 = currentY - (hexHeight / 4.0);
+                Platform.runLater(() -> gfxCtx.strokeLine(currentX, currentY, x2, y2));
             }
 
             //South road
             else if (edge.getOrientation() == IEdge.Orientation.SOUTH) {
-                gfxCtx.strokeLine(currentX, currentY, currentX, currentY + (hexHeight / 2.0));
+                double y2 = currentY + (hexHeight / 2.0);
+                Platform.runLater(() -> gfxCtx.strokeLine(currentX, currentY, currentX, y2));
             }
 
             //Northeast road
             if (edge.getOrientation() == IEdge.Orientation.EAST) {
-                gfxCtx.strokeLine(currentX, currentY, currentX + (hexWidth / 2.0), currentY - (hexHeight / 4.0));
+                double x2 = currentX + (hexWidth / 2.0);
+                double y2 = currentY - (hexHeight / 4.0);
+                Platform.runLater(() -> gfxCtx.strokeLine(currentX, currentY, x2, y2));
             }
         }
     }
@@ -929,33 +1012,35 @@ public class GameRendering {
      * @param hex The hex tile the colour should be set accordingly to
      *
      * @return True if the colour couldn't be set, false otherwise
+     *
+     * @implNote The method contents are executed on the JavaFX Application Thread
      */
     private boolean setHexColour(IGameHex hex) {
         if (hex == null) return false;
         switch (hex.getType()) {
             case WATER:
             case HARBOUR:
-                gfxCtx.setFill(WATER_COLOUR);
+                Platform.runLater(() -> gfxCtx.setFill(WATER_COLOUR));
                 break;
             case DESERT:
-                gfxCtx.setFill(DESERT_COLOUR);
+                Platform.runLater(() -> gfxCtx.setFill(DESERT_COLOUR));
                 break;
             case RESOURCE:
                 switch (((IResourceHex) hex).getResource()) {
                     case BRICK:
-                        gfxCtx.setFill(HILLS_COLOUR);
+                        Platform.runLater(() -> gfxCtx.setFill(HILLS_COLOUR));
                         break;
                     case LUMBER:
-                        gfxCtx.setFill(FOREST_COLOUR);
+                        Platform.runLater(() -> gfxCtx.setFill(FOREST_COLOUR));
                         break;
                     case ORE:
-                        gfxCtx.setFill(MOUNTAINS_COLOUR);
+                        Platform.runLater(() -> gfxCtx.setFill(MOUNTAINS_COLOUR));
                         break;
                     case GRAIN:
-                        gfxCtx.setFill(FIELDS_COLOUR);
+                        Platform.runLater(() -> gfxCtx.setFill(FIELDS_COLOUR));
                         break;
                     case WOOL:
-                        gfxCtx.setFill(PASTURE_COLOUR);
+                        Platform.runLater(() -> gfxCtx.setFill(PASTURE_COLOUR));
                         break;
                     default:
                         return false;
@@ -974,15 +1059,21 @@ public class GameRendering {
      *
      * @author Temmo Junkhoff
      * @author Aldin Dervisi
+     * @implNote The method contents are executed on the JavaFX Application Thread
      * @since 2021-04-08
      */
     private void showBottomText(String text) {
         if (text == null) return;
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(bottomTextFontSize));
-        gfxCtx.fillText(text, width / 2.0, height * (3.0 / 4.0));
+        Font bottomTextFont = Font.font(bottomTextFontSize);
+        double bottomTextX = width / 2.0;
+        double bottomTextY = height * (3.0 / 4.0);
+        Platform.runLater(() -> {
+            gfxCtx.setTextAlign(TextAlignment.CENTER);
+            gfxCtx.setTextBaseline(VPos.CENTER);
+            gfxCtx.setFill(Color.BLACK);
+            gfxCtx.setFont(bottomTextFont);
+            gfxCtx.fillText(text, bottomTextX, bottomTextY);
+        });
     }
 
     /**
@@ -992,15 +1083,21 @@ public class GameRendering {
      *
      * @author Temmo Junkhoff
      * @author Maximilian Lindner
+     * @implNote The method contents are executed on the JavaFX Application Thread
      * @since 2021-03-29
      */
     private void showCenterText(String text) {
         if (text == null) return;
-        gfxCtx.setTextAlign(TextAlignment.CENTER);
-        gfxCtx.setTextBaseline(VPos.CENTER);
-        gfxCtx.setFill(Color.BLACK);
-        gfxCtx.setFont(Font.font(centerTextFontSize));
-        gfxCtx.fillText(text, width / 2.0, height / 2.0);
+        Font centerTextFont = Font.font(centerTextFontSize);
+        double centerTextX = width / 2.0;
+        double centerTextY = height / 2.0;
+        Platform.runLater(() -> {
+            gfxCtx.setTextAlign(TextAlignment.CENTER);
+            gfxCtx.setTextBaseline(VPos.CENTER);
+            gfxCtx.setFill(Color.BLACK);
+            gfxCtx.setFont(centerTextFont);
+            gfxCtx.fillText(text, centerTextX, centerTextY);
+        });
     }
 
     /**

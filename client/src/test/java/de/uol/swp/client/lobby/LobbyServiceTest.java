@@ -39,7 +39,7 @@ class LobbyServiceTest {
                                                        "testa@chuck.com");
     private static final LobbyName defaultLobbyName = new LobbyName("testlobby");
     private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, defaultUser,//
-                                                                     false, 4, 60,//
+                                                                     4, 60,//
                                                                      false, false,//
                                                                      false, null, null);
 
@@ -224,7 +224,6 @@ class LobbyServiceTest {
         assertEquals(defaultLobby.getName(), lobbyUpdateEvent.getLobby().getName());
         assertEquals(defaultLobby.isInGame(), lobbyUpdateEvent.getLobby().isInGame());
         assertEquals(defaultLobby.getMaxPlayers(), lobbyUpdateEvent.getLobby().getMaxPlayers());
-        assertEquals(defaultLobby.areCommandsAllowed(), lobbyUpdateEvent.getLobby().areCommandsAllowed());
         assertEquals(defaultLobby.getMoveTime(), lobbyUpdateEvent.getLobby().getMoveTime());
         assertEquals(defaultLobby.isStartUpPhaseEnabled(), lobbyUpdateEvent.getLobby().isStartUpPhaseEnabled());
         assertEquals(defaultLobby.isRandomPlayFieldEnabled(), lobbyUpdateEvent.getLobby().isRandomPlayFieldEnabled());
@@ -347,7 +346,7 @@ class LobbyServiceTest {
      */
     @Test
     void updateLobbySettings() throws InterruptedException {
-        lobbyService.updateLobbySettings(defaultLobbyName, 4, true, true, 60, true);
+        lobbyService.updateLobbySettings(defaultLobbyName, 4, true, 60, true);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 
@@ -361,7 +360,6 @@ class LobbyServiceTest {
         assertEquals(defaultUser.getUsername(), request.getUser().getUsername());
         assertEquals(4, request.getAllowedPlayers());
         assertTrue(request.isStartUpPhaseEnabled());
-        assertTrue(request.isCommandsAllowed());
         assertEquals(60, request.getMoveTime());
         assertTrue(request.isRandomPlayFieldEnabled());
     }

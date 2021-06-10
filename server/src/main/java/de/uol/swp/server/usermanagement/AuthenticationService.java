@@ -4,16 +4,17 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.message.Message;
-import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.sessions.Session;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.request.*;
+import de.uol.swp.common.user.request.LoginRequest;
+import de.uol.swp.common.user.request.LogoutRequest;
+import de.uol.swp.common.user.request.RetrieveAllOnlineUsersRequest;
 import de.uol.swp.common.user.response.AllOnlineUsersResponse;
-import de.uol.swp.common.user.response.KillOldClientResponse;
-import de.uol.swp.common.user.response.NukedUsersSessionsResponse;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.message.*;
+import de.uol.swp.server.message.ClientAuthorisedMessage;
+import de.uol.swp.server.message.ServerExceptionMessage;
+import de.uol.swp.server.message.ServerInternalMessage;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
 import de.uol.swp.server.sessionmanagement.SessionManagementException;
 import org.apache.logging.log4j.LogManager;
@@ -77,11 +78,11 @@ public class AuthenticationService extends AbstractService {
         ServerInternalMessage returnMessage;
         try {
             if (userManagement.isLoggedIn(msg.getUsername())) {
-                // Don't need isPresent check here as it is implied by isLoggedIn
-                returnMessage = new ClientAuthorisedMessage(userManagement.getUser(msg.getUsername()).get(), true);
+                returnMessage = new ServerExceptionMessage(
+                        new LoginException("User [" + msg.getUsername() + "] already logged in"));
             } else {
                 User newUser = userManagement.login(msg.getUsername(), msg.getPassword());
-                returnMessage = new ClientAuthorisedMessage(newUser, false);
+                returnMessage = new ClientAuthorisedMessage(newUser);
                 returnMessage.setSession(sessionManagement.createSession(newUser));
             }
         } catch (SecurityException e) {
@@ -123,47 +124,6 @@ public class AuthenticationService extends AbstractService {
         }
         Message returnMessage = new UserLoggedOutMessage(userToLogOut.getUsername());
         post(returnMessage);
-    }
-
-    /**
-     * Handles a NukeUsersSessionsRequest found on the EventBus
-     * <p>
-     * If a NukeUsersSessionsRequest is detected on the EventBus, this method is called.
-     * It takes the user from received request and logs it out via UserManagement.
-     * After that it cycles through the session store and removes all sessions matching
-     * that particular user along with sending a KillOldClientResponse to log the old
-     * client out. At last a NukeUsersSessionsResponse is posted on the EventBus
-     * as a confirmation for the requesting client.
-     *
-     * @param req NukeUsersSessionsRequest found on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @see de.uol.swp.common.user.request.NukeUsersSessionsRequest
-     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onNukeUsersSessionsRequest(NukeUsersSessionsRequest req) {
-        LOG.debug("Received NukeUsersSessionsRequest");
-        if (req.getUser() == null) return;
-        User userToLogOut = req.getUser();
-        LOG.debug("---- Logging out User {}", userToLogOut.getUsername());
-        userManagement.logout(userToLogOut);
-        // With the new logic there should only ever be one session but keep this to be safe.
-        while (sessionManagement.getSession(userToLogOut).isPresent()) {
-            post(new FetchUserContextInternalRequest(sessionManagement.getSession(userToLogOut).get(),
-                                                     new KillOldClientResponse()));
-            try {
-                sessionManagement.removeSession(sessionManagement.getSession(userToLogOut).get());
-            } catch (SessionManagementException e) {
-                LOG.error(e);
-            }
-        }
-        post(new UserLoggedOutMessage(userToLogOut.getUsername()));
-        ResponseMessage response = new NukedUsersSessionsResponse(userToLogOut);
-        response.initWithMessage(req);
-        post(response);
     }
 
     /**

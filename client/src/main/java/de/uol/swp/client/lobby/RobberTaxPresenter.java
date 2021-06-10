@@ -16,8 +16,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType.*;
 
@@ -31,7 +37,7 @@ import static de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.r
 @SuppressWarnings("UnstableApiUsage")
 public class RobberTaxPresenter extends AbstractPresenter {
 
-    public static final String fxml = "/fxml/RobberTaxPresenter.fxml";
+    public static final String fxml = "/fxml/RobberTaxView.fxml";
     public static final int MIN_HEIGHT = 650;
     public static final int MIN_WIDTH = 550;
     private static final Logger LOG = LogManager.getLogger(RobberTaxPresenter.class);
@@ -63,7 +69,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
     /**
      * Listener for the brickSlider
      */
-    @FXML
     private void brickSliderListener() {
         selectedResources.set(BRICK, (int) brickSlider.getValue());
         dragMethod();
@@ -76,27 +81,28 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * and enables/ disables the taxPay button depending on said amount.
      */
     private void dragMethod() {
-        int selectedAmount = 0;
-        for (IResource resource : selectedResources) {
-            selectedAmount += resource.getAmount();
-        }
-        if (selectedAmount < taxAmount) {
-            progress.setProgress((double) selectedAmount / taxAmount);
-            progress.getStyleClass().removeAll(barColourClasses);
-            progress.getStyleClass().add(BLUE_BAR);
-        } else if (selectedAmount == taxAmount) {
-            progress.setProgress(100);
-            progress.getStyleClass().removeAll(barColourClasses);
-            progress.getStyleClass().add(GREEN_BAR);
-        } else progress.getStyleClass().add(RED_BAR);
+        Platform.runLater(() -> {
+            int selectedAmount = 0;
+            for (IResource resource : selectedResources) {
+                selectedAmount += resource.getAmount();
+            }
+            if (selectedAmount < taxAmount) {
+                progress.setProgress((double) selectedAmount / taxAmount);
+                progress.getStyleClass().removeAll(barColourClasses);
+                progress.getStyleClass().add(BLUE_BAR);
+            } else if (selectedAmount == taxAmount) {
+                progress.setProgress(100);
+                progress.getStyleClass().removeAll(barColourClasses);
+                progress.getStyleClass().add(GREEN_BAR);
+            } else progress.getStyleClass().add(RED_BAR);
 
-        taxPay.setDisable(selectedAmount != taxAmount);
+            taxPay.setDisable(selectedAmount != taxAmount);
+        });
     }
 
     /**
      * Listener for the grainSlider
      */
-    @FXML
     private void grainSliderListener() {
         selectedResources.set(GRAIN, (int) grainSlider.getValue());
         dragMethod();
@@ -117,7 +123,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
                 });
             }
         });
-        Platform.runLater(()-> brickSlider.requestFocus());
+        Platform.runLater(() -> brickSlider.requestFocus());
 
         brickSlider.valueProperty().addListener((obs, oldValue, newValue) -> brickSliderListener());
         grainSlider.valueProperty().addListener((obs, oldValue, newValue) -> grainSliderListener());
@@ -137,7 +143,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
     /**
      * Listener for the lumberSlider
      */
-    @FXML
     private void lumberSliderListener() {
         selectedResources.set(LUMBER, (int) lumberSlider.getValue());
         dragMethod();
@@ -146,7 +151,12 @@ public class RobberTaxPresenter extends AbstractPresenter {
     /**
      * Handles a ShowRobberTaxUpdateEvent
      * <p>
-     * The event is sent when a new RobberTaxPresenter is created
+     * The event is sent when a new RobberTaxPresenter is created and
+     * contains the relevant data to be displayed in the RobberTaxPresenter.
+     * <p>
+     * This method also sets the accelerators for the RobberTaxPresenter, namely
+     * <ul>
+     *     <li> CTRL/META + P = Pay Tax button
      *
      * @param event ShowRobberTaxUpdateEvent found on the EventBus
      *
@@ -159,9 +169,14 @@ public class RobberTaxPresenter extends AbstractPresenter {
         taxAmount = event.getTaxAmount();
         inventory = event.getInventory();
 
-        resourceAmount.setText(String.valueOf(taxAmount));
+        Platform.runLater(() -> resourceAmount.setText(String.valueOf(taxAmount)));
         setInventoryList();
         setSliders(event.getInventory());
+
+        Map<KeyCombination, Runnable> accelerators = new HashMap<>();
+        accelerators.put(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN), // CTRL/META + P
+                         this::onTaxPayButtonPressed);
+        resourceAmount.getScene().getAccelerators().putAll(accelerators);
     }
 
     /**
@@ -173,17 +188,20 @@ public class RobberTaxPresenter extends AbstractPresenter {
      */
     @FXML
     private void onTaxPayButtonPressed() {
+        if (taxPay.isDisabled()) {
+            LOG.trace("onTaxPayButton called with disabled button, returning");
+            return;
+        }
         soundService.button();
         LOG.debug("Sending RobberTaxChosenRequest");
         gameService.taxPayed(lobbyName, selectedResources);
         gameService.updateInventory(lobbyName);
-        eventBus.post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
     /**
      * Listener for the oreSlider
      */
-    @FXML
     private void oreSliderListener() {
         selectedResources.set(ORE, (int) oreSlider.getValue());
         dragMethod();
@@ -196,20 +214,21 @@ public class RobberTaxPresenter extends AbstractPresenter {
      * then it gets updated with the items as listed in the inventory map.
      */
     private void setInventoryList() {
-        if (ownInventoryList == null) {
-            ownInventoryList = FXCollections.observableArrayList();
-            ownInventoryView.setItems(ownInventoryList);
-        }
-        ownInventoryList.clear();
-        for (IResource entry : inventory) {
-            ownInventoryList.add(entry.create());
-        }
+        Platform.runLater(() -> {
+            if (ownInventoryList == null) {
+                ownInventoryList = FXCollections.observableArrayList();
+                ownInventoryView.setItems(ownInventoryList);
+            }
+            ownInventoryList.clear();
+            for (IResource entry : inventory) {
+                ownInventoryList.add(entry.create());
+            }
+        });
     }
 
     /**
      * Helper method to handle the slider attributes
      */
-    @FXML
     private void setSliders(ResourceList inventory) {
         inventory = inventory.create();
         brickSlider.setMax(inventory.getAmount(BRICK));
@@ -222,7 +241,6 @@ public class RobberTaxPresenter extends AbstractPresenter {
     /**
      * Listener for the woolSlider
      */
-    @FXML
     private void woolSliderListener() {
         selectedResources.set(WOOL, (int) woolSlider.getValue());
         dragMethod();

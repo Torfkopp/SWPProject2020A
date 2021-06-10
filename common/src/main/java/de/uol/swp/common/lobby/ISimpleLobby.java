@@ -14,16 +14,6 @@ import java.util.Set;
 public interface ISimpleLobby extends Serializable {
 
     /**
-     * Gets if commands are allowed.
-     *
-     * @return The boolean
-     *
-     * @author Temmo Junkhoff
-     * @since 2021-05-03
-     */
-    boolean areCommandsAllowed();
-
-    /**
      * Gets the max players.
      *
      * @return The max players

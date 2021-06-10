@@ -1,6 +1,6 @@
 package de.uol.swp.client.lobby.event;
 
-import de.uol.swp.common.lobby.LobbyName;
+import de.uol.swp.common.lobby.ISimpleLobby;
 
 /**
  * Event used to show a window of a specified lobby
@@ -14,15 +14,15 @@ import de.uol.swp.common.lobby.LobbyName;
  */
 public class ShowLobbyViewEvent {
 
-    private final LobbyName name;
+    private final ISimpleLobby lobby;
 
     /**
      * Constructor
      *
-     * @param name Name containing the lobby's name
+     * @param lobby Name containing the lobby's name
      */
-    public ShowLobbyViewEvent(LobbyName name) {
-        this.name = name;
+    public ShowLobbyViewEvent(ISimpleLobby lobby) {
+        this.lobby = lobby;
     }
 
     /**
@@ -30,7 +30,7 @@ public class ShowLobbyViewEvent {
      *
      * @return A String containing the lobby's name
      */
-    public LobbyName getName() {
-        return name;
+    public ISimpleLobby getLobby() {
+        return lobby;
     }
 }

@@ -3,6 +3,8 @@ package de.uol.swp.client.sound;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javafx.scene.media.AudioClip;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
@@ -13,6 +15,8 @@ import java.io.File;
  * @since 2021-05-15
  */
 public class SoundService implements ISoundService {
+
+    private static final Logger LOG = LogManager.getLogger(SoundService.class);
 
     @Inject
     @Named("soundPack")
@@ -32,6 +36,7 @@ public class SoundService implements ISoundService {
         audio.setCycleCount(10000);
         audio.setPriority(-1);
         audio.play(backgroundVolume);
+        LOG.debug("SoundService initialised");
     }
 
     @Override
