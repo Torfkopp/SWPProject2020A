@@ -39,6 +39,7 @@ class AskLatestChatMessageResponseTest {
     void getChatHistory_LobbyNameIsNull() {
         response = new AskLatestChatMessageResponse(history);
 
+        assertEquals(lobbyName, response.getLobbyName());
         assertNull(response.getLobbyName());
         assertNull(response.getLobbyName());
         assertEquals(history, response.getChatHistory());
