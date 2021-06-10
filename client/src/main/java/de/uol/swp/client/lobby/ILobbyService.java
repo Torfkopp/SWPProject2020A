@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
@@ -25,18 +26,6 @@ public interface ILobbyService {
      * @since 2021-04-15
      */
     void changeOwner(LobbyName lobbyName, UserOrDummy newOwner);
-
-    /**
-     * Checks if the lobby is in a game
-     *
-     * @param lobbyName LobbyName to check
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     * @since 2021-04-09
-     */
-    void checkForGame(LobbyName lobbyName);
 
     /**
      * Posts a request to check if the user is currently in a lobby
@@ -78,6 +67,7 @@ public interface ILobbyService {
      * @param name The name of the lobby
      * @param ai   The AI to join the lobby
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @author Mario Fokken
      * @since 2021-05-21
      */
@@ -139,6 +129,21 @@ public interface ILobbyService {
      * @since 2021-01-28
      */
     void removeFromAllLobbies();
+
+    /**
+     * Posts a request to change a user's colour.
+     * If colour is null, the colour won't be changed,
+     * but the response will be sent nevertheless.
+     *
+     * @param lobbyName The lobby's name
+     * @param colour    The colour the user desires
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.SetColourRequest
+     * @since 2021-06-04
+     */
+    void setColour(LobbyName lobbyName, Colour colour);
 
     /**
      * Posts a request to retrieve all lobby names

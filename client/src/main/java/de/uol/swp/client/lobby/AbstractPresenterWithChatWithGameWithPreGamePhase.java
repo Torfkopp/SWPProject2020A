@@ -5,13 +5,14 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
-import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
-import de.uol.swp.common.game.response.RecoverSessionResponse;
+import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
@@ -24,17 +25,18 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 /**
- * This class is the base for creating a new Presenter that uses the game and needs the pre game phase.
+ * This class is the base for creating a new Presenter that uses the game and needs the pre-game phase.
  * <p>
- * This class prepares the child classes to have methods and attributes related to the pre game phase.
+ * This class prepares the child classes to have methods and attributes related to the pre-game phase.
  *
  * @author Temmo Junkhoff
  * @author Maximillian Lindner
@@ -86,12 +88,15 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton easyAIRadioButton;
     @FXML
     private VBox preGameSettingBox;
+    @FXML
+    private ComboBox<Colour> colourComboBox;
 
     @FXML
     @Override
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        prepareColourComboBox();
         LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
     }
 
@@ -99,7 +104,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * Helper method to clean chat history of old owner notices
      * <p>
      * This method removes all SystemMessages from the chat history
-     * that match the text used notify the owner that every player
+     * that match the text used to notify the owner that every player
      * (or every player except the owner) is ready to play and that
      * the owner should press the "Start Session" button to proceed
      * to the game.
@@ -113,6 +118,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
 
     /**
      * Helper function to let the user leave the lobby and close the window
+     * <p>
      * Also clears the EventBus of the instance to avoid NullPointerExceptions.
      *
      * @param kicked Whether the user was kicked (true) or is leaving
@@ -135,8 +141,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Method called when the KickUserButton is pressed
      * <p>
-     * If the EndTurnButton is pressed, this method requests to kick
-     * the selected User of the members view.
+     * If the KickUserButton is pressed, this method requests to kick
+     * the selected User inside the MembersView.
      *
      * @author Maximilian Lindner
      * @author Sven Ahrens
@@ -157,7 +163,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * <p>
      * Method called when the StartSessionButton is pressed.
      * The Method calls the GameService to start the Session and
-     * makes the buildingCost, timerLabel, and moveTimeLabel visible.
+     * makes the BuildingCosts, TimerLabel, and MoveTimeLabel visible.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
@@ -192,11 +198,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the disable and visible state of the changeOwnerButton.
+     * Helper function that sets the visibility and state of the changeOwnerButton.
      * <p>
-     * The button is only enabled the lobby owner when a game
-     * has not started yet and if the logged in user is the
-     * owner
+     * The button is only enabled for the lobby owner when a game
+     * has not started yet and if the logged in user is the owner
      *
      * @author Maximilian Lindner
      * @since 2021-04-13
@@ -209,11 +214,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the disable and visible state of the kickUserButton.
+     * Helper function that sets the visibility and state of the kickUserButton.
      * <p>
-     * The button is only enabled the lobby owner when a game
-     * has not started yet and if the logged in user is the
-     * owner
+     * The button is only enabled for the lobby owner when a game
+     * has not started yet and if the logged in user is the owner
      *
      * @author Maximilian Lindner
      * @author Sven Ahrens
@@ -227,8 +231,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper method that sets the visibility for the lobby owner and disables pre-game Buttons and Checkboxes
-     * for everyone, expect the owner.
+     * Helper method that sets the visibility and state of buttons and checkboxes for the
+     * pre-game settings. The pre-game settings are disabled for everyone, except the
+     * owner of the lobby.
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
@@ -247,11 +252,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Helper function that sets the Visible and Disable states of the "Start
-     * Session" button.
+     * Helper function that sets the visibility and state of the StartSessionButton.
      * <p>
-     * The button is only ever visible to the lobby owner, and is only enabled
-     * if there are 3 or more lobby members, and all members are marked as ready.
+     * The button is only visible to the lobby owner and only enabled
+     * if there are 3 or more lobby members and all members are marked as ready.
      *
      * @author Eric Vuong
      * @author Maximilian Lindner
@@ -268,16 +272,33 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Helper method to create a PlayerColourMap from
+     * the UserColourMap and the UserOrDummyPlayerMap
+     *
+     * @return PlayerColourMap
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    private Map<Player, Colour> getPlayerColourMap() {
+        Map<Player, Colour> map = new HashMap<>();
+        for (UserOrDummy u : userColoursMap.keySet())
+            map.put(userOrDummyPlayerMap.get(u), userColoursMap.get(u));
+        return map;
+    }
+
+    /**
      * Handles a click on the AddAI Button
      * <p>
      * Method called when the AddAIButton is pressed.
-     * This Method calls the lobbyService to post an AddAIRequest
+     * This Method calls the lobbyService to post an AddAIRequest.
      *
      * @author Mario Fokken
      * @since 2021-05-21
      */
     @FXML
     private void onAddAIButtonPressed() {
+        soundService.button();
         boolean talking = talkingAICheckBox.isSelected();
         AI.Difficulty difficulty =
                 difficultyAIToggleGroup.getSelectedToggle() == easyAIRadioButton ? AI.Difficulty.EASY :
@@ -289,8 +310,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Method called when the ChangeOwnerButtonPressed is pressed
      * <p>
-     * If the ChangeOwnerButtonPressed is pressed, this method requests to change
-     * the owner status of the selected User of the members view .
+     * If the ChangeOwnerButton is pressed, this method requests to change
+     * the owner status to the selected User of the members view.
      *
      * @author Maximilian Lindner
      * @see de.uol.swp.common.lobby.request.ChangeOwnerRequest
@@ -306,9 +327,49 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
+     * Handles a click on the ColourChangeButton
+     * <p>
+     * Method called when the ColourChangeButton is pressed.
+     * This method calls the lobbyService to post a setColourRequest.
+     *
+     * @author Mario Fokken
+     * @since 2021-06-04
+     */
+    @FXML
+    private void onColourChangeButtonPressed() {
+        Colour colour = colourComboBox.getValue();
+        lobbyService.setColour(lobbyName, colour);
+    }
+
+    /**
+     * Handles a ColourChangedMessage found on the EventBus
+     * <p>
+     * The message gets sent by the server if a user changed their colour.
+     * It tells the gameRendering to adapt those new colours.
+     *
+     * @param msg The ColourChangedMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    @Subscribe
+    private void onColourChangedMessage(ColourChangedMessage msg) {
+        LOG.debug("Received ColourChangedMessage for {}", msg.getName());
+        Map<UserOrDummy, Player> map = new HashMap<>();
+        int i = 0;
+        for (UserOrDummy u : msg.getUserColours().keySet())
+            map.put(u, Player.byIndex(i++));
+        userOrDummyPlayerMap = map;
+        userColoursMap = msg.getUserColours();
+        gameRendering.setPlayerColours(getPlayerColourMap());
+        lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
+        Platform.runLater(this::prepareColourComboBox);
+    }
+
+    /**
      * Handles a KickUserResponse found on the EventBus
      * <p>
-     * If a KickUserResponse is detected on the EventBus and its
+     * If a KickUserResponse is detected on the EventBus and it is
      * directed to this lobby and this player, the according lobby
      * window is closed.
      *
@@ -409,6 +470,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      */
     @FXML
     private void onReadyCheckBoxClicked() {
+        soundService.button();
         boolean isReady = readyCheckBox.isSelected();
         lobbyService.userReady(lobbyName, isReady);
     }
@@ -453,7 +515,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     /**
      * Handles a StartSessionMessage found on the EventBus
      * <p>
-     * Sets the play field visible.
+     * Sets the play field to visible.
      * The startSessionButton and every readyCheckbox are getting invisible for
      * the lobby members.
      *
@@ -471,6 +533,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         winner = null;
         inGame = true;
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
+        userColoursMap = msg.getUserOrDummyColourMap();
+        gameRendering.setPlayerColours(getPlayerColourMap());
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -515,74 +579,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Handles a StartSessionResponse found on the EventBus
-     * <p>
-     * Sets the play field visible.
-     * The startSessionButton and every readyCheckbox are getting invisible for
-     * the user. <- No, it doesn't
-     *
-     * @param rsp The StartSessionResponse found on the EventBus
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-02-04
-     */
-    @Subscribe
-    private void onStartSessionResponse(RecoverSessionResponse rsp) {
-        if (!rsp.getLobby().getName().equals(lobbyName)) return;
-        LOG.debug("Received StartSessionResponse for Lobby {}", lobbyName);
-        gameWon = false;
-        winner = null;
-        inGame = true;
-        lobbyService.retrieveAllLobbyMembers(lobbyName);
-        cleanChatHistoryOfOldOwnerNotices();
-        Platform.runLater(() -> {
-            startUpPhaseBuiltStructures = rsp.getBuiltStructures();
-            // because startUpPhaseEnabled tracks whether it's _ongoing_, we check if player built everything
-            startUpPhaseEnabled = startUpPhaseBuiltStructures != StartUpPhaseBuiltStructures.ALL_BUILT;
-            if (startUpPhaseEnabled) {
-                switch (startUpPhaseBuiltStructures) {
-                    case NONE_BUILT:
-                        notice.setVisible(true);
-                        notice.setText(ResourceManager.get("game.setupphase.building.firstsettlement"));
-                        break;
-                    case FIRST_SETTLEMENT_BUILT:
-                        notice.setText(ResourceManager.get("game.setupphase.building.firstroad"));
-                        break;
-                    case FIRST_BOTH_BUILT:
-                        notice.setText(ResourceManager.get("game.setupphase.building.secondsettlement"));
-                        break;
-                    case SECOND_SETTLEMENT_BUILT:
-                        notice.setText(ResourceManager.get("game.setupphase.building.secondroad"));
-                        break;
-                }
-            }
-            autoRollEnabled = rsp.isAutoRollState();
-            autoRoll.setSelected(autoRollEnabled);
-            int[] dices = rsp.getDices();
-            dice1 = dices[0];
-            dice2 = dices[1];
-            setTurnIndicatorText(rsp.getPlayer());
-            setMoveTimer(rsp.getMoveTime());
-            gameService.updateGameMap(lobbyName);
-            prepareInGameArrangement();
-            endTurn.setDisable(!rsp.areDiceRolledAlready());
-            autoRoll.setVisible(true);
-            tradeWithUserButton.setVisible(true);
-            tradeWithUserButton.setDisable(!rsp.areDiceRolledAlready());
-            tradeWithBankButton.setVisible(true);
-            tradeWithBankButton.setDisable(!rsp.areDiceRolledAlready());
-            turnIndicator.setVisible(true);
-            if (!rsp.areDiceRolledAlready()) setRollDiceButtonState(rsp.getPlayer());
-            if (rsp.getPlayer().equals(userService.getLoggedInUser())) ownTurn = true;
-            kickUserButton.setVisible(false);
-            changeOwnerButton.setVisible(false);
-            playCard.setVisible(true);
-            playCard.setDisable(!rsp.areDiceRolledAlready());
-        });
-    }
-
-    /**
      * Handles the UserReadyMessage
      * <p>
      * If the UserReadyMessage belongs to this lobby, it calls the LobbyService
@@ -600,6 +596,47 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received UserReadyMessage for Lobby {}", lobbyName);
         lobbyService.retrieveAllLobbyMembers(lobbyName); // for updateUserList
+    }
+
+    /**
+     * Prepares the ColourComboBox
+     * <p>
+     * Colours the text in the right colour.
+     *
+     * @author Mario Fokken
+     * @since 2021-06-04
+     */
+    private void prepareColourComboBox() {
+        colourComboBox.getItems().clear();
+        Colour[] colours = new Colour[Colour.values().length - 1];
+        System.arraycopy(Colour.values(), 0, colours, 0, colours.length);
+
+        colourComboBox.getItems().addAll(colours);
+        colourComboBox.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<Colour> call(ListView<Colour> param) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(Colour item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(resourceBundle.getString("colours." + item));
+                            int[] colourCode = item.getColourCode();
+                            setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
+                            setDisable(userColoursMap.containsValue(item));
+                        } else setText(null);
+                    }
+                };
+            }
+        });
+        colourComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Colour item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) setText(resourceBundle.getString("colours." + item));
+                else setText(null);
+            }
+        });
     }
 
     /**
@@ -664,6 +701,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(ResourceManager.get("lobby.error.movetime")));
             } else {
+                soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
                                                  randomPlayFieldCheckbox.isSelected());
             }
@@ -673,7 +711,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     }
 
     /**
-     * Prepare the MoveTimeTextField
+     * Prepares the MoveTimeTextField
      * <p>
      * Lets the moveTimeTextField only accept numbers.
      *

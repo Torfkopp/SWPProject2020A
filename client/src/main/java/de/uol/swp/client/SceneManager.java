@@ -7,12 +7,15 @@ import com.google.inject.Injector;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import de.uol.swp.client.auth.LoginPresenter;
-import de.uol.swp.client.auth.events.RetryLoginEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.ChangeAccountDetailsPresenter;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsCanceledEvent;
 import de.uol.swp.client.changeAccountDetails.event.ChangeAccountDetailsErrorEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeProperties.ChangePropertiesPresenter;
+import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
+import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
+import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.devmenu.DevMenuPresenter;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyPresenter;
@@ -28,9 +31,7 @@ import de.uol.swp.client.rules.RulesOverviewPresenter;
 import de.uol.swp.client.rules.event.ResetRulesOverviewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.client.sound.ISoundService;
-import de.uol.swp.client.trade.TradeWithBankPresenter;
-import de.uol.swp.client.trade.TradeWithUserAcceptPresenter;
-import de.uol.swp.client.trade.TradeWithUserPresenter;
+import de.uol.swp.client.trade.*;
 import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.devmenu.response.OpenDevMenuResponse;
@@ -39,6 +40,9 @@ import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.lobby.response.AllLobbiesResponse;
 import de.uol.swp.common.user.User;
+import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
+import de.uol.swp.common.user.response.LoginSuccessfulResponse;
+import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
 import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import de.uol.swp.common.util.ResourceManager;
@@ -91,6 +95,9 @@ public class SceneManager {
     private ILobbyService lobbyService;
 
     @Inject
+    private ITradeService tradeService;
+
+    @Inject
     private ISoundService soundService;
 
     private Scene loginScene;
@@ -100,6 +107,7 @@ public class SceneManager {
     private Scene lastScene = null;
     private Scene currentScene = null;
     private Scene changeAccountDetailsScene;
+    private Scene changePropertiesScene;
     private Scene rulesScene;
     private boolean devMenuIsOpen;
     private boolean rulesOverviewIsOpen;
@@ -162,6 +170,21 @@ public class SceneManager {
     }
 
     /**
+     * Shows the ChangePropertiesScreen
+     * <p>
+     * Sets the scene's UserData to the current user.
+     * Switches the current Scene to the ChangePropertiesScreen
+     * and sets the window's title to "Change Properties"
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-22
+     */
+    public void showChangePropertiesScreen() {
+        showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
+                  ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
+    }
+
+    /**
      * Shows an error message inside an error alert
      *
      * @param message The type of error to be shown
@@ -187,6 +210,7 @@ public class SceneManager {
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
     }
 
@@ -202,42 +226,6 @@ public class SceneManager {
     }
 
     /**
-     * Method to open a popup which allows to log an old session out
-     * <p>
-     * This method allows logging an old session out by posting
-     * a NukeUsersSessionsRequest on the EventBus once the
-     * confirmation button is pressed on the opened popup.
-     *
-     * @param user The user that is already logged in.
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-03
-     */
-    public void showLogOldSessionOutScreen(User user) {
-        soundService.popup();
-        String content = ResourceManager.get("logoldsessionout.error");
-        String title = ResourceManager.get("confirmation.title");
-        String headerText = ResourceManager.get("confirmation.header");
-        String confirmText = ResourceManager.get("button.confirm");
-        String cancelText = ResourceManager.get("button.cancel");
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, content);
-            alert.setTitle(title);
-            alert.setHeaderText(headerText);
-            ButtonType confirm = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancel = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(confirm, cancel);
-            alert.getDialogPane().getStylesheets().add(styleSheet);
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == confirm) {
-                LOG.debug("Sending NukeUsersSessionsRequest");
-                ThreadManager.runNow(() -> eventBus.post(new NukeUsersSessionsRequest(user)));
-            }
-        });
-    }
-
-    /**
      * Shows the login error alert
      * <p>
      * Opens an ErrorAlert popup saying "Error logging in to server"
@@ -245,6 +233,7 @@ public class SceneManager {
      * @since 2019-09-03
      */
     public void showLoginErrorScreen() {
+        // Will we ever use this?
         soundService.popup();
         String contentText = ResourceManager.get("login.error");
         String confirmText = ResourceManager.get("button.confirm");
@@ -254,6 +243,7 @@ public class SceneManager {
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
         showLoginScreen();
     }
@@ -353,6 +343,7 @@ public class SceneManager {
             alert.getButtonTypes().setAll(confirm);
             alert.getDialogPane().getStylesheets().add(styleSheet);
             alert.showAndWait();
+            soundService.button();
         });
     }
 
@@ -372,6 +363,25 @@ public class SceneManager {
             Parent rootPane = initPresenter(ChangeAccountDetailsPresenter.fxml);
             changeAccountDetailsScene = new Scene(rootPane, 400, 200);
             changeAccountDetailsScene.getStylesheets().add(styleSheet);
+        }
+    }
+
+    /**
+     * Initialises the ChangePropertiesView
+     * <p>
+     * If the ChangePropertiesScene is null, it gets set to a new scene containing the
+     * pane showing the ChangePropertiesView as specified by the ChangePropertiesView
+     * FXML file.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.ChangePropertiesPresenter
+     * @since 2021-05-22
+     */
+    private void initChangePropertiesView() {
+        if (changePropertiesScene == null) {
+            Parent rootPane = initPresenter(ChangePropertiesPresenter.fxml);
+            changePropertiesScene = new Scene(rootPane, 400, 200);
+            changePropertiesScene.getStylesheets().add(styleSheet);
         }
     }
 
@@ -487,6 +497,7 @@ public class SceneManager {
         initRegistrationView();
         initRulesOverviewView();
         initChangeAccountDetailsView();
+        initChangePropertiesView();
         eventBus.post(new SetAcceleratorsEvent());
     }
 
@@ -550,7 +561,10 @@ public class SceneManager {
         }
         //found in UserManagement
         if (e.contains("Cannot auth user "))
-            context = String.format(ResourceManager.get("error.context.cannotauth"), e.substring(17));
+            context = ResourceManager.get("error.context.cannotauth", e.substring(17));
+        if (e.contains("already logged in")) context =
+                ResourceManager.get("error.context.alreadyloggedin",
+                        e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')));
         //found in UserService
         if (e.contains("Cannot delete user ")) {
             context = String.format(ResourceManager.get("error.context.cannotdelete"),
@@ -613,26 +627,6 @@ public class SceneManager {
     }
 
     /**
-     * Handles an old session
-     * <p>
-     * If an AlreadyLoggedInResponse object is found on the EventBus this method
-     * is called. If a client attempts to log in but the user is already
-     * logged in elsewhere this method tells the SceneManager to open a popup
-     * which prompts the user to log the old session out.
-     *
-     * @param rsp The AlreadyLoggedInResponse object detected on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onAlreadyLoggedInResponse(AlreadyLoggedInResponse rsp) {
-        LOG.debug("Received AlreadyLoggedInResponse for User {}", rsp.getLoggedInUser());
-        showLogOldSessionOutScreen(rsp.getLoggedInUser());
-    }
-
-    /**
      * Handles the ChangeAccountDetailsCanceledEvent detected on the EventBus
      * <p>
      * If a ChangeAccountDetailsCanceledEvent is detected on the EventBus, this method gets
@@ -678,6 +672,37 @@ public class SceneManager {
     private void onChangeAccountDetailsSuccessfulResponse(ChangeAccountDetailsSuccessfulResponse rsp) {
         LOG.debug("Account Details change was successful.");
         showMainScreen(rsp.getUser());
+    }
+
+    /**
+     * Handles the ChangePropertiesCanceledEvent detected on the EventBus
+     * <p>
+     * If a ChangePropertiesCanceledEvent is detected on the EventBus, this method gets
+     * called. It calls a method to show the main screen.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
+     * @since 2020-12-19
+     */
+    @Subscribe
+    private void onChangePropertiesCanceledEvent(ChangePropertiesCanceledEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
+    }
+
+    /**
+     * Handles a successful properties changing process
+     * <p>
+     * If an ChangePropertiesSuccessfulEvent object is detected on the EventBus this
+     * method is called. It tells the SceneManager to show the MainScreen window.
+     *
+     * @param event The ChangePropertiesSuccessfulEvent object detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @since 2021-05-22
+     */
+    @Subscribe
+    private void onChangePropertiesSuccessfulEvent(ChangePropertiesSuccessfulEvent event) {
+        showScene(lastScene, lastTitle, MainMenuPresenter.MIN_WIDTH, MainMenuPresenter.MIN_HEIGHT);
     }
 
     /**
@@ -799,26 +824,6 @@ public class SceneManager {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse for User {}", rsp.getUser().getUsername());
         showMainScreen(rsp.getUser());
-    }
-
-    /**
-     * Handles the NukeUsersSessionsResponse detected on the EventBus
-     * <p>
-     * If this method is called, it means all sessions belonging to a
-     * user have been nuked, therefore it posts a RetryLoginEvent
-     * on the EventBus to create a new session for the user.
-     *
-     * @param rsp The NukeUsersSessionsResponse detected on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @see de.uol.swp.common.user.response.NukedUsersSessionsResponse
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onNukedUsersSessionsResponse(NukedUsersSessionsResponse rsp) {
-        LOG.debug("Received NukedUsersSessionsResponse");
-        eventBus.post(new RetryLoginEvent());
     }
 
     /**
@@ -948,6 +953,29 @@ public class SceneManager {
     @Subscribe
     private void onShowChangeAccountDetailsViewEvent(ShowChangeAccountDetailsViewEvent event) {
         showChangeAccountDetailsScreen();
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            windowEvent.consume();
+            showMainScreen(userService.getLoggedInUser());
+        });
+    }
+
+    /**
+     * Handles the ShowChangePropertiesViewEvent detected on the EventBus
+     * <p>
+     * If a ShowChangePropertiesViewEvent is detected on the EventBus, this method gets
+     * called. It calls a method to switch the current screen to the Change Properties
+     * screen.
+     * If the user wants to close this window, the user gets redirected to the Main Menu.
+     *
+     * @param event The ShowChangePropertiesViewEvent detected on the EventBus
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @since 2021-05-22
+     */
+    @Subscribe
+    private void onShowChangePropertiesViewEvent(ShowChangePropertiesViewEvent event) {
+        showChangePropertiesScreen();
         primaryStage.setOnCloseRequest(windowEvent -> {
             windowEvent.consume();
             showMainScreen(userService.getLoggedInUser());
@@ -1153,6 +1181,7 @@ public class SceneManager {
         });
         LOG.debug("Sending TradeUpdateEvent for the Lobby {}", lobbyName);
         eventBus.post(new TradeUpdateEvent(lobbyName));
+        tradeService.tradeWithBank(lobbyName);
     }
 
     /**
@@ -1236,6 +1265,7 @@ public class SceneManager {
             tradingStage.show();
             LOG.debug("Sending TradeWithUserUpdateEvent to Lobby {}", lobbyName);
             ThreadManager.runNow(() -> eventBus.post(new TradeWithUserUpdateEvent(lobbyName)));
+            tradeService.tradeWithUser(lobbyName, event.getRespondingUser(), event.isCounterOffer());
         });
     }
 

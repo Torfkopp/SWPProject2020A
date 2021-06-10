@@ -1,6 +1,8 @@
 package de.uol.swp.client.lobby;
 
 import com.google.inject.Inject;
+import de.uol.swp.client.util.ThreadManager;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
@@ -34,11 +36,6 @@ public class AsyncLobbyService implements ILobbyService {
     @Override
     public void changeOwner(LobbyName lobbyName, UserOrDummy newOwner) {
         ThreadManager.runNow(() -> syncLobbyService.changeOwner(lobbyName, newOwner));
-    }
-
-    @Override
-    public void checkForGame(LobbyName lobbyName) {
-        ThreadManager.runNow(() -> syncLobbyService.checkForGame(lobbyName));
     }
 
     @Override
@@ -84,6 +81,11 @@ public class AsyncLobbyService implements ILobbyService {
     @Override
     public void removeFromAllLobbies() {
         ThreadManager.runNow(syncLobbyService::removeFromAllLobbies);
+    }
+
+    @Override
+    public void setColour(LobbyName lobbyName, Colour colour) {
+        ThreadManager.runNow(() -> syncLobbyService.setColour(lobbyName, colour));
     }
 
     @Override

@@ -151,8 +151,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         soundService.button();
-        tradeService.showUserTradeWindow(lobbyName, offeringUser);
-        tradeService.tradeWithUser(lobbyName, offeringUser, true);
+        tradeService.showUserTradeWindow(lobbyName, offeringUser, true);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 

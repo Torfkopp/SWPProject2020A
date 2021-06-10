@@ -120,6 +120,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      */
     @FXML
     private void onCancelTradeButtonPressed() {
+        soundService.button();
         closeWindow();
     }
 
@@ -186,6 +187,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             LOG.trace("onOfferTradeButtonPressed called with disabled offerTradeButton, returning");
             return;
         }
+        soundService.button();
         setResourceLists();
         if (checkResources()) {
             LOG.debug("Failed sending the offer");
@@ -279,21 +281,19 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * @since 2021-04-20
      */
     private void setResourceLists() {
-        Platform.runLater(() -> {
-            selectedOwnResourceList = new ResourceList();
-            selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
-            selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));
-            selectedOwnResourceList.set(ResourceType.LUMBER, ((int) (ownLumberSlider.getValue())));
-            selectedOwnResourceList.set(ResourceType.GRAIN, ((int) (ownGrainSlider.getValue())));
-            selectedOwnResourceList.set(ResourceType.WOOL, ((int) (ownWoolSlider.getValue())));
+        selectedOwnResourceList = new ResourceList();
+        selectedOwnResourceList.set(ResourceType.BRICK, ((int) (ownBrickSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.ORE, ((int) (ownOreSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.LUMBER, ((int) (ownLumberSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.GRAIN, ((int) (ownGrainSlider.getValue())));
+        selectedOwnResourceList.set(ResourceType.WOOL, ((int) (ownWoolSlider.getValue())));
 
-            selectedPartnersResourceList = new ResourceList();
-            selectedPartnersResourceList.set(ResourceType.BRICK, ((int) (tradingPartnerBrickSlider.getValue())));
-            selectedPartnersResourceList.set(ResourceType.ORE, ((int) (tradingPartnerOreSlider.getValue())));
-            selectedPartnersResourceList.set(ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
-            selectedPartnersResourceList.set(ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
-            selectedPartnersResourceList.set(ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
-        });
+        selectedPartnersResourceList = new ResourceList();
+        selectedPartnersResourceList.set(ResourceType.BRICK, ((int) (tradingPartnerBrickSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.ORE, ((int) (tradingPartnerOreSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.WOOL, ((int) (tradingPartnerWoolSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.LUMBER, ((int) (tradingPartnerLumberSlider.getValue())));
+        selectedPartnersResourceList.set(ResourceType.GRAIN, ((int) (tradingPartnerGrainSlider.getValue())));
     }
 
     /**

@@ -8,6 +8,7 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
+import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
@@ -22,7 +23,6 @@ import de.uol.swp.common.lobby.response.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.message.UserLoggedInMessage;
 import de.uol.swp.common.user.message.UserLoggedOutMessage;
-import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.*;
 import de.uol.swp.common.util.ResourceManager;
 import javafx.application.Platform;
@@ -273,6 +273,22 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     }
 
     /**
+     * Method called when the ChangePropertiesButton is pressed
+     * <p>
+     * This method is called when the ChangePropertiesButton is pressed.
+     * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
+     *
+     * @author Alwin Bossert
+     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @since 2021-05-22
+     */
+    @FXML
+    private void onChangePropertiesButtonPressed() {
+        soundService.button();
+        post(new ShowChangePropertiesViewEvent());
+    }
+
+    /**
      * Handles a CheckUserInLobbyResponse found on the EventBus
      * <p>
      * If a new CheckUserInLobbyResponse object is found on the EventBus, this method
@@ -346,6 +362,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         //if 'OK' is pressed the lobby will be created. Otherwise, it won't
         Optional<String> result = dialogue.showAndWait();
+        soundService.button();
         String lobbyPasswordHash = lobbyPassword.getText();
         if (!Strings.isNullOrEmpty(lobbyPassword.getText())) {
             lobbyPasswordHash = userService.hash(lobbyPassword.getText());
@@ -434,6 +451,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 userDeletionConfirmCheckBox.selectedProperty(), confirmPasswordField.textProperty()));
         dialogue.getDialogPane().getStylesheets().add(styleSheet);
         Optional<String> result = dialogue.showAndWait();
+        soundService.button();
         result.ifPresent(s -> userService
                 .dropUser(userService.getLoggedInUser(), userService.hash(confirmPasswordField.getText())));
     }
@@ -534,6 +552,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
             dialogue.getDialogPane().getStylesheets().add(styleSheet);
             //if 'OK' is pressed a JoinLobbyWithPasswordConfirmationRequest is send. Otherwise, it won't
             Optional<String> result = dialogue.showAndWait();
+            soundService.button();
             String lobbyPassword = lobbyPasswordField.getText();
             if (!Strings.isNullOrEmpty(lobbyPasswordField.getText())) {
                 lobbyPassword = userService.hash(lobbyPasswordField.getText());
@@ -576,32 +595,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     @Subscribe
     private void onJoinRandomLobbyFailedResponse(JoinRandomLobbyFailedResponse rsp) {
         Platform.runLater(() -> randomLobbyState.setVisible(true));
-    }
-
-    /**
-     * Handles a KillOldClientResponse found on the EventBus
-     * <p>
-     * If a new KillOldClientResponse object is found on the EventBus, this
-     * method removes the user from all lobbies and resets the users chat vars.
-     * After that it posts a new showLoginViewMessage on the bus,
-     * so the old client gets reset to the login screen. The final step is
-     * to post a CloseLobbiesViewEvent on the bus so the remaining lobby
-     * windows get closed as well.
-     *
-     * @param rsp TheKillOldClientResponse object fount on the EventBus
-     *
-     * @author Eric Vuong
-     * @author Marvin Drees
-     * @see de.uol.swp.common.user.response.KillOldClientResponse
-     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
-     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
-     * @since 2021-03-03
-     */
-    @Subscribe
-    private void onKillOldClientResponse(KillOldClientResponse rsp) {
-        resetChatVars();
-        post(showLoginViewMessage);
-        post(closeLobbiesViewEvent);
     }
 
     /**
@@ -664,7 +657,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLoginSuccessfulResponse(LoginSuccessfulResponse rsp) {
         LOG.debug("Received LoginSuccessfulResponse");
         prepareChatVars();
-        post(new GetOldSessionsRequest(rsp.getUser()));
         userService.retrieveAllUsers();
         lobbyService.retrieveAllLobbies();
         chatService.askLatestMessages(10);
@@ -708,6 +700,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      */
     @FXML
     private void onRulesMenuClicked() {
+        soundService.button();
         post(new ShowRulesOverviewViewEvent());
     }
 
@@ -833,6 +826,22 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
                 chatMessages.add(systemMessage);
             }
         });
+    }
+
+    /**
+     * Generic method being called by UI Elements
+     * <p>
+     * This method is called by UI Elements which don't
+     * have or need a dedicated method. So far it only
+     * plays the button sound and is primarily being
+     * used by checkboxes.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-06
+     */
+    @FXML
+    private void uiElementClicked() {
+        soundService.button();
     }
 
     /**

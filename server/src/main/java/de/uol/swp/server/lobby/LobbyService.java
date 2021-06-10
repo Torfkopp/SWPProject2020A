@@ -7,7 +7,6 @@ import com.google.inject.Inject;
 import de.uol.swp.common.exception.ExceptionMessage;
 import de.uol.swp.common.exception.LobbyExceptionMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
-import de.uol.swp.common.game.request.CheckForGameRequest;
 import de.uol.swp.common.game.request.ReturnToPreGameLobbyRequest;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
@@ -19,10 +18,11 @@ import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
 import de.uol.swp.common.user.*;
 import de.uol.swp.common.user.request.CheckUserInLobbyRequest;
-import de.uol.swp.common.user.request.GetOldSessionsRequest;
 import de.uol.swp.common.user.response.CheckUserInLobbyResponse;
 import de.uol.swp.server.AbstractService;
-import de.uol.swp.server.game.event.*;
+import de.uol.swp.server.game.event.CreateGameInternalRequest;
+import de.uol.swp.server.game.event.ForwardToUserInternalRequest;
+import de.uol.swp.server.game.event.KickUserEvent;
 import de.uol.swp.server.message.ServerInternalMessage;
 import de.uol.swp.server.sessionmanagement.ISessionManagement;
 import org.apache.logging.log4j.LogManager;
@@ -76,6 +76,23 @@ public class LobbyService extends AbstractService {
             msg.setReceiver(sessionManagement.getSessions(lobby.get().getRealUsers()));
             post(msg);
         }
+    }
+
+    /**
+     * Handles a AddAIRequest found on the EventBus
+     * <p>
+     * If a AddAIRequest is detected on the EventBus, this method is called.
+     * It adds the AI to the lobby.
+     *
+     * @param req The AddAIRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.AddAIRequest
+     * @since 2021-05-21
+     */
+    @Subscribe
+    private void onAddAIRequest(AddAIRequest req) {
+        post(new JoinLobbyRequest(req.getName(), req.getUser()));
     }
 
     /**
@@ -149,25 +166,6 @@ public class LobbyService extends AbstractService {
     }
 
     /**
-     * Handles a CheckForGameRequest found on the EventBus
-     * <p>
-     * If the lobby contained in the request is ingame, an ActivePlayerEvent
-     * is posted onto the EventBus.
-     *
-     * @param req The CheckForGameRequest on the EventBus
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-04-09
-     */
-    @Subscribe
-    private void onCheckForGameRequest(CheckForGameRequest req) {
-        Optional<ILobby> lobby = lobbyManagement.getLobby(req.getOriginLobby());
-        if (lobby.isPresent() && lobby.get().isInGame())
-            post(new TransferLobbyStateEvent(lobby.get(), req.getUser(), req.getMessageContext()));
-    }
-
-    /**
      * Handles a CheckUserInLobbyRequest found on the EventBus
      * If a CheckUserInLobbyRequest is detected on the EventBus, this method is
      * called. It checks if the logged in user is currently in a lobby.
@@ -191,23 +189,6 @@ public class LobbyService extends AbstractService {
         Message responseMessage = new CheckUserInLobbyResponse(user, isInLobby);
         responseMessage.initWithMessage(req);
         post(responseMessage);
-    }
-
-    /**
-     * Handles a AddAIRequest found on the EventBus
-     * <p>
-     * If a AddAIRequest is detected on the EventBus, this method is called.
-     * It adds the AI to the lobby.
-     *
-     * @param req The AddAIRequest found on the EventBus
-     *
-     * @author Mario Fokken
-     * @see de.uol.swp.common.lobby.request.AddAIRequest
-     * @since 2021-05-21
-     */
-    @Subscribe
-    private void onAddAIRequest(AddAIRequest req) {
-        post(new JoinLobbyRequest(req.getName(), req.getUser()));
     }
 
     /**
@@ -246,35 +227,6 @@ public class LobbyService extends AbstractService {
             exceptionMessage.initWithMessage(req);
             post(exceptionMessage);
             LOG.debug(e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a GetOldSessionRequest found on the EventBus
-     * <p>
-     * When a GetOldSessionRequest is found on the EventBus, this method
-     * is called. It checks the LobbyManagement for all the lobbies
-     * the requesting user is in and posts JoinLobbyResponses for each.
-     * This method is used to reopen lobby windows on a new client.
-     *
-     * @param req The GetOldSessionRequest on the EventBus
-     *
-     * @author Marvin Drees
-     * @author Maximilian Lindner
-     * @since 2021-04-09
-     */
-    @Subscribe
-    private void onGetOldSessionsRequest(GetOldSessionsRequest req) {
-        LOG.debug("Received GetOldSessionsRequest");
-        User user = req.getUser();
-        Map<LobbyName, ILobby> lobbies = lobbyManagement.getLobbies();
-        for (Map.Entry<LobbyName, ILobby> entry : lobbies.entrySet()) {
-            if (entry.getValue().getUserOrDummies().contains(user)) {
-                ResponseMessage responseMessage = new JoinLobbyResponse(entry.getKey(),
-                                                                        ILobby.getSimpleLobby(entry.getValue()));
-                responseMessage.initWithMessage(req);
-                post(responseMessage);
-            }
         }
     }
 
@@ -325,6 +277,7 @@ public class LobbyService extends AbstractService {
                             post(responseMessage);
                             sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), user));
                             post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+                            sendColourChangedMessage(lobby.get(), user);
                         }
                     } else {
                         ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Game session started already!");
@@ -378,6 +331,7 @@ public class LobbyService extends AbstractService {
                 post(responseMessage);
                 sendToAllInLobby(req.getName(), new UserJoinedLobbyMessage(req.getName(), req.getUser()));
                 post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+                sendColourChangedMessage(lobby.get(), req.getUser());
             } else {
                 ExceptionMessage exceptionMessage = new LobbyExceptionMessage("Wrong Password!");
                 exceptionMessage.initWithMessage(req);
@@ -465,6 +419,7 @@ public class LobbyService extends AbstractService {
             post(responseMessage);
             sendToAllInLobby(randomLobby.getName(), new UserJoinedLobbyMessage(randomLobby.getName(), req.getUser()));
             post(new AllLobbiesMessage(lobbyManagement.getSimpleLobbies()));
+            sendColourChangedMessage(randomLobby, req.getUser());
         } else {
             Message responseMessage = new JoinRandomLobbyFailedResponse();
             responseMessage.initWithMessage(req);
@@ -622,6 +577,28 @@ public class LobbyService extends AbstractService {
     }
 
     /**
+     * Handles a SetColourRequest found on the EventBus
+     * <p>
+     * This request gets sent in the lobby, after the user changes the desired colour.
+     * It calls setUserColour method of the user's lobby and sends a ColourChangedMessage
+     * back to the aforementioned lobby.
+     *
+     * @param req The SetColourRequest found on the EventBus
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.SetColourRequest
+     * @since 2021-06-02
+     */
+    @Subscribe
+    private void onSetColourRequest(SetColourRequest req) {
+        LOG.debug("Received SetColourRequest for Lobby {}", req.getName());
+        ILobby lobby = lobbyManagement.getLobby(req.getName()).get();
+        if (req.getColour() != null && !lobby.getUserColourMap().containsValue(req.getColour()))
+            lobby.setUserColour(req.getUser(), req.getColour());
+        sendColourChangedMessage(lobby, req.getUser());
+    }
+
+    /**
      * Handles a StartSessionRequest found on the EventBus
      * <p>
      * If a StartSessionRequest is detected on the EventBus, this method is called.
@@ -675,5 +652,26 @@ public class LobbyService extends AbstractService {
         }
         ServerMessage msg = new UserReadyMessage(req.getName(), req.getUser());
         sendToAllInLobby(req.getName(), msg);
+    }
+
+    /**
+     * Helper method to send a ColourChangedMessage
+     * <p>
+     * To let the Client show the right colours, a
+     * ColourChangedMessage has to be sent everytime
+     * a Lobby is created, a User joins, or a User changes
+     * the colour
+     *
+     * @param lobby The affected lobby
+     * @param user  The user triggering this message
+     *
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.message.ColourChangedMessage
+     * @since 2021-06-04
+     */
+    private void sendColourChangedMessage(ILobby lobby, UserOrDummy user) {
+        LobbyName name = lobby.getName();
+        LOG.debug("Sending a ColourChangedMessage for {}", name);
+        sendToAllInLobby(name, new ColourChangedMessage(name, user, lobby.getUserColourMap()));
     }
 }
