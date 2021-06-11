@@ -390,8 +390,9 @@ public class GameService extends AbstractService {
     private void onAcceptUserTradeRequest(AcceptUserTradeRequest req) {
         LOG.debug("Received AcceptUserTradeRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getOfferingUser()) || !game.isDiceRolledAlready() || game
-                .isPausedByVoting()) return;
+        if (!game.isDiceRolledAlready() || game.isPausedByVoting()) return;
+        if (!(game.getActivePlayer().equals(req.getOfferingUser()) || game.getActivePlayer()
+                                                                          .equals(req.getRespondingUser()))) return;
         game.setBuildingAllowed(false);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         Inventory respondingInventory = game.getInventory(req.getRespondingUser());
@@ -1339,11 +1340,13 @@ public class GameService extends AbstractService {
     private void onResetOfferTradeButtonRequest(ResetOfferTradeButtonRequest req) {
         LOG.debug("Received ResetOfferTradeButtonRequest for Lobby {}", req.getOriginLobby());
         Game game = gameManagement.getGame(req.getOriginLobby());
-        if (!game.getActivePlayer().equals(req.getOfferingUser()) || !game.isDiceRolledAlready()) return;
+        if (!game.isDiceRolledAlready()) return;
         game.setBuildingAllowed(true);
         Inventory offeringInventory = game.getInventory(req.getOfferingUser());
         if (offeringInventory == null) return;
-        ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby());
+        boolean secondOfferOfRespondingUser = game.getActivePlayer().equals(req.getSession().get().getUser());
+        ResponseMessage returnMessage = new ResetOfferTradeButtonResponse(req.getOriginLobby(),
+                                                                          secondOfferOfRespondingUser);
         LOG.debug("Sending ResetOfferTradeButtonResponse for Lobby {}", req.getOriginLobby());
         post(new ForwardToUserInternalRequest(req.getOfferingUser(), returnMessage));
     }
