@@ -179,7 +179,7 @@ public class GameRendering {
     }
 
     /**
-     * Handels the buildingEnabled status
+     * Handles the buildingEnabled status
      *
      * @param buildingCurrentlyEnabled Whether the building should be enabled or not
      *
