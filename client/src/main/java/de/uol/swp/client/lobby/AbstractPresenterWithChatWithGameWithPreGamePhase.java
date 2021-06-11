@@ -623,7 +623,6 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             };
             this.elapsedTimer.start();
         });
-
         if (helpActivated) setHelpText();
     }
 
