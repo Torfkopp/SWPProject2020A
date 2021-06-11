@@ -35,7 +35,8 @@ public interface ILobby extends Serializable {
     static SimpleLobby getSimpleLobby(ILobby lobby) {
         return new SimpleLobby(lobby.getName(), lobby.isInGame(), lobby.getOwner(), lobby.getMaxPlayers(),
                                lobby.getMoveTime(), lobby.isStartUpPhaseEnabled(), lobby.isRandomPlayFieldEnabled(),
-                               lobby.hasPassword(), lobby.getUserOrDummies(), lobby.getReadyUsers());
+                               lobby.hasPassword(), lobby.getUserOrDummies(), lobby.getReadyUsers(),
+                               lobby.getMaxTradeDiff());
     }
 
     /**
@@ -59,6 +60,26 @@ public interface ILobby extends Serializable {
      * @since 2021-03-15
      */
     void setMaxPlayers(int maxPlayers);
+
+    /**
+     * Gets the maximum trade difference for a lobby
+     *
+     * @return Maximum trade difference
+     *
+     * @author Aldin Dervisi
+     * @since 2021-08-06
+     */
+    int getMaxTradeDiff();
+
+    /**
+     * Sets the maximum trade difference for a lobby
+     *
+     * @return Maximum trade difference
+     *
+     * @author Aldin Dervisi
+     * @since 2021-08-06
+     */
+    void setMaxTradeDiff(int maxTradeDiff);
 
     /**
      * Gets the maximum time for a move.
@@ -141,17 +162,6 @@ public interface ILobby extends Serializable {
      * @since 2021-06-02
      */
     Map<UserOrDummy, Colour> getUserColourMap();
-
-    /**
-     * Sets the user's colour to the desired one
-     *
-     * @param user   The user wanting to change the colour
-     * @param colour The chosen colour
-     *
-     * @author Mario Fokken
-     * @since 2012-06-02
-     */
-    void setUserColour(UserOrDummy user, Colour colour);
 
     /**
      * Gets all users and dummies in the lobby
@@ -265,6 +275,17 @@ public interface ILobby extends Serializable {
      * @since 2021-04-22
      */
     void setHasPassword(boolean hasPassword);
+
+    /**
+     * Sets the user's colour to the desired one
+     *
+     * @param user   The user wanting to change the colour
+     * @param colour The chosen colour
+     *
+     * @author Mario Fokken
+     * @since 2012-06-02
+     */
+    void setUserColour(UserOrDummy user, Colour colour);
 
     /**
      * Sets a user as ready

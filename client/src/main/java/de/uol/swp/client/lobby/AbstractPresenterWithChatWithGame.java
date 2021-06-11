@@ -148,6 +148,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
     protected Map<UserOrDummy, Colour> userColoursMap = null;
     protected IGameService gameService;
+    protected int maxTradeDiff;
 
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;

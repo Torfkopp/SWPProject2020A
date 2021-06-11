@@ -112,5 +112,5 @@ public interface ILobbyManagement {
      * @since 2021-03-15
      */
     void updateLobbySettings(LobbyName lobbyName, int maxPlayers, int moveTime, boolean startUpPhaseEnabled,
-                             boolean randomPlayfieldEnabled);
+                             boolean randomPlayfieldEnabled, int maxTradeDiff);
 }
