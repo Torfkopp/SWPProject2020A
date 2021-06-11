@@ -19,7 +19,6 @@ import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
@@ -493,37 +492,6 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                 tradeWithUserButton
                         .setText(String.format(resourceBundle.getString("lobby.game.buttons.playertrade"), name));
             }
-        });
-    }
-
-    /**
-     * Updates the lobby's member list according to the list given
-     * <p>
-     * This method clears the entire member list and then adds the name of each user
-     * in the list given to the lobby's member list.
-     * If there is no member list, it creates one.
-     * <p>
-     * If a user is marked as ready in the readyUsers Set, their name is prepended
-     * with a checkmark.
-     * If the owner is found amongst the users, their username is appended with a
-     * crown symbol.
-     *
-     * @param userLobbyList A list of User objects including all currently logged in
-     *                      users
-     *
-     * @implNote The code inside this Method has to run in the JavaFX-application
-     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
-     * @see de.uol.swp.common.user.UserOrDummy
-     * @since 2021-01-05
-     */
-    private void updateUsersList(List<UserOrDummy> userLobbyList) {
-        Platform.runLater(() -> {
-            if (lobbyMembers == null) {
-                lobbyMembers = FXCollections.observableArrayList();
-                membersView.setItems(lobbyMembers);
-            }
-            lobbyMembers.clear();
-            lobbyMembers.addAll(userLobbyList);
         });
     }
 }

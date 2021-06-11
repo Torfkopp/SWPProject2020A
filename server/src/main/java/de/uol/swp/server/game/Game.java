@@ -40,6 +40,8 @@ public class Game {
     private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
+    private final int maxTradeDiff;
+    private final List<UserOrDummy> playerList;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -51,7 +53,6 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
-    private final int maxTradeDiff;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -95,6 +96,7 @@ public class Game {
         startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         bankInventory = new BankInventory();
+        playerList = createPlayerList();
     }
 
     /**
@@ -152,6 +154,26 @@ public class Game {
      */
     public void changePauseStatus(UserOrDummy user) {
         pauseGameMap.replace(user, !pauseGameMap.get(user));
+    }
+
+    /**
+     * Prepares a ordered list of players in the game
+     *
+     * @return An ordered list of the players
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> createPlayerList() {
+        List<UserOrDummy> playerList = new ArrayList<>();
+        UserOrDummy player = activePlayer;
+        playerList.add(activePlayer);
+        for (int i = 0; i < players.size() - 1; i++) {
+            player = players
+                    .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(player).nextPlayer(players.size()));
+            playerList.add(player);
+        }
+        return playerList;
     }
 
     /**
@@ -374,6 +396,18 @@ public class Game {
      */
     public Player getPlayer(UserOrDummy user) {
         return players.getPlayerFromUserOrDummy(user);
+    }
+
+    /**
+     * Gets the player list
+     *
+     * @return The order of the players in the game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> getPlayerList() {
+        return playerList;
     }
 
     /**
