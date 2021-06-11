@@ -209,14 +209,18 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * is re-enabled and the trading user gets a hint that the other user
      * rejected the offer.
      *
-     * @param event ResetOfferTradeButtonResponse found on the EventBus
+     * @param rsp ResetOfferTradeButtonResponse found on the EventBus
      *
      * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
      */
     @Subscribe
-    private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
-        if (!lobbyName.equals(event.getLobbyName())) return;
+    private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
+        if (rsp.isTradeRejectedByActivePlayer()) {
+            closeWindow();
+            return;
+        }
         String text = String.format(resourceBundle.getString("game.trade.status.rejected"), respondingUser);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
