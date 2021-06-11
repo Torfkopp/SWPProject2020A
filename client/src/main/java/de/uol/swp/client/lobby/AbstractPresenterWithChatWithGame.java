@@ -219,6 +219,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
         gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
     }
