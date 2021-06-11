@@ -87,19 +87,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     }
 
     /**
-     * Sets the GameService via Injection
-     *
-     * @param gameService The GameService this class should use.
-     *
-     * @author Marvin Drees
-     * @since 2021-06-09
-     */
-    @Inject
-    private void setGameService(IGameService gameService) {
-        this.gameService = gameService;
-    }
-
-    /**
      * Initialises the Presenter by setting up the MapValueFactories for
      * the Bank and Trading inventories.
      *
@@ -287,6 +274,19 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
         soundService.coins();
+    }
+
+    /**
+     * Sets the GameService via Injection
+     *
+     * @param gameService The GameService this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    private void setGameService(IGameService gameService) {
+        this.gameService = gameService;
     }
 
     /**

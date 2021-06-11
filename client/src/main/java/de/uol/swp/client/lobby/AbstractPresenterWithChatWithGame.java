@@ -174,25 +174,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
-     * Sets the injected fields
-     * <p>
-     * This method sets the injected fields via parameters.
-     *
-     * @param tradeService The TradeService this class should use.
-     * @param gameService  The GameService this class should use.
-     * @param theme        The theme this class should use.
-     *
-     * @author Marvin Drees
-     * @since 2021-06-09
-     */
-    @Inject
-    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
-        this.tradeService = tradeService;
-        this.gameService = gameService;
-        this.theme = theme;
-    }
-
-    /**
      * Prepares the change size listener
      * <p>
      * Changes the size of the game map when the window size
@@ -1547,6 +1528,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
             tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
         }
+    }
+
+    /**
+     * Sets the injected fields
+     * <p>
+     * This method sets the injected fields via parameters.
+     *
+     * @param tradeService The TradeService this class should use.
+     * @param gameService  The GameService this class should use.
+     * @param theme        The theme this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
+        this.tradeService = tradeService;
+        this.gameService = gameService;
+        this.theme = theme;
     }
 
     /**

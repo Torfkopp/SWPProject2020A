@@ -71,7 +71,8 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("volume", preferences.get("volume", "100"));
         defaultProps.setProperty("backgroundvolume", preferences.get("backgroundvolume", "50"));
         defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
-        defaultProps.setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
+        defaultProps
+                .setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);

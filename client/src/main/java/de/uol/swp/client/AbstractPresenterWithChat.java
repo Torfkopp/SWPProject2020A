@@ -64,23 +64,6 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
     }
 
     /**
-     * Sets the injected fields
-     * <p>
-     * This method sets the injected fields via parameters.
-     *
-     * @param chatService The ChatService this class should use.
-     * @param styleSheet  The styleSheet this class should use.
-     *
-     * @author Marvin Drees
-     * @since 2021-06-09
-     */
-    @Inject
-    private void setInjects(IChatService chatService, @Named("styleSheet") String styleSheet) {
-        this.chatService = chatService;
-        this.styleSheet = styleSheet;
-    }
-
-    /**
      * Initialises the Presenter by calling {@code prepareChatVars()}.
      *
      * @implNote Called automatically by JavaFX
@@ -453,6 +436,23 @@ public abstract class AbstractPresenterWithChat extends AbstractPresenter {
                 }
             }
         });
+    }
+
+    /**
+     * Sets the injected fields
+     * <p>
+     * This method sets the injected fields via parameters.
+     *
+     * @param chatService The ChatService this class should use.
+     * @param styleSheet  The styleSheet this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    private void setInjects(IChatService chatService, @Named("styleSheet") String styleSheet) {
+        this.chatService = chatService;
+        this.styleSheet = styleSheet;
     }
 
     /**
