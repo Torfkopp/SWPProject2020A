@@ -43,8 +43,6 @@ import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.response.ChangeAccountDetailsSuccessfulResponse;
 import de.uol.swp.common.user.response.LoginSuccessfulResponse;
 import de.uol.swp.common.user.response.RegistrationSuccessfulResponse;
-import de.uol.swp.common.user.request.NukeUsersSessionsRequest;
-import de.uol.swp.common.user.response.*;
 import de.uol.swp.common.util.ResourceManager;
 import de.uol.swp.common.util.ThreadManager;
 import javafx.application.Platform;
@@ -180,7 +178,7 @@ public class SceneManager {
      * @since 2021-05-22
      */
     public void showChangePropertiesScreen() {
-        showScene(changePropertiesScene, resourceBundle.getString("changeproperties.window.title"),
+        showScene(changePropertiesScene, ResourceManager.get("changeproperties.window.title"),
                   ChangePropertiesPresenter.MIN_WIDTH, ChangePropertiesPresenter.MIN_HEIGHT);
     }
 
@@ -560,11 +558,9 @@ public class SceneManager {
                 break;
         }
         //found in UserManagement
-        if (e.contains("Cannot auth user "))
-            context = ResourceManager.get("error.context.cannotauth", e.substring(17));
-        if (e.contains("already logged in")) context =
-                ResourceManager.get("error.context.alreadyloggedin",
-                        e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')));
+        if (e.contains("Cannot auth user ")) context = ResourceManager.get("error.context.cannotauth", e.substring(17));
+        if (e.contains("already logged in")) context = ResourceManager
+                .get("error.context.alreadyloggedin", e.substring(e.indexOf('[') + 1, e.lastIndexOf(']')));
         //found in UserService
         if (e.contains("Cannot delete user ")) {
             context = String.format(ResourceManager.get("error.context.cannotdelete"),

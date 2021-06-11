@@ -19,6 +19,7 @@ import de.uol.swp.common.lobby.response.RemoveFromLobbiesResponse;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -112,7 +113,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @Subscribe
     private void onAllLobbyMembersResponse(AllLobbyMembersResponse rsp) {
-        if (!Objects.equals(lobbyName, rsp.getLobbyName())) return;
+        if (!Util.equals(lobbyName, rsp.getLobbyName())) return;
         LOG.debug("Received AllLobbyMembersResponse");
         LOG.debug("---- Update of Lobby member list");
         LOG.debug("---- Owner of this Lobby: {}", rsp.getOwner().getUsername());
@@ -304,7 +305,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         LOG.debug("Received AllowedAmountOfPlayersMessage");
         if (!lobbyName.equals(msg.getName())) return;
         setAllowedPlayers(msg.getLobby().getMaxPlayers() == 3 ? 3 : 4);
-        if (!Objects.equals(owner, msg.getLobby().getOwner())) {
+        if (!Util.equals(owner, msg.getLobby().getOwner())) {
             if (ownerTransferNotificationsOn) {
                 if (userService.getLoggedInUser().equals(owner)) {
                     I18nWrapper content = new I18nWrapper("lobby.owner.transferred",
@@ -391,7 +392,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         if (!msg.getName().equals(this.lobbyName)) return;
         LOG.debug("Received UserLeftLobbyMessage for Lobby {}", lobbyName);
         UserOrDummy user = msg.getUser();
-        if (Objects.equals(user, owner)) {
+        if (Util.equals(user, owner)) {
             LOG.debug("---- Owner {} left", user.getUsername());
         } else LOG.debug("---- User {} left", user.getUsername());
         Platform.runLater(() -> {
@@ -450,7 +451,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
                                 for (UserOrDummy u : lobbyMembers) cardAmountsList.add(new CardsAmount(u, 0, 0));
                             }
                             for (CardsAmount cardsAmount : cardAmountsList) {
-                                if (Objects.equals(cardsAmount.getUser(), user)) {
+                                if (Util.equals(cardsAmount.getUser(), user)) {
                                     name = ResourceManager
                                             .get("lobby.members.amount", name, cardsAmount.getResourceCardsAmount(),
                                                  cardsAmount.getDevelopmentCardsAmount());

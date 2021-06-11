@@ -1,15 +1,39 @@
 package de.uol.swp.common.util;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
-import java.util.IllegalFormatException;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class ResourceManager {
 
+    private static final ResourceBundle resourceBundle;
     @Inject
-    private static ResourceBundle resourceBundle;
+    @Named("lang")
+    private static String lang;
+
+    static {
+        if (Strings.isNullOrEmpty(lang)) resourceBundle = null;
+        else {
+            String[] splitLang = lang.split("_");
+            Locale locale;
+            switch (splitLang.length) {
+                case 1:
+                    locale = new Locale(splitLang[0]);
+                    break;
+                case 2:
+                    locale = new Locale(splitLang[0], splitLang[1]);
+                    break;
+                case 3:
+                    locale = new Locale(splitLang[0], splitLang[1], splitLang[2]);
+                    break;
+                default:
+                    locale = Locale.UK;
+            }
+            resourceBundle = ResourceBundle.getBundle("i18n.SWP2020A", locale);
+        }
+    }
 
     public static String get(String key) {
         try {
@@ -34,5 +58,17 @@ public class ResourceManager {
                 return "Missing Resource";
             }
         }
+    }
+
+    public static String getIfAvailableElse(String alternative, String key, Object... args) {
+        return isAvailable() ? get(key, args) : alternative;
+    }
+
+    public static String getIfAvailableElse(String alternative, String key) {
+        return isAvailable() ? get(key) : alternative;
+    }
+
+    public static boolean isAvailable() {
+        return (resourceBundle != null);
     }
 }

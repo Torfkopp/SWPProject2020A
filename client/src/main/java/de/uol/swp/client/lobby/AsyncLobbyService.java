@@ -1,7 +1,6 @@
 package de.uol.swp.client.lobby;
 
 import com.google.inject.Inject;
-import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;

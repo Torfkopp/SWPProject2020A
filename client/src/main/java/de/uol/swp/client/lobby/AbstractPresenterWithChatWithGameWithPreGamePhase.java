@@ -20,6 +20,7 @@ import de.uol.swp.common.user.AI;
 import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -29,7 +30,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -443,7 +446,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             currentRound.setVisible(false);
             roundCounter = 0;
             this.elapsedTimer.stop();
-            if (Objects.equals(owner, userService.getLoggedInUser())) {
+            if (Util.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
                 returnToLobby.setPrefHeight(30);
                 returnToLobby.setPrefWidth(250);
@@ -620,7 +623,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                     protected void updateItem(Colour item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item != null) {
-                            setText(resourceBundle.getString("colours." + item));
+                            setText(ResourceManager.get("colours." + item));
                             int[] colourCode = item.getColourCode();
                             setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
                             setDisable(userColoursMap.containsValue(item));
@@ -633,7 +636,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             @Override
             protected void updateItem(Colour item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item != null) setText(resourceBundle.getString("colours." + item));
+                if (item != null) setText(ResourceManager.get("colours." + item));
                 else setText(null);
             }
         });

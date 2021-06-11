@@ -35,6 +35,7 @@ import de.uol.swp.common.game.robber.*;
 import de.uol.swp.common.user.User;
 import de.uol.swp.common.user.UserOrDummy;
 import de.uol.swp.common.util.ResourceManager;
+import de.uol.swp.common.util.Util;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -208,7 +209,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     protected void fitCanvasToSize() {
         double heightDiff = 35; // height of toolbar
-        if (gameWon && Objects.equals(owner, userService.getLoggedInUser())) heightDiff += 40;
+        if (gameWon && Util.equals(owner, userService.getLoggedInUser())) heightDiff += 40;
         double hexFactor = 10.0 / 11.0; // <~0.91 (ratio of tiled hexagons (less high than wide))
         double heightValue = (gameMapCanvas.getScene().getWindow().getHeight() - 60) / hexFactor;
         double widthValue = gameMapCanvas.getScene().getWindow().getWidth() - LobbyPresenter.MIN_WIDTH_PRE_GAME;
@@ -421,7 +422,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
             tradeService.showTradeError(ResourceManager.get("game.trade.error.noplayer"));
-        } else if (Objects.equals(user, userService.getLoggedInUser())) {
+        } else if (Util.equals(user, userService.getLoggedInUser())) {
             tradeService.showTradeError(ResourceManager.get("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
@@ -446,7 +447,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         for (int i = 0; i < 4; i++) {
             cardAmount += developmentCardTableView.getItems().get(i + 1).getAmount();
         }
-        String cardString = resourceBundle.getString("game.help.labels.playcard");
+        String cardString = ResourceManager.get("game.help.labels.playcard");
         Text wait, turn, rollDiceText, setRobber, playCard, endTurn, trade, build;
         wait = setLabel("waitforturn");
         turn = setLabel("turn");
@@ -685,7 +686,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onBuildingSuccessfulMessage(BuildingSuccessfulMessage msg) {
-        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
         gameRendering.redraw();
         soundService.building();
         LOG.debug("Received BuildingSuccessfulMessage");
@@ -742,7 +743,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                 break;
         }
         final String finalAttr = attr;
-        if (Objects.equals(msg.getUser(), userService.getLoggedInUser())) {
+        if (Util.equals(msg.getUser(), userService.getLoggedInUser())) {
             gameService.updateInventory(lobbyName);
             if (finalAttr != null) {
                 InGameSystemMessageDTO message = new InGameSystemMessageDTO(new I18nWrapper(finalAttr + ".you"));
@@ -1262,7 +1263,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onUpdateGameMapResponse(UpdateGameMapResponse rsp) {
-        if (!Objects.equals(rsp.getLobbyName(), lobbyName)) return;
+        if (!Util.equals(rsp.getLobbyName(), lobbyName)) return;
         LOG.debug("Received UpdateGameMapResponse");
         if (rsp.getGameMapDTO() == null) return;
         if (gameRendering == null) return;
@@ -1313,7 +1314,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onUpdateUniqueCardsListMessage(UpdateUniqueCardsListMessage msg) {
-        if (!Objects.equals(msg.getLobbyName(), lobbyName)) return;
+        if (!Util.equals(msg.getLobbyName(), lobbyName)) return;
         uniqueCardList.clear();
         uniqueCardList.addAll(msg.getUniqueCardsList());
     }
@@ -1546,7 +1547,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      * @since 2021-06-03
      */
     private Text setLabel(String type) {
-        Text text = new Text(resourceBundle.getString("game.help.labels." + type));
+        Text text = new Text(ResourceManager.get("game.help.labels." + type));
         if (theme.equals("dark") || theme.equals("classic")) text.setFill(Color.web("#F3F5F3"));
         return text;
     }
