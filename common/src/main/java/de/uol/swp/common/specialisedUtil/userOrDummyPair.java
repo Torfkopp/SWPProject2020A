@@ -1,4 +1,4 @@
-package de.uol.swp.common.SpecialisedClasses;
+package de.uol.swp.common.specialisedUtil;
 
 import de.uol.swp.common.user.UserOrDummy;
 
@@ -11,14 +11,14 @@ import de.uol.swp.common.user.UserOrDummy;
  */
 public class userOrDummyPair {
 
-    UserOrDummy user1;
-    UserOrDummy user2;
+    private final UserOrDummy user1;
+    private final UserOrDummy user2;
 
     /**
      * Constructor
      *
-     * @param user1 UserOrDummy
-     * @param user2 UserOrDummy
+     * @param user1 The pair's first UserOrDummy
+     * @param user2 The pair's second UserOrDummy
      */
     public userOrDummyPair(UserOrDummy user1, UserOrDummy user2) {
         this.user1 = user1;

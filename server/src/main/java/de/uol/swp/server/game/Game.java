@@ -1,7 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.Colour;
-import de.uol.swp.common.SpecialisedClasses.userOrDummyPair;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;

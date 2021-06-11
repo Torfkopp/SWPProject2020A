@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.SpecialisedClasses.userOrDummyPair;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.message.SystemMessageMessage;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
