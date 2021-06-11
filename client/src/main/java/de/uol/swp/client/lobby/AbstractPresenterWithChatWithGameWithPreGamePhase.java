@@ -432,6 +432,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             developmentCardTableView.setVisible(false);
             rollDice.setVisible(false);
             autoRoll.setVisible(false);
+            constructionMode.setVisible(false);
             endTurn.setVisible(false);
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
@@ -556,6 +557,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
+            constructionMode.setVisible(true);
             buildingCosts.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
