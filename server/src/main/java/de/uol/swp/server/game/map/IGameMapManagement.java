@@ -117,7 +117,7 @@ public interface IGameMapManagement {
     /**
      * Gets all edges around an intersection
      *
-     * @param mapPoint The mappoint of the Intersection
+     * @param mapPoint The mapPoint of the Intersection
      *
      * @return Set of IEdge
      *
