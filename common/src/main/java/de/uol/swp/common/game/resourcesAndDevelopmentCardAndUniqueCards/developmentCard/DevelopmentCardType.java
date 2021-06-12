@@ -1,6 +1,7 @@
 package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.developmentCard;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
+
 import java.io.Serializable;
 import java.util.ResourceBundle;
 

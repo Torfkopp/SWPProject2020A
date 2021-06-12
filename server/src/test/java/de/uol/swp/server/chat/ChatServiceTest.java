@@ -64,7 +64,7 @@ class ChatServiceTest {
     @BeforeEach
     protected void setUp() {
         chatManagement = new ChatManagement(new MainMemoryBasedChatMessageStore());
-        chatService = new ChatService(bus, chatManagement, lobbyManagement, lobbyService);
+        chatService = new ChatService(bus, chatManagement, lobbyManagement, lobbyService, false);
     }
 
     /**
