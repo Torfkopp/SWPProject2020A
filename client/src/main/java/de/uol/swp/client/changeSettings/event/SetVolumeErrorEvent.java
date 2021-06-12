@@ -1,4 +1,4 @@
-package de.uol.swp.client.changeProperties.event;
+package de.uol.swp.client.changeSettings.event;
 
 /**
  * Event used to show a SetVolumeError alert
@@ -17,6 +17,7 @@ public class SetVolumeErrorEvent {
     /**
      * Constructor
      *
+     * @param message Message containing the cause of the Error
      */
     public SetVolumeErrorEvent(String message) {
         this.message = message;

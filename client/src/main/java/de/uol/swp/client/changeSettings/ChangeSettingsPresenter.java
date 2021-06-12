@@ -1,10 +1,10 @@
-package de.uol.swp.client.changeProperties;
+package de.uol.swp.client.changeSettings;
 
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ClientApp;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
-import de.uol.swp.client.changeProperties.event.SetVolumeErrorEvent;
+import de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent;
+import de.uol.swp.client.changeSettings.event.ChangeSettingsSuccessfulEvent;
+import de.uol.swp.client.changeSettings.event.SetVolumeErrorEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -13,16 +13,16 @@ import javafx.scene.control.TextField;
 import java.util.prefs.Preferences;
 
 /**
- * Manages the changeProperties menu
+ * Manages the changeSettings menu
  *
  * @author Alwin Bossert
  * @since 2021-05-22
  */
-public class ChangePropertiesPresenter extends AbstractPresenter {
+public class ChangeSettingsPresenter extends AbstractPresenter {
 
-    public static final String fxml = "/fxml/ChangePropertiesView.fxml";
-    public static final int MIN_HEIGHT = 500;
-    public static final int MIN_WIDTH = 1300;
+    public static final String fxml = "/fxml/ChangeSettingsView.fxml";
+    public static final int MIN_HEIGHT = 400;
+    public static final int MIN_WIDTH = 1000;
     private static final Preferences preferences = Preferences.userNodeForPackage(ClientApp.class);
     @FXML
     private ComboBox<String> themeBox;
@@ -69,27 +69,27 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      * Method called when the CancelButton is pressed
      * <p>
      * This method is called when the CancelButton is pressed.
-     * It posts a new ChangePropertiesCanceledEvent onto the EventBus.
+     * It posts a new ChangeSettingsCanceledEvent onto the EventBus.
      *
-     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
+     * @see de.uol.swp.client.changeSettings.event.ChangeSettingsCanceledEvent
      */
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        post(new ChangePropertiesCanceledEvent());
+        post(new ChangeSettingsCanceledEvent());
     }
 
     /**
-     * Method called when the ChangePropertiesButton is pressed
+     * Method called when the ChangeSettingsButton is pressed
      * <p>
-     * This method is called when the ChangePropertiesButton is pressed.
+     * This method is called when the ChangeSettingsButton is pressed.
      * It gets the value chosen in the ComboBox/TextField and puts it into the Preferences.
-     * It also posts a new ChangePropertiesSuccessfulEvent onto the EventBus.
+     * It also posts a new ChangeSettingsSuccessfulEvent onto the EventBus.
      *
-     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent
+     * @see de.uol.swp.client.changeSettings.event.ChangeSettingsSuccessfulEvent
      */
     @FXML
-    private void onChangePropertiesButtonPressed() {
+    private void onChangeSettingsButtonPressed() {
         soundService.button();
         String theme = themeBox.getValue();
         String language = languageBox.getValue();
@@ -137,12 +137,12 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
             try {
                 int volume = Integer.parseInt(volumeField.getText());
                 if (volume < 0 || volume > 100) {
-                    post(new SetVolumeErrorEvent(resourceBundle.getString("changeproperties.error.volume")));
+                    post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.volume")));
                 } else {
                     preferences.put("volume", Integer.toString(volume));
                 }
             } catch (NumberFormatException ignored) {
-                post(new SetVolumeErrorEvent(resourceBundle.getString("changeproperties.error.volume")));
+                post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.volume")));
                 return;
             }
         }
@@ -150,12 +150,12 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
             try {
                 int backgroundVolume = Integer.parseInt(backgroundVolumeField.getText());
                 if (backgroundVolume < 0 || backgroundVolume > 100) {
-                    post(new SetVolumeErrorEvent(resourceBundle.getString("changeptoperties.error.backgroundvolume")));
+                    post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.backgroundvolume")));
                 } else {
                     preferences.put("backgroundvolume", Integer.toString(backgroundVolume));
                 }
             } catch (NumberFormatException ignored) {
-                post(new SetVolumeErrorEvent(resourceBundle.getString("changeptoperties.error.backgroundvolume")));
+                post(new SetVolumeErrorEvent(resourceBundle.getString("changesettings.error.backgroundvolume")));
                 return;
             }
         }
@@ -163,6 +163,6 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
         if (loglevel != null) {
             preferences.put("debug.loglevel", loglevel);
         }
-        post(new ChangePropertiesSuccessfulEvent());
+        post(new ChangeSettingsSuccessfulEvent());
     }
 }
