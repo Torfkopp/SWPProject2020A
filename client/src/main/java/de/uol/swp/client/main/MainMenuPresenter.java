@@ -8,7 +8,7 @@ import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.SetAcceleratorsEvent;
 import de.uol.swp.client.auth.events.ShowLoginViewEvent;
 import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
-import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
+import de.uol.swp.client.changeSettings.event.ShowChangeSettingsViewEvent;
 import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
 import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
@@ -277,13 +277,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
+     * @see de.uol.swp.client.changeSettings.event.ShowChangeSettingsViewEvent
      * @since 2021-05-22
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
         soundService.button();
-        post(new ShowChangePropertiesViewEvent());
+        post(new ShowChangeSettingsViewEvent());
     }
 
     /**
