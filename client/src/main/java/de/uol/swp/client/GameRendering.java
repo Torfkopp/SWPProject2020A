@@ -67,7 +67,6 @@ public class GameRendering {
     @Inject
     @Named("drawHitboxGrid")
     private static boolean drawHitboxGrid;
-
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
@@ -75,6 +74,7 @@ public class GameRendering {
     private final double tokenTextFontSize;
     private final double centerTextFontSize;
     private final double bottomTextFontSize;
+    private boolean buildingEnabled;
     private GameMapDescription gameMapDescription = new GameMapDescription();
 
     /**
@@ -176,6 +176,18 @@ public class GameRendering {
                 }, 1500);
             }
         }
+    }
+
+    /**
+     * Handles the buildingEnabled status
+     *
+     * @param buildingCurrentlyEnabled Whether the building should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public void setBuildingEnabled(boolean buildingCurrentlyEnabled) {
+        buildingEnabled = buildingCurrentlyEnabled;
     }
 
     /**
@@ -741,7 +753,7 @@ public class GameRendering {
         if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
             if (edge == null) continue;
-            if (edge.isBuildableBy(userService.getLoggedInUser())) {
+            if (edge.isBuildableBy(userService.getLoggedInUser()) && buildingEnabled) {
                 Platform.runLater(() -> gfxCtx.setStroke(BUILDABLE_COLOUR));
             } else if (edge.getOwner() == null) {
                 continue;
@@ -806,13 +818,13 @@ public class GameRendering {
         if (intersection == null) return;
         switch (intersection.getState()) {
             case FREE:
-                if (intersection.isBuildableBy(userService.getLoggedInUser()))
+                if (intersection.isBuildableBy(userService.getLoggedInUser()) && buildingEnabled)
                     drawSettlement(Optional.empty(), currentX, currentY);
                 //Free intersections don't need to be marked, but it could easily be added here
                 break;
             case SETTLEMENT:
                 drawSettlement(Optional.of(intersection.getOwner()), currentX, currentY);
-                if (intersection.isBuildableBy(userService.getLoggedInUser()))
+                if (intersection.isBuildableBy(userService.getLoggedInUser()) && buildingEnabled)
                     drawCity(Optional.empty(), currentX, currentY);
                 break;
             case CITY:

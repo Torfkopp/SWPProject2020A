@@ -114,6 +114,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected CheckBox autoRoll;
     @FXML
+    protected CheckBox constructionMode;
+    @FXML
     protected ColumnConstraints helpColumn;
     @FXML
     protected TextFlow helpLabel;
@@ -142,6 +144,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean startUpPhaseEnabled;
     protected boolean ownTurn;
     protected boolean tradingCurrentlyAllowed;
+    protected boolean buildingCurrentlyEnabled;
     protected boolean timerPaused;
     protected boolean gamePaused = false;
     protected int moveTime;
@@ -216,6 +219,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
         gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
     }
@@ -265,7 +269,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             helpLabel.setBorder(null);
             helpLabel.getChildren().clear();
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen()) window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen())
+                window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
     }
@@ -762,6 +767,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a click on the construction mode check box
+     * <p>
+     * This method activates/ deactivates the construction mode of the player.
+     * Afterwards the gamerendering is called to redraw the map
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    @FXML
+    private void onConstructionModeCheckBoxPressed() {
+        constructionMode.setSelected(constructionMode.isSelected());
+        buildingCurrentlyEnabled = constructionMode.isSelected();
+        gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
+        gameRendering.redraw();
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -815,8 +837,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
-        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-            gameService.buildRequest(lobbyName, mapPoint);
+        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE) && constructionMode
+                .isSelected() && buildingCurrentlyEnabled) gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition && !gamePaused) {
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
