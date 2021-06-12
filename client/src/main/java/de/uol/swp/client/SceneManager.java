@@ -1297,13 +1297,13 @@ public class SceneManager {
     private void onTradeCancelEvent(TradeCancelEvent event) {
         LOG.debug("Received TradeCancelEvent");
         LobbyName lobby = event.getLobbyName();
-        if (tradingStages.containsKey(lobby)) {
+
             Platform.runLater(() -> {
+                if (!tradingStages.containsKey(lobby)) return;
                 tradingStages.get(lobby).close();
                 tradingStages.remove(lobby);
             });
         }
-    }
 
     /**
      * Handles the TradeErrorEvent detected on the EventBus
