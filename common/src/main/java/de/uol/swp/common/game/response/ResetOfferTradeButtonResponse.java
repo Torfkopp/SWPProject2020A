@@ -14,12 +14,25 @@ import de.uol.swp.common.lobby.response.AbstractLobbyResponse;
  */
 public class ResetOfferTradeButtonResponse extends AbstractLobbyResponse {
 
+    private final boolean tradeRejectedByActivePlayer;
+
     /**
      * Constructor
      *
-     * @param lobbyName Name of the lobby
+     * @param lobbyName                   Name of the lobby
+     * @param tradeRejectedByActivePlayer Whether the trade was rejected by the active player or not
      */
-    public ResetOfferTradeButtonResponse(LobbyName lobbyName) {
+    public ResetOfferTradeButtonResponse(LobbyName lobbyName, boolean tradeRejectedByActivePlayer) {
         super(lobbyName);
+        this.tradeRejectedByActivePlayer = tradeRejectedByActivePlayer;
+    }
+
+    /**
+     * Gets the secondOfferOfRespondingUser attibute
+     *
+     * @return Whether the trade was rejected by the active player or not
+     */
+    public boolean isTradeRejectedByActivePlayer() {
+        return tradeRejectedByActivePlayer;
     }
 }

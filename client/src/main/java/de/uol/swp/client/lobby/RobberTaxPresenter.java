@@ -44,9 +44,7 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private static final String GREEN_BAR = "green-bar", BLUE_BAR = "blue-bar", RED_BAR = "red-bar";
     private static final String[] barColourClasses = {RED_BAR, BLUE_BAR, GREEN_BAR};
     private final ResourceList selectedResources = new ResourceList();
-
-    @Inject
-    protected IGameService gameService;
+    private final IGameService gameService;
 
     @FXML
     private Label resourceAmount;
@@ -65,6 +63,16 @@ public class RobberTaxPresenter extends AbstractPresenter {
     private int taxAmount;
     private ResourceList inventory;
     private ObservableList<Resource> ownInventoryList;
+
+    /**
+     * Constructor
+     *
+     * @param gameService Injected GameService
+     */
+    @Inject
+    public RobberTaxPresenter(IGameService gameService) {
+        this.gameService = gameService;
+    }
 
     /**
      * Listener for the brickSlider
