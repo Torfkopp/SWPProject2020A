@@ -14,7 +14,7 @@ import java.util.List;
 public class AINames implements Serializable {
 
     final static List<String> aiNameEasy = new ArrayList<>(
-            Arrays.asList("Jonathan Joestar", "Robert E. O. Speedwagon", "Erina Pendleton", "George Joestar I.",
+            Arrays.asList("Jonathan Joestar", "Robert E O Speedwagon", "Erina Pendleton", "George Joestar I.",
                           "Lisa Lisa", "Johnny Joestar", //British
                           "Rudol von Stroheim", //German
                           "Jean Pierre Polnareff", //French
@@ -44,7 +44,7 @@ public class AINames implements Serializable {
                           "Gold Experience", "Sticky Fingers", "Moody Blues", "Sex Pistols", "Aerosmith", "Purple Haze",
                           "Spice Girl", "Kiss", "Magician's Red", "Hermit Purple", "Hierophant Green", "The Fool",
                           "Earth, Wind and Fire", "The Hand", "Echoes", "Heaven's Door", "Love Deluxe", "Achtung Baby!",
-                          "Mr. President", "Burning Down The House", "Ball Breaker", "Oh! Lonesome Me", "Cream Starter",
+                          "Mr. President", "Burn Down The House", "Ball Breaker", "Oh! Lonesome Me", "Cream Starter",
                           "Ticket to Ride", "Paisley Park", "Doggy Style", "Nut King Call", "Paper Moon King",
                           "King Nothing"));
     final static List<String> aiNameHardNoTalk = new ArrayList<>(
@@ -54,9 +54,9 @@ public class AINames implements Serializable {
                           "Beach Boy", "Man in the Mirror", "Kraft Work", "The Grateful Dead", "Notorious B.I.G",
                           "Green Day", "Rolling Stones", "King Crimson", "Talking Head", "Made in Heaven",
                           "Highway to Hell", "Limp Bizkit", "Bohemian Rhapsody", "Driver Down", "Jumpin' Jack Flash",
-                          "Jail House Lock", "Yo-Yo Ma", "Survivor", "Dirty Deeds Done Dirt Cheap", "Hey Ya!",
-                          "Tomb of the Boom", "Catch the Rainbow", "Civil War", "In a Silent Way", "Fun Fun Fun",
-                          "I Am a Rock", "Doobie Wah!", "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
+                          "Jail House Lock", "Yo-Yo Ma", "Survivor", "D4C", "Hey Ya!", "Tomb of the Boom",
+                          "Catch the Rainbow", "Civil War", "In a Silent Way", "Fun Fun Fun", "I Am a Rock",
+                          "Doobie Wah!", "Vitamin C", "Milagro Man", "Ozone Baby", "Wonder of U"));
 
     /**
      * Enum for an AI's language
@@ -260,7 +260,7 @@ public class AINames implements Serializable {
                             case "Jonathan Joestar":
                                 msg = "I even feel a bizarre friendship between us. And now, our fates are truly intertwined...";
                                 break;
-                            case "Robert E. O. Speedwagon":
+                            case "Robert E O Speedwagon":
                                 msg = "Stop, everyone! If you touch this gentleman, I, Speedwagon won't forgive you!";
                                 break;
                             case "Will A. Zeppeli":
@@ -375,7 +375,7 @@ public class AINames implements Serializable {
                                 break;
                         }
                         switch (name) {
-                            case "Robert E. O. Speedwagon":
+                            case "Robert E O Speedwagon":
                                 msg = "*Speedwagon withdraws coolly.*";
                                 break;
                             case "Johnny Joestar":
@@ -442,7 +442,7 @@ public class AINames implements Serializable {
                             case "Johnny Joestar":
                                 msg = "It's truly, truly been... a very long roundabout path...";
                                 break;
-                            case "Robert E. O. Speedwagon":
+                            case "Robert E O Speedwagon":
                                 msg = "This is so great! I wish you nothing but happiness! I'll always be there for you guys. If you need me, I'll come no matter where it is! Though, I might just get in the way...";
                                 break;
                             case "Will A. Zeppeli":
