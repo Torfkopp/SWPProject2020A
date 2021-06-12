@@ -89,14 +89,14 @@ public class ServerModule extends AbstractModule {
 
         // Set permission of elevated commands according to server config
         LOG.debug("Server allows elevated commands: {}", serverProperties.getProperty("debug.commands"));
-        final boolean commandsAllowed = Boolean.parseBoolean(serverProperties.getProperty("debug.commands"));
+        final boolean devCommandsAllowed = Boolean.parseBoolean(serverProperties.getProperty("debug.commands"));
 
         bind(IChatMessageStore.class).toInstance(chatMessageStore);
         bind(EventBus.class).toInstance(bus);
         bind(Properties.class).toInstance(serverProperties);
         bind(UserStore.class).toInstance(store);
 
-        bindConstant().annotatedWith(Names.named("commandsAllowed")).to(commandsAllowed);
+        bindConstant().annotatedWith(Names.named("devCommandsAllowed")).to(devCommandsAllowed);
 
         // Scopes.SINGLETON forces Singleton behaviour without @Singleton annotation in the class
         bind(IChatManagement.class).to(ChatManagement.class).in(Scopes.SINGLETON);
