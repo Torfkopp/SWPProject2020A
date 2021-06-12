@@ -17,7 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
  */
 public abstract class AbstractTradePresenter extends AbstractPresenter {
 
-    @Inject
     protected ITradeService tradeService;
 
     @FXML
@@ -36,5 +35,18 @@ public abstract class AbstractTradePresenter extends AbstractPresenter {
     public void initialize() {
         resourceAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
         resourceNameCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+    }
+
+    /**
+     * Sets the TradeService via Injection
+     *
+     * @param tradeService The TradeService this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    private void setTradeService(ITradeService tradeService) {
+        this.tradeService = tradeService;
     }
 }

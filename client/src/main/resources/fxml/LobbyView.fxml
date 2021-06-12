@@ -191,6 +191,8 @@
                 prefWidth="230.0" text="%lobby.game.buttons.banktrade" visible="false"/>
         <Button fx:id="playCard" disable="true" onAction="#onPlayCardButtonPressed" prefHeight="30.0" prefWidth="230.0"
                 text="%lobby.game.buttons.playcard" visible="false"/>
+        <CheckBox fx:id="constructionMode" onAction="#onConstructionModeCheckBoxPressed" prefHeight="50.0"
+                  prefWidth="115.0" text="%lobby.game.constructionmode" visible="false" wrapText="true"/>
         <Label fx:id="notice" maxHeight="60.0" maxWidth="-Infinity" minHeight="60.0" minWidth="-Infinity"
                prefWidth="230" text="%game.robber.position" visible="false" wrapText="true"/>
         <Label fx:id="buildingCosts" text="%game.building.info.costs" visible="false" wrapText="true"/>

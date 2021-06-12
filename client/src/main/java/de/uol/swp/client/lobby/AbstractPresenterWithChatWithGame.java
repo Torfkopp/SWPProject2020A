@@ -75,14 +75,6 @@ import static de.uol.swp.common.game.map.management.MapPoint.Type.*;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class AbstractPresenterWithChatWithGame extends AbstractPresenterWithChat {
 
-    @Inject
-    @Named("theme")
-    private static String theme;
-    @Inject
-    @Named("styleSheet")
-    private static String styleSheet;
-    @Inject
-    protected IGameService gameService;
     @FXML
     protected Button endTurn;
     @FXML
@@ -120,6 +112,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected CheckBox autoRoll;
     @FXML
+    protected CheckBox constructionMode;
+    @FXML
     protected ColumnConstraints helpColumn;
     @FXML
     protected TextFlow helpLabel;
@@ -148,6 +142,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected boolean startUpPhaseEnabled;
     protected boolean ownTurn;
     protected boolean tradingCurrentlyAllowed;
+    protected boolean buildingCurrentlyEnabled;
     protected boolean timerPaused;
     protected boolean gamePaused = false;
     protected int moveTime;
@@ -161,11 +156,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected GameRendering.GameMapDescription gameMapDescription = new GameRendering.GameMapDescription();
     protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
     protected Map<UserOrDummy, Colour> userColoursMap = null;
+    protected IGameService gameService;
     protected int maxTradeDiff;
     protected Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap;
+    protected List<UserOrDummy> inGameUserList;
 
-    @Inject
-    private ITradeService tradeService;
     @FXML
     private TableColumn<IDevelopmentCard, Integer> developmentCardAmountCol;
     @FXML
@@ -177,6 +172,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     private boolean diceRolled = false;
     private boolean buildingCurrentlyAllowed;
+    private ITradeService tradeService;
+    private String theme;
 
     @Override
     @FXML
@@ -223,6 +220,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         gameMapCanvas.setHeight(dimension * hexFactor - heightDiff);
         gameMapCanvas.setWidth(dimension);
         gameRendering = new GameRendering(gameMapCanvas);
+        gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
         gameRendering.bindGameMapDescription(gameMapDescription);
         gameRendering.redraw();
     }
@@ -819,6 +817,23 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Handles a click on the construction mode check box
+     * <p>
+     * This method activates/ deactivates the construction mode of the player.
+     * Afterwards the gamerendering is called to redraw the map
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    @FXML
+    private void onConstructionModeCheckBoxPressed() {
+        constructionMode.setSelected(constructionMode.isSelected());
+        buildingCurrentlyEnabled = constructionMode.isSelected();
+        gameRendering.setBuildingEnabled(buildingCurrentlyEnabled);
+        gameRendering.redraw();
+    }
+
+    /**
      * Handles a DiceCastMessage
      * <p>
      * If a new DiceCastMessage object is posted onto the EventBus,
@@ -872,8 +887,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_FIRST_ROAD || roadBuildingCardPhase == RoadBuildingCardPhase.WAITING_FOR_SECOND_ROAD) {
             gameService.buildRequest(lobbyName, mapPoint);
         }
-        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE))
-            gameService.buildRequest(lobbyName, mapPoint);
+        if (buildingCurrentlyAllowed && (mapPoint.getType() == INTERSECTION || mapPoint.getType() == EDGE) && constructionMode
+                .isSelected() && buildingCurrentlyEnabled) gameService.buildRequest(lobbyName, mapPoint);
         if (mapPoint.getType() == HEX && robberNewPosition && !gamePaused) {
             gameService.robberNewPosition(lobbyName, mapPoint);
             robberNewPosition = false;
@@ -1591,6 +1606,25 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             buildingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
             tradingCurrentlyAllowed = userService.getLoggedInUser().equals(user);
         }
+    }
+
+    /**
+     * Sets the injected fields
+     * <p>
+     * This method sets the injected fields via parameters.
+     *
+     * @param tradeService The TradeService this class should use.
+     * @param gameService  The GameService this class should use.
+     * @param theme        The theme this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    private void setInjects(ITradeService tradeService, IGameService gameService, @Named("theme") String theme) {
+        this.tradeService = tradeService;
+        this.gameService = gameService;
+        this.theme = theme;
     }
 
     /**

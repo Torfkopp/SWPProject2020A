@@ -1,6 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.Colour;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -42,6 +43,7 @@ public class Game {
     private final Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap = new HashMap<>();
     private final UserOrDummy first;
     private final int maxTradeDiff;
+    private final List<UserOrDummy> playerList;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -53,6 +55,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
+    private userOrDummyPair robResourceReceiverVictimPair = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -100,6 +103,7 @@ public class Game {
         startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         bankInventory = new BankInventory();
+        playerList = createPlayerList();
     }
 
     /**
@@ -157,6 +161,26 @@ public class Game {
      */
     public void changePauseStatus(UserOrDummy user) {
         pauseGameMap.replace(user, !pauseGameMap.get(user));
+    }
+
+    /**
+     * Prepares a ordered list of players in the game
+     *
+     * @return An ordered list of the players
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> createPlayerList() {
+        List<UserOrDummy> playerList = new ArrayList<>();
+        UserOrDummy player = activePlayer;
+        playerList.add(activePlayer);
+        for (int i = 0; i < players.size() - 1; i++) {
+            player = players
+                    .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(player).nextPlayer(players.size()));
+            playerList.add(player);
+        }
+        return playerList;
     }
 
     /**
@@ -382,6 +406,18 @@ public class Game {
     }
 
     /**
+     * Gets the player list
+     *
+     * @return The order of the players in the game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> getPlayerList() {
+        return playerList;
+    }
+
+    /**
      * Gets a mapping of Players to Users
      *
      * @return The player user mapping
@@ -473,6 +509,30 @@ public class Game {
      */
     public void setRoadBuildingCardPhase(RoadBuildingCardPhase roadBuildingCardPhase) {
         this.roadBuildingCardPhase = roadBuildingCardPhase;
+    }
+
+    /**
+     * Gets the robResourceReceiverVictimPair
+     *
+     * @return userOrDummyPair of receiver and victim
+     *
+     * @author Mario Fokken
+     * @since 2021-06-11
+     */
+    public userOrDummyPair getRobResourceReceiverVictimPair() {
+        return robResourceReceiverVictimPair;
+    }
+
+    /**
+     * Sets the robResourceReceiverVictimPair
+     *
+     * @param robResourceReceiverVictimPair userOrDummyPair of receiver and victim
+     *
+     * @author Mario Fokken
+     * @since 2021-06-11
+     */
+    public void setRobResourceReceiverVictimPair(userOrDummyPair robResourceReceiverVictimPair) {
+        this.robResourceReceiverVictimPair = robResourceReceiverVictimPair;
     }
 
     /**
