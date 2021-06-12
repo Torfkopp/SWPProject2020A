@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.LobbyUpdateEvent;
 import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
@@ -31,7 +32,6 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.inject.Named;
 import java.util.*;
 
 /**
@@ -53,26 +53,30 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
 
     private static final Logger LOG = LogManager.getLogger(LobbyPresenter.class);
 
-    @Inject
-    @Named("joinLeaveMsgsOn")
-    private boolean joinLeaveMsgsOn;
-    @Inject
-    @Named("ownerReadyNotificationsOn")
-    private boolean ownerReadyNotificationsOn;
-    @Inject
-    @Named("ownerTransferNotificationsOn")
-    private boolean ownerTransferNotificationsOn;
+    private final boolean joinLeaveMsgsOn;
+    private final boolean ownerReadyNotificationsOn;
+    private final boolean ownerTransferNotificationsOn;
 
     /**
      * Constructor
+     *
+     * @param joinLeaveMsgsOn              Boolean whether to show join/leave messages.
+     * @param ownerReadyNotificationsOn    Boolean whether to show ready messages.
+     * @param ownerTransferNotificationsOn Boolean whether to show owner transfer messages.
      *
      * @author Temmo Junkhoff
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.AbstractPresenterWithChat
      * @since 2021-01-02
      */
-    public LobbyPresenter() {
+    @Inject
+    public LobbyPresenter(@Named("joinLeaveMsgsOn") boolean joinLeaveMsgsOn,
+                          @Named("ownerReadyNotificationsOn") boolean ownerReadyNotificationsOn,
+                          @Named("ownerTransferNotificationsOn") boolean ownerTransferNotificationsOn) {
         super.init(LogManager.getLogger(LobbyPresenter.class));
+        this.joinLeaveMsgsOn = joinLeaveMsgsOn;
+        this.ownerReadyNotificationsOn = ownerReadyNotificationsOn;
+        this.ownerTransferNotificationsOn = ownerTransferNotificationsOn;
     }
 
     /**
