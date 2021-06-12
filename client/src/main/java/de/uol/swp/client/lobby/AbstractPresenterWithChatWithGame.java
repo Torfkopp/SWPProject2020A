@@ -40,7 +40,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -95,6 +99,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Button playCard;
     @FXML
     protected Button returnToLobby;
+    @FXML
+    protected Button displayVictoryPointChart;
     @FXML
     protected Button rollDice;
     @FXML
@@ -156,6 +162,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected Map<UserOrDummy, Player> userOrDummyPlayerMap = null;
     protected Map<UserOrDummy, Colour> userColoursMap = null;
     protected int maxTradeDiff;
+    protected Map<UserOrDummy, Map<Integer, Integer>> victoryPointsOverTimeMap;
 
     @Inject
     private ITradeService tradeService;
@@ -221,6 +228,55 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     }
 
     /**
+     * Method called when the DisplayVictoryChart Button is pressed
+     *
+     * If the DisplayVictoryChart is pressed, this method will display the
+     * Victory Point Chart for the specific lobby.
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-12
+     */
+    @FXML
+    protected void onDisplayVictoryPointChartPressed() {
+        if (victoryPointsOverTimeMap == null) return;
+        soundService.button();
+        Dialog<String> dialog = new Dialog<>();
+        dialog.getDialogPane().setPrefSize(400, 400);
+        dialog.getDialogPane().setMinHeight(400);
+        dialog.getDialogPane().setMinWidth(400);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+        LineChart<Number, Number> victoryPointChart = new LineChart<>(xAxis, yAxis);
+        victoryPointChart.setTitle(resourceBundle.getString("game.won.victorypointchart.title"));
+        victoryPointChart.setLegendVisible(false);
+        xAxis.setLabel(resourceBundle.getString("game.won.victorypointchart.xaxis"));
+        yAxis.setLabel(resourceBundle.getString("game.won.victorypointchart.yaxis"));
+        yAxis.setAutoRanging(true);
+        xAxis.setAutoRanging(true);
+        yAxis.setTickUnit(1.0);
+        xAxis.setTickUnit(1.0);
+        yAxis.setMinorTickVisible(false);
+        xAxis.setMinorTickVisible(false);
+        for (Map.Entry<UserOrDummy, Map<Integer, Integer>> victoryPointMap : victoryPointsOverTimeMap.entrySet()) {
+            XYChart.Series<Number, Number> series = new XYChart.Series<>();
+            Colour colour = userColoursMap.get(victoryPointMap.getKey());
+            for (Map.Entry<Integer, Integer> points : victoryPointMap.getValue().entrySet()) {
+                series.getData().add(new XYChart.Data<>(points.getKey(), points.getValue()));
+            }
+            victoryPointChart.getData().add(series);
+            Node line = series.getNode().lookup(".chart-series-line");
+            String rgb = String.format("%d, %d, %d", colour.getColourCode()[0], colour.getColourCode()[1],
+                                       colour.getColourCode()[2]);
+            line.setStyle("-fx-stroke: rgba(" + rgb + ",1.0);");
+        }
+        dialog.getDialogPane().setContent(victoryPointChart);
+        dialog.setResizable(true);
+        dialog.getDialogPane().getStylesheets().add(styleSheet);
+        dialog.showAndWait();
+    }
+
+    /**
      * Method called when the EndTurnButton is pressed
      * <p>
      * If the EndTurnButton is pressed, this method disables all appropriate
@@ -265,7 +321,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             helpLabel.setBorder(null);
             helpLabel.getChildren().clear();
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
-            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen()) window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
+            if (!((Stage) window).isMaximized() && !((Stage) window).isFullScreen())
+                window.setWidth(LobbyPresenter.MIN_WIDTH_IN_GAME);
         }
         helpActivated = !helpActivated;
     }

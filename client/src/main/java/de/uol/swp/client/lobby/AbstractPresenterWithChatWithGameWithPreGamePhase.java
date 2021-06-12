@@ -22,6 +22,7 @@ import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -416,6 +417,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (!lobbyName.equals(msg.getLobbyName())) return;
         gameMap = null;
         gameWon = true;
+        victoryPointsOverTimeMap = msg.getVictoryPointMap();
         winner = msg.getUser();
         Platform.runLater(() -> {
             uniqueCardView.setMaxHeight(0);
@@ -453,6 +455,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             currentRound.setVisible(false);
             roundCounter = 0;
             this.elapsedTimer.stop();
+            displayVictoryPointChart.setVisible(true);
+            displayVictoryPointChart.setPrefHeight(30);
+            displayVictoryPointChart.setPrefWidth(230);
             if (Objects.equals(owner, userService.getLoggedInUser())) {
                 returnToLobby.setVisible(true);
                 returnToLobby.setPrefHeight(30);
@@ -505,6 +510,9 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             returnToLobby.setVisible(false);
             returnToLobby.setPrefHeight(0);
             returnToLobby.setPrefWidth(0);
+            displayVictoryPointChart.setVisible(false);
+            displayVictoryPointChart.setPrefHeight(0);
+            displayVictoryPointChart.setPrefWidth(0);
             window.setWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
             window.setHeight(LobbyPresenter.MIN_HEIGHT_PRE_GAME);
             ((Stage) window).setMinWidth(LobbyPresenter.MIN_WIDTH_PRE_GAME);
@@ -606,6 +614,26 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received UserReadyMessage for Lobby {}", lobbyName);
         lobbyService.retrieveAllLobbyMembers(lobbyName); // for updateUserList
+    }
+    /**
+     * Helper Method for the VictoryPointchart
+     * <p>
+     * This method updates with every round and saves the specific
+     * Victory Points for each player for each round to display when a player
+     * has won the game
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-12
+     */
+
+    private void populateVictoryPointChat(Map<UserOrDummy, Map<Integer, Integer>> victoryPointMap) {
+        for (Map.Entry<UserOrDummy, Map<Integer, Integer>> playerVictoryPoints : victoryPointMap.entrySet()) {
+            XYChart.Series<Integer, Integer> victoryPointSeries = new XYChart.Series<>();
+            victoryPointSeries.setName(playerVictoryPoints.getKey().getUsername());
+            for (Map.Entry<Integer, Integer> victoryPoints : playerVictoryPoints.getValue().entrySet()) {
+                victoryPointSeries.getData().add(new XYChart.Data<>(victoryPoints.getKey(), victoryPoints.getValue()));
+            }
+        }
     }
 
     /**
