@@ -42,7 +42,8 @@ class LobbyServiceTest {
     private static final ISimpleLobby defaultLobby = new SimpleLobby(defaultLobbyName, false, defaultUser,//
                                                                      4, 60,//
                                                                      false, false,//
-                                                                     false, null, null);
+                                                                     false, null, null, 2);
+    private static final int MAX_TRADE_DIFF = 2;
 
     private final EventBus eventBus = new EventBus();
     private final CountDownLatch lock = new CountDownLatch(1);
@@ -426,7 +427,7 @@ class LobbyServiceTest {
      */
     @Test
     void updateLobbySettings() throws InterruptedException {
-        lobbyService.updateLobbySettings(defaultLobbyName, 4, true, 60, true);
+        lobbyService.updateLobbySettings(defaultLobbyName, 4, true, 60, true, 2);
 
         lock.await(250, TimeUnit.MILLISECONDS);
 

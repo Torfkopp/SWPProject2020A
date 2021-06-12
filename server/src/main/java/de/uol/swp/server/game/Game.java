@@ -1,5 +1,7 @@
 package de.uol.swp.server.game;
 
+import de.uol.swp.common.Colour;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -39,6 +41,8 @@ public class Game {
     private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
+    private final int maxTradeDiff;
+    private final List<UserOrDummy> playerList;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -50,6 +54,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
+    private userOrDummyPair robResourceReceiverVictimPair = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -68,6 +73,7 @@ public class Game {
         this.lobby = lobby;
         this.map = gameMap;
         this.first = first;
+        this.maxTradeDiff = getLobby().getMaxTradeDiff();
         playersStartUpBuiltMap = new HashMap<>();
         autoRollEnabled = new HashMap<>();
         {
@@ -92,6 +98,7 @@ public class Game {
         startUpPhase = lobby.isStartUpPhaseEnabled() ? StartUpPhase.PHASE_1 : StartUpPhase.NOT_IN_STARTUP_PHASE;
         activePlayer = first;
         bankInventory = new BankInventory();
+        playerList = createPlayerList();
     }
 
     /**
@@ -149,6 +156,26 @@ public class Game {
      */
     public void changePauseStatus(UserOrDummy user) {
         pauseGameMap.replace(user, !pauseGameMap.get(user));
+    }
+
+    /**
+     * Prepares a ordered list of players in the game
+     *
+     * @return An ordered list of the players
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> createPlayerList() {
+        List<UserOrDummy> playerList = new ArrayList<>();
+        UserOrDummy player = activePlayer;
+        playerList.add(activePlayer);
+        for (int i = 0; i < players.size() - 1; i++) {
+            player = players
+                    .getUserOrDummyFromPlayer(players.getPlayerFromUserOrDummy(player).nextPlayer(players.size()));
+            playerList.add(player);
+        }
+        return playerList;
     }
 
     /**
@@ -327,6 +354,15 @@ public class Game {
     }
 
     /**
+     * Gets this game's maximum resource difference
+     *
+     * @return The Game's maximum resource difference
+     */
+    public int getMaxTradeDiff() {
+        return maxTradeDiff;
+    }
+
+    /**
      * Gets the next player
      *
      * @return User object of the next player
@@ -362,6 +398,18 @@ public class Game {
      */
     public Player getPlayer(UserOrDummy user) {
         return players.getPlayerFromUserOrDummy(user);
+    }
+
+    /**
+     * Gets the player list
+     *
+     * @return The order of the players in the game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> getPlayerList() {
+        return playerList;
     }
 
     /**
@@ -459,6 +507,30 @@ public class Game {
     }
 
     /**
+     * Gets the robResourceReceiverVictimPair
+     *
+     * @return userOrDummyPair of receiver and victim
+     *
+     * @author Mario Fokken
+     * @since 2021-06-11
+     */
+    public userOrDummyPair getRobResourceReceiverVictimPair() {
+        return robResourceReceiverVictimPair;
+    }
+
+    /**
+     * Sets the robResourceReceiverVictimPair
+     *
+     * @param robResourceReceiverVictimPair userOrDummyPair of receiver and victim
+     *
+     * @author Mario Fokken
+     * @since 2021-06-11
+     */
+    public void setRobResourceReceiverVictimPair(userOrDummyPair robResourceReceiverVictimPair) {
+        this.robResourceReceiverVictimPair = robResourceReceiverVictimPair;
+    }
+
+    /**
      * Gets the current Round the Game is in
      *
      * @author Aldin Dervisi
@@ -533,6 +605,18 @@ public class Game {
                                       playerWithLargestArmy == null ? 0 :
                                       getInventory(playerWithLargestArmy).getKnights()));
         return returnList;
+    }
+
+    /**
+     * Gets a map of users or dummies and their chosen colour
+     *
+     * @return A map containing users or dummies and their chosen colour
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    public Map<UserOrDummy, Colour> getUserColoursMap() {
+        return lobby.getUserColourMap();
     }
 
     /**
@@ -660,7 +744,7 @@ public class Game {
     /**
      * Sets the boolean paused for the game.
      *
-     * @param pausedByTrade
+     * @param pausedByTrade True if paused by trade
      *
      * @author Alwin Bossert
      * @since 2021-05-02
@@ -674,8 +758,6 @@ public class Game {
      * Returns false if not everyone want to change the status. Otherwise
      * the pause status gets changed and the preparePausedMembers method is
      * called.
-     *
-     * @return Whether the paused status of the game has changed
      *
      * @author Maximilian Lindner
      * @since 2021-05-21

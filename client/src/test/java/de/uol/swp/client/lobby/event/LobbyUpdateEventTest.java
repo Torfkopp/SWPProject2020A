@@ -26,7 +26,7 @@ class LobbyUpdateEventTest {
                                                                      defaultUser, 3, //
                                                                      60, false, //
                                                                      false, false, //
-                                                                     null, null); //
+                                                                     null, null, 2); //
 
     /**
      * Test for the creation of LobbyUpdateEvents

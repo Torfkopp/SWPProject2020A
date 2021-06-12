@@ -5,11 +5,14 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.dto.ReadySystemMessageDTO;
+import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.message.PlayerWonGameMessage;
 import de.uol.swp.common.game.message.ReturnToPreGameLobbyMessage;
+import de.uol.swp.common.lobby.message.ColourChangedMessage;
 import de.uol.swp.common.lobby.message.StartSessionMessage;
 import de.uol.swp.common.lobby.message.UserReadyMessage;
 import de.uol.swp.common.lobby.response.KickUserResponse;
@@ -18,13 +21,15 @@ import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
@@ -64,6 +69,8 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     @FXML
     protected Label timerLabel;
     @FXML
+    protected Label maxTradeDiffLabel;
+    @FXML
     private Button changeMoveTimeButton;
     @FXML
     private Button startSession;
@@ -83,12 +90,20 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     private RadioButton easyAIRadioButton;
     @FXML
     private VBox preGameSettingBox;
+    @FXML
+    private TextField maxTradeDiffTextField;
+    @FXML
+    private Button maxTradeChangeButton;
+    @FXML
+    private ComboBox<Colour> colourComboBox;
 
     @FXML
     @Override
     protected void initialize() {
         super.initialize();
         prepareMoveTimeTextField();
+        prepareMaxTradeDiffTextfield();
+        prepareColourComboBox();
         LOG.debug("AbstractPresenterWithChatWithGameWithPreGamePhase initialised");
     }
 
@@ -234,6 +249,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
     protected void setPreGameSettings() {
         moveTimeTextField.setDisable(!userService.getLoggedInUser().equals(owner));
         moveTimeTextField.setVisible(userService.getLoggedInUser().equals(owner));
+        maxTradeChangeButton.setDisable(!userService.getLoggedInUser().equals(owner));
+        maxTradeChangeButton.setVisible(userService.getLoggedInUser().equals(owner));
+        maxTradeDiffTextField.setDisable(!userService.getLoggedInUser().equals(owner));
+        maxTradeDiffTextField.setVisible(userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setDisable(!userService.getLoggedInUser().equals(owner));
         changeMoveTimeButton.setVisible(userService.getLoggedInUser().equals(owner));
         setStartUpPhaseCheckBox.setDisable(!userService.getLoggedInUser().equals(owner));
@@ -261,6 +280,58 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             startSession.setDisable(true);
             startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Updates the lobby's member list according to the list given
+     * <p>
+     * This method clears the entire member list and then adds the name of each user
+     * in the list given to the lobby's member list.
+     * If there is no member list, it creates one.
+     * <p>
+     * If a user is marked as ready in the readyUsers Set, their name is prepended
+     * with a checkmark.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
+     *
+     * @param userLobbyList A list of User objects including all currently logged in
+     *                      users
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.user.UserOrDummy
+     * @since 2021-01-05
+     */
+    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+        Platform.runLater(() -> {
+            if (inGame) {
+                lobbyMembers.clear();
+                lobbyMembers.addAll(inGameUserList);
+                return;
+            }
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
+    }
+
+    /**
+     * Helper method to create a PlayerColourMap from
+     * the UserColourMap and the UserOrDummyPlayerMap
+     *
+     * @return PlayerColourMap
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    private Map<Player, Colour> getPlayerColourMap() {
+        Map<Player, Colour> map = new HashMap<>();
+        for (UserOrDummy u : userColoursMap.keySet())
+            map.put(userOrDummyPlayerMap.get(u), userColoursMap.get(u));
+        return map;
     }
 
     /**
@@ -300,6 +371,46 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         UserOrDummy selectedUser = membersView.getSelectionModel().getSelectedItem();
         if (selectedUser == userService.getLoggedInUser()) return;
         lobbyService.changeOwner(lobbyName, selectedUser);
+    }
+
+    /**
+     * Handles a click on the ColourChangeButton
+     * <p>
+     * Method called when the ColourChangeButton is pressed.
+     * This method calls the lobbyService to post a setColourRequest.
+     *
+     * @author Mario Fokken
+     * @since 2021-06-04
+     */
+    @FXML
+    private void onColourChangeButtonPressed() {
+        Colour colour = colourComboBox.getValue();
+        lobbyService.setColour(lobbyName, colour);
+    }
+
+    /**
+     * Handles a ColourChangedMessage found on the EventBus
+     * <p>
+     * The message gets sent by the server if a user changed their colour.
+     * It tells the gameRendering to adapt those new colours.
+     *
+     * @param msg The ColourChangedMessage found on the EventBus
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    @Subscribe
+    private void onColourChangedMessage(ColourChangedMessage msg) {
+        LOG.debug("Received ColourChangedMessage for {}", msg.getName());
+        Map<UserOrDummy, Player> map = new HashMap<>();
+        int i = 0;
+        for (UserOrDummy u : msg.getUserColours().keySet())
+            map.put(u, Player.byIndex(i++));
+        userOrDummyPlayerMap = map;
+        userColoursMap = msg.getUserColours();
+        gameRendering.setPlayerColours(getPlayerColourMap());
+        lobbyService.retrieveAllLobbyMembers(lobbyName);//for updating the list
+        Platform.runLater(this::prepareColourComboBox);
     }
 
     /**
@@ -358,6 +469,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             developmentCardTableView.setVisible(false);
             rollDice.setVisible(false);
             autoRoll.setVisible(false);
+            constructionMode.setVisible(false);
             endTurn.setVisible(false);
             tradeWithUserButton.setVisible(false);
             tradeWithUserButton.setDisable(false);
@@ -468,7 +580,10 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        inGameUserList = msg.getPlayerList();
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
+        userColoursMap = msg.getUserOrDummyColourMap();
+        gameRendering.setPlayerColours(getPlayerColourMap());
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         cleanChatHistoryOfOldOwnerNotices();
         Platform.runLater(() -> {
@@ -480,6 +595,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             prepareInGameArrangement();
             endTurn.setDisable(true);
             autoRoll.setVisible(true);
+            constructionMode.setVisible(true);
             buildingCosts.setVisible(true);
             tradeWithUserButton.setVisible(true);
             tradeWithUserButton.setDisable(true);
@@ -530,6 +646,47 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         if (!msg.getName().equals(lobbyName)) return;
         LOG.debug("Received UserReadyMessage for Lobby {}", lobbyName);
         lobbyService.retrieveAllLobbyMembers(lobbyName); // for updateUserList
+    }
+
+    /**
+     * Prepares the ColourComboBox
+     * <p>
+     * Colours the text in the right colour.
+     *
+     * @author Mario Fokken
+     * @since 2021-06-04
+     */
+    private void prepareColourComboBox() {
+        colourComboBox.getItems().clear();
+        Colour[] colours = new Colour[Colour.values().length - 1];
+        System.arraycopy(Colour.values(), 0, colours, 0, colours.length);
+
+        colourComboBox.getItems().addAll(colours);
+        colourComboBox.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<Colour> call(ListView<Colour> param) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(Colour item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(resourceBundle.getString("colours." + item));
+                            int[] colourCode = item.getColourCode();
+                            setTextFill(Color.rgb(colourCode[0], colourCode[1], colourCode[2]));
+                            setDisable(userColoursMap.containsValue(item));
+                        } else setText(null);
+                    }
+                };
+            }
+        });
+        colourComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Colour item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) setText(resourceBundle.getString("colours." + item));
+                else setText(null);
+            }
+        });
     }
 
     /**
@@ -590,17 +747,34 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             int moveTime = !moveTimeTextField.getText().equals("") ? Integer.parseInt(moveTimeTextField.getText()) :
                            this.moveTime;
             int maxPlayers = maxPlayersToggleGroup.getSelectedToggle() == threePlayerRadioButton ? 3 : 4;
+            int newMaxTradeDiff =
+                    !maxTradeDiffTextField.getText().equals("") ? Integer.parseInt(maxTradeDiffTextField.getText()) :
+                    this.maxTradeDiff;
 
             if (moveTime < 30 || moveTime > 500) {
                 post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
             } else {
                 soundService.button();
                 lobbyService.updateLobbySettings(lobbyName, maxPlayers, setStartUpPhaseCheckBox.isSelected(), moveTime,
-                                                 randomPlayFieldCheckbox.isSelected());
+                                                 randomPlayFieldCheckbox.isSelected(), newMaxTradeDiff);
             }
         } catch (NumberFormatException ignored) {
             post(new SetMoveTimeErrorEvent(resourceBundle.getString("lobby.error.movetime")));
         }
+    }
+
+    /**
+     * Prepare the MaxTradeTextfield
+     * <p>
+     * Lets the maxTradeTextfield only accept positive numbers.
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-08
+     */
+    private void prepareMaxTradeDiffTextfield() {
+        UnaryOperator<TextFormatter.Change> integerFilter = (s) ->
+                s.getText().matches("^[0-9]\\d*(\\.\\d+)?$") || s.isDeleted() || s.getText().equals("") ? s : null;
+        maxTradeDiffTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 
     /**

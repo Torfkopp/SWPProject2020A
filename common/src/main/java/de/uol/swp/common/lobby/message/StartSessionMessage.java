@@ -1,10 +1,12 @@
 package de.uol.swp.common.lobby.message;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.configuration.IConfiguration;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,8 +21,10 @@ import java.util.Map;
 public class StartSessionMessage extends AbstractLobbyMessage {
 
     private final Map<UserOrDummy, Player> userOrDummyPlayerMap;
+    private final Map<UserOrDummy, Colour> userOrDummyColourMap;
     private final IConfiguration configuration;
     private final boolean startUpPhaseEnabled;
+    private final List<UserOrDummy> playerList;
 
     /**
      * Constructor
@@ -30,13 +34,18 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      * @param configuration        The field configuration used in the game
      * @param startUpPhaseEnabled  Whether the game has the startup phase enabled
      * @param userOrDummyPlayerMap The Map with userOrDummyPlayer
+     * @param userOrDummyColourMap The Map with userOrDummyColour
+     * @param playerList           List of the players order
      */
     public StartSessionMessage(LobbyName name, UserOrDummy user, IConfiguration configuration,
-                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap) {
+                               boolean startUpPhaseEnabled, Map<UserOrDummy, Player> userOrDummyPlayerMap,
+                               Map<UserOrDummy, Colour> userOrDummyColourMap, List<UserOrDummy> playerList) {
         super(name, user);
         this.configuration = configuration;
         this.startUpPhaseEnabled = startUpPhaseEnabled;
         this.userOrDummyPlayerMap = userOrDummyPlayerMap;
+        this.userOrDummyColourMap = userOrDummyColourMap;
+        this.playerList = playerList;
     }
 
     /**
@@ -53,6 +62,25 @@ public class StartSessionMessage extends AbstractLobbyMessage {
      */
     public IConfiguration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * Gets the player list
+     *
+     * @return The order of the players in the game
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public List<UserOrDummy> getPlayerList() {
+        return playerList;
+    }
+
+    /**
+     * Gets the Map of UserOrDummies and Colours
+     */
+    public Map<UserOrDummy, Colour> getUserOrDummyColourMap() {
+        return userOrDummyColourMap;
     }
 
     /**

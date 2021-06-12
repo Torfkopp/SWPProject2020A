@@ -41,8 +41,6 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
     public static final int MIN_WIDTH = 620;
     private static final Logger LOG = LogManager.getLogger(TradeWithBankPresenter.class);
     private LobbyName lobbyName;
-
-    @Inject
     private IGameService gameService;
 
     @FXML
@@ -276,6 +274,19 @@ public class TradeWithBankPresenter extends AbstractTradePresenter {
         tradeService.closeBankTradeWindow(lobbyName);
         gameService.updateInventory(lobbyName);
         soundService.coins();
+    }
+
+    /**
+     * Sets the GameService via Injection
+     *
+     * @param gameService The GameService this class should use.
+     *
+     * @author Marvin Drees
+     * @since 2021-06-09
+     */
+    @Inject
+    private void setGameService(IGameService gameService) {
+        this.gameService = gameService;
     }
 
     /**

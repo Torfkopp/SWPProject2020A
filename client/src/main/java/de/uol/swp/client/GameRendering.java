@@ -3,6 +3,7 @@ package de.uol.swp.client;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.user.IUserService;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.game.map.Player;
 import de.uol.swp.common.game.map.gamemapDTO.*;
 import de.uol.swp.common.game.map.hexes.IGameHex;
@@ -38,10 +39,6 @@ import static de.uol.swp.common.game.map.management.MapPoint.*;
  */
 public class GameRendering {
 
-    public static final Color PLAYER_1_COLOUR = Color.BLUE;
-    public static final Color PLAYER_2_COLOUR = Color.RED;
-    public static final Color PLAYER_3_COLOUR = Color.rgb(255, 69, 0);
-    public static final Color PLAYER_4_COLOUR = Color.rgb(255, 127, 124);
     //Constants used for the colours
     private static final Color TOKEN_COLOUR = Color.BEIGE;
     private static final Color TEXT_COLOUR = Color.BLACK;
@@ -58,6 +55,11 @@ public class GameRendering {
     private static final Logger LOG = LogManager.getLogger(GameRendering.class);
     private static final Color BUILDABLE_COLOUR = Color.rgb(150, 150, 150, 0.6);
 
+    public static Color PLAYER_1_COLOUR = Color.BLACK;
+    public static Color PLAYER_2_COLOUR = Color.BLACK;
+    public static Color PLAYER_3_COLOUR = Color.BLACK;
+    public static Color PLAYER_4_COLOUR = Color.BLACK;
+
     @Inject
     private static ResourceBundle resourceBundle;
     @Inject
@@ -65,7 +67,6 @@ public class GameRendering {
     @Inject
     @Named("drawHitboxGrid")
     private static boolean drawHitboxGrid;
-
     private final double OFFSET_Y = 3.0, OFFSET_X = 3.0;
     private final double hexHeight, hexWidth, settlementSize, citySize, diceSize, diceLineWidth, diceDotSize;
     private final double roadWidth, robberLineWidth, tokenSize, effectiveHeight, effectiveWidth, width, height;
@@ -73,6 +74,7 @@ public class GameRendering {
     private final double tokenTextFontSize;
     private final double centerTextFontSize;
     private final double bottomTextFontSize;
+    private boolean buildingEnabled;
     private GameMapDescription gameMapDescription = new GameMapDescription();
 
     /**
@@ -172,6 +174,48 @@ public class GameRendering {
                         timer.cancel();
                     }
                 }, 1500);
+            }
+        }
+    }
+
+    /**
+     * Handles the buildingEnabled status
+     *
+     * @param buildingCurrentlyEnabled Whether the building should be enabled or not
+     *
+     * @author Maximilian Lindner
+     * @since 2021-06-11
+     */
+    public void setBuildingEnabled(boolean buildingCurrentlyEnabled) {
+        buildingEnabled = buildingCurrentlyEnabled;
+    }
+
+    /**
+     * Sets the player's colours according
+     * to the given map
+     *
+     * @param playerColourMap Map of player and the colour
+     *
+     * @author Mario Fokken
+     * @since 2021-06-02
+     */
+    public void setPlayerColours(Map<Player, Colour> playerColourMap) {
+        int[] colour;
+        for (Player p : playerColourMap.keySet()) {
+            colour = playerColourMap.get(p).getColourCode();
+            switch (p) {
+                case PLAYER_1:
+                    PLAYER_1_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_2:
+                    PLAYER_2_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_3:
+                    PLAYER_3_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
+                case PLAYER_4:
+                    PLAYER_4_COLOUR = Color.rgb(colour[0], colour[1], colour[2]);
+                    break;
             }
         }
     }
@@ -709,7 +753,7 @@ public class GameRendering {
         if (intersection == null) return;
         for (IEdgeWithBuildable edge : intersection.getEdges()) {
             if (edge == null) continue;
-            if (edge.isBuildableBy(userService.getLoggedInUser())) {
+            if (edge.isBuildableBy(userService.getLoggedInUser()) && buildingEnabled) {
                 Platform.runLater(() -> gfxCtx.setStroke(BUILDABLE_COLOUR));
             } else if (edge.getOwner() == null) {
                 continue;
@@ -774,13 +818,13 @@ public class GameRendering {
         if (intersection == null) return;
         switch (intersection.getState()) {
             case FREE:
-                if (intersection.isBuildableBy(userService.getLoggedInUser()))
+                if (intersection.isBuildableBy(userService.getLoggedInUser()) && buildingEnabled)
                     drawSettlement(Optional.empty(), currentX, currentY);
                 //Free intersections don't need to be marked, but it could easily be added here
                 break;
             case SETTLEMENT:
                 drawSettlement(Optional.of(intersection.getOwner()), currentX, currentY);
-                if (intersection.isBuildableBy(userService.getLoggedInUser()))
+                if (intersection.isBuildableBy(userService.getLoggedInUser()) && buildingEnabled)
                     drawCity(Optional.empty(), currentX, currentY);
                 break;
             case CITY:

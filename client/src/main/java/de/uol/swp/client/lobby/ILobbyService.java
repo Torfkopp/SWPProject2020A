@@ -1,5 +1,6 @@
 package de.uol.swp.client.lobby;
 
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
@@ -21,6 +22,7 @@ public interface ILobbyService {
      * @param name The name of the lobby
      * @param ai   The AI to join the lobby
      *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
      * @author Mario Fokken
      * @since 2021-05-21
      */
@@ -163,6 +165,21 @@ public interface ILobbyService {
     void returnToPreGameLobby(LobbyName lobbyName);
 
     /**
+     * Posts a request to change a user's colour.
+     * If colour is null, the colour won't be changed,
+     * but the response will be sent nevertheless.
+     *
+     * @param lobbyName The lobby's name
+     * @param colour    The colour the user desires
+     *
+     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
+     * @author Mario Fokken
+     * @see de.uol.swp.common.lobby.request.SetColourRequest
+     * @since 2021-06-04
+     */
+    void setColour(LobbyName lobbyName, Colour colour);
+
+    /**
      * Posts an event to show a Lobby Error alert with the provided message
      *
      * @param message The message to display
@@ -179,6 +196,7 @@ public interface ILobbyService {
      * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
      * @param moveTime               The maximum time of a move
      * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
+     * @param maxTradeDiff
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
@@ -186,7 +204,7 @@ public interface ILobbyService {
      * @since 2021-03-15
      */
     void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
-                             boolean randomPlayFieldEnabled);
+                             boolean randomPlayFieldEnabled, int maxTradeDiff);
 
     /**
      * Posts a request to change the ready status of a user

@@ -2,6 +2,7 @@ package de.uol.swp.client.lobby;
 
 import com.google.inject.Inject;
 import de.uol.swp.client.util.ThreadManager;
+import de.uol.swp.common.Colour;
 import de.uol.swp.common.lobby.ISimpleLobby;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.AI;
@@ -82,6 +83,11 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
+    public void setColour(LobbyName lobbyName, Colour colour) {
+        ThreadManager.runNow(() -> syncLobbyService.setColour(lobbyName, colour));
+    }
+
+    @Override
     public void retrieveAllLobbies() {
         ThreadManager.runNow(syncLobbyService::retrieveAllLobbies);
     }
@@ -103,9 +109,10 @@ public class AsyncLobbyService implements ILobbyService {
 
     @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
-                                    boolean randomPlayFieldEnabled) {
+                                    boolean randomPlayFieldEnabled, int maxTradeDiff) {
         ThreadManager.runNow(() -> syncLobbyService
-                .updateLobbySettings(lobbyName, maxPlayers, startUpPhaseEnabled, moveTime, randomPlayFieldEnabled));
+                .updateLobbySettings(lobbyName, maxPlayers, startUpPhaseEnabled, moveTime, randomPlayFieldEnabled,
+                                     maxTradeDiff));
     }
 
     @Override
