@@ -15,6 +15,7 @@ import de.uol.swp.client.game.IGameService;
 import de.uol.swp.client.lobby.AsyncLobbyService;
 import de.uol.swp.client.lobby.ILobbyService;
 import de.uol.swp.client.lobby.LobbyService;
+import de.uol.swp.client.scene.*;
 import de.uol.swp.client.sound.AsyncSoundService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.sound.SoundService;
@@ -160,6 +161,7 @@ public class ClientModule extends AbstractModule {
         ownerTransferNotificationsOn = Boolean.parseBoolean(properties.getProperty("owner_transfer_notifs_on"));
 
         //DI stuff
+        bind(SceneManager.class).in(Scopes.SINGLETON);
         install(new FactoryModuleBuilder().implement(SceneManager.class, SceneManager.class)
                                           .build(SceneManagerFactory.class));
         install(new FactoryModuleBuilder().implement(ClientConnection.class, ClientConnection.class)
@@ -193,6 +195,8 @@ public class ClientModule extends AbstractModule {
         bind(TradeService.class).in(Scopes.SINGLETON);
         bind(ISoundService.class).to(AsyncSoundService.class).in(Scopes.SINGLETON);
         bind(SoundService.class).in(Scopes.SINGLETON);
+        bind(ISceneService.class).to(AsyncSceneService.class).in(Scopes.SINGLETON);
+        bind(SceneService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(I18nWrapper.class);
         requestStaticInjection(ResourceType.class);

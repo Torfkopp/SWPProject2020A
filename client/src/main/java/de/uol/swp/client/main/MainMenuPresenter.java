@@ -6,12 +6,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.SetAcceleratorsEvent;
-import de.uol.swp.client.auth.events.ShowLoginViewEvent;
-import de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent;
-import de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent;
-import de.uol.swp.client.lobby.event.CloseLobbiesViewEvent;
-import de.uol.swp.client.lobby.event.ShowLobbyViewEvent;
-import de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent;
 import de.uol.swp.common.I18nWrapper;
 import de.uol.swp.common.chat.dto.SystemMessageDTO;
 import de.uol.swp.common.game.message.GameCreatedMessage;
@@ -62,8 +56,6 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     public static final int MIN_HEIGHT = 550;
     public static final int MIN_WIDTH = 820;
     private static final Logger LOG = LogManager.getLogger(MainMenuPresenter.class);
-    private static final CloseLobbiesViewEvent closeLobbiesViewEvent = new CloseLobbiesViewEvent();
-    private static final ShowLoginViewEvent showLoginViewMessage = new ShowLoginViewEvent();
 
     private final String soundPack;
     private final boolean loginLogoutMsgsOn;
@@ -260,8 +252,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @author Eric Vuong
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeAccountDetails.event.ShowChangeAccountDetailsViewEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @since 2021-03-16
      */
     @FXML
@@ -277,13 +268,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * It posts a new ShowChangePropertiesViewEvent onto the EventBus.
      *
      * @author Alwin Bossert
-     * @see de.uol.swp.client.changeProperties.event.ShowChangePropertiesViewEvent
      * @since 2021-05-22
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
         soundService.button();
-        post(new ShowChangePropertiesViewEvent());
+        sceneService.showChangePropertiesScreen();
     }
 
     /**
@@ -304,9 +294,9 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onCheckUserInLobbyResponse(CheckUserInLobbyResponse rsp) {
         LOG.debug("Received CheckUserInLobbyResponse");
         if (rsp.getIsInLobby()) {
-            lobbyService.showLobbyError(resourceBundle.getString("lobby.error.in.lobby"));
+            sceneService.showError(resourceBundle.getString("lobby.error.in.lobby"));
         } else {
-            post(new ShowChangeAccountDetailsViewEvent());
+            sceneService.showChangeAccountDetailsScreen();
         }
     }
 
@@ -383,14 +373,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @param rsp The CreateLobbyResponse object found on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
      * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe
     private void onCreateLobbyResponse(CreateLobbyResponse rsp) {
         LOG.debug("Received CreateLobbyResponse");
-        post(new ShowLobbyViewEvent(rsp.getLobby()));
+        sceneService.showLobbyWindow(rsp.getLobby());
     }
 
     /**
@@ -405,14 +394,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @param rsp The CreateLobbyWithPasswordResponse object found on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.CreateLobbyWithPasswordResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
      * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2021-04-22
      */
     @Subscribe
     private void onCreateLobbyWithPasswordResponse(CreateLobbyWithPasswordResponse rsp) {
         LOG.debug("Received CreateLobbyWithPasswordResponse");
-        post(new ShowLobbyViewEvent(rsp.getLobby()));
+        sceneService.showLobbyWindow(rsp.getLobby());
     }
 
     /**
@@ -493,7 +481,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
         soundService.button();
         lobbyView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         if (lobbyView.getSelectionModel().isEmpty()) {
-            lobbyService.showLobbyError(resourceBundle.getString("lobby.error.invalidlobby"));
+            sceneService.showError(resourceBundle.getString("lobby.error.invalidlobby"));
         } else {
             ISimpleLobby lobby = lobbyView.getSelectionModel().getSelectedItem().getKey();
             lobbyService.joinLobby(lobby.getName());
@@ -512,14 +500,13 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * @param rsp The JoinLobbyResponse object found on the EventBus
      *
      * @see de.uol.swp.common.lobby.response.JoinLobbyResponse
-     * @see de.uol.swp.client.lobby.event.ShowLobbyViewEvent
      * @see de.uol.swp.client.lobby.LobbyService#retrieveAllLobbyMembers(de.uol.swp.common.lobby.LobbyName)
      * @since 2020-12-20
      */
     @Subscribe
     private void onJoinLobbyResponse(JoinLobbyResponse rsp) {
         LOG.debug("Received JoinLobbyResponse");
-        post(new ShowLobbyViewEvent(rsp.getLobby()));
+        sceneService.showLobbyWindow(rsp.getLobby());
     }
 
     /**
@@ -612,7 +599,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @author Temmo Junkhoff
      * @see de.uol.swp.common.lobby.message.LobbyCreatedMessage
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @since 2020-12-17
      */
     @Subscribe
@@ -677,9 +664,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      *
      * @author Phillip-André Suhr
      * @see de.uol.swp.client.AbstractPresenterWithChat#resetChatVars()
-     * @see de.uol.swp.client.auth.events.ShowLoginViewEvent
-     * @see de.uol.swp.client.lobby.event.CloseLobbiesViewEvent
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @see de.uol.swp.client.user.UserService
      * @since 2020-11-02
      */
@@ -687,8 +672,8 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onLogoutButtonPressed() {
         soundService.button();
         logout();
-        post(showLoginViewMessage);
-        post(closeLobbiesViewEvent);
+        sceneService.showLoginScreen();
+        sceneService.closeLobbyWindows();
     }
 
     /**
@@ -698,13 +683,12 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
      * It posts a ShowRulesOverviewViewEvent onto the EventBus.
      *
      * @author Phillip-André Suhr
-     * @see de.uol.swp.client.rules.event.ShowRulesOverviewViewEvent
      * @since 2021-05-02
      */
     @FXML
     private void onRulesMenuClicked() {
         soundService.button();
-        post(new ShowRulesOverviewViewEvent());
+        sceneService.showRulesWindow();
     }
 
     /**
@@ -759,7 +743,7 @@ public class MainMenuPresenter extends AbstractPresenterWithChat {
     private void onUserDeletionSuccessfulResponse(UserDeletionSuccessfulResponse rsp) {
         LOG.info("User deletion successful");
         String username = userService.getLoggedInUser().getUsername();
-        post(showLoginViewMessage);
+        sceneService.showLoginScreen();
         logout();
         ButtonType ok = new ButtonType(resourceBundle.getString("button.confirm"), ButtonBar.ButtonData.OK_DONE);
         String bundleString = resourceBundle.getString("mainmenu.settings.deleteaccount.success");

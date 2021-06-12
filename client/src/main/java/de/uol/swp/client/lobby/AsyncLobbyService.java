@@ -103,11 +103,6 @@ public class AsyncLobbyService implements ILobbyService {
     }
 
     @Override
-    public void showLobbyError(String message) {
-        ThreadManager.runNow(() -> syncLobbyService.showLobbyError(message));
-    }
-
-    @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
                                     boolean randomPlayFieldEnabled, int maxTradeDiff) {
         ThreadManager.runNow(() -> syncLobbyService

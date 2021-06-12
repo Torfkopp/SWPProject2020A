@@ -6,7 +6,6 @@ import com.google.inject.name.Named;
 import de.uol.swp.client.AbstractPresenterWithChat;
 import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.game.IGameService;
-import de.uol.swp.client.lobby.event.ShowRobberTaxViewEvent;
 import de.uol.swp.client.trade.ITradeService;
 import de.uol.swp.client.trade.event.ResetTradeWithBankButtonEvent;
 import de.uol.swp.common.Colour;
@@ -398,7 +397,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     protected void onTradeWithBankButtonPressed() {
         soundService.button();
         disableButtonStates();
-        tradeService.showBankTradeWindow(lobbyName);
+        sceneService.showBankTradeWindow(lobbyName);
     }
 
     /**
@@ -419,12 +418,12 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         membersView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         UserOrDummy user = membersView.getSelectionModel().getSelectedItem();
         if (membersView.getSelectionModel().isEmpty() || user == null) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.noplayer"));
+            sceneService.showError(resourceBundle.getString("game.trade.error.noplayer"));
         } else if (Objects.equals(user, userService.getLoggedInUser())) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.selfplayer"));
+            sceneService.showError(resourceBundle.getString("game.trade.error.selfplayer"));
         } else {
             disableButtonStates();
-            tradeService.showUserTradeWindow(lobbyName, user, false);
+            sceneService.showUserTradeWindow(lobbyName, user, false);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
@@ -512,9 +511,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
                             .setText(String.format(moveTimeText, moveTimeToDecrement.getAndDecrement())));
                     if (moveTimeToDecrement.get() == 0) {
                         gameService.rollDice(lobbyName);
-                        tradeService.closeTradeResponseWindow(lobbyName);
-                        tradeService.closeBankTradeWindow(lobbyName);
-                        tradeService.closeUserTradeWindow(lobbyName);
+                        sceneService.closeAcceptTradeWindow(lobbyName);
+                        sceneService.closeBankTradeWindow(lobbyName);
+                        sceneService.closeUserTradeWindow(lobbyName);
                         disableButtonStates();
                         gameService.endTurn(lobbyName);
                         moveTimeTimer.cancel();
@@ -912,9 +911,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
         if (gamePaused) {
             Platform.runLater(() -> pauseButton.setText(resourceBundle.getString("game.menu.unpause")));
             timerPaused = true;
-            tradeService.closeBankTradeWindow(lobbyName);
-            tradeService.closeTradeResponseWindow(lobbyName);
-            tradeService.closeUserTradeWindow(lobbyName);
+            sceneService.closeBankTradeWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
+            sceneService.closeUserTradeWindow(lobbyName);
             disableButtonStates();
             rollDice.setDisable(true);
         } else {
@@ -1185,8 +1184,8 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
             if (msg.getPlayers().containsKey(userService.getLoggedInUser())) {
                 LOG.debug("Sending ShowRobberTaxViewEvent");
                 User user = userService.getLoggedInUser();
-                post(new ShowRobberTaxViewEvent(msg.getLobbyName(), msg.getPlayers().get(user),
-                                                msg.getInventories().get(user).create()));
+                sceneService.showRobberTaxWindow(msg.getLobbyName(), msg.getPlayers().get(user),
+                                                 msg.getInventories().get(user).create());
                 post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
             }
         }
@@ -1224,9 +1223,11 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserCancelResponse(TradeWithUserCancelResponse rsp) {
+        LOG.debug("Received TradeWithUserCancelResponse");
         if (!rsp.getActivePlayer().equals(userService.getLoggedInUser())) return;
         if (!gamePaused) resetButtonStates(userService.getLoggedInUser());
         if (helpActivated) setHelpText();
+        sceneService.closeAcceptTradeWindow(rsp.getLobbyName());
     }
 
     /**
@@ -1243,9 +1244,9 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
      */
     @Subscribe
     private void onTradeWithUserOfferResponse(TradeWithUserOfferResponse rsp) {
+        LOG.debug("Received TradeWithUserOfferResponse");
         if (!rsp.getLobbyName().equals(lobbyName)) return;
-        LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        tradeService.showOfferWindow(lobbyName, rsp.getOfferingUser(), rsp);
+        sceneService.showAcceptTradeWindow(lobbyName, rsp.getOfferingUser(), rsp);
     }
 
     /**

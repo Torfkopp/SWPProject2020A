@@ -180,15 +180,6 @@ public interface ILobbyService {
     void returnToPreGameLobby(LobbyName lobbyName);
 
     /**
-     * Posts an event to show a Lobby Error alert with the provided message
-     *
-     * @param message The message to display
-     *
-     * @implNote The method contents are executed on a separate Thread from the JavaFX Application Thread
-     */
-    void showLobbyError(String message);
-
-    /**
      * This method is used to update the pre-game settings of a specific lobby.
      *
      * @param lobbyName              The name of the lobby

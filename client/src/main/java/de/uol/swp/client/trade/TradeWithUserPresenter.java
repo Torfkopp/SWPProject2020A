@@ -11,7 +11,9 @@ import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -87,7 +89,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             selectedPartnersResourceMapCounter += entry.getAmount();
         }
         if (selectedPartnersResourceMapCounter > traderInventorySize) {
-            tradeService.showTradeError(resourceBundle.getString("game.trade.error.demandtoohigh"));
+            sceneService.showError(resourceBundle.getString("game.trade.error.demandtoohigh"));
         }
         //@formatter:off
         return ((selectedPartnersResourceMapCounter + selectedOwnResourceMapCounter == 0)
@@ -101,11 +103,9 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * Posts a TradeWithBankCancelEvent with its lobbyName to close the
      * trading window and a TradeWithUserCancelResponse to close the responding
      * trading window if existent.
-     *
-     * @see de.uol.swp.client.trade.event.TradeCancelEvent
      */
     private void closeWindow() {
-        tradeService.closeUserTradeWindow(lobbyName);
+        sceneService.closeUserTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, respondingUser);
     }
 
@@ -197,7 +197,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.waiting"), respondingUser));
             tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
                                     counterOffer);
-            tradeService.closeTradeResponseWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
             post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
         }
     }
@@ -335,7 +335,6 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         statusLabel.setText(String.format(resourceBundle.getString("game.trade.status.toomanyresources")));
         int counterOwnResource = selectedOwnResourceList.getTotal();
         int counterPartnersResource = selectedPartnersResourceList.getTotal();
-        if (Math.abs(counterOwnResource - counterPartnersResource) > maxTradeDiff) return false;
-        else return true;
+        return Math.abs(counterOwnResource - counterPartnersResource) <= maxTradeDiff;
     }
 }

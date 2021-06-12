@@ -2,12 +2,10 @@ package de.uol.swp.client.trade;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import de.uol.swp.client.trade.event.*;
 import de.uol.swp.client.user.IUserService;
 import de.uol.swp.common.game.request.*;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceList;
 import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource.ResourceType;
-import de.uol.swp.common.game.response.TradeWithUserOfferResponse;
 import de.uol.swp.common.lobby.LobbyName;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.user.UserOrDummy;
@@ -70,26 +68,6 @@ public class TradeService implements ITradeService {
     }
 
     @Override
-    public void closeBankTradeWindow(LobbyName lobbyName) {
-        LOG.debug("Sending TradeCancelEvent");
-        eventBus.post(new TradeCancelEvent(lobbyName));
-        LOG.debug("Sending ResetTradeWithBankButtonEvent");
-        eventBus.post(new ResetTradeWithBankButtonEvent(lobbyName));
-    }
-
-    @Override
-    public void closeTradeResponseWindow(LobbyName lobbyName) {
-        LOG.debug("Sending CloseTradeResponseEvent");
-        eventBus.post(new CloseTradeResponseEvent(lobbyName));
-    }
-
-    @Override
-    public void closeUserTradeWindow(LobbyName lobbyName) {
-        LOG.debug("Sending TradeCancelEvent");
-        eventBus.post(new TradeCancelEvent(lobbyName));
-    }
-
-    @Override
     public void executeTradeWithBank(LobbyName lobbyName, ResourceType gainedResource, ResourceType lostResource) {
         LOG.debug("Sending ExecuteTradeWithBankRequest");
         Message request = new ExecuteTradeWithBankRequest(userService.getLoggedInUser(), lobbyName, gainedResource,
@@ -111,30 +89,6 @@ public class TradeService implements ITradeService {
         LOG.debug("Sending ResetOfferTradeButtonRequest");
         Message request = new ResetOfferTradeButtonRequest(lobbyName, offeringUser);
         eventBus.post(request);
-    }
-
-    @Override
-    public void showBankTradeWindow(LobbyName lobbyName) {
-        LOG.debug("Sending ShowTradeWithBankViewEvent");
-        eventBus.post(new ShowTradeWithBankViewEvent(lobbyName));
-    }
-
-    @Override
-    public void showOfferWindow(LobbyName lobbyName, UserOrDummy offeringUser, TradeWithUserOfferResponse rsp) {
-        LOG.debug("Sending ShowTradeWithUserRespondViewEvent");
-        eventBus.post(new ShowTradeWithUserRespondViewEvent(rsp.getOfferingUser(), lobbyName, rsp));
-    }
-
-    @Override
-    public void showTradeError(String message) {
-        LOG.debug("Sending TradeErrorEvent");
-        eventBus.post(new TradeErrorEvent(message));
-    }
-
-    @Override
-    public void showUserTradeWindow(LobbyName lobbyName, UserOrDummy respondingUser, boolean isCounterOffer) {
-        LOG.debug("Sending ShowTradeWithUserViewEvent");
-        eventBus.post(new ShowTradeWithUserViewEvent(lobbyName, respondingUser, isCounterOffer));
     }
 
     @Override

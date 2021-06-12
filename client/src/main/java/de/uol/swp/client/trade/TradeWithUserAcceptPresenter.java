@@ -91,7 +91,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
                     Platform.runLater(() -> acceptTradeTimerLabel.setText(moveTimeText));
                     if (moveTimeToDecrement.get() == 0) {
                         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
-                        tradeService.closeTradeResponseWindow(lobbyName);
+                        sceneService.closeAcceptTradeWindow(lobbyName);
                         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
                     }
                 }
@@ -143,14 +143,13 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
-     * @see de.uol.swp.client.trade.event.ShowTradeWithUserViewEvent
      * @see de.uol.swp.common.game.request.TradeWithUserRequest
      * @since 2021-03-19
      */
     @FXML
     private void onMakeCounterOfferButtonPressed() {
         soundService.button();
-        tradeService.showUserTradeWindow(lobbyName, offeringUser, true);
+        sceneService.showUserTradeWindow(lobbyName, offeringUser, true);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
@@ -167,7 +166,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     private void onRejectTradeButtonPressed() {
         soundService.button();
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
-        tradeService.closeTradeResponseWindow(lobbyName);
+        sceneService.closeAcceptTradeWindow(lobbyName);
         tradeService.cancelTrade(lobbyName, offeringUser);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
@@ -184,7 +183,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
     @Subscribe
     private void onTradeOfUsersAcceptedResponse(TradeOfUsersAcceptedResponse rsp) {
         LOG.debug("Received TradeOfUsersAcceptedResponse for Lobby {}", lobbyName);
-        tradeService.closeTradeResponseWindow(lobbyName);
+        sceneService.closeAcceptTradeWindow(lobbyName);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 
@@ -220,7 +219,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         Window window = ownResourceTableView.getScene().getWindow();
         window.setOnCloseRequest(windowEvent -> {
             tradeService.resetOfferTradeButton(lobbyName, offeringUser);
-            tradeService.closeTradeResponseWindow(lobbyName);
+            sceneService.closeAcceptTradeWindow(lobbyName);
         });
 
         Map<KeyCombination, Runnable> accelerators = new HashMap<>();

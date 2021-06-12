@@ -1,4 +1,4 @@
-package de.uol.swp.client;
+package de.uol.swp.client.scene;
 
 import javafx.stage.Stage;
 
@@ -18,7 +18,7 @@ public interface SceneManagerFactory {
      *
      * @return The SceneManger used inside the client
      *
-     * @see de.uol.swp.client.SceneManager
+     * @see de.uol.swp.client.scene.SceneManager
      * @since 2019-09-19
      */
     SceneManager create(Stage primaryStage);

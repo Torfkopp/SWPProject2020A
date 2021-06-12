@@ -4,18 +4,16 @@ import de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.resource
 import de.uol.swp.common.lobby.LobbyName;
 
 /**
- * Event used to show the window for the robberTax
- * <p>
- * In order to show the previous window using this event, post an instance of it
- * onto the EventBus the SceneManager is subscribed to.
+ * Event used to trigger an update of the RobberTaxPresenter
+ * To give a RobberTaxPresenter its values, post an instance
+ * of this event onto the EventBus the RobberTaxPresenter is subscribed to.
  *
  * @author Mario Fokken
  * @author Timo Gerken
- * @see de.uol.swp.client.SceneManager
- * @see de.uol.swp.common.game.robber.RobberTaxMessage
- * @since 2021-04-07
+ * @see de.uol.swp.client.lobby.RobberTaxPresenter
+ * @since 2021-04-08
  */
-public class ShowRobberTaxViewEvent {
+public class RobberTaxUpdateEvent {
 
     private final LobbyName lobbyName;
     private final int taxAmount;
@@ -26,18 +24,18 @@ public class ShowRobberTaxViewEvent {
      *
      * @param lobbyName The lobby's name
      * @param taxAmount The amount of cards to pay
-     * @param inventory The inventory
+     * @param inventory The inventory of the user
      */
-    public ShowRobberTaxViewEvent(LobbyName lobbyName, int taxAmount, ResourceList inventory) {
+    public RobberTaxUpdateEvent(LobbyName lobbyName, int taxAmount, ResourceList inventory) {
         this.lobbyName = lobbyName;
         this.taxAmount = taxAmount;
         this.inventory = inventory;
     }
 
     /**
-     * Gets the Inventory
+     * Gets the inventory
      *
-     * @return Map of resources and its amount
+     * @return Map with the resource and its amount as integer
      */
     public ResourceList getInventory() {
         return inventory.create();
@@ -46,7 +44,7 @@ public class ShowRobberTaxViewEvent {
     /**
      * Gets the lobby's name
      *
-     * @return String lobbyName
+     * @return LobbyName lobbyName
      */
     public LobbyName getLobbyName() {
         return lobbyName;

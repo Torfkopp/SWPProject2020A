@@ -2,8 +2,6 @@ package de.uol.swp.client.changeProperties;
 
 import de.uol.swp.client.AbstractPresenter;
 import de.uol.swp.client.ClientApp;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent;
-import de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 
@@ -39,13 +37,11 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      * <p>
      * This method is called when the CancelButton is pressed.
      * It posts a new ChangePropertiesCanceledEvent onto the EventBus.
-     *
-     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesCanceledEvent
      */
     @FXML
     private void onCancelButtonPressed() {
         soundService.button();
-        post(new ChangePropertiesCanceledEvent());
+        sceneService.showMainMenuScreen();
     }
 
     /**
@@ -54,8 +50,6 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
      * This method is called when the ChangePropertiesButton is pressed.
      * It gets the value chosen in the ComboBox and puts it into the Preferences.
      * It also posts a new ChangePropertiesSuccessfulEvent onto the EventBus
-     *
-     * @see de.uol.swp.client.changeProperties.event.ChangePropertiesSuccessfulEvent
      */
     @FXML
     private void onChangePropertiesButtonPressed() {
@@ -94,6 +88,6 @@ public class ChangePropertiesPresenter extends AbstractPresenter {
                     break;
             }
         }
-        post(new ChangePropertiesSuccessfulEvent());
+        sceneService.showMainMenuScreen();
     }
 }
