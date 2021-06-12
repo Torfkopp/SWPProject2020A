@@ -652,6 +652,7 @@ public class Game {
      * @return A map containing users or dummies and their corresponding players
      *
      * @since 2021-05-20
+     * @author Aldin Dervisi
      */
     public Map<UserOrDummy, Map<Integer, Integer>> getVictoryPointsOverTimeMap() {
         return victoryPointsOverTimeMap;

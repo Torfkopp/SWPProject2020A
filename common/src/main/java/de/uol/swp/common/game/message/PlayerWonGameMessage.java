@@ -29,6 +29,13 @@ public class PlayerWonGameMessage extends AbstractGameMessage {
         this.victoryPointMap = victoryPointMap;
     }
 
+    /**
+     * Gets the current Victory Point Map
+     * @return Map of Victory Point Map
+     *
+     * @author Aldin Dervisi
+     * @since 2021-06-12
+     */
     public Map<UserOrDummy, Map<Integer, Integer>> getVictoryPointMap() {
         return victoryPointMap;
     }
