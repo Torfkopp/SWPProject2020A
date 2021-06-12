@@ -1,6 +1,7 @@
 package de.uol.swp.server.game;
 
 import de.uol.swp.common.Colour;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.game.CardsAmount;
 import de.uol.swp.common.game.RoadBuildingCardPhase;
 import de.uol.swp.common.game.StartUpPhaseBuiltStructures;
@@ -40,6 +41,7 @@ public class Game {
     private final Map<UserOrDummy, Boolean> pauseGameMap = new HashMap<>(); //true if the user wants to change the current pause status of the game
     private final Map<UserOrDummy, StartUpPhaseBuiltStructures> playersStartUpBuiltMap;
     private final UserOrDummy first;
+    private final int maxTradeDiff;
     private UserOrDummy activePlayer;
     private boolean buildingAllowed = false;
     private boolean diceRolledAlready = false;
@@ -51,7 +53,7 @@ public class Game {
     private boolean pausedByTrade = false;
     private boolean pausedByVoting = false;
     private int round = 1;
-    private final int maxTradeDiff;
+    private userOrDummyPair robResourceReceiverVictimPair = null;
 
     public enum StartUpPhase {
         PHASE_1,
@@ -468,6 +470,30 @@ public class Game {
      */
     public void setRoadBuildingCardPhase(RoadBuildingCardPhase roadBuildingCardPhase) {
         this.roadBuildingCardPhase = roadBuildingCardPhase;
+    }
+
+    /**
+     * Gets the robResourceReceiverVictimPair
+     *
+     * @return userOrDummyPair of receiver and victim
+     *
+     * @author Mario Fokken
+     * @since 2021-06-11
+     */
+    public userOrDummyPair getRobResourceReceiverVictimPair() {
+        return robResourceReceiverVictimPair;
+    }
+
+    /**
+     * Sets the robResourceReceiverVictimPair
+     *
+     * @param robResourceReceiverVictimPair userOrDummyPair of receiver and victim
+     *
+     * @author Mario Fokken
+     * @since 2021-06-11
+     */
+    public void setRobResourceReceiverVictimPair(userOrDummyPair robResourceReceiverVictimPair) {
+        this.robResourceReceiverVictimPair = robResourceReceiverVictimPair;
     }
 
     /**
