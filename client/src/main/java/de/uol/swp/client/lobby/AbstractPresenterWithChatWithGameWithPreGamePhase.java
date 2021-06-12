@@ -5,6 +5,7 @@ import de.uol.swp.client.GameRendering;
 import de.uol.swp.client.lobby.event.SetMoveTimeErrorEvent;
 import de.uol.swp.client.trade.event.CloseTradeResponseEvent;
 import de.uol.swp.client.trade.event.TradeCancelEvent;
+import de.uol.swp.client.util.ThreadManager;
 import de.uol.swp.common.Colour;
 import de.uol.swp.common.chat.ChatOrSystemMessage;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
@@ -138,10 +139,12 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             lobbyService.leaveLobby(lobbyName);
         }
         if (moveTimeTimer != null) moveTimeTimer.cancel();
-        ((Stage) window).close();
-        post(new TradeCancelEvent(lobbyName));
-        post(new CloseTradeResponseEvent(lobbyName));
-        clearEventBus();
+        window.hide();
+        ThreadManager.runNow(() -> {
+            eventBus.post(new TradeCancelEvent(lobbyName));
+            eventBus.post(new CloseTradeResponseEvent(lobbyName));
+            clearEventBus();
+        });
     }
 
     /**

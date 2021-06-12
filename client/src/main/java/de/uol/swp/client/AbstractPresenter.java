@@ -33,7 +33,7 @@ public abstract class AbstractPresenter {
     @Inject
     protected ResourceBundle resourceBundle;
 
-    private EventBus eventBus;
+    protected EventBus eventBus;
 
     /**
      * Clears the field EventBus
