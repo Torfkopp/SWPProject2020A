@@ -308,15 +308,13 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
                 lobbyMembers.clear();
                 lobbyMembers.addAll(inGameUserList);
                 return;
-            } else {
-
-                if (lobbyMembers == null) {
-                    lobbyMembers = FXCollections.observableArrayList();
-                    membersView.setItems(lobbyMembers);
-                }
-                lobbyMembers.clear();
-                lobbyMembers.addAll(userLobbyList);
             }
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
         });
     }
 
