@@ -147,8 +147,8 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      * Method called when the leaveLobby button is pressed.
      * If the leaveLobby button is pressed this method requests the lobby service
      * through an ConfirmationAlert if the user wants to leave the lobby.
-     * If the User press Confirm while he is in a Lobby which is not in a Game, the User leaves the Lobby.
-     * If the User press Confirm while he is in a Lobby that is in a Game, he leaves the lobby and gets replaced by an AI.
+     * If the user presses Confirm while he is in a Lobby which is not in a Game, the User leaves the Lobby.
+     * If the user presses Confirm while he is in a Lobby that is in a Game, he leaves the lobby and gets replaced by an AI.
      *
      * @since 2020-12-14
      */

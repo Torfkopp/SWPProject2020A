@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import de.uol.swp.common.I18nWrapper;
-import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.chat.dto.InGameSystemMessageDTO;
 import de.uol.swp.common.chat.message.SystemMessageMessage;
 import de.uol.swp.common.chat.request.NewChatMessageRequest;
@@ -36,6 +35,7 @@ import de.uol.swp.common.lobby.request.KickUserRequest;
 import de.uol.swp.common.message.Message;
 import de.uol.swp.common.message.ResponseMessage;
 import de.uol.swp.common.message.ServerMessage;
+import de.uol.swp.common.specialisedUtil.userOrDummyPair;
 import de.uol.swp.common.user.*;
 import de.uol.swp.server.AbstractService;
 import de.uol.swp.server.game.event.CreateGameInternalRequest;
@@ -1300,7 +1300,7 @@ public class GameService extends AbstractService {
     /**
      * Handles a ReplaceUserWithAIRequest found on the EventBus
      * <p>
-     * If a PlayYearOfPlentyCardRequest is detected on the EventBus, this method is called.
+     * If a ReplaceUserWithAIRequest is detected on the EventBus, this method is called.
      * It then request the GameManagement to handle the Replace of an User who left a Lobby in Game with an AI.
      * The Colour of the Player who left, remains as the Colour of the AI who replaced the User.
      * The AI takes over the game from the moment the user leaves the game.

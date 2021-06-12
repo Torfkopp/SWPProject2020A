@@ -131,16 +131,16 @@ public class InventoryMap implements Serializable {
     /**
      * Replace a User who left a Lobby in Game with an AI
      *
-     * @param userToBeReplace
-     * @param userToReplaceWith
+     * @param userToBeReplaced  The user who left the lobby and should be replaced
+     * @param userToReplaceWith The AI that replace the user who left the lobby
      *
      * @author Eric Vuong
      * @since 2021-06-10
      */
-    public void replace(UserOrDummy userToBeReplace, UserOrDummy userToReplaceWith) {
+    public void replace(UserOrDummy userToBeReplaced, UserOrDummy userToReplaceWith) {
         for (int i = 0; i < map.size(); i++) {
             UserPlayerInventoryMapping entry = map.get(i);
-            if (Objects.equals(entry.getUser(), userToBeReplace)) {
+            if (Objects.equals(entry.getUser(), userToBeReplaced)) {
                 map.set(i, new UserPlayerInventoryMapping(userToReplaceWith, entry.getPlayer(), entry.getInventory()));
                 return;
             }
