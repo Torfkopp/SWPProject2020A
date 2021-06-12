@@ -12,8 +12,9 @@ import de.uol.swp.client.chat.IChatService;
 import de.uol.swp.client.game.AsyncGameService;
 import de.uol.swp.client.game.GameService;
 import de.uol.swp.client.game.IGameService;
-import de.uol.swp.client.lobby.*;
-import de.uol.swp.client.main.MainMenuPresenter;
+import de.uol.swp.client.lobby.AsyncLobbyService;
+import de.uol.swp.client.lobby.ILobbyService;
+import de.uol.swp.client.lobby.LobbyService;
 import de.uol.swp.client.sound.AsyncSoundService;
 import de.uol.swp.client.sound.ISoundService;
 import de.uol.swp.client.sound.SoundService;
@@ -64,7 +65,8 @@ public class ClientModule extends AbstractModule {
         defaultProps.setProperty("volume", preferences.get("volume", "100"));
         defaultProps.setProperty("backgroundvolume", preferences.get("backgroundvolume", "50"));
         defaultProps.setProperty("login_logout_msgs_on", preferences.get("login_logout_msgs_on", "false"));
-        defaultProps.setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
+        defaultProps
+                .setProperty("lobby_create_delete_msgs_on", preferences.get("lobby_create_delete_msgs_on", "false"));
 
         //Reading properties-file
         final Properties properties = new Properties(defaultProps);
@@ -169,9 +171,5 @@ public class ClientModule extends AbstractModule {
         bind(SoundService.class).in(Scopes.SINGLETON);
         requestStaticInjection(GameRendering.class);
         requestStaticInjection(SceneManager.class);
-        requestStaticInjection(MainMenuPresenter.class);
-        requestStaticInjection(AbstractPresenterWithChat.class);
-        requestStaticInjection(AbstractPresenterWithChatWithGame.class);
-        requestStaticInjection(SoundService.class);
     }
 }

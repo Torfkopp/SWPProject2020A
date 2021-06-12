@@ -2,6 +2,8 @@ package de.uol.swp.common.game.resourcesAndDevelopmentCardAndUniqueCards.develop
 
 import de.uol.swp.common.util.ResourceManager;
 
+import com.google.inject.Inject;
+
 import java.io.Serializable;
 
 /**
