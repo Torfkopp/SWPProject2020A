@@ -21,6 +21,7 @@ import de.uol.swp.common.user.AIDTO;
 import de.uol.swp.common.user.UserOrDummy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -279,6 +280,42 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
             startSession.setDisable(true);
             startSession.setVisible(false);
         }
+    }
+
+    /**
+     * Updates the lobby's member list according to the list given
+     * <p>
+     * This method clears the entire member list and then adds the name of each user
+     * in the list given to the lobby's member list.
+     * If there is no member list, it creates one.
+     * <p>
+     * If a user is marked as ready in the readyUsers Set, their name is prepended
+     * with a checkmark.
+     * If the owner is found amongst the users, their username is appended with a
+     * crown symbol.
+     *
+     * @param userLobbyList A list of User objects including all currently logged in
+     *                      users
+     *
+     * @implNote The code inside this Method has to run in the JavaFX-application
+     * thread. Therefore, it is crucial not to remove the {@code Platform.runLater()}
+     * @see de.uol.swp.common.user.UserOrDummy
+     * @since 2021-01-05
+     */
+    protected void updateUsersList(List<UserOrDummy> userLobbyList) {
+        Platform.runLater(() -> {
+            if (inGame) {
+                lobbyMembers.clear();
+                lobbyMembers.addAll(inGameUserList);
+                return;
+            }
+            if (lobbyMembers == null) {
+                lobbyMembers = FXCollections.observableArrayList();
+                membersView.setItems(lobbyMembers);
+            }
+            lobbyMembers.clear();
+            lobbyMembers.addAll(userLobbyList);
+        });
     }
 
     /**
@@ -543,6 +580,7 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
         gameWon = false;
         winner = null;
         inGame = true;
+        inGameUserList = msg.getPlayerList();
         userOrDummyPlayerMap = msg.getUserOrDummyPlayerMap();
         userColoursMap = msg.getUserOrDummyColourMap();
         gameRendering.setPlayerColours(getPlayerColourMap());
