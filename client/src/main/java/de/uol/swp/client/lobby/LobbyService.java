@@ -118,13 +118,6 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
-    public void setColour(LobbyName lobbyName, Colour colour) {
-        LOG.debug("Sending SetColourRequest");
-        Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
-        eventBus.post(setColourRequest);
-    }
-
-    @Override
     public void retrieveAllLobbies() {
         LOG.debug("Sending RetrieveAllLobbiesRequest");
         Message retrieveAllLobbiesRequest = new RetrieveAllLobbiesRequest();
@@ -146,6 +139,13 @@ public class LobbyService implements ILobbyService {
     }
 
     @Override
+    public void setColour(LobbyName lobbyName, Colour colour) {
+        LOG.debug("Sending SetColourRequest");
+        Message setColourRequest = new SetColourRequest(lobbyName, userService.getLoggedInUser(), colour);
+        eventBus.post(setColourRequest);
+    }
+
+    @Override
     public void showLobbyError(String message) {
         LOG.debug("Sending LobbyErrorEvent");
         eventBus.post(new LobbyErrorEvent(message));
@@ -156,7 +156,8 @@ public class LobbyService implements ILobbyService {
                                     boolean randomPlayFieldEnabled, int maxTradeDiff) {
         LOG.debug("Sending ChangeLobbySettingsRequest");
         eventBus.post(new ChangeLobbySettingsRequest(lobbyName, userService.getLoggedInUser(), maxPlayers,
-                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled, maxTradeDiff));
+                                                     startUpPhaseEnabled, moveTime, randomPlayFieldEnabled,
+                                                     maxTradeDiff));
     }
 
     @Override

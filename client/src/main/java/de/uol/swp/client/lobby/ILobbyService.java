@@ -196,7 +196,7 @@ public interface ILobbyService {
      * @param startUpPhaseEnabled    Whether the startUpPhase is allowed or not
      * @param moveTime               The maximum time of a move
      * @param randomPlayFieldEnabled Whether the randomPlayField is enabled or not
-     * @param maxTradeDiff
+     * @param maxTradeDiff           The maximum allowed net resource difference in a trade
      *
      * @author Maximilian Lindner
      * @author Aldin Dervisi
