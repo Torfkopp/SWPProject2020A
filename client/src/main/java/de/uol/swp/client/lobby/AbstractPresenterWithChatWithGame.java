@@ -92,7 +92,7 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
     @FXML
     protected Button returnToLobby;
     @FXML
-    protected Button displayVictoryPointChart;
+    protected Button displayVictoryPointChartButton;
     @FXML
     protected Button rollDice;
     @FXML
@@ -227,7 +227,6 @@ public abstract class AbstractPresenterWithChatWithGame extends AbstractPresente
 
     /**
      * Method called when the DisplayVictoryChart Button is pressed
-     *
      * If the DisplayVictoryChart is pressed, this method will display the
      * Victory Point Chart for the specific lobby.
      *

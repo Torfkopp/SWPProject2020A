@@ -53,7 +53,7 @@
             <Button fx:id="returnToLobby" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                     minWidth="-Infinity" onAction="#onReturnToLobbyButtonPressed" prefHeight="0" prefWidth="0"
                     text="%game.won.button.returnPreLobby" visible="false"/>
-            <Button fx:id="displayVictoryPointChart" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            <Button fx:id="displayVictoryPointChartButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                     minWidth="-Infinity" onAction="#onDisplayVictoryPointChartPressed" prefHeight="0" prefWidth="0"
                     text="%game.won.victorypointchart.button" visible="false"/>
         </HBox>
