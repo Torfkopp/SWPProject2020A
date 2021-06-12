@@ -234,6 +234,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         setAllowedPlayers(event.getLobby().getMaxPlayers());
         startUpPhaseEnabled = event.getLobby().isStartUpPhaseEnabled();
         moveTime = event.getLobby().getMoveTime();
+        maxTradeDiff = event.getLobby().getMaxTradeDiff();
         randomPlayFieldCheckbox.setSelected(event.getLobby().isRandomPlayFieldEnabled());
         setStartUpPhaseCheckBox.setSelected(event.getLobby().isStartUpPhaseEnabled());
 
@@ -243,6 +244,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
             tradeWithUserButton.setText(ResourceManager.get("lobby.game.buttons.playertrade.noneselected"));
             moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime));
             moveTimeTextField.setText(String.valueOf(moveTime));
+            maxTradeDiffLabel.setText(ResourceManager.get("game.trade.change.select.diff", maxTradeDiff));
         });
         setPreGameSettings();
     }
@@ -328,7 +330,9 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         randomPlayFieldCheckbox.setSelected(msg.getLobby().isRandomPlayFieldEnabled());
         moveTimeTextField.setText(String.valueOf(msg.getLobby().getMoveTime()));
         moveTime = msg.getLobby().getMoveTime();
+        maxTradeDiff = msg.getLobby().getMaxTradeDiff();
         Platform.runLater(() -> moveTimeLabel.setText(ResourceManager.get("lobby.labels.movetime", moveTime)));
+        maxTradeDiffLabel.setText(ResourceManager.get("game.trade.change.select.diff", maxTradeDiff));
     }
 
     /**

@@ -41,6 +41,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
     public static final int MIN_HEIGHT = 680;
     public static final int MIN_WIDTH = 520;
     private static final Logger LOG = LogManager.getLogger(TradeWithUserPresenter.class);
+    private int maxTradeDiff;
 
     @FXML
     private Label statusLabel;
@@ -145,6 +146,7 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
         LOG.debug("Received InventoryForTradeResponse for Lobby {}", rsp.getLobbyName());
         respondingUser = rsp.getTradingUser();
         counterOffer = rsp.isCounterOffer();
+        maxTradeDiff = rsp.getMaxTradeDiff();
         IResourceList resourceList = rsp.getResourceMap();
         for (IResource resource : resourceList)
             ownResourceTableView.getItems().add(resource);
@@ -193,12 +195,14 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             LOG.debug("Failed sending the offer");
             return;
         }
-        offerTradeButton.setDisable(true);
-        statusLabel.setText(ResourceManager.get("game.trade.status.waiting", respondingUser));
-        tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
-                                counterOffer);
-        tradeService.closeTradeResponseWindow(lobbyName);
-        post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        if (tradeIsFair()) {
+            offerTradeButton.setDisable(true);
+            statusLabel.setText(ResourceManager.get("game.trade.status.waiting", respondingUser));
+            tradeService.offerTrade(lobbyName, respondingUser, selectedOwnResourceList, selectedPartnersResourceList,
+                                    counterOffer);
+            tradeService.closeTradeResponseWindow(lobbyName);
+            post(new PauseTimerRequest(lobbyName, userService.getLoggedInUser()));
+        }
     }
 
     /**
@@ -208,14 +212,18 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
      * is re-enabled and the trading user gets a hint that the other user
      * rejected the offer.
      *
-     * @param event ResetOfferTradeButtonResponse found on the EventBus
+     * @param rsp ResetOfferTradeButtonResponse found on the EventBus
      *
      * @see de.uol.swp.common.game.response.ResetOfferTradeButtonResponse
      */
     @Subscribe
-    private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse event) {
-        if (!lobbyName.equals(event.getLobbyName())) return;
+    private void onResetOfferTradeButtonResponse(ResetOfferTradeButtonResponse rsp) {
+        if (!lobbyName.equals(rsp.getLobbyName())) return;
         LOG.debug("Received ResetOfferTradeButtonResponse for Lobby {}", lobbyName);
+        if (rsp.isTradeRejectedByActivePlayer()) {
+            closeWindow();
+            return;
+        }
         String text = ResourceManager.get("game.trade.status.rejected", respondingUser);
         Platform.runLater(() -> {
             offerTradeButton.setDisable(false);
@@ -315,5 +323,21 @@ public class TradeWithUserPresenter extends AbstractTradePresenter {
             ownWoolSlider.setMax(resourceList.getAmount(ResourceType.WOOL));
             ownBrickSlider.setMax(resourceList.getAmount(ResourceType.BRICK));
         });
+    }
+
+    /**
+     * Method which blocks unfair trades
+     * <p>
+     * If the onOfferTradeButtonPressed Method has been called, this
+     * method checks if the difference in the amount of Ressources between
+     * offering and demanding Trade is the current MAX_TRADE_DIFF or lower.
+     * If not, the Method will return false and with that, the onOfferTradeButtonPressed
+     * will not send the offer
+     */
+    private boolean tradeIsFair() {
+        statusLabel.setText(ResourceManager.get("game.trade.status.toomanyresources"));
+        int counterOwnResource = selectedOwnResourceList.getTotal();
+        int counterPartnersResource = selectedPartnersResourceList.getTotal();
+        return Math.abs(counterOwnResource - counterPartnersResource) <= maxTradeDiff;
     }
 }

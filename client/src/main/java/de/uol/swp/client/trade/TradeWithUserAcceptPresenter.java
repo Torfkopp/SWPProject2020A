@@ -169,6 +169,7 @@ public class TradeWithUserAcceptPresenter extends AbstractTradePresenter {
         soundService.button();
         tradeService.resetOfferTradeButton(lobbyName, offeringUser);
         tradeService.closeTradeResponseWindow(lobbyName);
+        tradeService.cancelTrade(lobbyName, offeringUser);
         post(new UnpauseTimerRequest(lobbyName, userService.getLoggedInUser()));
     }
 

@@ -109,9 +109,10 @@ public class AsyncLobbyService implements ILobbyService {
 
     @Override
     public void updateLobbySettings(LobbyName lobbyName, int maxPlayers, boolean startUpPhaseEnabled, int moveTime,
-                                    boolean randomPlayFieldEnabled) {
+                                    boolean randomPlayFieldEnabled, int maxTradeDiff) {
         ThreadManager.runNow(() -> syncLobbyService
-                .updateLobbySettings(lobbyName, maxPlayers, startUpPhaseEnabled, moveTime, randomPlayFieldEnabled));
+                .updateLobbySettings(lobbyName, maxPlayers, startUpPhaseEnabled, moveTime, randomPlayFieldEnabled,
+                                     maxTradeDiff));
     }
 
     @Override
