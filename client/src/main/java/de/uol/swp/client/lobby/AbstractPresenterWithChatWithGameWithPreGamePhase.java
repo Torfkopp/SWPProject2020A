@@ -303,18 +303,20 @@ public abstract class AbstractPresenterWithChatWithGameWithPreGamePhase extends 
      * @since 2021-01-05
      */
     protected void updateUsersList(List<UserOrDummy> userLobbyList) {
-        if (inGame) {
-            lobbyMembers.clear();
-            lobbyMembers.addAll(inGameUserList);
-            return;
-        }
         Platform.runLater(() -> {
-            if (lobbyMembers == null) {
-                lobbyMembers = FXCollections.observableArrayList();
-                membersView.setItems(lobbyMembers);
+            if (inGame) {
+                lobbyMembers.clear();
+                lobbyMembers.addAll(inGameUserList);
+                return;
+            } else {
+
+                if (lobbyMembers == null) {
+                    lobbyMembers = FXCollections.observableArrayList();
+                    membersView.setItems(lobbyMembers);
+                }
+                lobbyMembers.clear();
+                lobbyMembers.addAll(userLobbyList);
             }
-            lobbyMembers.clear();
-            lobbyMembers.addAll(userLobbyList);
         });
     }
 
