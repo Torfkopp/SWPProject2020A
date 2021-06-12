@@ -33,7 +33,7 @@ public enum ResourceType implements Serializable {
 
     @Override
     public String toString() {
-        return ResourceManager.get(getInternationalizationPropertyName());
+        return ResourceManager.getIfAvailableElse(this.name(), getInternationalizationPropertyName());
     }
 
     /**

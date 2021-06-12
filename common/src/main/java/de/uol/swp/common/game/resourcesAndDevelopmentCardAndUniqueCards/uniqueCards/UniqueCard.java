@@ -72,9 +72,13 @@ public class UniqueCard implements IUniqueCard {
     public String toString() {
         String displayOwner = owner == null ? "nobody" : owner.getUsername();
         if (type == UniqueCardsType.LARGEST_ARMY) {
-            return ResourceManager.get("game.resources.whohas.largestarmy", displayOwner, amount);
+            return ResourceManager
+                    .getIfAvailableElse("Largest Army: %s (%s Knights)", "game.resources.whohas.largestarmy",
+                                        displayOwner, amount);
         } else if (type == UniqueCardsType.LONGEST_ROAD) {
-            return ResourceManager.get("game.resources.whohas.longestroad", displayOwner, amount);
+            return ResourceManager
+                    .getIfAvailableElse("Longest Road: %s (%s Roads)", "game.resources.whohas.longestroad",
+                                        displayOwner, amount);
         }
         return type.name() + ": " + displayOwner + ": " + amount;
     }

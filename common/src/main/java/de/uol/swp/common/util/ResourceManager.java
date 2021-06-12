@@ -6,6 +6,12 @@ import com.google.inject.name.Named;
 
 import java.util.*;
 
+/**
+ * A class to manage all access to the resource bundle
+ *
+ * @author Temmo Junkhoff
+ * @since 2021-06-07
+ */
 public class ResourceManager {
 
     private static final ResourceBundle resourceBundle;
@@ -35,6 +41,13 @@ public class ResourceManager {
         }
     }
 
+    /**
+     * Gets a specified key from the resource bundle.
+     *
+     * @param key The key whose resource is required
+     *
+     * @return The internationalized resource
+     */
     public static String get(String key) {
         try {
             return resourceBundle.getString(key);
@@ -47,6 +60,14 @@ public class ResourceManager {
         }
     }
 
+    /**
+     * Gets a specified key from the resource bundle and injects arguments.
+     *
+     * @param key  The key whose resource is required
+     * @param args The args which should be injected into the resource
+     *
+     * @return The internationalized resource with the arguments injected
+     */
     public static String get(String key, Object... args) {
         if (args == null) return get(key);
         try {
@@ -60,14 +81,41 @@ public class ResourceManager {
         }
     }
 
+    /**
+     * Gets a specified key from the resource bundle and injects arguments or returns the specified alternative.
+     *
+     * @param alternative The alternative that should be returned if the resource bundle is unavailable
+     * @param key         The key whose resource is required
+     * @param args        The args which should be injected into the resource
+     *
+     * @return The internationalized resource with the arguments injected or the alternative
+     */
     public static String getIfAvailableElse(String alternative, String key, Object... args) {
-        return isAvailable() ? get(key, args) : alternative;
+        if (isAvailable()) return get(key, args);
+        try {
+            return String.format(alternative, args);
+        } catch (NullPointerException | IllegalFormatException | ClassCastException e) {
+            return alternative;
+        }
     }
 
+    /**
+     * Gets a specified key from the resource bundle or returns the specified alternative.
+     *
+     * @param alternative The alternative that should be returned if the resource bundle is unavailable
+     * @param key         The key whose resource is required
+     *
+     * @return The internationalized resource or the alternative
+     */
     public static String getIfAvailableElse(String alternative, String key) {
         return isAvailable() ? get(key) : alternative;
     }
 
+    /**
+     * Checks if the resource bundle is available
+     *
+     * @return True if the resource bundle is available, false otherwise
+     */
     public static boolean isAvailable() {
         return (resourceBundle != null);
     }

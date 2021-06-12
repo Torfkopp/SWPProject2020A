@@ -35,7 +35,7 @@ public enum DevelopmentCardType implements Serializable {
 
     @Override
     public String toString() {
-        return ResourceManager.get(getAttributeName());
+        return ResourceManager.getIfAvailableElse(this.name(), getAttributeName());
     }
 
     /**
