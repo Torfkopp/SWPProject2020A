@@ -269,7 +269,7 @@ public interface ILobby extends Serializable {
     /**
      * Replace a User who left a Lobby in Game with an AI
      *
-     * @param userToReplace     The User who left a lobby in Game and gets replace with an AI
+     * @param userToReplace     The User who left a lobby in Game and gets replaced with an AI
      * @param userToReplaceWith The AI who replace a User who left the Lobby
      * @param oldColour         The colour of the User who left the Lobby
      *

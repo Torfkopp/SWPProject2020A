@@ -132,7 +132,7 @@ public class InventoryMap implements Serializable {
      * Replace a User who left a Lobby in Game with an AI
      *
      * @param userToBeReplaced  The user who left the lobby and should be replaced
-     * @param userToReplaceWith The AI that replace the user who left the lobby
+     * @param userToReplaceWith The AI that replaces the user who left the lobby
      *
      * @author Eric Vuong
      * @since 2021-06-10

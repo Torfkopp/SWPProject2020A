@@ -245,6 +245,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
         membersView.getScene().getAccelerators().putAll(accelerators);
 
         this.window.setOnCloseRequest(windowEvent -> closeWindow(false));
+        this.window.setOnCloseRequest(WindowEvent -> lobbyService.replaceUserWithAI(lobbyName, userColoursMap.get(userService.getLoggedInUser())));
         lobbyService.retrieveAllLobbyMembers(lobbyName);
         lobbyService.setColour(lobbyName, null);
 
