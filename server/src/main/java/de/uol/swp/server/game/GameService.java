@@ -1301,7 +1301,7 @@ public class GameService extends AbstractService {
      * Handles a ReplaceUserWithAIRequest found on the EventBus
      * <p>
      * If a ReplaceUserWithAIRequest is detected on the EventBus, this method is called.
-     * It then request the GameManagement to handle the Replace of an User who left a Lobby in Game with an AI.
+     * It then requests the GameManagement to handle the replacement of an User who left a Lobby in Game with an AI.
      * The Colour of the Player who left, remains as the Colour of the AI who replaced the User.
      * The AI takes over the game from the moment the user leaves the game.
      *

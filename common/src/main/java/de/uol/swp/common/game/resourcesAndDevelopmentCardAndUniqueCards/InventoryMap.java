@@ -137,7 +137,7 @@ public class InventoryMap implements Serializable {
      * @author Eric Vuong
      * @since 2021-06-10
      */
-    public void replace(UserOrDummy userToBeReplaced, UserOrDummy userToReplaceWith) {
+    public void replace(UserOrDummy userToBeReplaced, UserOrDummy userToReplaceWith) throws IllegalArgumentException {
         for (int i = 0; i < map.size(); i++) {
             UserPlayerInventoryMapping entry = map.get(i);
             if (Objects.equals(entry.getUser(), userToBeReplaced)) {

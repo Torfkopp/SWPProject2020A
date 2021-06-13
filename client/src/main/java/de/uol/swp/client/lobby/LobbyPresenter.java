@@ -154,6 +154,7 @@ public class LobbyPresenter extends AbstractPresenterWithChatWithGameWithPreGame
      */
     @FXML
     private void onLeaveLobbyButtonPressed() {
+        soundService.button();
         //Create new alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resourceBundle.getString("lobby.leave.confirmation.window"));
